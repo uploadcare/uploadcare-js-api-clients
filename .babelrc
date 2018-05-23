@@ -1,0 +1,16 @@
+{
+  "presets": [
+    [
+      "@babel/preset-env",
+      {
+        "modules": false,
+        "targets": {
+          "browsers": ["> 1% in my stats", "not ie <= 11"],
+          "node": "8.0.0"
+        }
+      }
+    ],
+    "@babel/preset-flow"
+  ],
+  "plugins": []
+}
