@@ -1,5 +1,6 @@
 import license from 'rollup-plugin-license'
 import babel from 'rollup-plugin-babel'
+import rootImport from 'rollup-plugin-root-import'
 
 export default {
   input: 'src/index.js',
@@ -12,6 +13,7 @@ export default {
         Date: <%= moment().format('YYYY-MM-DD') %>
       `,
     }),
+    rootImport({}),
     babel(),
   ],
   output: [
