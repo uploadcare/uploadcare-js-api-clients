@@ -62,6 +62,7 @@
     "rollup-plugin-license": "^0.6.0",
     "rollup-plugin-node-builtins": "^2.1.2",
     "rollup-plugin-node-globals": "^1.2.1",
-    "rollup-plugin-node-resolve-magic": "^0.2.9"
+    "rollup-plugin-node-resolve-magic": "^0.2.9",
+    "rollup-plugin-root-import": "^0.2.2"
   }
 }
