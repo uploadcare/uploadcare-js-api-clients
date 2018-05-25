@@ -1,4 +1,4 @@
-import {request} from './index'
+import request from './request'
 import * as factory from '/test/fileFactory'
 
 describe('request', () => {
