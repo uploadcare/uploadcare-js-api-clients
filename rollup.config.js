@@ -2,7 +2,7 @@ import license from 'rollup-plugin-license'
 import babel from 'rollup-plugin-babel'
 
 export default {
-  input: 'src/uploadcareAPI.js',
+  input: 'src/index.js',
   plugins: [
     license({
       banner: `
