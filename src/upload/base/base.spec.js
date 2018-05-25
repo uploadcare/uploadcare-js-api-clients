@@ -17,7 +17,6 @@ describe('request', () => {
     const ucRequest = base(file, {
       UPLOADCARE_PUB_KEY: 'demopublickey',
       UPLOADCARE_STORE: 0,
-      jsonerrors: 1,
     })
 
     const {code, response} = await ucRequest.response

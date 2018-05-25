@@ -18,7 +18,6 @@ describe('info', () => {
     const ucRequest = info(uuid, {
       pub_key: publicKey,
       file_id: uuid,
-      jsonerrors: 1,
     })
 
     const {code, response} = await ucRequest.response

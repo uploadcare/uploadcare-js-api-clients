@@ -18,6 +18,14 @@ export function image(id) {
   return dataURItoBlob(images[id])
 }
 
+export function file(mbSize) {
+  const byteLength = mbSize * 1000000
+  const buffer = new ArrayBuffer(byteLength)
+  const blob = new Blob([buffer])
+
+  return blob
+}
+
 export function uuid(id) {
   const {uuid} = uuids[id]
 
