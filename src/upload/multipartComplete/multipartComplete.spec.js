@@ -1,7 +1,7 @@
 import {multipartComplete} from './multipartComplete'
-import {multipartStart} from './multipartStart'
-import {multipartUpload} from './multipartUpload'
-import * as factory from '/test/fileFactory'
+import {multipartStart} from '../multipartStart'
+import {multipartUpload} from '../multipartUpload'
+import * as factory from '../../../test/fileFactory'
 
 describe('multipartComplete', () => {
   it('should return UCRequest', () => {

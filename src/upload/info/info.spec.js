@@ -1,5 +1,5 @@
-import info from './info'
-import * as factory from '/test/fileFactory'
+import {info} from './info'
+import * as factory from '../../../test/fileFactory'
 
 describe('info', () => {
   it('should return UCRequest', () => {
