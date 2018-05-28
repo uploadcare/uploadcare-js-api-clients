@@ -1,5 +1,6 @@
 const babel = require('rollup-plugin-babel')
 const browserStackConf = require('./browserstack.json')
+const resolve = require('rollup-plugin-node-resolve')
 
 process.env.CHROME_BIN = require('puppeteer').executablePath()
 
@@ -10,7 +11,7 @@ module.exports = function(config) {
       accessKey: browserStackConf.accessKey,
     },
     browsers: ['ChromeHeadless'],
-    frameworks: ['jest-matchers', 'jasmine'],
+    frameworks: ['@babel/polyfill', 'jest-matchers', 'jasmine'],
 
     files: [
       {
@@ -20,6 +21,7 @@ module.exports = function(config) {
     ],
 
     plugins: [
+      require('./scripts/karma-babel-polyfill'),
       'karma-browserstack-launcher',
       'karma-chrome-launcher',
       'karma-jasmine',
@@ -29,7 +31,7 @@ module.exports = function(config) {
 
     preprocessors: {'src/**/*.spec.js': ['rollup']},
     rollupPreprocessor: {
-      plugins: [babel()],
+      plugins: [resolve(), babel()],
       output: {
         format: 'iife',
         name: 'uploadcare',
