@@ -32,9 +32,9 @@ uploadApi.base(options)
 uploadApi.request('POST', 'base', {
   file: 'Blob/Stream/etc'
 })
-.then(({code, response}) => {
-  console.log({status: 'error', error: ''});
-  console.log({status: 'success', file: ''});
+.then(({code, data}) => {
+  // http code
+  // response data
 })
 .catch((error) => ())
 ```
@@ -114,4 +114,20 @@ const request2 = upload.fromUrlStatus(token)
 const ({code: data: {uuid}}) = await request2.response
 ```
 
+# low-level request
 
+```javascript
+api.request(method, path, params)
+```
+
+# high level api
+
+```javascript
+api.file('file' || 'blob' || 'buffer' || 'url', file, options) // single
+
+api.group('file', [files], options) // group
+
+api.fileInfo(uuid, options)
+api.groupInfo(groupId, options)
+api.status(token, options)
+```
