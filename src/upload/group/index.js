@@ -12,6 +12,6 @@ export type Options = {
  * @param {Object} options Set of options.
  * @returns {Promise}
  */
-const group = (files: Array<UUID> | Array<CDNUrl>, options: Options) => (new Promise())
+const group = (files: Array<UUID | CDNUrl>, options: Options) => (new Promise())
 
 export default group

@@ -1,9 +1,11 @@
 import fromUrlStatus from './index'
 
 describe('fromUrlStatus', () => {
-  it('should return success response', async() => {
+  it('should return UCRequest', () => {
     const token = ''
+    const ucRequest = fromUrlStatus(token)
 
-    return await expect(fromUrlStatus(token)).resolves.toEqual(true)
+    expect(ucRequest).toBeTruthy()
+    expect(ucRequest.promise).toBeInstanceOf(Promise)
   })
 })

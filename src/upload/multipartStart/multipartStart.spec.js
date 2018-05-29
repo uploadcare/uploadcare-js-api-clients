@@ -5,7 +5,7 @@ describe('multipartStart', () => {
     const ucRequest = multipartStart({})
 
     expect(ucRequest).toBeTruthy()
-    expect(ucRequest.response).toBeInstanceOf(Promise)
+    expect(ucRequest.promise).toBeInstanceOf(Promise)
     expect(ucRequest.cancel).toBeInstanceOf(Function)
     expect(ucRequest.progress).toBeInstanceOf(Function)
   })

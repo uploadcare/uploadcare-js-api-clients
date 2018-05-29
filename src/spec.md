@@ -85,13 +85,13 @@ const request = uploadApi.request('POST', 'base', {
 })
 
 request
-.response
+.promise
   .then()
   .catch()
 .progress(() =>)
 .cancel()
 
-await request.response
+await request.promise
 
 request.cancel()
 ```
@@ -107,11 +107,11 @@ const request = upload.fromUrl(url, options)
 
 const request = upload.base(file, options)
 
-const ({code, data: {token}}) = await request.response
+const ({code, data: {token}}) = await request.promise
 
 const request2 = upload.fromUrlStatus(token)
 
-const ({code: data: {uuid}}) = await request2.response
+const ({code: data: {uuid}}) = await request2.promise
 ```
 
 # low-level request

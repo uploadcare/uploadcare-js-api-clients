@@ -6,7 +6,7 @@ describe('info', () => {
     const ucRequest = info({})
 
     expect(ucRequest).toBeTruthy()
-    expect(ucRequest.response).toBeInstanceOf(Promise)
+    expect(ucRequest.promise).toBeInstanceOf(Promise)
     expect(ucRequest.cancel).toBeInstanceOf(Function)
     expect(ucRequest.progress).toBeInstanceOf(Function)
   })
@@ -20,7 +20,7 @@ describe('info', () => {
       file_id: uuid,
     })
 
-    const {code, response} = await ucRequest.response
+    const {code, response} = await ucRequest.promise
 
     expect.assertions(4)
 

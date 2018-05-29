@@ -6,7 +6,7 @@ describe('request', () => {
     const ucRequest = base({})
 
     expect(ucRequest).toBeTruthy()
-    expect(ucRequest.response).toBeInstanceOf(Promise)
+    expect(ucRequest.promise).toBeInstanceOf(Promise)
     expect(ucRequest.cancel).toBeInstanceOf(Function)
     expect(ucRequest.progress).toBeInstanceOf(Function)
   })
@@ -19,7 +19,7 @@ describe('request', () => {
       UPLOADCARE_STORE: 0,
     })
 
-    const {code, response} = await ucRequest.response
+    const {code, response} = await ucRequest.promise
 
     expect.assertions(3)
 

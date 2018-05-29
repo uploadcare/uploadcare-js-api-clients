@@ -1,9 +1,11 @@
 import group from './index'
 
 describe('group', () => {
-  it('should return success response', async() => {
+  it('should return UCRequest', () => {
     const files = []
+    const ucRequest = group(files)
 
-    return await expect(group(files)).resolves.toEqual(true)
+    expect(ucRequest).toBeTruthy()
+    expect(ucRequest.promise).toBeInstanceOf(Promise)
   })
 })

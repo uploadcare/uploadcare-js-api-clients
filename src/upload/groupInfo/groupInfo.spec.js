@@ -1,9 +1,11 @@
 import groupInfo from './index'
 
 describe('groupInfo', () => {
-  it('should return success response', async() => {
+  it('should return UCRequest', () => {
     const groupId = ''
+    const ucRequest = groupInfo(groupId)
 
-    return await expect(groupInfo(groupId)).resolves.toEqual(true)
+    expect(ucRequest).toBeTruthy()
+    expect(ucRequest.promise).toBeInstanceOf(Promise)
   })
 })

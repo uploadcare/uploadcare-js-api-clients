@@ -1,10 +1,12 @@
 import fromUrl from './index'
 
 describe('fromUrl', () => {
-  it('should return success response', async() => {
+  it('should return UCRequest', () => {
     const source = ''
     const options = {}
+    const ucRequest = fromUrl(source, options)
 
-    return await expect(fromUrl(source, options)).resolves.toEqual(true)
+    expect(ucRequest).toBeTruthy()
+    expect(ucRequest.promise).toBeInstanceOf(Promise)
   })
 })
