@@ -1,15 +1,15 @@
 const babel = require('rollup-plugin-babel')
-const browserStackConf = require('./browserstack.json')
+// const browserStackConf = require('./browserstack.json')
 const resolve = require('rollup-plugin-node-resolve')
 
 process.env.CHROME_BIN = require('puppeteer').executablePath()
 
 module.exports = function(config) {
   config.set({
-    browserStack: {
-      username: browserStackConf.username,
-      accessKey: browserStackConf.accessKey,
-    },
+    // browserStack: {
+    //   username: browserStackConf.username,
+    //   accessKey: browserStackConf.accessKey,
+    // },
     browsers: ['ChromeHeadless'],
     frameworks: ['@babel/polyfill', 'jest-matchers', 'jasmine'],
 
