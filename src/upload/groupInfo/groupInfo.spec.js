@@ -16,11 +16,25 @@ describe('groupInfo', () => {
 
     const {code, response} = await ucRequest.promise
 
-    expect.assertions(4)
+    expect.assertions(5)
 
     expect(code).toBe(200)
     expect(response).toBeTruthy()
     expect(response.id).toBeTruthy()
     expect(response.files).toBeTruthy()
+    expect(response.files).toBeInstanceOf(Array)
+  })
+  it('should fail with [HTTP 404] group_id is invalid.', async() => {
+    const groupId = ''
+    const options = {publicKey: ''}
+    const ucRequest = groupInfo(groupId, options)
+
+    const {code, response} = await ucRequest.promise
+
+    expect.assertions(3)
+
+    expect(code).toBe(404)
+    expect(response).toBeTruthy()
+    expect(response.error).toBe('group_id is invalid')
   })
 })
