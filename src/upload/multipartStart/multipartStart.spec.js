@@ -1,4 +1,5 @@
 import {multipartStart} from './multipartStart'
+import * as factory from '../../../test/fileFactory'
 
 describe('multipartStart', () => {
   it('should return UCRequest', () => {
@@ -11,7 +12,9 @@ describe('multipartStart', () => {
   })
 
   it('should get uuid and parts', async() => {
-    const {code, data} = await multipartStart().response
+    const publicKey = factory.publicKey('demo')
+
+    const {code, data} = await multipartStart({publicKey}).promise
 
     expect(code).toBe(200)
     expect(data).toBeTruthy()

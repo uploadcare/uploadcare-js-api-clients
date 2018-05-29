@@ -36,7 +36,7 @@ describe('UCRequest', () => {
   })
 
   it('should have response promise', () => {
-    const promise = request.response
+    const promise = request.promise
 
     expect(promise).toBeInstanceOf(Promise)
   })

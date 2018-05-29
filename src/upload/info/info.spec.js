@@ -15,10 +15,7 @@ describe('info', () => {
     const uuid = factory.uuid('image')
     const publicKey = factory.publicKey('image')
 
-    const ucRequest = info(uuid, {
-      pub_key: publicKey,
-      file_id: uuid,
-    })
+    const ucRequest = info(uuid, {publicKey: publicKey})
 
     const {code, response} = await ucRequest.promise
 

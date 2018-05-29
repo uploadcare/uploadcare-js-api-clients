@@ -15,8 +15,8 @@ describe('request', () => {
     const file = factory.image('blackSquare')
 
     const ucRequest = base(file, {
-      UPLOADCARE_PUB_KEY: 'demopublickey',
-      UPLOADCARE_STORE: 0,
+      publicKey: factory.publicKey('demo'),
+      store: false,
     })
 
     const {code, response} = await ucRequest.promise

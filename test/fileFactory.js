@@ -12,6 +12,7 @@ const uuids = {
     publicKey: '',
     uuid: '8e92b914-93a6-490d-84ae-b8a7077aa957',
   },
+  demo: {publicKey: 'demopublickey'},
 }
 
 export function image(id) {
