@@ -61,20 +61,22 @@ uploadApi.request('POST', 'base', {
 # async/await
 
 ```javascript
-const promise = uploadApi.request('POST', 'base', {
+const ucRequest = uploadApi.request('POST', 'base', {
   file: 'Blob/Stream/etc'
 })
 
-result.progress(progress => {
+ucRequest.progress(progress => {
   // catch progress
 })
 
 try {
-  const result = await promise
+  const {code, data} = await ucRequest.promise
 }
 catch(e) {
   console.log(e);
 }
+
+ucRequest.cancel()
 ```
 
 # cancel
@@ -88,12 +90,8 @@ request
 .promise
   .then()
   .catch()
-.progress(() =>)
+.progress(() => {})
 .cancel()
-
-await request.promise
-
-request.cancel()
 ```
 
 #
