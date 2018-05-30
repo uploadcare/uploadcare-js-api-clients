@@ -1,6 +1,8 @@
 const babel = require('rollup-plugin-babel')
 // const browserStackConf = require('./browserstack.json')
 const resolve = require('rollup-plugin-node-resolve')
+const commonjs = require('rollup-plugin-commonjs')
+const replace = require('rollup-plugin-replace')
 
 process.env.CHROME_BIN = require('puppeteer').executablePath()
 
@@ -31,7 +33,12 @@ module.exports = function(config) {
 
     preprocessors: {'src/**/*.spec.js': ['rollup']},
     rollupPreprocessor: {
-      plugins: [resolve(), babel()],
+      plugins: [
+        replace({'process.env.NODE_ENV': process.env.NODE_ENV}),
+        resolve({browser: true}),
+        commonjs({include: 'node_modules/**'}),
+        babel(),
+      ],
       output: {
         format: 'iife',
         name: 'uploadcare',

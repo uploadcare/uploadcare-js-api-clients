@@ -9,10 +9,11 @@ const images = {
 
 const uuids = {
   image: {
-    publicKey: '',
-    uuid: '8e92b914-93a6-490d-84ae-b8a7077aa957',
+    publicKey: '8fa271321efd536ee1aa',
+    uuid: '89827330-e200-41bc-9fba-7d51c8e9ea15',
   },
   demo: {publicKey: 'demopublickey'},
+  invalid: {publicKey: 'invalidpublickey'},
 }
 
 export function image(id) {

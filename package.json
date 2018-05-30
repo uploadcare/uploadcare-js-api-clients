@@ -11,9 +11,9 @@
     "test": "npm run test:node && npm run test:browser",
     "test:node": "jest --no-cache src/",
     "test:node:debug": "node --inspect-brk ./node_modules/jest/bin/jest.js --runInBand --watchAll src/",
-    "test:browser": "npm run test:browser:prepare && karma start karma.config.js --single-run",
+    "test:browser": "npm run test:browser:prepare && karma start karma.config.js --single-run --nocache",
     "test:browser:prepare": "node scripts/build-jest-matchers.js",
-    "test:browser:debug": "npm run test:browser:prepare && karma start karma.config.js --browsers=Chrome --single-run=false --watch --debug"
+    "test:browser:debug": "npm run test:browser:prepare && karma start karma.config.js --browsers=Chrome --single-run=false --watch --debug  --nocache"
   },
   "repository": {
     "type": "git",
@@ -40,7 +40,7 @@
     "eslint": "^4.19.1",
     "eslint-config-uploadcare": "^1.1.0",
     "eslint-plugin-flowtype": "^2.47.1",
-    "flow-bin": "^0.72.0",
+    "flow-bin": "^0.73.0",
     "husky": "^0.14.3",
     "jasmine": "^2.99.0",
     "jasmine-core": "^2.99.1",
@@ -63,6 +63,14 @@
     "rollup-plugin-node-builtins": "^2.1.2",
     "rollup-plugin-node-globals": "^1.2.1",
     "rollup-plugin-node-resolve": "^3.3.0",
-    "rollup-plugin-node-resolve-magic": "^0.2.9"
+    "rollup-plugin-node-resolve-magic": "^0.2.9",
+    "rollup-plugin-replace": "^2.0.0"
+  },
+  "dependencies": {
+    "query-string": "^6.1.0",
+    "axios": "^0.18.0"
+  },
+  "peerDependencies": {
+    "«": "^0.18.0"
   }
 }
