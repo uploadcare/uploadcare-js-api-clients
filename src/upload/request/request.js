@@ -6,7 +6,6 @@ import FormData from 'form-data'
 import type {
   Body,
   Query,
-  Headers,
   Options,
   UCRequest,
   UCResponse,
@@ -36,50 +35,28 @@ export function request(
     url,
     method,
     cancelToken: source.token,
-    headers: constructHeaders(method, options),
+    headers: options.headers || {},
     data: options.body && buildFormData(options.body),
     onUploadProgress: createProgressHandler(() => progressListener),
   }
 
   const promise = axios(axiosOptions).then(normalizeResponse)
 
-  const cancel = () => {
-    source.cancel('cancelled')
-  }
-  const progress = (callback: ProgressListener) => {
-    progressListener = callback
-  }
+  const ucRequest = {}
 
-  return {
+  Object.assign(ucRequest, {
     promise,
-    progress,
-    cancel,
-  }
-}
+    cancel: function(): void {
+      source.cancel('cancelled')
+    },
+    progress: function(callback: ProgressListener): UCRequest {
+      progressListener = callback
 
-/**
- * Construct headers to send with request
- *
- * @param {Options} options
- * @returns {Headers}
- */
-function constructHeaders(method: string, options: Options): Headers {
-  const baseHeaders = {}
-  const passedHeaders = options.headers
+      return this
+    }.bind(ucRequest),
+  })
 
-  let headers = {
-    ...baseHeaders,
-    ...passedHeaders,
-  }
-
-  if (['POST', 'PUT'].includes(method.toUpperCase())) {
-    headers = {
-      ...headers,
-      'content-type': 'multipart/form-data',
-    }
-  }
-
-  return headers
+  return ucRequest
 }
 
 /**

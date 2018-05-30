@@ -5,7 +5,7 @@ export type Query = {
 }
 
 export type Body = {
-  [key: string]: string | {} | ArrayBuffer | Buffer | FormData | File | Blob,
+  [key: string]: string | Blob | File | Buffer,
 }
 
 export type Headers = {
@@ -30,7 +30,7 @@ export type UCResponse = {
 export interface UCRequest {
   promise: Promise<UCResponse>,
   cancel(): void,
-  progress(callback: ProgressListener): void,
+  progress(callback: ProgressListener): UCRequest,
 }
 
 export interface ServerResponse {

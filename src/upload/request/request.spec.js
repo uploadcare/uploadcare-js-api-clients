@@ -9,8 +9,10 @@ fdescribe('request', () => {
 
     expect(ucRequest).toBeTruthy()
     expect(ucRequest.promise).toBeInstanceOf(Promise)
-    expect(ucRequest.cancel).toBeInstanceOf(Function)
     expect(ucRequest.progress).toBeInstanceOf(Function)
+    expect(ucRequest.cancel).toBeInstanceOf(Function)
+
+    expect(ucRequest.progress()).toBe(ucRequest)
   })
 
   it('should be resolved with 200 code when all input is valid', async() => {
