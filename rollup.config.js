@@ -7,6 +7,10 @@ import replace from 'rollup-plugin-replace'
 export default {
   input: 'src/index.js',
   plugins: [
+    replace({'process.env.NODE_ENV': process.env.NODE_ENV}),
+    resolve({browser: true}),
+    commonjs({include: 'node_modules/**'}),
+    babel(),
     license({
       banner: `
         <%= pkg.name %> <%= pkg.version %>
@@ -15,10 +19,6 @@ export default {
         Date: <%= moment().format('YYYY-MM-DD') %>
       `,
     }),
-    replace({'process.env.NODE_ENV': process.env.NODE_ENV}),
-    resolve(),
-    commonjs({include: 'node_modules/**'}),
-    babel(),
   ],
   output: [
     {
