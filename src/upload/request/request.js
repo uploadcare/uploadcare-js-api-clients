@@ -1,15 +1,14 @@
 /* @flow */
 import axios from 'axios'
 import qs from 'query-string'
-import type {AxiosXHR, CancelTokenSource} from 'axios'
 
 import type {
-  Method,
   Query,
   Options,
   UCRequest,
   UCResponse,
   ProgressListener,
+  ServerResponse,
 } from './flow-typed'
 
 /**
@@ -22,12 +21,12 @@ import type {
  * @returns {UCRequest}
  */
 export function request(
-  method: Method,
+  method: string,
   path: string,
   options: Options,
 ): UCRequest {
   const url = buildUrl(method, path, options.query)
-  const source: CancelTokenSource = axios.CancelToken.source()
+  const source = axios.CancelToken.source()
   let progressListener: ProgressListener | typeof undefined
 
   const axiosOptions = {
@@ -84,7 +83,7 @@ function createProgressHandler(
  * @param {Object} query - object with query parameters
  * @returns {string} url - resulting URL
  */
-function buildUrl(method: Method, path: string, query: Query): string {
+function buildUrl(method: string, path: string, query: Query): string {
   const base = 'https://upload.uploadcare.com/'
   const url = base + path + '/?jsonerrors=1&' + qs.stringify(query)
 
@@ -97,8 +96,8 @@ function buildUrl(method: Method, path: string, query: Query): string {
  * @param {AxiosXHR} response - Axios response
  * @returns {UCResponse} UCResponse
  */
-function normalizeResponse(response: AxiosXHR): UCResponse {
-  const {status, data} = response
+function normalizeResponse(response): UCResponse {
+  const {status, data}: {status: number, data: ServerResponse} = response
 
   if (data.error) {
     return {
