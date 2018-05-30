@@ -60,10 +60,12 @@ export function request(
 }
 
 /**
+ * Constructs FormData instance from object
+ * Uses 'form-data' package which internally use native FormData
+ * in browsers and the polyfill in node env
  *
- *
- * @param {mixed} body
- * @returns {FormData}
+ * @param {Body} body
+ * @returns {FormData} FormData instance
  */
 function buildFormData(body: Body): FormData {
   const formData = new FormData()
