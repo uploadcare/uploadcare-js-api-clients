@@ -1,11 +1,13 @@
+/* eslint-disable max-statements */
+
 import {multipartComplete} from './multipartComplete'
 import {multipartStart} from '../multipartStart'
 import {multipartUpload} from '../multipartUpload'
 import * as factory from '../../../test/fileFactory'
 
-describe('multipartComplete', () => {
+fdescribe('multipartComplete', () => {
   it('should return UCRequest', () => {
-    const ucRequest = multipartComplete({})
+    const ucRequest = multipartComplete(factory.uuid('image'), {})
 
     expect(ucRequest).toBeTruthy()
     expect(ucRequest.promise).toBeInstanceOf(Promise)
@@ -14,23 +16,33 @@ describe('multipartComplete', () => {
   })
 
   it('should upload some file via multipart', async() => {
-    const file = factory.file(6)
+    const file = factory.file(16)
+    const filename = 'test'
     const publicKey = factory.publicKey('demo')
 
     // start multipart uploading: get uuid and url parts
-    const {data: {uuid, parts}} = await multipartStart({publicKey}).promise
+    const {data: {uuid, parts}} = await multipartStart({
+      filename,
+      publicKey,
+      size: file.size,
+    }).promise
 
     // upload files as single part to the first url
-    const {code: uploadCode} = await multipartUpload(parts[0], file)
+    const {code: uploadCode} = await multipartUpload(
+      parts[0],
+      file,
+    ).promise
 
-    expect.assertions(3)
-
-    await expect(uploadCode).toBe(200)
+    expect(uploadCode).toBe(200)
 
     // complete multipart: get uploaded file info
     const {code, data} = await multipartComplete(uuid, {publicKey}).promise
 
-    await expect(code).toBe(200)
-    await expect(data.uuid).toBe(uuid)
+    expect(code).toBe(200)
+    expect(data.uuid).toBe(uuid)
+    expect(data.total).toBe(file.size)
+    expect(data.size).toBe(file.size)
+    expect(data.done).toBe(file.size)
+    expect(data.filename).toBe(filename)
   })
 })

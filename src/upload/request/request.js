@@ -29,7 +29,10 @@ export function request(
 ): UCRequest {
   const url = buildUrl(method, path, options.query)
   const source = axios.CancelToken.source()
-  let progressListener: ProgressListener | typeof undefined
+
+  let onProgress: ProgressListener | typeof undefined
+  const getOnProgress = () => onProgress
+  const removeOnProgress = () => (onProgress = undefined)
 
   const axiosOptions = {
     url,
@@ -37,10 +40,13 @@ export function request(
     cancelToken: source.token,
     headers: options.headers || {},
     data: options.body && buildFormData(options.body),
-    onUploadProgress: createProgressHandler(() => progressListener),
+    onUploadProgress: createProgressHandler(getOnProgress),
   }
 
-  const promise = axios(axiosOptions).then(normalizeResponse)
+  const promise = axios(axiosOptions)
+    .then(normalizeResponse)
+    .then(cleanOnResolve(removeOnProgress))
+    .catch(cleanOnReject(removeOnProgress))
 
   const ucRequest = {}
 
@@ -50,7 +56,7 @@ export function request(
       source.cancel('cancelled')
     },
     progress: function(callback: ProgressListener): UCRequest {
-      progressListener = callback
+      onProgress = callback
 
       return this
     }.bind(ucRequest),
@@ -71,9 +77,18 @@ function buildFormData(body: Body): FormData {
   const formData = new FormData()
 
   for (const key of Object.keys(body)) {
-    const value = body[key]
+    let value = body[key]
 
-    formData.append(key, value)
+    if (typeof value !== 'undefined') {
+      if (typeof value === 'boolean') {
+        value = value ? '1' : '0'
+      }
+      else if (typeof value === 'number') {
+        value = value.toString(10)
+      }
+
+      formData.append(key, value)
+    }
   }
 
   return formData
@@ -83,18 +98,18 @@ function buildFormData(body: Body): FormData {
  * Create handler for axios onUploadProgress event
  * It calls user defined progress listener inside
  *
- * @param {() => ProgressListener} getProgressListener - function to get progress listener
+ * @param {() => ProgressListener} getOnProgress - function to get progress listener
  * @returns {(event: ProgressEvent) => void} onUploadProgress handler
  */
 function createProgressHandler(
-  getProgressListener: () => ProgressListener | typeof undefined,
+  getOnProgress: () => ProgressListener | typeof undefined,
 ): (event: ProgressEvent) => void {
   return (event: ProgressEvent) => {
     const {total, loaded} = event
-    const progressListener = getProgressListener()
+    const onProgress = getOnProgress()
 
-    progressListener &&
-      progressListener({
+    onProgress &&
+      onProgress({
         total,
         loaded,
       })
@@ -135,5 +150,35 @@ function normalizeResponse(response): UCResponse {
   return {
     code: status,
     data,
+  }
+}
+
+/**
+ * Run clean callback on promise resolve
+ *
+ * @template T argument type
+ * @param {() => void} clean callback
+ * @returns {(arg: T) => T} function to pass to then
+ */
+function cleanOnResolve<T>(clean: () => void): (arg: T) => T {
+  return arg => {
+    clean()
+
+    return arg
+  }
+}
+
+/**
+ * Run clean callback on promise reject
+ *
+ * @template T argument type
+ * @param {() => void} clean callback
+ * @returns {(arg: T) => Promise<T>} function to pass to then
+ */
+function cleanOnReject<T>(clean: () => void): (arg: T) => Promise<T> {
+  return arg => {
+    clean()
+
+    return Promise.reject(arg)
   }
 }

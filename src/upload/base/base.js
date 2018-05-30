@@ -1,4 +1,4 @@
-// @flow
+/* @flow */
 
 import type {UCRequest} from '../request/flow-typed'
 import {request} from '../request'
@@ -21,7 +21,7 @@ export function base(file: File | Blob, options: Options): UCRequest {
     body: {
       file,
       UPLOADCARE_PUB_KEY: options.publicKey,
-      UPLOADCARE_STORE: options.store,
+      UPLOADCARE_STORE: options.store ? options.store.toString() : undefined,
     },
   })
 }

@@ -1,24 +1,21 @@
 /* @flow */
+import type {Request, ProgressListener, Headers, FileData} from '../types'
+
+export type {ProgressListener}
 
 export type Query = {
   [key: string]: string,
 }
 
 export type Body = {
-  [key: string]: string | boolean | number | Blob | File | Buffer,
+  [key: string]: string | boolean | number | FileData | typeof undefined,
 }
-
-export type Headers = {
-    [name: string]: string
-  }
 
 export type Options = {
   body?: Body,
   query?: Query,
-  headers?: Headers
+  headers?: Headers,
 }
-
-export type ProgressListener = ({total: number, loaded: number}) => void
 
 export type UCResponse = {
   code: number,
@@ -27,11 +24,7 @@ export type UCResponse = {
   },
 }
 
-export interface UCRequest {
-  promise: Promise<UCResponse>,
-  cancel(): void,
-  progress(callback: ProgressListener): UCRequest,
-}
+export type UCRequest = Request<UCResponse>
 
 export interface ServerResponse {
   [key: string]: mixed;

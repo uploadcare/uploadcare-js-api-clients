@@ -1,3 +1,3 @@
-// @flow
+/* @flow */
 
 export {base} from './base'
