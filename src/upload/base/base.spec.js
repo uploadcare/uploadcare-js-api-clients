@@ -1,9 +1,9 @@
 import {base} from './base'
 import * as factory from '../../../test/fileFactory'
 
-describe('request', () => {
+fdescribe('base', () => {
   it('should return UCRequest', () => {
-    const ucRequest = base({})
+    const ucRequest = base('file', {})
 
     expect(ucRequest).toBeTruthy()
     expect(ucRequest.promise).toBeInstanceOf(Promise)
@@ -19,12 +19,12 @@ describe('request', () => {
       store: false,
     })
 
-    const {code, response} = await ucRequest.promise
+    const {code, data} = await ucRequest.promise
 
     expect.assertions(3)
 
     expect(code).toBe(200)
-    expect(response).toBeTruthy()
-    expect(response.file).toBeTruthy()
+    expect(data).toBeTruthy()
+    expect(data.file).toBeTruthy()
   })
 })

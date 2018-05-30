@@ -5,7 +5,7 @@ export type Query = {
 }
 
 export type Body = {
-  [key: string]: string | Blob | File | Buffer,
+  [key: string]: string | boolean | number | Blob | File | Buffer,
 }
 
 export type Headers = {

@@ -1,6 +1,5 @@
 import {request} from './request'
 import * as factory from '../../../test/fileFactory'
-import * as helpers from '../../../test/helpers'
 import axios from 'axios'
 
 fdescribe('request', () => {
