@@ -1,5 +1,6 @@
 import {request} from './request'
 import * as factory from '../../../test/fileFactory'
+import * as helpers from '../../../test/helpers'
 import axios from 'axios'
 
 fdescribe('request', () => {
@@ -123,6 +124,10 @@ fdescribe('request', () => {
 
     expect(code).toBe(200)
     expect(data.file).toBeTruthy()
+
+    // ucarecdn sometimes returns 404
+    // if we trying to request uploaded file immediately
+    await helpers.wait(500)
 
     const link = factory.linkTo(data.file)
     const loaded = await axios.get(link)
