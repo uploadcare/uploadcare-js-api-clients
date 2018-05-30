@@ -55,7 +55,7 @@ export function request(
 
 /**
  * Create handler for axios onUploadProgress event
- * It is called user defined progress listener inside
+ * It calls user defined progress listener inside
  *
  * @param {() => ProgressListener} getProgressListener - function to get progress listener
  * @returns {(event: ProgressEvent) => void} onUploadProgress handler
