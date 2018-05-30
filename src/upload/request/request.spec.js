@@ -109,7 +109,7 @@ fdescribe('request', () => {
   })
 
   it('should be able to upload data', async() => {
-    expect.assertions(3)
+    expect.assertions(2)
 
     const file = factory.image('blackSquare')
 
@@ -124,14 +124,5 @@ fdescribe('request', () => {
 
     expect(code).toBe(200)
     expect(data.file).toBeTruthy()
-
-    // ucarecdn sometimes returns 404
-    // if we trying to request uploaded file immediately
-    await helpers.wait(500)
-
-    const link = factory.linkTo(data.file)
-    const loaded = await axios.get(link)
-
-    expect(loaded.status).toBe(200)
   })
 })

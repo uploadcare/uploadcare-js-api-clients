@@ -6,6 +6,7 @@ import FormData from 'form-data'
 import type {
   Body,
   Query,
+  Headers,
   Options,
   UCRequest,
   UCResponse,
@@ -25,21 +26,18 @@ import type {
 export function request(
   method: string,
   path: string,
-  options: Options,
+  options: Options = {},
 ): UCRequest {
   const url = buildUrl(method, path, options.query)
   const source = axios.CancelToken.source()
   let progressListener: ProgressListener | typeof undefined
 
-  const formData = options.body && buildFormData(options.body)
-  const headers = formData ? {'content-type': 'multipart/form-data'} : {}
-
   const axiosOptions = {
     url,
     method,
-    headers,
-    data: formData,
     cancelToken: source.token,
+    headers: constructHeaders(method, options),
+    data: options.body && buildFormData(options.body),
     onUploadProgress: createProgressHandler(() => progressListener),
   }
 
@@ -57,6 +55,31 @@ export function request(
     progress,
     cancel,
   }
+}
+
+/**
+ * Construct headers to send with request
+ *
+ * @param {Options} options
+ * @returns {Headers}
+ */
+function constructHeaders(method: string, options: Options): Headers {
+  const baseHeaders = {}
+  const passedHeaders = options.headers
+
+  let headers = {
+    ...baseHeaders,
+    ...passedHeaders,
+  }
+
+  if (['POST', 'PUT'].includes(method.toUpperCase())) {
+    headers = {
+      ...headers,
+      'content-type': 'multipart/form-data',
+    }
+  }
+
+  return headers
 }
 
 /**
@@ -109,7 +132,7 @@ function createProgressHandler(
  * @param {Object} query - object with query parameters
  * @returns {string} url - resulting URL
  */
-function buildUrl(method: string, path: string, query: Query): string {
+function buildUrl(method: string, path: string, query: Query = {}): string {
   const base = 'https://upload.uploadcare.com/'
   const url = base + path + '/?jsonerrors=1&' + qs.stringify(query)
 

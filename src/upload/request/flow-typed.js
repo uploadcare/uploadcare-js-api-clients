@@ -8,9 +8,14 @@ export type Body = {
   [key: string]: string | {} | ArrayBuffer | Buffer | FormData | File | Blob,
 }
 
+export type Headers = {
+    [name: string]: string
+  }
+
 export type Options = {
-  body: Body,
-  query: Query,
+  body?: Body,
+  query?: Query,
+  headers?: Headers
 }
 
 export type ProgressListener = ({total: number, loaded: number}) => void
