@@ -71,7 +71,9 @@ fdescribe('request', () => {
 
     ucRequest.cancel()
 
-    await expect(ucRequest.promise).rejects.toBe('cancelled')
+    await expect(ucRequest.promise).rejects.toEqual(
+      jasmine.objectContaining({message: 'cancelled'}),
+    )
 
     expect(onResolve).not.toHaveBeenCalled()
     expect(onReject).toHaveBeenCalled()
@@ -84,7 +86,7 @@ fdescribe('request', () => {
 
     const ucRequest = request('POST', 'base', {
       query: {UPLOADCARE_PUB_KEY: factory.publicKey('demo')},
-      data: file,
+      body: file,
     })
 
     const onProgress = jasmine.createSpy('onProgress')
