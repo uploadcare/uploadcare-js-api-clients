@@ -10,4 +10,4 @@ export type Options = {
  * @param {Options} options Set of options.
  * @returns {Promise}
  */
-export const fromUrl = (sourceUrl: string, options: Options) => (new Promise())
+export const fromUrl = (sourceUrl: string, options: Options) => (Promise.resolve())

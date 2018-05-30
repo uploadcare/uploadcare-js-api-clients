@@ -9,4 +9,4 @@ export type Options = {
  * @param {Options} options Set of options.
  * @returns {Promise}
  */
-export const groupInfo = (groupId: string, options: Options) => new Promise()
+export const groupInfo = (groupId: string, options: Options) => Promise.resolve()

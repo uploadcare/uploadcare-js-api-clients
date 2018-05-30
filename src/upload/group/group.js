@@ -12,4 +12,4 @@ export type Options = {
  * @param {Object} options Set of options.
  * @returns {Promise}
  */
-export const group = (files: Array<UUID | CDNUrl>, options: Options) => (new Promise())
+export const group = (files: Array<UUID | CDNUrl>, options: Options) => (Promise.resolve())

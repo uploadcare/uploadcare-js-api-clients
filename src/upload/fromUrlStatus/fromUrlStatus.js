@@ -4,4 +4,4 @@
  * @param {string} token File token to recieve an actual file UUID.
  * @returns {Promise}
  */
-export const fromUrlStatus = (token: string) => new Promise()
+export const fromUrlStatus = (token: string) => Promise.resolve()
