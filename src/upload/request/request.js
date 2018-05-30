@@ -1,8 +1,10 @@
 /* @flow */
 import axios from 'axios'
 import qs from 'query-string'
+import FormData from 'form-data'
 
 import type {
+  Body,
   Query,
   Options,
   UCRequest,
@@ -29,10 +31,14 @@ export function request(
   const source = axios.CancelToken.source()
   let progressListener: ProgressListener | typeof undefined
 
+  const formData = options.body && buildFormData(options.body)
+  const headers = formData ? {'content-type': 'multipart/form-data'} : {}
+
   const axiosOptions = {
     url,
     method,
-    data: options.body,
+    headers,
+    data: formData,
     cancelToken: source.token,
     onUploadProgress: createProgressHandler(() => progressListener),
   }
@@ -51,6 +57,24 @@ export function request(
     progress,
     cancel,
   }
+}
+
+/**
+ *
+ *
+ * @param {mixed} body
+ * @returns {FormData}
+ */
+function buildFormData(body: Body): FormData {
+  const formData = new FormData()
+
+  for (const key of Object.keys(body)) {
+    const value = body[key]
+
+    formData.append(key, value)
+  }
+
+  return formData
 }
 
 /**

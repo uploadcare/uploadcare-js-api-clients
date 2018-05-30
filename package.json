@@ -68,8 +68,9 @@
     "rollup-plugin-replace": "^2.0.0"
   },
   "dependencies": {
-    "query-string": "^6.1.0",
-    "axios": "^0.18.0"
+    "axios": "^0.18.0",
+    "form-data": "^2.3.2",
+    "query-string": "^6.1.0"
   },
   "peerDependencies": {
     "axios": "^0.18.0"

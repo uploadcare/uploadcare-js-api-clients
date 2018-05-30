@@ -25,10 +25,12 @@ fdescribe('request', () => {
     expect.assertions(2)
 
     await expect(code).toBe(200)
-    await expect(data).toBeTruthy()
+    await expect(data).toEqual(
+      jasmine.objectContaining({uuid: factory.uuid('image')}),
+    )
   })
 
-  it('should be resolved if server return error', async() => {
+  it('should be resolved if server returns error', async() => {
     const ucRequest = request('GET', 'info', {})
 
     const {code, data} = await ucRequest.promise
@@ -36,20 +38,21 @@ fdescribe('request', () => {
     expect.assertions(2)
 
     await expect(code).toBe(400)
-    await expect(data.error).toBeTruthy()
+    await expect(data.error).toEqual(
+      jasmine.objectContaining({content: 'file_id is required.'}),
+    )
   })
 
   it('should be rejected on connection error', async() => {
-    const interceptor = axios.interceptors.response.use(
-      () => Promise.reject(),
-      () => Promise.reject(),
+    const interceptor = axios.interceptors.response.use(() =>
+      Promise.reject('error'),
     )
 
     const ucRequest = request('GET', 'info', {})
 
     expect.assertions(1)
 
-    await expect(ucRequest.promise).rejects.toBe()
+    await expect(ucRequest.promise).rejects.toBe('error')
 
     axios.interceptors.response.eject(interceptor)
   })
@@ -85,8 +88,10 @@ fdescribe('request', () => {
     const file = factory.file(0.01)
 
     const ucRequest = request('POST', 'base', {
-      query: {UPLOADCARE_PUB_KEY: factory.publicKey('demo')},
-      body: file,
+      body: {
+        UPLOADCARE_PUB_KEY: factory.publicKey('demo'),
+        file,
+      },
     })
 
     const onProgress = jasmine.createSpy('onProgress')
@@ -94,12 +99,34 @@ fdescribe('request', () => {
     ucRequest.progress(onProgress)
 
     await expect(ucRequest.promise).resolves.toBeTruthy()
+    await expect(onProgress).toHaveBeenCalled()
 
-    expect(onProgress).toHaveBeenCalledWith(
-      jasmine.objectContaining({
-        total: file.size,
-        loaded: jasmine.any(Number),
-      }),
-    )
+    const lastProgressArg = onProgress.calls.mostRecent().args[0]
+
+    await expect(lastProgressArg.total).toBeGreaterThan(file.size)
+    await expect(lastProgressArg.loaded).toBe(lastProgressArg.total)
+  })
+
+  it('should be able to upload data', async() => {
+    expect.assertions(3)
+
+    const file = factory.image('blackSquare')
+
+    const ucRequest = request('POST', 'base', {
+      body: {
+        UPLOADCARE_PUB_KEY: factory.publicKey('demo'),
+        file,
+      },
+    })
+
+    const {code, data} = await ucRequest.promise
+
+    expect(code).toBe(200)
+    expect(data.file).toBeTruthy()
+
+    const link = factory.linkTo(data.file)
+    const loaded = await axios.get(link)
+
+    expect(loaded.status).toBe(200)
   })
 })

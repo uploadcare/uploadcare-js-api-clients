@@ -4,8 +4,12 @@ export type Query = {
   [key: string]: string,
 }
 
+export type Body = {
+  [key: string]: string | {} | ArrayBuffer | Buffer | FormData | File | Blob,
+}
+
 export type Options = {
-  body: string | {} | ArrayBuffer | Buffer | FormData | File | Blob,
+  body: Body,
   query: Query,
 }
 
