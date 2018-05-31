@@ -1,98 +1,101 @@
-import {fromUrl} from './index'
+import {fromUrl} from './fromUrl'
+import * as factory from '../../../test/fixtureFactory'
 
 describe('fromUrl', () => {
   it('should return UCRequest', () => {
-    const source = ''
-    const options = {}
-    const ucRequest = fromUrl(source, options)
-
-    expect(ucRequest).toBeTruthy()
-    expect(ucRequest.promise).toBeInstanceOf(Promise)
-  })
-  it('should upload file from url', async() => {
-    const sourceUrl = ''
+    const sourceUrl = factory.imageUrl('valid')
     const options = {
-      publicKey: '',
-      store: 0,
-      fileName: '',
+      publicKey: factory.publicKey('demo'),
+      store: false,
     }
     const ucRequest = fromUrl(sourceUrl, options)
 
-    const {code, response} = await ucRequest.promise
+    expect(ucRequest).toBeTruthy()
+    expect(ucRequest.promise).toBeInstanceOf(Promise)
+    expect(ucRequest.cancel).toBeInstanceOf(Function)
+    expect(ucRequest.progress).toBeInstanceOf(Function)
+  })
+  it('should upload file from url', async() => {
+    const sourceUrl = factory.imageUrl('valid')
+    const options = {
+      publicKey: factory.publicKey('demo'),
+      store: true,
+      fileName: 'newFileName',
+    }
+    const ucRequest = fromUrl(sourceUrl, options)
+
+    const {code, data} = await ucRequest.promise
 
     expect.assertions(4)
 
     expect(code).toBe(200)
-    expect(response).toBeTruthy()
-    expect(response.token).toBeTruthy()
-    expect(response.token).toBeInstanceOf(String)
+    expect(data).toBeTruthy()
+    expect(data.token).toBeTruthy()
+    expect(data.token).toBeInstanceOf(String)
   })
   it('should fail with [HTTP 400] Host does not exist.', async() => {
-    const sourceUrl = ''
+    const sourceUrl = factory.imageUrl('doesNotExist')
     const options = {
-      publicKey: '',
-      store: 0,
-      fileName: '',
+      publicKey: factory.publicKey('demo'),
+      store: true,
+      fileName: 'newFileName',
     }
     const ucRequest = fromUrl(sourceUrl, options)
 
-    const {code, response} = await ucRequest.promise
+    const {code, data} = await ucRequest.promise
 
     expect.assertions(3)
 
     expect(code).toBe(400)
-    expect(response).toBeTruthy()
-    expect(response.error).toBe('Host does not exist')
+    expect(data).toBeTruthy()
+    expect(data.error).toBe('Host does not exist')
   })
   it('should fail with [HTTP 400] Source is blacklisted.', async() => {
-    const sourceUrl = ''
+    const sourceUrl = factory.imageUrl('blacklisted')
     const options = {
-      publicKey: '',
-      store: 0,
-      fileName: '',
+      publicKey: factory.publicKey('demo'),
+      store: false,
     }
     const ucRequest = fromUrl(sourceUrl, options)
 
-    const {code, response} = await ucRequest.promise
+    const {code, data} = await ucRequest.promise
 
     expect.assertions(3)
 
     expect(code).toBe(400)
-    expect(response).toBeTruthy()
-    expect(response.error).toBe('Source is blacklisted')
+    expect(data).toBeTruthy()
+    expect(data.error).toBe('Source is blacklisted')
   })
   it('should fail with [HTTP 400] URL host is malformed.', async() => {
-    const sourceUrl = ''
+    const sourceUrl = factory.imageUrl('malformed')
     const options = {
-      publicKey: '',
-      store: 0,
-      fileName: '',
+      publicKey: factory.publicKey('demo'),
+      store: false,
     }
     const ucRequest = fromUrl(sourceUrl, options)
 
-    const {code, response} = await ucRequest.promise
+    const {code, data} = await ucRequest.promise
 
     expect.assertions(3)
 
     expect(code).toBe(400)
-    expect(response).toBeTruthy()
-    expect(response.error).toBe('URL host is malformed')
+    expect(data).toBeTruthy()
+    expect(data.error).toBe('URL host is malformed')
   })
   it('should fail with [HTTP 400] Only public IPs are allowed.', async() => {
-    const sourceUrl = ''
+    const sourceUrl = factory.imageUrl('privateIP')
     const options = {
-      publicKey: '',
-      store: 0,
-      fileName: '',
+      publicKey: factory.publicKey('demo'),
+      store: false,
     }
     const ucRequest = fromUrl(sourceUrl, options)
 
-    const {code, response} = await ucRequest.promise
+    const {code, data} = await ucRequest.promise
 
     expect.assertions(3)
 
     expect(code).toBe(400)
-    expect(response).toBeTruthy()
-    expect(response.error).toBe('Only public IPs are allowed')
+    expect(data).toBeTruthy()
+    expect(data.error).toBe('Only public IPs are allowed')
   })
 })
