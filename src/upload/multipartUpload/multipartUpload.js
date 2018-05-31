@@ -2,13 +2,9 @@
 
 import axios from 'axios'
 
-import type {
-  ProgressListener,
-  AWSRequest,
-  AWSResponse,
-  Options,
-  FileData,
-} from './flow-typed'
+import type {AWSRequest, AWSResponse, Options} from './flow-typed'
+
+import type {ProgressListener, FileData} from '../types'
 
 /**
  * Perform upload request to AWS part URL

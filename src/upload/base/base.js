@@ -1,12 +1,8 @@
 /* @flow */
 
-import type {UCRequest} from '../request/flow-typed'
+import type {UCRequest} from '../types'
 import {request} from '../request'
-
-export type Options = {
-  publicKey: string,
-  store: boolean | 'auto',
-}
+import type {Options, BaseResponse} from './flow-typed'
 
 /**
  * Request wrapper for file uploading
@@ -16,7 +12,10 @@ export type Options = {
  * @param {Options} options
  * @returns {UCRequest}
  */
-export function base(file: File | Blob, options: Options): UCRequest {
+export function base(
+  file: File | Blob,
+  options: Options,
+): UCRequest<BaseResponse> {
   return request('POST', 'base', {
     body: {
       file,

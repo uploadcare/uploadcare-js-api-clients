@@ -4,13 +4,16 @@ import qs from 'query-string'
 import FormData from 'form-data'
 
 import type {
+  ProgressListener,
+  UCRequest,
+  ErrorResponse,
+  UCResponse,
+} from '../types'
+
+import type {
+  Options,
   Body,
   Query,
-  Options,
-  UCRequest,
-  UCResponse,
-  ProgressListener,
-  ServerResponse,
 } from './flow-typed'
 
 /**
@@ -22,11 +25,11 @@ import type {
  * @param {Options} options - request options (data and query)
  * @returns {UCRequest}
  */
-export function request(
+export function request<T>(
   method: string,
   path: string,
   options: Options = {},
-): UCRequest {
+): UCRequest<T> {
   const url = buildUrl(method, path, options.query)
   const source = axios.CancelToken.source()
 
@@ -55,7 +58,7 @@ export function request(
     cancel: function(): void {
       source.cancel('cancelled')
     },
-    progress: function(callback: ProgressListener): UCRequest {
+    progress: function(callback: ProgressListener): UCRequest<T> {
       onProgress = callback
 
       return this
@@ -146,8 +149,9 @@ function buildUrl(method: string, path: string, query: Query = {}): string {
  * @param {AxiosXHR} response - Axios response
  * @returns {UCResponse} UCResponse
  */
-function normalizeResponse(response): UCResponse {
-  const {status, data}: {status: number, data: ServerResponse} = response
+function normalizeResponse<T>(response): UCResponse<T> {
+  const data: T & ErrorResponse = response.data
+  const status: number = response.status
 
   if (data.error) {
     return {

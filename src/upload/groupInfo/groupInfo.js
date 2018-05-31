@@ -1,7 +1,7 @@
 /* @flow */
-import type {UCRequest} from '../request/flow-typed'
+import type {UCRequest} from '../types'
 import {request} from '../request'
-import type {Options} from './flow-typed'
+import type {Options, GroupInfoResponse} from './flow-typed'
 
 /**
  * Getting file group info.
@@ -10,7 +10,7 @@ import type {Options} from './flow-typed'
  * @param {Options} options Set of options.
  * @returns {UCRequest}
  */
-export function groupInfo(groupId: string, options: Options): UCRequest {
+export function groupInfo(groupId: string, options: Options): UCRequest<GroupInfoResponse> {
   return request('GET', 'group/info/', {
     query: {
       group_id: groupId,

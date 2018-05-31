@@ -122,10 +122,20 @@ api.request(method, path, params)
 
 ```javascript
 api.file('file' || 'blob' || 'buffer' || 'url', file, options) // single
-
-api.group('file', [files], options) // group
+api.files('file' || 'blob' || 'buffer' || 'url', [file], options) // single
 
 api.fileInfo(uuid, options)
 api.groupInfo(groupId, options)
 api.status(token, options)
 ```
+
+```javascript
+const file = api.files('blob', blob, {})
+await file.info()
+
+const group = api.files('blob', [blobs], {})
+await group.info()
+
+
+```
+

@@ -1,19 +1,9 @@
 /* @flow */
 
-import type {UCRequest} from '../request/flow-typed'
+import type {UCRequest} from '../types'
 import {request} from '../request'
 
-export type Options = {
-  contentType?: string,
-  expire?: number,
-  filename: string,
-  partSize?: number,
-  publicKey: string,
-  signature?: string,
-  size: number,
-  source?: string,
-  store?: boolean | 'auto',
-}
+import type {MultipartStartResponse, Options} from './flow-typed'
 
 const defaultOptions: $Shape<Options> = {
   contentType: 'application/octet-stream',
@@ -28,7 +18,7 @@ const defaultOptions: $Shape<Options> = {
  * @param {Options} opts
  * @returns {UCRequest}
  */
-export function multipartStart(opts: Options): UCRequest {
+export function multipartStart(opts: Options): UCRequest<MultipartStartResponse> {
   const options = {
     ...defaultOptions,
     ...opts,

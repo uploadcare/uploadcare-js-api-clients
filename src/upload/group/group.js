@@ -1,7 +1,8 @@
 /* @flow */
-import type {UCRequest} from '../request/flow-typed'
+import type {UCRequest} from '../types'
 import {request} from '../request'
-import type {UUID, CDNUrl, Options} from './flow-typed'
+import type {UUID, CDNUrl, Options, GroupResponse} from './flow-typed'
+
 
 /**
  * Making a group.
@@ -11,7 +12,10 @@ import type {UUID, CDNUrl, Options} from './flow-typed'
  * @param {Options} options Set of options.
  * @returns {UCRequest}
  */
-export function group(files: Array<UUID | CDNUrl>, options: Options): UCRequest {
+export function group(
+  files: Array<UUID | CDNUrl>,
+  options: Options,
+): UCRequest<GroupResponse> {
   return request('POST', 'group', {
     body: {
       files,

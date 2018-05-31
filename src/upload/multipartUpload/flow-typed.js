@@ -1,8 +1,6 @@
 /* @flow */
 
-import type {Request, ProgressListener, Headers, FileData} from '../types'
-
-export type {ProgressListener, Headers, FileData}
+import type {Request, Headers} from '../types'
 
 export type Options = {
   headers?: Headers,

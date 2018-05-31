@@ -1,11 +1,9 @@
 /* @flow */
 
-import type {UCRequest} from '../request/flow-typed'
+import type {UCRequest} from '../types'
 import {request} from '../request'
 
-export type Options = {
-  publicKey: string,
-}
+import type {MultipartCompleteResponse, Options} from './flow-typed'
 
 /**
  * Perfroms request to the /multipart/complete/ endpoint
@@ -15,7 +13,10 @@ export type Options = {
  * @param {Options} options
  * @returns {UCRequest}
  */
-export function multipartComplete(uuid: string, options: Options): UCRequest {
+export function multipartComplete(
+  uuid: string,
+  options: Options,
+): UCRequest<MultipartCompleteResponse> {
   return request('POST', 'multipart/complete', {
     body: {
       uuid: uuid,

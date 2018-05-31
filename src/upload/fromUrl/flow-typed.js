@@ -4,3 +4,7 @@ export type Options = {
   store?: boolean | 'auto',
   fileName?: string,
 }
+
+export type FromUrlResponse = {
+  token: string
+}

@@ -1,7 +1,7 @@
 /* @flow */
-import type {UCRequest} from '../request/flow-typed'
+import type {UCRequest} from '../types'
 import {request} from '../request'
-import type {Options} from './flow-typed'
+import type {Options, FromUrlResponse} from './flow-typed'
 
 /**
  * Uploading files from URL.
@@ -10,7 +10,10 @@ import type {Options} from './flow-typed'
  * @param {Options} options Set of options.
  * @returns {UCRequest}
  */
-export function fromUrl(sourceUrl: string, options: Options): UCRequest {
+export function fromUrl(
+  sourceUrl: string,
+  options: Options,
+): UCRequest<FromUrlResponse> {
   return request('GET', 'from_url', {
     query: {
       source_url: sourceUrl,

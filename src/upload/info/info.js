@@ -1,11 +1,9 @@
 /* @flow */
 
-import type {UCRequest} from '../request/flow-typed'
+import type {UCRequest} from '../types'
 import {request} from '../request'
 
-export type Options = {
-  publicKey: string,
-}
+import type {InfoResponse, Options} from './flow-typed'
 
 /**
  * Requesting file info.
@@ -15,7 +13,7 @@ export type Options = {
  * @param {Options} options Options
  * @returns {UCRequest}
  */
-export function info(uuid: string, options: Options): UCRequest {
+export function info(uuid: string, options: Options): UCRequest<InfoResponse> {
   return request('GET', 'info', {
     query: {
       pub_key: options.publicKey,
