@@ -12,6 +12,7 @@ module.exports = function(config) {
     //   username: browserStackConf.username,
     //   accessKey: browserStackConf.accessKey,
     // },
+    browserNoActivityTimeout: 20000,
     browsers: ['ChromeHeadless'],
     frameworks: ['@babel/polyfill', 'jest-matchers', 'jasmine'],
 
