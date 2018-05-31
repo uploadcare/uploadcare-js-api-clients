@@ -1,4 +1,6 @@
-export function dataURItoBlob(dataURI) {
+/* @flow */
+
+export function dataURItoBlob(dataURI: string): Blob {
   // convert base64 to raw binary data held in a string
   // doesn't handle URLEncoded DataURIs - see SO answer #6850276 for code that does this
   const byteString = atob(dataURI.split(',')[1])
@@ -26,7 +28,7 @@ export function dataURItoBlob(dataURI) {
   return blob
 }
 
-export function wait(timeout) {
+export function wait(timeout: number): Promise {
   return new Promise(res => {
     setTimeout(() => {
       res()
