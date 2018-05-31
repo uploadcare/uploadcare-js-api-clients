@@ -1,4 +1,6 @@
 /* @flow */
+import type {Token} from '../fromUrlStatus/flow-typed'
+
 export type Options = {
   publicKey: string,
   store?: boolean | 'auto',
@@ -6,5 +8,5 @@ export type Options = {
 }
 
 export type FromUrlResponse = {
-  token: string
+  token: Token
 }
