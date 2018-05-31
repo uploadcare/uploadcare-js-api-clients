@@ -1,9 +1,9 @@
 import {info} from './info'
 import * as factory from '../../../test/fixtureFactory'
 
-describe('info', () => {
+fdescribe('info', () => {
   it('should return UCRequest', () => {
-    const ucRequest = info({})
+    const ucRequest = info('', {})
 
     expect(ucRequest).toBeTruthy()
     expect(ucRequest.promise).toBeInstanceOf(Promise)
@@ -15,15 +15,15 @@ describe('info', () => {
     const uuid = factory.uuid('image')
     const publicKey = factory.publicKey('image')
 
-    const ucRequest = info(uuid, {publicKey: publicKey})
+    const ucRequest = info(uuid, {publicKey})
 
-    const {code, response} = await ucRequest.promise
+    const {code, data} = await ucRequest.promise
 
     expect.assertions(4)
 
     expect(code).toBe(200)
-    expect(response).toBeTruthy()
-    expect(response.is_image).toBeTruthy()
-    expect(response.uuid).toBe(uuid)
+    expect(data).toBeTruthy()
+    expect(data.is_image).toBeTruthy()
+    expect(data.uuid).toBe(uuid)
   })
 })
