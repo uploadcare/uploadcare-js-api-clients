@@ -5,7 +5,7 @@ import type {Request, ProgressListener, Headers, FileData} from '../types'
 export type {ProgressListener, Headers, FileData}
 
 export type Options = {
-  headers: Headers,
+  headers?: Headers,
 }
 
 export type AWSResponse = {

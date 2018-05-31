@@ -4,7 +4,7 @@ import type {Request, ProgressListener, Headers, FileData} from '../types'
 export type {ProgressListener}
 
 export type Query = {
-  [key: string]: string,
+  [key: string]: string | boolean | number | typeof undefined,
 }
 
 export type Body = {

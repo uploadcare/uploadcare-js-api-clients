@@ -6,6 +6,17 @@ import {multipartUpload} from '../multipartUpload'
 import * as factory from '../../../test/fixtureFactory'
 
 fdescribe('multipartComplete', () => {
+  let originalTimeout
+
+  beforeEach(function() {
+    originalTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL
+    jasmine.DEFAULT_TIMEOUT_INTERVAL = 20000
+  })
+
+  afterEach(function() {
+    jasmine.DEFAULT_TIMEOUT_INTERVAL = originalTimeout
+  })
+
   it('should return UCRequest', () => {
     const ucRequest = multipartComplete(factory.uuid('image'), {})
 
@@ -28,10 +39,7 @@ fdescribe('multipartComplete', () => {
     }).promise
 
     // upload files as single part to the first url
-    const {code: uploadCode} = await multipartUpload(
-      parts[0],
-      file,
-    ).promise
+    const {code: uploadCode} = await multipartUpload(parts[0], file).promise
 
     expect(uploadCode).toBe(200)
 
