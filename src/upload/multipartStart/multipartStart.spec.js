@@ -1,5 +1,5 @@
 import {multipartStart} from './multipartStart'
-import * as factory from '../../../test/fileFactory'
+import * as factory from '../../../test/fixtureFactory'
 
 fdescribe('multipartStart', () => {
   it('should return UCRequest', () => {

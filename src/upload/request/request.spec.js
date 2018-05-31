@@ -1,5 +1,5 @@
 import {request} from './request'
-import * as factory from '../../../test/fileFactory'
+import * as factory from '../../../test/fixtureFactory'
 import axios from 'axios'
 
 fdescribe('request', () => {

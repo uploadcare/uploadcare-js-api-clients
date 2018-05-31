@@ -1,5 +1,5 @@
 import {base} from './base'
-import * as factory from '../../../test/fileFactory'
+import * as factory from '../../../test/fixtureFactory'
 
 fdescribe('base', () => {
   it('should return UCRequest', () => {

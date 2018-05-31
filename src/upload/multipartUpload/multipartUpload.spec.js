@@ -1,6 +1,6 @@
 import {multipartUpload} from './multipartUpload'
 import {multipartStart} from '../multipartStart'
-import * as factory from '../../../test/fileFactory'
+import * as factory from '../../../test/fixtureFactory'
 
 fdescribe('multipartUpload', () => {
   it('should return UCRequest', () => {
