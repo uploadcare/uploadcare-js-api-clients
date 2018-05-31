@@ -65,6 +65,7 @@ export function request(
   return ucRequest
 }
 
+/* eslint-disable max-statements, no-continue */
 /**
  * Constructs FormData instance from object
  * Uses 'form-data' package which internally use native FormData
@@ -76,23 +77,31 @@ export function request(
 function buildFormData(body: Body): FormData {
   const formData = new FormData()
 
-  for (const key of Object.keys(body)) {
+  for (let key of Object.keys(body)) {
     let value = body[key]
 
-    if (typeof value !== 'undefined') {
-      if (typeof value === 'boolean') {
-        value = value ? '1' : '0'
-      }
-      else if (typeof value === 'number') {
-        value = value.toString(10)
-      }
-
-      formData.append(key, value)
+    if (typeof value === 'undefined') {
+      continue
     }
+
+    if (typeof value === 'boolean') {
+      value = value ? '1' : '0'
+    }
+    else if (typeof value === 'number') {
+      value = value.toString(10)
+    }
+    else if (Array.isArray(value)) {
+      key += '[]'
+      value.forEach(val => formData.append(key, val))
+      continue
+    }
+
+    formData.append(key, value)
   }
 
   return formData
 }
+/* eslint-enable max-statements, no-continue */
 
 /**
  * Create handler for axios onUploadProgress event

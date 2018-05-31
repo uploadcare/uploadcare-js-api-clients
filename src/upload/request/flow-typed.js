@@ -8,7 +8,7 @@ export type Query = {
 }
 
 export type Body = {
-  [key: string]: string | boolean | number | FileData | typeof undefined,
+  [key: string]: Array<string> | string | boolean | number | FileData | typeof undefined,
 }
 
 export type Options = {
