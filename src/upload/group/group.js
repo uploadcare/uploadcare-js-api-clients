@@ -1,12 +1,7 @@
 /* @flow */
 import type {UCRequest} from '../request/flow-typed'
 import {request} from '../request'
-
-export type UUID = string
-export type CDNUrl = string
-export type Options = {
-  publicKey: string,
-}
+import type {UUID, CDNUrl, Options} from './flow-typed'
 
 /**
  * Making a group.

@@ -1,10 +1,7 @@
 /* @flow */
 import type {UCRequest} from '../request/flow-typed'
 import {request} from '../request'
-
-export type Options = {
-  publicKey: string,
-}
+import type {Options} from './flow-typed'
 
 /**
  * Getting file group info.

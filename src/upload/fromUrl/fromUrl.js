@@ -1,12 +1,8 @@
 /* @flow */
 import type {UCRequest} from '../request/flow-typed'
 import {request} from '../request'
+import type {Options} from './flow-typed'
 
-export type Options = {
-  publicKey: string,
-  store?: boolean | 'auto',
-  fileName?: string,
-}
 /**
  * Uploading files from URL.
  * @export
