@@ -2,24 +2,24 @@
 
 import axios from 'axios'
 
-import type {AWSRequest, AWSResponse, Options} from './flow-typed'
+import type {MultipartUploadRequest, MultipartUploadResponse, Options} from './flow-typed'
 
 import type {ProgressListener, FileData} from '../types'
 
 /**
- * Perform upload request to AWS part URL
+ * Perform upload request to the part URL
  *
  * @export
  * @param {string} partUrl
  * @param {FileData} file
  * @param {Options} options
- * @returns {AWSRequest}
+ * @returns {MultipartUploadRequest}
  */
 export function multipartUpload(
   partUrl: string,
   file: FileData,
   options: Options = {},
-): AWSRequest {
+): MultipartUploadRequest {
   const source = axios.CancelToken.source()
 
   let onProgress: ProgressListener | typeof undefined
@@ -40,21 +40,21 @@ export function multipartUpload(
     .then(cleanOnResolve(removeOnProgress))
     .catch(cleanOnReject(removeOnProgress))
 
-  const awsRequest = {}
+  const uploadRequest = {}
 
-  Object.assign(awsRequest, {
+  Object.assign(uploadRequest, {
     promise,
     cancel: function(): void {
       source.cancel('cancelled')
     },
-    progress: function(callback: ProgressListener): AWSRequest {
+    progress: function(callback: ProgressListener): MultipartUploadRequest {
       onProgress = callback
 
       return this
-    }.bind(awsRequest),
+    }.bind(uploadRequest),
   })
 
-  return awsRequest
+  return uploadRequest
 }
 
 /**
@@ -80,12 +80,12 @@ function createProgressHandler(
 }
 
 /**
- * Transorms axios's response object to AWSResponse format
+ * Transorms axios's response object to MultipartUploadResponse format
  *
  * @param {AxiosXHR} response - Axios response
- * @returns {AWSResponse} AWSResponse
+ * @returns {MultipartUploadResponse} MultipartUploadResponse
  */
-function normalizeResponse(response): AWSResponse {
+function normalizeResponse(response): MultipartUploadResponse {
   const {status} = response
 
   return {code: status}

@@ -23,7 +23,7 @@ fdescribe('multipartUpload', () => {
     expect(ucRequest.progress).toBeInstanceOf(Function)
   })
 
-  it('should upload file part to the AWS', async() => {
+  it('should upload file part to the url', async() => {
     const publicKey = factory.publicKey('demo')
 
     const file = factory.file(16)

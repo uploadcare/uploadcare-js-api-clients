@@ -6,8 +6,8 @@ export type Options = {
   headers?: Headers,
 }
 
-export type AWSResponse = {
+export type MultipartUploadResponse = {
   code: number,
 }
 
-export type AWSRequest = Request<AWSResponse>
+export type MultipartUploadRequest = Request<MultipartUploadResponse>
