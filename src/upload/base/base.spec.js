@@ -1,7 +1,7 @@
 import {base} from './base'
 import * as factory from '../../../test/fixtureFactory'
 
-fdescribe('base', () => {
+describe('base', () => {
   it('should return UCRequest', () => {
     const ucRequest = base('file', {})
 

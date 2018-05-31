@@ -5,7 +5,7 @@ import {multipartStart} from '../multipartStart'
 import {multipartUpload} from '../multipartUpload'
 import * as factory from '../../../test/fixtureFactory'
 
-fdescribe('multipartComplete', () => {
+describe('multipartComplete', () => {
   let originalTimeout
 
   beforeEach(function() {

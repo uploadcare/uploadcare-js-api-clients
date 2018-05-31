@@ -1,7 +1,7 @@
 import {info} from './info'
 import * as factory from '../../../test/fixtureFactory'
 
-fdescribe('info', () => {
+describe('info', () => {
   it('should return UCRequest', () => {
     const ucRequest = info('', {})
 

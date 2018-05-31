@@ -1,7 +1,7 @@
 import {multipartStart} from './multipartStart'
 import * as factory from '../../../test/fixtureFactory'
 
-fdescribe('multipartStart', () => {
+describe('multipartStart', () => {
   it('should return UCRequest', () => {
     const ucRequest = multipartStart({})
 
