@@ -14,7 +14,7 @@ module.exports = function(config) {
     // },
     browserNoActivityTimeout: 50000,
     browsers: ['ChromeHeadless'],
-    frameworks: ['@babel/polyfill', 'jest-matchers', 'jasmine'],
+    frameworks: ['@babel/polyfill', 'jest-mock', 'jest-matchers', 'jasmine'],
 
     files: [
       {
@@ -30,6 +30,7 @@ module.exports = function(config) {
       'karma-jasmine',
       'karma-rollup-preprocessor',
       require('./scripts/karma-jest-matchers'),
+      require('./scripts/karma-jest-mock'),
     ],
 
     preprocessors: {'src/**/*.spec.js': ['rollup']},

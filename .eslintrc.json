@@ -10,6 +10,7 @@
   },
   "env": {"node": true},
   "rules": {
-    "max-nested-callbacks": ["error", 4]
+    "max-nested-callbacks": ["error", 4],
+    "max-statements": ["error", 15]
   }
 }

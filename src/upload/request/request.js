@@ -2,19 +2,17 @@
 import axios from 'axios'
 import qs from 'query-string'
 import FormData from 'form-data'
+import {isBinaryData} from '../util'
 
 import type {
   ProgressListener,
   UCRequest,
   ErrorResponse,
   UCResponse,
+  Headers,
 } from '../types'
 
-import type {
-  Options,
-  Body,
-  Query,
-} from './flow-typed'
+import type {Options, Body, Query} from './flow-typed'
 
 /**
  * Performs request to Uploadcare Upload API
@@ -37,12 +35,14 @@ export function request<T>(
   const getOnProgress = () => onProgress
   const removeOnProgress = () => (onProgress = undefined)
 
+  const data = options.body && buildFormData(options.body)
+
   const axiosOptions = {
     url,
+    data,
     method,
     cancelToken: source.token,
-    headers: options.headers || {},
-    data: options.body && buildFormData(options.body),
+    headers: constructHeaders(options, data),
     onUploadProgress: createProgressHandler(getOnProgress),
   }
 
@@ -66,6 +66,26 @@ export function request<T>(
   })
 
   return ucRequest
+}
+
+/**
+ *
+ *
+ * @param {Options} options
+ * @param {FormData} data
+ * @returns {Headers}
+ */
+function constructHeaders(options: Options, data?: FormData): Headers {
+  let headers = options.headers || {}
+
+  if (data && data.getHeaders) {
+    headers = {
+      ...headers,
+      ...data.getHeaders(),
+    }
+  }
+
+  return headers
 }
 
 /* eslint-disable max-statements, no-continue */
@@ -99,7 +119,10 @@ function buildFormData(body: Body): FormData {
       continue
     }
 
-    formData.append(key, value)
+    // if value is raw file without metadata (Buffer)
+    const filename = isBinaryData(value) ? key : undefined
+
+    formData.append(key, value, filename)
   }
 
   return formData

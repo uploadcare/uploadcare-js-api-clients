@@ -1,6 +1,6 @@
 /* @flow */
 
-import {dataURItoBlob} from './helpers'
+import {dataURItoBlob, dataURItoBuffer, isNode} from './helpers'
 
 /* eslint-disable max-len */
 const images: {[key: string]: string} = {
@@ -18,12 +18,23 @@ const uuids: {[key: string]: {publicKey: string, uuid?: string}} = {
   invalid: {publicKey: 'invalidpublickey'},
 }
 
-export function image(id: string): Blob {
+export function image(id: string): Blob | Buffer {
+  if (isNode()) {
+    return dataURItoBuffer(images[id])
+  }
+
   return dataURItoBlob(images[id])
 }
 
-export function file(mbSize: number): Blob {
+export function file(mbSize: number): Blob | Buffer {
   const byteLength = mbSize * 1000000
+
+  if (isNode()) {
+    const buffer = new Buffer(byteLength)
+
+    return buffer
+  }
+
   const buffer = new ArrayBuffer(byteLength)
   const blob = new Blob([buffer])
 

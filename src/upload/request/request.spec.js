@@ -28,7 +28,7 @@ describe('request', () => {
 
     await expect(code).toBe(200)
     await expect(data).toEqual(
-      jasmine.objectContaining({uuid: factory.uuid('image')}),
+      expect.objectContaining({uuid: factory.uuid('image')}),
     )
   })
 
@@ -41,7 +41,7 @@ describe('request', () => {
 
     await expect(code).toBe(400)
     await expect(data.error).toEqual(
-      jasmine.objectContaining({content: 'file_id is required.'}),
+      expect.objectContaining({content: 'file_id is required.'}),
     )
   })
 
@@ -62,8 +62,8 @@ describe('request', () => {
   it('should be cancellable', async() => {
     expect.assertions(3)
 
-    const onResolve = jasmine.createSpy('onResolve')
-    const onReject = jasmine.createSpy('onReject')
+    const onResolve = jest.fn()
+    const onReject = jest.fn()
 
     const ucRequest = request('GET', 'info', {
       query: {
@@ -77,7 +77,7 @@ describe('request', () => {
     ucRequest.cancel()
 
     await expect(ucRequest.promise).rejects.toEqual(
-      jasmine.objectContaining({message: 'cancelled'}),
+      expect.objectContaining({message: 'cancelled'}),
     )
 
     expect(onResolve).not.toHaveBeenCalled()
@@ -96,17 +96,17 @@ describe('request', () => {
       },
     })
 
-    const onProgress = jasmine.createSpy('onProgress')
+    const onProgress = jest.fn()
 
     ucRequest.progress(onProgress)
 
     await expect(ucRequest.promise).resolves.toBeTruthy()
-    await expect(onProgress).toHaveBeenCalled()
+    expect(onProgress).toHaveBeenCalled()
 
-    const lastProgressArg = onProgress.calls.mostRecent().args[0]
+    const lastProgressArg = onProgress.mock.calls[onProgress.mock.calls.length - 1][0]
 
-    await expect(lastProgressArg.total).toBeGreaterThan(file.size)
-    await expect(lastProgressArg.loaded).toBe(lastProgressArg.total)
+    expect(lastProgressArg.total).toBeGreaterThan(file.size)
+    expect(lastProgressArg.loaded).toBe(lastProgressArg.total)
   })
 
   it('should be able to upload data', async() => {

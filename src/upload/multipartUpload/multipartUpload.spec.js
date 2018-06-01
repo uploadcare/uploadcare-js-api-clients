@@ -17,6 +17,7 @@ describe('multipartUpload', () => {
   it('should return UCRequest', () => {
     const ucRequest = multipartUpload('', factory.file(0.1), {})
 
+    expect(ucRequest.promise).rejects.toBeTruthy()
     expect(ucRequest).toBeTruthy()
     expect(ucRequest.promise).toBeInstanceOf(Promise)
     expect(ucRequest.cancel).toBeInstanceOf(Function)
@@ -31,7 +32,7 @@ describe('multipartUpload', () => {
     const {code, data} = await multipartStart({
       publicKey,
       filename: 'test',
-      size: file.size,
+      size: file.size || file.length,
     }).promise
 
     const firstPart = data.parts[0]
