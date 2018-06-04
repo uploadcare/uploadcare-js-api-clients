@@ -1,5 +1,6 @@
 import {fromUrlStatus} from './fromUrlStatus'
 import * as factory from '../../../test/fixtureFactory'
+import * as helpers from '../../../test/helpers'
 import {fromUrl} from '../fromUrl/fromUrl'
 
 describe('fromUrlStatus', () => {
@@ -22,6 +23,9 @@ describe('fromUrlStatus', () => {
     const ucFromUrlRequest = fromUrl(sourceUrl, options)
 
     const {data: {token}} = await ucFromUrlRequest.promise
+
+    await helpers.wait(1000)
+
     const ucRequest = fromUrlStatus(token)
 
     const {code, data} = await ucRequest.promise
