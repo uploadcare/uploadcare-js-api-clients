@@ -14,7 +14,7 @@ module.exports = function(config) {
     // },
     browserNoActivityTimeout: 50000,
     browsers: ['ChromeHeadless'],
-    frameworks: ['@babel/polyfill', 'jest-mock', 'jest-matchers', 'jasmine'],
+    frameworks: ['inject', 'jasmine'],
 
     files: [
       {
@@ -24,13 +24,11 @@ module.exports = function(config) {
     ],
 
     plugins: [
-      require('./scripts/karma-babel-polyfill'),
       'karma-browserstack-launcher',
       'karma-chrome-launcher',
       'karma-jasmine',
       'karma-rollup-preprocessor',
-      require('./scripts/karma-jest-matchers'),
-      require('./scripts/karma-jest-mock'),
+      require('./scripts/karma-inject'),
     ],
 
     preprocessors: {'src/**/*.spec.js': ['rollup']},

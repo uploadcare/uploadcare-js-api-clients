@@ -11,9 +11,8 @@
     "test": "npm run test:node && npm run test:browser",
     "test:node": "jest --no-cache src/",
     "test:node:debug": "node --inspect-brk ./node_modules/jest/bin/jest.js --runInBand --watchAll src/",
-    "test:browser": "npm run test:browser:prepare && karma start karma.config.js --single-run --nocache",
-    "test:browser:prepare": "node scripts/build-jest-matchers.js",
-    "test:browser:debug": "npm run test:browser:prepare && karma start karma.config.js --browsers=Chrome --single-run=false --watch --debug  --nocache"
+    "test:browser": "karma start karma.config.js --single-run --nocache",
+    "test:browser:debug": "karma start karma.config.js --browsers=Chrome --single-run=false --watch --debug  --nocache"
   },
   "repository": {
     "type": "git",

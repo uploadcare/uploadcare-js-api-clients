@@ -4,16 +4,12 @@ const path = require('path')
 const fs = require('fs')
 const rollup = require('rollup')
 
-const jestMatchersDir = path.dirname(
-  path.resolve(require.resolve('jest-mock')),
-)
-
-const build = async(input, output) => {
+const build = async({base, input, output}) => {
   const bundle = await rollup.rollup({
     input: input,
     plugins: [
       require('rollup-plugin-node-resolve-magic')({
-        basedir: jestMatchersDir,
+        basedir: base,
         browser: true,
         main: false,
       }),
@@ -31,21 +27,39 @@ const build = async(input, output) => {
   })
 }
 
-;(async() => {
-  const input = path.resolve(jestMatchersDir, 'index.js')
-  const output = path.resolve(jestMatchersDir, 'bundle.js')
+const tryBuild = async(packageName, inputPath, outputPath) => {
+  const packageDir = path.dirname(path.resolve(require.resolve(packageName)))
+  const input = path.resolve(packageDir, inputPath)
+  const output = path.resolve(packageDir, outputPath)
 
   if (fs.existsSync(output)) {
-    console.log('jest-matches build exist, skip')
+    console.log(`${packageName} build exist, skip`)
 
     return
   }
 
   try {
     await build(input, output)
-    console.log('jest-matches built successfully')
+    console.log(`${packageName} built successfully`)
   }
   catch (exception) {
     console.err(exception)
   }
-})()
+}
+
+const packages = {
+  'jest-matchers': {
+    input: 'index.js',
+    output: 'bundle.js',
+  },
+  'jest-mock': {
+    input: 'index.js',
+    output: 'bundle.js',
+  },
+}
+
+for (const pkg of Object.keys(packages)) {
+  const {input, output} = packages[pkg]
+
+  tryBuild(pkg, input, output)
+}
