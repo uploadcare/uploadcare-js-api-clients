@@ -47,7 +47,7 @@ describe('fromUrl', () => {
 
     expect(code).toBe(400)
     expect(data).toBeTruthy()
-    expect(data.error).toBe('Host does not exist')
+    expect(data.error.content).toBe('Host does not exist.')
   })
   it('should fail with [HTTP 400] Only public IPs are allowed.', async() => {
     const sourceUrl = factory.imageUrl('privateIP')

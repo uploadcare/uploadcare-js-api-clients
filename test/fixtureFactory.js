@@ -60,7 +60,7 @@ export function linkTo(uuid: string): string {
 export function imageUrl(id: string): string {
   const images = {
     valid: 'https://ucarecdn.com/2e6b7f23-9143-4b71-94e7-338bbf278c01/',
-    doesNotExist: 'https://qwerty.com/1.jpg',
+    doesNotExist: 'https://1.com/1.jpg',
     privateIP: 'http://192.168.1.10/1.jpg',
   }
 
