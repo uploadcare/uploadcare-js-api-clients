@@ -1,5 +1,6 @@
 import {fromUrlStatus} from './fromUrlStatus'
 import * as factory from '../../../test/fixtureFactory'
+import {fromUrl} from '../fromUrl/fromUrl'
 
 describe('fromUrlStatus', () => {
   it('should return UCRequest', () => {
@@ -12,7 +13,15 @@ describe('fromUrlStatus', () => {
     expect(ucRequest.progress).toBeInstanceOf(Function)
   })
   it('should return info about file uploaded from url', async() => {
-    const token = factory.token('valid')
+    const sourceUrl = factory.imageUrl('valid')
+    const options = {
+      publicKey: factory.publicKey('demo'),
+      store: true,
+      fileName: 'newFileName',
+    }
+    const ucFromUrlRequest = fromUrl(sourceUrl, options)
+
+    const {data: {token}} = await ucFromUrlRequest.promise
     const ucRequest = fromUrlStatus(token)
 
     const {code, data} = await ucRequest.promise
@@ -33,6 +42,6 @@ describe('fromUrlStatus', () => {
 
     expect(code).toBe(400)
     expect(data).toBeTruthy()
-    expect(data.error).toBe('token is required')
+    expect(data.error.content).toBe('token is required.')
   })
 })

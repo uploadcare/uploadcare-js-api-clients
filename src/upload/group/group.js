@@ -18,7 +18,7 @@ export function group(
 ): UCRequest<GroupResponse> {
   return request('POST', 'group', {
     body: {
-      files,
+      files: files,
       pub_key: options.publicKey,
     },
   })

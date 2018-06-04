@@ -15,7 +15,7 @@ describe('fromUrl', () => {
     expect(ucRequest.cancel).toBeInstanceOf(Function)
     expect(ucRequest.progress).toBeInstanceOf(Function)
   })
-  it('should upload file from url', async() => {
+  it('should return token for file from url', async() => {
     const sourceUrl = factory.imageUrl('valid')
     const options = {
       publicKey: factory.publicKey('demo'),
@@ -26,12 +26,11 @@ describe('fromUrl', () => {
 
     const {code, data} = await ucRequest.promise
 
-    expect.assertions(4)
+    expect.assertions(3)
 
     expect(code).toBe(200)
     expect(data).toBeTruthy()
     expect(data.token).toBeTruthy()
-    expect(data.token).toBeInstanceOf(String)
   })
   it('should fail with [HTTP 400] Host does not exist.', async() => {
     const sourceUrl = factory.imageUrl('doesNotExist')
@@ -50,38 +49,6 @@ describe('fromUrl', () => {
     expect(data).toBeTruthy()
     expect(data.error).toBe('Host does not exist')
   })
-  it('should fail with [HTTP 400] Source is blacklisted.', async() => {
-    const sourceUrl = factory.imageUrl('blacklisted')
-    const options = {
-      publicKey: factory.publicKey('demo'),
-      store: false,
-    }
-    const ucRequest = fromUrl(sourceUrl, options)
-
-    const {code, data} = await ucRequest.promise
-
-    expect.assertions(3)
-
-    expect(code).toBe(400)
-    expect(data).toBeTruthy()
-    expect(data.error).toBe('Source is blacklisted')
-  })
-  it('should fail with [HTTP 400] URL host is malformed.', async() => {
-    const sourceUrl = factory.imageUrl('malformed')
-    const options = {
-      publicKey: factory.publicKey('demo'),
-      store: false,
-    }
-    const ucRequest = fromUrl(sourceUrl, options)
-
-    const {code, data} = await ucRequest.promise
-
-    expect.assertions(3)
-
-    expect(code).toBe(400)
-    expect(data).toBeTruthy()
-    expect(data.error).toBe('URL host is malformed')
-  })
   it('should fail with [HTTP 400] Only public IPs are allowed.', async() => {
     const sourceUrl = factory.imageUrl('privateIP')
     const options = {
@@ -96,6 +63,6 @@ describe('fromUrl', () => {
 
     expect(code).toBe(400)
     expect(data).toBeTruthy()
-    expect(data.error).toBe('Only public IPs are allowed')
+    expect(data.error.content).toBe('Only public IPs are allowed.')
   })
 })

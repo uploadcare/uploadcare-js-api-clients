@@ -59,11 +59,9 @@ export function linkTo(uuid: string): string {
 
 export function imageUrl(id: string): string {
   const images = {
-    valid: '',
-    doesNotExist: '',
-    blacklisted: '',
-    malformed: '',
-    privateIP: '',
+    valid: 'https://ucarecdn.com/2e6b7f23-9143-4b71-94e7-338bbf278c01/',
+    doesNotExist: 'https://qwerty.com/1.jpg',
+    privateIP: 'http://192.168.1.10/1.jpg',
   }
 
   return images[id]
@@ -81,8 +79,23 @@ export function token(id: string): string {
 export function groupId(id: string): string {
   const groupIds = {
     valid: '945ebb27-1fd6-46c6-a859-b9893712d650',
-    invalid: '123ebb27-1fd6-46c6-a859-b9893712d650',
+    invalid: '123ebb27-1fd6-46c6-a859-b9893',
   }
 
   return groupIds[id]
+}
+
+export function groupOfFiles(id: string): Array {
+  const groupOfFiles = {
+    valid: [
+      '89827330-e200-41bc-9fba-7d51c8e9ea15',
+      '89827330-e200-41bc-9fba-7d51c8e9ea15/-/resize/x800/',
+    ],
+    invalid: [
+      '2e6b7f23-9143-4b71-94e7-338bb',
+      'e143e315-bdce-4421-9a0b-ca1aa/-/resize/x800/',
+    ],
+  }
+
+  return groupOfFiles[id]
 }
