@@ -1,6 +1,7 @@
 import {request} from './request'
 import * as factory from '../../../test/fixtureFactory'
 import axios from 'axios'
+import {isNode} from '../../../test/helpers'
 
 describe('request', () => {
   it('should return UCRequest', () => {
@@ -84,9 +85,7 @@ describe('request', () => {
     expect(onReject).toHaveBeenCalled()
   })
 
-  it('should provide progress info', async() => {
-    expect.assertions(2)
-
+  it('should provide progress info only in browser', async() => {
     const file = factory.file(0.01)
 
     const ucRequest = request('POST', 'base', {
@@ -101,12 +100,19 @@ describe('request', () => {
     ucRequest.progress(onProgress)
 
     await expect(ucRequest.promise).resolves.toBeTruthy()
-    expect(onProgress).toHaveBeenCalled()
 
-    const lastProgressArg = onProgress.mock.calls[onProgress.mock.calls.length - 1][0]
+    if (isNode()) {
+      expect(onProgress).not.toHaveBeenCalled()
+    }
+    else {
+      expect(onProgress).toHaveBeenCalled()
 
-    expect(lastProgressArg.total).toBeGreaterThan(file.size)
-    expect(lastProgressArg.loaded).toBe(lastProgressArg.total)
+      const lastProgressArg =
+        onProgress.mock.calls[onProgress.mock.calls.length - 1][0]
+
+      expect(lastProgressArg.total).toBeGreaterThan(file.size || file.length)
+      expect(lastProgressArg.loaded).toBe(lastProgressArg.total)
+    }
   })
 
   it('should be able to upload data', async() => {
