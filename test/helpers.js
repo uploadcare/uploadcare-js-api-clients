@@ -6,7 +6,7 @@ import dataUriToBlob from 'dataurl-to-blob'
 export const dataURItoBuffer: (uri: string) => Buffer = dataUriToBuffer
 export const dataURItoBlob: (uri: string) => Buffer = dataUriToBlob
 
-export function wait(timeout: number): Promise<> {
+export function wait(timeout: number): Promise<void> {
   return new Promise(res => {
     setTimeout(() => {
       res()

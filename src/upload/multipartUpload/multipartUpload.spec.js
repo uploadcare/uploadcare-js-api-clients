@@ -15,7 +15,7 @@ describe('multipartUpload', () => {
   })
 
   it('should return UCRequest', () => {
-    const ucRequest = multipartUpload('', factory.file(0.1), {})
+    const ucRequest = multipartUpload('', factory.file(0.1).data, {})
 
     expect(ucRequest.promise).rejects.toBeTruthy()
     expect(ucRequest).toBeTruthy()
@@ -32,7 +32,7 @@ describe('multipartUpload', () => {
     const {code, data} = await multipartStart({
       publicKey,
       filename: 'test',
-      size: file.size || file.length,
+      size: file.size,
     }).promise
 
     const firstPart = data.parts[0]
@@ -44,7 +44,7 @@ describe('multipartUpload', () => {
 
     const {code: uploadCode} = await multipartUpload(
       firstPart,
-      file.slice(0, 5242880),
+      file.data.slice(0, 5242880),
     ).promise
 
     expect(uploadCode).toBe(200)

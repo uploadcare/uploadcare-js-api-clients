@@ -35,11 +35,11 @@ describe('multipartComplete', () => {
     const {data: {uuid, parts}} = await multipartStart({
       filename,
       publicKey,
-      size: file.size || file.length,
+      size: file.size,
     }).promise
 
     // upload files as single part to the first url
-    const {code: uploadCode} = await multipartUpload(parts[0], file).promise
+    const {code: uploadCode} = await multipartUpload(parts[0], file.data).promise
 
     expect(uploadCode).toBe(200)
 

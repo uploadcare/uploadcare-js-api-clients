@@ -13,7 +13,7 @@ describe('base', () => {
 
   it('should upload simple image', async() => {
     const file = factory.image('blackSquare')
-    const ucRequest = base(file, {
+    const ucRequest = base(file.data, {
       publicKey: factory.publicKey('demo'),
       store: false,
     })

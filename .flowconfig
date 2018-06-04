@@ -1,7 +1,6 @@
 [ignore]
 .*/dist/.*
 .*/scripts/.*
-.*/test/.*
 
 [include]
 

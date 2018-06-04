@@ -91,7 +91,7 @@ describe('request', () => {
     const ucRequest = request('POST', 'base', {
       body: {
         UPLOADCARE_PUB_KEY: factory.publicKey('demo'),
-        file,
+        file: file.data,
       },
     })
 
@@ -110,7 +110,7 @@ describe('request', () => {
       const lastProgressArg =
         onProgress.mock.calls[onProgress.mock.calls.length - 1][0]
 
-      expect(lastProgressArg.total).toBeGreaterThan(file.size || file.length)
+      expect(lastProgressArg.total).toBeGreaterThan(file.size)
       expect(lastProgressArg.loaded).toBe(lastProgressArg.total)
     }
   })
@@ -123,7 +123,7 @@ describe('request', () => {
     const ucRequest = request('POST', 'base', {
       body: {
         UPLOADCARE_PUB_KEY: factory.publicKey('demo'),
-        file,
+        file: file.data,
       },
     })
 

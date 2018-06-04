@@ -18,30 +18,69 @@ const uuids: {[key: string]: {publicKey: string, uuid?: string}} = {
   invalid: {publicKey: 'invalidpublickey'},
 }
 
-export function image(id: string): Blob | Buffer {
-  if (isNode()) {
-    return dataURItoBuffer(images[id])
-  }
-
-  return dataURItoBlob(images[id])
+type FixtureFile = {
+  data: Buffer | Blob,
+  size: number,
 }
 
-export function file(mbSize: number): Blob | Buffer {
+export function image(id: string): FixtureFile {
+  if (isNode()) {
+    return imageBuffer(id)
+  }
+
+  return imageBlob(id)
+}
+
+function imageBuffer(id: string): FixtureFile {
+  const data = dataURItoBuffer(images[id])
+  const size = data.length
+
+  return {
+    data,
+    size,
+  }
+}
+
+function imageBlob(id: string): FixtureFile {
+  const data = dataURItoBlob(images[id])
+  const size = data.length
+
+  return {
+    data,
+    size,
+  }
+}
+
+export function file(mbSize: number): FixtureFile {
   const byteLength = mbSize * 1000000
 
   if (isNode()) {
-    const buffer = new Buffer(byteLength)
-
-    return buffer
+    return fileBuffer(byteLength)
   }
 
-  const buffer = new ArrayBuffer(byteLength)
-  const blob = new Blob([buffer])
-
-  return blob
+  return fileBlob(byteLength)
 }
 
-export function uuid(id: string): string {
+function fileBuffer(bytes: number): FixtureFile {
+  const buffer = new Buffer(bytes)
+
+  return {
+    data: buffer,
+    size: buffer.length,
+  }
+}
+
+function fileBlob(bytes: number): FixtureFile {
+  const buffer = new ArrayBuffer(bytes)
+  const blob = new Blob([buffer])
+
+  return {
+    data: blob,
+    size: blob.size,
+  }
+}
+
+export function uuid(id: string): string | typeof undefined {
   const {uuid} = uuids[id]
 
   return uuid
@@ -85,7 +124,7 @@ export function groupId(id: string): string {
   return groupIds[id]
 }
 
-export function groupOfFiles(id: string): Array {
+export function groupOfFiles(id: string): Array<string> {
   const groupOfFiles = {
     valid: [
       '89827330-e200-41bc-9fba-7d51c8e9ea15',
