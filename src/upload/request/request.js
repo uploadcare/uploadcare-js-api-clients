@@ -14,6 +14,9 @@ import type {
 
 import type {Options, Body, Query} from './flow-typed'
 
+// set max upload body size for node.js to 50M (default is 10M)
+const maxContentLength = 50 * 1000 * 1000
+
 /**
  * Performs request to Uploadcare Upload API
  *
@@ -44,6 +47,7 @@ export function request<T>(
     cancelToken: source.token,
     headers: constructHeaders(options, data),
     onUploadProgress: createProgressHandler(getOnProgress),
+    maxContentLength,
   }
 
   const promise = axios(axiosOptions)

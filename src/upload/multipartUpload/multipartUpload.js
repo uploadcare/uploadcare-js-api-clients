@@ -6,6 +6,9 @@ import type {MultipartUploadRequest, MultipartUploadResponse, Options} from './f
 
 import type {ProgressListener, FileData} from '../types'
 
+// set max upload body size for node.js to 50M (default is 10M)
+const maxContentLength = 50 * 1000 * 1000
+
 /**
  * Perform upload request to the part URL
  *
@@ -33,6 +36,7 @@ export function multipartUpload(
     cancelToken: source.token,
     headers: options.headers || {},
     onUploadProgress: createProgressHandler(getOnProgress),
+    maxContentLength,
   }
 
   const promise = axios(axiosOptions)
