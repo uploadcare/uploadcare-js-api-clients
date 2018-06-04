@@ -121,8 +121,9 @@ function buildFormData(body: Body): FormData {
 
     // if value is raw file without metadata (Buffer)
     const filename = isBinaryData(value) ? key : undefined
+    const appendArgs = filename ? [key, value, filename] : [key, value]
 
-    formData.append(key, value, filename)
+    formData.append.apply(formData, appendArgs)
   }
 
   return formData
