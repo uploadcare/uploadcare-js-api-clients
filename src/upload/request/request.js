@@ -47,7 +47,7 @@ export function request<T>(
     cancelToken: source.token,
     headers: constructHeaders(options, data),
     onUploadProgress: createProgressHandler(getOnProgress),
-    maxContentLength: maxContentLength,
+    maxContentLength,
   }
 
   const promise = axios(axiosOptions)
