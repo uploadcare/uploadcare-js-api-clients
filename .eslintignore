@@ -1,2 +1,2 @@
-**/dist/**
-**/flow-typed/**
+dist
+flow-typed
