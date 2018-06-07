@@ -11,8 +11,8 @@
     "test": "npm run test:node && npm run test:browser",
     "test:node": "BABEL_ENV=test:jest jest --no-cache src/",
     "test:node:debug": "BABEL_ENV=test:jest node --inspect-brk ./node_modules/jest/bin/jest.js --runInBand --watchAll src/",
-    "test:browser": "BABEL_ENV=test karma start karma.config.js --single-run --nocache",
-    "test:browser:debug": "BABEL_ENV=test karma start karma.config.js --browsers=Chrome --single-run=false --watch --debug  --nocache"
+    "test:browser": "BABEL_ENV=test node scripts/build-karma-injectables.js && karma start karma.config.js --single-run --nocache",
+    "test:browser:debug": "BABEL_ENV=test node scripts/build-karma-injectables.js && karma start karma.config.js --browsers=Chrome --single-run=false --watch --debug  --nocache"
   },
   "repository": {
     "type": "git",

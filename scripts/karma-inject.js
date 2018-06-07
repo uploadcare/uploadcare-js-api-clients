@@ -1,5 +1,3 @@
-require('./build-karma-injectables')
-
 const path = require('path')
 
 const resolveBundle = (packageName, bundlePath) =>

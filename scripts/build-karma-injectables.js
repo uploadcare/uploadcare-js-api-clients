@@ -4,7 +4,7 @@ const path = require('path')
 const fs = require('fs')
 const rollup = require('rollup')
 
-const build = async({base, input, output}) => {
+const build = async({name, base, input, output}) => {
   const bundle = await rollup.rollup({
     input: input,
     plugins: [
@@ -23,11 +23,11 @@ const build = async({base, input, output}) => {
   return await bundle.write({
     file: output,
     format: 'umd',
-    name: 'jest',
+    name: name,
   })
 }
 
-const tryBuild = async(packageName, inputPath, outputPath) => {
+const tryBuild = async({exportName, packageName, inputPath, outputPath}) => {
   const packageDir = path.dirname(path.resolve(require.resolve(packageName)))
   const input = path.resolve(packageDir, inputPath)
   const output = path.resolve(packageDir, outputPath)
@@ -39,27 +39,39 @@ const tryBuild = async(packageName, inputPath, outputPath) => {
   }
 
   try {
-    await build(input, output)
+    await build({
+      name: exportName,
+      base: packageDir,
+      input,
+      output,
+    })
     console.log(`${packageName} built successfully`)
   }
-  catch (error) {
-    console.err(error)
+  catch (exception) {
+    console.error(exception)
   }
 }
 
 const packages = {
   'jest-matchers': {
+    name: 'expect',
     input: 'index.js',
     output: 'bundle.js',
   },
   'jest-mock': {
+    name: 'jest',
     input: 'index.js',
     output: 'bundle.js',
   },
 }
 
 for (const pkg of Object.keys(packages)) {
-  const {input, output} = packages[pkg]
+  const {name, input, output} = packages[pkg]
 
-  tryBuild(pkg, input, output)
+  tryBuild({
+    exportName: name,
+    packageName: pkg,
+    inputPath: input,
+    outputPath: output,
+  })
 }
