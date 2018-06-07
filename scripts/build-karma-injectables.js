@@ -42,8 +42,8 @@ const tryBuild = async(packageName, inputPath, outputPath) => {
     await build(input, output)
     console.log(`${packageName} built successfully`)
   }
-  catch (exception) {
-    console.err(exception)
+  catch (error) {
+    console.err(error)
   }
 }
 
