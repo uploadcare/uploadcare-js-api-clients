@@ -3,10 +3,11 @@
     [
       "@babel/preset-env",
       {
-        "useBuiltIns": "usage",
+        "useBuiltIns": false,
         "modules": false,
         "targets": {
-          "node": "8.0.0"
+          "node": "8.0.0",
+          "esmodules": true
         }
       }
     ],

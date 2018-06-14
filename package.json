@@ -2,8 +2,9 @@
   "name": "@uploadcare/api",
   "version": "1.0.0",
   "description": "JavaScript library for work with Uploadcare API",
-  "main": "dist/uploadcare.umd.js",
+  "main": "src/uploadcare.umd.js",
   "module": "dist/uploadcare.esm.js",
+  "browser": "dist/uploadcare.umd.js",
   "scripts": {
     "build": "flow && rollup -c rollup.config.js",
     "lint": "eslint .",
