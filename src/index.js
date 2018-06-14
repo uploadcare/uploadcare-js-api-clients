@@ -1,1 +1,3 @@
-export {request} from './upload/request'
+import * as UploadAPI from './upload'
+
+export {UploadAPI}
