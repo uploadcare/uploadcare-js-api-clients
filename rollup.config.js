@@ -27,15 +27,14 @@ export default [
   {
     input: 'src/index.js',
     plugins: getPlugins({forBrowser: false}),
+    external: ['axios', 'query-string', 'form-data'],
     output: [
       {
         file: 'dist/uploadcare.cjs.js',
-        name: 'uploadcareAPI',
         format: 'cjs',
       },
       {
         file: 'dist/uploadcare.esm.js',
-        name: 'uploadcareAPI',
         format: 'esm',
       },
     ],
