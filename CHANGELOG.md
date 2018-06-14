@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Added
 
-* Request wrappers for Uploadcare [Upload API][upload-api]
+* Low-level request wrappers for Uploadcare [Upload API][upload-api]
+* Test environment for both Node.js and browsers
 
 [upload-api]: https://uploadcare.com/docs/api_reference/upload/
