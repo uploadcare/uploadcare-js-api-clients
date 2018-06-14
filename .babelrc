@@ -3,14 +3,21 @@
     [
       "@babel/preset-env",
       {
+        "useBuiltIns": false,
         "modules": false,
         "targets": {
-          "browsers": ["> 0.5%", "last 2 versions", "Firefox ESR", "not dead"],
-          "node": "8.0.0"
+          "node": "8.0.0",
+          "esmodules": true
         }
       }
     ],
     "@babel/preset-flow"
   ],
-  "plugins": []
+  "plugins": [],
+
+  "env": {
+    "test:jest": {
+      "plugins": ["@babel/plugin-transform-modules-commonjs"]
+    }
+  }
 }

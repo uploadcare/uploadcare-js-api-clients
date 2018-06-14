@@ -1,29 +1,54 @@
 import license from 'rollup-plugin-license'
 import babel from 'rollup-plugin-babel'
+import resolve from 'rollup-plugin-node-resolve'
+import commonjs from 'rollup-plugin-commonjs'
+import replace from 'rollup-plugin-replace'
 
-export default {
-  input: 'src/index.js',
-  plugins: [
-    license({
-      banner: `
-        <%= pkg.name %> <%= pkg.version %>
-        <%= pkg.description %>
-        <%= pkg.homepage %>
-        Date: <%= moment().format('YYYY-MM-DD') %>
-      `,
+const getPlugins = ({forBrowser} = {}) =>
+  [
+    replace({'process.env.NODE_ENV': process.env.NODE_ENV}),
+    forBrowser && resolve({browser: true}),
+    commonjs({
+      include: 'node_modules/**',
+      sourceMap: false,
     }),
     babel(),
-  ],
-  output: [
-    {
-      file: 'dist/uploadcare.umd.js',
-      name: 'uploadcareAPI',
-      format: 'umd',
-    },
-    {
-      file: 'dist/uploadcare.esm.js',
-      name: 'uploadcareAPI',
-      format: 'esm',
-    },
-  ],
-}
+    license({
+      banner: `
+      <%= pkg.name %> <%= pkg.version %>
+      <%= pkg.description %>
+      <%= pkg.homepage %>
+      Date: <%= moment().format('YYYY-MM-DD') %>
+    `,
+    }),
+  ].filter(plugin => !!plugin)
+
+export default [
+  {
+    input: 'src/index.js',
+    plugins: getPlugins({forBrowser: false}),
+    output: [
+      {
+        file: 'dist/uploadcare.cjs.js',
+        name: 'uploadcareAPI',
+        format: 'cjs',
+      },
+      {
+        file: 'dist/uploadcare.esm.js',
+        name: 'uploadcareAPI',
+        format: 'esm',
+      },
+    ],
+  },
+  {
+    input: 'src/index.js',
+    plugins: getPlugins({forBrowser: true}),
+    output: [
+      {
+        file: 'dist/uploadcare.umd.js',
+        name: 'uploadcareAPI',
+        format: 'umd',
+      },
+    ],
+  },
+]

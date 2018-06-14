@@ -1,3 +1,6 @@
-**/node_modules/**
-**/dist/**
+node_modules
+dist
 browserstack.json
+.idea
+.log
+.vscode

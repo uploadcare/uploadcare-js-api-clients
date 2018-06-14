@@ -1,16 +1,20 @@
 const babel = require('rollup-plugin-babel')
-const browserStackConf = require('./browserstack.json')
+// const browserStackConf = require('./browserstack.json')
+const resolve = require('rollup-plugin-node-resolve')
+const commonjs = require('rollup-plugin-commonjs')
+const replace = require('rollup-plugin-replace')
 
 process.env.CHROME_BIN = require('puppeteer').executablePath()
 
 module.exports = function(config) {
   config.set({
-    browserStack: {
-      username: browserStackConf.username,
-      accessKey: browserStackConf.accessKey,
-    },
+    // browserStack: {
+    //   username: browserStackConf.username,
+    //   accessKey: browserStackConf.accessKey,
+    // },
+    browserNoActivityTimeout: 50000,
     browsers: ['ChromeHeadless'],
-    frameworks: ['jest-matchers', 'jasmine'],
+    frameworks: ['inject', 'jasmine'],
 
     files: [
       {
@@ -24,12 +28,17 @@ module.exports = function(config) {
       'karma-chrome-launcher',
       'karma-jasmine',
       'karma-rollup-preprocessor',
-      require('./scripts/karma-jest-matchers'),
+      require('./scripts/karma-inject'),
     ],
 
     preprocessors: {'src/**/*.spec.js': ['rollup']},
     rollupPreprocessor: {
-      plugins: [babel()],
+      plugins: [
+        replace({'process.env.NODE_ENV': process.env.NODE_ENV}),
+        resolve({browser: true}),
+        commonjs({include: 'node_modules/**'}),
+        babel(),
+      ],
       output: {
         format: 'iife',
         name: 'uploadcare',

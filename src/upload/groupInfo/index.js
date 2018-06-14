@@ -1,0 +1,1 @@
+export {groupInfo} from './groupInfo'

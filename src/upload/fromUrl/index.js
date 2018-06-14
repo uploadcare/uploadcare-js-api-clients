@@ -1,0 +1,1 @@
+export {fromUrl} from './fromUrl'

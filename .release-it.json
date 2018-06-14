@@ -1,13 +1,9 @@
 {
-  "src": {
-    "tagName": "v%s"
-  },
   "buildCommand": "npm run build",
-  "github": {
-    "release": true,
-    "draft": true
-  },
-  "npm": {
-    "publish": true
-  }
+  "githubRelease": true,
+  "createArchives": false,
+  "npmPublish": true,
+  "deployRelease": false,
+  "deployDemo": false,
+  "dryRun": false
 }
