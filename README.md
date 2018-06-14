@@ -6,7 +6,7 @@
     alt="">
 </a>
 
-:bangbang: This project is in alpha. The API will be changed. Do not use it. Really. :bangbang:
+:bangbang: Work in progress. The API will be changed. Do not use it. Really. :bangbang:
 
 JavaScript library for work with Uploadcare API.
 
