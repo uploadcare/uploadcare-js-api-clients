@@ -6,7 +6,9 @@
     alt="">
 </a>
 
-JavaScript library for work with Uploadcare API
+:bangbang: This project is in alpha. The API will be changed. Do not use it. Really. :bangbang:
+
+JavaScript library for work with Uploadcare API.
 
 [![NPM version][npm-img]][npm-url]
 [![GitHub release][badge-release-img]][badge-release-url]&nbsp;
@@ -25,7 +27,7 @@ JavaScript library for work with Uploadcare API
 ## Install
 
 ```
-npm i @uploadcare/api --save
+npm install @uploadcare/api --save
 ```
 
 ## Usage
@@ -33,9 +35,8 @@ npm i @uploadcare/api --save
 ```
 import {UploadAPI} from '@uploadcare/api'
 
-UploadAPI.request()
-UploadAPI.base()
-
+UploadAPI.request(method, path, {query, body})
+UploadAPI.base(file, {publicKey, store})
 ```
 
 ## Configuration
