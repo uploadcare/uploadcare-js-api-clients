@@ -1,6 +1,6 @@
 {
   "name": "@uploadcare/api",
-  "version": "1.0.0",
+  "version": "1.0.0-alpha",
   "description": "JavaScript library for work with Uploadcare API",
   "main": "src/uploadcare.cjs.js",
   "module": "dist/uploadcare.esm.js",
