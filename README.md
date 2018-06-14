@@ -37,6 +37,14 @@ import {UploadAPI} from '@uploadcare/api'
 
 UploadAPI.request(method, path, {query, body})
 UploadAPI.base(file, {publicKey, store})
+UploadAPI.fromUrl(url, {publicKey, store, fileName})
+UploadAPI.fromUrlStatus(token)
+UploadAPI.group([uuids], {publicKey})
+UploadAPI.groupInfo(groupId, {publicKey})
+UploadAPI.info(uuid, {publicKey})
+UploadAPI.multipartStart({publicKey, filename, size})
+UploadAPI.multipartUpload(partUrl, data)
+UploadAPI.multipartComplete(uuid, {publicKey})
 ```
 
 ## Configuration
