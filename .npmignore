@@ -1,0 +1,6 @@
+src/**
+test/**
+flow-typed/**
+scripts/**
+*.config.js
+.*
