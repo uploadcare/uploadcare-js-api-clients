@@ -26,13 +26,13 @@ JavaScript library for work with Uploadcare API.
 
 ## Install
 
-```
+```bash
 npm install @uploadcare/api --save
 ```
 
 ## Usage
 
-```
+```javascript
 import {UploadAPI} from '@uploadcare/api'
 
 UploadAPI.request(method, path, {query, body})
