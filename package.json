@@ -4,7 +4,10 @@
   "description": "JavaScript library for work with Uploadcare API",
   "main": "src/uploadcare.cjs.js",
   "module": "dist/uploadcare.esm.js",
-  "browser": "dist/uploadcare.umd.js",
+  "browser": {
+    "./dist/uploadcare.browser.esm.js": "./dist/uploadcare.browser.esm.js",
+    "./dist/uploadcare.browser.umd.js": "./dist/uploadcare.browser.umd.js"
+  },
   "scripts": {
     "build": "flow && rollup -c rollup.config.js",
     "lint": "eslint .",

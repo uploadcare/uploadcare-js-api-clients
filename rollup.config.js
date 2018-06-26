@@ -44,9 +44,13 @@ export default [
     plugins: getPlugins({forBrowser: true}),
     output: [
       {
-        file: 'dist/uploadcare.umd.js',
+        file: 'dist/uploadcare.browser.umd.js',
         name: 'uploadcareAPI',
         format: 'umd',
+      },
+      {
+        file: 'dist/uploadcare.browser.esm.js',
+        format: 'esm',
       },
     ],
   },
