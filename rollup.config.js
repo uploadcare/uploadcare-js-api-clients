@@ -6,32 +6,44 @@ import replace from 'rollup-plugin-replace'
 import {terser} from 'rollup-plugin-terser'
 import {sizeSnapshot} from 'rollup-plugin-size-snapshot'
 
-const getPlugins = ({forBrowser, uglify, banner} = {}) =>
+const getPlugins = ({iife} = {}) =>
   [
     replace({'process.env.NODE_ENV': process.env.NODE_ENV}),
-    forBrowser && resolve({browser: true}),
-    commonjs({
-      include: 'node_modules/**',
-      sourceMap: false,
-    }),
+    resolve({browser: iife}),
+    iife &&
+      commonjs({
+        include: 'node_modules/**',
+        sourceMap: false,
+      }),
     babel(),
-    uglify && terser(),
-    banner &&
-      license({
-        banner: `
+    iife && terser(),
+    license({
+      banner: `
           <%= pkg.name %> <%= pkg.version %>
           <%= pkg.description %>
           <%= pkg.homepage %>
           Date: <%= moment().format('YYYY-MM-DD') %>
         `,
-      }),
-      sizeSnapshot(),
+    }),
+    sizeSnapshot(),
   ].filter(plugin => !!plugin)
 
 export default [
   {
+    input: 'src/upload/index.js',
+    plugins: getPlugins({iife: false}),
+    external: ['axios', 'query-string', 'form-data'],
+    output: [
+      {
+        file: 'dist/upload.esm.js',
+        format: 'esm',
+        interop: false,
+      },
+    ],
+  },
+  {
     input: 'src/index.js',
-    plugins: getPlugins({forBrowser: false}),
+    plugins: getPlugins({iife: false}),
     external: ['axios', 'query-string', 'form-data'],
     output: [
       {
@@ -39,40 +51,14 @@ export default [
         format: 'cjs',
         interop: false,
       },
-      {
-        file: 'dist/uploadcare.esm.js',
-        format: 'esm',
-        interop: false,
-      },
     ],
   },
   {
     input: 'src/index.js',
-    plugins: getPlugins({forBrowser: true}),
-    external: ['axios', 'query-string', 'form-data'],
+    plugins: getPlugins({iife: true}),
     output: [
       {
-        file: 'dist/uploadcare.browser.cjs.js',
-        format: 'cjs',
-        interop: false,
-      },
-      {
-        file: 'dist/uploadcare.browser.esm.js',
-        format: 'esm',
-        interop: false,
-      },
-    ],
-  },
-  {
-    input: 'src/index.js',
-    plugins: getPlugins({
-      forBrowser: true,
-      uglify: true,
-      banner: true,
-    }),
-    output: [
-      {
-        file: 'dist/uploadcare.browser.iife.js',
+        file: 'dist/uploadcare.iife.js',
         format: 'iife',
         name: 'uploadcareAPI',
         interop: false,
