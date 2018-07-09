@@ -3,6 +3,7 @@ import babel from 'rollup-plugin-babel'
 import resolve from 'rollup-plugin-node-resolve'
 import commonjs from 'rollup-plugin-commonjs'
 import replace from 'rollup-plugin-replace'
+import {sizeSnapshot} from 'rollup-plugin-size-snapshot'
 
 const getPlugins = ({forBrowser} = {}) =>
   [
@@ -21,6 +22,7 @@ const getPlugins = ({forBrowser} = {}) =>
       Date: <%= moment().format('YYYY-MM-DD') %>
     `,
     }),
+    sizeSnapshot(),
   ].filter(plugin => !!plugin)
 
 export default [
