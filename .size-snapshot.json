@@ -1,0 +1,26 @@
+{
+  "dist/uploadcare.umd.js": {
+    "bundled": 58190,
+    "minified": 17380,
+    "gzipped": 6415
+  },
+  "dist/uploadcare.cjs.js": {
+    "bundled": 12298,
+    "minified": 4663,
+    "gzipped": 1674
+  },
+  "dist/uploadcare.esm.js": {
+    "bundled": 11849,
+    "minified": 4285,
+    "gzipped": 1581,
+    "treeshaked": {
+      "rollup": {
+        "code": 53,
+        "import_statements": 53
+      },
+      "webpack": {
+        "code": 1103
+      }
+    }
+  }
+}
