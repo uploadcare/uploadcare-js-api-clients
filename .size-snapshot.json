@@ -1,15 +1,5 @@
 {
-  "dist/uploadcare.umd.js": {
-    "bundled": 58190,
-    "minified": 17380,
-    "gzipped": 6415
-  },
-  "dist/uploadcare.cjs.js": {
-    "bundled": 12298,
-    "minified": 4663,
-    "gzipped": 1674
-  },
-  "dist/uploadcare.esm.js": {
+  "dist/upload.esm.js": {
     "bundled": 11849,
     "minified": 4285,
     "gzipped": 1581,
@@ -22,5 +12,15 @@
         "code": 1103
       }
     }
+  },
+  "dist/uploadcare.cjs.js": {
+    "bundled": 12137,
+    "minified": 4501,
+    "gzipped": 1662
+  },
+  "dist/uploadcare.iife.js": {
+    "bundled": 17386,
+    "minified": 17166,
+    "gzipped": 6383
   }
 }

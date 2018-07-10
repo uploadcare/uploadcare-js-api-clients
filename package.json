@@ -2,11 +2,10 @@
   "name": "@uploadcare/api",
   "version": "1.0.0-alpha",
   "description": "JavaScript library for work with Uploadcare API",
-  "main": "src/uploadcare.cjs.js",
-  "module": "dist/uploadcare.esm.js",
-  "browser": "dist/uploadcare.umd.js",
+  "main": "dist/uploadcare.cjs.js",
+  "module": "index.js",
   "scripts": {
-    "build": "flow && rollup -c rollup.config.js",
+    "build": "flow check && rollup -c rollup.config.js",
     "lint": "eslint .",
     "release": "release-it",
     "test": "npm run test:node && npm run test:browser",
@@ -70,7 +69,8 @@
     "rollup-plugin-node-resolve": "^3.3.0",
     "rollup-plugin-node-resolve-magic": "^0.2.9",
     "rollup-plugin-replace": "^2.0.0",
-    "rollup-plugin-size-snapshot": "^0.5.1"
+    "rollup-plugin-size-snapshot": "^0.5.1",
+    "rollup-plugin-terser": "^1.0.1"
   },
   "dependencies": {
     "axios": "^0.18.0",
