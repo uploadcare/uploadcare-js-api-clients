@@ -14,13 +14,13 @@
     }
   },
   "dist/uploadcare.cjs.js": {
-    "bundled": 12137,
-    "minified": 4501,
-    "gzipped": 1662
+    "bundled": 12131,
+    "minified": 4528,
+    "gzipped": 1644
   },
-  "dist/uploadcare.iife.js": {
-    "bundled": 17386,
-    "minified": 17166,
-    "gzipped": 6383
+  "dist/uploadcare.js": {
+    "bundled": 17367,
+    "minified": 17147,
+    "gzipped": 6363
   }
 }

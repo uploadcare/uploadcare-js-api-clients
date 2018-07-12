@@ -58,7 +58,7 @@ export default [
     plugins: getPlugins({iife: true}),
     output: [
       {
-        file: 'dist/uploadcare.iife.js',
+        file: 'dist/uploadcare.js',
         format: 'iife',
         name: 'uploadcareAPI',
         interop: false,
