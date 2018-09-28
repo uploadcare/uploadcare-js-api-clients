@@ -10,10 +10,7 @@ describe('fromUrl', () => {
     }
     const ucRequest = fromUrl(sourceUrl, options)
 
-    expect(ucRequest).toBeTruthy()
-    expect(ucRequest.promise).toBeInstanceOf(Promise)
-    expect(ucRequest.cancel).toBeInstanceOf(Function)
-    expect(ucRequest.progress).toBeInstanceOf(Function)
+    expect(ucRequest).toBeInstanceOf(Promise)
   })
   it('should return token for file from url', async() => {
     const sourceUrl = factory.imageUrl('valid')
@@ -24,7 +21,7 @@ describe('fromUrl', () => {
     }
     const ucRequest = fromUrl(sourceUrl, options)
 
-    const {code, data} = await ucRequest.promise
+    const {code, data} = await ucRequest
 
     expect.assertions(3)
 
@@ -41,7 +38,7 @@ describe('fromUrl', () => {
     }
     const ucRequest = fromUrl(sourceUrl, options)
 
-    const {code, data} = await ucRequest.promise
+    const {code, data} = await ucRequest
 
     expect.assertions(3)
 
@@ -57,7 +54,7 @@ describe('fromUrl', () => {
     }
     const ucRequest = fromUrl(sourceUrl, options)
 
-    const {code, data} = await ucRequest.promise
+    const {code, data} = await ucRequest
 
     expect.assertions(3)
 

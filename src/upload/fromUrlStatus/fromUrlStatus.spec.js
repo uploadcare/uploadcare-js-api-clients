@@ -8,10 +8,7 @@ describe('fromUrlStatus', () => {
     const token = factory.token('valid')
     const ucRequest = fromUrlStatus(token)
 
-    expect(ucRequest).toBeTruthy()
-    expect(ucRequest.promise).toBeInstanceOf(Promise)
-    expect(ucRequest.cancel).toBeInstanceOf(Function)
-    expect(ucRequest.progress).toBeInstanceOf(Function)
+    expect(ucRequest).toBeInstanceOf(Promise)
   })
   it('should return info about file uploaded from url', async() => {
     const sourceUrl = factory.imageUrl('valid')
@@ -22,13 +19,13 @@ describe('fromUrlStatus', () => {
     }
     const ucFromUrlRequest = fromUrl(sourceUrl, options)
 
-    const {data: {token}} = await ucFromUrlRequest.promise
+    const {data: {token}} = await ucFromUrlRequest
 
     await helpers.wait(1000)
 
     const ucRequest = fromUrlStatus(token)
 
-    const {code, data} = await ucRequest.promise
+    const {code, data} = await ucRequest
 
     expect.assertions(3)
 
@@ -40,7 +37,7 @@ describe('fromUrlStatus', () => {
     const token = factory.token('empty')
     const ucRequest = fromUrlStatus(token)
 
-    const {code, data} = await ucRequest.promise
+    const {code, data} = await ucRequest
 
     expect.assertions(3)
 

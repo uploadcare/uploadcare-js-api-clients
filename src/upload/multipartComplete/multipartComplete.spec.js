@@ -20,10 +20,7 @@ describe('multipartComplete', () => {
   it('should return UCRequest', () => {
     const ucRequest = multipartComplete(factory.uuid('image'), {})
 
-    expect(ucRequest).toBeTruthy()
-    expect(ucRequest.promise).toBeInstanceOf(Promise)
-    expect(ucRequest.cancel).toBeInstanceOf(Function)
-    expect(ucRequest.progress).toBeInstanceOf(Function)
+    expect(ucRequest).toBeInstanceOf(Promise)
   })
 
   it('should upload some file via multipart', async() => {
@@ -36,7 +33,7 @@ describe('multipartComplete', () => {
       filename,
       publicKey,
       size: file.size,
-    }).promise
+    })
 
     // upload files as single part to the first url
     const {code: uploadCode} = await multipartUpload(parts[0], file.data).promise
@@ -44,7 +41,7 @@ describe('multipartComplete', () => {
     expect(uploadCode).toBe(200)
 
     // complete multipart: get uploaded file info
-    const {code, data} = await multipartComplete(uuid, {publicKey}).promise
+    const {code, data} = await multipartComplete(uuid, {publicKey})
 
     expect(code).toBe(200)
     expect(data.uuid).toBe(uuid)

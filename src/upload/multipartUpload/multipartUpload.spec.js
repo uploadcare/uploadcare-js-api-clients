@@ -33,7 +33,7 @@ describe('multipartUpload', () => {
       publicKey,
       filename: 'test',
       size: file.size,
-    }).promise
+    })
 
     const firstPart = data.parts[0]
 

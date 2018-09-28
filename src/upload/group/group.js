@@ -1,8 +1,8 @@
 /* @flow */
-import type {UCRequest} from '../types'
+import type {UCSimpleRequest} from '../types'
+
 import {request} from '../request'
 import type {UUID, CDNUrl, Options, GroupResponse} from './flow-typed'
-
 
 /**
  * Making a group.
@@ -10,16 +10,16 @@ import type {UUID, CDNUrl, Options, GroupResponse} from './flow-typed'
  * @param {Array<UUID | CDNUrl>} files Array, where each parameter can be a file UUID or a CDN URL,
  * with or without applied Media Processing operations.
  * @param {Options} options Set of options.
- * @returns {UCRequest}
+ * @returns {UCSimpleRequest}
  */
 export function group(
   files: Array<UUID | CDNUrl>,
   options: Options,
-): UCRequest<GroupResponse> {
+): UCSimpleRequest<GroupResponse> {
   return request('POST', 'group', {
     body: {
       files: files,
       pub_key: options.publicKey,
     },
-  })
+  }).promise
 }

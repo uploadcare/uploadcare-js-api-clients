@@ -7,17 +7,12 @@ describe('group', () => {
     const options = {publicKey: factory.publicKey('image')}
     const ucRequest = group(files, options)
 
-    expect(ucRequest).toBeTruthy()
-    expect(ucRequest.promise).toBeInstanceOf(Promise)
-    expect(ucRequest.cancel).toBeInstanceOf(Function)
-    expect(ucRequest.progress).toBeInstanceOf(Function)
+    expect(ucRequest).toBeInstanceOf(Promise)
   })
   it('should upload group of files', async() => {
     const files = factory.groupOfFiles('valid')
     const options = {publicKey: factory.publicKey('image')}
-    const ucRequest = group(files, options)
-
-    const {code, data} = await ucRequest.promise
+    const {code, data} = await group(files, options)
 
     expect.assertions(5)
 
@@ -30,9 +25,7 @@ describe('group', () => {
   it('should fail with [HTTP 400] no files[N] parameters found.', async() => {
     const files = []
     const options = {publicKey: factory.publicKey('image')}
-    const ucRequest = group(files, options)
-
-    const {code, data} = await ucRequest.promise
+    const {code, data} = await group(files, options)
 
     expect.assertions(3)
 
@@ -43,9 +36,7 @@ describe('group', () => {
   it('should fail with [HTTP 400] this is not valid file url: http://invalid/url.', async() => {
     const files = factory.groupOfFiles('invalid')
     const options = {publicKey: factory.publicKey('image')}
-    const ucRequest = group(files, options)
-
-    const {code, data} = await ucRequest.promise
+    const {code, data} = await group(files, options)
 
     expect.assertions(3)
 
@@ -56,9 +47,7 @@ describe('group', () => {
   it('should fail with [HTTP 400] some files not found.', async() => {
     const files = factory.groupOfFiles('valid')
     const options = {publicKey: factory.publicKey('demo')}
-    const ucRequest = group(files, options)
-
-    const {code, data} = await ucRequest.promise
+    const {code, data} = await group(files, options)
 
     expect.assertions(3)
 

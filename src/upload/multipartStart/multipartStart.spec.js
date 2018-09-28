@@ -5,10 +5,7 @@ describe('multipartStart', () => {
   it('should return UCRequest', () => {
     const ucRequest = multipartStart({})
 
-    expect(ucRequest).toBeTruthy()
-    expect(ucRequest.promise).toBeInstanceOf(Promise)
-    expect(ucRequest.cancel).toBeInstanceOf(Function)
-    expect(ucRequest.progress).toBeInstanceOf(Function)
+    expect(ucRequest).toBeInstanceOf(Promise)
   })
 
   it('should get uuid and parts', async() => {
@@ -18,7 +15,7 @@ describe('multipartStart', () => {
       publicKey,
       filename: 'test',
       size: 20000000,
-    }).promise
+    })
 
     expect.assertions(4)
 

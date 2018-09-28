@@ -1,5 +1,6 @@
 /* @flow */
-import type {UCRequest} from '../types'
+import type {UCSimpleRequest} from '../types'
+
 import {request} from '../request'
 import type {Options, FromUrlResponse} from './flow-typed'
 
@@ -8,12 +9,12 @@ import type {Options, FromUrlResponse} from './flow-typed'
  * @export
  * @param {string} sourceUrl Source file URL, which should be a public HTTP or HTTPS link.
  * @param {Options} options Set of options.
- * @returns {UCRequest}
+ * @returns {UCSimpleRequest}
  */
 export function fromUrl(
   sourceUrl: string,
   options: Options,
-): UCRequest<FromUrlResponse> {
+): UCSimpleRequest<FromUrlResponse> {
   return request('GET', 'from_url', {
     query: {
       source_url: sourceUrl,
@@ -21,5 +22,5 @@ export function fromUrl(
       store: options.store ? options.store.toString() : undefined,
       filename: options.fileName ? options.fileName.toString() : undefined,
     },
-  })
+  }).promise
 }

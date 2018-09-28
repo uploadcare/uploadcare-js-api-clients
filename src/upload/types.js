@@ -20,6 +20,7 @@ export type UCResponse<T> = {
 }
 
 export type UCRequest<T> = Request<UCResponse<T>>
+export type UCSimpleRequest<T> = $PropertyType<UCRequest<T>, 'promise'>
 
 export type ErrorResponse = {
   error: {

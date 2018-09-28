@@ -1,6 +1,6 @@
 /* @flow */
 
-import type {UCRequest} from '../types'
+import type {UCSimpleRequest} from '../types'
 import {request} from '../request'
 
 import type {MultipartStartResponse, Options} from './flow-typed'
@@ -16,9 +16,9 @@ const defaultOptions: $Shape<Options> = {
  *
  * @export
  * @param {Options} opts
- * @returns {UCRequest}
+ * @returns {UCSimpleRequest}
  */
-export function multipartStart(opts: Options): UCRequest<MultipartStartResponse> {
+export function multipartStart(opts: Options): UCSimpleRequest<MultipartStartResponse> {
   const options = {
     ...defaultOptions,
     ...opts,
@@ -36,5 +36,5 @@ export function multipartStart(opts: Options): UCRequest<MultipartStartResponse>
       UPLOADCARE_PUB_KEY: options.publicKey,
       UPLOADCARE_STORE: options.store,
     },
-  })
+  }).promise
 }

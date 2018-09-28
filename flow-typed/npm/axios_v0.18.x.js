@@ -1,5 +1,5 @@
-// flow-typed signature: 8e8da7ef9aaf22786956acdff3a0f0ab
-// flow-typed version: 9dcc97865b/axios_v0.18.x/flow_>=v0.25.x
+// flow-typed signature: 4ad46d97b50b0c2f5955394366fdc8cf
+// flow-typed version: e67d002d9c/axios_v0.18.x/flow_>=v0.25.x <=v0.74.x
 
 declare module "axios" {
   declare interface AxiosTransformer<T> {
@@ -46,7 +46,8 @@ declare module "axios" {
     maxRedirects?: number;
     params?: Object;
     paramsSerializer?: (params: Object) => string;
-    progress?: (progressEvent: Event) => void | mixed;
+    onUploadProgress?: (progressEvent: ProgressEvent) => void;
+    onDownloadProgress?: (progressEvent: ProgressEvent) => void;
     proxy?: ProxyConfig | false;
     responseType?:
       | "arraybuffer"

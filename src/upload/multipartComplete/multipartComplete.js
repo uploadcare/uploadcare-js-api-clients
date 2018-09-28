@@ -1,6 +1,6 @@
 /* @flow */
+import type {UCSimpleRequest} from '../types'
 
-import type {UCRequest} from '../types'
 import {request} from '../request'
 
 import type {MultipartCompleteResponse, Options} from './flow-typed'
@@ -11,16 +11,16 @@ import type {MultipartCompleteResponse, Options} from './flow-typed'
  * @export
  * @param {string} uuid
  * @param {Options} options
- * @returns {UCRequest}
+ * @returns {UCSimpleRequest}
  */
 export function multipartComplete(
   uuid: string,
   options: Options,
-): UCRequest<MultipartCompleteResponse> {
+): UCSimpleRequest<MultipartCompleteResponse> {
   return request('POST', 'multipart/complete', {
     body: {
       uuid: uuid,
       UPLOADCARE_PUB_KEY: options.publicKey,
     },
-  })
+  }).promise
 }
