@@ -1,6 +1,3 @@
-// flow-typed signature: 4ad46d97b50b0c2f5955394366fdc8cf
-// flow-typed version: e67d002d9c/axios_v0.18.x/flow_>=v0.25.x <=v0.74.x
-
 declare module "axios" {
   declare interface AxiosTransformer<T> {
     (data: T, headers?: Object): Object;
@@ -46,8 +43,7 @@ declare module "axios" {
     maxRedirects?: number;
     params?: Object;
     paramsSerializer?: (params: Object) => string;
-    onUploadProgress?: (progressEvent: ProgressEvent) => void;
-    onDownloadProgress?: (progressEvent: ProgressEvent) => void;
+    progress?: (progressEvent: Event) => void | mixed;
     proxy?: ProxyConfig | false;
     responseType?:
       | "arraybuffer"
@@ -100,10 +96,7 @@ declare module "axios" {
   declare type AxiosPromise<T,R = T> = Promise<AxiosXHR<T,R>>;
   declare class Axios {
     constructor<T,R>(config?: AxiosXHRConfigBase<T,R>): void;
-    $call: <T,R>(
-      config: AxiosXHRConfig<T,R> | string,
-      config?: AxiosXHRConfig<T,R>
-    ) => AxiosPromise<T,R>;
+    [[call]]<T,R>(config: AxiosXHRConfig<T,R> | string, config?: AxiosXHRConfig<T,R>): AxiosPromise<T,R>;
     request<T,R>(config: AxiosXHRConfig<T,R>): AxiosPromise<T,R>;
     delete<T,R>(url: string, config?: AxiosXHRConfigBase<T,R>): AxiosPromise<T,R>;
     get<T,R>(url: string, config?: AxiosXHRConfigBase<T,R>): AxiosPromise<T,R>;
@@ -140,6 +133,7 @@ declare module "axios" {
   declare type $AxiosError<T,R = T> = AxiosError<T,R>;
 
   declare interface AxiosExport extends Axios {
+    [[call]]<T,R>(config: AxiosXHRConfig<T,R> | string, config?: AxiosXHRConfig<T,R>): AxiosPromise<T,R>;
     Axios: typeof Axios;
     Cancel: Class<Cancel>;
     CancelToken: Class<CancelToken>;
