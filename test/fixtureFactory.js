@@ -18,7 +18,7 @@ const uuids: {[key: string]: {publicKey: string, uuid?: string}} = {
   invalid: {publicKey: 'invalidpublickey'},
 }
 
-type FixtureFile = {
+export type FixtureFile = {
   data: Buffer | Blob,
   size: number,
 }

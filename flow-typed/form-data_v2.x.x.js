@@ -4,7 +4,7 @@ declare module 'form-data' {
 
     append(
       key: string,
-      value: string | Blob | File | Buffer | ArrayBuffer | stream$Readable,
+      value: mixed,
       filename?: string,
     ): void;
 

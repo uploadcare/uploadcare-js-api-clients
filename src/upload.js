@@ -1,1 +1,1 @@
-export * from './upload/index'
+export {fileFrom} from './high/fileFrom'

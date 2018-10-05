@@ -30,12 +30,12 @@ const getPlugins = ({iife} = {}) =>
 
 export default [
   {
-    input: 'src/upload/index.js',
+    input: 'src/index.js',
     plugins: getPlugins({iife: false}),
     external: ['axios', 'query-string', 'form-data'],
     output: [
       {
-        file: 'dist/upload.esm.js',
+        file: 'dist/upload-api.esm.js',
         format: 'esm',
         interop: false,
       },
@@ -47,7 +47,7 @@ export default [
     external: ['axios', 'query-string', 'form-data'],
     output: [
       {
-        file: 'dist/uploadcare.cjs.js',
+        file: 'dist/upload-api.cjs.js',
         format: 'cjs',
         interop: false,
       },
@@ -58,7 +58,7 @@ export default [
     plugins: getPlugins({iife: true}),
     output: [
       {
-        file: 'dist/uploadcare.js',
+        file: 'dist/upload-api.js',
         format: 'iife',
         name: 'uploadcareAPI',
         interop: false,

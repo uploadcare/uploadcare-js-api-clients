@@ -42,7 +42,7 @@
     "eslint": "^4.19.1",
     "eslint-config-uploadcare": "^1.1.0",
     "eslint-plugin-flowtype": "^2.47.1",
-    "flow-bin": "^0.73.0",
+    "flow-bin": "^0.82.0",
     "flow-typed": "^2.4.0",
     "husky": "^0.14.3",
     "jasmine": "^2.99.0",
