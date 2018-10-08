@@ -1,7 +1,7 @@
 /* @flow */
 import type {FileData, UCFile} from '../../flow-typed'
 import type {Options} from './flow-typed'
-import {uploadSimple} from './uploadSimple/uploadSimple'
+import {uploadDirect} from './uploadDirect/uploadDirect'
 import {isFileData} from '../../util/checkers'
 import {extractInfo} from './extractInfo'
 import {uploadMultipart} from './uploadMultipart/uploadMultipart'
@@ -35,6 +35,6 @@ export function fileFrom(
       return uploadMultipart(input, options)
     }
 
-    return uploadSimple(input, options)
+    return uploadDirect(input, options)
   }
 }

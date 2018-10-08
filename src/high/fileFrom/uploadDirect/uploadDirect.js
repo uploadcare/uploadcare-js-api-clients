@@ -81,7 +81,7 @@ function handleFailed(state: $Call<typeof makeState>) {
   }
 }
 
-export function uploadSimple(input: FileData, options: Options): UCFile {
+export function uploadDirect(input: FileData, options: Options): UCFile {
   const uploadReq = base(input, {
     publicKey: options.publicKey,
     store: typeof options.store === 'undefined' ? 'auto' : options.store,

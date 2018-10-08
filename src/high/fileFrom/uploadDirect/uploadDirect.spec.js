@@ -1,12 +1,12 @@
 import * as factory from '../../../../test/fixtureFactory'
 import {testProgressCallback} from '../../../../test/helpers'
-import {uploadSimple} from './uploadSimple'
+import {uploadDirect} from './uploadDirect'
 import {isBrowser} from '../../../util/checkers'
 
-describe('#uploadSimple', () => {
+describe('#uploadDirect', () => {
   it('should return UCFile instance', () => {
     const file = factory.image('blackSquare')
-    const ucFile = uploadSimple(file.data, {publicKey: 'demopublickey'})
+    const ucFile = uploadDirect(file.data, {publicKey: 'demopublickey'})
 
     expect(ucFile).toBeTruthy()
     expect(ucFile.promise).toBeInstanceOf(Promise)
@@ -20,7 +20,7 @@ describe('#uploadSimple', () => {
 
   it('should provide initial fileInfo', () => {
     const file = new File([factory.image('blackSquare').data], 'filename', {type: 'image/png'})
-    const ucFile = uploadSimple(file, {publicKey: 'demopublickey'})
+    const ucFile = uploadDirect(file, {publicKey: 'demopublickey'})
 
     const initialFileInfo = ucFile.getFileInfo()
 
@@ -32,7 +32,7 @@ describe('#uploadSimple', () => {
 
   it('should be able to cancel uploading', () => {
     const file = factory.file(1)
-    const ucFile = uploadSimple(file.data, {publicKey: 'demopublickey'})
+    const ucFile = uploadDirect(file.data, {publicKey: 'demopublickey'})
 
     expect(ucFile.promise).rejects.toEqual(
       expect.objectContaining({type: 'REQUEST_CANCELLED'}),
@@ -43,7 +43,7 @@ describe('#uploadSimple', () => {
 
   it('should have success status on upload complete', async() => {
     const file = factory.image('blackSquare')
-    const ucFile = uploadSimple(file.data, {publicKey: 'demopublickey'})
+    const ucFile = uploadDirect(file.data, {publicKey: 'demopublickey'})
 
     expect(ucFile.status).toBe('progress')
 
@@ -56,7 +56,7 @@ describe('#uploadSimple', () => {
 
   it('should provide full fileInfo after upload', async() => {
     const file = factory.image('blackSquare')
-    const ucFile = uploadSimple(file.data, {publicKey: 'demopublickey'})
+    const ucFile = uploadDirect(file.data, {publicKey: 'demopublickey'})
 
     await ucFile.promise
 
@@ -71,7 +71,7 @@ describe('#uploadSimple', () => {
     jasmine.DEFAULT_TIMEOUT_INTERVAL = 10000
 
     const file = factory.image('blackSquare')
-    const ucFile = uploadSimple(file.data, {publicKey: 'non'})
+    const ucFile = uploadDirect(file.data, {publicKey: 'non'})
 
     expect.assertions(3)
 
@@ -94,7 +94,7 @@ describe('#uploadSimple', () => {
 
   it('should upload instance of File', async() => {
     const file = factory.image('blackSquare')
-    const ucFile = uploadSimple(file.data, {publicKey: 'demopublickey'})
+    const ucFile = uploadDirect(file.data, {publicKey: 'demopublickey'})
 
     const fileInfo = await ucFile.promise
 
@@ -104,7 +104,7 @@ describe('#uploadSimple', () => {
 
   it('should provide progress for it', () => {
     const file = factory.file(3)
-    const ucFile = uploadSimple(file.data, {publicKey: 'demopublickey'})
+    const ucFile = uploadDirect(file.data, {publicKey: 'demopublickey'})
 
     isBrowser() && testProgressCallback(ucFile.promise, ucFile.progress, file)
   })
