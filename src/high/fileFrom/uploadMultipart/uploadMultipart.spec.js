@@ -87,8 +87,6 @@ fdescribe('#uploadMultipart', () => {
   })
 
   it('should have failed status on upload error', async() => {
-    jasmine.DEFAULT_TIMEOUT_INTERVAL = 10000
-
     const file = factory.image('blackSquare')
     const ucFile = uploadMultipart(file.data, {publicKey: 'non'})
 
@@ -121,10 +119,15 @@ fdescribe('#uploadMultipart', () => {
     expect(typeof fileInfo.uuid).toBe('string')
   })
 
-  it('should provide progress for it', () => {
-    const file = factory.file(3)
-    const ucFile = uploadMultipart(file.data, {publicKey: 'demopublickey'})
+  fit('should provide progress for it', async() => {
+    const file = factory.file(12)
+    const ucFile = uploadMultipart(file.data, {
+      publicKey: 'demopublickey',
+      filename: 'test',
+      contentType: 'application/octet-stream',
+    })
 
-    isBrowser() && testProgressCallback(ucFile.promise, ucFile.progress, file)
+    isBrowser() &&
+      (await testProgressCallback(ucFile.promise, ucFile.progress, file))
   })
 })

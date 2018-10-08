@@ -102,10 +102,11 @@ describe('#uploadDirect', () => {
     expect(typeof fileInfo.uuid).toBe('string')
   })
 
-  it('should provide progress for it', () => {
+  it('should provide progress for it', async() => {
     const file = factory.file(3)
     const ucFile = uploadDirect(file.data, {publicKey: 'demopublickey'})
 
-    isBrowser() && testProgressCallback(ucFile.promise, ucFile.progress, file)
+    isBrowser() &&
+      (await testProgressCallback(ucFile.promise, ucFile.progress, file))
   })
 })

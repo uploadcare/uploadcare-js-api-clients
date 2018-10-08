@@ -36,13 +36,13 @@ export async function testProgressCallback(
 
   progress(onProgress)
 
-  await promise
+  await expect(promise).resolves.toBeTruthy()
 
   expect(onProgress).toHaveBeenCalled()
 
   const lastProgressArg =
     onProgress.mock.calls[onProgress.mock.calls.length - 1][0]
 
-  expect(lastProgressArg.total).toBeGreaterThan(file.size)
-  expect(lastProgressArg.loaded).toBe(lastProgressArg.total)
+  expect(lastProgressArg.total).toBe(file.size)
+  expect(lastProgressArg.loaded).toBe(file.size)
 }

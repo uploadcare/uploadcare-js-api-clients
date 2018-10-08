@@ -86,7 +86,7 @@ describe('request', () => {
     expect(onReject).toHaveBeenCalled()
   })
 
-  it('should provide progress info in browser', () => {
+  it('should provide progress info in browser', async() => {
     const file = factory.file(0.01)
 
     const ucRequest = request('POST', 'base', {
@@ -97,7 +97,7 @@ describe('request', () => {
     })
 
     isBrowser() &&
-      testProgressCallback(ucRequest.promise, ucRequest.progress, file)
+      (await testProgressCallback(ucRequest.promise, ucRequest.progress, file))
   })
 
   it('should be able to upload data', async() => {
