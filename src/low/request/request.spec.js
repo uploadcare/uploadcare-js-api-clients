@@ -2,7 +2,7 @@ import {request} from './request'
 import * as factory from '../../../test/fixtureFactory'
 import axios from 'axios'
 import {testProgressCallback} from '../../../test/helpers'
-import { isBrowser } from '../../util/checkers';
+import {isBrowser} from '../../util/checkers'
 
 describe('request', () => {
   it('should return UCRequest', () => {
@@ -96,7 +96,8 @@ describe('request', () => {
       },
     })
 
-    isBrowser() && testProgressCallback(ucRequest.promise, ucRequest.progress, file)
+    isBrowser() &&
+      testProgressCallback(ucRequest.promise, ucRequest.progress, file)
   })
 
   it('should be able to upload data', async() => {

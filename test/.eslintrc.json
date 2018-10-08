@@ -1,5 +1,5 @@
 {
-  "env": {"browser": true},
+  "env": {"node": true, "es6": true, "browser": true, "mocha": true, "jasmine": true, "jest": true},
   "rules": {
     "require-jsdoc": "off",
     "id-length": "off"

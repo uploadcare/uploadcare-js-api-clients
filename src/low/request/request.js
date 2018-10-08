@@ -13,7 +13,7 @@ import type {
 } from '../../flow-typed'
 
 import type {Options, Body, Query} from './flow-typed'
-import { makeError } from '../../util/makeError';
+import {makeError} from '../../util/makeError'
 
 // set max upload body size for node.js to 50M (default is 10M)
 const maxContentLength = 50 * 1000 * 1000
@@ -54,10 +54,16 @@ export function request<T>(
   const promise = axios(axiosOptions)
     .then(normalizeResponse)
     .then(cleanOnResolve(removeOnProgress))
-    .catch(thrown => Promise.reject(axios.isCancel(thrown) ? makeError({
-      type: 'REQUEST_CANCELLED',
-      origin: thrown,
-    }) : thrown))
+    .catch(thrown =>
+      Promise.reject(
+        axios.isCancel(thrown)
+          ? makeError({
+            type: 'REQUEST_CANCELLED',
+            origin: thrown,
+          })
+          : thrown,
+      ),
+    )
     .catch(cleanOnReject(removeOnProgress))
 
   const ucRequest = {}
@@ -67,6 +73,7 @@ export function request<T>(
     cancel: function(): void {
       source.cancel()
     },
+    // TODO: make able to add multiple handlers
     progress: function(callback: ProgressListener): UCRequest<T> {
       onProgress = callback
 

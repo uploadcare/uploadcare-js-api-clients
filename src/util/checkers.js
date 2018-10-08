@@ -1,7 +1,13 @@
 /* @flow */
 
-export const isNode = (): boolean =>
-  Object.prototype.toString.call(global.process) === '[object process]'
+export const isNode = (): boolean => {
+  try {
+    return Object.prototype.toString.call(global.process) === '[object process]'
+  }
+  catch (e) {
+    return false
+  }
+}
 export const isBrowser = (): boolean => !isNode()
 export const isObject = (data: any): boolean %checks => typeof data === 'object'
 export const isFunction = (data: any): boolean %checks =>

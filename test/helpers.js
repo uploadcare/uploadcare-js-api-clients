@@ -16,8 +16,13 @@ export function wait(timeout: number): Promise<void> {
   })
 }
 
-export function isNode(): boolean {
-  return Object.prototype.toString.call(global.process) === '[object process]'
+export const isNode = (): boolean => {
+  try {
+    return Object.prototype.toString.call(global.process) === '[object process]'
+  }
+  catch (e) {
+    return false
+  }
 }
 
 export async function testProgressCallback(
@@ -40,5 +45,4 @@ export async function testProgressCallback(
 
   expect(lastProgressArg.total).toBeGreaterThan(file.size)
   expect(lastProgressArg.loaded).toBe(lastProgressArg.total)
-
 }

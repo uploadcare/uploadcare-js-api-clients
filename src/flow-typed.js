@@ -1,6 +1,6 @@
 /* @flow */
 
-export type ProgressListener = ({total: number, loaded: number}) => void
+export type ProgressListener = ({total: number, loaded: number}) => mixed
 
 export interface Request<T> {
   promise: Promise<T>;
@@ -20,7 +20,7 @@ export type UCResponse<T> = {
 }
 
 export type UCRequest<T> = Request<UCResponse<T>>
-export type UCSimpleRequest<T> = $PropertyType<UCRequest<T>, 'promise'>
+export type UCSimpleRequest<T> = Promise<UCResponse<T>>
 
 export type ErrorResponse = {
   error: {
