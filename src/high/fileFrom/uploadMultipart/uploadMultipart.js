@@ -1,5 +1,4 @@
 /* @flow */
-/* eslint-disable require-jsdoc */
 
 import type {
   FileData,
@@ -16,12 +15,20 @@ import type {MultipartUploadRequest} from '../../../low/multipartUpload/flow-typ
 import type {UCError} from '../../../flow-typed'
 import {multipartComplete} from '../../../low/multipartComplete/multipartComplete'
 
+/**
+ * Receives uuid and upload urls from API
+ *
+ * @param {FileData} input
+ * @param {$Call<typeof makeState>} state
+ * @param {Options} options
+ * @returns {() => Promise<{uuid: string, parts: Array<string>}>}
+ */
 function getParts(
   input: FileData,
   state: $Call<typeof makeState>,
   options: Options,
-) {
-  return (): Promise<{uuid: string, parts: Array<string>}> => {
+): () => Promise<{uuid: string, parts: Array<string>}> {
+  return () => {
     const fileInfo = state.get('fileInfo')
 
     return multipartStart({
@@ -44,6 +51,12 @@ function getParts(
   }
 }
 
+/**
+ * Extract uuid from promise chain and save it to the state
+ *
+ * @param {$Call<typeof makeState>} state
+ * @returns
+ */
 function updateUuid(state: $Call<typeof makeState>) {
   return (response: {uuid: string, parts: Array<string>}) => {
     state.set('fileInfo', {
@@ -55,18 +68,31 @@ function updateUuid(state: $Call<typeof makeState>) {
   }
 }
 
+/**
+ * Split file size to chunks
+ *
+ * @param {number} fileSize
+ * @returns {Array<[number, number]>}
+ */
 function getChunks(fileSize: number): Array<[number, number]> {
   const chunkSize = 5242880
   const chunksCount = Math.ceil(fileSize / chunkSize)
 
   return Array.apply(null, Array(chunksCount)).map((val, idx) => {
     const start = 0 + (idx * chunkSize)
-    const end = start + chunkSize
+    const end = Math.min(start + chunkSize, fileSize)
 
     return [start, end]
   })
 }
 
+/**
+ * Create upload requests for each chunk
+ *
+ * @param {FileData} input
+ * @param {$Call<typeof makeState>} state
+ * @returns
+ */
 function startUploadChunks(input: FileData, state: $Call<typeof makeState>) {
   return ({parts}: {parts: Array<string>}) => {
     const fileInfo = state.get('fileInfo')
@@ -78,6 +104,18 @@ function startUploadChunks(input: FileData, state: $Call<typeof makeState>) {
       return multipartUpload(url, input.slice(start, end))
     })
 
+    return requests
+  }
+}
+
+/**
+ * Create cancel function that cancels each request and save it to the state
+ *
+ * @param {$Call<typeof makeState>} state
+ * @returns
+ */
+function createSharedCancel(state: $Call<typeof makeState>) {
+  return (requests: Array<MultipartUploadRequest>) => {
     const cancelUpload = () => requests.forEach(req => req.cancel())
 
     state.set('cancelUpload', cancelUpload)
@@ -86,6 +124,14 @@ function startUploadChunks(input: FileData, state: $Call<typeof makeState>) {
   }
 }
 
+/**
+ * Assign progress listener to the each request
+ * Calculate total uploaded size and save it to the state
+ * Call user's progress listeners with calculated size
+ *
+ * @param {$Call<typeof makeState>} state
+ * @returns
+ */
 function trackProgress(state: $Call<typeof makeState>) {
   return (requests: Array<MultipartUploadRequest>) => {
     const loadedPerChunk = requests.map(() => 0)
@@ -119,6 +165,11 @@ function trackProgress(state: $Call<typeof makeState>) {
   }
 }
 
+/**
+ * Just wait until all the requests will not be resolved
+ *
+ * @returns
+ */
 function waitForUpload() {
   return (requests: Array<MultipartUploadRequest>) => {
     return Promise.all(
@@ -133,6 +184,13 @@ function waitForUpload() {
   }
 }
 
+/**
+ * Call API to receive full fileInfo and complete multipart upload
+ *
+ * @param {$Call<typeof makeState>} state
+ * @param {Options} options
+ * @returns
+ */
 function completeUpload(state: $Call<typeof makeState>, options: Options) {
   return () => {
     const fileInfo = state.get('fileInfo')
@@ -153,6 +211,12 @@ function completeUpload(state: $Call<typeof makeState>, options: Options) {
   }
 }
 
+/**
+ * Update state on success upload
+ *
+ * @param {$Call<typeof makeState>} state
+ * @returns
+ */
 function handleSuccess(state: $Call<typeof makeState>) {
   return (fileInfo: FileInfo) => {
     const resolve = state.get('resolve')
@@ -165,6 +229,12 @@ function handleSuccess(state: $Call<typeof makeState>) {
   }
 }
 
+/**
+ * Update state on failed upload
+ *
+ * @param {$Call<typeof makeState>} state
+ * @returns
+ */
 function handleFailed(state: $Call<typeof makeState>) {
   return err => {
     const reject = state.get('reject')
@@ -176,6 +246,11 @@ function handleFailed(state: $Call<typeof makeState>) {
   }
 }
 
+/**
+ * Create object to store internal request state
+ *
+ * @returns
+ */
 function makeState() {
   const state: {
     fileInfo: $Shape<FileInfo>,
@@ -199,6 +274,14 @@ function makeState() {
   }
 }
 
+/**
+ * Upload any file via multipart
+ *
+ * @export
+ * @param {FileData} input
+ * @param {Options} options
+ * @returns {UCFile}
+ */
 export function uploadMultipart(input: FileData, options: Options): UCFile {
   const state = makeState()
 
@@ -213,6 +296,7 @@ export function uploadMultipart(input: FileData, options: Options): UCFile {
     .then(getParts(input, state, options))
     .then(updateUuid(state))
     .then(startUploadChunks(input, state))
+    .then(createSharedCancel(state))
     .then(trackProgress(state))
     .then(waitForUpload())
     .then(completeUpload(state, options))
