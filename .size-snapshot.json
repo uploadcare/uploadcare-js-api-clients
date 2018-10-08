@@ -24,9 +24,9 @@
     "gzipped": 6363
   },
   "dist/upload-api.esm.js": {
-    "bundled": 8591,
-    "minified": 3536,
-    "gzipped": 1516,
+    "bundled": 9408,
+    "minified": 3909,
+    "gzipped": 1650,
     "treeshaked": {
       "rollup": {
         "code": 53,
@@ -38,13 +38,13 @@
     }
   },
   "dist/upload-api.cjs.js": {
-    "bundled": 8687,
-    "minified": 3611,
-    "gzipped": 1546
+    "bundled": 9504,
+    "minified": 3984,
+    "gzipped": 1680
   },
   "dist/upload-api.js": {
-    "bundled": 16677,
-    "minified": 16459,
-    "gzipped": 6248
+    "bundled": 17010,
+    "minified": 16792,
+    "gzipped": 6366
   }
 }

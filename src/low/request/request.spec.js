@@ -2,6 +2,7 @@ import {request} from './request'
 import * as factory from '../../../test/fixtureFactory'
 import axios from 'axios'
 import {testProgressCallback} from '../../../test/helpers'
+import { isBrowser } from '../../util/checkers';
 
 describe('request', () => {
   it('should return UCRequest', () => {
@@ -78,14 +79,14 @@ describe('request', () => {
     ucRequest.cancel()
 
     await expect(ucRequest.promise).rejects.toEqual(
-      expect.objectContaining({message: 'cancelled'}),
+      expect.objectContaining({type: 'REQUEST_CANCELLED'}),
     )
 
     expect(onResolve).not.toHaveBeenCalled()
     expect(onReject).toHaveBeenCalled()
   })
 
-  it('should provide progress info only in browser', () => {
+  it('should provide progress info in browser', () => {
     const file = factory.file(0.01)
 
     const ucRequest = request('POST', 'base', {
@@ -95,7 +96,7 @@ describe('request', () => {
       },
     })
 
-    testProgressCallback(ucRequest.promise, ucRequest.progress, file)
+    isBrowser() && testProgressCallback(ucRequest.promise, ucRequest.progress, file)
   })
 
   it('should be able to upload data', async() => {

@@ -1,6 +1,7 @@
 import * as factory from '../../../test/fixtureFactory'
 import {testProgressCallback, isNode} from '../../../test/helpers'
 import {simpleUpload} from './simpleUpload'
+import { isBrowser } from '../../util/checkers';
 
 describe('#simpleUpload', () => {
   it('should return UCFile instance', () => {
@@ -33,7 +34,7 @@ describe('#simpleUpload', () => {
     const file = factory.file(1)
     const ucFile = simpleUpload(file.data, {publicKey: 'demopublickey'})
 
-    expect(ucFile.promise).rejects.toEqual({message: 'cancelled'})
+    expect(ucFile.promise).rejects.toEqual(expect.objectContaining({type: 'REQUEST_CANCELLED'}))
 
     ucFile.cancel()
   })
@@ -52,7 +53,7 @@ describe('#simpleUpload', () => {
   })
 
   it('should have failed status on upload error', async() => {
-    jest.setTimeout(10000)
+    jasmine.DEFAULT_TIMEOUT_INTERVAL = 10000
 
     const file = factory.image('blackSquare')
     const ucFile = simpleUpload(file.data, {publicKey: 'non'})
@@ -90,6 +91,6 @@ describe('#simpleUpload', () => {
     const file = factory.file(3)
     const ucFile = simpleUpload(file.data, {publicKey: 'demopublickey'})
 
-    testProgressCallback(ucFile.promise, ucFile.progress, file)
+    isBrowser() && testProgressCallback(ucFile.promise, ucFile.progress, file)
   })
 })

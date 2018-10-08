@@ -25,25 +25,20 @@ export async function testProgressCallback(
   progress: ProgressListener => void,
   file: FixtureFile,
 ): Promise<void> {
+  expect.assertions(3)
+
   const onProgress = jest.fn()
 
   progress(onProgress)
 
   await promise
 
-  if (isNode()) {
-    expect.assertions(1)
-    expect(onProgress).not.toHaveBeenCalled()
-  }
-  else {
-    expect.assertions(3)
+  expect(onProgress).toHaveBeenCalled()
 
-    expect(onProgress).toHaveBeenCalled()
+  const lastProgressArg =
+    onProgress.mock.calls[onProgress.mock.calls.length - 1][0]
 
-    const lastProgressArg =
-      onProgress.mock.calls[onProgress.mock.calls.length - 1][0]
+  expect(lastProgressArg.total).toBeGreaterThan(file.size)
+  expect(lastProgressArg.loaded).toBe(lastProgressArg.total)
 
-    expect(lastProgressArg.total).toBeGreaterThan(file.size)
-    expect(lastProgressArg.loaded).toBe(lastProgressArg.total)
-  }
 }

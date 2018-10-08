@@ -49,7 +49,7 @@ export function multipartUpload(
   Object.assign(uploadRequest, {
     promise,
     cancel: function(): void {
-      source.cancel('cancelled')
+      source.cancel()
     },
     progress: function(callback: ProgressListener): MultipartUploadRequest {
       onProgress = callback

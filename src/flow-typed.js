@@ -62,8 +62,8 @@ export type GroupInfo = {
 }
 
 export interface UCError {
-  type: 'UPLOAD_FAILED',
-  payload: {} | Error,
+  type: string,
+  payload?: mixed,
 }
 
 export interface UCFile {

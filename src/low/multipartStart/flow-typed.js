@@ -1,7 +1,7 @@
 /* @flow */
 
 export type Options = {
-  contentType?: string,
+  contentType: string,
   expire?: number,
   filename: string,
   partSize?: number,

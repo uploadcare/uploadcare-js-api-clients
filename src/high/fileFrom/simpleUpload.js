@@ -13,15 +13,16 @@ import {base} from '../../low/base/base'
 import {info} from '../../low/info/info'
 import type {Options} from './flow-typed'
 import {extractInfo} from './extractInfo'
+import {makeError} from '../../util/makeError'
 
 function handleUpload(req: UCRequest<BaseResponse>) {
   return () =>
     req.promise.then(({code, data}) => {
       if (code !== 200 || data.error) {
-        return Promise.reject({
+        return Promise.reject(makeError({
           type: 'UPLOAD_FAILED',
           payload: data,
-        })
+        }))
       }
 
       const {file: uuid} = data
@@ -34,10 +35,10 @@ function updateFileInfo(fileInfo: $Shape<FileInfo>, options: Options) {
   return (uuid: string) =>
     info(uuid, {publicKey: options.publicKey}).then(({code, data}) => {
       if (code !== 200 || data.error) {
-        return Promise.reject({
-          type: 'INFO_FAILED',
+        return Promise.reject(makeError({
+          type: 'INFO_REQUEST_FAILED',
           payload: data,
-        })
+        }))
       }
 
       return (data: FileInfo)

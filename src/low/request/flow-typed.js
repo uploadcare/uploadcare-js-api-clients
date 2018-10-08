@@ -6,7 +6,7 @@ export type Query = {
 }
 
 export type Body = {
-  [key: string]: | Array<string>
+  [key: string]: Array<string>
     | string
     | boolean
     | number
