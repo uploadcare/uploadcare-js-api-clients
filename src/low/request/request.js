@@ -7,7 +7,6 @@ import {isBinaryData} from '../../util/checkers'
 import type {
   ProgressListener,
   UCRequest,
-  ErrorResponse,
   UCResponse,
   Headers,
 } from '../../flow-typed'
@@ -57,10 +56,7 @@ export function request<T>(
     .catch(thrown =>
       Promise.reject(
         axios.isCancel(thrown)
-          ? makeError({
-            type: 'REQUEST_CANCELLED',
-            origin: thrown,
-          })
+          ? makeError({type: 'UPLOAD_CANCEL'})
           : thrown,
       ),
     )
@@ -190,7 +186,7 @@ function buildUrl(method: string, path: string, query: Query = {}): string {
  * @returns {UCResponse} UCResponse
  */
 function normalizeResponse<T>(response): UCResponse<T> {
-  const data: T & ErrorResponse = response.data
+  const data = response.data
   const status: number = response.status
 
   if (data.error) {

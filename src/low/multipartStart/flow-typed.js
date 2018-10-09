@@ -1,13 +1,13 @@
 /* @flow */
 
 export type Options = {
-  contentType: string,
+  contentType?: string,
   expire?: number,
-  filename: string,
+  filename?: string,
   partSize?: number,
-  publicKey: string,
+  publicKey?: string,
   signature?: string,
-  size: number,
+  size?: number,
   source?: string,
   store?: boolean | 'auto',
 }

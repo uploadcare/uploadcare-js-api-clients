@@ -12,7 +12,7 @@ module.exports = function(config) {
     //   username: browserStackConf.username,
     //   accessKey: browserStackConf.accessKey,
     // },
-    browserNoActivityTimeout: 50000,
+    browserNoActivityTimeout: 60000,
     browsers: ['ChromeHeadless'],
     frameworks: ['inject', 'jasmine'],
 

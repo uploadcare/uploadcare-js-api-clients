@@ -1,6 +1,7 @@
 /* @flow */
 import type {FileInfo} from '../../flow-typed'
 import {isBlob, isFile, isBuffer, isArrayBuffer} from '../../util/checkers'
+import type {Options} from './flow-typed'
 
 /**
  *
@@ -8,26 +9,32 @@ import {isBlob, isFile, isBuffer, isArrayBuffer} from '../../util/checkers'
  * @export
  * @param {(FileData | string)} input
  */
-export function extractInfo(input: any): $Shape<FileInfo> {
-  const fileInfo: $Shape<FileInfo> = {}
+export function extractInfo(input: any, options: Options): $Shape<FileInfo> {
+  const fileInfo: $Shape<FileInfo> = {
+    filename: options.filename,
+    mime_type: options.contentType,
+  }
+
+  const setProp = (key: string, value: mixed) =>
+    typeof value !== 'undefined' && (fileInfo[key] = value)
 
   if (typeof input === 'string') {
-    fileInfo.uuid = input
+    setProp('uuid', input)
   }
   else if (isFile(input)) {
-    fileInfo.filename = input.name
-    fileInfo.size = input.size
-    fileInfo.mime_type = input.type
+    setProp('filename', input.name)
+    setProp('size', input.size)
+    setProp('mime_type', input.type)
   }
   else if (isBlob(input)) {
-    fileInfo.mime_type = input.type
-    fileInfo.size = input.size
+    setProp('mime_type', input.type)
+    setProp('size', input.size)
   }
   else if (isBuffer(input)) {
-    fileInfo.size = input.length
+    setProp('size', input.length)
   }
   else if (isArrayBuffer(input)) {
-    fileInfo.size = input.byteLength
+    setProp('size', input.byteLength)
   }
 
   return fileInfo

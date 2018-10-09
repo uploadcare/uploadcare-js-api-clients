@@ -14,20 +14,20 @@ export type Headers = {
 
 export type FileData = Blob | File | Buffer
 
-export type UCResponse<T> = {
+export type UCResponse<T> = {|
   code: number,
   data: T | ErrorResponse,
-}
+|}
 
 export type UCRequest<T> = Request<UCResponse<T>>
 export type UCSimpleRequest<T> = Promise<UCResponse<T>>
 
-export type ErrorResponse = {
+export type ErrorResponse = {|
   error: {
     status_code: number,
     content: string,
-  };
-}
+  },
+|}
 
 export type FileInfo = {
   uuid: string,
@@ -61,17 +61,26 @@ export type GroupInfo = {
   files: Array<FileInfo>,
 }
 
+export type UCErrorType =
+  | 'UPLOAD_CANCEL'
+  | 'APPLICATION_ERROR'
+  | 'SERVER_ERROR'
+  | 'NETWORK_ERROR'
+  | 'UNKNOWN_ERROR'
+
 export interface UCError {
-  type: string,
-  payload?: mixed,
+  type: string;
+  message: ?string;
+  code: ?number;
+  error: ?Error;
 }
 
 export interface UCFile {
-  promise: Promise<FileInfo>,
-  progress(callback: ProgressListener): void,
-  cancel(): void,
+  promise: Promise<FileInfo>;
+  progress(callback: ProgressListener): void;
+  cancel(): void;
 
-  getFileInfo(): FileInfo,
-  +status: 'progress' | 'error' | 'success',
-  type: 'file'
+  getFileInfo(): FileInfo;
+  +status: 'progress' | 'error' | 'success';
+  type: 'file';
 }

@@ -43,7 +43,7 @@ function imageBuffer(id: string): FixtureFile {
 
 function imageBlob(id: string): FixtureFile {
   const data = dataURItoBlob(images[id])
-  const size = data.length
+  const size = data.size
 
   return {
     data,

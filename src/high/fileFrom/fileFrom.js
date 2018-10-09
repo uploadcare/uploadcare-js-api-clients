@@ -24,7 +24,7 @@ export function fileFrom(
     ...opts,
   }
 
-  const fileInfo = extractInfo(input)
+  const fileInfo = extractInfo(input, options)
 
   if (typeof input === 'string') {
     return

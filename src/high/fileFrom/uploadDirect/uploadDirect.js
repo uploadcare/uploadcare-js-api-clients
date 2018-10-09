@@ -14,54 +14,49 @@ import {info} from '../../../low/info/info'
 import type {Options} from '../flow-typed'
 import {extractInfo} from '../extractInfo'
 import {makeError} from '../../../util/makeError'
+import {extractResponseErrors} from '../../extractResponseErrors'
 
 function makeState() {
   const state: {
     fileInfo: $Shape<FileInfo>,
-    status: 'failed' | 'success' | 'progress',
+    status: 'failed' | 'cancelled' | 'success' | 'progress',
+    request: ?UCRequest<BaseResponse>,
   } = {
     fileInfo: {},
     status: 'progress',
+    request: undefined,
   }
 
   return {
-    set: (key: string, value: mixed) => state[key] = value,
+    set: (key: string, value: mixed) => (state[key] = value),
     get: (key: string) => state[key],
   }
 }
 
-function handleUpload(req: UCRequest<BaseResponse>) {
-  return () =>
-    req.promise.then(({code, data}) => {
-      if (code !== 200 || data.error) {
-        return Promise.reject(
-          makeError({
-            type: 'UPLOAD_FAILED',
-            payload: data,
-          }),
-        )
-      }
+function startUpload(
+  input: FileData,
+  options: Options,
+  state: $Call<typeof makeState>,
+) {
+  const request = base(input, {
+    publicKey: options.publicKey,
+    store: options.store,
+    signature: options.signature,
+    expire: options.expire,
+    filename: options.filename,
+    source: options.source,
+  })
 
-      const {file: uuid} = data
+  state.set('request', request)
 
-      return uuid
-    })
+  return request.promise
+    .then(extractResponseErrors)
+    .then(({file: uuid}) => uuid)
 }
 
 function receiveFileInfo(options: Options) {
   return (uuid: string) =>
-    info(uuid, {publicKey: options.publicKey}).then(({code, data}) => {
-      if (code !== 200 || data.error) {
-        return Promise.reject(
-          makeError({
-            type: 'INFO_REQUEST_FAILED',
-            payload: data,
-          }),
-        )
-      }
-
-      return (data: FileInfo)
-    })
+    info(uuid, {publicKey: options.publicKey}).then(extractResponseErrors)
 }
 
 function handleSuccess(state: $Call<typeof makeState>) {
@@ -74,34 +69,56 @@ function handleSuccess(state: $Call<typeof makeState>) {
 }
 
 function handleFailed(state: $Call<typeof makeState>) {
-  return (err) => {
+  return err => {
+    if (err.type) {
+      if (err.type === 'UPLOAD_CANCEL') {
+        state.set('status', 'cancelled')
+      }
+      else {
+        state.set('status', 'failed')
+      }
+
+      return Promise.reject(err)
+    }
+
     state.set('status', 'failed')
 
-    return Promise.reject(err)
+    if (!err.response) {
+      return Promise.reject(
+        makeError({
+          type: 'NETWORK_ERROR',
+          error: err,
+        }),
+      )
+    }
+
+    return Promise.reject(
+      makeError({
+        type: 'UNKNOWN_ERROR',
+        error: err,
+      }),
+    )
   }
 }
 
 export function uploadDirect(input: FileData, options: Options): UCFile {
-  const uploadReq = base(input, {
-    publicKey: options.publicKey,
-    store: typeof options.store === 'undefined' ? 'auto' : options.store,
-  })
-
   const state = makeState()
 
-  state.set('fileInfo', extractInfo(input))
+  state.set('fileInfo', extractInfo(input, options))
 
-  const promise = Promise.resolve()
-    .then(handleUpload(uploadReq))
+  const promise = startUpload(input, options, state)
     .then(receiveFileInfo(options))
     .then(handleSuccess(state))
     .catch(handleFailed(state))
 
   const ucFile: UCFile = {
     promise,
-    cancel: uploadReq.cancel,
+    cancel: () => {
+      state.set('status', 'cancelled')
+      state.get('request').cancel()
+    },
     progress: (callback: ProgressListener) => {
-      uploadReq.progress(callback)
+      state.get('request').progress(callback)
 
       return
     },

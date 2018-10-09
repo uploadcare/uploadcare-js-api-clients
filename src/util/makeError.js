@@ -3,8 +3,9 @@ import type {UCError} from '../flow-typed'
 
 type Options = {
   type: string,
-  payload?: mixed,
-  origin?: Error,
+  code?: number,
+  message?: string,
+  error?: Error,
 }
 
 /**
@@ -14,10 +15,13 @@ type Options = {
  * @param {Options} [{type, message, origin}={}]
  * @returns {UCError}
  */
-export function makeError({type, payload, origin}: Options): UCError {
+export function makeError({type, message, code, error}: Options): UCError {
+  const msg = message || (error && error.message)
+
   return {
     type,
-    payload,
-    origin,
+    code,
+    message: msg,
+    error,
   }
 }

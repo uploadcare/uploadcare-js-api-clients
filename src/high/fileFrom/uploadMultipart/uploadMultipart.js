@@ -14,9 +14,11 @@ import {multipartUpload} from '../../../low/multipartUpload/multipartUpload'
 import type {MultipartUploadRequest} from '../../../low/multipartUpload/flow-typed'
 import type {UCError} from '../../../flow-typed'
 import {multipartComplete} from '../../../low/multipartComplete/multipartComplete'
+import {extractResponseErrors} from '../../extractResponseErrors'
 
 /**
- * Receives uuid and upload urls from API
+ * Receive uuid and part urls from API
+ * Rejects when application or server error detected
  *
  * @param {FileData} input
  * @param {$Call<typeof makeState>} state
@@ -32,27 +34,17 @@ function getParts(
     const fileInfo = state.get('fileInfo')
 
     return multipartStart({
-      filename: fileInfo.filename,
-      contentType: fileInfo.mime_type,
+      publicKey: options.publicKey,
+      filename: fileInfo.filename || options.filename,
+      contentType: fileInfo.mime_type || options.contentType,
       size: fileInfo.size,
-      ...options,
-    }).then(({code, data}) => {
-      if (code !== 200 || data.error) {
-        return Promise.reject(
-          makeError({
-            type: 'MULTIPART_START_FAILED',
-            payload: data,
-          }),
-        )
-      }
-
-      return data
-    })
+      source: options.source,
+    }).then(extractResponseErrors)
   }
 }
 
 /**
- * Extract uuid from promise chain and save it to the state
+ * Extract file uuid from chain and save it to the state
  *
  * @param {$Call<typeof makeState>} state
  * @returns
@@ -79,7 +71,7 @@ function getChunks(fileSize: number): Array<[number, number]> {
   const chunksCount = Math.ceil(fileSize / chunkSize)
 
   return Array.apply(null, Array(chunksCount)).map((val, idx) => {
-    const start = 0 + (idx * chunkSize)
+    const start = 0 + idx * chunkSize
     const end = Math.min(start + chunkSize, fileSize)
 
     return [start, end]
@@ -87,7 +79,7 @@ function getChunks(fileSize: number): Array<[number, number]> {
 }
 
 /**
- * Create upload requests for each chunk
+ * Create upload request for each chunk
  *
  * @param {FileData} input
  * @param {$Call<typeof makeState>} state
@@ -95,6 +87,10 @@ function getChunks(fileSize: number): Array<[number, number]> {
  */
 function startUploadChunks(input: FileData, state: $Call<typeof makeState>) {
   return ({parts}: {parts: Array<string>}) => {
+    if (state.get('status') === 'cancelled') {
+      return Promise.reject()
+    }
+
     const fileInfo = state.get('fileInfo')
     const chunks = getChunks(fileInfo.size)
 
@@ -147,14 +143,12 @@ function trackProgress(state: $Call<typeof makeState>) {
         loaded: sum,
       })
 
-      state
-        .get('progressListeners')
-        .forEach((cb: ProgressListener) =>
-          cb({
-            loaded: sum,
-            total: fileInfo.size,
-          }),
-        )
+      state.get('progressListeners').forEach((cb: ProgressListener) =>
+        cb({
+          loaded: sum,
+          total: fileInfo.size,
+        }),
+      )
     }
 
     requests.forEach((req: MultipartUploadRequest, idx) => {
@@ -167,6 +161,7 @@ function trackProgress(state: $Call<typeof makeState>) {
 
 /**
  * Just wait until all the requests will not be resolved
+ * Rejects if any part failed
  *
  * @returns
  */
@@ -176,7 +171,12 @@ function waitForUpload() {
       requests.map(req =>
         req.promise.then(({code}: {code: number}) => {
           if (code !== 200) {
-            return Promise.reject(makeError({type: 'CHUNK_UPLOAD_FAILED'}))
+            return Promise.reject(
+              makeError({
+                type: 'SERVER_ERROR',
+                code,
+              }),
+            )
           }
         }),
       ),
@@ -196,18 +196,7 @@ function completeUpload(state: $Call<typeof makeState>, options: Options) {
     const fileInfo = state.get('fileInfo')
     const uuid = fileInfo.uuid
 
-    return multipartComplete(uuid, options).then(({code, data}) => {
-      if (code !== 200 || data.error) {
-        return Promise.reject(
-          makeError({
-            type: 'MULTIPART_COMPLETE_FAILED',
-            payload: data,
-          }),
-        )
-      }
-
-      return (data: fileInfo)
-    })
+    return multipartComplete(uuid, options).then(extractResponseErrors)
   }
 }
 
@@ -239,10 +228,35 @@ function handleFailed(state: $Call<typeof makeState>) {
   return err => {
     const reject = state.get('reject')
 
-    state.set('status', 'failed')
-    state.set('progressListeners', undefined)
+    if (state.get('status') !== 'progress') {
+      return
+    }
 
-    return reject(err)
+    state.set('status', 'failed')
+
+    if (err.type) {
+      reject(err)
+
+      return
+    }
+
+    if (!err.response) {
+      reject(
+        makeError({
+          type: 'NETWORK_ERROR',
+          error: err,
+        }),
+      )
+
+      return
+    }
+
+    reject(
+      makeError({
+        type: 'UNKNOWN_ERROR',
+        error: err,
+      }),
+    )
   }
 }
 
@@ -254,7 +268,7 @@ function handleFailed(state: $Call<typeof makeState>) {
 function makeState() {
   const state: {
     fileInfo: $Shape<FileInfo>,
-    status: 'failed' | 'success' | 'progress',
+    status: 'failed' | 'cancelled' | 'success' | 'progress',
     cancelUpload: ?() => void,
     resolve: ?(fileInfo: FileInfo) => void,
     reject: ?(err: UCError) => void,
@@ -285,7 +299,7 @@ function makeState() {
 export function uploadMultipart(input: FileData, options: Options): UCFile {
   const state = makeState()
 
-  state.set('fileInfo', extractInfo(input))
+  state.set('fileInfo', extractInfo(input, options))
 
   const promise = new Promise((resolve, reject) => {
     state.set('resolve', resolve)
@@ -310,9 +324,9 @@ export function uploadMultipart(input: FileData, options: Options): UCFile {
       const cancelUpload = state.get('cancelUpload')
 
       cancelUpload && cancelUpload()
-      state.set('status', 'failed')
+      state.set('status', 'cancelled')
 
-      reject(makeError({type: 'UPLOAD_CANCELLED'}))
+      reject(makeError({type: 'UPLOAD_CANCEL'}))
     },
     progress: (callback: ProgressListener) => {
       const listeners = state.get('progressListeners')

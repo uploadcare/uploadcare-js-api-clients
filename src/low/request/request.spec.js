@@ -79,7 +79,7 @@ describe('request', () => {
     ucRequest.cancel()
 
     await expect(ucRequest.promise).rejects.toEqual(
-      expect.objectContaining({type: 'REQUEST_CANCELLED'}),
+      expect.objectContaining({type: 'UPLOAD_CANCEL'}),
     )
 
     expect(onResolve).not.toHaveBeenCalled()

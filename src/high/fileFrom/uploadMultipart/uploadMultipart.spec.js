@@ -3,21 +3,23 @@ import {testProgressCallback} from '../../../../test/helpers'
 import {uploadMultipart} from './uploadMultipart'
 import {isBrowser} from '../../../util/checkers'
 
-fdescribe('#uploadMultipart', () => {
+describe('#uploadMultipart', () => {
   let originalTimeout
 
   beforeEach(function() {
     originalTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL
-    jasmine.DEFAULT_TIMEOUT_INTERVAL = 50000
+    jasmine.DEFAULT_TIMEOUT_INTERVAL = 60000
   })
 
   afterEach(function() {
     jasmine.DEFAULT_TIMEOUT_INTERVAL = originalTimeout
   })
 
-  it('should return UCFile instance', () => {
+  it('should return UCFile instance', async() => {
     const file = factory.image('blackSquare')
     const ucFile = uploadMultipart(file.data, {publicKey: 'demopublickey'})
+
+    await expect(ucFile.promise).rejects.toBeTruthy()
 
     expect(ucFile).toBeTruthy()
     expect(ucFile.promise).toBeInstanceOf(Promise)
@@ -29,9 +31,15 @@ fdescribe('#uploadMultipart', () => {
     expect(ucFile.progress()).toBeFalsy()
   })
 
-  it('should provide initial fileInfo', () => {
-    const file = new File([factory.image('blackSquare').data], 'filename', {type: 'image/png'})
-    const ucFile = uploadMultipart(file, {publicKey: 'demopublickey'})
+  it('should provide initial fileInfo', async() => {
+    const file = factory.image('blackSquare')
+    const ucFile = uploadMultipart(file.data, {
+      publicKey: 'demopublickey',
+      contentType: 'image/png',
+      filename: 'filename',
+    })
+
+    await expect(ucFile.promise).rejects.toBeTruthy()
 
     const initialFileInfo = ucFile.getFileInfo()
 
@@ -41,19 +49,25 @@ fdescribe('#uploadMultipart', () => {
     expect(initialFileInfo.size).toBe(file.size)
   })
 
-  it('should be able to cancel uploading', () => {
-    const file = factory.file(1)
-    const ucFile = uploadMultipart(file.data, {publicKey: 'demopublickey'})
-
-    expect(ucFile.promise).rejects.toEqual(
-      expect.objectContaining({type: 'REQUEST_CANCELLED'}),
-    )
+  it('should be able to cancel uploading', async() => {
+    const file = factory.file(11)
+    const ucFile = uploadMultipart(file.data, {
+      publicKey: 'demopublickey',
+      filename: 'test',
+      contentType: 'application/octet-stream',
+    })
 
     ucFile.cancel()
+
+    await expect(ucFile.promise).rejects.toEqual(
+      expect.objectContaining({type: 'UPLOAD_CANCEL'}),
+    )
+
+    expect(ucFile.status).toBe('cancelled')
   })
 
   it('should have success status on upload complete', async() => {
-    const file = factory.file(12)
+    const file = factory.file(11)
     const ucFile = uploadMultipart(file.data, {
       publicKey: 'demopublickey',
       filename: 'test',
@@ -62,15 +76,15 @@ fdescribe('#uploadMultipart', () => {
 
     expect(ucFile.status).toBe('progress')
 
-    const fileInfo = await ucFile.promise
+    await expect(ucFile.promise).resolves.toEqual(
+      expect.objectContaining({uuid: expect.any(String)}),
+    )
 
-    expect(fileInfo).toBeTruthy()
     expect(ucFile.status).toBe('success')
-    expect(typeof fileInfo.uuid).toBe('string')
   })
 
   it('should provide full fileInfo after upload', async() => {
-    const file = factory.file(15)
+    const file = factory.file(11)
     const ucFile = uploadMultipart(file.data, {
       publicKey: 'demopublickey',
       filename: 'test',
@@ -86,7 +100,7 @@ fdescribe('#uploadMultipart', () => {
     expect(typeof fileInfo.uuid).toBe('string')
   })
 
-  it('should have failed status on upload error', async() => {
+  it('should have failed status on error', async() => {
     const file = factory.image('blackSquare')
     const ucFile = uploadMultipart(file.data, {publicKey: 'non'})
 
@@ -95,39 +109,29 @@ fdescribe('#uploadMultipart', () => {
     expect(ucFile.status).toBe('progress')
 
     await expect(ucFile.promise).rejects.toEqual(
-      expect.objectContaining({
-        type: 'MULTIPART_START_FAILED',
-        payload: {
-          error: {
-            content: 'UPLOADCARE_PUB_KEY is invalid.',
-            status_code: 403,
-          },
-        },
-      }),
+      expect.objectContaining({type: 'APPLICATION_ERROR'}),
     )
 
     expect(ucFile.status).toBe('failed')
   })
 
-  it('should upload instance of File', async() => {
-    const file = new File([factory.file(12).data], 'filename', {type: 'image/png'})
+  isBrowser() && it('should upload instance of File', async() => {
+    const file = new File([factory.file(11).data], 'filename', {type: 'image/png'})
     const ucFile = uploadMultipart(file, {publicKey: 'demopublickey'})
 
-    const fileInfo = await ucFile.promise
-
-    expect(fileInfo).toBeTruthy()
-    expect(typeof fileInfo.uuid).toBe('string')
+    await expect(ucFile.promise).resolves.toEqual(
+      expect.objectContaining({uuid: expect.any(String)}),
+    )
   })
 
-  fit('should provide progress for it', async() => {
-    const file = factory.file(12)
+  isBrowser() && it('should provide progress for it', async() => {
+    const file = factory.file(11)
     const ucFile = uploadMultipart(file.data, {
       publicKey: 'demopublickey',
       filename: 'test',
       contentType: 'application/octet-stream',
     })
 
-    isBrowser() &&
-      (await testProgressCallback(ucFile.promise, ucFile.progress, file))
+    await testProgressCallback(ucFile.promise, ucFile.progress, file)
   })
 })

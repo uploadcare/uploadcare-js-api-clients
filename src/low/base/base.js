@@ -20,7 +20,11 @@ export function base(
     body: {
       file,
       UPLOADCARE_PUB_KEY: options.publicKey,
-      UPLOADCARE_STORE: options.store ? options.store.toString() : undefined,
+      UPLOADCARE_STORE: options.store,
+      signature: options.signature,
+      expire: options.expire,
+      file_name: options.filename,
+      source: options.source || 'local',
     },
   })
 }

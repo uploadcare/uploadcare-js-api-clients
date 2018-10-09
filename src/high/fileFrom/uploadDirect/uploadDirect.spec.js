@@ -4,6 +4,17 @@ import {uploadDirect} from './uploadDirect'
 import {isBrowser} from '../../../util/checkers'
 
 describe('#uploadDirect', () => {
+  let originalTimeout
+
+  beforeEach(function() {
+    originalTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL
+    jasmine.DEFAULT_TIMEOUT_INTERVAL = 60000
+  })
+
+  afterEach(function() {
+    jasmine.DEFAULT_TIMEOUT_INTERVAL = originalTimeout
+  })
+
   it('should return UCFile instance', () => {
     const file = factory.image('blackSquare')
     const ucFile = uploadDirect(file.data, {publicKey: 'demopublickey'})
@@ -19,8 +30,12 @@ describe('#uploadDirect', () => {
   })
 
   it('should provide initial fileInfo', () => {
-    const file = new File([factory.image('blackSquare').data], 'filename', {type: 'image/png'})
-    const ucFile = uploadDirect(file, {publicKey: 'demopublickey'})
+    const file = factory.image('blackSquare')
+    const ucFile = uploadDirect(file.data, {
+      publicKey: 'demopublickey',
+      filename: 'filename',
+      contentType: 'image/png',
+    })
 
     const initialFileInfo = ucFile.getFileInfo()
 
@@ -30,15 +45,20 @@ describe('#uploadDirect', () => {
     expect(initialFileInfo.size).toBe(file.size)
   })
 
-  it('should be able to cancel uploading', () => {
+  it('should be able to cancel uploading', async() => {
     const file = factory.file(1)
     const ucFile = uploadDirect(file.data, {publicKey: 'demopublickey'})
 
-    expect(ucFile.promise).rejects.toEqual(
-      expect.objectContaining({type: 'REQUEST_CANCELLED'}),
-    )
+    expect.assertions(2)
 
     ucFile.cancel()
+
+    await expect(ucFile.promise).rejects.toEqual(
+      expect.objectContaining({type: 'UPLOAD_CANCEL'}),
+    )
+
+
+    expect(ucFile.status).toBe('cancelled')
   })
 
   it('should have success status on upload complete', async() => {
@@ -67,9 +87,7 @@ describe('#uploadDirect', () => {
     expect(typeof fileInfo.uuid).toBe('string')
   })
 
-  it('should have failed status on upload error', async() => {
-    jasmine.DEFAULT_TIMEOUT_INTERVAL = 10000
-
+  it('should have failed status on error', async() => {
     const file = factory.image('blackSquare')
     const ucFile = uploadDirect(file.data, {publicKey: 'non'})
 
@@ -79,20 +97,15 @@ describe('#uploadDirect', () => {
 
     await expect(ucFile.promise).rejects.toEqual(
       expect.objectContaining({
-        type: 'UPLOAD_FAILED',
-        payload: {
-          error: {
-            content: 'UPLOADCARE_PUB_KEY is invalid.',
-            status_code: 403,
-          },
-        },
+        type: 'APPLICATION_ERROR',
+        message: 'UPLOADCARE_PUB_KEY is invalid.',
       }),
     )
 
     expect(ucFile.status).toBe('failed')
   })
 
-  it('should upload instance of File', async() => {
+  isBrowser() && it('should upload instance of File', async() => {
     const file = factory.image('blackSquare')
     const ucFile = uploadDirect(file.data, {publicKey: 'demopublickey'})
 
@@ -102,11 +115,11 @@ describe('#uploadDirect', () => {
     expect(typeof fileInfo.uuid).toBe('string')
   })
 
-  it('should provide progress for it', async() => {
-    const file = factory.file(3)
-    const ucFile = uploadDirect(file.data, {publicKey: 'demopublickey'})
+  isBrowser() &&
+    it('should provide progress for it', async() => {
+      const file = factory.file(3)
+      const ucFile = uploadDirect(file.data, {publicKey: 'demopublickey'})
 
-    isBrowser() &&
-      (await testProgressCallback(ucFile.promise, ucFile.progress, file))
-  })
+      await testProgressCallback(ucFile.promise, ucFile.progress, file)
+    })
 })

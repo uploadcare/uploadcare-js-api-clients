@@ -6,7 +6,7 @@ import type {FixtureFile} from './fixtureFactory'
 import type {ProgressListener} from '../src/flow-typed'
 
 export const dataURItoBuffer: (uri: string) => Buffer = dataUriToBuffer
-export const dataURItoBlob: (uri: string) => Buffer = dataUriToBlob
+export const dataURItoBlob: (uri: string) => Blob = dataUriToBlob
 
 export function wait(timeout: number): Promise<void> {
   return new Promise(res => {
@@ -43,6 +43,6 @@ export async function testProgressCallback(
   const lastProgressArg =
     onProgress.mock.calls[onProgress.mock.calls.length - 1][0]
 
-  expect(lastProgressArg.total).toBe(file.size)
-  expect(lastProgressArg.loaded).toBe(file.size)
+  expect(lastProgressArg.total).toBeGreaterThanOrEqual(file.size)
+  expect(lastProgressArg.loaded).toBe(lastProgressArg.total)
 }
