@@ -1,0 +1,1 @@
+export {fileFrom} from './fileFrom'

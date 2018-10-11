@@ -18,7 +18,7 @@ const uuids: {[key: string]: {publicKey: string, uuid?: string}} = {
   invalid: {publicKey: 'invalidpublickey'},
 }
 
-type FixtureFile = {
+export type FixtureFile = {
   data: Buffer | Blob,
   size: number,
 }
@@ -43,7 +43,7 @@ function imageBuffer(id: string): FixtureFile {
 
 function imageBlob(id: string): FixtureFile {
   const data = dataURItoBlob(images[id])
-  const size = data.length
+  const size = data.size
 
   return {
     data,

@@ -11,6 +11,13 @@
   "env": {"node": true},
   "rules": {
     "max-nested-callbacks": ["error", 4],
-    "max-statements": ["error", 15]
-  }
+    "max-statements": ["error", 15],
+    "arrow-body-style": 0
+  },
+  "overrides": [
+    {
+      "files": "*.spec.js",
+      "env": {"node": true, "es6": true, "browser": true, "mocha": true, "jasmine": true, "jest": true}
+    }
+  ]
 }

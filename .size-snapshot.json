@@ -22,5 +22,29 @@
     "bundled": 17367,
     "minified": 17147,
     "gzipped": 6363
+  },
+  "dist/upload-api.esm.js": {
+    "bundled": 21382,
+    "minified": 8961,
+    "gzipped": 2930,
+    "treeshaked": {
+      "rollup": {
+        "code": 53,
+        "import_statements": 53
+      },
+      "webpack": {
+        "code": 1103
+      }
+    }
+  },
+  "dist/upload-api.cjs.js": {
+    "bundled": 21478,
+    "minified": 9036,
+    "gzipped": 2962
+  },
+  "dist/upload-api.js": {
+    "bundled": 21027,
+    "minified": 20917,
+    "gzipped": 7445
   }
 }
