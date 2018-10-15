@@ -71,7 +71,7 @@ function getChunks(fileSize: number): Array<[number, number]> {
   const chunksCount = Math.ceil(fileSize / chunkSize)
 
   return Array.apply(null, Array(chunksCount)).map((val, idx) => {
-    const start = 0 + idx * chunkSize
+    const start = chunkSize * idx
     const end = Math.min(start + chunkSize, fileSize)
 
     return [start, end]
