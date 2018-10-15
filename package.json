@@ -1,7 +1,7 @@
 {
-  "name": "@uploadcare/api",
+  "name": "@uploadcare/upload-api",
   "version": "1.0.0-alpha",
-  "description": "JavaScript library for work with Uploadcare API",
+  "description": "JavaScript library for work with Uploadcare Upload API",
   "main": "dist/uploadcare.cjs.js",
   "module": "index.js",
   "scripts": {
@@ -16,14 +16,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/uploadcare/uploadcare-javascript.git"
+    "url": "git+https://github.com/uploadcare/uploadcare-js-upload-api.git"
   },
   "author": "Uploadcare",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/uploadcare/uploadcare-javascript/issues"
+    "url": "https://github.com/uploadcare/uploadcare-js-upload-api/issues"
   },
-  "homepage": "https://github.com/uploadcare/uploadcare-javascript#readme",
+  "homepage": "https://github.com/uploadcare/uploadcare-js-upload-api#readme",
   "devDependencies": {
     "@babel/cli": "^7.1.2",
     "@babel/core": "^7.1.2",
@@ -76,8 +76,5 @@
     "axios": "^0.18.0",
     "form-data": "^2.3.2",
     "query-string": "^6.2.0"
-  },
-  "peerDependencies": {
-    "axios": "^0.18.0"
   }
 }
