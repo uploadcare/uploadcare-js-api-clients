@@ -18,7 +18,7 @@ module.exports = function(config) {
 
     files: [
       {
-        pattern: 'src/**/*.spec.js',
+        pattern: 'test/**/*.spec.js',
         watched: false,
       },
     ],
@@ -31,7 +31,7 @@ module.exports = function(config) {
       require('./scripts/karma-inject'),
     ],
 
-    preprocessors: {'src/**/*.spec.js': ['rollup']},
+    preprocessors: {'test/**/*.spec.js': ['rollup']},
     rollupPreprocessor: {
       plugins: [
         replace({'process.env.NODE_ENV': process.env.NODE_ENV}),
