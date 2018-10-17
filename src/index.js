@@ -7,6 +7,7 @@ export default class {
       ...defaultSettings,
       ...settings,
     }
+    /* TODO Set up user agent */
     this.updateSettingsListeners = []
     this.api = new UploadAPI(this)
   }

@@ -5,7 +5,7 @@ describe('UploadcareUpload.api', () => {
     it('with default settings', () => {
       const upload = new UploadcareUpload()
 
-      expect(upload.api.request()).toBe('Request to https://upload.uploadcare.com/')
+      expect(upload.api.request()).toBe('Request to https://upload.uploadcare.com')
     })
     it('with constructor settings', () => {
       const upload = new UploadcareUpload({baseURL: 'new base url'})
