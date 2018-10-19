@@ -1,5 +1,24 @@
 /* @flow */
 
+export type FileData = Blob | File | Buffer
+
+export type Query = {
+  [key: string]: string | boolean | number | void,
+}
+
+export type Body = {
+  [key: string]: Array<string>
+    | string
+    | boolean
+    | number
+    | FileData
+    | void,
+}
+
+export type Headers = {
+  [key: string]: string,
+}
+
 export type ProgressListener = ({total: number, loaded: number}) => mixed
 
 export interface Request<T> {
@@ -7,12 +26,6 @@ export interface Request<T> {
   cancel(): void;
   progress(callback: ProgressListener): Request<T>;
 }
-
-export type Headers = {
-  [name: string]: string,
-}
-
-export type FileData = Blob | File | Buffer
 
 export type UCResponse<T> = {|
   code: number,

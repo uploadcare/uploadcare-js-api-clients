@@ -1,2 +1,2 @@
 /* @flow */
-export {request} from './request'
+export {request} from '../../api/request'
