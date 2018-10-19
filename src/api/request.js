@@ -36,7 +36,7 @@ export default function request({
   body,
   headers,
   baseURL,
-  ...axiosOptions,
+  ...axiosOptions
 }: Config): Promise {
   const data = body && buildFormData({
     ...body,
