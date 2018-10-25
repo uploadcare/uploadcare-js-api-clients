@@ -66,7 +66,7 @@ export default function request({
     headers: {
       'X-UC-User-Agent': defaultSettings.userAgent,
       ...headers,
-      ...(data ? data.getHeaders() : {}),
+      ...((data && data.getHeaders) ? data.getHeaders() : {}),
     },
     ...axiosOptions,
   }

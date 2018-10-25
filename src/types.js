@@ -7,12 +7,8 @@ export type Query = {
 }
 
 export type Body = {
-  [key: string]: Array<string>
-    | string
-    | boolean
-    | number
-    | FileData
-    | void,
+  source?: string,
+  file_name?: string,
 }
 
 export type Headers = {

@@ -1,6 +1,7 @@
 [ignore]
 .*/dist/.*
 .*/scripts/.*
+.*/.back/.*
 
 [include]
 

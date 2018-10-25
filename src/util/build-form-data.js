@@ -26,7 +26,9 @@ export default function buildFormData(body: Body): FormData {
       value.forEach(val => formData.append(key + '[]', val))
     }
     else if (key === 'file') {
-      formData.append('file', value, body['file_name'] || DEFAULT_FILE_NAME)
+      const fileName = body.file_name || DEFAULT_FILE_NAME
+
+      formData.append('file', value, fileName)
     }
     else {
       formData.append(key, value)
