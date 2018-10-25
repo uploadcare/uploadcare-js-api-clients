@@ -4,7 +4,7 @@ import buildFormData from '../util/build-form-data'
 import defaultSettings from '../default-settings'
 import type {Query, Body, Headers} from '../flow-typed'
 
-type Config = {
+export type RequestParams = {
   method?: string,
   path: string,
   query?: Query,
@@ -13,6 +13,17 @@ type Config = {
   baseURL?: string,
 }
 
+export type Response = {
+  data: {} | ErrorResponse,
+}
+
+export type ErrorResponse = {|
+  error: {
+    status_code: number,
+    content: string,
+  }
+|}
+
 /* Set max upload body size for node.js to 50M (default is 10M) */
 const MAX_CONTENT_LENGTH = 50 * 1000 * 1000
 
@@ -20,11 +31,11 @@ const MAX_CONTENT_LENGTH = 50 * 1000 * 1000
  * Performs request to Uploadcare Upload API
  *
  * @export
- * @param {Config} config – The config options for making requests.
+ * @param {RequestParams} config – The config options for making requests.
  * @param {string} [config.method=GET] – The request method.
  * @param {string} config.path – The path to requested method, without endpoint and with slashes.
  * @param {Object} [config.query] – The URL parameters.
- * @param {Object} [config.body] – The data to be sent as the request body. Only applicable for request methods 'PUT', 'POST', and 'PATCH'.
+ * @param {Object} [config.body] – The data to be sent as the body. Only for 'PUT', 'POST', 'PATCH'.
  * @param {Object} [config.headers] – The custom headers to be sent.
  * @param {string} [config.baseURL] – The Upload API endpoint.
  * @returns {Promise}
@@ -37,7 +48,7 @@ export default function request({
   headers,
   baseURL,
   ...axiosOptions
-}: Config): Promise {
+}: RequestParams): Promise<Response> {
   const data = body && buildFormData({
     ...body,
     source: body.source || 'local',
