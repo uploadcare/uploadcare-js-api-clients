@@ -2,7 +2,7 @@
 import axios from 'axios'
 import buildFormData from '../util/build-form-data'
 import defaultSettings from '../default-settings'
-import type {Query, Body, Headers} from '../flow-typed'
+import type {Query, Body, Headers} from '../types'
 
 export type RequestParams = {
   method?: string,

@@ -3,7 +3,7 @@
 import dataUriToBuffer from 'data-uri-to-buffer'
 import dataUriToBlob from 'dataurl-to-blob'
 import type {FixtureFile} from './fixtureFactory'
-import type {ProgressListener} from '../src/flow-typed'
+import type {ProgressListener} from '../src/types'
 
 export const dataURItoBuffer: (uri: string) => Buffer = dataUriToBuffer
 export const dataURItoBlob: (uri: string) => Blob = dataUriToBlob

@@ -1,6 +1,6 @@
 /* @flow */
 import FormData from 'form-data'
-import {Body} from '../flow-typed'
+import type {Body} from '../types'
 
 const DEFAULT_FILE_NAME = 'original'
 
