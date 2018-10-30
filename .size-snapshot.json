@@ -1,29 +1,5 @@
 {
-  "dist/upload.esm.js": {
-    "bundled": 11849,
-    "minified": 4285,
-    "gzipped": 1581,
-    "treeshaked": {
-      "rollup": {
-        "code": 53,
-        "import_statements": 53
-      },
-      "webpack": {
-        "code": 1103
-      }
-    }
-  },
-  "dist/uploadcare.cjs.js": {
-    "bundled": 12131,
-    "minified": 4528,
-    "gzipped": 1644
-  },
-  "dist/uploadcare.js": {
-    "bundled": 17367,
-    "minified": 17147,
-    "gzipped": 6363
-  },
-  "dist/upload-api.esm.js": {
+  "dist/uploadcare-upload-api.esm.js": {
     "bundled": 4143,
     "minified": 2555,
     "gzipped": 1037,
@@ -37,12 +13,12 @@
       }
     }
   },
-  "dist/upload-api.cjs.js": {
+  "dist/uploadcare-upload-api.cjs.js": {
     "bundled": 4163,
     "minified": 2570,
     "gzipped": 1049
   },
-  "dist/upload-api.js": {
+  "dist/uploadcare-upload-api.js": {
     "bundled": 41627,
     "minified": 13074,
     "gzipped": 4959

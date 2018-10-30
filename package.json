@@ -2,8 +2,8 @@
   "name": "@uploadcare/upload-api",
   "version": "1.0.0-alpha",
   "description": "JavaScript library for work with Uploadcare Upload API",
-  "main": "dist/uploadcare.cjs.js",
-  "module": "index.js",
+  "main": "dist/uploadcare-upload-api.cjs.js",
+  "module": "dist/uploadcare-upload-api.esm.js",
   "scripts": {
     "clean": "rimraf dist",
     "lint": "eslint .",

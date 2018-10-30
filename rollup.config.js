@@ -33,7 +33,7 @@ export default [
     external: ['axios', 'form-data'],
     output: [
       {
-        file: 'dist/upload-api.esm.js',
+        file: 'dist/uploadcare-upload-api.esm.js',
         format: 'esm',
         interop: false,
       },
@@ -45,7 +45,7 @@ export default [
     external: ['axios', 'form-data'],
     output: [
       {
-        file: 'dist/upload-api.cjs.js',
+        file: 'dist/uploadcare-upload-api.cjs.js',
         format: 'cjs',
         interop: false,
       },
@@ -56,7 +56,7 @@ export default [
     plugins: getPlugins('iife'),
     output: [
       {
-        file: 'dist/upload-api.js',
+        file: 'dist/uploadcare-upload-api.js',
         format: 'iife',
         name: 'uploadcareAPI',
         interop: false,
