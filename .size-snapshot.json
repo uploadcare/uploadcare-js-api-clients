@@ -24,27 +24,27 @@
     "gzipped": 6363
   },
   "dist/upload-api.esm.js": {
-    "bundled": 21382,
-    "minified": 8961,
-    "gzipped": 2930,
+    "bundled": 4143,
+    "minified": 2555,
+    "gzipped": 1037,
     "treeshaked": {
       "rollup": {
-        "code": 53,
-        "import_statements": 53
+        "code": 21,
+        "import_statements": 21
       },
       "webpack": {
-        "code": 1103
+        "code": 998
       }
     }
   },
   "dist/upload-api.cjs.js": {
-    "bundled": 21478,
-    "minified": 9036,
-    "gzipped": 2962
+    "bundled": 4163,
+    "minified": 2570,
+    "gzipped": 1049
   },
   "dist/upload-api.js": {
-    "bundled": 21027,
-    "minified": 20917,
-    "gzipped": 7445
+    "bundled": 41627,
+    "minified": 13074,
+    "gzipped": 4959
   }
 }

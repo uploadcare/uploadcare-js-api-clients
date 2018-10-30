@@ -14,7 +14,7 @@
     "test:browser": "BABEL_ENV=test node scripts/build-karma-injectables.js && karma start karma.config.js --single-run --nocache",
     "test:browser:debug": "BABEL_ENV=test node scripts/build-karma-injectables.js && karma start karma.config.js --browsers=Chrome --single-run=false --watch --debug  --nocache",
     "prebuild": "npm run clean",
-    "build": "rollup -c rollup.config.js",
+    "build": "NODE_ENV=production rollup -c rollup.config.js",
     "prerelease": "npm run test",
     "release": "release-it"
   },
