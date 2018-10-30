@@ -26,6 +26,7 @@ const getPlugins = (format) =>
     sizeSnapshot(),
   ].filter(plugin => !!plugin)
 
+/* TODO Add creating minified files with `.min` suffix */
 export default [
   {
     input: 'src/index.js',
