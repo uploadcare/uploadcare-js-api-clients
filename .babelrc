@@ -4,17 +4,11 @@
       "@babel/preset-env",
       {
         "useBuiltIns": false,
-        "modules": false,
-        "targets": {
-          "node": "8.0.0",
-          "esmodules": true
-        }
+        "modules": false
       }
     ],
     "@babel/preset-flow"
   ],
-  "plugins": [],
-
   "env": {
     "test:jest": {
       "plugins": ["@babel/plugin-transform-modules-commonjs"]

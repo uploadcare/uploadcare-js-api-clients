@@ -6,17 +6,17 @@ import replace from 'rollup-plugin-replace'
 import {terser} from 'rollup-plugin-terser'
 import {sizeSnapshot} from 'rollup-plugin-size-snapshot'
 
-const getPlugins = ({iife} = {}) =>
+const getPlugins = (format, minify = false) =>
   [
     replace({'process.env.NODE_ENV': process.env.NODE_ENV}),
-    resolve({browser: iife}),
-    iife &&
+    resolve({browser: format === 'iife'}),
+    (format === 'iife') &&
       commonjs({
         include: 'node_modules/**',
         sourceMap: false,
       }),
     babel(),
-    iife && terser(),
+    minify && terser({sourcemap: false}),
     license({
       banner: `
           <%= pkg.name %> <%= pkg.version %>
@@ -31,11 +31,11 @@ const getPlugins = ({iife} = {}) =>
 export default [
   {
     input: 'src/index.js',
-    plugins: getPlugins({iife: false}),
-    external: ['axios', 'query-string', 'form-data'],
+    plugins: getPlugins('esm'),
+    external: ['axios', 'form-data'],
     output: [
       {
-        file: 'dist/upload-api.esm.js',
+        file: 'dist/uploadcare-upload-api.esm.js',
         format: 'esm',
         interop: false,
       },
@@ -43,11 +43,11 @@ export default [
   },
   {
     input: 'src/index.js',
-    plugins: getPlugins({iife: false}),
-    external: ['axios', 'query-string', 'form-data'],
+    plugins: getPlugins('cjs'),
+    external: ['axios', 'form-data'],
     output: [
       {
-        file: 'dist/upload-api.cjs.js',
+        file: 'dist/uploadcare-upload-api.cjs.js',
         format: 'cjs',
         interop: false,
       },
@@ -55,10 +55,22 @@ export default [
   },
   {
     input: 'src/index.js',
-    plugins: getPlugins({iife: true}),
+    plugins: getPlugins('iife'),
     output: [
       {
-        file: 'dist/upload-api.js',
+        file: 'dist/uploadcare-upload-api.js',
+        format: 'iife',
+        name: 'uploadcareAPI',
+        interop: false,
+      },
+    ],
+  },
+  {
+    input: 'src/index.js',
+    plugins: getPlugins('iife', true),
+    output: [
+      {
+        file: 'dist/uploadcare-upload-api.min.js',
         format: 'iife',
         name: 'uploadcareAPI',
         interop: false,
