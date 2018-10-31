@@ -1,8 +1,7 @@
-export default {
-  baseURL: 'https://upload.uploadcare.com',
+/*
+Settings for future support:
+
   baseCDN: 'https://ucarecdn.com',
-  publicKey: null,
-  doNotStore: false,
   imagesOnly: false,
   validators: [],
   multipartMinSize: 25 * 1024 * 1024,
@@ -11,10 +10,16 @@ export default {
   multipartConcurrency: 4,
   multipartMaxAttempts: 3,
   parallelDirectUploads: 10,
+  pusherKey: '79ae88bd931ea68464d9',
+ */
+
+export default {
+  baseURL: 'https://upload.uploadcare.com',
+  publicKey: null,
+  doNotStore: false,
   secureSignature: '',
   secureExpire: '',
   integration: '',
   userAgent: 'UploadcareUpload (JavaScript)',
-  pusherKey: '79ae88bd931ea68464d9',
   debug: false,
 }
