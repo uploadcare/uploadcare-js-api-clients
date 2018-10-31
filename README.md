@@ -33,20 +33,13 @@ npm install @uploadcare/upload-api --save
 ## Usage
 
 ```javascript
-import UploadcareUpload from '@uploadcare/upload-api'
+import UploadcareUpload, {uploadAPIRequest} from '@uploadcare/upload-api'
+
+uploadAPIRequest(config, settings)
 
 const upload = new UploadcareUpload(settings)
 
-upload.api.request(method, path, {query, body})
-upload.api.base(file, {publicKey, store})
-upload.api.fromUrl(url, {publicKey, store, fileName})
-upload.api.fromUrlStatus(token)
-upload.api.group([uuids], {publicKey})
-upload.api.groupInfo(groupId, {publicKey})
-upload.api.info(uuid, {publicKey})
-upload.api.multipartStart({publicKey, filename, size})
-upload.api.multipartUpload(partUrl, data)
-upload.api.multipartComplete(uuid, {publicKey})
+upload.api.request(config, settings)
 ```
 
 ## Configuration
