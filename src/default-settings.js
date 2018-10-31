@@ -2,8 +2,6 @@
 Settings for future support:
 
   baseCDN: 'https://ucarecdn.com',
-  imagesOnly: false,
-  validators: [],
   multipartMinSize: 25 * 1024 * 1024,
   multipartPartSize: 5 * 1024 * 1024,
   multipartMinLastPartSize: 1024 * 1024,
