@@ -22,5 +22,10 @@
     "bundled": 41627,
     "minified": 13074,
     "gzipped": 4959
+  },
+  "dist/uploadcare-upload-api.min.js": {
+    "bundled": 13074,
+    "minified": 13064,
+    "gzipped": 4951
   }
 }
