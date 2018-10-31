@@ -9,8 +9,8 @@ import {sizeSnapshot} from 'rollup-plugin-size-snapshot'
 const getPlugins = (format, minify = false) =>
   [
     replace({'process.env.NODE_ENV': process.env.NODE_ENV}),
-    resolve({browser: format === 'iife'}),
-    (format === 'iife') &&
+    resolve({browser: format === 'umd'}),
+    (format === 'umd') &&
       commonjs({
         include: 'node_modules/**',
         sourceMap: false,
@@ -55,11 +55,11 @@ export default [
   },
   {
     input: 'src/index.js',
-    plugins: getPlugins('iife'),
+    plugins: getPlugins('umd'),
     output: [
       {
         file: 'dist/uploadcare-upload-api.js',
-        format: 'iife',
+        format: 'umd',
         name: 'uploadcareAPI',
         interop: false,
       },
@@ -67,11 +67,11 @@ export default [
   },
   {
     input: 'src/index.js',
-    plugins: getPlugins('iife', true),
+    plugins: getPlugins('umd', true),
     output: [
       {
         file: 'dist/uploadcare-upload-api.min.js',
-        format: 'iife',
+        format: 'umd',
         name: 'uploadcareAPI',
         interop: false,
       },

@@ -19,13 +19,13 @@
     "gzipped": 1443
   },
   "dist/uploadcare-upload-api.js": {
-    "bundled": 45499,
-    "minified": 13900,
-    "gzipped": 5232
+    "bundled": 45764,
+    "minified": 14086,
+    "gzipped": 5298
   },
   "dist/uploadcare-upload-api.min.js": {
-    "bundled": 13900,
-    "minified": 13883,
-    "gzipped": 5221
+    "bundled": 14086,
+    "minified": 14069,
+    "gzipped": 5287
   }
 }
