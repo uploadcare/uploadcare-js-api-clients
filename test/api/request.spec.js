@@ -16,11 +16,8 @@ describe('API – request', () => {
       },
     })
 
-
     await expect(response.status).toBe(200)
-    await expect(response.data).toEqual(
-      jasmine.objectContaining({uuid: factory.uuid('image')}),
-    )
+    await expect(response.data).toEqual(jasmine.objectContaining({uuid: factory.uuid('image')}))
   })
 
   it('should be resolved if server returns error', async() => {
@@ -29,7 +26,6 @@ describe('API – request', () => {
       query: {pub_key: factory.publicKey('image')},
     })
 
-
     await expect(response.status).toBe(200)
     await expect(response.data).toEqual(
       jasmine.objectContaining({
@@ -37,16 +33,16 @@ describe('API – request', () => {
           status_code: 400,
           content: 'file_id is required.',
         },
-      }),
+      })
     )
   })
 
   it('should be rejected on connection error', async() => {
-    const interceptor = axios.interceptors.response.use(() =>
-      Promise.reject('error'),
-    )
+    const interceptor = axios.interceptors.response.use(() => Promise.reject('error'))
+    const req = request({path: '/info/'})
 
-    await request({path: '/info/'}).catch(error => expect(error).toBe('error'))
+    await expectAsync(req).toBeRejected()
+    req.catch(error => expect(error).toBe('error'))
 
     axios.interceptors.response.eject(interceptor)
   })
