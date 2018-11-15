@@ -8,13 +8,9 @@ process.env.CHROME_BIN = require('puppeteer').executablePath()
 
 module.exports = function(config) {
   config.set({
-    // browserStack: {
-    //   username: browserStackConf.username,
-    //   accessKey: browserStackConf.accessKey,
-    // },
     browserNoActivityTimeout: 60000,
     browsers: ['ChromeHeadless'],
-    frameworks: ['inject', 'jasmine'],
+    frameworks: ['jasmine'],
 
     files: [
       {
@@ -23,13 +19,7 @@ module.exports = function(config) {
       },
     ],
 
-    plugins: [
-      'karma-browserstack-launcher',
-      'karma-chrome-launcher',
-      'karma-jasmine',
-      'karma-rollup-preprocessor',
-      require('./scripts/karma-inject'),
-    ],
+    plugins: ['karma-chrome-launcher', 'karma-jasmine', 'karma-rollup-preprocessor'],
 
     preprocessors: {'test/**/*.spec.js': ['rollup']},
     rollupPreprocessor: {
@@ -42,20 +32,8 @@ module.exports = function(config) {
       output: {
         format: 'iife',
         name: 'uploadcare',
-        sourcemap: 'inline',
+        sourcemap: false,
       },
     },
-
-    customLaunchers: {
-      bs_firefox59_win10: {
-        base: 'BrowserStack',
-        browser: 'Firefox',
-        browser_version: '59.0',
-        os: 'Windows',
-        os_version: '10',
-      },
-    },
-
-    client: {jasmine: {}},
   })
 }

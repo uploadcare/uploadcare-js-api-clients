@@ -4,7 +4,7 @@ import axios from 'axios'
 
 describe('API – request', () => {
   it('should return Promise', () => {
-    expect(request({path: '/info/'})).toBeInstanceOf(Promise)
+    expect(typeof request({path: '/info/'}).then).toBe('function')
   })
 
   it('should be resolved with 200 code when all input is valid', async() => {
@@ -16,11 +16,10 @@ describe('API – request', () => {
       },
     })
 
-    expect.assertions(2)
 
     await expect(response.status).toBe(200)
     await expect(response.data).toEqual(
-      expect.objectContaining({uuid: factory.uuid('image')}),
+      jasmine.objectContaining({uuid: factory.uuid('image')}),
     )
   })
 
@@ -30,11 +29,10 @@ describe('API – request', () => {
       query: {pub_key: factory.publicKey('image')},
     })
 
-    expect.assertions(2)
 
     await expect(response.status).toBe(200)
     await expect(response.data).toEqual(
-      expect.objectContaining({
+      jasmine.objectContaining({
         error: {
           status_code: 400,
           content: 'file_id is required.',
@@ -48,16 +46,12 @@ describe('API – request', () => {
       Promise.reject('error'),
     )
 
-    expect.assertions(1)
-
-    await expect(request({path: '/info/'})).rejects.toBe('error')
+    await request({path: '/info/'}).catch(error => expect(error).toBe('error'))
 
     axios.interceptors.response.eject(interceptor)
   })
 
   it('should be able to upload data', async() => {
-    expect.assertions(2)
-
     const file = factory.image('blackSquare')
 
     const response = await request({
