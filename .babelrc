@@ -8,5 +8,22 @@
       }
     ],
     "@babel/preset-flow"
-  ]
+  ],
+  "env": {
+    "test:node": {
+      "plugins": ["@babel/plugin-transform-modules-commonjs"]
+    },
+    "test:browser": {
+      "presets": [
+        [
+          "@babel/preset-env",
+          {
+            "useBuiltIns": "usage",
+            "modules": false
+          }
+        ],
+        "@babel/preset-flow"
+      ]
+    }
+  }
 }
