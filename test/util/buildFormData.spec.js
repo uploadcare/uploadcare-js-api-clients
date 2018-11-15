@@ -1,5 +1,5 @@
 import * as factory from '../fixtureFactory'
-import buildFormData from '../../src/util/build-form-data'
+import buildFormData from '../../src/util/buildFormData'
 
 describe('buildFormData', () => {
   it('should return FormData with nice input object', () => {

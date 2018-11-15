@@ -1,5 +1,4 @@
 /* @flow */
-
 import {dataURItoBlob, dataURItoBuffer, isNode} from './helpers'
 
 /* eslint-disable max-len */
