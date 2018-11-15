@@ -1,3 +1,6 @@
+/* @flow */
+import type {UploadcareSettings} from './types'
+
 /*
 Settings for future support:
 
@@ -10,8 +13,7 @@ Settings for future support:
   parallelDirectUploads: 10,
   pusherKey: '79ae88bd931ea68464d9',
  */
-
-export default {
+const defaultSettings: UploadcareSettings = {
   baseURL: 'https://upload.uploadcare.com',
   publicKey: null,
   doNotStore: false,
@@ -21,3 +23,5 @@ export default {
   userAgent: 'UploadcareUpload (JavaScript)',
   debug: false,
 }
+
+export default defaultSettings

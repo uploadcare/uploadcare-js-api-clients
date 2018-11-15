@@ -1,8 +1,21 @@
 /* @flow */
 import axios from 'axios'
-import buildFormData from '../util/build-form-data'
+import buildFormData from '../util/buildFormData'
 import defaultSettings from '../default-settings'
-import type {Query, Body, Headers} from '../types'
+import type {UploadcareSettings} from '../types'
+
+export type Query = {
+  [key: string]: string | boolean | number | void,
+}
+
+export type Body = {
+  source?: string,
+  file_name?: string,
+}
+
+export type Headers = {
+  [key: string]: string,
+}
 
 export type RequestConfig = {
   method?: string,
@@ -13,11 +26,9 @@ export type RequestConfig = {
   baseURL?: string,
 }
 
-export type UploadcareSettings = {}
-
-export type Response = {
+export type RequestResponse = Promise<{
   data: {} | ErrorResponse,
-}
+}>
 
 export type ErrorResponse = {|
   error: {
@@ -51,19 +62,17 @@ export default function request({
   headers,
   baseURL,
   ...axiosOptions
-}: RequestConfig, settings: UploadcareSettings = {}): Promise<Response> {
+}: RequestConfig, settings: UploadcareSettings = {}): RequestResponse {
   /*
   TODO Add support of all Uploadcare Settings
   */
-  const actualSettings = {
-    ...defaultSettings,
-    ...settings,
-  }
+  const actualSettings: UploadcareSettings = Object.assign({}, defaultSettings, settings)
   const data = body && buildFormData({
     ...body,
     source: body.source || 'local',
   })
-  const config = {
+
+  return axios({
     method: method || 'GET',
     baseURL: baseURL || actualSettings.baseURL,
     url: path,
@@ -79,7 +88,5 @@ export default function request({
       ...((data && data.getHeaders) ? data.getHeaders() : {}),
     },
     ...axiosOptions,
-  }
-
-  return axios(config)
+  })
 }
