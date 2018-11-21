@@ -11,7 +11,7 @@ export default class UploadAPI {
     this.client = client
   }
 
-  request(config: RequestConfig, settings: UploadcareSettings = {}): RequestResponse {
+  request(config: RequestConfig, settings: UploadcareSettings = {}): Promise<RequestResponse> {
     return request(config, {
       ...this.client.settings,
       ...settings,

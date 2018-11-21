@@ -26,9 +26,9 @@ export type RequestConfig = {
   baseURL?: string,
 }
 
-export type RequestResponse = Promise<{
+export type RequestResponse = {
   data: {} | ErrorResponse,
-}>
+}
 
 export type ErrorResponse = {|
   error: {
@@ -52,7 +52,7 @@ const MAX_CONTENT_LENGTH = 50 * 1000 * 1000
  * @param {Object} [config.headers] – The custom headers to be sent.
  * @param {string} [config.baseURL] – The Upload API endpoint.
  * @param {UploadcareSettings} [settings] - Uploadcare Settings
- * @returns {Promise}
+ * @returns {Promise<RequestResponse>}
  */
 export default function request({
   method,
@@ -62,7 +62,7 @@ export default function request({
   headers,
   baseURL,
   ...axiosOptions
-}: RequestConfig, settings: UploadcareSettings = {}): RequestResponse {
+}: RequestConfig, settings: UploadcareSettings = {}): Promise<RequestResponse> {
   /*
   TODO Add support of all Uploadcare Settings
   */
