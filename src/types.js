@@ -1,5 +1,5 @@
 /* @flow */
-export type UploadcareSettings = {
+export type Settings = {
   baseURL?: string,
   publicKey?: string | null,
   doNotStore?: boolean,

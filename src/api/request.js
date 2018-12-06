@@ -1,15 +1,20 @@
 /* @flow */
 import axios from 'axios'
-import buildFormData from '../util/buildFormData'
+import FormData from 'form-data'
 import defaultSettings from '../default-settings'
-import type {UploadcareSettings} from '../types'
+import type {DefaultSettings} from '../default-settings'
+import type {Settings} from '../types'
+
+export type RequiredSettings = DefaultSettings & Settings
 
 export type Query = {
   [key: string]: string | boolean | number | void,
 }
 
 export type Body = {
+  UPLOADCARE_PUB_KEY?: string,
   source?: string,
+  file?: string,
   file_name?: string,
 }
 
@@ -39,6 +44,7 @@ export type ErrorResponse = {|
 
 /* Set max upload body size for node.js to 50M (default is 10M) */
 const MAX_CONTENT_LENGTH = 50 * 1000 * 1000
+const DEFAULT_FILE_NAME = 'original'
 
 /**
  * Performs request to Uploadcare Upload API
@@ -51,7 +57,7 @@ const MAX_CONTENT_LENGTH = 50 * 1000 * 1000
  * @param {Object} [config.body] – The data to be sent as the body. Only for 'PUT', 'POST', 'PATCH'.
  * @param {Object} [config.headers] – The custom headers to be sent.
  * @param {string} [config.baseURL] – The Upload API endpoint.
- * @param {UploadcareSettings} [settings] - Uploadcare Settings
+ * @param {Settings} [settings] - Uploadcare Settings
  * @returns {Promise}
  */
 export default function request({
@@ -62,11 +68,15 @@ export default function request({
   headers,
   baseURL,
   ...axiosOptions
-}: RequestConfig, settings: UploadcareSettings = {}): RequestResponse {
+}: RequestConfig, settings: Settings = {}): RequestResponse {
   /*
   TODO Add support of all Uploadcare Settings
   */
-  const actualSettings: UploadcareSettings = Object.assign({}, defaultSettings, settings)
+  const actualSettings: RequiredSettings = {
+    ...defaultSettings,
+    ...settings,
+  }
+
   const data = body && buildFormData({
     ...body,
     source: body.source || 'local',
@@ -89,4 +99,38 @@ export default function request({
     },
     ...axiosOptions,
   })
+}
+
+/**
+ * Constructs FormData instance from object
+ * Uses 'form-data' package which internally use native FormData
+ * in browsers and the polyfill in node env
+ *
+ * @param {Body} body
+ * @returns {FormData} FormData instance
+ */
+export function buildFormData(body: Body): FormData {
+  const formData = new FormData()
+
+  for (let key of Object.keys(body)) {
+    let value = body[key]
+
+    if (typeof value === 'boolean') {
+      value = value ? '1' : '0'
+    }
+
+    if (Array.isArray(value)) {
+      value.forEach(val => formData.append(key + '[]', val))
+    }
+    else if (key === 'file') {
+      const fileName = body.file_name || DEFAULT_FILE_NAME
+
+      formData.append('file', value, fileName)
+    }
+    else {
+      formData.append(key, value)
+    }
+  }
+
+  return formData
 }
