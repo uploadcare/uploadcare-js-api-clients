@@ -2,7 +2,10 @@
 import axios from 'axios'
 import buildFormData from '../util/buildFormData'
 import defaultSettings from '../default-settings'
-import type {UploadcareSettings} from '../types'
+import type {DefaultSettings} from '../default-settings'
+import type {Settings} from '../types'
+
+export type RequiredSettings = DefaultSettings & Settings
 
 export type Query = {
   [key: string]: string | boolean | number | void,
@@ -51,7 +54,7 @@ const MAX_CONTENT_LENGTH = 50 * 1000 * 1000
  * @param {Object} [config.body] – The data to be sent as the body. Only for 'PUT', 'POST', 'PATCH'.
  * @param {Object} [config.headers] – The custom headers to be sent.
  * @param {string} [config.baseURL] – The Upload API endpoint.
- * @param {UploadcareSettings} [settings] - Uploadcare Settings
+ * @param {Settings} [settings] - Uploadcare Settings
  * @returns {Promise}
  */
 export default function request({
@@ -62,11 +65,15 @@ export default function request({
   headers,
   baseURL,
   ...axiosOptions
-}: RequestConfig, settings: UploadcareSettings = {}): RequestResponse {
+}: RequestConfig, settings: Settings = {}): RequestResponse {
   /*
   TODO Add support of all Uploadcare Settings
   */
-  const actualSettings: UploadcareSettings = Object.assign({}, defaultSettings, settings)
+  const actualSettings: RequiredSettings = {
+    ...defaultSettings,
+    ...settings,
+  }
+
   const data = body && buildFormData({
     ...body,
     source: body.source || 'local',

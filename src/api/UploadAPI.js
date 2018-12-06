@@ -2,7 +2,7 @@
 import request from './request'
 import type UploadcareUpload from '../UploadcareUpload'
 import type {RequestConfig, RequestResponse} from './request'
-import type {UploadcareSettings} from '../types'
+import type {Settings} from '../types'
 
 export default class UploadAPI {
   client: UploadcareUpload
@@ -11,7 +11,7 @@ export default class UploadAPI {
     this.client = client
   }
 
-  request(config: RequestConfig, settings: UploadcareSettings = {}): RequestResponse {
+  request(config: RequestConfig, settings: Settings = {}): RequestResponse {
     return request(config, {
       ...this.client.settings,
       ...settings,
