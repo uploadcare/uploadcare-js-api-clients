@@ -34,6 +34,11 @@ export type RequestOptions = {
 }
 
 export type RequestResponse = Promise<{
+  headers?: Object,
+  ok: boolean,
+  status: number,
+  statusText: string,
+  url: string,
   data: {} | ErrorResponse,
 }>
 
@@ -77,22 +82,37 @@ export default function request({
     source: body.source || 'local',
   })
 
-  return axios({
-    method: method || 'GET',
-    baseURL: baseURL || defaultSettings.baseURL,
-    url: path,
-    params: {
-      jsonerrors: 1,
-      ...query,
-    },
-    data,
-    maxContentLength: MAX_CONTENT_LENGTH,
-    headers: {
-      'X-UC-User-Agent': userAgent || defaultSettings.userAgent,
-      ...headers,
-      ...((data && data.getHeaders) ? data.getHeaders() : {}),
-    },
-    ...axiosOptions,
+  return new Promise((resolve, reject) => {
+    axios({
+      method: method || 'GET',
+      baseURL: baseURL || defaultSettings.baseURL,
+      url: path,
+      params: {
+        jsonerrors: 1,
+        ...query,
+      },
+      data,
+      maxContentLength: MAX_CONTENT_LENGTH,
+      headers: {
+        'X-UC-User-Agent': userAgent || defaultSettings.userAgent,
+        ...headers,
+        ...((data && data.getHeaders) ? data.getHeaders() : {}),
+      },
+      ...axiosOptions,
+    })
+      .then(response => {
+        resolve({
+          headers: response.headers,
+          ok: response.status >= 200 && response.status < 300,
+          status: response.status,
+          statusText: response.statusText,
+          url: response.config.url,
+          data: response.data,
+        })
+      })
+      .catch((error) => {
+        reject(error)
+      })
   })
 }
 
