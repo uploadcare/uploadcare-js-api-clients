@@ -25,10 +25,13 @@ describe('UploadcareUpload', () => {
 
       expect(response.config.baseURL).toBe('https://upload.staging0.uploadcare.com')
     })
-    it('with settings as method parameter', async() => {
+    it('with settings as options', async() => {
       const upload = new UploadcareUpload()
 
-      const response = await upload.api.request({path: '/info/'}, {baseURL: 'https://upload.staging0.uploadcare.com'})
+      const response = await upload.api.request({
+        path: '/info/',
+        baseURL: 'https://upload.staging0.uploadcare.com',
+      })
 
       expect(response.config.baseURL).toBe('https://upload.staging0.uploadcare.com')
     })

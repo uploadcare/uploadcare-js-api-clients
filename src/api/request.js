@@ -12,6 +12,7 @@ export type Query = {
 }
 
 export type Body = {
+  pub_key?: string,
   UPLOADCARE_PUB_KEY?: string,
   source?: string,
   file?: string,
@@ -22,13 +23,14 @@ export type Headers = {
   [key: string]: string,
 }
 
-export type RequestConfig = {
+export type RequestOptions = {
   method?: string,
   path: string,
   query?: Query,
   body?: Body,
   headers?: Headers,
   baseURL?: string,
+  userAgent?: string,
 }
 
 export type RequestResponse = Promise<{
@@ -50,14 +52,14 @@ const DEFAULT_FILE_NAME = 'original'
  * Performs request to Uploadcare Upload API
  *
  * @export
- * @param {RequestConfig} config – The config options for making requests.
- * @param {string} [config.method=GET] – The request method.
- * @param {string} config.path – The path to requested method, without endpoint and with slashes.
- * @param {Object} [config.query] – The URL parameters.
- * @param {Object} [config.body] – The data to be sent as the body. Only for 'PUT', 'POST', 'PATCH'.
- * @param {Object} [config.headers] – The custom headers to be sent.
- * @param {string} [config.baseURL] – The Upload API endpoint.
- * @param {Settings} [settings] - Uploadcare Settings
+ * @param {RequestOptions} options – The options for making requests.
+ * @param {string} [options.method=GET] – The request method.
+ * @param {string} options.path – The path to requested method, without endpoint and with slashes.
+ * @param {Object} [options.query] – The URL parameters.
+ * @param {Object} [options.body] – The data to be sent as the body. Only for 'PUT', 'POST', 'PATCH'.
+ * @param {Object} [options.headers] – The custom headers to be sent.
+ * @param {string} [options.baseURL] – The Upload API endpoint.
+ * @param {string} [options.userAgent] – The info about a library that use this request.
  * @returns {Promise}
  */
 export default function request({
@@ -67,16 +69,9 @@ export default function request({
   body,
   headers,
   baseURL,
+  userAgent,
   ...axiosOptions
-}: RequestConfig, settings: Settings = {}): RequestResponse {
-  /*
-  TODO Add support of all Uploadcare Settings
-  */
-  const actualSettings: RequiredSettings = {
-    ...defaultSettings,
-    ...settings,
-  }
-
+}: RequestOptions): RequestResponse {
   const data = body && buildFormData({
     ...body,
     source: body.source || 'local',
@@ -84,7 +79,7 @@ export default function request({
 
   return axios({
     method: method || 'GET',
-    baseURL: baseURL || actualSettings.baseURL,
+    baseURL: baseURL || defaultSettings.baseURL,
     url: path,
     params: {
       jsonerrors: 1,
@@ -93,7 +88,7 @@ export default function request({
     data,
     maxContentLength: MAX_CONTENT_LENGTH,
     headers: {
-      'X-UC-User-Agent': actualSettings.userAgent,
+      'X-UC-User-Agent': userAgent || defaultSettings.userAgent,
       ...headers,
       ...((data && data.getHeaders) ? data.getHeaders() : {}),
     },
