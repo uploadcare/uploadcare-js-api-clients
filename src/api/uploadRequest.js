@@ -1,5 +1,5 @@
 /* @flow */
-import {CancelToken, isCancel} from 'axios'
+import axios from 'axios'
 import request from './request'
 import type {RequestOptions, RequestResponse} from './request'
 
@@ -33,22 +33,32 @@ export type Uploading = {|
  * @return {{promise: Promise<RequestResponse>, onProgress: null, onCancel: null, cancel}}
  */
 export default function uploadRequest(options: RequestOptions): Uploading {
-  const source = CancelToken.source()
+  const source = axios.CancelToken.source()
 
-  return {
+  const uploading = {
     promise: new Promise((resolve, reject) => {
       request({
         ...options,
-        onUploadProgress: (progressEvent) => progressEvent,
+        onUploadProgress: (progressEvent) => {
+          if (typeof uploading.onProgress === 'function') {
+            uploading.onProgress(progressEvent)
+          }
+        },
         cancelToken: source.token,
       })
         .then(response => resolve(response))
         .catch(error => {
-          reject(isCancel(error) ? 'Request canceled' : error)
+          if (typeof uploading.onCancel === 'function') {
+            uploading.onCancel()
+          }
+
+          reject(axios.isCancel(error) ? 'Request canceled' : error)
         })
     }),
     onProgress: null,
     onCancel: null,
     cancel: source.cancel,
   }
+
+  return uploading
 }
