@@ -5,6 +5,7 @@ import type UploadcareUpload from '../UploadcareUpload'
 import type {RequestOptions, RequestResponse} from './request'
 import type {FileData, Settings} from '../types'
 import type {Uploading} from './base'
+import info from './info'
 
 export default class UploadAPI {
   client: UploadcareUpload
@@ -23,6 +24,13 @@ export default class UploadAPI {
 
   base(file: FileData, settings: Settings = {}): Uploading {
     return base(file, {
+      ...this.client.settings,
+      ...settings,
+    })
+  }
+
+  info(id: string, settings: Settings = {}): Promise<RequestResponse> {
+    return info(id, {
       ...this.client.settings,
       ...settings,
     })
