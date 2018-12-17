@@ -10,7 +10,7 @@ export default class UploadAPI {
     this.client = client
   }
 
-  request(options: RequestOptions): RequestResponse {
+  request(options: RequestOptions): Promise<RequestResponse> {
     return request({
       ...options,
       baseURL: options.baseURL || this.client.settings.baseURL,

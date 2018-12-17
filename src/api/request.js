@@ -2,10 +2,6 @@
 import axios from 'axios'
 import FormData from 'form-data'
 import defaultSettings from '../default-settings'
-import type {DefaultSettings} from '../default-settings'
-import type {Settings} from '../types'
-
-export type RequiredSettings = DefaultSettings & Settings
 
 export type Query = {
   [key: string]: string | boolean | number | void,
@@ -33,14 +29,14 @@ export type RequestOptions = {
   userAgent?: string,
 }
 
-export type RequestResponse = Promise<{
+export type RequestResponse = {
   headers?: Object,
   ok: boolean,
   status: number,
   statusText: string,
   url: string,
   data: {} | ErrorResponse,
-}>
+}
 
 export type ErrorResponse = {|
   error: {
@@ -65,7 +61,7 @@ const DEFAULT_FILE_NAME = 'original'
  * @param {Object} [options.headers] – The custom headers to be sent.
  * @param {string} [options.baseURL] – The Upload API endpoint.
  * @param {string} [options.userAgent] – The info about a library that use this request.
- * @returns {Promise}
+ * @returns {Promise<RequestResponse>}
  */
 export default function request({
   method,
@@ -76,7 +72,7 @@ export default function request({
   baseURL,
   userAgent,
   ...axiosOptions
-}: RequestOptions): RequestResponse {
+}: RequestOptions): Promise<RequestResponse> {
   const data = body && buildFormData({
     ...body,
     source: body.source || 'local',
@@ -100,15 +96,17 @@ export default function request({
       },
       ...axiosOptions,
     })
-      .then(response => {
-        resolve({
-          headers: response.headers,
-          ok: response.status >= 200 && response.status < 300,
-          status: response.status,
-          statusText: response.statusText,
-          url: response.config.url,
-          data: response.data,
-        })
+      .then(axiosResponse => {
+        const response: RequestResponse = {
+          headers: axiosResponse.headers,
+          ok: axiosResponse.status >= 200 && axiosResponse.status < 300,
+          status: axiosResponse.status,
+          statusText: axiosResponse.statusText,
+          url: axiosResponse.config.url,
+          data: axiosResponse.data,
+        }
+
+        resolve(response)
       })
       .catch((error) => {
         reject(error)
