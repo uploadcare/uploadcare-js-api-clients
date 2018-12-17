@@ -1,5 +1,15 @@
 {
-  "env": {"node": true, "es6": true, "browser": true, "mocha": true, "jasmine": true, "jest": true},
+  "env": {
+    "node": true,
+    "es6": true,
+    "browser": true,
+    "mocha": true,
+    "jasmine": true,
+    "jest": true
+  },
+  "globals": {
+    "expectAsync": true
+  },
   "rules": {
     "require-jsdoc": "off",
     "id-length": "off"
