@@ -2,6 +2,7 @@
 import axios from 'axios'
 import request from './request'
 import type {RequestOptions, RequestResponse} from './request'
+import type {Settings, FileData} from '../types'
 
 export type UploadProgressEvent = {
   status: 'uploading' | 'uploaded' | 'canceled' | 'error',
@@ -20,19 +21,34 @@ export type Uploading = {|
 |}
 
 /**
- * Performs uploading request to Uploadcare Upload API. Can be canceled and has progress.
+ * Performs file uploading request to Uploadcare Upload API.
+ * Can be canceled and has progress.
  *
- * @param {RequestOptions} options – The options for making requests.
- * @param {string} [options.method=GET] – The request method.
- * @param {string} options.path – The path to requested method, without endpoint and with slashes.
- * @param {Object} [options.query] – The URL parameters.
- * @param {Object} [options.body] – The data to be sent as the body. Only for 'PUT', 'POST', 'PATCH'.
- * @param {Object} [options.headers] – The custom headers to be sent.
- * @param {string} [options.baseURL] – The Upload API endpoint.
- * @param {string} [options.userAgent] – The info about a library that use this request.
+ * @param {FileData} file
+ * @param {Settings} settings
  * @return {{promise: Promise<RequestResponse>, onProgress: null, onCancel: null, cancel}}
  */
-export default function uploadRequest(options: RequestOptions): Uploading {
+export default function base(file: FileData, settings: Settings = {}): Uploading {
+  const options: RequestOptions = {
+    method: 'POST',
+    path: '/base/',
+    body: {
+      UPLOADCARE_PUB_KEY: settings.publicKey || '',
+      signature: settings.secureSignature || '',
+      expire: settings.secureExpire || '',
+      UPLOADCARE_STORE: settings.doNotStore ? '' : 'auto',
+      file: file,
+      source: 'local',
+    },
+  }
+
+  if (settings.baseURL) {
+    options.baseURL = settings.baseURL
+  }
+  if (settings.userAgent) {
+    options.userAgent = settings.userAgent
+  }
+
   const source = axios.CancelToken.source()
 
   const uploading = {

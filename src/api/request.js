@@ -2,17 +2,19 @@
 import axios from 'axios'
 import FormData from 'form-data'
 import defaultSettings from '../default-settings'
+import type {FileData} from '../types'
 
 export type Query = {
   [key: string]: string | boolean | number | void,
 }
 
 export type Body = {
-  pub_key?: string,
-  UPLOADCARE_PUB_KEY?: string,
-  source?: string,
-  file?: string,
-  file_name?: string,
+  [key: string]: Array<string>
+    | string
+    | boolean
+    | number
+    | FileData
+    | void,
 }
 
 export type Headers = {
@@ -136,7 +138,7 @@ export function buildFormData(body: Body): FormData {
       value.forEach(val => formData.append(key + '[]', val))
     }
     else if (key === 'file') {
-      const fileName = body.file_name || DEFAULT_FILE_NAME
+      const fileName = body.file.name || DEFAULT_FILE_NAME
 
       formData.append('file', value, fileName)
     }

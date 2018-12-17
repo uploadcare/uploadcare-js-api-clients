@@ -1,18 +1,11 @@
-import uploadRequest from '../../src/api/uploadRequest'
+import base from '../../src/api/base'
 import * as factory from '../fixtureFactory'
 
-describe('API - uploadRequest', () => {
+describe('API - base', () => {
   it('should be able to upload data', async() => {
     const file = factory.file(1)
 
-    const uploading = uploadRequest({
-      method: 'POST',
-      path: '/base/',
-      body: {
-        UPLOADCARE_PUB_KEY: factory.publicKey('demo'),
-        file: file.data,
-      },
-    })
+    const uploading = base(file.data, {publicKey: factory.publicKey('demo')})
 
     const response = await uploading.promise
 
@@ -23,14 +16,7 @@ describe('API - uploadRequest', () => {
   it('should be able to cancel uploading', async() => {
     const file = factory.image('blackSquare')
 
-    const uploading = uploadRequest({
-      method: 'POST',
-      path: '/base/',
-      body: {
-        UPLOADCARE_PUB_KEY: factory.publicKey('demo'),
-        file: file.data,
-      },
-    })
+    const uploading = base(file.data, {publicKey: factory.publicKey('demo')})
 
     setTimeout(() => {
       uploading.cancel()
@@ -42,14 +28,7 @@ describe('API - uploadRequest', () => {
   it('should be able to handle cancel uploading', (done) => {
     const file = factory.image('blackSquare')
 
-    const uploading = uploadRequest({
-      method: 'POST',
-      path: '/base/',
-      body: {
-        UPLOADCARE_PUB_KEY: factory.publicKey('demo'),
-        file: file.data,
-      },
-    })
+    const uploading = base(file.data, {publicKey: factory.publicKey('demo')})
 
     /* TODO Maybe cancel need to resolve instead of reject? */
     uploading.promise.catch(() => {})
@@ -66,14 +45,7 @@ describe('API - uploadRequest', () => {
   it('should be able to handle progress', (done) => {
     const file = factory.image('blackSquare')
 
-    const uploading = uploadRequest({
-      method: 'POST',
-      path: '/base/',
-      body: {
-        UPLOADCARE_PUB_KEY: factory.publicKey('demo'),
-        file: file.data,
-      },
-    })
+    const uploading = base(file.data, {publicKey: factory.publicKey('demo')})
 
     uploading.onProgress = () => {
       done()

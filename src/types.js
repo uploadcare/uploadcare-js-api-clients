@@ -9,3 +9,5 @@ export type Settings = {
   userAgent?: string,
   debug?: boolean,
 }
+
+export type FileData = Blob | File | Buffer
