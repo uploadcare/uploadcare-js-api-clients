@@ -1,14 +1,14 @@
 /* @flow */
 import defaultSettings from './default-settings'
 import UploadAPI from './api'
-import type {UploadcareSettings} from './types'
+import type {Settings} from './types'
 
 export default class UploadcareUpload {
-  settings: UploadcareSettings
+  settings: Settings
   updateSettingsListeners: Array<Function>
   api: UploadAPI
 
-  constructor(settings: UploadcareSettings = {}): void {
+  constructor(settings: Settings = {}): void {
     this.settings = {
       ...defaultSettings,
       ...settings,
@@ -18,7 +18,7 @@ export default class UploadcareUpload {
     this.api = new UploadAPI(this)
   }
 
-  setSettings(newSettings: UploadcareSettings = {}): void {
+  setSettings(newSettings: Settings = {}): void {
     const prevSettings = {...this.settings}
 
     this.settings = {
