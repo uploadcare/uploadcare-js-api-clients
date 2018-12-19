@@ -3,14 +3,13 @@ import * as factory from '../fixtureFactory'
 
 describe('API - base', () => {
   it('should be able to upload data', async() => {
-    const file = factory.file(1)
+    const file = factory.image('blackSquare')
 
     const uploading = base(file.data, {publicKey: factory.publicKey('demo')})
 
     const response = await uploading.promise
 
-    expect(response.status).toBe(200)
-    expect(response.data.file).toBeTruthy()
+    expect(response.file).toBeTruthy()
   })
 
   it('should be able to cancel uploading', async() => {

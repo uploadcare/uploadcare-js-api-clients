@@ -1,20 +1,18 @@
 /* @flow */
 import request from './request'
-import type {Settings} from '../types'
+import type {Settings, FileInfo} from '../types'
 import type {RequestOptions} from './request'
 
-export type FileInfo = {
-  [key: string]: string | number | boolean
-}
+export type InfoResponse = FileInfo
 
 /**
  * Returns a JSON dictionary holding file info
  *
  * @param {string} id – UUID of a target file to request its info.
  * @param {Settings} settings
- * @return {Promise<FileInfo>}
+ * @return {Promise<InfoResponse>}
  */
-export default function info(id: string, settings: Settings = {}): Promise<FileInfo> {
+export default function info(id: string, settings: Settings = {}): Promise<InfoResponse> {
   const options: RequestOptions = {
     path: '/info/',
     query: {

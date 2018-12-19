@@ -1,8 +1,12 @@
 /* @flow */
 import axios from 'axios'
 import request from './request'
-import type {RequestOptions, RequestResponse} from './request'
+import type {RequestOptions} from './request'
 import type {Settings, FileData} from '../types'
+
+export type BaseResponse = {|
+  file: string
+|}
 
 export type UploadProgressEvent = {
   status: 'uploading' | 'uploaded' | 'canceled' | 'error',
@@ -14,7 +18,7 @@ export type UploadCancelEvent = {
 }
 
 export type Uploading = {|
-  promise: Promise<RequestResponse>,
+  promise: Promise<BaseResponse>,
   onProgress: ?(event: UploadProgressEvent) => void,
   onCancel: ?(event: UploadCancelEvent) => void,
   cancel: Function,
@@ -26,7 +30,7 @@ export type Uploading = {|
  *
  * @param {FileData} file
  * @param {Settings} settings
- * @return {{promise: Promise<RequestResponse>, onProgress: null, onCancel: null, cancel}}
+ * @return {Uploading}
  */
 export default function base(file: FileData, settings: Settings = {}): Uploading {
   const options: RequestOptions = {
@@ -51,6 +55,7 @@ export default function base(file: FileData, settings: Settings = {}): Uploading
 
   const source = axios.CancelToken.source()
 
+  /* TODO Need to handle errors */
   const uploading = {
     promise: new Promise((resolve, reject) => {
       request({
@@ -62,7 +67,14 @@ export default function base(file: FileData, settings: Settings = {}): Uploading
         },
         cancelToken: source.token,
       })
-        .then(response => resolve(response))
+        .then(response => {
+          if (response.ok && typeof response.data.error === 'undefined') {
+            resolve(response.data)
+          }
+          else {
+            reject()
+          }
+        })
         .catch(error => {
           if (typeof uploading.onCancel === 'function') {
             uploading.onCancel()

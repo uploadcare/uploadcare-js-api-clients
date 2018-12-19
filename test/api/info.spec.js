@@ -3,8 +3,8 @@ import * as factory from '../fixtureFactory'
 
 describe('API - info', () => {
   it('should return file info', async() => {
-    const fileInfo = await info(factory.uuid('image'), {publicKey: factory.publicKey('image')})
+    const response = await info(factory.uuid('image'), {publicKey: factory.publicKey('image')})
 
-    expect(fileInfo.uuid).toBeTruthy()
+    expect(response.uuid).toBeTruthy()
   })
 })
