@@ -1,5 +1,5 @@
-import UploadcareUpload from './UploadcareUpload'
+import UploadClient from './UploadClient'
 
 export {request as uploadAPIRequest} from './api'
 
-export default UploadcareUpload
+export default UploadClient

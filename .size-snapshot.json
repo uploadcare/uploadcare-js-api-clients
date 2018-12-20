@@ -1,5 +1,5 @@
 {
-  "dist/uploadcare-upload-api.esm.js": {
+  "dist/uploadcare-upload-client.esm.js": {
     "bundled": 7708,
     "minified": 3672,
     "gzipped": 1417,
@@ -13,17 +13,17 @@
       }
     }
   },
-  "dist/uploadcare-upload-api.cjs.js": {
+  "dist/uploadcare-upload-client.cjs.js": {
     "bundled": 7792,
     "minified": 3738,
     "gzipped": 1443
   },
-  "dist/uploadcare-upload-api.js": {
+  "dist/uploadcare-upload-client.js": {
     "bundled": 45764,
     "minified": 14086,
     "gzipped": 5298
   },
-  "dist/uploadcare-upload-api.min.js": {
+  "dist/uploadcare-upload-client.min.js": {
     "bundled": 14086,
     "minified": 14069,
     "gzipped": 5287

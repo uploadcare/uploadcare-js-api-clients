@@ -18,7 +18,7 @@ Settings for future support:
  */
 const defaultSettings: DefaultSettings = {
   baseURL: 'https://upload.uploadcare.com',
-  userAgent: 'UploadcareUpload (JavaScript)',
+  userAgent: 'UploadcareUploadClient (JavaScript)',
 }
 
 export default defaultSettings

@@ -1,7 +1,7 @@
 /* @flow */
 import request from './request'
 import base from './base'
-import type UploadcareUpload from '../UploadcareUpload'
+import type UploadClient from '../UploadClient'
 import type {RequestOptions, RequestResponse} from './request'
 import type {FileData, Settings} from '../types'
 import type {Uploading} from './base'
@@ -9,9 +9,9 @@ import info from './info'
 import type {InfoResponse} from './info'
 
 export default class UploadAPI {
-  client: UploadcareUpload
+  client: UploadClient
 
-  constructor(client: UploadcareUpload) {
+  constructor(client: UploadClient) {
     this.client = client
   }
 

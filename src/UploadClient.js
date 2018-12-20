@@ -5,7 +5,7 @@ import fileFrom from './fileFrom'
 import type {FileData, Settings} from './types'
 import type {File} from './fileFrom'
 
-export default class UploadcareUpload {
+export default class UploadClient {
   settings: Settings
   updateSettingsListeners: Array<Function>
   api: UploadAPI

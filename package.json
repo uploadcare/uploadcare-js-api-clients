@@ -1,9 +1,9 @@
 {
-  "name": "@uploadcare/upload-api",
+  "name": "@uploadcare/upload-client",
   "version": "1.0.0-alpha",
   "description": "JavaScript library for work with Uploadcare Upload API",
-  "main": "dist/uploadcare-upload-api.cjs.js",
-  "module": "dist/uploadcare-upload-api.esm.js",
+  "main": "dist/uploadcare-upload-client.cjs.js",
+  "module": "dist/uploadcare-upload-client.esm.js",
   "scripts": {
     "clean": "rimraf dist",
     "lint": "eslint .",
@@ -19,14 +19,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/uploadcare/uploadcare-js-upload-api.git"
+    "url": "git+https://github.com/uploadcare/uploadcare-upload-client.git"
   },
   "author": "Uploadcare",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/uploadcare/uploadcare-js-upload-api/issues"
+    "url": "https://github.com/uploadcare/uploadcare-upload-client/issues"
   },
-  "homepage": "https://github.com/uploadcare/uploadcare-js-upload-api#readme",
+  "homepage": "https://github.com/uploadcare/uploadcare-upload-client#readme",
   "devDependencies": {
     "@babel/cli": "^7.2.0",
     "@babel/core": "^7.2.0",

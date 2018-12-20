@@ -13,4 +13,4 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 * Test environment for both Node.js and browsers
 
 [upload-api]: https://uploadcare.com/docs/api_reference/upload/
-[Unreleased]: https://github.com/uploadcare/uploadcare-js-upload-api/tree/master
+[Unreleased]: https://github.com/uploadcare/uploadcare-upload-client/tree/master

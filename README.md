@@ -1,6 +1,6 @@
 # Uploadcare Javascript API
 
-<a href="https://uploadcare.com/?utm_source=github&utm_campaign=uploadcare-js-upload-api">
+<a href="https://uploadcare.com/?utm_source=github&utm_campaign=uploadcare-upload-client">
   <img align="right" width="64" height="64"
     src="https://ucarecdn.com/2f4864b7-ed0e-4411-965b-8148623aa680/uploadcare-logo-mark.svg"
     alt="">
@@ -27,19 +27,17 @@ JavaScript library for work with Uploadcare API.
 ## Install
 
 ```bash
-npm install @uploadcare/upload-api --save
+npm install @uploadcare/upload-client --save
 ```
 
 ## Usage
 
 ```javascript
-import UploadcareUpload, {uploadAPIRequest} from '@uploadcare/upload-api'
+import UploadClient from '@uploadcare/upload-client'
 
-uploadAPIRequest(config, settings)
+const client = new UploadClient(settings)
 
-const upload = new UploadcareUpload(settings)
-
-upload.api.request(config, settings)
+client.api.request(config, settings)
 ```
 
 ## Configuration
@@ -61,12 +59,12 @@ request at [hello@uploadcare.com][uc-email-hello].
 
 [uc-email-bounty]: mailto:bugbounty@uploadcare.com
 [uc-email-hello]: mailto:hello@uploadcare.com
-[github-releases]: https://github.com/uploadcare/uploadcare-js-upload-api/releases
-[github-branch-release]: https://github.com/uploadcare/uploadcare-js-upload-api/tree/release
-[github-contributors]: https://github.com/uploadcare/uploadcare-js-upload-api/graphs/contributors
+[github-releases]: https://github.com/uploadcare/uploadcare-upload-client/releases
+[github-branch-release]: https://github.com/uploadcare/uploadcare-upload-client/tree/release
+[github-contributors]: https://github.com/uploadcare/uploadcare-upload-client/graphs/contributors
 [badge-stack-img]: https://img.shields.io/badge/tech-stack-0690fa.svg?style=flat
 [badge-stack-url]: https://stackshare.io/uploadcare/stacks/
-[badge-release-img]: https://img.shields.io/github/release/uploadcare/uploadcare-js-upload-api.svg
-[badge-release-url]: https://github.com/uploadcare/uploadcare-js-upload-api/releases
-[npm-img]: http://img.shields.io/npm/v/@uploadcare/upload-api.svg
-[npm-url]: https://www.npmjs.org/package/@uploadcare/upload-api
+[badge-release-img]: https://img.shields.io/github/release/uploadcare/uploadcare-upload-client.svg
+[badge-release-url]: https://github.com/uploadcare/uploadcare-upload-client/releases
+[npm-img]: http://img.shields.io/npm/v/@uploadcare/upload-client.svg
+[npm-url]: https://www.npmjs.org/package/@uploadcare/upload-client

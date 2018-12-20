@@ -35,7 +35,7 @@ export default [
     external: ['axios', 'form-data'],
     output: [
       {
-        file: 'dist/uploadcare-upload-api.esm.js',
+        file: 'dist/uploadcare-upload-client.esm.js',
         format: 'esm',
         interop: false,
       },
@@ -47,7 +47,7 @@ export default [
     external: ['axios', 'form-data'],
     output: [
       {
-        file: 'dist/uploadcare-upload-api.cjs.js',
+        file: 'dist/uploadcare-upload-client.cjs.js',
         format: 'cjs',
         interop: false,
       },
@@ -58,7 +58,7 @@ export default [
     plugins: getPlugins('umd'),
     output: [
       {
-        file: 'dist/uploadcare-upload-api.js',
+        file: 'dist/uploadcare-upload-client.js',
         format: 'umd',
         name: 'uploadcareAPI',
         interop: false,
@@ -70,7 +70,7 @@ export default [
     plugins: getPlugins('umd', true),
     output: [
       {
-        file: 'dist/uploadcare-upload-api.min.js',
+        file: 'dist/uploadcare-upload-client.min.js',
         format: 'umd',
         name: 'uploadcareAPI',
         interop: false,
