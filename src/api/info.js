@@ -8,16 +8,16 @@ export type InfoResponse = FileInfo
 /**
  * Returns a JSON dictionary holding file info
  *
- * @param {string} id – UUID of a target file to request its info.
+ * @param {string} uuid – UUID of a target file to request its info.
  * @param {Settings} settings
  * @return {Promise<InfoResponse>}
  */
-export default function info(id: string, settings: Settings = {}): Promise<InfoResponse> {
+export default function info(uuid: string, settings: Settings = {}): Promise<InfoResponse> {
   const options: RequestOptions = {
     path: '/info/',
     query: {
       pub_key: settings.publicKey || '',
-      file_id: id,
+      file_id: uuid,
     },
   }
 
