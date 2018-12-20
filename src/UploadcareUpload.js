@@ -1,7 +1,9 @@
 /* @flow */
 import defaultSettings from './default-settings'
 import UploadAPI from './api'
-import type {Settings} from './types'
+import fileFrom from './fileFrom'
+import type {FileData, Settings} from './types'
+import type {File} from './fileFrom'
 
 export default class UploadcareUpload {
   settings: Settings
@@ -43,5 +45,12 @@ export default class UploadcareUpload {
         break
       }
     }
+  }
+
+  fileFrom(from: string, data: FileData, settings: Settings = {}): File {
+    return fileFrom(from, data, {
+      ...this.settings,
+      ...settings,
+    })
   }
 }
