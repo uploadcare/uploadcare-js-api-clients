@@ -57,32 +57,30 @@ export default function base(file: FileData, settings: Settings = {}): Uploading
 
   /* TODO Need to handle errors */
   const uploading = {
-    promise: new Promise((resolve, reject) => {
-      request({
-        ...options,
-        onUploadProgress: (progressEvent) => {
-          if (typeof uploading.onProgress === 'function') {
-            uploading.onProgress(progressEvent)
-          }
-        },
-        cancelToken: source.token,
+    promise: request({
+      ...options,
+      onUploadProgress: (progressEvent) => {
+        if (typeof uploading.onProgress === 'function') {
+          uploading.onProgress(progressEvent)
+        }
+      },
+      cancelToken: source.token,
+    })
+      .then(response => {
+        if (response.ok && typeof response.data.error === 'undefined') {
+          return response.data
+        }
+        else {
+          return Promise.reject()
+        }
       })
-        .then(response => {
-          if (response.ok && typeof response.data.error === 'undefined') {
-            resolve(response.data)
-          }
-          else {
-            reject()
-          }
-        })
-        .catch(error => {
-          if (typeof uploading.onCancel === 'function') {
-            uploading.onCancel()
-          }
+      .catch(error => {
+        if (typeof uploading.onCancel === 'function') {
+          uploading.onCancel()
+        }
 
-          reject(axios.isCancel(error) ? 'Request canceled' : error)
-        })
-    }),
+        return Promise.reject(axios.isCancel(error) ? 'Request canceled' : error)
+      }),
     onProgress: null,
     onCancel: null,
     cancel: source.cancel,

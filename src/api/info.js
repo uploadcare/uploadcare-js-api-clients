@@ -29,18 +29,16 @@ export default function info(uuid: string, settings: Settings = {}): Promise<Inf
   }
 
   /* TODO Need to handle errors */
-  return new Promise((resolve, reject) => {
-    request(options)
-      .then(response => {
-        if (response.ok && typeof response.data.error === 'undefined') {
-          resolve(response.data)
-        }
-        else {
-          reject()
-        }
-      })
-      .catch(() => {
-        reject()
-      })
-  })
+  return request(options)
+    .then(response => {
+      if (response.ok && typeof response.data.error === 'undefined') {
+        return response.data
+      }
+      else {
+        return Promise.reject()
+      }
+    })
+    .catch(() => {
+      return Promise.reject()
+    })
 }

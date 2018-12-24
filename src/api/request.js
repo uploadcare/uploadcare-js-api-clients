@@ -80,40 +80,34 @@ export default function request({
     source: body.source || 'local',
   })
 
-  return new Promise((resolve, reject) => {
-    axios({
-      method: method || 'GET',
-      baseURL: baseURL || defaultSettings.baseURL,
-      url: path,
-      params: {
-        jsonerrors: 1,
-        ...query,
-      },
-      data,
-      maxContentLength: MAX_CONTENT_LENGTH,
-      headers: {
-        'X-UC-User-Agent': userAgent || defaultSettings.userAgent,
-        ...headers,
-        ...((data && data.getHeaders) ? data.getHeaders() : {}),
-      },
-      ...axiosOptions,
-    })
-      .then(axiosResponse => {
-        const response: RequestResponse = {
-          headers: axiosResponse.headers,
-          ok: axiosResponse.status >= 200 && axiosResponse.status < 300,
-          status: axiosResponse.status,
-          statusText: axiosResponse.statusText,
-          url: axiosResponse.config.url,
-          data: axiosResponse.data,
-        }
-
-        resolve(response)
-      })
-      .catch((error) => {
-        reject(error)
-      })
+  return axios({
+    method: method || 'GET',
+    baseURL: baseURL || defaultSettings.baseURL,
+    url: path,
+    params: {
+      jsonerrors: 1,
+      ...query,
+    },
+    data,
+    maxContentLength: MAX_CONTENT_LENGTH,
+    headers: {
+      'X-UC-User-Agent': userAgent || defaultSettings.userAgent,
+      ...headers,
+      ...((data && data.getHeaders) ? data.getHeaders() : {}),
+    },
+    ...axiosOptions,
   })
+    .then(axiosResponse => ({
+      headers: axiosResponse.headers,
+      ok: axiosResponse.status >= 200 && axiosResponse.status < 300,
+      status: axiosResponse.status,
+      statusText: axiosResponse.statusText,
+      url: axiosResponse.config.url,
+      data: axiosResponse.data,
+    }))
+    .catch((error) => {
+      return Promise.reject(error)
+    })
 }
 
 /**
