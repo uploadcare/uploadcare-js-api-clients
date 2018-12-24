@@ -12,6 +12,8 @@ export type File = {|
   cancel: Function,
 |}
 
+const MAX_TIMEOUT = 300
+
 export default class UploadClient {
   settings: Settings
   updateSettingsListeners: Array<Function>
@@ -54,54 +56,53 @@ export default class UploadClient {
     }
   }
 
-  fileFrom(from: string, data: FileData, settings: Settings = {}): File {
-    const uploading = this.api.base(data, settings)
-    const file = {
-      status: 'uploading',
-      info: {},
-      promise: new Promise((resolve, reject) => {
-        uploading.promise
-          .then(({file: uuid}) => {
-            file.status = 'uploaded'
-            file.info = {uuid}
+  checkFileIsReady(uuid: string, handleFileInfo: (FileInfo) => void, timeout, settings: Settings = {}): Promise {
+    return new Promise((resolve, reject) => {
+      this.api.info(uuid, settings)
+        .then(fileInfo => {
+          handleFileInfo(fileInfo)
 
-            let timeout = 100
+          if (fileInfo.is_ready) {
+            resolve()
+          }
 
-            const updateFileInfo = () => new Promise((resolveUpdating, rejectUpdating) => {
-              this.api.info(uuid, settings)
-                .then(fileInfo => {
-                  file.info = {...fileInfo}
-
-                  if (file.info.is_ready) {
-                    resolveUpdating()
-                  }
-                  else {
-                    setTimeout(() => {
-                      updateFileInfo()
-                        .then(() => resolveUpdating())
-                        .catch(() => rejectUpdating())
-                    }, timeout)
-
-                    timeout += 50
-                  }
-                })
-                .catch(() => rejectUpdating())
-            })
-
-            updateFileInfo()
+          setTimeout(() => {
+            this.checkFileIsReady(uuid, handleFileInfo, Math.min(MAX_TIMEOUT, timeout + 50), settings)
               .then(() => {
-                file.status = 'ready'
-
-                resolve(file.info)
+                resolve()
               })
               .catch(() => {
                 reject()
               })
-          })
-          .catch(error => {
-            reject(error)
-          })
-      }),
+          }, timeout)
+        })
+        .catch(() => {
+          reject()
+        })
+    })
+  }
+
+  fileFrom(from: string, data: FileData, settings: Settings = {}): File {
+    const uploading = this.api.base(data, settings)
+
+    const file = {
+      status: 'uploading',
+      info: {},
+      promise: uploading.promise
+        .then(({file: uuid}) => {
+          file.status = 'uploaded'
+          file.info = {uuid}
+
+          return this.checkFileIsReady(uuid, (fileInfo) => {
+            file.info = {...fileInfo}
+          }, 100, settings)
+        })
+        .then(() => {
+          file.status = 'ready'
+
+          return {...file.info}
+        })
+        .catch(() => Promise.reject()),
       onProgress: null,
       onCancel: null,
       cancel: uploading.cancel,

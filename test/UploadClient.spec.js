@@ -1,5 +1,5 @@
 import UploadClient from '../src/UploadClient'
-import * as factory from "./fixtureFactory";
+import * as factory from './fixtureFactory'
 
 describe('UploadClient', () => {
   describe('should request to the right base url', () => {
@@ -40,7 +40,7 @@ describe('UploadClient', () => {
 
   describe('fileFrom', () => {
     it('should resolves when file is ready on CDN', async() => {
-      const fileToUpload = factory.file(0.5)
+      const fileToUpload = factory.image('blackSquare')
 
       const client = new UploadClient({publicKey: factory.publicKey('demo')})
 
