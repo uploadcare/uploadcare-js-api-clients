@@ -2,6 +2,9 @@
 import axios from 'axios'
 import FormData from 'form-data'
 import defaultSettings from '../default-settings'
+import RequestError from '../errors/RequestError'
+import CancelError from '../errors/CancelError'
+import UploadcareError from '../errors/UploadcareError'
 import type {FileData} from '../types'
 
 export type Query = {
@@ -31,20 +34,10 @@ export type RequestOptions = {
   userAgent?: string,
 }
 
-export type RequestResponse = {
+export type RequestResponse = {|
   headers?: Object,
-  ok: boolean,
-  status: number,
-  statusText: string,
   url: string,
-  data: {} | ErrorResponse,
-}
-
-export type ErrorResponse = {|
-  error: {
-    status_code: number,
-    content: string,
-  }
+  data: {},
 |}
 
 /* Set max upload body size for node.js to 50M (default is 10M) */
@@ -97,11 +90,20 @@ export default function request({
     },
     ...axiosOptions,
   })
+    .catch((error) => {
+      return Promise.reject(axios.isCancel(error) ? new CancelError() : new RequestError(error.message))
+    })
+    .then(axiosResponse => {
+      if (axiosResponse.data.error) {
+        const {status_code: code, content} = axiosResponse.data.error
+
+        throw new UploadcareError(content, code)
+      }
+
+      return axiosResponse
+    })
     .then(axiosResponse => ({
       headers: axiosResponse.headers,
-      ok: axiosResponse.status >= 200 && axiosResponse.status < 300,
-      status: axiosResponse.status,
-      statusText: axiosResponse.statusText,
       url: axiosResponse.config.url,
       data: axiosResponse.data,
     }))
