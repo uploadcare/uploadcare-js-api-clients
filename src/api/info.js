@@ -30,15 +30,5 @@ export default function info(uuid: string, settings: Settings = {}): Promise<Inf
 
   /* TODO Need to handle errors */
   return request(options)
-    .then(response => {
-      if (response.ok && typeof response.data.error === 'undefined') {
-        return response.data
-      }
-      else {
-        return Promise.reject()
-      }
-    })
-    .catch(() => {
-      return Promise.reject()
-    })
+    .then(response => response.data)
 }
