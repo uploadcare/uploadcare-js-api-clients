@@ -66,20 +66,13 @@ export default function base(file: FileData, settings: Settings = {}): Uploading
       },
       cancelToken: source.token,
     })
-      .then(response => {
-        if (response.ok && typeof response.data.error === 'undefined') {
-          return response.data
-        }
-        else {
-          return Promise.reject()
-        }
-      })
+      .then(response => response.data)
       .catch(error => {
-        if (typeof uploading.onCancel === 'function') {
+        if (error.name === 'CancelError' && typeof uploading.onCancel === 'function') {
           uploading.onCancel()
         }
 
-        return Promise.reject(axios.isCancel(error) ? 'Request canceled' : error)
+        return Promise.reject(error)
       }),
     onProgress: null,
     onCancel: null,

@@ -7,9 +7,12 @@ describe('API - base', () => {
 
     const uploading = base(file.data, {publicKey: factory.publicKey('demo')})
 
-    const response = await uploading.promise
+    const req = uploading.promise
 
-    expect(response.file).toBeTruthy()
+    await expectAsync(req).toBeResolved()
+    req.then(data => {
+      expect(data.file).toBeTruthy()
+    })
   })
 
   it('should be able to cancel uploading', async() => {
@@ -21,7 +24,12 @@ describe('API - base', () => {
       uploading.cancel()
     }, 10)
 
-    await expectAsync(uploading.promise).toBeRejected()
+    const req = uploading.promise
+
+    await expectAsync(req).toBeRejected()
+    req.catch(error => {
+      expect(error.name).toBe('CancelError')
+    })
   })
 
   it('should be able to handle cancel uploading', (done) => {
@@ -29,25 +37,37 @@ describe('API - base', () => {
 
     const uploading = base(file.data, {publicKey: factory.publicKey('demo')})
 
-    /* TODO Maybe cancel need to resolve instead of reject? */
-    uploading.promise.catch(() => {})
+    setTimeout(() => {
+      uploading.cancel()
+    }, 10)
 
     uploading.onCancel = () => {
       done()
     }
 
-    setTimeout(() => {
-      uploading.cancel()
-    }, 10)
+    /* TODO Maybe cancel need to resolve instead of reject? */
+    uploading.promise.catch((error) => {
+      if (error.name !== 'CancelError') {
+        done.fail(error)
+      }
+    })
   })
 
-  it('should be able to handle progress', (done) => {
+  it('should be able to handle progress', async() => {
+    let progress = 0
     const file = factory.image('blackSquare')
 
     const uploading = base(file.data, {publicKey: factory.publicKey('demo')})
 
     uploading.onProgress = () => {
-      done()
+      progress += 1
     }
+
+    const req = uploading.promise
+
+    await expectAsync(req).toBeResolved()
+    req.then(() => {
+      expect(progress).toBeGreaterThan(0)
+    })
   })
 })
