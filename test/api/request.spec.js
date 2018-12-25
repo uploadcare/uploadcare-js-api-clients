@@ -98,9 +98,6 @@ describe('API – request', () => {
       })
 
       await expectAsync(req).toBeRejected()
-      req.catch(error => {
-        expect(error.name).toBe('RequestError')
-      })
 
       axios.interceptors.response.eject(interceptor)
     })

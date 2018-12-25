@@ -1,8 +1,7 @@
 /* @flow */
-
 export default class CancelError extends Error {
-  constructor(...args) {
-    super(...args)
+  constructor() {
+    super()
 
     this.name = 'CancelError'
     this.message = 'Request canceled'

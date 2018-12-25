@@ -91,13 +91,27 @@ export default function request({
     ...axiosOptions,
   })
     .catch((error) => {
-      return Promise.reject(axios.isCancel(error) ? new CancelError() : new RequestError(error.message))
+      if (axios.isCancel(error)) {
+        throw new CancelError()
+      }
+
+      if (error.response) {
+        throw new RequestError({url: error.config.url}, {
+          status: error.response.status,
+          statusText: error.response.statusText,
+        })
+      }
+
+      throw error
     })
     .then(axiosResponse => {
       if (axiosResponse.data.error) {
         const {status_code: code, content} = axiosResponse.data.error
 
-        throw new UploadcareError(content, code)
+        throw new UploadcareError({url: axiosResponse.config.url}, {
+          status: code,
+          statusText: content,
+        })
       }
 
       return axiosResponse
@@ -107,9 +121,7 @@ export default function request({
       url: axiosResponse.config.url,
       data: axiosResponse.data,
     }))
-    .catch((error) => {
-      return Promise.reject(error)
-    })
+    .catch((error) => Promise.reject(error))
 }
 
 /**
