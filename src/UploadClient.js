@@ -112,6 +112,18 @@ export default class UploadClient {
       cancel: uploading.cancel,
     }
 
+    uploading.onProgress = (progressEvent) => {
+      if (typeof file.onProgress === 'function') {
+        file.onProgress(progressEvent)
+      }
+    }
+
+    uploading.onCancel = () => {
+      if (typeof file.onCancel === 'function') {
+        file.onCancel()
+      }
+    }
+
     return file
   }
 }
