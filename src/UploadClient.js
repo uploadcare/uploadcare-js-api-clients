@@ -56,7 +56,12 @@ export default class UploadClient {
     }
   }
 
-  checkFileIsReady(uuid: string, handleFileInfo: (FileInfo) => void, timeout, settings: Settings = {}): Promise {
+  checkFileIsReady(
+    uuid: string,
+    handleFileInfo: (FileInfo) => void,
+    timeout: number,
+    settings: Settings = {}
+  ): Promise<void> {
     return new Promise((resolve, reject) => {
       this.api.info(uuid, settings)
         .then(fileInfo => {
@@ -71,13 +76,13 @@ export default class UploadClient {
               .then(() => {
                 resolve()
               })
-              .catch(() => {
-                reject()
+              .catch((error) => {
+                reject(error)
               })
           }, timeout)
         })
-        .catch(() => {
-          reject()
+        .catch((error) => {
+          reject(error)
         })
     })
   }
@@ -101,8 +106,7 @@ export default class UploadClient {
           file.status = 'ready'
 
           return {...file.info}
-        })
-        .catch(() => Promise.reject()),
+        }),
       onProgress: null,
       onCancel: null,
       cancel: uploading.cancel,
