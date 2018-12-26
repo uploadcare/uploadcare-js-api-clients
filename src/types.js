@@ -6,8 +6,6 @@ export type Settings = {
   secureSignature?: string,
   secureExpire?: string,
   integration?: string,
-  userAgent?: string,
-  debug?: boolean,
 }
 
 export type FileData = Blob | File | Buffer
