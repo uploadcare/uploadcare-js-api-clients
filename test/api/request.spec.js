@@ -1,6 +1,7 @@
 import request, {buildFormData} from '../../src/api/request'
 import * as factory from '../fixtureFactory'
 import axios from 'axios'
+import {sleep} from '../helpers'
 
 describe('buildFormData', () => {
   it('should return FormData with nice input object', () => {
@@ -25,65 +26,62 @@ describe('API – request', () => {
 
   describe('should be resolved', () => {
     it('on valid GET request', async() => {
-      const req = request({
+      await expectAsync(request({
         path: '/info/',
         query: {
           pub_key: factory.publicKey('image'),
           file_id: factory.uuid('image'),
         },
-      })
-
-      await expectAsync(req).toBeResolved()
-      req.then(({data}) => {
-        expect(data).toEqual(jasmine.objectContaining({uuid: factory.uuid('image')}))
+      })).toBeResolvedTo({
+        headers: jasmine.any(Object),
+        url: 'https://upload.uploadcare.com/info/',
+        data: jasmine.objectContaining({uuid: factory.uuid('image')}),
       })
     })
 
     it('on valid POST request', async() => {
       const file = factory.image('blackSquare')
 
-      const req = request({
+      await expectAsync(request({
         method: 'POST',
         path: '/base/',
         body: {
           UPLOADCARE_PUB_KEY: factory.publicKey('demo'),
           file: file.data,
         },
-      })
-
-      await expectAsync(req).toBeResolved()
-      req.then(({data}) => {
-        expect(data.file).toBeTruthy()
+      })).toBeResolvedTo({
+        headers: jasmine.any(Object),
+        url: 'https://upload.uploadcare.com/base/',
+        data: {file: jasmine.any(String)},
       })
     })
   })
 
   describe('should be rejected', () => {
-    it('if bad request', async() => {
-      const req = request({
+    /* Wait to bypass the requests limits */
+    beforeAll((done) => {
+      sleep(1000).then(() => done())
+    })
+
+    it('if bad request', (done) => {
+      request({
         path: '/infoxxx/',
         query: {
           pub_key: factory.publicKey('image'),
           file_id: factory.uuid('image'),
         },
       })
-
-      await expectAsync(req).toBeRejected()
-      req.catch(error => {
-        expect(error.name).toBe('RequestError')
-      })
+        .then(() => done.fail())
+        .catch((error) => error.name === 'RequestError' ? done() : done.fail(error))
     })
 
-    it('if Uploadcare returns error', async() => {
-      const req = request({
+    it('if Uploadcare returns error', (done) => {
+      request({
         path: '/info/',
         query: {pub_key: factory.publicKey('image')},
       })
-
-      await expectAsync(req).toBeRejected()
-      req.catch(error => {
-        expect(error.name).toBe('UploadcareError')
-      })
+        .then(() => done.fail())
+        .catch((error) => error.name === 'UploadcareError' ? done() : done.fail(error))
     })
 
     it('on connection error', async() => {
@@ -102,10 +100,10 @@ describe('API – request', () => {
       axios.interceptors.response.eject(interceptor)
     })
 
-    it('if request canceled', async() => {
+    it('if request canceled', (done) => {
       const source = axios.CancelToken.source()
 
-      const req = request({
+      request({
         path: '/info/',
         query: {
           pub_key: factory.publicKey('image'),
@@ -113,13 +111,10 @@ describe('API – request', () => {
         },
         cancelToken: source.token,
       })
+        .then(() => done.fail())
+        .catch((error) => error.name === 'CancelError' ? done() : done.fail(error))
 
       source.cancel()
-
-      await expectAsync(req).toBeRejected()
-      req.catch(error => {
-        expect(error.name).toBe('CancelError')
-      })
     })
   })
 })
