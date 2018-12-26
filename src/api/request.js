@@ -1,11 +1,11 @@
 /* @flow */
 import axios from 'axios'
 import FormData from 'form-data'
-import defaultSettings from '../default-settings'
+import defaultSettings, {getUserAgent} from '../default-settings'
 import RequestError from '../errors/RequestError'
 import CancelError from '../errors/CancelError'
 import UploadcareError from '../errors/UploadcareError'
-import type {FileData} from '../types'
+import type {FileData, Settings} from '../types'
 
 export type Query = {
   [key: string]: string | boolean | number | void,
@@ -31,7 +31,6 @@ export type RequestOptions = {
   body?: Body,
   headers?: Headers,
   baseURL?: string,
-  userAgent?: string,
 }
 
 export type RequestResponse = {|
@@ -45,6 +44,30 @@ const MAX_CONTENT_LENGTH = 50 * 1000 * 1000
 const DEFAULT_FILE_NAME = 'original'
 
 /**
+ * Updates options with Uploadcare Settings
+ *
+ * @param {RequestOptions} options
+ * @param {Settings} settings
+ * @returns {RequestOptions}
+ */
+export function prepareOptions(options: RequestOptions, settings: Settings): RequestOptions {
+  const newOptions = {...options}
+
+  if (settings.baseURL) {
+    newOptions.baseURL = settings.baseURL
+  }
+
+  if (settings.integration) {
+    newOptions.headers = {
+      ...newOptions.headers,
+      'X-UC-User-Agent': getUserAgent(settings),
+    }
+  }
+
+  return newOptions
+}
+
+/**
  * Performs request to Uploadcare Upload API
  *
  * @export
@@ -55,7 +78,6 @@ const DEFAULT_FILE_NAME = 'original'
  * @param {Object} [options.body] – The data to be sent as the body. Only for 'PUT', 'POST', 'PATCH'.
  * @param {Object} [options.headers] – The custom headers to be sent.
  * @param {string} [options.baseURL] – The Upload API endpoint.
- * @param {string} [options.userAgent] – The info about a library that use this request.
  * @returns {Promise<RequestResponse>}
  */
 export default function request({
@@ -65,7 +87,6 @@ export default function request({
   body,
   headers,
   baseURL,
-  userAgent,
   ...axiosOptions
 }: RequestOptions): Promise<RequestResponse> {
   const data = body && buildFormData({
@@ -84,7 +105,7 @@ export default function request({
     data,
     maxContentLength: MAX_CONTENT_LENGTH,
     headers: {
-      'X-UC-User-Agent': userAgent || defaultSettings.userAgent,
+      'X-UC-User-Agent': getUserAgent(),
       ...headers,
       ...((data && data.getHeaders) ? data.getHeaders() : {}),
     },

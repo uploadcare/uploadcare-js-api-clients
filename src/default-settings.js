@@ -1,7 +1,8 @@
 /* @flow */
+import type {Settings} from './types'
+
 export type DefaultSettings = {
   baseURL: string,
-  userAgent: string,
 }
 
 /*
@@ -16,9 +17,21 @@ Settings for future support:
   parallelDirectUploads: 10,
   pusherKey: '79ae88bd931ea68464d9',
  */
-const defaultSettings: DefaultSettings = {
-  baseURL: 'https://upload.uploadcare.com',
-  userAgent: 'UploadcareUploadClient (JavaScript)',
-}
+const defaultSettings: DefaultSettings = {baseURL: 'https://upload.uploadcare.com'}
 
 export default defaultSettings
+
+/**
+ * Returns User Agent based on version and settings
+ *
+ * @param {Settings} [settings]
+ * @returns {string}
+ */
+export function getUserAgent(settings: Settings = {}): string {
+  /* TODO Use package version */
+  const version = '1.0.0.alpha'
+  const publicKey = settings.publicKey ? '/' + settings.publicKey : ''
+  const integration = settings.integration ? '; ' + settings.integration : ''
+
+  return `UploadcareUploadClient/${version}${publicKey} (JavaScript${integration})`
+}

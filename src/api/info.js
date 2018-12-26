@@ -1,5 +1,5 @@
 /* @flow */
-import request from './request'
+import request, {prepareOptions} from './request'
 import type {Settings, FileInfo} from '../types'
 import type {RequestOptions} from './request'
 
@@ -13,20 +13,13 @@ export type InfoResponse = FileInfo
  * @return {Promise<InfoResponse>}
  */
 export default function info(uuid: string, settings: Settings = {}): Promise<InfoResponse> {
-  const options: RequestOptions = {
+  const options: RequestOptions = prepareOptions({
     path: '/info/',
     query: {
       pub_key: settings.publicKey || '',
       file_id: uuid,
     },
-  }
-
-  if (settings.baseURL) {
-    options.baseURL = settings.baseURL
-  }
-  if (settings.userAgent) {
-    options.userAgent = settings.userAgent
-  }
+  }, settings)
 
   /* TODO Need to handle errors */
   return request(options)

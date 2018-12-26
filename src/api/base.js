@@ -1,6 +1,6 @@
 /* @flow */
 import axios from 'axios'
-import request from './request'
+import request, {prepareOptions} from './request'
 import type {RequestOptions} from './request'
 import type {Settings, FileData} from '../types'
 
@@ -33,7 +33,7 @@ export type Uploading = {|
  * @return {Uploading}
  */
 export default function base(file: FileData, settings: Settings = {}): Uploading {
-  const options: RequestOptions = {
+  const options: RequestOptions = prepareOptions({
     method: 'POST',
     path: '/base/',
     body: {
@@ -44,14 +44,7 @@ export default function base(file: FileData, settings: Settings = {}): Uploading
       file: file,
       source: 'local',
     },
-  }
-
-  if (settings.baseURL) {
-    options.baseURL = settings.baseURL
-  }
-  if (settings.userAgent) {
-    options.userAgent = settings.userAgent
-  }
+  }, settings)
 
   const source = axios.CancelToken.source()
 
