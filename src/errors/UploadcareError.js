@@ -9,7 +9,7 @@ export default class UploadcareError extends Error {
     super()
 
     this.name = 'UploadcareError'
-    this.message = `Request to ${request.url} failed with Uploadcare error: [${response.status}] ${response.statusText}`
+    this.message = `[${response.status}] ${response.statusText}`
     this.request = request
     this.response = response
 

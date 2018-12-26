@@ -9,7 +9,7 @@ export default class RequestError extends Error {
     super()
 
     this.name = 'RequestError'
-    this.message = `Request to ${request.url} failed: [${response.status}] ${response.statusText}`
+    this.message = `[${response.status}] ${response.statusText}`
     this.request = request
     this.response = response
 
