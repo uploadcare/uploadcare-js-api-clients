@@ -9,13 +9,10 @@ describe('API - base', () => {
 
     const req = uploading.promise
 
-    await expectAsync(req).toBeResolved()
-    req.then(data => {
-      expect(data.file).toBeTruthy()
-    })
+    await expectAsync(req).toBeResolvedTo({file: jasmine.any(String)})
   })
 
-  it('should be able to cancel uploading', async() => {
+  it('should be able to cancel uploading', (done) => {
     const file = factory.image('blackSquare')
 
     const uploading = base(file.data, {publicKey: factory.publicKey('demo')})
@@ -24,12 +21,9 @@ describe('API - base', () => {
       uploading.cancel()
     }, 10)
 
-    const req = uploading.promise
-
-    await expectAsync(req).toBeRejected()
-    req.catch(error => {
-      expect(error.name).toBe('CancelError')
-    })
+    uploading.promise
+      .then(() => done.fail())
+      .catch((error) => error.name === 'CancelError' ? done() : done.fail(error))
   })
 
   it('should be able to handle cancel uploading', (done) => {
@@ -45,15 +39,16 @@ describe('API - base', () => {
       done()
     }
 
-    /* TODO Maybe cancel need to resolve instead of reject? */
-    uploading.promise.catch((error) => {
-      if (error.name !== 'CancelError') {
-        done.fail(error)
-      }
-    })
+    uploading.promise
+      .then(() => done.fail())
+      .catch((error) => {
+        if (error.name !== 'CancelError') {
+          done.fail(error)
+        }
+      })
   })
 
-  it('should be able to handle progress', async() => {
+  it('should be able to handle progress', (done) => {
     let progress = 0
     const file = factory.image('blackSquare')
 
@@ -63,11 +58,8 @@ describe('API - base', () => {
       progress += 1
     }
 
-    const req = uploading.promise
-
-    await expectAsync(req).toBeResolved()
-    req.then(() => {
-      expect(progress).toBeGreaterThan(0)
-    })
+    uploading.promise
+      .then(() => progress ? done() : done.fail())
+      .catch(error => done.fail(error))
   })
 })
