@@ -186,3 +186,12 @@ export function buildFormData(body: Body): FormData {
 
   return formData
 }
+
+/**
+ * Creates controller to cancel any request
+ *
+ * @returns {*}
+ */
+export function createCancelController() {
+  return axios.CancelToken.source()
+}

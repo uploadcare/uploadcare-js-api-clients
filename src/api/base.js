@@ -1,6 +1,5 @@
 /* @flow */
-import axios from 'axios'
-import request, {prepareOptions} from './request'
+import request, {createCancelController, prepareOptions} from './request'
 import type {RequestOptions} from './request'
 import type {Settings, FileData} from '../types'
 
@@ -46,7 +45,7 @@ export default function base(file: FileData, settings: Settings = {}): Uploading
     },
   }, settings)
 
-  const source = axios.CancelToken.source()
+  const cancelController = createCancelController()
 
   /* TODO Need to handle errors */
   const uploading = {
@@ -57,7 +56,7 @@ export default function base(file: FileData, settings: Settings = {}): Uploading
           uploading.onProgress(progressEvent)
         }
       },
-      cancelToken: source.token,
+      cancelToken: cancelController.token,
     })
       .then(response => response.data)
       .catch(error => {
@@ -69,7 +68,7 @@ export default function base(file: FileData, settings: Settings = {}): Uploading
       }),
     onProgress: null,
     onCancel: null,
-    cancel: source.cancel,
+    cancel: cancelController.cancel,
   }
 
   return uploading
