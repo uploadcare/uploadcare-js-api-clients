@@ -146,6 +146,7 @@ export function buildFormData(body: Body): FormData {
       value.forEach(val => formData.append(key + '[]', val))
     }
     else if (key === 'file') {
+      // $FlowFixMe
       const fileName = body.file.name || DEFAULT_FILE_NAME
 
       formData.append('file', value, fileName)
