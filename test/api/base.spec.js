@@ -1,5 +1,6 @@
 import base from '../../src/api/base'
 import * as factory from '../fixtureFactory'
+import {getUserAgent} from '../../src/default-settings'
 
 describe('API - base', () => {
   it('should be able to upload data', async() => {
@@ -7,9 +8,31 @@ describe('API - base', () => {
 
     const uploading = base(file.data, {publicKey: factory.publicKey('demo')})
 
-    const req = uploading.promise
+    await expectAsync(uploading.promise).toBeResolvedTo({file: jasmine.any(String)})
+  })
 
-    await expectAsync(req).toBeResolvedTo({file: jasmine.any(String)})
+  it('should accept integration setting', (done) => {
+    const settings = {
+      publicKey: 'test',
+      integration: 'Test',
+    }
+    const uploading = base('', settings)
+
+    uploading.promise
+      .then(() => done.fail())
+      .catch((error) => {
+        if (
+          error.request &&
+          error.request.headers &&
+          error.request.headers.hasOwnProperty('X-UC-User-Agent') &&
+          error.request.headers['X-UC-User-Agent'] === getUserAgent(settings)
+        ) {
+          done()
+        }
+        else {
+          done.fail(error)
+        }
+      })
   })
 
   it('should be able to cancel uploading', (done) => {

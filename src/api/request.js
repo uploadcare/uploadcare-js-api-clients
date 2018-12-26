@@ -117,7 +117,10 @@ export default function request({
       }
 
       if (error.response) {
-        throw new RequestError({url: error.config.url}, {
+        throw new RequestError({
+          headers: error.config.headers,
+          url: error.config.url,
+        }, {
           status: error.response.status,
           statusText: error.response.statusText,
         })
@@ -129,7 +132,11 @@ export default function request({
       if (axiosResponse.data.error) {
         const {status_code: code, content} = axiosResponse.data.error
 
-        throw new UploadcareError({url: axiosResponse.config.url}, {
+        throw new UploadcareError({
+          // $FlowFixMe
+          headers: axiosResponse.config.headers,
+          url: axiosResponse.config.url,
+        }, {
           status: code,
           statusText: content,
         })

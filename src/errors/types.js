@@ -1,6 +1,7 @@
 /* @flow */
 
 export type ErrorRequestInfo = {|
+  headers: Object,
   url: string,
 |}
 
