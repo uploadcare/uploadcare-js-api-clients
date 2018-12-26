@@ -1,5 +1,5 @@
 /* @flow */
-import request from './request'
+import request, {prepareOptions} from './request'
 import base from './base'
 import type UploadClient from '../UploadClient'
 import type {RequestOptions, RequestResponse} from './request'
@@ -16,11 +16,7 @@ export default class UploadAPI {
   }
 
   request(options: RequestOptions): Promise<RequestResponse> {
-    return request({
-      ...options,
-      baseURL: options.baseURL || this.client.settings.baseURL,
-      userAgent: options.userAgent || this.client.settings.userAgent,
-    })
+    return request(prepareOptions(options, this.client.settings))
   }
 
   base(file: FileData, settings: Settings = {}): Uploading {
