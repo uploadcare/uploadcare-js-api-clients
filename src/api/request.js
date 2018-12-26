@@ -53,7 +53,7 @@ const DEFAULT_FILE_NAME = 'original'
 export function prepareOptions(options: RequestOptions, settings: Settings): RequestOptions {
   const newOptions = {...options}
 
-  if (settings.baseURL) {
+  if (!options.baseURL && settings.baseURL) {
     newOptions.baseURL = settings.baseURL
   }
 
