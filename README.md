@@ -37,7 +37,18 @@ import UploadClient from '@uploadcare/upload-client'
 
 const client = new UploadClient(settings)
 
-client.api.request(config, settings)
+client.api.request(options)
+  .then(response => console.log(response.data))
+
+const uploading = client.api.base(file, settings)
+
+uploading.promise.then(data => console.log(data.file))
+uploading.onProgress = (progressEvent) => console.log(progressEvent.loaded)
+
+const file = client.fileFrom('object', file, settings)
+
+file.promise
+  .then(fileInfo => console.log(fileInfo.uuid))
 ```
 
 ## Configuration
