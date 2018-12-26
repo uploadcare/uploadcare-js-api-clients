@@ -24,7 +24,6 @@ export default class UploadClient {
       ...defaultSettings,
       ...settings,
     }
-    /* TODO Set up user agent */
     this.updateSettingsListeners = []
     this.api = new UploadAPI(this)
   }

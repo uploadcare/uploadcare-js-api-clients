@@ -47,10 +47,10 @@ export default function base(file: FileData, settings: Settings = {}): Uploading
 
   const cancelController = createCancelController()
 
-  /* TODO Need to handle errors */
   const uploading = {
     promise: request({
       ...options,
+      /* TODO Add support of progress for Node.js */
       onUploadProgress: (progressEvent) => {
         if (typeof uploading.onProgress === 'function') {
           uploading.onProgress(progressEvent)

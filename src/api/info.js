@@ -21,7 +21,6 @@ export default function info(uuid: string, settings: Settings = {}): Promise<Inf
     },
   }, settings)
 
-  /* TODO Need to handle errors */
   return request(options)
     .then(response => response.data)
 }
