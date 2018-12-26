@@ -1,6 +1,6 @@
 /* @flow */
 import axios from 'axios'
-import request from './request'
+import request, {prepareOptions} from './request'
 import type {RequestOptions} from './request'
 import type {Settings, FileData} from '../types'
 
@@ -33,7 +33,7 @@ export type Uploading = {|
  * @return {Uploading}
  */
 export default function base(file: FileData, settings: Settings = {}): Uploading {
-  const options: RequestOptions = {
+  const options: RequestOptions = prepareOptions({
     method: 'POST',
     path: '/base/',
     body: {
@@ -44,45 +44,29 @@ export default function base(file: FileData, settings: Settings = {}): Uploading
       file: file,
       source: 'local',
     },
-  }
-
-  if (settings.baseURL) {
-    options.baseURL = settings.baseURL
-  }
-  if (settings.userAgent) {
-    options.userAgent = settings.userAgent
-  }
+  }, settings)
 
   const source = axios.CancelToken.source()
 
   /* TODO Need to handle errors */
   const uploading = {
-    promise: new Promise((resolve, reject) => {
-      request({
-        ...options,
-        onUploadProgress: (progressEvent) => {
-          if (typeof uploading.onProgress === 'function') {
-            uploading.onProgress(progressEvent)
-          }
-        },
-        cancelToken: source.token,
-      })
-        .then(response => {
-          if (response.ok && typeof response.data.error === 'undefined') {
-            resolve(response.data)
-          }
-          else {
-            reject()
-          }
-        })
-        .catch(error => {
-          if (typeof uploading.onCancel === 'function') {
-            uploading.onCancel()
-          }
+    promise: request({
+      ...options,
+      onUploadProgress: (progressEvent) => {
+        if (typeof uploading.onProgress === 'function') {
+          uploading.onProgress(progressEvent)
+        }
+      },
+      cancelToken: source.token,
+    })
+      .then(response => response.data)
+      .catch(error => {
+        if (error.name === 'CancelError' && typeof uploading.onCancel === 'function') {
+          uploading.onCancel()
+        }
 
-          reject(axios.isCancel(error) ? 'Request canceled' : error)
-        })
-    }),
+        return Promise.reject(error)
+      }),
     onProgress: null,
     onCancel: null,
     cancel: source.cancel,

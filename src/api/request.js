@@ -1,8 +1,11 @@
 /* @flow */
 import axios from 'axios'
 import FormData from 'form-data'
-import defaultSettings from '../default-settings'
-import type {FileData} from '../types'
+import defaultSettings, {getUserAgent} from '../default-settings'
+import RequestError from '../errors/RequestError'
+import CancelError from '../errors/CancelError'
+import UploadcareError from '../errors/UploadcareError'
+import type {FileData, Settings} from '../types'
 
 export type Query = {
   [key: string]: string | boolean | number | void,
@@ -28,28 +31,41 @@ export type RequestOptions = {
   body?: Body,
   headers?: Headers,
   baseURL?: string,
-  userAgent?: string,
 }
 
-export type RequestResponse = {
+export type RequestResponse = {|
   headers?: Object,
-  ok: boolean,
-  status: number,
-  statusText: string,
   url: string,
-  data: {} | ErrorResponse,
-}
-
-export type ErrorResponse = {|
-  error: {
-    status_code: number,
-    content: string,
-  }
+  data: Object,
 |}
 
 /* Set max upload body size for node.js to 50M (default is 10M) */
 const MAX_CONTENT_LENGTH = 50 * 1000 * 1000
 const DEFAULT_FILE_NAME = 'original'
+
+/**
+ * Updates options with Uploadcare Settings
+ *
+ * @param {RequestOptions} options
+ * @param {Settings} settings
+ * @returns {RequestOptions}
+ */
+export function prepareOptions(options: RequestOptions, settings: Settings): RequestOptions {
+  const newOptions = {...options}
+
+  if (settings.baseURL) {
+    newOptions.baseURL = settings.baseURL
+  }
+
+  if (settings.integration) {
+    newOptions.headers = {
+      ...newOptions.headers,
+      'X-UC-User-Agent': getUserAgent(settings),
+    }
+  }
+
+  return newOptions
+}
 
 /**
  * Performs request to Uploadcare Upload API
@@ -62,7 +78,6 @@ const DEFAULT_FILE_NAME = 'original'
  * @param {Object} [options.body] – The data to be sent as the body. Only for 'PUT', 'POST', 'PATCH'.
  * @param {Object} [options.headers] – The custom headers to be sent.
  * @param {string} [options.baseURL] – The Upload API endpoint.
- * @param {string} [options.userAgent] – The info about a library that use this request.
  * @returns {Promise<RequestResponse>}
  */
 export default function request({
@@ -72,7 +87,6 @@ export default function request({
   body,
   headers,
   baseURL,
-  userAgent,
   ...axiosOptions
 }: RequestOptions): Promise<RequestResponse> {
   const data = body && buildFormData({
@@ -80,40 +94,62 @@ export default function request({
     source: body.source || 'local',
   })
 
-  return new Promise((resolve, reject) => {
-    axios({
-      method: method || 'GET',
-      baseURL: baseURL || defaultSettings.baseURL,
-      url: path,
-      params: {
-        jsonerrors: 1,
-        ...query,
-      },
-      data,
-      maxContentLength: MAX_CONTENT_LENGTH,
-      headers: {
-        'X-UC-User-Agent': userAgent || defaultSettings.userAgent,
-        ...headers,
-        ...((data && data.getHeaders) ? data.getHeaders() : {}),
-      },
-      ...axiosOptions,
-    })
-      .then(axiosResponse => {
-        const response: RequestResponse = {
-          headers: axiosResponse.headers,
-          ok: axiosResponse.status >= 200 && axiosResponse.status < 300,
-          status: axiosResponse.status,
-          statusText: axiosResponse.statusText,
-          url: axiosResponse.config.url,
-          data: axiosResponse.data,
-        }
-
-        resolve(response)
-      })
-      .catch((error) => {
-        reject(error)
-      })
+  return axios({
+    method: method || 'GET',
+    baseURL: baseURL || defaultSettings.baseURL,
+    url: path,
+    params: {
+      jsonerrors: 1,
+      ...query,
+    },
+    data,
+    maxContentLength: MAX_CONTENT_LENGTH,
+    headers: {
+      'X-UC-User-Agent': getUserAgent(),
+      ...headers,
+      ...((data && data.getHeaders) ? data.getHeaders() : {}),
+    },
+    ...axiosOptions,
   })
+    .catch((error) => {
+      if (axios.isCancel(error)) {
+        throw new CancelError()
+      }
+
+      if (error.response) {
+        throw new RequestError({
+          headers: error.config.headers,
+          url: error.config.url,
+        }, {
+          status: error.response.status,
+          statusText: error.response.statusText,
+        })
+      }
+
+      throw error
+    })
+    .then(axiosResponse => {
+      if (axiosResponse.data.error) {
+        const {status_code: code, content} = axiosResponse.data.error
+
+        throw new UploadcareError({
+          // $FlowFixMe
+          headers: axiosResponse.config.headers,
+          url: axiosResponse.config.url,
+        }, {
+          status: code,
+          statusText: content,
+        })
+      }
+
+      return axiosResponse
+    })
+    .then(axiosResponse => ({
+      headers: axiosResponse.headers,
+      url: axiosResponse.config.url,
+      data: axiosResponse.data,
+    }))
+    .catch((error) => Promise.reject(error))
 }
 
 /**
@@ -138,6 +174,7 @@ export function buildFormData(body: Body): FormData {
       value.forEach(val => formData.append(key + '[]', val))
     }
     else if (key === 'file') {
+      // $FlowFixMe
       const fileName = body.file.name || DEFAULT_FILE_NAME
 
       formData.append('file', value, fileName)

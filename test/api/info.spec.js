@@ -7,4 +7,14 @@ describe('API - info', () => {
 
     expect(response.uuid).toBeTruthy()
   })
+
+  it('should be rejected with bad options', (done) => {
+    info(factory.uuid('image'), {publicKey: ''})
+      .then(() => done.fail())
+      .catch(error => {
+        (error.name === 'UploadcareError')
+          ? done()
+          : done.fail(error)
+      })
+  })
 })
