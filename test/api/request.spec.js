@@ -1,7 +1,7 @@
 import request, {buildFormData} from '../../src/api/request'
-import * as factory from '../fixtureFactory'
+import * as factory from '../_fixtureFactory'
 import axios from 'axios'
-import {sleep} from '../helpers'
+import {sleep} from '../_helpers'
 
 describe('buildFormData', () => {
   it('should return FormData with nice input object', () => {

@@ -1,5 +1,5 @@
 import info from '../../src/api/info'
-import * as factory from '../fixtureFactory'
+import * as factory from '../_fixtureFactory'
 
 describe('API - info', () => {
   it('should return file info', async() => {

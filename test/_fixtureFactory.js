@@ -1,5 +1,5 @@
 /* @flow */
-import {dataURItoBlob, dataURItoBuffer, isNode} from './helpers'
+import {dataURItoBlob, dataURItoBuffer, isNode} from './_helpers'
 
 /* eslint-disable max-len */
 const images: {[key: string]: string} = {

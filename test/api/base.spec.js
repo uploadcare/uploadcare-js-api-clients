@@ -1,5 +1,5 @@
 import base from '../../src/api/base'
-import * as factory from '../fixtureFactory'
+import * as factory from '../_fixtureFactory'
 import {getUserAgent} from '../../src/default-settings'
 
 describe('API - base', () => {
