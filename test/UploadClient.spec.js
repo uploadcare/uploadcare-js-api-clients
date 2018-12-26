@@ -75,6 +75,16 @@ describe('UploadClient', () => {
       expect(fileInfo.is_ready).toBe(true)
     })
 
+    it('should accept doNotStore setting', async() => {
+      const fileToUpload = factory.image('blackSquare')
+
+      const client = new UploadClient({publicKey: factory.publicKey('demo')})
+
+      const file = client.fileFrom('object', fileToUpload.data, {doNotStore: true})
+
+      await expectAsync(file.promise).toBeResolvedTo(jasmine.objectContaining({is_stored: false}))
+    })
+
     it('should be able to cancel uploading', (done) => {
       const fileToUpload = factory.image('blackSquare')
 

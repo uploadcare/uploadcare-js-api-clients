@@ -112,6 +112,7 @@ export default class UploadClient {
       cancel: uploading.cancel,
     }
 
+    /* TODO Add progress for checking ready */
     uploading.onProgress = (progressEvent) => {
       if (typeof file.onProgress === 'function') {
         file.onProgress(progressEvent)
