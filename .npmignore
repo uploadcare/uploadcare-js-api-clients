@@ -3,4 +3,5 @@ test/**
 flow-typed/**
 scripts/**
 *.config.js
+*.config.json
 .*
