@@ -1,4 +1,4 @@
-# Uploadcare Javascript API
+# Uploadcare Upload Client
 
 <a href="https://uploadcare.com/?utm_source=github&utm_campaign=uploadcare-upload-client">
   <img align="right" width="64" height="64"
@@ -6,23 +6,16 @@
     alt="">
 </a>
 
-:bangbang: Work in progress. The API will be changed. Do not use it. Really. :bangbang:
-
-JavaScript library for work with Uploadcare API.
+JavaScript library for work with Uploadcare Upload API.
 
 [![NPM version][npm-img]][npm-url]
 [![GitHub release][badge-release-img]][badge-release-url]&nbsp;
 [![Uploadcare stack on StackShare][badge-stack-img]][badge-stack-url]
 
-* [Requirements](#requirements)
 * [Install](#install)
 * [Usage](#usage)
-* [Configuration](#configuration)
 * [Security issues](#security-issues)
 * [Feedback](#feedback)
-
-## Requirements
-
 
 ## Install
 
@@ -50,9 +43,6 @@ const file = client.fileFrom('object', file, settings)
 file.promise
   .then(fileInfo => console.log(fileInfo.uuid))
 ```
-
-## Configuration
-
 
 ## Security issues
 
