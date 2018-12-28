@@ -7,10 +7,21 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+
+[Unreleased]: https://github.com/uploadcare/uploadcare-upload-client/compare/v1.0.0.alpha...HEAD
+
+## 1.0.0.alpha
+
+The first public alpha release.
+
 ### Added
 
-* Low-level request wrappers for Uploadcare [Upload API][upload-api]
+* The `request` function to request to any path of [Upload API][upload-api].
+* Low-level request wrappers for `/base/` and `/info/` paths of Upload API.
+* `UploadClient` class with settings and `fileFrom` method that supports
+  only direct uploads now.
+* Support of following Uploadcare Settings: `publicKey`, `baseUrl`, 
+  `doNotStore`, `integration`, `secureExpire`, `secureSignature`.
 * Test environment for both Node.js and browsers
 
 [upload-api]: https://uploadcare.com/docs/api_reference/upload/
-[Unreleased]: https://github.com/uploadcare/uploadcare-upload-client/tree/master
