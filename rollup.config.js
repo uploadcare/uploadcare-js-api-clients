@@ -5,10 +5,12 @@ import commonjs from 'rollup-plugin-commonjs'
 import replace from 'rollup-plugin-replace'
 import {terser} from 'rollup-plugin-terser'
 import {sizeSnapshot} from 'rollup-plugin-size-snapshot'
+import json from 'rollup-plugin-json'
 
 const getPlugins = (format, minify = false) =>
   [
     replace({'process.env.NODE_ENV': process.env.NODE_ENV}),
+    json(),
     resolve({browser: format === 'umd'}),
     (format === 'umd') &&
       commonjs({

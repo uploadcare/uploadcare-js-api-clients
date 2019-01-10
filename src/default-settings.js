@@ -1,4 +1,5 @@
 /* @flow */
+import {version} from '../package.json'
 import type {Settings} from './types'
 
 export type DefaultSettings = {
@@ -28,8 +29,6 @@ export default defaultSettings
  * @returns {string}
  */
 export function getUserAgent(settings: Settings = {}): string {
-  /* TODO Use package version */
-  const version = '1.0.0.alpha'
   const publicKey = settings.publicKey ? '/' + settings.publicKey : ''
   const integration = settings.integration ? '; ' + settings.integration : ''
 
