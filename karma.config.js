@@ -3,6 +3,7 @@ const babel = require('rollup-plugin-babel')
 const resolve = require('rollup-plugin-node-resolve')
 const commonjs = require('rollup-plugin-commonjs')
 const replace = require('rollup-plugin-replace')
+const json = require('rollup-plugin-json')
 
 process.env.CHROME_BIN = require('puppeteer').executablePath()
 
@@ -25,6 +26,7 @@ module.exports = function(config) {
     rollupPreprocessor: {
       plugins: [
         replace({'process.env.NODE_ENV': process.env.NODE_ENV}),
+        json(),
         resolve({browser: true}),
         commonjs({include: 'node_modules/**'}),
         babel(),
