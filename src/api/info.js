@@ -1,9 +1,11 @@
 /* @flow */
 import request, {prepareOptions} from './request'
-import type {Settings, FileInfo} from '../types'
+import type {Settings} from '../types'
 import type {RequestOptions} from './request'
 
-export type InfoResponse = FileInfo
+export type InfoResponse = {
+  [key: string]: string | number | boolean | Object
+}
 
 /**
  * Returns a JSON dictionary holding file info

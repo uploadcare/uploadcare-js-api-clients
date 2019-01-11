@@ -11,5 +11,5 @@ export type Settings = {
 export type FileData = Blob | File | Buffer
 
 export type FileInfo = {
-  [key: string]: string | number | boolean
+  [key: string]: string | number | boolean | Object
 }

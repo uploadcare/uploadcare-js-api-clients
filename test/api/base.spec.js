@@ -6,9 +6,9 @@ describe('API - base', () => {
   it('should be able to upload data', async() => {
     const file = factory.image('blackSquare')
 
-    const uploading = base(file.data, {publicKey: factory.publicKey('demo')})
+    const directUpload = base(file.data, {publicKey: factory.publicKey('demo')})
 
-    await expectAsync(uploading.promise).toBeResolvedTo({file: jasmine.any(String)})
+    await expectAsync(directUpload).toBeResolvedTo({file: jasmine.any(String)})
   })
 
   it('should accept integration setting', (done) => {
@@ -16,9 +16,9 @@ describe('API - base', () => {
       publicKey: 'test',
       integration: 'Test',
     }
-    const uploading = base('', settings)
+    const directUpload = base('', settings)
 
-    uploading.promise
+    directUpload
       .then(() => done.fail())
       .catch((error) => {
         if (
@@ -38,13 +38,13 @@ describe('API - base', () => {
   it('should be able to cancel uploading', (done) => {
     const file = factory.image('blackSquare')
 
-    const uploading = base(file.data, {publicKey: factory.publicKey('demo')})
+    const directUpload = base(file.data, {publicKey: factory.publicKey('demo')})
 
     setTimeout(() => {
-      uploading.cancel()
+      directUpload.cancel()
     }, 10)
 
-    uploading.promise
+    directUpload
       .then(() => done.fail())
       .catch((error) => error.name === 'CancelError' ? done() : done.fail(error))
   })
@@ -52,17 +52,17 @@ describe('API - base', () => {
   it('should be able to handle cancel uploading', (done) => {
     const file = factory.image('blackSquare')
 
-    const uploading = base(file.data, {publicKey: factory.publicKey('demo')})
+    const directUpload = base(file.data, {publicKey: factory.publicKey('demo')})
 
     setTimeout(() => {
-      uploading.cancel()
+      directUpload.cancel()
     }, 10)
 
-    uploading.onCancel = () => {
+    directUpload.onCancel = () => {
       done()
     }
 
-    uploading.promise
+    directUpload
       .then(() => done.fail())
       .catch((error) => {
         if (error.name !== 'CancelError') {
@@ -75,13 +75,13 @@ describe('API - base', () => {
     let progress = 0
     const file = factory.image('blackSquare')
 
-    const uploading = base(file.data, {publicKey: factory.publicKey('demo')})
+    const directUpload = base(file.data, {publicKey: factory.publicKey('demo')})
 
-    uploading.onProgress = () => {
+    directUpload.onProgress = () => {
       progress += 1
     }
 
-    uploading.promise
+    directUpload
       .then(() => progress ? done() : done.fail())
       .catch(error => done.fail(error))
   })
