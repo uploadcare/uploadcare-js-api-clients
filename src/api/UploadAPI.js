@@ -1,10 +1,10 @@
 /* @flow */
 import request, {prepareOptions} from './request'
 import base from './base'
+import type {Uploading} from './base'
 import type UploadClient from '../UploadClient'
 import type {RequestOptions, RequestResponse} from './request'
 import type {FileData, Settings} from '../types'
-import type {Uploading} from './base'
 import info from './info'
 import type {InfoResponse} from './info'
 

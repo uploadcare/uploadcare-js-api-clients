@@ -7,21 +7,50 @@ export type BaseResponse = {|
   file: string
 |}
 
-export type UploadProgressEvent = {
-  status: 'uploading' | 'uploaded' | 'canceled' | 'error',
-  progress: number,
-}
+export class Uploading {
+  _promise: Promise<BaseResponse>
+  onProgress: ?Function
+  onCancel: ?Function
+  cancel: Function
 
-export type UploadCancelEvent = {
-  progress: number,
-}
+  constructor(options: RequestOptions) {
+    const cancelController = createCancelController()
 
-export type Uploading = {|
-  promise: Promise<BaseResponse>,
-  onProgress: ?(event: UploadProgressEvent) => void,
-  onCancel: ?(event: UploadCancelEvent) => void,
-  cancel: Function,
-|}
+    this._promise = request({
+      ...options,
+      /* TODO Add support of progress for Node.js */
+      onUploadProgress: (progressEvent) => {
+        if (typeof this.onProgress === 'function') {
+          this.onProgress(progressEvent)
+        }
+      },
+      cancelToken: cancelController.token,
+    })
+      .then(response => response.data)
+      .catch(error => {
+        if (error.name === 'CancelError' && typeof this.onCancel === 'function') {
+          this.onCancel()
+        }
+
+        return Promise.reject(error)
+      })
+    this.onProgress = null
+    this.onCancel = null
+    this.cancel = cancelController.cancel
+  }
+
+  then(onFulfilled?: Function, onRejected?: Function) {
+    return this._promise.then(onFulfilled, onRejected)
+  }
+
+  catch(onRejected?: Function) {
+    return this._promise.catch(onRejected)
+  }
+
+  finally(onFinally: Function) {
+    return this._promise.finally(onFinally)
+  }
+}
 
 /**
  * Performs file uploading request to Uploadcare Upload API.
@@ -45,31 +74,5 @@ export default function base(file: FileData, settings: Settings = {}): Uploading
     },
   }, settings)
 
-  const cancelController = createCancelController()
-
-  const uploading = {
-    promise: request({
-      ...options,
-      /* TODO Add support of progress for Node.js */
-      onUploadProgress: (progressEvent) => {
-        if (typeof uploading.onProgress === 'function') {
-          uploading.onProgress(progressEvent)
-        }
-      },
-      cancelToken: cancelController.token,
-    })
-      .then(response => response.data)
-      .catch(error => {
-        if (error.name === 'CancelError' && typeof uploading.onCancel === 'function') {
-          uploading.onCancel()
-        }
-
-        return Promise.reject(error)
-      }),
-    onProgress: null,
-    onCancel: null,
-    cancel: cancelController.cancel,
-  }
-
-  return uploading
+  return new Uploading(options)
 }

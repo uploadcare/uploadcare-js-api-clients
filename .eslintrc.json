@@ -16,6 +16,7 @@
     }],
     "max-nested-callbacks": ["error", 4],
     "max-statements": ["error", 15],
+    "no-underscore-dangle": ["error", {"allowAfterThis": true}],
     "arrow-body-style": 0
   },
   "overrides": [

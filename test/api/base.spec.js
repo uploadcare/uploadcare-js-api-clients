@@ -8,7 +8,7 @@ describe('API - base', () => {
 
     const uploading = base(file.data, {publicKey: factory.publicKey('demo')})
 
-    await expectAsync(uploading.promise).toBeResolvedTo({file: jasmine.any(String)})
+    await expectAsync(uploading).toBeResolvedTo({file: jasmine.any(String)})
   })
 
   it('should accept integration setting', (done) => {
@@ -18,7 +18,7 @@ describe('API - base', () => {
     }
     const uploading = base('', settings)
 
-    uploading.promise
+    uploading
       .then(() => done.fail())
       .catch((error) => {
         if (
@@ -44,7 +44,7 @@ describe('API - base', () => {
       uploading.cancel()
     }, 10)
 
-    uploading.promise
+    uploading
       .then(() => done.fail())
       .catch((error) => error.name === 'CancelError' ? done() : done.fail(error))
   })
@@ -62,7 +62,7 @@ describe('API - base', () => {
       done()
     }
 
-    uploading.promise
+    uploading
       .then(() => done.fail())
       .catch((error) => {
         if (error.name !== 'CancelError') {
@@ -81,7 +81,7 @@ describe('API - base', () => {
       progress += 1
     }
 
-    uploading.promise
+    uploading
       .then(() => progress ? done() : done.fail())
       .catch(error => done.fail(error))
   })
