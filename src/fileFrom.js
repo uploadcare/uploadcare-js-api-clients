@@ -14,9 +14,9 @@ export class FileUpload {
   cancel: Function
 
   constructor(data: FileData, settings: Settings) {
-    const uploading = base(data, settings)
+    const directUpload = base(data, settings)
 
-    this._promise = uploading
+    this._promise = directUpload
       .then(({file: uuid}) => {
         this.status = 'uploaded'
         this.info = {uuid}
@@ -42,16 +42,16 @@ export class FileUpload {
     this.onUploaded = null
     this.onReady = null
     this.onCancel = null
-    this.cancel = uploading.cancel
+    this.cancel = directUpload.cancel
 
     /* TODO Add progress for checking ready */
-    uploading.onProgress = (progressEvent) => {
+    directUpload.onProgress = (progressEvent) => {
       if (typeof this.onProgress === 'function') {
         this.onProgress(progressEvent)
       }
     }
 
-    uploading.onCancel = () => {
+    directUpload.onCancel = () => {
       if (typeof this.onCancel === 'function') {
         this.onCancel()
       }

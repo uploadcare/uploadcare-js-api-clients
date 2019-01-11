@@ -7,7 +7,7 @@ export type BaseResponse = {|
   file: string
 |}
 
-export class Uploading {
+export class DirectUpload {
   _promise: Promise<BaseResponse>
   onProgress: ?Function
   onCancel: ?Function
@@ -58,9 +58,9 @@ export class Uploading {
  *
  * @param {FileData} file
  * @param {Settings} settings
- * @return {Uploading}
+ * @return {DirectUpload}
  */
-export default function base(file: FileData, settings: Settings = {}): Uploading {
+export default function base(file: FileData, settings: Settings = {}): DirectUpload {
   const options: RequestOptions = prepareOptions({
     method: 'POST',
     path: '/base/',
@@ -74,5 +74,5 @@ export default function base(file: FileData, settings: Settings = {}): Uploading
     },
   }, settings)
 
-  return new Uploading(options)
+  return new DirectUpload(options)
 }

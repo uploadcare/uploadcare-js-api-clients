@@ -1,7 +1,7 @@
 /* @flow */
 import request, {prepareOptions} from './request'
 import base from './base'
-import type {Uploading} from './base'
+import type {DirectUpload} from './base'
 import type UploadClient from '../UploadClient'
 import type {RequestOptions, RequestResponse} from './request'
 import type {FileData, Settings} from '../types'
@@ -19,8 +19,8 @@ export default class UploadAPI {
     return request(prepareOptions(options, this.client.settings))
   }
 
-  base(file: FileData, settings: Settings = {}): Uploading {
-    return base(file, {
+  base(data: FileData, settings: Settings = {}): DirectUpload {
+    return base(data, {
       ...this.client.settings,
       ...settings,
     })
