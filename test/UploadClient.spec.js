@@ -69,7 +69,7 @@ describe('UploadClient', () => {
 
       const file = client.fileFrom('object', fileToUpload.data)
 
-      const fileInfo = await file.promise
+      const fileInfo = await file
 
       expect(file.status).toBe('ready')
       expect(fileInfo.is_ready).toBe(true)
@@ -82,7 +82,7 @@ describe('UploadClient', () => {
 
       const file = client.fileFrom('object', fileToUpload.data, {doNotStore: true})
 
-      await expectAsync(file.promise).toBeResolvedTo(jasmine.objectContaining({is_stored: false}))
+      await expectAsync(file).toBeResolvedTo(jasmine.objectContaining({is_stored: false}))
     })
 
     it('should be able to cancel uploading', (done) => {
@@ -96,7 +96,7 @@ describe('UploadClient', () => {
         file.cancel()
       }, 10)
 
-      file.promise
+      file
         .then(() => done.fail())
         .catch((error) => error.name === 'CancelError' ? done() : done.fail(error))
     })
@@ -116,7 +116,7 @@ describe('UploadClient', () => {
         done()
       }
 
-      file.promise
+      file
         .then(() => done.fail())
         .catch((error) => {
           if (error.name !== 'CancelError') {
@@ -137,7 +137,7 @@ describe('UploadClient', () => {
         progress += 1
       }
 
-      file.promise
+      file
         .then(() => progress ? done() : done.fail())
         .catch(error => done.fail(error))
     })
