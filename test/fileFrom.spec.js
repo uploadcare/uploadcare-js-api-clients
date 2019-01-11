@@ -1,104 +1,100 @@
 import * as factory from './_fixtureFactory'
 import fileFrom from '../src/fileFrom'
+import {sleep} from './_helpers'
 
 describe('fileFrom', () => {
+  const fileToUpload = factory.image('blackSquare')
+
   it('should resolves when file is ready on CDN', async() => {
-    const fileToUpload = factory.image('blackSquare')
+    const fileUpload = fileFrom('object', fileToUpload.data, {publicKey: factory.publicKey('demo')})
 
-    const file = fileFrom('object', fileToUpload.data, {publicKey: factory.publicKey('demo')})
+    const file = await fileUpload
 
-    const fileInfo = await file
-
-    expect(file.status).toBe('ready')
-    expect(fileInfo.is_ready).toBe(true)
+    expect(fileUpload.status).toBe('ready')
+    expect(file.is_ready).toBe(true)
   })
 
   it('should accept doNotStore setting', async() => {
-    const fileToUpload = factory.image('blackSquare')
-
-    const file = fileFrom('object', fileToUpload.data, {
+    const fileUpload = fileFrom('object', fileToUpload.data, {
       publicKey: factory.publicKey('demo'),
       doNotStore: true,
     })
 
-    await expectAsync(file).toBeResolvedTo(jasmine.objectContaining({is_stored: false}))
+    await expectAsync(fileUpload).toBeResolvedTo(jasmine.objectContaining({is_stored: false}))
   })
 
   it('should be able to cancel uploading', (done) => {
-    const fileToUpload = factory.image('blackSquare')
-
-    const file = fileFrom('object', fileToUpload.data, {publicKey: factory.publicKey('demo')})
+    const fileUpload = fileFrom('object', fileToUpload.data, {publicKey: factory.publicKey('demo')})
 
     setTimeout(() => {
-      file.cancel()
+      fileUpload.cancel()
     }, 10)
 
-    file
+    fileUpload
       .then(() => done.fail())
       .catch((error) => error.name === 'CancelError' ? done() : done.fail(error))
   })
 
-  it('should be able to handle cancel uploading', (done) => {
-    const fileToUpload = factory.image('blackSquare')
+  describe('should be able to handle', () => {
+    /* Wait to bypass the requests limits */
+    beforeEach((done) => {
+      sleep(1000).then(() => done())
+    })
 
-    const file = fileFrom('object', fileToUpload.data, {publicKey: factory.publicKey('demo')})
+    it('cancel uploading', (done) => {
+      const fileUpload = fileFrom('object', fileToUpload.data, {publicKey: factory.publicKey('demo')})
 
-    setTimeout(() => {
-      file.cancel()
-    }, 10)
+      setTimeout(() => {
+        fileUpload.cancel()
+      }, 10)
 
-    file.onCancel = () => {
-      done()
-    }
+      fileUpload.onCancel = () => {
+        done()
+      }
 
-    file
-      .then(() => done.fail())
-      .catch((error) => {
-        if (error.name !== 'CancelError') {
-          done.fail(error)
-        }
-      })
-  })
+      fileUpload
+        .then(() => done.fail())
+        .catch((error) => {
+          if (error.name !== 'CancelError') {
+            done.fail(error)
+          }
+        })
+    })
 
-  it('should be able to handle progress', (done) => {
-    let progress = 0
-    const fileToUpload = factory.image('blackSquare')
+    it('progress', (done) => {
+      let progress = 0
+      const fileUpload = fileFrom('object', fileToUpload.data, {publicKey: factory.publicKey('demo')})
 
-    const file = fileFrom('object', fileToUpload.data, {publicKey: factory.publicKey('demo')})
+      fileUpload.onProgress = () => {
+        progress += 1
+      }
 
-    file.onProgress = () => {
-      progress += 1
-    }
+      fileUpload
+        .then(() => progress ? done() : done.fail())
+        .catch(error => done.fail(error))
+    })
 
-    file
-      .then(() => progress ? done() : done.fail())
-      .catch(error => done.fail(error))
-  })
+    it('uploaded', (done) => {
+      const fileUpload = fileFrom('object', fileToUpload.data, {publicKey: factory.publicKey('demo')})
 
-  it('should be able to handle uploaded', (done) => {
-    const fileToUpload = factory.image('blackSquare')
+      fileUpload.onUploaded = () => {
+        done()
+      }
 
-    const file = fileFrom('object', fileToUpload.data, {publicKey: factory.publicKey('demo')})
+      fileUpload
+        .then(() => done.fail())
+        .catch(error => done.fail(error))
+    })
 
-    file.onUploaded = () => {
-      done()
-    }
+    it('ready', (done) => {
+      const fileUpload = fileFrom('object', fileToUpload.data, {publicKey: factory.publicKey('demo')})
 
-    file
-      .then(() => done.fail())
-      .catch(error => done.fail(error))
-  })
+      fileUpload.onReady = () => {
+        done()
+      }
 
-  it('should be able to handle ready', (done) => {
-    const fileToUpload = factory.image('blackSquare')
-
-    const file = fileFrom('object', fileToUpload.data, {publicKey: factory.publicKey('demo')})
-
-    file.onReady = () => {
-      done()
-    }
-
-    file
-      .catch(error => done.fail(error))
+      fileUpload
+        .catch(error => done.fail(error))
+    })
   })
 })

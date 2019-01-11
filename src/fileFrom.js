@@ -3,7 +3,7 @@ import base from './api/base'
 import checkFileIsReady from './checkFileIsReady'
 import type {FileData, FileInfo, Settings} from './types'
 
-export class File {
+export class FileUpload {
   _promise: Promise<FileInfo>
   status: 'uploading' | 'uploaded' | 'ready'
   info: FileInfo
@@ -77,8 +77,8 @@ export class File {
  * @param from
  * @param data
  * @param settings
- * @returns {File}
+ * @returns {FileUpload}
  */
-export default function fileFrom(from: string, data: FileData, settings: Settings = {}): File {
-  return new File(data, settings)
+export default function fileFrom(from: string, data: FileData, settings: Settings = {}): FileUpload {
+  return new FileUpload(data, settings)
 }
