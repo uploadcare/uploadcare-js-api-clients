@@ -74,4 +74,31 @@ describe('fileFrom', () => {
       .then(() => progress ? done() : done.fail())
       .catch(error => done.fail(error))
   })
+
+  it('should be able to handle uploaded', (done) => {
+    const fileToUpload = factory.image('blackSquare')
+
+    const file = fileFrom('object', fileToUpload.data, {publicKey: factory.publicKey('demo')})
+
+    file.onUploaded = () => {
+      done()
+    }
+
+    file
+      .then(() => done.fail())
+      .catch(error => done.fail(error))
+  })
+
+  it('should be able to handle ready', (done) => {
+    const fileToUpload = factory.image('blackSquare')
+
+    const file = fileFrom('object', fileToUpload.data, {publicKey: factory.publicKey('demo')})
+
+    file.onReady = () => {
+      done()
+    }
+
+    file
+      .catch(error => done.fail(error))
+  })
 })

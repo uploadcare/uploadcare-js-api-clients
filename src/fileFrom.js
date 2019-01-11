@@ -8,6 +8,8 @@ export class File {
   status: 'uploading' | 'uploaded' | 'ready'
   info: FileInfo
   onProgress: ?Function
+  onUploaded: ?Function
+  onReady: ?Function
   onCancel: ?Function
   cancel: Function
 
@@ -19,6 +21,10 @@ export class File {
         this.status = 'uploaded'
         this.info = {uuid}
 
+        if (typeof this.onUploaded === 'function') {
+          this.onUploaded(uuid)
+        }
+
         return checkFileIsReady(uuid, (fileInfo) => {
           this.info = {...fileInfo}
         }, 100, settings)
@@ -26,9 +32,15 @@ export class File {
       .then(() => {
         this.status = 'ready'
 
+        if (typeof this.onReady === 'function') {
+          this.onReady({...this.info})
+        }
+
         return {...this.info}
       })
     this.onProgress = null
+    this.onUploaded = null
+    this.onReady = null
     this.onCancel = null
     this.cancel = uploading.cancel
 
