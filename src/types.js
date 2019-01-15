@@ -11,7 +11,7 @@ export type Settings = {
 export type FileData = Blob | File | Buffer
 
 /* TODO Add sourceInfo */
-export type FileInfo = {
+export type UFile = {
   uuid: string,
   name: null | string,
   size: null | number,

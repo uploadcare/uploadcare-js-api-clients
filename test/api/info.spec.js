@@ -3,9 +3,9 @@ import * as factory from '../_fixtureFactory'
 
 describe('API - info', () => {
   it('should return file info', async() => {
-    const response = await info(factory.uuid('image'), {publicKey: factory.publicKey('image')})
+    const data = await info(factory.uuid('image'), {publicKey: factory.publicKey('image')})
 
-    expect(response.uuid).toBeTruthy()
+    expect(data.uuid).toBeTruthy()
   })
 
   it('should be rejected with bad options', (done) => {

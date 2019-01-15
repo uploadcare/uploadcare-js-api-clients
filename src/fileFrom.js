@@ -2,20 +2,20 @@
 import base from './api/base'
 import checkFileIsReady from './checkFileIsReady'
 import prettyFileInfo from './prettyFileInfo'
-import type {FileData, FileInfo, Settings} from './types'
+import type {FileData, UFile, Settings} from './types'
 import type {BaseProgress} from './api/base'
 
-export type FileUploadProgress = {|
+export type FilePromiseProgress = {|
   state: string,
   uploadProgress: null | BaseProgress,
   value: number,
 |}
 
-export class FileUpload {
-  _promise: Promise<FileInfo>
-  progress: FileUploadProgress
-  info: null | FileInfo
-  onProgress: ?(progress: FileUploadProgress) => void
+export class FilePromise {
+  _promise: Promise<UFile>
+  progress: FilePromiseProgress
+  file: null | UFile
+  onProgress: ?(progress: FilePromiseProgress) => void
   onUploaded: ?Function
   onReady: ?Function
   onCancel: ?Function
@@ -36,7 +36,7 @@ export class FileUpload {
           this.onProgress({...this.progress})
         }
 
-        this.info = {
+        this.file = {
           uuid,
           name: null,
           size: null,
@@ -52,8 +52,8 @@ export class FileUpload {
           this.onUploaded(uuid)
         }
 
-        return checkFileIsReady(uuid, (fileInfo) => {
-          this.info = prettyFileInfo(fileInfo)
+        return checkFileIsReady(uuid, (info) => {
+          this.file = prettyFileInfo(info)
         }, 100, settings)
       })
       .then(() => {
@@ -68,18 +68,18 @@ export class FileUpload {
         }
 
         if (typeof this.onReady === 'function') {
-          this.onReady({...this.info})
+          this.onReady({...this.file})
         }
 
         // $FlowFixMe
-        return {...this.info}
+        return {...this.file}
       })
     this.progress = {
       state: 'uploading',
       uploadProgress: null,
       value: 0,
     }
-    this.info = null
+    this.file = null
     this.onProgress = null
     this.onUploaded = null
     this.onReady = null
@@ -124,8 +124,8 @@ export class FileUpload {
  * @param from
  * @param data
  * @param settings
- * @returns {FileUpload}
+ * @returns {FilePromise}
  */
-export default function fileFrom(from: string, data: FileData, settings: Settings = {}): FileUpload {
-  return new FileUpload(data, settings)
+export default function fileFrom(from: string, data: FileData, settings: Settings = {}): FilePromise {
+  return new FilePromise(data, settings)
 }

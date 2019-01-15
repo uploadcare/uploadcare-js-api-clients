@@ -6,31 +6,31 @@ describe('fileFrom', () => {
   const fileToUpload = factory.image('blackSquare')
 
   it('should resolves when file is ready on CDN', async() => {
-    const fileUpload = fileFrom('object', fileToUpload.data, {publicKey: factory.publicKey('demo')})
+    const filePromise = fileFrom('object', fileToUpload.data, {publicKey: factory.publicKey('demo')})
 
-    const file = await fileUpload
+    const file = await filePromise
 
-    expect(fileUpload.status).toBe('ready')
+    expect(filePromise.status).toBe('ready')
     expect(file.cdnUrl).toBeTruthy()
   })
 
   it('should accept doNotStore setting', async() => {
-    const fileUpload = fileFrom('object', fileToUpload.data, {
+    const filePromise = fileFrom('object', fileToUpload.data, {
       publicKey: factory.publicKey('demo'),
       doNotStore: true,
     })
 
-    await expectAsync(fileUpload).toBeResolvedTo(jasmine.objectContaining({isStored: false}))
+    await expectAsync(filePromise).toBeResolvedTo(jasmine.objectContaining({isStored: false}))
   })
 
   it('should be able to cancel uploading', (done) => {
-    const fileUpload = fileFrom('object', fileToUpload.data, {publicKey: factory.publicKey('demo')})
+    const filePromise = fileFrom('object', fileToUpload.data, {publicKey: factory.publicKey('demo')})
 
     setTimeout(() => {
-      fileUpload.cancel()
+      filePromise.cancel()
     }, 10)
 
-    fileUpload
+    filePromise
       .then(() => done.fail())
       .catch((error) => error.name === 'CancelError' ? done() : done.fail(error))
   })
@@ -42,17 +42,17 @@ describe('fileFrom', () => {
     })
 
     it('cancel uploading', (done) => {
-      const fileUpload = fileFrom('object', fileToUpload.data, {publicKey: factory.publicKey('demo')})
+      const filePromise = fileFrom('object', fileToUpload.data, {publicKey: factory.publicKey('demo')})
 
       setTimeout(() => {
-        fileUpload.cancel()
+        filePromise.cancel()
       }, 10)
 
-      fileUpload.onCancel = () => {
+      filePromise.onCancel = () => {
         done()
       }
 
-      fileUpload
+      filePromise
         .then(() => done.fail())
         .catch((error) => {
           if (error.name !== 'CancelError') {
@@ -63,37 +63,37 @@ describe('fileFrom', () => {
 
     it('progress', (done) => {
       let progress = 0
-      const fileUpload = fileFrom('object', fileToUpload.data, {publicKey: factory.publicKey('demo')})
+      const filePromise = fileFrom('object', fileToUpload.data, {publicKey: factory.publicKey('demo')})
 
-      fileUpload.onProgress = () => {
+      filePromise.onProgress = () => {
         progress += 1
       }
 
-      fileUpload
+      filePromise
         .then(() => progress ? done() : done.fail())
         .catch(error => done.fail(error))
     })
 
     it('uploaded', (done) => {
-      const fileUpload = fileFrom('object', fileToUpload.data, {publicKey: factory.publicKey('demo')})
+      const filePromise = fileFrom('object', fileToUpload.data, {publicKey: factory.publicKey('demo')})
 
-      fileUpload.onUploaded = () => {
+      filePromise.onUploaded = () => {
         done()
       }
 
-      fileUpload
+      filePromise
         .then(() => done.fail())
         .catch(error => done.fail(error))
     })
 
     it('ready', (done) => {
-      const fileUpload = fileFrom('object', fileToUpload.data, {publicKey: factory.publicKey('demo')})
+      const filePromise = fileFrom('object', fileToUpload.data, {publicKey: factory.publicKey('demo')})
 
-      fileUpload.onReady = () => {
+      filePromise.onReady = () => {
         done()
       }
 
-      fileUpload
+      filePromise
         .catch(error => done.fail(error))
     })
   })
