@@ -2,16 +2,16 @@
 import defaultSettings from './default-settings'
 import camelizeKeys from './tools/camelizeKeys'
 import type {InfoResponse} from './api/info'
-import type {FileInfo} from './types'
+import type {UFile} from './types'
 
 /**
  * Transforms file info getting from Upload API to pretty info
  *
  * @param {InfoResponse} info
  * @param {string} baseCDN
- * @returns {FileInfo}
+ * @returns {UFile}
  */
-export default function prettyFileInfo(info: InfoResponse): FileInfo {
+export default function prettyFileInfo(info: InfoResponse): UFile {
   const {
     uuid,
     filename,
