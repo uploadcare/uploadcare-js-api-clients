@@ -1,6 +1,7 @@
 /* @flow */
 import base from './api/base'
 import checkFileIsReady from './checkFileIsReady'
+import prettyFileInfo from './prettyFileInfo'
 import type {FileData, FileInfo, Settings} from './types'
 
 export class FileUpload {
@@ -19,14 +20,24 @@ export class FileUpload {
     this._promise = directUpload
       .then(({file: uuid}) => {
         this.status = 'uploaded'
-        this.info = {uuid}
+        this.info = {
+          uuid,
+          name: null,
+          size: null,
+          isStored: null,
+          isImage: null,
+          cdnUrl: null,
+          cdnUrlModifiers: null,
+          originalUrl: null,
+          originalImageInfo: null,
+        }
 
         if (typeof this.onUploaded === 'function') {
           this.onUploaded(uuid)
         }
 
         return checkFileIsReady(uuid, (fileInfo) => {
-          this.info = {...fileInfo}
+          this.info = prettyFileInfo(fileInfo)
         }, 100, settings)
       })
       .then(() => {

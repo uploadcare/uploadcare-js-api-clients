@@ -4,6 +4,7 @@ import type {Settings} from './types'
 
 export type DefaultSettings = {
   baseURL: string,
+  baseCDN: string,
 }
 
 /*
@@ -18,7 +19,10 @@ Settings for future support:
   parallelDirectUploads: 10,
   pusherKey: '79ae88bd931ea68464d9',
  */
-const defaultSettings: DefaultSettings = {baseURL: 'https://upload.uploadcare.com'}
+const defaultSettings: DefaultSettings = {
+  baseURL: 'https://upload.uploadcare.com',
+  baseCDN: 'https://ucarecdn.com',
+}
 
 export default defaultSettings
 

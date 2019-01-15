@@ -1,13 +1,27 @@
 /* @flow */
+const SEPARATOR = /\W|_/g
 
-export function camelize(str: string): string {
-  return (str.split('_'))
-    .map((substr, index) => index > 0 ? substr.toUpperCase() : substr)
+/**
+ * Transforms a string to camelCased.
+ *
+ * @param {string} text
+ * @returns {string}
+ */
+export function camelize(text: string): string {
+  return (text.split(SEPARATOR))
+    // $FlowFixMe
+    .map((word, index) => word.charAt(0)[index > 0 ? 'toUpperCase' : 'toLowerCase']() + word.slice(1))
     .join('')
 }
 
+/**
+ * Transforms keys of an object to camelCased recursively.
+ *
+ * @param {Object} source
+ * @returns {Object}
+ */
 export default function camelizeKeys(source: any): any {
-  if (typeof source !== 'object') {
+  if (!source || typeof source !== 'object') {
     return source
   }
 
