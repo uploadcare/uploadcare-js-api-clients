@@ -33,15 +33,17 @@ const client = new UploadClient(settings)
 client.api.request(options)
   .then(response => console.log(response.data))
 
-const uploading = client.api.base(file, settings)
+const directUpload = client.api.base(file, settings)
 
-uploading.promise.then(data => console.log(data.file))
-uploading.onProgress = (progressEvent) => console.log(progressEvent.loaded)
+directUpload
+  .then(data => console.log(data.file))
 
-const file = client.fileFrom('object', file, settings)
+directUpload.onProgress = (progressEvent) => console.log(progressEvent.total / progressEvent.loaded)
 
-file.promise
-  .then(fileInfo => console.log(fileInfo.uuid))
+const filePromise = client.fileFrom('object', fileData, settings)
+
+filePromise
+  .then(file => console.log(file.uuid))
 ```
 
 ## Security issues
