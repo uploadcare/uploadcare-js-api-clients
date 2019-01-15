@@ -3,12 +3,19 @@ import base from './api/base'
 import checkFileIsReady from './checkFileIsReady'
 import prettyFileInfo from './prettyFileInfo'
 import type {FileData, FileInfo, Settings} from './types'
+import type {BaseProgress} from './api/base'
+
+export type FileUploadProgress = {|
+  state: string,
+  uploadProgress: null | BaseProgress,
+  value: number,
+|}
 
 export class FileUpload {
   _promise: Promise<FileInfo>
-  status: 'uploading' | 'uploaded' | 'ready'
-  info: FileInfo
-  onProgress: ?Function
+  progress: FileUploadProgress
+  info: null | FileInfo
+  onProgress: ?(progress: FileUploadProgress) => void
   onUploaded: ?Function
   onReady: ?Function
   onCancel: ?Function
@@ -19,7 +26,16 @@ export class FileUpload {
 
     this._promise = directUpload
       .then(({file: uuid}) => {
-        this.status = 'uploaded'
+        this.progress = {
+          ...this.progress,
+          state: 'uploaded',
+          value: 0.9,
+        }
+
+        if (typeof this.onProgress === 'function') {
+          this.onProgress({...this.progress})
+        }
+
         this.info = {
           uuid,
           name: null,
@@ -41,24 +57,44 @@ export class FileUpload {
         }, 100, settings)
       })
       .then(() => {
-        this.status = 'ready'
+        this.progress = {
+          ...this.progress,
+          state: 'ready',
+          value: 1,
+        }
+
+        if (typeof this.onProgress === 'function') {
+          this.onProgress({...this.progress})
+        }
 
         if (typeof this.onReady === 'function') {
           this.onReady({...this.info})
         }
 
+        // $FlowFixMe
         return {...this.info}
       })
+    this.progress = {
+      state: 'uploading',
+      uploadProgress: null,
+      value: 0,
+    }
+    this.info = null
     this.onProgress = null
     this.onUploaded = null
     this.onReady = null
     this.onCancel = null
     this.cancel = directUpload.cancel
 
-    /* TODO Add progress for checking ready */
     directUpload.onProgress = (progressEvent) => {
+      this.progress = {
+        ...this.progress,
+        uploadProgress: progressEvent,
+        value: (progressEvent.total / progressEvent.loaded) * 0.9,
+      }
+
       if (typeof this.onProgress === 'function') {
-        this.onProgress(progressEvent)
+        this.onProgress({...this.progress})
       }
     }
 
