@@ -12,9 +12,9 @@ describe('UploadClient', () => {
     }
 
     it('with default settings', async() => {
-      const upload = new UploadClient()
+      const client = new UploadClient()
 
-      const req = upload.api.request(requestOptions)
+      const req = client.api.request(requestOptions)
 
       await expectAsync(req).toBeResolved()
       req.then(({url}) => {
@@ -22,9 +22,9 @@ describe('UploadClient', () => {
       })
     })
     it('with constructor settings', async() => {
-      const upload = new UploadClient({baseURL: 'https://upload.staging0.uploadcare.com'})
+      const client = new UploadClient({baseURL: 'https://upload.staging0.uploadcare.com'})
 
-      const req = upload.api.request(requestOptions)
+      const req = client.api.request(requestOptions)
 
       await expectAsync(req).toBeRejected()
       req.catch(error => {
@@ -33,11 +33,11 @@ describe('UploadClient', () => {
       })
     })
     it('with setSettings method', async() => {
-      const upload = new UploadClient()
+      const client = new UploadClient()
 
-      upload.setSettings({baseURL: 'https://upload.staging0.uploadcare.com'})
+      client.setSettings({baseURL: 'https://upload.staging0.uploadcare.com'})
 
-      const req = upload.api.request(requestOptions)
+      const req = client.api.request(requestOptions)
 
       await expectAsync(req).toBeRejected()
       req.catch(error => {
@@ -46,9 +46,9 @@ describe('UploadClient', () => {
       })
     })
     it('with settings as options', async() => {
-      const upload = new UploadClient()
+      const client = new UploadClient()
 
-      const req = upload.api.request({
+      const req = client.api.request({
         ...requestOptions,
         baseURL: 'https://upload.staging0.uploadcare.com',
       })

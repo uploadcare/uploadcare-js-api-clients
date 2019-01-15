@@ -3,10 +3,10 @@ import * as factory from '../_fixtureFactory'
 import {getUserAgent} from '../../src/default-settings'
 
 describe('API - base', () => {
-  it('should be able to upload data', async() => {
-    const file = factory.image('blackSquare')
+  const fileToUpload = factory.image('blackSquare')
 
-    const directUpload = base(file.data, {publicKey: factory.publicKey('demo')})
+  it('should be able to upload data', async() => {
+    const directUpload = base(fileToUpload.data, {publicKey: factory.publicKey('demo')})
 
     await expectAsync(directUpload).toBeResolvedTo({file: jasmine.any(String)})
   })
@@ -36,9 +36,7 @@ describe('API - base', () => {
   })
 
   it('should be able to cancel uploading', (done) => {
-    const file = factory.image('blackSquare')
-
-    const directUpload = base(file.data, {publicKey: factory.publicKey('demo')})
+    const directUpload = base(fileToUpload.data, {publicKey: factory.publicKey('demo')})
 
     setTimeout(() => {
       directUpload.cancel()
@@ -50,9 +48,7 @@ describe('API - base', () => {
   })
 
   it('should be able to handle cancel uploading', (done) => {
-    const file = factory.image('blackSquare')
-
-    const directUpload = base(file.data, {publicKey: factory.publicKey('demo')})
+    const directUpload = base(fileToUpload.data, {publicKey: factory.publicKey('demo')})
 
     setTimeout(() => {
       directUpload.cancel()
@@ -73,9 +69,7 @@ describe('API - base', () => {
 
   it('should be able to handle progress', (done) => {
     let progress = 0
-    const file = factory.image('blackSquare')
-
-    const directUpload = base(file.data, {publicKey: factory.publicKey('demo')})
+    const directUpload = base(fileToUpload.data, {publicKey: factory.publicKey('demo')})
 
     directUpload.onProgress = () => {
       progress += 1
