@@ -27,6 +27,15 @@
     "url": "https://github.com/uploadcare/uploadcare-upload-client/issues"
   },
   "homepage": "https://github.com/uploadcare/uploadcare-upload-client#readme",
+  "keywords": [
+    "uploadcare",
+    "file",
+    "uploader",
+    "image",
+    "upload",
+    "store",
+    "cdn"
+  ],
   "devDependencies": {
     "@babel/cli": "^7.2.0",
     "@babel/core": "^7.2.0",
