@@ -6,7 +6,7 @@
     alt="">
 </a>
 
-JavaScript library for work with Uploadcare Upload API.
+Library for work with Uploadcare Upload API.
 
 [![NPM version][npm-img]][npm-url]
 [![GitHub release][badge-release-img]][badge-release-url]&nbsp;

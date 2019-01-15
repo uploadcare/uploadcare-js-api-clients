@@ -1,7 +1,7 @@
 {
   "name": "@uploadcare/upload-client",
   "version": "1.0.0-alpha",
-  "description": "JavaScript library for work with Uploadcare Upload API",
+  "description": "Library for work with Uploadcare Upload API",
   "main": "dist/uploadcare-upload-client.cjs.js",
   "module": "dist/uploadcare-upload-client.esm.js",
   "scripts": {
