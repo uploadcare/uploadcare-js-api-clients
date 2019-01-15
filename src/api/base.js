@@ -3,13 +3,15 @@ import request, {createCancelController, prepareOptions} from './request'
 import type {RequestOptions} from './request'
 import type {Settings, FileData} from '../types'
 
+export type BaseProgress = ProgressEvent
+
 export type BaseResponse = {|
   file: string
 |}
 
 export class DirectUpload {
   _promise: Promise<BaseResponse>
-  onProgress: ?Function
+  onProgress: ?(progressEvent: BaseProgress) => void
   onCancel: ?Function
   cancel: Function
 
