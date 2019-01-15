@@ -21,7 +21,7 @@ export function camelize(text: string): string {
  * @returns {Object}
  */
 export default function camelizeKeys(source: any): any {
-  if (typeof source !== 'object') {
+  if (!source || typeof source !== 'object') {
     return source
   }
 
