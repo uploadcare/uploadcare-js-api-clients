@@ -11,7 +11,7 @@ describe('fileFrom', () => {
     const file = await fileUpload
 
     expect(fileUpload.status).toBe('ready')
-    expect(file.is_ready).toBe(true)
+    expect(file.cdnUrl).toBeTruthy()
   })
 
   it('should accept doNotStore setting', async() => {
@@ -20,7 +20,7 @@ describe('fileFrom', () => {
       doNotStore: true,
     })
 
-    await expectAsync(fileUpload).toBeResolvedTo(jasmine.objectContaining({is_stored: false}))
+    await expectAsync(fileUpload).toBeResolvedTo(jasmine.objectContaining({isStored: false}))
   })
 
   it('should be able to cancel uploading', (done) => {
