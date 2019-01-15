@@ -6,7 +6,7 @@
     alt="">
 </a>
 
-JavaScript library for work with Uploadcare Upload API.
+Library for work with Uploadcare Upload API.
 
 [![NPM version][npm-img]][npm-url]
 [![GitHub release][badge-release-img]][badge-release-url]&nbsp;
@@ -28,20 +28,22 @@ npm install @uploadcare/upload-client --save
 ```javascript
 import UploadClient from '@uploadcare/upload-client'
 
-const client = new UploadClient(settings)
+const client = new UploadClient({publicKey: 'YOUR_PUBLIC_KEY'})
 
-client.api.request(options)
+client.api.request({path: 'info', query})
   .then(response => console.log(response.data))
 
-const uploading = client.api.base(file, settings)
+const directUpload = client.api.base(fileData)
 
-uploading.promise.then(data => console.log(data.file))
-uploading.onProgress = (progressEvent) => console.log(progressEvent.loaded)
+directUpload
+  .then(data => console.log(data.file))
 
-const file = client.fileFrom('object', file, settings)
+directUpload.onProgress = (progressEvent) => console.log(progressEvent.total / progressEvent.loaded)
 
-file.promise
-  .then(fileInfo => console.log(fileInfo.uuid))
+const filePromise = client.fileFrom('object', fileData)
+
+filePromise
+  .then(file => console.log(file.uuid))
 ```
 
 ## Security issues
