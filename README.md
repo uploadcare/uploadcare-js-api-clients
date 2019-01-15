@@ -28,19 +28,19 @@ npm install @uploadcare/upload-client --save
 ```javascript
 import UploadClient from '@uploadcare/upload-client'
 
-const client = new UploadClient(settings)
+const client = new UploadClient({publicKey: 'YOUR_PUBLIC_KEY'})
 
-client.api.request(options)
+client.api.request({path: 'info', query})
   .then(response => console.log(response.data))
 
-const directUpload = client.api.base(file, settings)
+const directUpload = client.api.base(fileData)
 
 directUpload
   .then(data => console.log(data.file))
 
 directUpload.onProgress = (progressEvent) => console.log(progressEvent.total / progressEvent.loaded)
 
-const filePromise = client.fileFrom('object', fileData, settings)
+const filePromise = client.fileFrom('object', fileData)
 
 filePromise
   .then(file => console.log(file.uuid))
