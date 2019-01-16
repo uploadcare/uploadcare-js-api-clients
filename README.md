@@ -51,6 +51,12 @@ const filePromise = client.fileFrom('object', fileData)
 
 filePromise
   .then(file => console.log(file.uuid))
+
+filePromise.onProgress = (progress => {
+  console.log(progress.state)
+  console.log(progress.uploadProgress.total / progress.uploadProgress.loaded)
+  console.log(progress.value)
+})
 ```
 
 ## Security issues
