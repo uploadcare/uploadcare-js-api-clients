@@ -7,10 +7,36 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+[Unreleased]: https://github.com/uploadcare/uploadcare-upload-client/compare/v1.0.0-alpha.1...HEAD
 
-[Unreleased]: https://github.com/uploadcare/uploadcare-upload-client/compare/v1.0.0.alpha...HEAD
+## [1.0.0-alpha.1]
 
-## 1.0.0.alpha
+### Fixed
+
+* Use the version from the `package.json` file to create Uploadcare User Agent.
+
+### Changed
+
+* The `base` function returns `thenable` object called `DirectUpload`
+  instead of using the `promise` property.
+* The `fileFrom` function returns `thenable` object called `FilePromise`
+  instead of using the `promise` property.
+* The `FileInfo` type renamed to `UFile` and updated.
+* The `FilePromise` resolved with an object of the `UFile` type.
+* The progress of `fileFrom` now based on the `FilePromiseProgress` type.
+* Updated the `InfoResponse` type.
+
+### Added
+
+* The `checkFileIsReady` function to check if the file is ready on the CDN.
+* New properties for the object that the `fileFrom` function returns:
+  `onUploaded`, `onReady`.
+* The `camelizeKeys` function for inner usage.
+* The `baseCDN` default setting
+
+[1.0.0-alpha.1]: https://github.com/uploadcare/uploadcare-upload-client/compare/v1.0.0-alpha...v1.0.0-alpha.1
+
+## 1.0.0-alpha
 
 The first public alpha release.
 

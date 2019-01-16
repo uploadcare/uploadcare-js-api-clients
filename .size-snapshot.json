@@ -1,8 +1,8 @@
 {
   "dist/uploadcare-upload-client.esm.js": {
-    "bundled": 18974,
-    "minified": 9656,
-    "gzipped": 2991,
+    "bundled": 23915,
+    "minified": 12198,
+    "gzipped": 3628,
     "treeshaked": {
       "rollup": {
         "code": 46,
@@ -14,18 +14,18 @@
     }
   },
   "dist/uploadcare-upload-client.cjs.js": {
-    "bundled": 18997,
-    "minified": 9669,
-    "gzipped": 3000
+    "bundled": 23938,
+    "minified": 12211,
+    "gzipped": 3639
   },
   "dist/uploadcare-upload-client.js": {
-    "bundled": 57661,
-    "minified": 19025,
-    "gzipped": 6619
+    "bundled": 62952,
+    "minified": 21189,
+    "gzipped": 7167
   },
   "dist/uploadcare-upload-client.min.js": {
-    "bundled": 19025,
-    "minified": 18999,
-    "gzipped": 6598
+    "bundled": 21189,
+    "minified": 21163,
+    "gzipped": 7150
   }
 }
