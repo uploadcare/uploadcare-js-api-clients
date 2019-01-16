@@ -7,7 +7,7 @@ import type {BaseProgress} from './api/base'
 
 export type FilePromiseProgress = {|
   state: string,
-  uploadProgress: null | BaseProgress,
+  upload: null | BaseProgress,
   value: number,
 |}
 
@@ -76,7 +76,7 @@ export class FilePromise {
       })
     this.progress = {
       state: 'uploading',
-      uploadProgress: null,
+      upload: null,
       value: 0,
     }
     this.file = null
@@ -89,7 +89,7 @@ export class FilePromise {
     directUpload.onProgress = (progressEvent) => {
       this.progress = {
         ...this.progress,
-        uploadProgress: progressEvent,
+        upload: progressEvent,
         value: (progressEvent.total / progressEvent.loaded) * 0.9,
       }
 
