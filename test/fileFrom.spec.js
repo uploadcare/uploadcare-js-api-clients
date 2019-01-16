@@ -10,7 +10,7 @@ describe('fileFrom', () => {
 
     const file = await filePromise
 
-    expect(filePromise.status).toBe('ready')
+    expect(filePromise.progress.state).toBe('ready')
     expect(file.cdnUrl).toBeTruthy()
   })
 
