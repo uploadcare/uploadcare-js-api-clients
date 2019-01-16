@@ -63,18 +63,6 @@ describe('API – request', () => {
       sleep(1000).then(() => done())
     })
 
-    it('if bad request', (done) => {
-      request({
-        path: '/infoxxx/',
-        query: {
-          pub_key: factory.publicKey('image'),
-          file_id: factory.uuid('image'),
-        },
-      })
-        .then(() => done.fail())
-        .catch((error) => error.name === 'RequestError' ? done() : done.fail(error))
-    })
-
     it('if Uploadcare returns error', (done) => {
       request({
         path: '/info/',
