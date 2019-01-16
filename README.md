@@ -6,16 +6,20 @@
     alt="">
 </a>
 
-Library for work with Uploadcare Upload API.
+Library for work with Uploadcare [Upload API][uc-docs-upload-api] in Node.js and browsers.
 
 [![NPM version][npm-img]][npm-url]
 [![GitHub release][badge-release-img]][badge-release-url]&nbsp;
 [![Uploadcare stack on StackShare][badge-stack-img]][badge-stack-url]
 
+<!-- toc -->
+
 * [Install](#install)
 * [Usage](#usage)
 * [Security issues](#security-issues)
 * [Feedback](#feedback)
+
+<!-- tocstop -->
 
 ## Install
 
@@ -32,6 +36,9 @@ const client = new UploadClient({publicKey: 'YOUR_PUBLIC_KEY'})
 
 client.api.request({path: 'info', query})
   .then(response => console.log(response.data))
+
+client.api.info(uuid)
+  .then(data => console.log(data.is_image))
 
 const directUpload = client.api.base(fileData)
 
@@ -71,3 +78,4 @@ request at [hello@uploadcare.com][uc-email-hello].
 [badge-release-url]: https://github.com/uploadcare/uploadcare-upload-client/releases
 [npm-img]: http://img.shields.io/npm/v/@uploadcare/upload-client.svg
 [npm-url]: https://www.npmjs.org/package/@uploadcare/upload-client
+[uc-docs-upload-api]: https://uploadcare.com/docs/api_reference/upload/?utm_source=github&utm_campaign=uploadcare-upload-client
