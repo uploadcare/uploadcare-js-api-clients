@@ -4,6 +4,7 @@
   "description": "Library for work with Uploadcare Upload API",
   "main": "dist/uploadcare-upload-client.cjs.js",
   "module": "dist/uploadcare-upload-client.esm.js",
+  "types": "dist/uploadcare-upload-client.d.ts",
   "scripts": {
     "clean": "rimraf dist",
     "lint": "eslint .",
@@ -73,7 +74,9 @@
     "rollup-plugin-node-resolve-magic": "^0.2.11",
     "rollup-plugin-replace": "^2.1.0",
     "rollup-plugin-size-snapshot": "^0.7.0",
-    "rollup-plugin-terser": "^3.0.0"
+    "rollup-plugin-terser": "^3.0.0",
+    "rollup-plugin-typescript2": "^0.19.2",
+    "typescript": "^3.2.4"
   },
   "dependencies": {
     "axios": "^0.18.0",
