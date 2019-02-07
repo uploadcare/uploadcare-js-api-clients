@@ -1,4 +1,3 @@
-/* @flow */
 export default class CancelError extends Error {
   constructor() {
     super()

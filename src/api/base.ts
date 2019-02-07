@@ -1,18 +1,17 @@
-/* @flow */
 import request, {createCancelController, prepareOptions} from './request'
-import type {RequestOptions} from './request'
-import type {Settings, FileData} from '../types'
+import {RequestOptions} from './request'
+import {Settings, FileData} from '../types'
 
-export type BaseProgress = ProgressEvent
+export interface BaseProgress extends ProgressEvent {}
 
-export type BaseResponse = {|
+export interface BaseResponse {
   file: string
-|}
+}
 
 export class DirectUpload {
   _promise: Promise<BaseResponse>
-  onProgress: ?(progressEvent: BaseProgress) => void
-  onCancel: ?Function
+  onProgress: ((progressEvent: BaseProgress) => void) | null
+  onCancel: Function | null
   cancel: Function
 
   constructor(options: RequestOptions) {
@@ -21,6 +20,8 @@ export class DirectUpload {
     this._promise = request({
       ...options,
       /* TODO Add support of progress for Node.js */
+      // TODO: Fix ts-ignore
+      // @ts-ignore
       onUploadProgress: (progressEvent) => {
         if (typeof this.onProgress === 'function') {
           this.onProgress(progressEvent)
@@ -42,14 +43,20 @@ export class DirectUpload {
   }
 
   then(onFulfilled?: Function, onRejected?: Function) {
+    // TODO: Fix ts-ignore
+    // @ts-ignore
     return this._promise.then(onFulfilled, onRejected)
   }
 
   catch(onRejected?: Function) {
+    // TODO: Fix ts-ignore
+    // @ts-ignore
     return this._promise.catch(onRejected)
   }
 
   finally(onFinally: Function) {
+    // TODO: Fix ts-ignore
+    // @ts-ignore
     return this._promise.finally(onFinally)
   }
 }

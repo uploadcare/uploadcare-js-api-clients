@@ -1,9 +1,6 @@
 {
   "parser": "babel-eslint",
-  "extends": ["uploadcare", "plugin:flowtype/recommended"],
-  "plugins": [
-    "flowtype"
-  ],
+  "extends": ["uploadcare"],
   "parserOptions": {
     "ecmaVersion": 6,
     "sourceType": "module"

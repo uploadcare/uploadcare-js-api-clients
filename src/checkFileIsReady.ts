@@ -1,7 +1,6 @@
-/* @flow */
 import info from './api/info'
-import type {Settings} from './types'
-import type {InfoResponse} from './api/info'
+import {Settings} from './types'
+import {InfoResponse} from './api/info'
 
 const MAX_TIMEOUT = 300
 
@@ -16,7 +15,7 @@ const MAX_TIMEOUT = 300
  */
 export default function checkFileIsReady(
   uuid: string,
-  handleFileInfo: null | (info: InfoResponse) => void,
+  handleFileInfo: null | ((info: InfoResponse) => void),
   timeout: number,
   settings: Settings = {}
 ): Promise<void> {

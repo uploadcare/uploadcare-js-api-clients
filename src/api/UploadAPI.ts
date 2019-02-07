@@ -1,12 +1,11 @@
-/* @flow */
 import request, {prepareOptions} from './request'
 import base from './base'
-import type {DirectUpload} from './base'
-import type UploadClient from '../UploadClient'
-import type {RequestOptions, RequestResponse} from './request'
-import type {FileData, Settings} from '../types'
+import {DirectUpload} from './base'
+import UploadClient from '../UploadClient'
+import {RequestOptions, RequestResponse} from './request'
+import {FileData, Settings} from '../types'
 import info from './info'
-import type {InfoResponse} from './info'
+import {InfoResponse} from './info'
 
 export default class UploadAPI {
   client: UploadClient

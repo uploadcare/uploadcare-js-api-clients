@@ -1,20 +1,19 @@
-/* @flow */
-import type {ErrorRequestInfo, ErrorResponseInfo} from './types'
+import {ErrorRequestInfo, ErrorResponseInfo} from './types'
 
-export default class UploadcareError extends Error {
+export default class RequestError extends Error {
   request: ErrorRequestInfo
   response: ErrorResponseInfo
 
   constructor(request: ErrorRequestInfo, response: ErrorResponseInfo) {
     super()
 
-    this.name = 'UploadcareError'
+    this.name = 'RequestError'
     this.message = `[${response.status}] ${response.statusText}`
     this.request = request
     this.response = response
 
     if (Error.captureStackTrace) {
-      Error.captureStackTrace(this, UploadcareError)
+      Error.captureStackTrace(this, RequestError)
     }
     else {
       this.stack = (new Error()).stack

@@ -1,24 +1,23 @@
-/* @flow */
 import base from './api/base'
 import checkFileIsReady from './checkFileIsReady'
 import prettyFileInfo from './prettyFileInfo'
-import type {FileData, UFile, Settings} from './types'
-import type {BaseProgress} from './api/base'
+import {FileData, UFile, Settings} from './types'
+import {BaseProgress} from './api/base'
 
-export type FilePromiseProgress = {|
+export interface FilePromiseProgress {
   state: string,
   upload: null | BaseProgress,
   value: number,
-|}
+}
 
 export class FilePromise {
   _promise: Promise<UFile>
   progress: FilePromiseProgress
   file: null | UFile
-  onProgress: ?(progress: FilePromiseProgress) => void
-  onUploaded: ?Function
-  onReady: ?Function
-  onCancel: ?Function
+  onProgress: ((progress: FilePromiseProgress) => void) | null
+  onUploaded: Function | null
+  onReady: Function | null
+  onCancel: Function | null
   cancel: Function
 
   constructor(data: FileData, settings: Settings) {
@@ -106,14 +105,20 @@ export class FilePromise {
   }
 
   then(onFulfilled?: Function, onRejected?: Function) {
+    // TODO: Fix ts-ignore
+    // @ts-ignore
     return this._promise.then(onFulfilled, onRejected)
   }
 
   catch(onRejected?: Function) {
+    // TODO: Fix ts-ignore
+    // @ts-ignore
     return this._promise.catch(onRejected)
   }
 
   finally(onFinally: Function) {
+    // TODO: Fix ts-ignore
+    // @ts-ignore
     return this._promise.finally(onFinally)
   }
 }

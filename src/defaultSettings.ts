@@ -1,8 +1,7 @@
-/* @flow */
 import {version} from '../package.json'
-import type {Settings} from './types'
+import {Settings} from './types'
 
-export type DefaultSettings = {
+export interface DefaultSettings {
   baseURL: string,
   baseCDN: string,
 }

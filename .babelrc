@@ -7,7 +7,7 @@
         "modules": false
       }
     ],
-    "@babel/preset-flow"
+    "@babel/preset-typescript"
   ],
   "env": {
     "test:node": {
@@ -18,7 +18,7 @@
             "targets": {"node": "current"}
           }
         ],
-        "@babel/preset-flow"
+        "@babel/preset-typescript"
       ]
     },
     "test:browser": {
@@ -30,7 +30,7 @@
             "modules": false
           }
         ],
-        "@babel/preset-flow"
+        "@babel/preset-typescript"
       ]
     }
   }

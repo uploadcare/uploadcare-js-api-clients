@@ -6,8 +6,10 @@
     "lib": ["es2016", "dom"],
     "noImplicitAny": false,
     "strictNullChecks": true,
-    "strict": true
+    "strict": true,
+    "resolveJsonModule": true,
+    "moduleResolution": "node"
   },
-  "include": ["src"],
+  "include": ["src", "test"],
   "exclude": ["node_modules"]
 }

@@ -1,16 +1,15 @@
-/* @flow */
-import defaultSettings from './default-settings'
-import UploadAPI from './api'
+import defaultSettings from './defaultSettings'
+import UploadAPI from './api/index'
 import fileFrom from './fileFrom'
-import type {FileData, Settings} from './types'
-import type {FilePromise} from './fileFrom'
+import {FileData, Settings} from './types'
+import {FilePromise} from './fileFrom'
 
 export default class UploadClient {
   settings: Settings
   updateSettingsListeners: Array<Function>
   api: UploadAPI
 
-  constructor(settings: Settings = {}): void {
+  constructor(settings: Settings = {}) {
     this.settings = {
       ...defaultSettings,
       ...settings,
