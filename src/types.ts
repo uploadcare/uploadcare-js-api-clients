@@ -1,4 +1,4 @@
-export interface Settings {
+export type Settings = {
   baseURL?: string,
   publicKey?: string | null,
   doNotStore?: boolean,
@@ -7,12 +7,10 @@ export interface Settings {
   integration?: string,
 }
 
-export interface FileData extends Blob {}
-// TODO: Fix this
-// export interface FileData = Blob | File | Buffer
+export type FileData = Blob | File | Buffer
 
 /* TODO Add sourceInfo */
-export interface UFile {
+export type UFile = {
   uuid: string,
   name: null | string,
   size: null | number,

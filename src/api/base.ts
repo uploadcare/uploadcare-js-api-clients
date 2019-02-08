@@ -2,9 +2,9 @@ import request, {createCancelController, prepareOptions} from './request'
 import {RequestOptions} from './request'
 import {Settings, FileData} from '../types'
 
-export interface BaseProgress extends ProgressEvent {}
+export type BaseProgress = ProgressEvent
 
-export interface BaseResponse {
+export type BaseResponse = {
   file: string
 }
 

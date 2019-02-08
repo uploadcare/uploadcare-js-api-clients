@@ -1,4 +1,5 @@
-const babel = require('rollup-plugin-babel')
+// const babel = require('rollup-plugin-babel')
+const typescript = require('rollup-plugin-typescript2')
 // const browserStackConf = require('./browserstack.json')
 const resolve = require('rollup-plugin-node-resolve')
 const commonjs = require('rollup-plugin-commonjs')
@@ -20,7 +21,11 @@ module.exports = function(config) {
       },
     ],
 
-    plugins: ['karma-chrome-launcher', 'karma-jasmine', 'karma-rollup-preprocessor'],
+    plugins: [
+      'karma-rollup-preprocessor',
+      'karma-chrome-launcher',
+      'karma-jasmine',
+    ],
 
     preprocessors: {'test/**/*.spec.js': ['rollup']},
     rollupPreprocessor: {
@@ -29,7 +34,7 @@ module.exports = function(config) {
         json(),
         resolve({browser: true}),
         commonjs({include: 'node_modules/**'}),
-        babel(),
+        typescript(),
       ],
       output: {
         format: 'iife',

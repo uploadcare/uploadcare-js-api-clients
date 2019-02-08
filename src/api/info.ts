@@ -2,7 +2,7 @@ import request, {prepareOptions} from './request'
 import {Settings} from '../types'
 import {RequestOptions} from './request'
 
-export interface InfoResponse {
+export type InfoResponse = {
   size: number,
   total: number,
   done: number,

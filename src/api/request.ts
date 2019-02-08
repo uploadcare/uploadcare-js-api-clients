@@ -6,11 +6,11 @@ import CancelError from '../errors/CancelError'
 import UploadcareError from '../errors/UploadcareError'
 import {FileData, Settings} from '../types'
 
-export interface Query {
+export type Query = {
   [key: string]: string | boolean | number | void,
 }
 
-export interface Body {
+export type Body = {
   [key: string]: Array<string>
     | string
     | boolean
@@ -19,11 +19,11 @@ export interface Body {
     | void,
 }
 
-export interface Headers {
+export type Headers = {
   [key: string]: string,
 }
 
-export interface RequestOptions {
+export type RequestOptions = {
   method?: string,
   path: string,
   query?: Query,
@@ -32,7 +32,7 @@ export interface RequestOptions {
   baseURL?: string,
 }
 
-export interface RequestResponse {
+export type RequestResponse = {
   headers?: Object,
   url: string,
   data: Object,

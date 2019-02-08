@@ -1,7 +1,7 @@
 import {version} from '../package.json'
 import {Settings} from './types'
 
-export interface DefaultSettings {
+export type DefaultSettings = {
   baseURL: string,
   baseCDN: string,
 }

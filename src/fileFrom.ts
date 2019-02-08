@@ -4,7 +4,7 @@ import prettyFileInfo from './prettyFileInfo'
 import {FileData, UFile, Settings} from './types'
 import {BaseProgress} from './api/base'
 
-export interface FilePromiseProgress {
+export type FilePromiseProgress = {
   state: string,
   upload: null | BaseProgress,
   value: number,
