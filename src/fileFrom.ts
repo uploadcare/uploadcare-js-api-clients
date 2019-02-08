@@ -70,7 +70,6 @@ export class FilePromise {
           this.onReady({...this.file})
         }
 
-        // $FlowFixMe
         return {...this.file}
       })
     this.progress = {
