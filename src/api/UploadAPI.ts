@@ -6,6 +6,8 @@ import {RequestOptions, RequestResponse} from './request'
 import {FileData, Settings} from '../types'
 import info from './info'
 import {InfoResponse} from './info'
+import fromUrl, {FromUrlResponse} from './fromUrl'
+import fromUrlStatus, {FromUrlStatusResponse} from './fromUrlStatus'
 
 export default class UploadAPI {
   client: UploadClient
@@ -27,6 +29,20 @@ export default class UploadAPI {
 
   info(id: string, settings: Settings = {}): Promise<InfoResponse> {
     return info(id, {
+      ...this.client.settings,
+      ...settings,
+    })
+  }
+
+  fromUrl(sourceUrl: string, settings: Settings = {}): Promise<FromUrlResponse> {
+    return fromUrl(sourceUrl,  {
+      ...this.client.settings,
+      ...settings,
+    })
+  }
+
+  fromUrlStatus(token: string, settings: Settings = {}): Promise<FromUrlStatusResponse> {
+    return fromUrlStatus(token,  {
       ...this.client.settings,
       ...settings,
     })
