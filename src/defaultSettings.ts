@@ -1,14 +1,8 @@
 import {version} from '../package.json'
 import {Settings} from './types'
 
-export type DefaultSettings = {
-  baseURL: string,
-  baseCDN: string,
-}
-
 /*
 Settings for future support:
-
   baseCDN: 'https://ucarecdn.com',
   multipartMinSize: 25 * 1024 * 1024,
   multipartPartSize: 5 * 1024 * 1024,
@@ -18,9 +12,9 @@ Settings for future support:
   parallelDirectUploads: 10,
   pusherKey: '79ae88bd931ea68464d9',
  */
-const defaultSettings: DefaultSettings = {
-  baseURL: 'https://upload.uploadcare.com',
+const defaultSettings: Settings = {
   baseCDN: 'https://ucarecdn.com',
+  baseURL: 'https://upload.uploadcare.com',
 }
 
 export default defaultSettings

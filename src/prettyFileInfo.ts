@@ -1,15 +1,16 @@
 import defaultSettings from './defaultSettings'
 import camelizeKeys from './tools/camelizeKeys'
 import {InfoResponse} from './api/info'
-import {UFile} from './types'
+import {Settings, UFile} from './types'
 
 /**
  * Transforms file info getting from Upload API to pretty info
  *
  * @param {InfoResponse} info
+ * @param {Settings} settings
  * @returns {UFile}
  */
-export default function prettyFileInfo(info: InfoResponse): UFile {
+export default function prettyFileInfo(info: InfoResponse, settings: Settings = {}): UFile {
   const {
     uuid,
     filename,
@@ -23,9 +24,13 @@ export default function prettyFileInfo(info: InfoResponse): UFile {
     s3Bucket,
   } = camelizeKeys(info)
 
+  const extendedSettings = {
+    ...defaultSettings,
+    ...settings,
+  }
   const urlBase = s3Bucket
     ? `https://${s3Bucket}.s3.amazonaws.com/${fileId}/${filename}`
-    : `${defaultSettings.baseCDN}/${fileId}/`
+    : `${extendedSettings.baseCDN}/${fileId}/`
   const cdnUrlModifiers = defaultEffects ? '-/' + defaultEffects : null
   const cdnUrl = fileId ? urlBase + (cdnUrlModifiers || '') : null
   const originalUrl = fileId ? urlBase : null

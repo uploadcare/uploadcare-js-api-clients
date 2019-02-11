@@ -1,4 +1,5 @@
 export type Settings = {
+  baseCDN?: string,
   baseURL?: string,
   publicKey?: string | null,
   doNotStore?: boolean,
