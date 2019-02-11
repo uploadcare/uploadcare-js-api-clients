@@ -11,7 +11,7 @@
     "test": "npm-run-all lint test:node test:browser",
     "test:node": "BABEL_ENV=test:node jasmine --config=jasmine.config.json",
     "test:browser": "BABEL_ENV=test:browser karma start karma.config.js --single-run --nocache",
-    "test:browser:debug": "BABEL_ENV=test:browser karma start karma.config.js --browsers=Chrome --single-run=false --watch --debug  --nocache",
+    "test:browser:debug": "BABEL_ENV=test:browser karma start karma.config.js --browsers=Chrome --single-run=false --watch --debug --nocache",
     "prebuild": "npm run clean",
     "build": "NODE_ENV=production rollup -c rollup.config.js",
     "prerelease": "npm run test",
@@ -75,6 +75,7 @@
     "rollup-plugin-size-snapshot": "^0.7.0",
     "rollup-plugin-terser": "^3.0.0",
     "rollup-plugin-typescript2": "^0.19.2",
+    "ts-node": "^8.0.2",
     "typescript": "^3.2.4"
   },
   "dependencies": {
