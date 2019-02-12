@@ -12,34 +12,35 @@ module.exports = function(config) {
   config.set({
     browserNoActivityTimeout: 60000,
     browsers: ['ChromeHeadless'],
-    frameworks: ['jasmine'],
+    reporters: ['progress', 'karma-typescript'],
+    frameworks: ['jasmine', 'karma-typescript'],
 
     files: [
       {
-        pattern: 'test/**/*.spec.js',
+        pattern: 'src/**/*.ts',
+        watched: false,
+      },
+      {
+        pattern: 'test/**/*.ts',
         watched: false,
       },
     ],
 
     plugins: [
-      'karma-rollup-preprocessor',
+      'karma-typescript',
       'karma-chrome-launcher',
       'karma-jasmine',
     ],
 
-    preprocessors: {'test/**/*.spec.js': ['rollup']},
-    rollupPreprocessor: {
-      plugins: [
-        replace({'process.env.NODE_ENV': process.env.NODE_ENV}),
-        json(),
-        resolve({browser: true}),
-        commonjs({include: 'node_modules/**'}),
-        typescript(),
-      ],
-      output: {
-        format: 'iife',
-        name: 'uploadcare',
-        sourcemap: false,
+    preprocessors: {'**/*.ts': ['karma-typescript']},
+
+    karmaTypescriptConfig: {
+      compilerOptions: {
+        target: 'es5',
+        lib: ['esnext', 'dom'],
+        strict: true,
+        resolveJsonModule: true,
+        noImplicitAny: false,
       },
     },
   })
