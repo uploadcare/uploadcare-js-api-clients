@@ -4,7 +4,7 @@
   "description": "Library for work with Uploadcare Upload API",
   "main": "dist/uploadcare-upload-client.cjs.js",
   "module": "dist/uploadcare-upload-client.esm.js",
-  "types": "dist/uploadcare-upload-client.d.ts",
+  "types": "dist/src/index.d.ts",
   "scripts": {
     "clean": "rimraf dist",
     "lint": "eslint .",

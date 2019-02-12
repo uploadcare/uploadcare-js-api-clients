@@ -1,6 +1,6 @@
 {
   "dist/uploadcare-upload-client.esm.js": {
-    "bundled": 20166,
+    "bundled": 20524,
     "minified": 8229,
     "gzipped": 2746,
     "treeshaked": {
@@ -14,12 +14,12 @@
     }
   },
   "dist/uploadcare-upload-client.cjs.js": {
-    "bundled": 20184,
+    "bundled": 20542,
     "minified": 8235,
     "gzipped": 2750
   },
   "dist/uploadcare-upload-client.js": {
-    "bundled": 62075,
+    "bundled": 63602,
     "minified": 18311,
     "gzipped": 6450
   },
