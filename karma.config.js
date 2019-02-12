@@ -1,11 +1,3 @@
-// const babel = require('rollup-plugin-babel')
-const typescript = require('rollup-plugin-typescript2')
-// const browserStackConf = require('./browserstack.json')
-const resolve = require('rollup-plugin-node-resolve')
-const commonjs = require('rollup-plugin-commonjs')
-const replace = require('rollup-plugin-replace')
-const json = require('rollup-plugin-json')
-
 process.env.CHROME_BIN = require('puppeteer').executablePath()
 
 module.exports = function(config) {
