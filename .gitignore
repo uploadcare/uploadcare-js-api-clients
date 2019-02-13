@@ -4,3 +4,5 @@ browserstack.json
 .idea
 .log
 .vscode
+.rpt2_cache
+coverage

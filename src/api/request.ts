@@ -1,11 +1,10 @@
-/* @flow */
 import axios from 'axios'
-import FormData from 'form-data'
-import defaultSettings, {getUserAgent} from '../default-settings'
+import * as FormData from 'form-data'
+import defaultSettings, {getUserAgent} from '../defaultSettings'
 import RequestError from '../errors/RequestError'
 import CancelError from '../errors/CancelError'
 import UploadcareError from '../errors/UploadcareError'
-import type {FileData, Settings} from '../types'
+import {FileData, Settings} from '../types'
 
 export type Query = {
   [key: string]: string | boolean | number | void,
@@ -33,11 +32,11 @@ export type RequestOptions = {
   baseURL?: string,
 }
 
-export type RequestResponse = {|
+export type RequestResponse = {
   headers?: Object,
   url: string,
   data: Object,
-|}
+}
 
 /* Set max upload body size for node.js to 50M (default is 10M) */
 const MAX_CONTENT_LENGTH = 50 * 1000 * 1000
@@ -94,6 +93,8 @@ export default function request({
     source: body.source || 'local',
   })
 
+  // TODO: Fix ts-ignore
+  // @ts-ignore
   return axios({
     method: method || 'GET',
     baseURL: baseURL || defaultSettings.baseURL,
@@ -133,8 +134,9 @@ export default function request({
         const {status_code: code, content} = axiosResponse.data.error
 
         throw new UploadcareError({
-          // $FlowFixMe
           headers: axiosResponse.config.headers,
+          // TODO: Fix ts-ignore
+          // @ts-ignore
           url: axiosResponse.config.url,
         }, {
           status: code,
@@ -174,7 +176,8 @@ export function buildFormData(body: Body): FormData {
       value.forEach(val => formData.append(key + '[]', val))
     }
     else if (key === 'file') {
-      // $FlowFixMe
+      // TODO: Fix ts-ignore
+      // @ts-ignore
       const fileName = body.file.name || DEFAULT_FILE_NAME
 
       formData.append('file', value, fileName)

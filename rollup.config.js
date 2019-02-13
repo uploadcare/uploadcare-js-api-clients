@@ -1,5 +1,5 @@
 import license from 'rollup-plugin-license'
-import babel from 'rollup-plugin-babel'
+import typescript from 'rollup-plugin-typescript2'
 import resolve from 'rollup-plugin-node-resolve'
 import commonjs from 'rollup-plugin-commonjs'
 import replace from 'rollup-plugin-replace'
@@ -12,12 +12,12 @@ const getPlugins = (format, minify = false) =>
     replace({'process.env.NODE_ENV': process.env.NODE_ENV}),
     json(),
     resolve({browser: format === 'umd'}),
-    (format === 'umd') &&
+    format === 'umd' &&
       commonjs({
         include: 'node_modules/**',
         sourceMap: false,
       }),
-    babel(),
+    typescript(),
     minify && terser({sourcemap: false}),
     license({
       banner: `
@@ -30,53 +30,24 @@ const getPlugins = (format, minify = false) =>
     sizeSnapshot(),
   ].filter(plugin => !!plugin)
 
-export default [
-  {
-    input: 'src/index.js',
-    plugins: getPlugins('esm'),
-    external: ['axios', 'form-data'],
-    output: [
-      {
-        file: 'dist/uploadcare-upload-client.esm.js',
-        format: 'esm',
-        interop: false,
-      },
-    ],
-  },
-  {
-    input: 'src/index.js',
-    plugins: getPlugins('cjs'),
-    external: ['axios', 'form-data'],
-    output: [
-      {
-        file: 'dist/uploadcare-upload-client.cjs.js',
-        format: 'cjs',
-        interop: false,
-      },
-    ],
-  },
-  {
-    input: 'src/index.js',
-    plugins: getPlugins('umd'),
-    output: [
-      {
-        file: 'dist/uploadcare-upload-client.js',
-        format: 'umd',
-        name: 'uploadcareAPI',
-        interop: false,
-      },
-    ],
-  },
-  {
-    input: 'src/index.js',
-    plugins: getPlugins('umd', true),
-    output: [
-      {
-        file: 'dist/uploadcare-upload-client.min.js',
-        format: 'umd',
-        name: 'uploadcareAPI',
-        interop: false,
-      },
-    ],
-  },
-]
+const chosePostfix = (format, minify = false) => {
+  if (minify) return '.min'
+  if (format === 'umd') return ''
+  else return `.${format}`
+}
+
+const getConfig = (format, minify = false) => ({
+  input: 'src/index.ts',
+  plugins: getPlugins(format, minify),
+  external: format === 'umd' ? [] : ['axios', 'form-data'],
+  output: [
+    {
+      file: `dist/uploadcare-upload-client${chosePostfix(format, minify)}.js`,
+      format,
+      name: 'uploadcareAPI',
+      interop: false,
+    },
+  ],
+})
+
+export default [getConfig('esm'), getConfig('cjs'), getConfig('umd'), getConfig('umd', true)]

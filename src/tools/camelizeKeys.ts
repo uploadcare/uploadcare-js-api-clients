@@ -1,4 +1,3 @@
-/* @flow */
 const SEPARATOR = /\W|_/g
 
 /**
@@ -9,7 +8,6 @@ const SEPARATOR = /\W|_/g
  */
 export function camelize(text: string): string {
   return (text.split(SEPARATOR))
-    // $FlowFixMe
     .map((word, index) => word.charAt(0)[index > 0 ? 'toUpperCase' : 'toLowerCase']() + word.slice(1))
     .join('')
 }

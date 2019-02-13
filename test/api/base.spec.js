@@ -1,6 +1,7 @@
+import jasmine from 'jasmine'
 import base from '../../src/api/base'
 import * as factory from '../_fixtureFactory'
-import {getUserAgent} from '../../src/default-settings'
+import {getUserAgent} from '../../src/defaultSettings'
 
 describe('API - base', () => {
   const fileToUpload = factory.image('blackSquare')

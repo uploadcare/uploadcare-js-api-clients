@@ -1,40 +1,38 @@
-const babel = require('rollup-plugin-babel')
-// const browserStackConf = require('./browserstack.json')
-const resolve = require('rollup-plugin-node-resolve')
-const commonjs = require('rollup-plugin-commonjs')
-const replace = require('rollup-plugin-replace')
-const json = require('rollup-plugin-json')
-
 process.env.CHROME_BIN = require('puppeteer').executablePath()
 
 module.exports = function(config) {
   config.set({
     browserNoActivityTimeout: 60000,
     browsers: ['ChromeHeadless'],
-    frameworks: ['jasmine'],
+    reporters: ['progress', 'karma-typescript'],
+    frameworks: ['jasmine', 'karma-typescript'],
 
     files: [
       {
-        pattern: 'test/**/*.spec.js',
+        pattern: 'src/**/*.ts',
+        watched: false,
+      },
+      {
+        pattern: 'test/**/*.ts',
         watched: false,
       },
     ],
 
-    plugins: ['karma-chrome-launcher', 'karma-jasmine', 'karma-rollup-preprocessor'],
+    plugins: [
+      'karma-typescript',
+      'karma-chrome-launcher',
+      'karma-jasmine',
+    ],
 
-    preprocessors: {'test/**/*.spec.js': ['rollup']},
-    rollupPreprocessor: {
-      plugins: [
-        replace({'process.env.NODE_ENV': process.env.NODE_ENV}),
-        json(),
-        resolve({browser: true}),
-        commonjs({include: 'node_modules/**'}),
-        babel(),
-      ],
-      output: {
-        format: 'iife',
-        name: 'uploadcare',
-        sourcemap: false,
+    preprocessors: {'**/*.ts': ['karma-typescript']},
+
+    karmaTypescriptConfig: {
+      compilerOptions: {
+        target: 'es5',
+        lib: ['esnext', 'dom'],
+        strict: true,
+        resolveJsonModule: true,
+        noImplicitAny: false,
       },
     },
   })
