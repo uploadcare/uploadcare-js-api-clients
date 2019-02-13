@@ -1,8 +1,7 @@
 {
-  "parser": "babel-eslint",
   "extends": ["uploadcare"],
   "parserOptions": {
-    "ecmaVersion": 6,
+    "ecmaVersion": 2018,
     "sourceType": "module"
   },
   "env": {"node": true},
@@ -18,7 +17,7 @@
   },
   "overrides": [
     {
-      "files": "*.spec.js",
+      "files": ["*.spec.js", "*.spec.ts"],
       "env": {"node": true, "es6": true, "browser": true, "mocha": true, "jasmine": true, "jest": true}
     }
   ]

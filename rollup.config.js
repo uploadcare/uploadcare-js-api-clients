@@ -1,5 +1,4 @@
 import license from 'rollup-plugin-license'
-import babel from 'rollup-plugin-babel'
 import typescript from 'rollup-plugin-typescript2'
 import resolve from 'rollup-plugin-node-resolve'
 import commonjs from 'rollup-plugin-commonjs'
@@ -19,7 +18,6 @@ const getPlugins = (format, minify = false) =>
         sourceMap: false,
       }),
     typescript(),
-    babel(),
     minify && terser({sourcemap: false}),
     license({
       banner: `
