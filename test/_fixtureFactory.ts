@@ -84,7 +84,7 @@ function fileBlob(bytes: number): FixtureFile {
   }
 }
 
-export function uuid(id: string): string{
+export function uuid(id: string): string {
   const {uuid} = uuids[id]
 
   return uuid
