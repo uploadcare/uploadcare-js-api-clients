@@ -10,6 +10,7 @@ describe('API - from url', () => {
     }, settings)
 
     expect(data.type).toBeTruthy()
+    expect(data.token).toBeTruthy()
   })
 
   it('should be rejected with bad options', (done) => {

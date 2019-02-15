@@ -13,35 +13,11 @@ export type FromUrlTokenResponse = {
   token: UUID
 }
 
-export type FromUrlInfoResponse = {
-  status?: string,
-  type: string,
-  size: number,
-  total: number,
-  done: number,
-  uuid: UUID,
-  file_id: UUID,
-  filename: string,
-  original_filename: string,
-  is_image: boolean,
-  is_stored: boolean,
-  image_info: {
-    height: number,
-    width: number,
-    geo_location: null,
-    datetime_original: null,
-    format: string
-  },
-  video_info: {},
-  is_ready: boolean,
-  mime_type: string
-}
-
-export type FromUrlResponse = FromUrlTokenResponse | FromUrlInfoResponse
+export type FromUrlResponse = FromUrlTokenResponse
 
 /**
  * Uploading files from URL.
- * @param {FromUrlRequest} fromUrlRequest – Source file URL, which should be a public HTTP or HTTPS link.
+ * @param {FromUrlRequest} data – Source file URL, which should be a public HTTP or HTTPS link.
  * @param {Settings} settings
  * @return {Promise<FromUrlResponse>}
  */
