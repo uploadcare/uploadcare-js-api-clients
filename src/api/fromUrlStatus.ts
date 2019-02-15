@@ -1,15 +1,13 @@
 import request, {prepareOptions} from './request'
 import {RequestOptions} from './request'
 import {Settings} from '../types'
-import {InfoResponse} from './info'
+import {FileInfo, ProgressStatus} from './types'
 
-export type FromUrlStatusProgressResponse = {
-  status: string,
-  done: number,
-  total: number,
-}
+type ProgressResponse = ProgressStatus
 
-export type FromUrlStatusResponse = FromUrlStatusProgressResponse | InfoResponse
+type InfoResponse = FileInfo
+
+export type FromUrlStatusResponse = ProgressResponse | InfoResponse
 
 /**
  * Checking upload status and working with file tokens.

@@ -6,6 +6,7 @@ describe('API - from url status', () => {
     const token = factory.token('valid')
     const data = await fromUrlStatus(token)
 
+    // @ts-ignore
     expect(data.status).toBeTruthy()
     expect(data.done).toBeTruthy()
   })

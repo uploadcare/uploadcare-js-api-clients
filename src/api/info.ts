@@ -1,41 +1,9 @@
 import request, {prepareOptions} from './request'
+import {FileInfo} from './types'
 import {Settings} from '../types'
 import {RequestOptions} from './request'
 
-type GeoLocation = {
-  latitude: number,
-  longitude: number,
-}
-
-type ImageInfo = {
-  height: number,
-  width: number,
-  geo_location: null | GeoLocation,
-  orientation: null | number,
-  dpi: null | Array<number>,
-  color_mode: string,
-  sequence?: boolean,
-}
-
-type VideoInfo = {}
-
-export type InfoResponse = {
-  status?: string,
-  size: number,
-  total: number,
-  done: number,
-  uuid: string,
-  file_id: string,
-  original_filename: string,
-  filename: string,
-  mime_type: string,
-  is_image: boolean,
-  is_stored: boolean,
-  is_ready: boolean,
-  image_info: null | ImageInfo,
-  video_info: null | VideoInfo,
-  s3_bucket?: string
-}
+export type InfoResponse = FileInfo
 
 /**
  * Returns a JSON dictionary holding file info

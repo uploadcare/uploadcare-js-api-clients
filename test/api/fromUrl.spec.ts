@@ -5,21 +5,33 @@ describe('API - from url', () => {
   it('should return token for file', async() => {
     const sourceUrl = factory.imageUrl('valid')
     const settings = {publicKey: factory.publicKey('demo')}
-    const data = await fromUrl({
-      sourceUrl,
-    }, settings)
+    const data = await fromUrl({sourceUrl}, settings)
 
-    expect(data.type).toBeTruthy()
+    // @ts-ignore
+    expect(data.type).toEqual('token')
+
+    // @ts-ignore
     expect(data.token).toBeTruthy()
+  })
+
+  it('should return file info', async() => {
+    const sourceUrl = factory.imageUrl('valid')
+    const urlData = {
+      sourceUrl,
+      checkForUrlDuplicates: true,
+    }
+    const settings = {publicKey: factory.publicKey('demo')}
+    const data = await fromUrl(urlData, settings)
+
+    // @ts-ignore
+    expect(data.type).toEqual('file_info')
   })
 
   it('should be rejected with bad options', (done) => {
     const sourceUrl = factory.imageUrl('valid')
     const settings = {publicKey: factory.publicKey('invalid')}
 
-    fromUrl({
-      sourceUrl
-    }, settings)
+    fromUrl({sourceUrl}, settings)
       .then(() => done.fail())
       .catch(error => {
         (error.name === 'UploadcareError')
@@ -32,9 +44,7 @@ describe('API - from url', () => {
     const sourceUrl = factory.imageUrl('doesNotExist')
     const settings = {publicKey: factory.publicKey('demo')}
 
-    fromUrl({
-      sourceUrl
-    }, settings)
+    fromUrl({sourceUrl}, settings)
       .then(() => done.fail())
       .catch(error => {
         (error.name === 'UploadcareError')
@@ -47,9 +57,7 @@ describe('API - from url', () => {
     const sourceUrl = factory.imageUrl('privateIP')
     const settings = {publicKey: factory.publicKey('demo')}
 
-    fromUrl({
-      sourceUrl
-    }, settings)
+    fromUrl({sourceUrl}, settings)
       .then(() => done.fail())
       .catch(error => {
         (error.name === 'UploadcareError')

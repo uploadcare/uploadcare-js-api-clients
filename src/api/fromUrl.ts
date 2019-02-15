@@ -1,6 +1,7 @@
 import request, {prepareOptions} from './request'
 import {Settings} from '../types'
 import {RequestOptions} from './request'
+import {FileInfo} from './types'
 
 export type UrlData = {
   sourceUrl: string,
@@ -8,12 +9,14 @@ export type UrlData = {
   saveUrlForRecurrentUploads?: boolean
 }
 
-export type FromUrlTokenResponse = {
+type TokenResponse = {
   type: string,
   token: string,
 }
 
-export type FromUrlResponse = FromUrlTokenResponse
+type InfoResponse = FileInfo
+
+export type FromUrlResponse = TokenResponse | InfoResponse
 
 /**
  * Uploading files from URL.
