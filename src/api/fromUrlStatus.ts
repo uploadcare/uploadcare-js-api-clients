@@ -1,7 +1,7 @@
 import request, {prepareOptions} from './request'
 import {RequestOptions} from './request'
 import {Settings} from '../types'
-import {FromUrlInfoResponse} from './fromUrl'
+import {InfoResponse} from './info'
 
 export type FromUrlStatusProgressResponse = {
   status: string,
@@ -9,18 +9,14 @@ export type FromUrlStatusProgressResponse = {
   total: number,
 }
 
-export type FromUrlStatusErrorResponse = {
-  status: string,
-  error: string,
-}
-
-export type FromUrlStatusResponse = FromUrlStatusProgressResponse | FromUrlStatusErrorResponse | FromUrlInfoResponse
+export type FromUrlStatusResponse = FromUrlStatusProgressResponse | InfoResponse
 
 /**
  * Checking upload status and working with file tokens.
  *
  * @param {string} token – Source file URL, which should be a public HTTP or HTTPS link.
  * @param {Settings} settings
+ * @throws {UploadcareError}
  * @return {Promise<FromUrlStatusResponse>}
  */
 export default function fromUrlStatus(token: string, settings: Settings = {}): Promise<FromUrlStatusResponse> {

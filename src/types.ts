@@ -11,11 +11,9 @@ export type Settings = {
 
 export type FileData = Blob | File | Buffer
 
-export type UUID = string
-
 /* TODO Add sourceInfo */
 export type UFile = {
-  uuid: UUID,
+  uuid: string,
   name: null | string,
   size: null | number,
   isStored: null | boolean,

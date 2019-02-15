@@ -3,10 +3,10 @@ import base from './base'
 import {DirectUpload} from './base'
 import UploadClient from '../UploadClient'
 import {RequestOptions, RequestResponse} from './request'
-import {FileData, Settings, UUID} from '../types'
+import {FileData, Settings} from '../types'
 import info from './info'
 import {InfoResponse} from './info'
-import fromUrl, {FromUrlRequest, FromUrlResponse} from './fromUrl'
+import fromUrl, {UrlData, FromUrlResponse} from './fromUrl'
 import fromUrlStatus, {FromUrlStatusResponse} from './fromUrlStatus'
 
 export default class UploadAPI {
@@ -27,21 +27,21 @@ export default class UploadAPI {
     })
   }
 
-  info(uuid: UUID, settings: Settings = {}): Promise<InfoResponse> {
+  info(uuid: string, settings: Settings = {}): Promise<InfoResponse> {
     return info(uuid, {
       ...this.client.settings,
       ...settings,
     })
   }
 
-  fromUrl({sourceUrl, checkForUrlDuplicates, saveUrlForRecurrentUploads}: FromUrlRequest, settings: Settings = {}): Promise<FromUrlResponse> {
-    return fromUrl({sourceUrl, checkForUrlDuplicates, saveUrlForRecurrentUploads}, {
+  fromUrl(urlData: UrlData, settings: Settings = {}): Promise<FromUrlResponse> {
+    return fromUrl(urlData, {
       ...this.client.settings,
       ...settings,
     })
   }
 
-  fromUrlStatus(token: UUID, settings: Settings = {}): Promise<FromUrlStatusResponse> {
+  fromUrlStatus(token: string, settings: Settings = {}): Promise<FromUrlStatusResponse> {
     return fromUrlStatus(token,  {
       ...this.client.settings,
       ...settings,

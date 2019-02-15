@@ -7,6 +7,7 @@ describe('API - from url status', () => {
     const data = await fromUrlStatus(token)
 
     expect(data.status).toBeTruthy()
+    expect(data.done).toBeTruthy()
   })
 
   it('should be rejected with empty token', (done) => {

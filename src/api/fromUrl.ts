@@ -1,8 +1,8 @@
 import request, {prepareOptions} from './request'
-import {Settings, UUID} from '../types'
+import {Settings} from '../types'
 import {RequestOptions} from './request'
 
-export type FromUrlRequest = {
+export type UrlData = {
   sourceUrl: string,
   checkForUrlDuplicates?: boolean,
   saveUrlForRecurrentUploads?: boolean
@@ -10,20 +10,20 @@ export type FromUrlRequest = {
 
 export type FromUrlTokenResponse = {
   type: string,
-  token: UUID
+  token: string,
 }
 
 export type FromUrlResponse = FromUrlTokenResponse
 
 /**
  * Uploading files from URL.
- * @param {FromUrlRequest} data – Source file URL, which should be a public HTTP or HTTPS link.
+ *
+ * @param {UrlData} urlData – Source file URL, which should be a public HTTP or HTTPS link.
  * @param {Settings} settings
  * @return {Promise<FromUrlResponse>}
  */
 export default function fromUrl(
-  {sourceUrl, checkForUrlDuplicates, saveUrlForRecurrentUploads}: FromUrlRequest,
-  settings: Settings = {}
+  {sourceUrl, checkForUrlDuplicates, saveUrlForRecurrentUploads}: UrlData, settings: Settings = {}
 ): Promise<FromUrlResponse> {
   const options: RequestOptions = prepareOptions({
     path: '/from_url/',

@@ -6,7 +6,7 @@ describe('API - from url', () => {
     const sourceUrl = factory.imageUrl('valid')
     const settings = {publicKey: factory.publicKey('demo')}
     const data = await fromUrl({
-      sourceUrl: sourceUrl
+      sourceUrl,
     }, settings)
 
     expect(data.type).toBeTruthy()
@@ -15,7 +15,7 @@ describe('API - from url', () => {
 
   it('should be rejected with bad options', (done) => {
     const sourceUrl = factory.imageUrl('valid')
-    const settings = {publicKey: ''}
+    const settings = {publicKey: factory.publicKey('invalid')}
 
     fromUrl({
       sourceUrl
