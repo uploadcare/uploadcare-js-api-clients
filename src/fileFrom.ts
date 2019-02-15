@@ -52,7 +52,7 @@ export class FilePromise {
         }
 
         return checkFileIsReady(uuid, (info) => {
-          this.file = prettyFileInfo(info)
+          this.file = prettyFileInfo(info, settings)
         }, 100, settings)
       })
       .then(() => {
