@@ -2,6 +2,7 @@ export type Settings = {
   baseCDN?: string,
   baseURL?: string,
   publicKey?: string | null,
+  fileName?: string,
   doNotStore?: boolean,
   secureSignature?: string,
   secureExpire?: string,
@@ -10,9 +11,11 @@ export type Settings = {
 
 export type FileData = Blob | File | Buffer
 
+export type UUID = string
+
 /* TODO Add sourceInfo */
 export type UFile = {
-  uuid: string,
+  uuid: UUID,
   name: null | string,
   size: null | number,
   isStored: null | boolean,

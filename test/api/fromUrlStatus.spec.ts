@@ -3,23 +3,16 @@ import * as factory from '../_fixtureFactory'
 
 describe('API - from url status', () => {
   it('should return info about file uploaded from url', async() => {
-    const data = await fromUrlStatus(factory.token('valid'))
+    const token = factory.token('valid')
+    const data = await fromUrlStatus(token)
 
-    expect(data.uuid).toBeTruthy()
-  })
-
-  it('should be rejected with bad options', (done) => {
-    fromUrlStatus(factory.token('valid'), {publicKey: ''})
-      .then(() => done.fail())
-      .catch(error => {
-        (error.name === 'UploadcareError')
-          ? done()
-          : done.fail(error)
-      })
+    expect(data.status).toBeTruthy()
   })
 
   it('should be rejected with empty token', (done) => {
-    fromUrlStatus(factory.token('empty'))
+    const token = factory.token('empty')
+
+    fromUrlStatus(token)
       .then(() => done.fail())
       .catch(error => {
         (error.name === 'UploadcareError')

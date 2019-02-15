@@ -7,13 +7,19 @@ const images: {[key: string]: string} = {
 }
 /* eslint-enable max-len */
 
-const uuids: {[key: string]: {publicKey: string, uuid?: string}} = {
+const uuids: {[key: string]: {publicKey: string, uuid: string}} = {
   image: {
     publicKey: '8fa271321efd536ee1aa',
     uuid: '89827330-e200-41bc-9fba-7d51c8e9ea15',
   },
-  demo: {publicKey: 'demopublickey'},
-  invalid: {publicKey: 'invalidpublickey'},
+  demo: {
+    publicKey: 'demopublickey',
+    uuid: '',
+  },
+  invalid: {
+    publicKey: 'invalidpublickey',
+    uuid: '',
+  },
 }
 
 export type FixtureFile = {
@@ -78,7 +84,7 @@ function fileBlob(bytes: number): FixtureFile {
   }
 }
 
-export function uuid(id: string): string | typeof undefined {
+export function uuid(id: string): string{
   const {uuid} = uuids[id]
 
   return uuid

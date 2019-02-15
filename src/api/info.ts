@@ -1,12 +1,12 @@
 import request, {prepareOptions} from './request'
-import {Settings} from '../types'
+import {Settings, UUID} from '../types'
 import {RequestOptions} from './request'
 
 export type InfoResponse = {
   size: number,
   total: number,
   done: number,
-  uuid: string,
+  uuid: UUID,
   file_id: string,
   original_filename: string,
   filename: string,
@@ -33,11 +33,11 @@ export type InfoResponse = {
 /**
  * Returns a JSON dictionary holding file info
  *
- * @param {string} uuid – UUID of a target file to request its info.
+ * @param {UUID} uuid – UUID of a target file to request its info.
  * @param {Settings} settings
  * @return {Promise<InfoResponse>}
  */
-export default function info(uuid: string, settings: Settings = {}): Promise<InfoResponse> {
+export default function info(uuid: UUID, settings: Settings = {}): Promise<InfoResponse> {
   const options: RequestOptions = prepareOptions({
     path: '/info/',
     query: {
