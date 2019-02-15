@@ -1,13 +1,13 @@
 import request, {prepareOptions} from './request'
 import {RequestOptions} from './request'
 import {Settings} from '../types'
-import {FileInfo, ProgressStatus} from './types'
+import {FileInfo, ProgressStatus, ResponseInterface} from './types'
 
 type ProgressResponse = ProgressStatus
 
 type InfoResponse = FileInfo
 
-export type FromUrlStatusResponse = ProgressResponse | InfoResponse
+export type FromUrlStatusResponse = ProgressResponse | InfoResponse | ResponseInterface
 
 /**
  * Checking upload status and working with file tokens.
@@ -23,8 +23,6 @@ export default function fromUrlStatus(token: string, settings: Settings = {}): P
     query: {token: token},
   }, settings)
 
-  // TODO: Fix ts-ignore
-  // @ts-ignore
   return request(options)
     .then(response => response.data)
 }

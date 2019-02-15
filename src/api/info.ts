@@ -1,9 +1,9 @@
 import request, {prepareOptions} from './request'
-import {FileInfo} from './types'
+import {FileInfo, ResponseInterface} from './types'
 import {Settings} from '../types'
 import {RequestOptions} from './request'
 
-export type InfoResponse = FileInfo
+export type InfoResponse = FileInfo | ResponseInterface
 
 /**
  * Returns a JSON dictionary holding file info
@@ -21,8 +21,6 @@ export default function info(uuid: string, settings: Settings = {}): Promise<Inf
     },
   }, settings)
 
-  // TODO: Fix ts-ignore
-  // @ts-ignore
   return request(options)
     .then(response => response.data)
 }

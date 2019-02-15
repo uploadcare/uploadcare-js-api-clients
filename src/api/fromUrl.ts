@@ -1,7 +1,7 @@
 import request, {prepareOptions} from './request'
 import {Settings} from '../types'
 import {RequestOptions} from './request'
-import {FileInfo} from './types'
+import {FileInfo, ResponseInterface} from './types'
 
 export type UrlData = {
   sourceUrl: string,
@@ -16,7 +16,7 @@ type TokenResponse = {
 
 type InfoResponse = FileInfo
 
-export type FromUrlResponse = TokenResponse | InfoResponse
+export type FromUrlResponse = TokenResponse | InfoResponse | ResponseInterface
 
 /**
  * Uploading files from URL.
@@ -42,8 +42,6 @@ export default function fromUrl(
     },
   }, settings)
 
-  // TODO: Fix ts-ignore
-  // @ts-ignore
   return request(options)
     .then(response => response.data)
 }
