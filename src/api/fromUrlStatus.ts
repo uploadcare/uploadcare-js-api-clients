@@ -5,7 +5,9 @@ import {FileInfo, ProgressStatus, ResponseInterface} from './types'
 
 type ProgressResponse = ProgressStatus
 
-type InfoResponse = FileInfo
+type InfoResponse = FileInfo & {
+  status: string,
+}
 
 export type FromUrlStatusResponse = ProgressResponse | InfoResponse | ResponseInterface
 

@@ -7,11 +7,11 @@ describe('API - from url', () => {
     const settings = {publicKey: factory.publicKey('demo')}
     const data = await fromUrl({sourceUrl}, settings)
 
-    // @ts-ignore
     expect(data.type).toEqual('token')
 
-    // @ts-ignore
-    expect(data.token).toBeTruthy()
+    if (data.type === 'token') {
+      expect(data.token).toBeTruthy()
+    }
   })
 
   it('should return file info', async() => {
@@ -23,7 +23,6 @@ describe('API - from url', () => {
     const settings = {publicKey: factory.publicKey('demo')}
     const data = await fromUrl(urlData, settings)
 
-    // @ts-ignore
     expect(data.type).toEqual('file_info')
   })
 

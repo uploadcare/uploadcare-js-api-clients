@@ -14,7 +14,9 @@ type TokenResponse = {
   token: string,
 }
 
-type InfoResponse = FileInfo
+type InfoResponse = FileInfo & {
+  type: string,
+}
 
 export type FromUrlResponse = TokenResponse | InfoResponse | ResponseInterface
 
@@ -29,6 +31,7 @@ export default function fromUrl(
   {sourceUrl, checkForUrlDuplicates, saveUrlForRecurrentUploads}: UrlData, settings: Settings = {}
 ): Promise<FromUrlResponse> {
   const options: RequestOptions = prepareOptions({
+    method: 'POST',
     path: '/from_url/',
     query: {
       pub_key: settings.publicKey || '',
