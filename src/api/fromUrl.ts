@@ -36,7 +36,7 @@ export default function fromUrl(
     query: {
       pub_key: settings.publicKey || '',
       source_url: sourceUrl,
-      store: settings.doNotStore ? settings.doNotStore : true,
+      store: settings.doNotStore ? '' : 'auto',
       filename: settings.fileName || '',
       check_URL_duplicates: checkForUrlDuplicates ? 1 : 0,
       save_URL_duplicates: saveUrlForRecurrentUploads ? 1 : 0,
