@@ -5,7 +5,6 @@ import RequestError from '../errors/RequestError'
 import CancelError from '../errors/CancelError'
 import UploadcareError from '../errors/UploadcareError'
 import {FileData, Settings} from '../types'
-import {ResponseInterface} from './types'
 
 export type Query = {
   [key: string]: string | boolean | number | void,
@@ -33,10 +32,10 @@ export type RequestOptions = {
   baseURL?: string,
 }
 
-export type RequestResponse = {
-  headers?: Object,
+export interface RequestResponse {
+  headers?: object,
   url: string,
-  data: ResponseInterface,
+  data: any,
 }
 
 /* Set max upload body size for node.js to 50M (default is 10M) */

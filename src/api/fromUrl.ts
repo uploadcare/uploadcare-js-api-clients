@@ -1,7 +1,7 @@
 import request, {prepareOptions} from './request'
 import {Settings} from '../types'
 import {RequestOptions} from './request'
-import {FileInfo, ResponseInterface} from './types'
+import {FileInfo} from './types'
 
 export type UrlData = {
   sourceUrl: string,
@@ -9,16 +9,21 @@ export type UrlData = {
   saveUrlForRecurrentUploads?: boolean
 }
 
+export enum TypeEnum {
+  Token = 'token',
+  FileInfo = 'file_info'
+}
+
 type TokenResponse = {
-  type: string,
+  type: TypeEnum.Token,
   token: string,
 }
 
-type InfoResponse = FileInfo & {
-  type: string,
-}
+type InfoResponse = {
+  type: TypeEnum.FileInfo,
+} & FileInfo
 
-export type FromUrlResponse = TokenResponse | InfoResponse | ResponseInterface
+export type FromUrlResponse = InfoResponse | TokenResponse
 
 /**
  * Uploading files from URL.

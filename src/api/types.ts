@@ -1,5 +1,3 @@
-export interface ResponseInterface {}
-
 interface StatusInterface {
   status: string,
 }

@@ -1,9 +1,9 @@
 import request, {prepareOptions} from './request'
-import {FileInfo, ResponseInterface} from './types'
+import {FileInfo} from './types'
 import {Settings} from '../types'
 import {RequestOptions} from './request'
 
-export type InfoResponse = FileInfo | ResponseInterface
+export type InfoResponse = FileInfo
 
 /**
  * Returns a JSON dictionary holding file info
