@@ -1,4 +1,4 @@
-import fromUrlStatus from '../../src/api/fromUrlStatus'
+import fromUrlStatus, {StatusEnum} from '../../src/api/fromUrlStatus'
 import * as factory from '../_fixtureFactory'
 
 describe('API - from url status', () => {
@@ -7,7 +7,13 @@ describe('API - from url status', () => {
     const data = await fromUrlStatus(token)
 
     expect(data.status).toBeTruthy()
-    expect(data.done).toBeTruthy()
+
+    if (data.status === StatusEnum.Progress || data.status === StatusEnum.Success) {
+      expect(data.done).toBeTruthy()
+      expect(data.total).toBeTruthy()
+    } else if (data.status === StatusEnum.Error) {
+      expect(data.error).toBeTruthy()
+    }
   })
 
   it('should be rejected with empty token', (done) => {

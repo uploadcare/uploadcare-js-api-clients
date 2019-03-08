@@ -1,15 +1,29 @@
 import request, {prepareOptions} from './request'
 import {RequestOptions} from './request'
 import {Settings} from '../types'
-import {FileInfo, ProgressStatus, ResponseInterface} from './types'
+import {FileInfo, ProgressStatus} from './types'
 
-type ProgressResponse = ProgressStatus
-
-type InfoResponse = FileInfo & {
-  status: string,
+type ProgressResponse = ProgressStatus & {
+  status: StatusEnum.Progress
 }
 
-export type FromUrlStatusResponse = ProgressResponse | InfoResponse | ResponseInterface
+export enum StatusEnum {
+  Unknown = 'unknown',
+  Progress = 'progress',
+  Error = 'error',
+  Success = 'success'
+}
+
+type InfoResponse = FileInfo & {
+  status: StatusEnum.Success,
+}
+
+type ErrorResponse = {
+  status: StatusEnum.Error,
+  error: string,
+}
+
+export type FromUrlStatusResponse = ProgressResponse | InfoResponse | ErrorResponse
 
 /**
  * Checking upload status and working with file tokens.
