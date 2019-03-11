@@ -1,5 +1,5 @@
 export type ErrorRequestInfo = {
-  headers: Object,
+  headers: object,
   url: string,
 }
 

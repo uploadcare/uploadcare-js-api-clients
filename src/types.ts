@@ -2,6 +2,7 @@ export type Settings = {
   baseCDN?: string,
   baseURL?: string,
   publicKey?: string | null,
+  fileName?: string,
   doNotStore?: boolean,
   secureSignature?: string,
   secureExpire?: string,

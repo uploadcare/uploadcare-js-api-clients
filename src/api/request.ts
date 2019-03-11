@@ -32,10 +32,10 @@ export type RequestOptions = {
   baseURL?: string,
 }
 
-export type RequestResponse = {
-  headers?: Object,
+export interface RequestResponse {
+  headers?: object,
   url: string,
-  data: Object,
+  data: any,
 }
 
 /* Set max upload body size for node.js to 50M (default is 10M) */

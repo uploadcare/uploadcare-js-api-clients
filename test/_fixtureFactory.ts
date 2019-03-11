@@ -7,13 +7,19 @@ const images: {[key: string]: string} = {
 }
 /* eslint-enable max-len */
 
-const uuids: {[key: string]: {publicKey: string, uuid?: string}} = {
+const uuids: {[key: string]: {publicKey: string, uuid: string}} = {
   image: {
-    publicKey: '8fa271321efd536ee1aa',
-    uuid: '89827330-e200-41bc-9fba-7d51c8e9ea15',
+    publicKey: '657ec3b474e01b9045f7',
+    uuid: 'd3275f8b-686d-4980-916a-53a1fc17450b',
   },
-  demo: {publicKey: 'demopublickey'},
-  invalid: {publicKey: 'invalidpublickey'},
+  demo: {
+    publicKey: 'demopublickey',
+    uuid: '',
+  },
+  invalid: {
+    publicKey: 'invalidpublickey',
+    uuid: '',
+  },
 }
 
 export type FixtureFile = {
@@ -78,7 +84,7 @@ function fileBlob(bytes: number): FixtureFile {
   }
 }
 
-export function uuid(id: string): string | typeof undefined {
+export function uuid(id: string): string {
   const {uuid} = uuids[id]
 
   return uuid
@@ -96,7 +102,7 @@ export function linkTo(uuid: string): string {
 
 export function imageUrl(id: string): string {
   const images = {
-    valid: 'https://ucarecdn.com/2e6b7f23-9143-4b71-94e7-338bbf278c01/',
+    valid: 'https://ucarecdn.com/d3275f8b-686d-4980-916a-53a1fc17450b/1findfacecropgrayscale.jpg',
     doesNotExist: 'https://1.com/1.jpg',
     privateIP: 'http://192.168.1.10/1.jpg',
   }
