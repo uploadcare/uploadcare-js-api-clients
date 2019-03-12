@@ -1,4 +1,4 @@
-import request, {createCancelController, prepareOptions} from './request'
+import request, {createCancelController, HandleProgressFunction, prepareOptions} from './request'
 import {RequestOptions} from './request'
 import {Settings, FileData} from '../types'
 
@@ -8,26 +8,23 @@ export type BaseResponse = {
   file: string
 }
 
-export class DirectUpload {
-  _promise: Promise<BaseResponse>
-  onProgress: ((progressEvent: BaseProgress) => void) | null
+export class DirectUpload implements Promise<BaseResponse> {
+  private request: Promise<BaseResponse>
+  onProgress: HandleProgressFunction | null
   onCancel: Function | null
   cancel: Function
 
   constructor(options: RequestOptions) {
     const cancelController = createCancelController()
 
-    this._promise = request({
+    this.request = request({
       ...options,
       /* TODO Add support of progress for Node.js */
-      // TODO: Fix ts-ignore
-      // @ts-ignore
-      onUploadProgress: (progressEvent) => {
+      onUploadProgress: (progressEvent: BaseProgress) => {
         if (typeof this.onProgress === 'function') {
           this.onProgress(progressEvent)
         }
-      },
-      cancelToken: cancelController.token,
+      }
     })
       .then(response => response.data)
       .catch(error => {
@@ -42,22 +39,23 @@ export class DirectUpload {
     this.cancel = cancelController.cancel
   }
 
-  then(onFulfilled?: Function, onRejected?: Function) {
-    // TODO: Fix ts-ignore
-    // @ts-ignore
-    return this._promise.then(onFulfilled, onRejected)
+  readonly [Symbol.toStringTag]: string
+
+  catch<TResult = never>(
+    onRejected?: ((reason: any) => (PromiseLike<TResult> | TResult)) | undefined | null
+  ): Promise<BaseResponse | TResult> {
+    return this.request.catch(onRejected)
   }
 
-  catch(onRejected?: Function) {
-    // TODO: Fix ts-ignore
-    // @ts-ignore
-    return this._promise.catch(onRejected)
+  finally(onFinally?: (() => void) | undefined | null): Promise<BaseResponse> {
+    return this.request.finally(onFinally)
   }
 
-  finally(onFinally: Function) {
-    // TODO: Fix ts-ignore
-    // @ts-ignore
-    return this._promise.finally(onFinally)
+  then<TResult1 = BaseResponse, TResult2 = never>(
+    onFulfilled?: ((value: BaseResponse) => (PromiseLike<TResult1> | TResult1)) | undefined | null,
+    onRejected?: ((reason: any) => (PromiseLike<TResult2> | TResult2)) | undefined | null
+  ): Promise<TResult1 | TResult2> {
+    return this.request.then(onFulfilled, onRejected)
   }
 }
 

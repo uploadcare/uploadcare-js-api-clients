@@ -12,7 +12,7 @@ export type Settings = {
 export type FileData = Blob | File | Buffer
 
 /* TODO Add sourceInfo */
-export type UFile = {
+export type UploadcareFile = {
   uuid: string,
   name: null | string,
   size: null | number,
@@ -21,6 +21,7 @@ export type UFile = {
   cdnUrl: null | string,
   cdnUrlModifiers: null | string,
   originalUrl: null | string,
+  originalFilename: null | string,
   originalImageInfo: null | {
     width: number,
     height: number,

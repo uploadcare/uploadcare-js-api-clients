@@ -1,8 +1,15 @@
-import base from './api/base'
+import base, {BaseResponse, DirectUpload} from './api/base'
 import checkFileIsReady from './checkFileIsReady'
 import prettyFileInfo from './prettyFileInfo'
-import {FileData, UFile, Settings} from './types'
+import {FileData, UploadcareFile, Settings} from './types'
 import {BaseProgress} from './api/base'
+
+export enum FileFrom {
+  Object = 'object',
+  URL = 'url',
+  DOM = 'input',
+  Uploaded = 'uploaded',
+}
 
 export type FilePromiseProgress = {
   state: string,
@@ -10,10 +17,10 @@ export type FilePromiseProgress = {
   value: number,
 }
 
-export class FilePromise {
-  _promise: Promise<UFile>
+export class FilePromise implements Promise<UploadcareFile> {
+  private request: Promise<UploadcareFile>
   progress: FilePromiseProgress
-  file: null | UFile
+  file: null | UploadcareFile
   onProgress: ((progress: FilePromiseProgress) => void) | null
   onUploaded: Function | null
   onReady: Function | null
@@ -23,7 +30,7 @@ export class FilePromise {
   constructor(data: FileData, settings: Settings) {
     const directUpload = base(data, settings)
 
-    this._promise = directUpload
+    this.request = directUpload
       .then(({file: uuid}) => {
         this.progress = {
           ...this.progress,
@@ -44,6 +51,7 @@ export class FilePromise {
           cdnUrl: null,
           cdnUrlModifiers: null,
           originalUrl: null,
+          originalFilename: null,
           originalImageInfo: null,
         }
 
@@ -51,27 +59,45 @@ export class FilePromise {
           this.onUploaded(uuid)
         }
 
-        return checkFileIsReady(uuid, (info) => {
+        const isReady = checkFileIsReady(uuid, (info) => {
           this.file = prettyFileInfo(info, settings)
         }, 100, settings)
-      })
-      .then(() => {
-        this.progress = {
-          ...this.progress,
-          state: 'ready',
-          value: 1,
-        }
 
-        if (typeof this.onProgress === 'function') {
-          this.onProgress({...this.progress})
-        }
+        if (isReady) {
+          this.progress = {
+            ...this.progress,
+            state: 'ready',
+            value: 1,
+          }
 
-        if (typeof this.onReady === 'function') {
-          this.onReady({...this.file})
+          if (typeof this.onProgress === 'function') {
+            this.onProgress({...this.progress})
+          }
+
+          if (typeof this.onReady === 'function') {
+            this.onReady({...this.file})
+          }
         }
 
         return {...this.file}
       })
+      // .then(() => {
+      //   this.progress = {
+      //     ...this.progress,
+      //     state: 'ready',
+      //     value: 1,
+      //   }
+      //
+      //   if (typeof this.onProgress === 'function') {
+      //     this.onProgress({...this.progress})
+      //   }
+      //
+      //   if (typeof this.onReady === 'function') {
+      //     this.onReady({...this.file})
+      //   }
+      //
+      //   return {...this.file}
+      // })
     this.progress = {
       state: 'uploading',
       upload: null,
@@ -88,7 +114,7 @@ export class FilePromise {
       this.progress = {
         ...this.progress,
         upload: progressEvent,
-        value: (progressEvent.total / progressEvent.loaded) * 0.9,
+        value: Math.round((progressEvent.loaded * 100) / progressEvent.total),
       }
 
       if (typeof this.onProgress === 'function') {
@@ -103,33 +129,34 @@ export class FilePromise {
     }
   }
 
-  then(onFulfilled?: Function, onRejected?: Function) {
-    // TODO: Fix ts-ignore
-    // @ts-ignore
-    return this._promise.then(onFulfilled, onRejected)
+  readonly [Symbol.toStringTag]: string
+
+  catch<TResult = never>(
+    onRejected?: ((reason: any) => (PromiseLike<TResult> | TResult)) | undefined | null
+  ): Promise<UploadcareFile | TResult> {
+    return this.request.catch(onRejected)
   }
 
-  catch(onRejected?: Function) {
-    // TODO: Fix ts-ignore
-    // @ts-ignore
-    return this._promise.catch(onRejected)
+  finally(onFinally?: (() => void) | undefined | null): Promise<UploadcareFile> {
+    return this.request.finally(onFinally)
   }
 
-  finally(onFinally: Function) {
-    // TODO: Fix ts-ignore
-    // @ts-ignore
-    return this._promise.finally(onFinally)
+  then<TResult1 = UploadcareFile, TResult2 = never>(
+    onFulfilled?: ((value: UploadcareFile) => (PromiseLike<TResult1> | TResult1)) | undefined | null,
+    onRejected?: ((reason: any) => (PromiseLike<TResult2> | TResult2)) | undefined | null
+  ): Promise<TResult1 | TResult2> {
+    return this.request.then(onFulfilled, onRejected)
   }
 }
 
 /**
  * Uploads file from provided data
  *
- * @param from
- * @param data
- * @param settings
+ * @param {FileFrom} from
+ * @param {FileData} data
+ * @param {Settings} settings
  * @returns {FilePromise}
  */
-export default function fileFrom(from: string, data: FileData, settings: Settings = {}): FilePromise {
+export default function fileFrom(from: FileFrom, data: FileData, settings: Settings = {}): FilePromise {
   return new FilePromise(data, settings)
 }

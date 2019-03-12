@@ -5,6 +5,7 @@ import RequestError from '../errors/RequestError'
 import CancelError from '../errors/CancelError'
 import UploadcareError from '../errors/UploadcareError'
 import {FileData, Settings} from '../types'
+import {BaseProgress} from './base'
 
 export type Query = {
   [key: string]: string | boolean | number | void,
@@ -23,6 +24,10 @@ export type Headers = {
   [key: string]: string,
 }
 
+export interface HandleProgressFunction {
+  (progressEvent: BaseProgress): void
+}
+
 export type RequestOptions = {
   method?: string,
   path: string,
@@ -30,6 +35,7 @@ export type RequestOptions = {
   body?: Body,
   headers?: Headers,
   baseURL?: string,
+  onUploadProgress?: HandleProgressFunction,
 }
 
 export interface RequestResponse {
@@ -93,8 +99,6 @@ export default function request({
     source: body.source || 'local',
   })
 
-  // TODO: Fix ts-ignore
-  // @ts-ignore
   return axios({
     method: method || 'GET',
     baseURL: baseURL || defaultSettings.baseURL,
@@ -130,27 +134,26 @@ export default function request({
       throw error
     })
     .then(axiosResponse => {
+      const url = axiosResponse.config.url || path
+
       if (axiosResponse.data.error) {
         const {status_code: code, content} = axiosResponse.data.error
 
         throw new UploadcareError({
           headers: axiosResponse.config.headers,
-          // TODO: Fix ts-ignore
-          // @ts-ignore
-          url: axiosResponse.config.url,
+          url,
         }, {
           status: code,
           statusText: content,
         })
       }
 
-      return axiosResponse
+      return {
+        headers: axiosResponse.headers,
+        url,
+        data: axiosResponse.data,
+      }
     })
-    .then(axiosResponse => ({
-      headers: axiosResponse.headers,
-      url: axiosResponse.config.url,
-      data: axiosResponse.data,
-    }))
     .catch((error) => Promise.reject(error))
 }
 
@@ -176,11 +179,11 @@ export function buildFormData(body: Body): FormData {
       value.forEach(val => formData.append(key + '[]', val))
     }
     else if (key === 'file') {
-      // TODO: Fix ts-ignore
-      // @ts-ignore
-      const fileName = body.file.name || DEFAULT_FILE_NAME
+      if (body.file instanceof File) {
+        const fileName = body.file.name || DEFAULT_FILE_NAME
 
-      formData.append('file', value, fileName)
+        formData.append('file', value, fileName)
+      }
     }
     else {
       formData.append(key, value)

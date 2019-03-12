@@ -1,16 +1,16 @@
 import defaultSettings from './defaultSettings'
 import camelizeKeys from './tools/camelizeKeys'
 import {InfoResponse} from './api/info'
-import {Settings, UFile} from './types'
+import {Settings, UploadcareFile} from './types'
 
 /**
  * Transforms file info getting from Upload API to pretty info
  *
  * @param {InfoResponse} info
  * @param {Settings} settings
- * @returns {UFile}
+ * @returns {UploadcareFile}
  */
-export default function prettyFileInfo(info: InfoResponse, settings: Settings = {}): UFile {
+export default function prettyFileInfo(info: InfoResponse, settings: Settings = {}): UploadcareFile {
   const {
     uuid,
     filename,
@@ -37,13 +37,14 @@ export default function prettyFileInfo(info: InfoResponse, settings: Settings = 
 
   return {
     uuid,
-    name: originalFilename,
+    name: settings.fileName || originalFilename,
     size,
     isStored,
     isImage,
     cdnUrl,
     cdnUrlModifiers,
     originalUrl,
+    originalFilename,
     originalImageInfo: imageInfo,
   }
 }

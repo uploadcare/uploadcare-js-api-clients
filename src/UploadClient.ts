@@ -1,6 +1,6 @@
 import defaultSettings from './defaultSettings'
 import UploadAPI from './api/index'
-import fileFrom from './fileFrom'
+import fileFrom, {FileFrom} from './fileFrom'
 import {FileData, Settings} from './types'
 import {FilePromise} from './fileFrom'
 
@@ -45,7 +45,7 @@ export default class UploadClient {
     }
   }
 
-  fileFrom(from: string, data: FileData, settings: Settings = {}): FilePromise {
+  fileFrom(from: FileFrom, data: FileData, settings: Settings = {}): FilePromise {
     return fileFrom(from, data, {
       ...this.settings,
       ...settings,

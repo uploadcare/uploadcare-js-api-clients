@@ -1,4 +1,3 @@
-import jasmine from 'jasmine'
 import base from '../../src/api/base'
 import * as factory from '../_fixtureFactory'
 import {getUserAgent} from '../../src/defaultSettings'
@@ -9,7 +8,8 @@ describe('API - base', () => {
   it('should be able to upload data', async() => {
     const directUpload = base(fileToUpload.data, {publicKey: factory.publicKey('demo')})
 
-    await expectAsync(directUpload).toBeResolvedTo({file: jasmine.any(String)})
+    directUpload
+      .then(({file}) => expect(file).toBe(jasmine.any(String)))
   })
 
   it('should accept integration setting', (done) => {
@@ -17,7 +17,7 @@ describe('API - base', () => {
       publicKey: 'test',
       integration: 'Test',
     }
-    const directUpload = base('', settings)
+    const directUpload = base(fileToUpload.data, settings)
 
     directUpload
       .then(() => done.fail())

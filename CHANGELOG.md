@@ -21,8 +21,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
   instead of using the `promise` property.
 * The `fileFrom` function returns `thenable` object called `FilePromise`
   instead of using the `promise` property.
-* The `FileInfo` type renamed to `UFile` and updated.
-* The `FilePromise` resolved with an object of the `UFile` type.
+* The `FileInfo` type renamed to `UploadcareFile` and updated.
+* The `FilePromise` resolved with an object of the `UploadcareFile` type.
 * The progress of `fileFrom` now based on the `FilePromiseProgress` type.
 * Updated the `InfoResponse` type.
 

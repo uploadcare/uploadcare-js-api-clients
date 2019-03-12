@@ -1,13 +1,12 @@
 import * as factory from './_fixtureFactory'
-import fileFrom from '../src/fileFrom'
+import fileFrom, {FileFrom} from '../src/fileFrom'
 import {sleep} from './_helpers'
 
 describe('fileFrom', () => {
   const fileToUpload = factory.image('blackSquare')
 
   it('should resolves when file is ready on CDN', async() => {
-    const filePromise = fileFrom('object', fileToUpload.data, {publicKey: factory.publicKey('demo')})
-
+    const filePromise = fileFrom(FileFrom.Object, fileToUpload.data, {publicKey: factory.publicKey('demo')})
     const file = await filePromise
 
     expect(filePromise.progress.state).toBe('ready')
@@ -15,16 +14,17 @@ describe('fileFrom', () => {
   })
 
   it('should accept doNotStore setting', async() => {
-    const filePromise = fileFrom('object', fileToUpload.data, {
+    const filePromise = fileFrom(FileFrom.Object, fileToUpload.data, {
       publicKey: factory.publicKey('demo'),
       doNotStore: true,
     })
+    const file = await filePromise
 
-    await expectAsync(filePromise).toBeResolvedTo(jasmine.objectContaining({isStored: false}))
+    expect(file.isStored).toBeFalsy()
   })
 
   it('should be able to cancel uploading', (done) => {
-    const filePromise = fileFrom('object', fileToUpload.data, {publicKey: factory.publicKey('demo')})
+    const filePromise = fileFrom(FileFrom.Object, fileToUpload.data, {publicKey: factory.publicKey('demo')})
 
     setTimeout(() => {
       filePromise.cancel()
@@ -35,6 +35,17 @@ describe('fileFrom', () => {
       .catch((error) => error.name === 'CancelError' ? done() : done.fail(error))
   })
 
+  it('should accept new file name setting', async() => {
+    const filePromise = fileFrom(FileFrom.URL, fileToUpload.data, {
+      publicKey: factory.publicKey('demo'),
+      doNotStore: true,
+      fileName: 'newFileName.jpg',
+    })
+    const file = await filePromise
+
+    expect(file.name).toEqual('newFileName.jpg')
+  })
+
   describe('should be able to handle', () => {
     /* Wait to bypass the requests limits */
     beforeEach((done) => {
@@ -42,7 +53,7 @@ describe('fileFrom', () => {
     })
 
     it('cancel uploading', (done) => {
-      const filePromise = fileFrom('object', fileToUpload.data, {publicKey: factory.publicKey('demo')})
+      const filePromise = fileFrom(FileFrom.Object, fileToUpload.data, {publicKey: factory.publicKey('demo')})
 
       setTimeout(() => {
         filePromise.cancel()
@@ -63,7 +74,7 @@ describe('fileFrom', () => {
 
     it('progress', (done) => {
       let progress = 0
-      const filePromise = fileFrom('object', fileToUpload.data, {publicKey: factory.publicKey('demo')})
+      const filePromise = fileFrom(FileFrom.Object, fileToUpload.data, {publicKey: factory.publicKey('demo')})
 
       filePromise.onProgress = () => {
         progress += 1
@@ -75,7 +86,7 @@ describe('fileFrom', () => {
     })
 
     it('uploaded', (done) => {
-      const filePromise = fileFrom('object', fileToUpload.data, {publicKey: factory.publicKey('demo')})
+      const filePromise = fileFrom(FileFrom.Object, fileToUpload.data, {publicKey: factory.publicKey('demo')})
 
       filePromise.onUploaded = () => {
         done()
@@ -87,7 +98,7 @@ describe('fileFrom', () => {
     })
 
     it('ready', (done) => {
-      const filePromise = fileFrom('object', fileToUpload.data, {publicKey: factory.publicKey('demo')})
+      const filePromise = fileFrom(FileFrom.Object, fileToUpload.data, {publicKey: factory.publicKey('demo')})
 
       filePromise.onReady = () => {
         done()
