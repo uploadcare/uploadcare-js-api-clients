@@ -1,6 +1,6 @@
-import * as factory from './_fixtureFactory'
-import fileFrom, {FileFrom} from '../src/fileFrom'
-import {sleep} from './_helpers'
+import * as factory from '../_fixtureFactory'
+import fileFrom, {FileFrom} from '../../src/fileFrom/fileFrom'
+import {sleep} from '../_helpers'
 
 describe('fileFrom', () => {
   const fileToUpload = factory.image('blackSquare')
