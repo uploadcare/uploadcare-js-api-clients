@@ -23,7 +23,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
   instead of using the `promise` property.
 * The `FileInfo` type renamed to `UploadcareFile` and updated.
 * The `FilePromise` resolved with an object of the `UploadcareFile` type.
-* The progress of `fileFrom` now based on the `FilePromiseProgress` type.
+* The progress of `fileFrom` now based on the `UploadingProgress` type.
 * Updated the `InfoResponse` type.
 
 ### Added

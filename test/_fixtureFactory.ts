@@ -20,6 +20,10 @@ const uuids: {[key: string]: {publicKey: string, uuid: string}} = {
     publicKey: 'invalidpublickey',
     uuid: '',
   },
+  empty: {
+    publicKey: '',
+    uuid: '',
+  },
 }
 
 export type FixtureFile = {

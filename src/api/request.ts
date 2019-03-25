@@ -1,4 +1,4 @@
-import axios from 'axios'
+import axios, {CancelToken} from 'axios'
 import * as FormData from 'form-data'
 import defaultSettings, {getUserAgent} from '../defaultSettings'
 import RequestError from '../errors/RequestError'
@@ -36,6 +36,7 @@ export type RequestOptions = {
   headers?: Headers,
   baseURL?: string,
   onUploadProgress?: HandleProgressFunction,
+  cancelToken?: CancelToken,
 }
 
 export interface RequestResponse {
@@ -179,11 +180,10 @@ export function buildFormData(body: Body): FormData {
       value.forEach(val => formData.append(key + '[]', val))
     }
     else if (key === 'file') {
-      if (body.file instanceof File) {
-        const fileName = body.file.name || DEFAULT_FILE_NAME
+      const file = body.file as File
+      const fileName = file.name || DEFAULT_FILE_NAME
 
-        formData.append('file', value, fileName)
-      }
+      formData.append('file', value, fileName)
     }
     else {
       formData.append(key, value)

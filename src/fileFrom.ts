@@ -1,8 +1,10 @@
-import base, {BaseResponse, DirectUpload} from './api/base'
+import base, {BaseProgress} from './api/base'
 import checkFileIsReady from './checkFileIsReady'
 import prettyFileInfo from './prettyFileInfo'
-import {FileData, UploadcareFile, Settings} from './types'
-import {BaseProgress} from './api/base'
+import {FileData, Settings, UploadcareFile} from './types'
+import fromUrl, {TypeEnum, UrlData} from './api/fromUrl'
+import {createCancelController} from './api/request'
+import fromUrlStatus from './api/fromUrlStatus'
 
 export enum FileFrom {
   Object = 'object',
@@ -11,114 +13,180 @@ export enum FileFrom {
   Uploaded = 'uploaded',
 }
 
-export type FilePromiseProgress = {
-  state: string,
+export enum ProgressState {
+  Pending = 'pending',
+  Uploading = 'uploading',
+  Uploaded = 'uploaded',
+  Ready = 'ready',
+  Error = 'error',
+}
+
+export type UploadingProgress = {
+  state: ProgressState,
   upload: null | BaseProgress,
   value: number,
 }
 
-export class FilePromise implements Promise<UploadcareFile> {
-  private request: Promise<UploadcareFile>
-  progress: FilePromiseProgress
-  file: null | UploadcareFile
-  onProgress: ((progress: FilePromiseProgress) => void) | null
+export interface UploadFromInterface {
+  onProgress: ((progress: UploadingProgress) => void) | null
   onUploaded: Function | null
   onReady: Function | null
   onCancel: Function | null
+
+  upload(): Promise<UploadcareFile>
+
+  getProgress(): UploadingProgress
+
+  getFile(): UploadcareFile
+}
+
+interface UploadCancellableInterface {
+  cancel: Function
+}
+
+abstract class UploadFrom implements UploadFromInterface {
+  protected progress: UploadingProgress = {
+    state: ProgressState.Pending,
+    upload: null,
+    value: 0,
+  }
+  protected file: UploadcareFile | undefined
+  onProgress: ((progress: UploadingProgress) => void) | null = null
+  onUploaded: Function | null = null
+  onReady: Function | null = null
+  onCancel: Function | null = null
+
+  protected setProgress(state: ProgressState, progressEvent?: ProgressEvent) {
+    switch (state) {
+      case ProgressState.Uploading:
+        this.progress = {
+          ...this.getProgress(),
+          state: ProgressState.Uploading,
+          upload: progressEvent || null,
+          value: progressEvent ? Math.round((progressEvent.loaded * 100) / progressEvent.total) : 0,
+        }
+        break
+      case ProgressState.Uploaded:
+        this.progress = {
+          ...this.getProgress(),
+          state: ProgressState.Uploaded,
+          value: 99,
+        }
+        break
+      case ProgressState.Ready:
+        this.progress = {
+          ...this.getProgress(),
+          state: ProgressState.Ready,
+          value: 100,
+        }
+        break
+      case ProgressState.Error:
+        this.progress = {
+          ...this.getProgress(),
+          state: ProgressState.Error,
+          value: 0,
+        }
+        break
+    }
+  }
+
+  getProgress(): UploadingProgress {
+    return this.progress
+  }
+
+  protected setFile(file: UploadcareFile) {
+    this.file = {...file}
+  }
+
+  getFile(): UploadcareFile {
+    return this.file as UploadcareFile
+  }
+
+  abstract upload(): Promise<UploadcareFile>
+
+  /**
+   * Handle uploading error
+   * @param error
+   */
+  protected handleError(error) {
+    this.setProgress(ProgressState.Error)
+
+    return Promise.reject(error)
+  }
+
+  /**
+   * Handle uploaded file.
+   * @param {string} uuid
+   * @param {Settings} settings
+   */
+  protected handleUploaded(uuid: string, settings: Settings) {
+    this.setFile({
+      uuid,
+      name: null,
+      size: null,
+      isStored: null,
+      isImage: null,
+      cdnUrl: null,
+      cdnUrlModifiers: null,
+      originalUrl: null,
+      originalFilename: null,
+      originalImageInfo: null,
+    })
+
+    this.setProgress(ProgressState.Uploaded)
+
+    if (typeof this.onUploaded === 'function') {
+      this.onUploaded(uuid)
+    }
+
+    return checkFileIsReady(uuid, (info) => {
+      this.file = prettyFileInfo(info, settings)
+    }, 100, settings)
+  }
+
+  /**
+   * Handle uploaded file that ready on CDN.
+   */
+  protected handleReady() {
+    this.setProgress(ProgressState.Ready)
+
+    if (typeof this.onProgress === 'function') {
+      this.onProgress(this.getProgress())
+    }
+
+    if (typeof this.onReady === 'function') {
+      this.onReady(this.getFile())
+    }
+
+    return Promise.resolve(this.getFile())
+  }
+}
+
+class UploadFromObject extends UploadFrom implements UploadCancellableInterface {
+  readonly data: FileData
+  readonly settings: Settings
   cancel: Function
 
   constructor(data: FileData, settings: Settings) {
-    const directUpload = base(data, settings)
+    super()
+    const cancelController = createCancelController()
 
-    this.request = directUpload
-      .then(({file: uuid}) => {
-        this.progress = {
-          ...this.progress,
-          state: 'uploaded',
-          value: 0.9,
-        }
+    this.data = data
+    this.settings = settings
+    this.cancel = cancelController.cancel
+  }
 
-        if (typeof this.onProgress === 'function') {
-          this.onProgress({...this.progress})
-        }
+  upload(): Promise<UploadcareFile> {
+    const directUpload = base(this.data, this.settings)
+    const filePromise = directUpload.upload()
 
-        this.file = {
-          uuid,
-          name: null,
-          size: null,
-          isStored: null,
-          isImage: null,
-          cdnUrl: null,
-          cdnUrlModifiers: null,
-          originalUrl: null,
-          originalFilename: null,
-          originalImageInfo: null,
-        }
-
-        if (typeof this.onUploaded === 'function') {
-          this.onUploaded(uuid)
-        }
-
-        const isReady = checkFileIsReady(uuid, (info) => {
-          this.file = prettyFileInfo(info, settings)
-        }, 100, settings)
-
-        if (isReady) {
-          this.progress = {
-            ...this.progress,
-            state: 'ready',
-            value: 1,
-          }
-
-          if (typeof this.onProgress === 'function') {
-            this.onProgress({...this.progress})
-          }
-
-          if (typeof this.onReady === 'function') {
-            this.onReady({...this.file})
-          }
-        }
-
-        return {...this.file}
-      })
-      // .then(() => {
-      //   this.progress = {
-      //     ...this.progress,
-      //     state: 'ready',
-      //     value: 1,
-      //   }
-      //
-      //   if (typeof this.onProgress === 'function') {
-      //     this.onProgress({...this.progress})
-      //   }
-      //
-      //   if (typeof this.onReady === 'function') {
-      //     this.onReady({...this.file})
-      //   }
-      //
-      //   return {...this.file}
-      // })
-    this.progress = {
-      state: 'uploading',
-      upload: null,
-      value: 0,
-    }
-    this.file = null
-    this.onProgress = null
-    this.onUploaded = null
-    this.onReady = null
-    this.onCancel = null
-    this.cancel = directUpload.cancel
+    this.setProgress(ProgressState.Uploading)
 
     directUpload.onProgress = (progressEvent) => {
-      this.progress = {
-        ...this.progress,
-        upload: progressEvent,
-        value: Math.round((progressEvent.loaded * 100) / progressEvent.total),
-      }
+      this.setProgress(ProgressState.Uploading, progressEvent)
 
       if (typeof this.onProgress === 'function') {
-        this.onProgress({...this.progress})
+        this.onProgress(this.getProgress())
       }
     }
 
@@ -127,25 +195,64 @@ export class FilePromise implements Promise<UploadcareFile> {
         this.onCancel()
       }
     }
+
+    return filePromise
+      .then(({file: uuid}) => {
+        return this.handleUploaded(uuid, this.settings)
+      })
+      .catch(this.handleError)
+      .then(this.handleReady)
+  }
+}
+
+class UploadFromUrl extends UploadFrom {
+  readonly data: UrlData
+  readonly settings: Settings
+
+  constructor(data: UrlData, settings: Settings) {
+    super()
+
+    this.data = data
+    this.settings = settings
   }
 
-  readonly [Symbol.toStringTag]: string
+  upload(): Promise<UploadcareFile> {
+    const urlPromise = fromUrl(this.data, this.settings)
 
-  catch<TResult = never>(
-    onRejected?: ((reason: any) => (PromiseLike<TResult> | TResult)) | undefined | null
-  ): Promise<UploadcareFile | TResult> {
-    return this.request.catch(onRejected)
-  }
+    this.setProgress(ProgressState.Uploading)
 
-  finally(onFinally?: (() => void) | undefined | null): Promise<UploadcareFile> {
-    return this.request.finally(onFinally)
-  }
+    if (typeof this.onProgress === 'function') {
+      this.onProgress(this.getProgress())
+    }
 
-  then<TResult1 = UploadcareFile, TResult2 = never>(
-    onFulfilled?: ((value: UploadcareFile) => (PromiseLike<TResult1> | TResult1)) | undefined | null,
-    onRejected?: ((reason: any) => (PromiseLike<TResult2> | TResult2)) | undefined | null
-  ): Promise<TResult1 | TResult2> {
-    return this.request.then(onFulfilled, onRejected)
+    if (typeof this.onCancel === 'function') {
+      this.onCancel()
+    }
+
+    return urlPromise
+      .then(data => {
+        const {type} = data
+
+        if (type === TypeEnum.Token) {
+          // @ts-ignore
+          const {token} = data
+          const status = fromUrlStatus(token, this.settings)
+
+          status.then(data => {
+            // @ts-ignore
+            const {uuid} = data
+
+            return this.handleUploaded(uuid, this.settings)
+          })
+        } else if (type === TypeEnum.FileInfo) {
+          // @ts-ignore
+          const {uuid} = data
+
+          return this.handleUploaded(uuid, this.settings)
+        }
+      })
+      .catch(this.handleError)
+      .then(this.handleReady)
   }
 }
 
@@ -155,8 +262,16 @@ export class FilePromise implements Promise<UploadcareFile> {
  * @param {FileFrom} from
  * @param {FileData} data
  * @param {Settings} settings
- * @returns {FilePromise}
+ * @throws Error
+ * @returns {UploadFromInterface}
  */
-export default function fileFrom(from: FileFrom, data: FileData, settings: Settings = {}): FilePromise {
-  return new FilePromise(data, settings)
+export default function fileFrom(from: FileFrom, data: FileData | UrlData, settings: Settings = {}): UploadFromInterface {
+  switch (from) {
+    case FileFrom.Object:
+      return new UploadFromObject(data as FileData, settings)
+    case FileFrom.URL:
+      return new UploadFromUrl(data as UrlData, settings)
+    default:
+      throw new Error(`File uploading from "${from}" is not supported`)
+  }
 }

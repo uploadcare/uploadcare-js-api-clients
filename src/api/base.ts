@@ -8,25 +8,40 @@ export type BaseResponse = {
   file: string
 }
 
-export class DirectUpload implements Promise<BaseResponse> {
-  private request: Promise<BaseResponse>
+interface DirectUploadInterface {
+  readonly options: RequestOptions
   onProgress: HandleProgressFunction | null
   onCancel: Function | null
+  cancel: Function
+
+  upload(): Promise<BaseResponse>
+}
+
+export class DirectUpload implements DirectUploadInterface {
+  readonly options: RequestOptions
+  onProgress: HandleProgressFunction | null = null
+  onCancel: Function | null = null
   cancel: Function
 
   constructor(options: RequestOptions) {
     const cancelController = createCancelController()
 
-    this.request = request({
+    this.options = {
       ...options,
       /* TODO Add support of progress for Node.js */
       onUploadProgress: (progressEvent: BaseProgress) => {
         if (typeof this.onProgress === 'function') {
           this.onProgress(progressEvent)
         }
-      }
-    })
-      .then(response => response.data)
+      },
+      cancelToken: cancelController.token,
+    }
+    this.cancel = cancelController.cancel
+  }
+
+  upload(): Promise<BaseResponse> {
+    return request(this.options)
+      .then(response => Promise.resolve(response.data))
       .catch(error => {
         if (error.name === 'CancelError' && typeof this.onCancel === 'function') {
           this.onCancel()
@@ -34,28 +49,6 @@ export class DirectUpload implements Promise<BaseResponse> {
 
         return Promise.reject(error)
       })
-    this.onProgress = null
-    this.onCancel = null
-    this.cancel = cancelController.cancel
-  }
-
-  readonly [Symbol.toStringTag]: string
-
-  catch<TResult = never>(
-    onRejected?: ((reason: any) => (PromiseLike<TResult> | TResult)) | undefined | null
-  ): Promise<BaseResponse | TResult> {
-    return this.request.catch(onRejected)
-  }
-
-  finally(onFinally?: (() => void) | undefined | null): Promise<BaseResponse> {
-    return this.request.finally(onFinally)
-  }
-
-  then<TResult1 = BaseResponse, TResult2 = never>(
-    onFulfilled?: ((value: BaseResponse) => (PromiseLike<TResult1> | TResult1)) | undefined | null,
-    onRejected?: ((reason: any) => (PromiseLike<TResult2> | TResult2)) | undefined | null
-  ): Promise<TResult1 | TResult2> {
-    return this.request.then(onFulfilled, onRejected)
   }
 }
 
