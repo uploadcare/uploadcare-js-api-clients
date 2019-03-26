@@ -48,6 +48,13 @@ export abstract class UploadFrom implements UploadFromInterface {
 
   protected setProgress(state: ProgressState, progressEvent?: ProgressEvent) {
     switch (state) {
+      case ProgressState.Pending:
+        this.progress = {
+          state: ProgressState.Pending,
+          upload: null,
+          value: 0,
+        }
+        break
       case ProgressState.Uploading:
         this.progress = {
           ...this.getProgress(),
