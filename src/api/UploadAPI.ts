@@ -1,6 +1,5 @@
 import request, {prepareOptions} from './request'
-import base from './base'
-import {DirectUpload} from './base'
+import base, {DirectUploadInterface} from './base'
 import UploadClient from '../UploadClient'
 import {RequestOptions, RequestResponse} from './request'
 import {FileData, Settings} from '../types'
@@ -20,7 +19,7 @@ export default class UploadAPI {
     return request(prepareOptions(options, this.client.settings))
   }
 
-  base(data: FileData, settings: Settings = {}): DirectUpload {
+  base(data: FileData, settings: Settings = {}): DirectUploadInterface {
     return base(data, {
       ...this.client.settings,
       ...settings,

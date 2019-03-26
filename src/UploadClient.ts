@@ -1,7 +1,8 @@
 import defaultSettings from './defaultSettings'
 import UploadAPI from './api/index'
-import fileFrom, {FileFrom, UploadFromInterface} from './fileFrom'
+import fileFrom, {FileFrom} from './fileFrom/fileFrom'
 import {FileData, Settings} from './types'
+import {UploadFromInterface} from './fileFrom/UploadFrom'
 
 export default class UploadClient {
   settings: Settings

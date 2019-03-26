@@ -8,7 +8,7 @@ export type BaseResponse = {
   file: string
 }
 
-interface DirectUploadInterface {
+export interface DirectUploadInterface {
   readonly options: RequestOptions
   onProgress: HandleProgressFunction | null
   onCancel: Function | null
