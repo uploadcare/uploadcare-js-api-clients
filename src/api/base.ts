@@ -58,9 +58,9 @@ export class DirectUpload implements DirectUploadInterface {
  *
  * @param {FileData} file
  * @param {Settings} settings
- * @return {DirectUpload}
+ * @return {DirectUploadInterface}
  */
-export default function base(file: FileData, settings: Settings = {}): DirectUpload {
+export default function base(file: FileData, settings: Settings = {}): DirectUploadInterface {
   const options: RequestOptions = prepareOptions({
     method: 'POST',
     path: '/base/',
