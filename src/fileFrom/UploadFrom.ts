@@ -17,36 +17,49 @@ export type UploadingProgress = {
   value: number,
 }
 
-export interface UploadFromInterface {
+export interface UploadFromInterface extends Promise<UploadcareFile> {
+  readonly [Symbol.toStringTag]: string
+
   onProgress: ((progress: UploadingProgress) => void) | null
-  onUploaded: Function | null
-  onReady: Function | null
-  onCancel: Function | null
+  onUploaded: ((uuid: string) => void) | null
+  onReady: ((file: UploadcareFile) => void) | null
+  onCancel: (() => void) | null
+  cancel: (() => void)
 
-  upload(): Promise<UploadcareFile>
-
-  getProgress(): UploadingProgress
+  getProgressState(): ProgressState
 
   getFile(): UploadcareFile
-}
 
-export interface UploadCancellableInterface {
-  cancel: Function
+  then<TFulfilled = UploadcareFile, TRejected = never>(
+    onFulfilled?: ((value: UploadcareFile) => (PromiseLike<TFulfilled> | TFulfilled)) | undefined | null,
+    onRejected?: ((reason: any) => (PromiseLike<TRejected> | TRejected)) | undefined | null
+  ): Promise<TFulfilled | TRejected>
+  catch<TRejected = never>(
+    onRejected?: ((reason: any) => (PromiseLike<TRejected> | TRejected)) | undefined | null
+  ): Promise<UploadcareFile | TRejected>
 }
 
 export abstract class UploadFrom implements UploadFromInterface {
+  readonly [Symbol.toStringTag]: string
+
+  protected abstract request: Promise<UploadcareFile>
   protected progress: UploadingProgress = {
     state: ProgressState.Pending,
     upload: null,
     value: 0,
   }
   protected file: UploadcareFile | undefined
+
   onProgress: ((progress: UploadingProgress) => void) | null = null
-  onUploaded: Function | null = null
-  onReady: Function | null = null
-  onCancel: Function | null = null
+  onUploaded: ((uuid: string) => void) | null = null
+  onReady: ((file: UploadcareFile) => void) | null = null
+  onCancel: (() => void) | null = null
+
+  abstract cancel: (() => void)
 
   protected setProgress(state: ProgressState, progressEvent?: ProgressEvent) {
+    const progress = this.getProgress()
+
     switch (state) {
       case ProgressState.Pending:
         this.progress = {
@@ -57,7 +70,7 @@ export abstract class UploadFrom implements UploadFromInterface {
         break
       case ProgressState.Uploading:
         this.progress = {
-          ...this.getProgress(),
+          ...progress,
           state: ProgressState.Uploading,
           upload: progressEvent || null,
           value: progressEvent ? Math.round((progressEvent.loaded * 100) / progressEvent.total) : 0,
@@ -65,21 +78,21 @@ export abstract class UploadFrom implements UploadFromInterface {
         break
       case ProgressState.Uploaded:
         this.progress = {
-          ...this.getProgress(),
+          ...progress,
           state: ProgressState.Uploaded,
           value: 99,
         }
         break
       case ProgressState.Ready:
         this.progress = {
-          ...this.getProgress(),
+          ...progress,
           state: ProgressState.Ready,
           value: 100,
         }
         break
       case ProgressState.Error:
         this.progress = {
-          ...this.getProgress(),
+          ...progress,
           state: ProgressState.Error,
           value: 0,
         }
@@ -87,19 +100,33 @@ export abstract class UploadFrom implements UploadFromInterface {
     }
   }
 
-  getProgress(): UploadingProgress {
+  protected getProgress(): UploadingProgress {
     return this.progress
   }
 
+  getProgressState(): ProgressState {
+    return this.getProgress().state
+  }
+
   protected setFile(file: UploadcareFile) {
-    this.file = {...file}
+    this.file = file
   }
 
   getFile(): UploadcareFile {
     return this.file as UploadcareFile
   }
 
-  abstract upload(): Promise<UploadcareFile>
+  then<TFulfilled = UploadcareFile, TRejected = never>(
+    onFulfilled?: ((value: UploadcareFile) => (PromiseLike<TFulfilled> | TFulfilled)) | undefined | null,
+    onRejected?: ((reason: any) => (PromiseLike<TRejected> | TRejected)) | undefined | null
+  ): Promise<TFulfilled | TRejected> {
+    return this.request.then(onFulfilled, onRejected)
+  }
+  catch<TRejected = never>(
+    onRejected?: ((reason: any) => (PromiseLike<TRejected> | TRejected)) | undefined | null
+  ): Promise<UploadcareFile | TRejected> {
+    return this.request.then(onRejected)
+  }
 
   /**
    * Handle uploading error

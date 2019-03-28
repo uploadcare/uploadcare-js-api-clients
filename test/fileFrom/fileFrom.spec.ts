@@ -1,37 +1,34 @@
 import * as factory from '../_fixtureFactory'
 import fileFrom, {FileFrom} from '../../src/fileFrom/fileFrom'
 import {sleep} from '../_helpers'
+import {ProgressState} from '../../src/fileFrom/UploadFrom'
 
 describe('fileFrom', () => {
   const fileToUpload = factory.image('blackSquare')
 
   it('should resolves when file is ready on CDN', async() => {
-    const fromObject = fileFrom(FileFrom.Object, fileToUpload.data, {publicKey: factory.publicKey('demo')})
-    const filePromise = fromObject.upload()
+    const filePromise = fileFrom(FileFrom.Object, fileToUpload.data, {publicKey: factory.publicKey('demo')})
     const file = await filePromise
 
-    expect(fromObject.getProgress().state).toBe('ready')
+    expect(filePromise.getProgressState()).toBe(ProgressState.Ready)
     expect(file.cdnUrl).toBeTruthy()
   })
 
   it('should accept doNotStore setting', async() => {
-    const fromObject = fileFrom(FileFrom.Object, fileToUpload.data, {
+    const filePromise = fileFrom(FileFrom.Object, fileToUpload.data, {
       publicKey: factory.publicKey('demo'),
       doNotStore: true,
     })
-    const filePromise = fromObject.upload()
     const file = await filePromise
 
     expect(file.isStored).toBeFalsy()
   })
 
   it('should be able to cancel uploading', (done) => {
-    const fromObject = fileFrom(FileFrom.Object, fileToUpload.data, {publicKey: factory.publicKey('demo')})
-    const filePromise = fromObject.upload()
+    const filePromise = fileFrom(FileFrom.Object, fileToUpload.data, {publicKey: factory.publicKey('demo')})
 
     setTimeout(() => {
-      // @ts-ignore
-      fromObject.cancel()
+      filePromise.cancel()
     }, 10)
 
     filePromise
@@ -40,12 +37,11 @@ describe('fileFrom', () => {
   })
 
   it('should accept new file name setting', async() => {
-    const fromObject = fileFrom(FileFrom.URL, fileToUpload.data, {
+    const filePromise = fileFrom(FileFrom.URL, fileToUpload.data, {
       publicKey: factory.publicKey('demo'),
       doNotStore: true,
       fileName: 'newFileName.jpg',
     })
-    const filePromise = fromObject.upload()
     const file = await filePromise
 
     expect(file.name).toEqual('newFileName.jpg')
@@ -58,15 +54,14 @@ describe('fileFrom', () => {
     })
 
     it('cancel uploading', (done) => {
-      const fromObject = fileFrom(FileFrom.Object, fileToUpload.data, {publicKey: factory.publicKey('demo')})
-      const filePromise = fromObject.upload()
+      const filePromise = fileFrom(FileFrom.Object, fileToUpload.data, {publicKey: factory.publicKey('demo')})
 
       setTimeout(() => {
         // @ts-ignore
-        fromObject.cancel()
+        filePromise.cancel()
       }, 10)
 
-      fromObject.onCancel = () => {
+      filePromise.onCancel = () => {
         done()
       }
 
@@ -81,10 +76,9 @@ describe('fileFrom', () => {
 
     it('progress', (done) => {
       let progress = 0
-      const fromObject = fileFrom(FileFrom.Object, fileToUpload.data, {publicKey: factory.publicKey('demo')})
-      const filePromise = fromObject.upload()
+      const filePromise = fileFrom(FileFrom.Object, fileToUpload.data, {publicKey: factory.publicKey('demo')})
 
-      fromObject.onProgress = () => {
+      filePromise.onProgress = () => {
         progress += 1
       }
 
@@ -94,10 +88,9 @@ describe('fileFrom', () => {
     })
 
     it('uploaded', (done) => {
-      const fromObject = fileFrom(FileFrom.Object, fileToUpload.data, {publicKey: factory.publicKey('demo')})
-      const filePromise = fromObject.upload()
+      const filePromise = fileFrom(FileFrom.Object, fileToUpload.data, {publicKey: factory.publicKey('demo')})
 
-      fromObject.onUploaded = () => {
+      filePromise.onUploaded = () => {
         done()
       }
 
@@ -107,10 +100,9 @@ describe('fileFrom', () => {
     })
 
     it('ready', (done) => {
-      const fromObject = fileFrom(FileFrom.Object, fileToUpload.data, {publicKey: factory.publicKey('demo')})
-      const filePromise = fromObject.upload()
+      const filePromise = fileFrom(FileFrom.Object, fileToUpload.data, {publicKey: factory.publicKey('demo')})
 
-      fromObject.onReady = () => {
+      filePromise.onReady = () => {
         done()
       }
 

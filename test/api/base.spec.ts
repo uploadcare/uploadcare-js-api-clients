@@ -7,7 +7,7 @@ describe('API - base', () => {
 
   it('should be able to upload data', async() => {
     const directUpload = base(fileToUpload.data, {publicKey: factory.publicKey('demo')})
-    const {file} = await directUpload.upload()
+    const {file} = await directUpload
 
     expect(file).toEqual(jasmine.any(String))
   })
@@ -17,7 +17,7 @@ describe('API - base', () => {
       publicKey: 'test',
       integration: 'Test',
     }
-    const directUpload = base(fileToUpload.data, settings).upload()
+    const directUpload = base(fileToUpload.data, settings)
 
     directUpload
       .then(() => done.fail())
@@ -43,7 +43,7 @@ describe('API - base', () => {
       directUpload.cancel()
     }, 10)
 
-    directUpload.upload()
+    directUpload
       .then(() => done.fail())
       .catch((error) => error.name === 'CancelError' ? done() : done.fail(error))
   })
@@ -59,7 +59,7 @@ describe('API - base', () => {
       done()
     }
 
-    directUpload.upload()
+    directUpload
       .then(() => done.fail())
       .catch((error) => {
         if (error.name !== 'CancelError') {
@@ -76,7 +76,7 @@ describe('API - base', () => {
       progress += 1
     }
 
-    directUpload.upload()
+    directUpload
       .then(() => progress ? done() : done.fail())
       .catch(error => done.fail(error))
   })

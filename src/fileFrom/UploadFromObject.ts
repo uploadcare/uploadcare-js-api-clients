@@ -2,12 +2,15 @@ import {FileData, Settings, UploadcareFile} from '../types'
 import {createCancelController} from '../api/request'
 import base from '../api/base'
 import {ProgressState} from './UploadFrom'
-import {UploadFrom, UploadCancellableInterface} from './UploadFrom'
+import {UploadFrom} from './UploadFrom'
 
-export class UploadFromObject extends UploadFrom implements UploadCancellableInterface {
+export class UploadFromObject extends UploadFrom {
+  protected request: Promise<UploadcareFile>
+
   readonly data: FileData
   readonly settings: Settings
-  cancel: Function
+
+  cancel: (() => void)
 
   constructor(data: FileData, settings: Settings) {
     super()
@@ -16,11 +19,12 @@ export class UploadFromObject extends UploadFrom implements UploadCancellableInt
     this.data = data
     this.settings = settings
     this.cancel = cancelController.cancel
+    this.request = this.getFilePromise()
   }
 
-  upload(): Promise<UploadcareFile> {
+  private getFilePromise(): Promise<UploadcareFile> {
     const directUpload = base(this.data, this.settings)
-    const filePromise = directUpload.upload()
+    const filePromise = directUpload
 
     this.setProgress(ProgressState.Uploading)
 

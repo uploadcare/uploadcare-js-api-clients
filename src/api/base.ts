@@ -8,20 +8,32 @@ export type BaseResponse = {
   file: string
 }
 
-export interface DirectUploadInterface {
+export interface DirectUploadInterface extends Promise<BaseResponse> {
+  readonly [Symbol.toStringTag]: string
   readonly options: RequestOptions
-  onProgress: HandleProgressFunction | null
-  onCancel: Function | null
-  cancel: Function
+  readonly cancel: (() => void)
 
-  upload(): Promise<BaseResponse>
+  onProgress: HandleProgressFunction | null
+  onCancel: (() => void) | null
+
+  then<TFulfilled = BaseResponse, TRejected = never>(
+    onFulfilled?: ((value: BaseResponse) => (PromiseLike<TFulfilled> | TFulfilled)) | undefined | null,
+    onRejected?: ((reason: any) => (PromiseLike<TRejected> | TRejected)) | undefined | null
+  ): Promise<TFulfilled | TRejected>
+  catch<TRejected = never>(
+    onRejected?: ((reason: any) => (PromiseLike<TRejected> | TRejected)) | undefined | null
+  ): Promise<BaseResponse | TRejected>
 }
 
 export class DirectUpload implements DirectUploadInterface {
+  protected request: Promise<BaseResponse>
+
+  readonly [Symbol.toStringTag]: string
   readonly options: RequestOptions
+  readonly cancel: (() => void)
+
   onProgress: HandleProgressFunction | null = null
-  onCancel: Function | null = null
-  cancel: Function
+  onCancel: (() => void) | null = null
 
   constructor(options: RequestOptions) {
     const cancelController = createCancelController()
@@ -37,10 +49,7 @@ export class DirectUpload implements DirectUploadInterface {
       cancelToken: cancelController.token,
     }
     this.cancel = cancelController.cancel
-  }
-
-  upload(): Promise<BaseResponse> {
-    return request(this.options)
+    this.request = request(this.options)
       .then(response => Promise.resolve(response.data))
       .catch(error => {
         if (error.name === 'CancelError' && typeof this.onCancel === 'function') {
@@ -49,6 +58,18 @@ export class DirectUpload implements DirectUploadInterface {
 
         return Promise.reject(error)
       })
+  }
+
+  then<TFulfilled = BaseResponse, TRejected = never>(
+    onFulfilled?: ((value: BaseResponse) => (PromiseLike<TFulfilled> | TFulfilled)) | undefined | null,
+    onRejected?: ((reason: any) => (PromiseLike<TRejected> | TRejected)) | undefined | null
+  ): Promise<TFulfilled | TRejected> {
+    return this.request.then(onFulfilled, onRejected)
+  }
+  catch<TRejected = never>(
+    onRejected?: ((reason: any) => (PromiseLike<TRejected> | TRejected)) | undefined | null
+  ): Promise<BaseResponse | TRejected> {
+    return this.request.catch(onRejected)
   }
 }
 

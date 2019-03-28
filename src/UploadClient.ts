@@ -3,6 +3,7 @@ import UploadAPI from './api/index'
 import fileFrom, {FileFrom} from './fileFrom/fileFrom'
 import {FileData, Settings} from './types'
 import {UploadFromInterface} from './fileFrom/UploadFrom'
+import {UrlData} from './api/fromUrl'
 
 export default class UploadClient {
   settings: Settings
@@ -45,7 +46,7 @@ export default class UploadClient {
     }
   }
 
-  fileFrom(from: FileFrom, data: FileData, settings: Settings = {}): UploadFromInterface {
+  fileFrom(from: FileFrom, data: FileData | UrlData, settings: Settings = {}): UploadFromInterface {
     return fileFrom(from, data, {
       ...this.settings,
       ...settings,

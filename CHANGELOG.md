@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Changed
+
+* The `base` function now returns object that implements `DirectUploadInterface`.
+* The `fileFrom` function now returns object that implements `UploadFromInterface`.
+* The `UploadcareFile` type changed to interface and renamed to `UploadcareFile`
+* The progress of `fileFrom` now based on the `UploadingProgress` type.
+
+### Added
+
 [Unreleased]: https://github.com/uploadcare/uploadcare-upload-client/compare/v1.0.0-alpha.1...HEAD
 
 ## [1.0.0-alpha.1]
@@ -21,9 +30,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
   instead of using the `promise` property.
 * The `fileFrom` function returns `thenable` object called `FilePromise`
   instead of using the `promise` property.
-* The `FileInfo` type renamed to `UploadcareFile` and updated.
+* The `FileInfo` type renamed to `UCFile` and updated.
 * The `FilePromise` resolved with an object of the `UploadcareFile` type.
-* The progress of `fileFrom` now based on the `UploadingProgress` type.
+* The progress of `fileFrom` now based on the `FilePromiseProgress` type.
 * Updated the `InfoResponse` type.
 
 ### Added
