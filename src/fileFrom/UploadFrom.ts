@@ -125,14 +125,14 @@ export abstract class UploadFrom implements UploadFromInterface {
   catch<TRejected = never>(
     onRejected?: ((reason: any) => (PromiseLike<TRejected> | TRejected)) | undefined | null
   ): Promise<UploadcareFile | TRejected> {
-    return this.request.then(onRejected)
+    return this.request.catch(onRejected)
   }
 
   /**
    * Handle uploading error
    * @param error
    */
-  protected handleError(error) {
+  protected handleError = (error) => {
     this.setProgress(ProgressState.Error)
 
     return Promise.reject(error)
@@ -143,7 +143,7 @@ export abstract class UploadFrom implements UploadFromInterface {
    * @param {string} uuid
    * @param {Settings} settings
    */
-  protected handleUploaded(uuid: string, settings: Settings) {
+  protected handleUploaded = (uuid: string, settings: Settings) => {
     this.setFile({
       uuid,
       name: null,
@@ -171,7 +171,7 @@ export abstract class UploadFrom implements UploadFromInterface {
   /**
    * Handle uploaded file that ready on CDN.
    */
-  protected handleReady() {
+  protected handleReady = () => {
     this.setProgress(ProgressState.Ready)
 
     if (typeof this.onProgress === 'function') {
