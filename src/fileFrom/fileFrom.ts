@@ -1,7 +1,7 @@
 import {FileData, Settings} from '../types'
 import {UrlData} from '../api/fromUrl'
-import {UploadFromObject} from './uploadFromObject'
-import {UploadFromUrl} from './uploadFromUrl'
+import {UploadFromObject} from './UploadFromObject'
+import {UploadFromUrl} from './UploadFromUrl'
 import {UploadFromInterface} from './UploadFrom'
 
 export enum FileFrom {
