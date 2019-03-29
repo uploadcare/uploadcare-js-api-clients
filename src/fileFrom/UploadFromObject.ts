@@ -16,7 +16,9 @@ export class UploadFromObject extends UploadFrom {
     super()
     this.data = data
     this.settings = settings
+
     this.directUpload = base(this.data, this.settings)
+
     this.cancel = this.directUpload.cancel
     this.request = this.getFilePromise()
   }

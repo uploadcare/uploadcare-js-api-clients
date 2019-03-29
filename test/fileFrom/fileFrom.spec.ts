@@ -76,15 +76,17 @@ describe('fileFrom', () => {
     })
 
     it('progress', (done) => {
-      let progress = 0
+      let progressValue = 0
       const filePromise = fileFrom(FileFrom.Object, fileToUpload.data, {publicKey: factory.publicKey('demo')})
 
-      filePromise.onProgress = () => {
-        progress += 1
+      filePromise.onProgress = (progress) => {
+        const {value} = progress
+
+        progressValue = value
       }
 
       filePromise
-        .then(() => progress ? done() : done.fail())
+        .then(() => progressValue ? done() : done.fail())
         .catch(error => done.fail(error))
     })
 
