@@ -1,11 +1,11 @@
 import {FileData, Settings, UploadcareFile} from '../types'
-import {createCancelController} from '../api/request'
-import base from '../api/base'
+import base, {DirectUploadInterface} from '../api/base'
 import {ProgressState} from './UploadFrom'
 import {UploadFrom} from './UploadFrom'
 
 export class UploadFromObject extends UploadFrom {
   protected request: Promise<UploadcareFile>
+  private readonly directUpload: DirectUploadInterface
 
   readonly data: FileData
   readonly settings: Settings
@@ -14,21 +14,19 @@ export class UploadFromObject extends UploadFrom {
 
   constructor(data: FileData, settings: Settings) {
     super()
-    const cancelController = createCancelController()
-
     this.data = data
     this.settings = settings
-    this.cancel = cancelController.cancel
+    this.directUpload = base(this.data, this.settings)
+    this.cancel = this.directUpload.cancel
     this.request = this.getFilePromise()
   }
 
   private getFilePromise(): Promise<UploadcareFile> {
-    const directUpload = base(this.data, this.settings)
-    const filePromise = directUpload
+    const filePromise = this.directUpload
 
     this.setProgress(ProgressState.Uploading)
 
-    directUpload.onProgress = (progressEvent) => {
+    filePromise.onProgress = (progressEvent) => {
       this.setProgress(ProgressState.Uploading, progressEvent)
 
       if (typeof this.onProgress === 'function') {
@@ -36,7 +34,7 @@ export class UploadFromObject extends UploadFrom {
       }
     }
 
-    directUpload.onCancel = () => {
+    filePromise.onCancel = () => {
       if (typeof this.onCancel === 'function') {
         this.onCancel()
       }
