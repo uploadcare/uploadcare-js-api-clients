@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 * The `base` function now returns object that implements `DirectUploadInterface`.
 * The `fileFrom` function now returns object that implements `UploadFromInterface`.
-* The `UploadcareFile` type changed to interface and renamed to `UploadcareFile`
+* The `UCFile` type renamed to `UploadcareFile`
 * The progress of `fileFrom` now based on the `UploadingProgress` type.
 
 ### Added
