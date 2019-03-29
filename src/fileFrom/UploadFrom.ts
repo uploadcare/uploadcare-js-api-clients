@@ -164,7 +164,7 @@ export abstract class UploadFrom implements UploadFromInterface {
     }
 
     return checkFileIsReady(uuid, (info) => {
-      this.file = prettyFileInfo(info, settings)
+      this.setFile(prettyFileInfo(info, settings))
     }, 100, settings)
   }
 

@@ -36,7 +36,10 @@ export type FromUrlStatusResponse = ProgressResponse | InfoResponse | ErrorRespo
 export default function fromUrlStatus(token: string, settings: Settings = {}): Promise<FromUrlStatusResponse> {
   const options: RequestOptions = prepareOptions({
     path: '/from_url/status/',
-    query: {token: token},
+    query: {
+      token: token,
+      pub_key: settings.publicKey || '',
+    },
   }, settings)
 
   return request(options)

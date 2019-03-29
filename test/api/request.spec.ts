@@ -1,4 +1,4 @@
-import request, {buildFormData} from '../../src/api/request'
+import request, {buildFormData, createCancelController} from '../../src/api/request'
 import * as factory from '../_fixtureFactory'
 import axios from 'axios'
 import {sleep} from '../_helpers'
@@ -89,7 +89,7 @@ describe('API – request', () => {
     })
 
     it('if request canceled', (done) => {
-      const source = axios.CancelToken.source()
+      const source = createCancelController()
 
       request({
         path: '/info/',

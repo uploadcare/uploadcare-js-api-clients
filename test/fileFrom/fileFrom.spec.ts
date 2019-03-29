@@ -37,7 +37,9 @@ describe('fileFrom', () => {
   })
 
   it('should accept new file name setting', async() => {
-    const filePromise = fileFrom(FileFrom.URL, fileToUpload.data, {
+    const filePromise = fileFrom(FileFrom.URL, {
+      sourceUrl: factory.imageUrl('valid'),
+    }, {
       publicKey: factory.publicKey('demo'),
       doNotStore: true,
       fileName: 'newFileName.jpg',
@@ -57,7 +59,6 @@ describe('fileFrom', () => {
       const filePromise = fileFrom(FileFrom.Object, fileToUpload.data, {publicKey: factory.publicKey('demo')})
 
       setTimeout(() => {
-        // @ts-ignore
         filePromise.cancel()
       }, 10)
 
