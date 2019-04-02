@@ -100,7 +100,11 @@ describe('API – request', () => {
         cancelToken: source.token,
       })
         .then(() => done.fail())
-        .catch((error) => error.name === 'CancelError' ? done() : done.fail(error))
+        .catch(error => {
+          (error.name === 'CancelError')
+            ? done()
+            : done.fail(error)
+        })
 
       source.cancel()
     })

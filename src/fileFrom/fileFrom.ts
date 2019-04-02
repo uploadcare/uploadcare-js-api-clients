@@ -1,5 +1,5 @@
 import {FileData, Settings} from '../types'
-import {UrlData} from '../api/fromUrl'
+import {Url} from '../api/fromUrl'
 import {UploadFromObject} from './UploadFromObject'
 import {UploadFromUrl} from './UploadFromUrl'
 import {UploadFromInterface} from './UploadFrom'
@@ -20,12 +20,12 @@ export enum FileFrom {
  * @throws Error
  * @returns {UploadFromInterface}
  */
-export default function fileFrom(from: FileFrom, data: FileData | UrlData, settings: Settings = {}): UploadFromInterface {
+export default function fileFrom(from: FileFrom, data: FileData | Url, settings: Settings = {}): UploadFromInterface {
   switch (from) {
     case FileFrom.Object:
       return new UploadFromObject(data as FileData, settings)
     case FileFrom.URL:
-      return new UploadFromUrl(data as UrlData, settings)
+      return new UploadFromUrl(data as Url, settings)
     default:
       throw new Error(`File uploading from "${from}" is not supported`)
   }

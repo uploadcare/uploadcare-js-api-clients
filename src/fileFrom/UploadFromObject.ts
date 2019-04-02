@@ -46,7 +46,7 @@ export class UploadFromObject extends UploadFrom {
       .then(({file: uuid}) => {
         return this.handleUploaded(uuid, this.settings)
       })
-      .catch(this.handleError)
       .then(this.handleReady)
+      .catch(this.handleError)
   }
 }

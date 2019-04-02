@@ -1,4 +1,4 @@
-import {TypeEnum, UrlData} from '../api/fromUrl'
+import {TypeEnum, Url} from '../api/fromUrl'
 import {Settings, UploadcareFile} from '../types'
 import fromUrl from '../api/fromUrl'
 import fromUrlStatus from '../api/fromUrlStatus'
@@ -8,12 +8,12 @@ import {UploadFrom} from './UploadFrom'
 export class UploadFromUrl extends UploadFrom {
   protected request: Promise<UploadcareFile>
 
-  readonly data: UrlData
+  readonly data: Url
   readonly settings: Settings
 
   cancel: (() => void)
 
-  constructor(data: UrlData, settings: Settings) {
+  constructor(data: Url, settings: Settings) {
     super()
 
     this.data = data
@@ -45,7 +45,7 @@ export class UploadFromUrl extends UploadFrom {
           const {token} = data
           const status = fromUrlStatus(token, this.settings)
 
-          status.then(data => {
+          return status.then(data => {
             // @ts-ignore
             const {uuid} = data
 
@@ -58,7 +58,7 @@ export class UploadFromUrl extends UploadFrom {
           return this.handleUploaded(uuid, this.settings)
         }
       })
-      .catch(this.handleError)
       .then(this.handleReady)
+      .catch(this.handleError)
   }
 }

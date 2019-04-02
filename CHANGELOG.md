@@ -18,7 +18,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Added
 
 * Low-level request wrappers for `/from_url/` and `/from_url/status/` paths of Upload API.
-* Settings: the support of setting `baseCDN`.
+* Settings: the support of setting `baseCDN`, `checkForUrlDuplicates`, `saveUrlForRecurrentUploads`.
 
 [Unreleased]: https://github.com/uploadcare/uploadcare-upload-client/compare/v1.0.0-alpha.1...HEAD
 

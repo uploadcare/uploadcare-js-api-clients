@@ -7,6 +7,8 @@ export type Settings = {
   secureSignature?: string,
   secureExpire?: string,
   integration?: string,
+  checkForUrlDuplicates?: boolean,
+  saveUrlForRecurrentUploads?: boolean,
 }
 
 export type FileData = Blob | File | Buffer

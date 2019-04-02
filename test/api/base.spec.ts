@@ -69,15 +69,15 @@ describe('API - base', () => {
   })
 
   it('should be able to handle progress', (done) => {
-    let progress = 0
+    let progressValue = 0
     const directUpload = base(fileToUpload.data, {publicKey: factory.publicKey('demo')})
 
-    directUpload.onProgress = () => {
-      progress += 1
+    directUpload.onProgress = (progress) => {
+      progressValue = progress.loaded
     }
 
     directUpload
-      .then(() => progress ? done() : done.fail())
+      .then(() => progressValue > 0 ? done() : done.fail())
       .catch(error => done.fail(error))
   })
 })
