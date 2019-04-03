@@ -19,27 +19,30 @@ export class UploadFromObject extends UploadFrom {
 
     this.directUpload = base(this.data, this.settings)
 
-    this.cancel = this.directUpload.cancel
+    this.cancel = () => {
+      if (this.timerId) {
+        clearTimeout(this.timerId)
+      }
+
+      this.directUpload.cancel()
+    }
     this.request = this.getFilePromise()
   }
 
   private getFilePromise(): Promise<UploadcareFile> {
     const filePromise = this.directUpload
 
-    this.setProgress(ProgressState.Uploading)
+    this.handleUploading()
 
     filePromise.onProgress = (progressEvent) => {
-      this.setProgress(ProgressState.Uploading, progressEvent)
-
-      if (typeof this.onProgress === 'function') {
-        this.onProgress(this.getProgress())
-      }
+      this.handleUploading({
+        total: progressEvent.total,
+        loaded: progressEvent.loaded,
+      })
     }
 
     filePromise.onCancel = () => {
-      if (typeof this.onCancel === 'function') {
-        this.onCancel()
-      }
+      this.handleCancelling()
     }
 
     return filePromise

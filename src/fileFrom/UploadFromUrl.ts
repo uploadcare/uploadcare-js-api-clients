@@ -1,8 +1,11 @@
-import {TypeEnum, Url} from '../api/fromUrl'
+import fromUrl, {FromUrlResponse, isFileInfoResponse, isTokenResponse, Url} from '../api/fromUrl'
 import {Settings, UploadcareFile} from '../types'
-import fromUrl from '../api/fromUrl'
-import fromUrlStatus from '../api/fromUrlStatus'
-import {ProgressState} from './UploadFrom'
+import fromUrlStatus, {
+  FromUrlStatusResponse,
+  isErrorResponse,
+  isProgressResponse,
+  isSuccessResponse,
+} from '../api/fromUrlStatus'
 import {UploadFrom} from './UploadFrom'
 
 export class UploadFromUrl extends UploadFrom {
@@ -18,47 +21,58 @@ export class UploadFromUrl extends UploadFrom {
 
     this.data = data
     this.settings = settings
-    // TODO: Just reject promise and stop check file on CDN
-    this.cancel = function () {}
+    this.cancel = () => {
+      if (this.timerId) {
+        clearTimeout(this.timerId)
+      }
+    }
     this.request = this.getFilePromise()
   }
 
   private getFilePromise(): Promise<UploadcareFile> {
     const urlPromise = fromUrl(this.data, this.settings)
 
-    this.setProgress(ProgressState.Uploading)
-
-    if (typeof this.onProgress === 'function') {
-      this.onProgress(this.getProgress())
-    }
-
-    if (typeof this.onCancel === 'function') {
-      this.onCancel()
-    }
+    this.handleUploading()
+    this.handleCancelling()
 
     return urlPromise
-      .then(data => {
-        const {type} = data
-
-        if (type === TypeEnum.Token) {
-          // @ts-ignore
-          const {token} = data
-          const status = fromUrlStatus(token, this.settings)
-
-          return status.then(data => {
-            // @ts-ignore
-            const {uuid} = data
-
-            return this.handleUploaded(uuid, this.settings)
-          })
-        } else if (type === TypeEnum.FileInfo) {
-          // @ts-ignore
-          const {uuid} = data
-
-          return this.handleUploaded(uuid, this.settings)
-        }
-      })
+      .then(this.handleFromUrlResponse)
       .then(this.handleReady)
       .catch(this.handleError)
+  }
+
+  private handleFromUrlResponse(response: FromUrlResponse) {
+    if (isTokenResponse(response)) {
+      const {token} = response
+      const status = fromUrlStatus(token, this.settings)
+
+      return status
+        .then(this.handleFromUrlStatusResponse)
+        .catch(this.handleError)
+    } else if (isFileInfoResponse(response)) {
+      const {uuid} = response
+
+      return this.handleUploaded(uuid, this.settings)
+    }
+  }
+
+  private handleFromUrlStatusResponse(response: FromUrlStatusResponse) {
+    if (isErrorResponse(response)) {
+      this.handleError(response.error)
+    } else if (isProgressResponse(response)) {
+      this.handleUploading({
+        total: response.total,
+        loaded: response.done,
+      })
+    } else if (isSuccessResponse(response)) {
+      const {uuid} = response
+
+      this.handleUploading({
+        total: response.total,
+        loaded: response.done,
+      })
+
+      return this.handleUploaded(uuid, this.settings)
+    }
   }
 }

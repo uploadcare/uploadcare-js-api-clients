@@ -1,7 +1,6 @@
 import {Settings, UploadcareFile} from '../types'
 import checkFileIsReady from '../checkFileIsReady'
 import prettyFileInfo from '../prettyFileInfo'
-import {BaseProgress} from '../api/base'
 
 export enum ProgressState {
   Pending = 'pending',
@@ -11,9 +10,14 @@ export enum ProgressState {
   Error = 'error',
 }
 
+export type FileProgress = {
+  total: number,
+  loaded: number,
+}
+
 export type UploadingProgress = {
   state: ProgressState,
-  upload: null | BaseProgress,
+  upload: null | FileProgress,
   value: number,
 }
 
@@ -49,6 +53,7 @@ export abstract class UploadFrom implements UploadFromInterface {
     value: 0,
   }
   protected file: UploadcareFile | undefined
+  protected timerId: any
 
   onProgress: ((progress: UploadingProgress) => void) | null = null
   onUploaded: ((uuid: string) => void) | null = null
@@ -57,9 +62,7 @@ export abstract class UploadFrom implements UploadFromInterface {
 
   abstract cancel: (() => void)
 
-  protected setProgress(state: ProgressState, progressEvent?: ProgressEvent) {
-    const progress = this.getProgress()
-
+  protected setProgress(state: ProgressState, progress?: FileProgress) {
     switch (state) {
       case ProgressState.Pending:
         this.progress = {
@@ -70,30 +73,29 @@ export abstract class UploadFrom implements UploadFromInterface {
         break
       case ProgressState.Uploading:
         this.progress = {
-          ...progress,
           state: ProgressState.Uploading,
-          upload: progressEvent || null,
-          value: progressEvent ? Math.round((progressEvent.loaded * 100) / progressEvent.total) : 0,
+          upload: progress || null,
+          value: progress ? Math.round((progress.loaded * 100) / progress.total) : 0,
         }
         break
       case ProgressState.Uploaded:
         this.progress = {
-          ...progress,
           state: ProgressState.Uploaded,
+          upload: null,
           value: 99,
         }
         break
       case ProgressState.Ready:
         this.progress = {
-          ...progress,
           state: ProgressState.Ready,
+          upload: null,
           value: 100,
         }
         break
       case ProgressState.Error:
         this.progress = {
-          ...progress,
           state: ProgressState.Error,
+          upload: null,
           value: 0,
         }
         break
@@ -129,13 +131,24 @@ export abstract class UploadFrom implements UploadFromInterface {
   }
 
   /**
-   * Handle uploading error
-   * @param error
+   * Handle cancelling of uploading file.
    */
-  protected handleError = (error) => {
-    this.setProgress(ProgressState.Error)
+  protected handleCancelling = (): void => {
+    if (typeof this.onCancel === 'function') {
+      this.onCancel()
+    }
+  }
 
-    return Promise.reject(error)
+  /**
+   * Handle file uploading.
+   * @param {FileProgress} fileProgress
+   */
+  protected handleUploading = (fileProgress?: FileProgress): void => {
+    this.setProgress(ProgressState.Uploading, fileProgress)
+
+    if (typeof this.onProgress === 'function') {
+      this.onProgress(this.getProgress())
+    }
   }
 
   /**
@@ -143,7 +156,7 @@ export abstract class UploadFrom implements UploadFromInterface {
    * @param {string} uuid
    * @param {Settings} settings
    */
-  protected handleUploaded = (uuid: string, settings: Settings) => {
+  protected handleUploaded = (uuid: string, settings: Settings): Promise<void> => {
     this.setFile({
       uuid,
       name: null,
@@ -165,13 +178,13 @@ export abstract class UploadFrom implements UploadFromInterface {
 
     return checkFileIsReady(uuid, (info) => {
       this.setFile(prettyFileInfo(info, settings))
-    }, 100, settings)
+    }, 100, this.timerId, settings)
   }
 
   /**
    * Handle uploaded file that ready on CDN.
    */
-  protected handleReady = () => {
+  protected handleReady = (): Promise<UploadcareFile> => {
     this.setProgress(ProgressState.Ready)
 
     if (typeof this.onProgress === 'function') {
@@ -183,5 +196,15 @@ export abstract class UploadFrom implements UploadFromInterface {
     }
 
     return Promise.resolve(this.getFile())
+  }
+
+  /**
+   * Handle uploading error
+   * @param error
+   */
+  protected handleError = (error) => {
+    this.setProgress(ProgressState.Error)
+
+    return Promise.reject(error)
   }
 }

@@ -10,6 +10,7 @@ const MAX_TIMEOUT = 300
  * @param uuid
  * @param handleFileInfo
  * @param timeout
+ * @param timerId
  * @param settings
  * @returns {Promise<void>}
  */
@@ -17,7 +18,8 @@ export default function checkFileIsReady(
   uuid: string,
   handleFileInfo: null | ((info: InfoResponse) => void),
   timeout: number,
-  settings: Settings = {}
+  timerId: any,
+  settings: Settings = {},
 ): Promise<void> {
   return new Promise((resolve, reject) => {
     info(uuid, settings)
@@ -30,8 +32,8 @@ export default function checkFileIsReady(
           resolve()
         }
 
-        setTimeout(() => {
-          checkFileIsReady(uuid, handleFileInfo, Math.min(MAX_TIMEOUT, timeout + 50), settings)
+        timerId = setTimeout(() => {
+          checkFileIsReady(uuid, handleFileInfo, Math.min(MAX_TIMEOUT, timeout + 50), timerId, settings)
             .then(() => {
               resolve()
             })

@@ -15,11 +15,27 @@ type TokenResponse = {
   token: string,
 }
 
-type InfoResponse = {
+type FileInfoResponse = {
   type: TypeEnum.FileInfo,
 } & FileInfo
 
-export type FromUrlResponse = InfoResponse | TokenResponse
+export type FromUrlResponse = FileInfoResponse | TokenResponse
+
+/**
+ * TokenResponse Type Guard
+ * @param {FromUrlResponse} response
+ */
+export const isTokenResponse = (response: FromUrlResponse): response is TokenResponse => {
+  return response.type !== undefined && response.type === TypeEnum.Token;
+}
+
+/**
+ * InfoResponse Type Guard
+ * @param {FromUrlResponse} response
+ */
+export const isFileInfoResponse = (response: FromUrlResponse): response is FileInfoResponse => {
+  return response.type !== undefined && response.type === TypeEnum.Token;
+}
 
 /**
  * Uploading files from URL.
