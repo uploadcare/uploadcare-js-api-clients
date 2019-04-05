@@ -7,6 +7,7 @@ export enum ProgressState {
   Uploading = 'uploading',
   Uploaded = 'uploaded',
   Ready = 'ready',
+  Canceled = 'canceled',
   Error = 'error',
 }
 
@@ -75,7 +76,8 @@ export abstract class UploadFrom implements UploadFromInterface {
         this.progress = {
           state: ProgressState.Uploading,
           upload: progress || null,
-          value: progress ? Math.round((progress.loaded * 100) / progress.total) : 0,
+          // leave 1 percent for uploaded and 1 for ready on cdn
+          value: progress ? Math.round((progress.loaded * 98) / progress.total) : 0,
         }
         break
       case ProgressState.Uploaded:
@@ -90,6 +92,13 @@ export abstract class UploadFrom implements UploadFromInterface {
           state: ProgressState.Ready,
           upload: null,
           value: 100,
+        }
+        break
+      case ProgressState.Canceled:
+        this.progress = {
+          state: ProgressState.Canceled,
+          upload: null,
+          value: 0,
         }
         break
       case ProgressState.Error:
@@ -134,6 +143,8 @@ export abstract class UploadFrom implements UploadFromInterface {
    * Handle cancelling of uploading file.
    */
   protected handleCancelling = (): void => {
+    this.setProgress(ProgressState.Canceled)
+
     if (typeof this.onCancel === 'function') {
       this.onCancel()
     }
@@ -141,10 +152,10 @@ export abstract class UploadFrom implements UploadFromInterface {
 
   /**
    * Handle file uploading.
-   * @param {FileProgress} fileProgress
+   * @param {FileProgress} progress
    */
-  protected handleUploading = (fileProgress?: FileProgress): void => {
-    this.setProgress(ProgressState.Uploading, fileProgress)
+  protected handleUploading = (progress?: FileProgress): void => {
+    this.setProgress(ProgressState.Uploading, progress)
 
     if (typeof this.onProgress === 'function') {
       this.onProgress(this.getProgress())
@@ -156,7 +167,7 @@ export abstract class UploadFrom implements UploadFromInterface {
    * @param {string} uuid
    * @param {Settings} settings
    */
-  protected handleUploaded = (uuid: string, settings: Settings): Promise<void> => {
+  protected handleUploaded = (uuid: string, settings: Settings): Promise<UploadcareFile> => {
     this.setFile({
       uuid,
       name: null,
@@ -176,9 +187,15 @@ export abstract class UploadFrom implements UploadFromInterface {
       this.onUploaded(uuid)
     }
 
-    return checkFileIsReady(uuid, (info) => {
-      this.setFile(prettyFileInfo(info, settings))
-    }, 100, this.timerId, settings)
+    return checkFileIsReady({
+      uuid, timeout: 100, settings
+    })
+      .then(info => {
+        this.setFile(prettyFileInfo(info, settings))
+
+        return Promise.resolve(this.getFile())
+      })
+      .catch(error => Promise.reject(error))
   }
 
   /**

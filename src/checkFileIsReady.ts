@@ -1,49 +1,26 @@
-import info from './api/info'
+import info, {InfoResponse} from './api/info'
 import {Settings} from './types'
-import {InfoResponse} from './api/info'
+import poll from './tools/poll'
 
-const MAX_TIMEOUT = 300
-
-/**
- * Resolves then file on CDN get status "ready".
- *
- * @param uuid
- * @param handleFileInfo
- * @param timeout
- * @param timerId
- * @param settings
- * @returns {Promise<void>}
- */
-export default function checkFileIsReady(
+type CheckFileIsReadyParams = {
   uuid: string,
-  handleFileInfo: null | ((info: InfoResponse) => void),
   timeout: number,
-  timerId: any,
-  settings: Settings = {},
-): Promise<void> {
-  return new Promise((resolve, reject) => {
-    info(uuid, settings)
-      .then(data => {
-        if (typeof handleFileInfo === 'function') {
-          handleFileInfo(data)
-        }
-
-        if (data.is_ready) {
-          resolve()
-        }
-
-        timerId = setTimeout(() => {
-          checkFileIsReady(uuid, handleFileInfo, Math.min(MAX_TIMEOUT, timeout + 50), timerId, settings)
-            .then(() => {
-              resolve()
-            })
-            .catch((error) => {
-              reject(error)
-            })
-        }, timeout)
-      })
-      .catch((error) => {
-        reject(error)
-      })
-  })
+  settings?: Settings
 }
+
+const checkFileIsReady = ({uuid, timeout, settings = {}}: CheckFileIsReadyParams): Promise<InfoResponse> =>
+  poll<InfoResponse>(
+    async () => {
+      const response = await info(uuid, settings)
+
+      if (response.is_ready) {
+        return response
+      }
+
+      return false
+    },
+    timeout,
+    150
+  )
+
+export default checkFileIsReady

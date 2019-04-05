@@ -3,36 +3,15 @@ import * as factory from './_fixtureFactory'
 
 describe('checkFileIsReady', () => {
   it('should be resolved if file is ready', async() => {
-    let timerId = null
+    const info = await checkFileIsReady({
+      uuid: factory.uuid('image'),
+      timeout: 50,
+      settings: {publicKey: factory.publicKey('image')}
+    })
 
-    await expectAsync(
-      checkFileIsReady(
-        factory.uuid('image'),
-        null,
-        50,
-        timerId,
-        {publicKey: factory.publicKey('image')}
-      )
-    )
-      .toBeResolved()
+    expect(info.is_ready).toBeTruthy()
   })
-  // TODO: checkFileIsReady should be cancellable
   it('should be cancellable', async() => {
-    let timerId = null
 
-    await expectAsync(
-      checkFileIsReady(
-        factory.uuid('image'),
-        null,
-        50,
-        timerId,
-        {publicKey: factory.publicKey('image')}
-      )
-    )
-      .toBeResolved()
-
-    if (timerId) {
-      clearTimeout(timerId)
-    }
   })
 })

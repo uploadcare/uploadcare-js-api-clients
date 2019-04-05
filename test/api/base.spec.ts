@@ -73,7 +73,7 @@ describe('API - base', () => {
     const directUpload = base(fileToUpload.data, {publicKey: factory.publicKey('demo')})
 
     directUpload.onProgress = (progress) => {
-      progressValue = progress.loaded
+      progressValue = Math.round((progress.loaded * 100) / progress.total)
     }
 
     directUpload

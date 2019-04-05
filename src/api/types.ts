@@ -52,7 +52,7 @@ interface VideoInfoInterface {
   video: Video
 }
 
-interface FileInfoInterface extends ProgressInterface, ImageInfoInterface, VideoInfoInterface {
+export interface FileInfoInterface extends ProgressInterface, ImageInfoInterface, VideoInfoInterface {
   uuid: string,
   file_id: string,
   original_filename: string,

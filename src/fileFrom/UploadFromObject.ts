@@ -1,6 +1,5 @@
 import {FileData, Settings, UploadcareFile} from '../types'
 import base, {DirectUploadInterface} from '../api/base'
-import {ProgressState} from './UploadFrom'
 import {UploadFrom} from './UploadFrom'
 
 export class UploadFromObject extends UploadFrom {
@@ -41,9 +40,7 @@ export class UploadFromObject extends UploadFrom {
       })
     }
 
-    filePromise.onCancel = () => {
-      this.handleCancelling()
-    }
+    filePromise.onCancel = this.handleCancelling
 
     return filePromise
       .then(({file: uuid}) => {

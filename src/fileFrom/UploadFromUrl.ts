@@ -5,8 +5,10 @@ import fromUrlStatus, {
   isErrorResponse,
   isProgressResponse,
   isSuccessResponse,
+  isUnknownResponse,
 } from '../api/fromUrlStatus'
 import {UploadFrom} from './UploadFrom'
+import checkFileIsUploaded from '../checkFileIsUploaded'
 
 export class UploadFromUrl extends UploadFrom {
   protected request: Promise<UploadcareFile>
@@ -41,13 +43,13 @@ export class UploadFromUrl extends UploadFrom {
       .catch(this.handleError)
   }
 
-  private handleFromUrlResponse(response: FromUrlResponse) {
+  private handleFromUrlResponse = (response: FromUrlResponse) => {
     if (isTokenResponse(response)) {
       const {token} = response
       const status = fromUrlStatus(token, this.settings)
 
       return status
-        .then(this.handleFromUrlStatusResponse)
+        .then(response => this.handleFromUrlStatusResponse(token, response) )
         .catch(this.handleError)
     } else if (isFileInfoResponse(response)) {
       const {uuid} = response
@@ -56,21 +58,31 @@ export class UploadFromUrl extends UploadFrom {
     }
   }
 
-  private handleFromUrlStatusResponse(response: FromUrlStatusResponse) {
-    if (isErrorResponse(response)) {
-      this.handleError(response.error)
-    } else if (isProgressResponse(response)) {
-      this.handleUploading({
-        total: response.total,
-        loaded: response.done,
-      })
-    } else if (isSuccessResponse(response)) {
-      const {uuid} = response
+  private handleFromUrlStatusResponse = (token: string, response: FromUrlStatusResponse) => {
+    if (isUnknownResponse(response)) {
+      // TODO: More info about error
+      return this.handleError(new Error('Unknown response'))
+    }
 
+    if (isErrorResponse(response)) {
+      return this.handleError(response.error)
+    }
+
+    if (isProgressResponse(response)) {
       this.handleUploading({
         total: response.total,
         loaded: response.done,
       })
+
+      return checkFileIsUploaded({
+        token, timeout: 100, settings: this.settings
+      })
+        .then(status => this.handleFromUrlStatusResponse(token, status))
+        .catch(error => Promise.reject(error))
+    }
+
+    if (isSuccessResponse(response)) {
+      const {uuid} = response
 
       return this.handleUploaded(uuid, this.settings)
     }
