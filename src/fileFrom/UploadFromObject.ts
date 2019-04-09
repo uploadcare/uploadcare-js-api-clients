@@ -9,7 +9,7 @@ export class UploadFromObject extends UploadFrom {
   readonly data: FileData
   readonly settings: Settings
 
-  cancel: (() => void)
+  cancel: VoidFunction
 
   constructor(data: FileData, settings: Settings) {
     super()

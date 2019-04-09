@@ -1,18 +1,18 @@
 import * as factory from '../_fixtureFactory'
 import fileFrom, {FileFrom} from '../../src/fileFrom/fileFrom'
 import {sleep} from '../_helpers'
-import {ProgressState} from '../../src/fileFrom/UploadFrom'
 
 describe('fileFrom', () => {
   describe('Object', () => {
     const fileToUpload = factory.image('blackSquare')
 
-    it('should resolves when file is ready on CDN', async() => {
+    it('should resolves when file is ready on CDN', () => {
       const filePromise = fileFrom(FileFrom.Object, fileToUpload.data, {publicKey: factory.publicKey('demo')})
-      const file = await filePromise
 
-      expect(filePromise.getProgressState()).toBe(ProgressState.Ready)
-      expect(file.cdnUrl).toBeTruthy()
+      filePromise
+        .then(file => {
+          expect(file.cdnUrl).toBeTruthy()
+        })
     })
 
     it('should accept doNotStore setting', async() => {
@@ -125,12 +125,13 @@ describe('fileFrom', () => {
   describe('URL', () => {
     const sourceUrl = factory.imageUrl('valid')
 
-    it('should resolves when file is ready on CDN', async() => {
+    it('should resolves when file is ready on CDN', () => {
       const filePromise = fileFrom(FileFrom.URL, sourceUrl, {publicKey: factory.publicKey('demo')})
-      const file = await filePromise
 
-      expect(filePromise.getProgressState()).toBe(ProgressState.Ready)
-      expect(file.cdnUrl).toBeTruthy()
+      filePromise
+        .then(file => {
+          expect(file.cdnUrl).toBeTruthy()
+        })
     })
 
     it('should accept doNotStore setting', async() => {

@@ -1,8 +1,9 @@
 import {Settings, UploadcareFile} from '../types'
 import checkFileIsReady from '../checkFileIsReady'
 import prettyFileInfo from '../prettyFileInfo'
+import {Thenable} from '../tools/Thenable'
 
-export enum ProgressState {
+export enum UploadingProgressState {
   Pending = 'pending',
   Uploading = 'uploading',
   Uploaded = 'uploaded',
@@ -17,39 +18,34 @@ export type FileProgress = {
 }
 
 export type UploadingProgress = {
-  state: ProgressState,
+  state: UploadingProgressState,
   upload: null | FileProgress,
   value: number,
 }
 
+/**
+ * Base `thenable` interface for uploading `fileFrom` (`object`, `url`, `input`, `uploaded`).
+ */
 export interface UploadFromInterface extends Promise<UploadcareFile> {
-  readonly [Symbol.toStringTag]: string
-
   onProgress: ((progress: UploadingProgress) => void) | null
   onUploaded: ((uuid: string) => void) | null
   onReady: ((file: UploadcareFile) => void) | null
-  onCancel: (() => void) | null
-  cancel: (() => void)
+  onCancel: VoidFunction | null
 
-  getProgressState(): ProgressState
-
-  getFile(): UploadcareFile
-
-  then<TFulfilled = UploadcareFile, TRejected = never>(
-    onFulfilled?: ((value: UploadcareFile) => (PromiseLike<TFulfilled> | TFulfilled)) | undefined | null,
-    onRejected?: ((reason: any) => (PromiseLike<TRejected> | TRejected)) | undefined | null
-  ): Promise<TFulfilled | TRejected>
-  catch<TRejected = never>(
-    onRejected?: ((reason: any) => (PromiseLike<TRejected> | TRejected)) | undefined | null
-  ): Promise<UploadcareFile | TRejected>
+  cancel: VoidFunction
 }
 
-export abstract class UploadFrom implements UploadFromInterface {
-  readonly [Symbol.toStringTag]: string
-
+/**
+ * Base abstract `thenable` implementation of `UploadFromInterface`.
+ * You need to use this as base class for all uploading methods of `fileFrom`.
+ * All that you need to implement — `request` and `cancel` properties.
+ */
+export abstract class UploadFrom extends Thenable<UploadcareFile> implements UploadFromInterface {
   protected abstract request: Promise<UploadcareFile>
+  abstract cancel: VoidFunction
+
   protected progress: UploadingProgress = {
-    state: ProgressState.Pending,
+    state: UploadingProgressState.Pending,
     upload: null,
     value: 0,
   }
@@ -59,51 +55,49 @@ export abstract class UploadFrom implements UploadFromInterface {
   onProgress: ((progress: UploadingProgress) => void) | null = null
   onUploaded: ((uuid: string) => void) | null = null
   onReady: ((file: UploadcareFile) => void) | null = null
-  onCancel: (() => void) | null = null
+  onCancel: VoidFunction | null = null
 
-  abstract cancel: (() => void)
-
-  protected setProgress(state: ProgressState, progress?: FileProgress) {
+  protected setProgress(state: UploadingProgressState, progress?: FileProgress) {
     switch (state) {
-      case ProgressState.Pending:
+      case UploadingProgressState.Pending:
         this.progress = {
-          state: ProgressState.Pending,
+          state: UploadingProgressState.Pending,
           upload: null,
           value: 0,
         }
         break
-      case ProgressState.Uploading:
+      case UploadingProgressState.Uploading:
         this.progress = {
-          state: ProgressState.Uploading,
+          state: UploadingProgressState.Uploading,
           upload: progress || null,
           // leave 1 percent for uploaded and 1 for ready on cdn
           value: progress ? Math.round((progress.loaded * 98) / progress.total) : 0,
         }
         break
-      case ProgressState.Uploaded:
+      case UploadingProgressState.Uploaded:
         this.progress = {
-          state: ProgressState.Uploaded,
+          state: UploadingProgressState.Uploaded,
           upload: null,
           value: 99,
         }
         break
-      case ProgressState.Ready:
+      case UploadingProgressState.Ready:
         this.progress = {
-          state: ProgressState.Ready,
+          state: UploadingProgressState.Ready,
           upload: null,
           value: 100,
         }
         break
-      case ProgressState.Canceled:
+      case UploadingProgressState.Canceled:
         this.progress = {
-          state: ProgressState.Canceled,
+          state: UploadingProgressState.Canceled,
           upload: null,
           value: 0,
         }
         break
-      case ProgressState.Error:
+      case UploadingProgressState.Error:
         this.progress = {
-          state: ProgressState.Error,
+          state: UploadingProgressState.Error,
           upload: null,
           value: 0,
         }
@@ -115,35 +109,19 @@ export abstract class UploadFrom implements UploadFromInterface {
     return this.progress
   }
 
-  getProgressState(): ProgressState {
-    return this.getProgress().state
-  }
-
   protected setFile(file: UploadcareFile) {
     this.file = file
   }
 
-  getFile(): UploadcareFile {
+  protected getFile(): UploadcareFile {
     return this.file as UploadcareFile
-  }
-
-  then<TFulfilled = UploadcareFile, TRejected = never>(
-    onFulfilled?: ((value: UploadcareFile) => (PromiseLike<TFulfilled> | TFulfilled)) | undefined | null,
-    onRejected?: ((reason: any) => (PromiseLike<TRejected> | TRejected)) | undefined | null
-  ): Promise<TFulfilled | TRejected> {
-    return this.request.then(onFulfilled, onRejected)
-  }
-  catch<TRejected = never>(
-    onRejected?: ((reason: any) => (PromiseLike<TRejected> | TRejected)) | undefined | null
-  ): Promise<UploadcareFile | TRejected> {
-    return this.request.catch(onRejected)
   }
 
   /**
    * Handle cancelling of uploading file.
    */
   protected handleCancelling = (): void => {
-    this.setProgress(ProgressState.Canceled)
+    this.setProgress(UploadingProgressState.Canceled)
 
     if (typeof this.onCancel === 'function') {
       this.onCancel()
@@ -155,7 +133,7 @@ export abstract class UploadFrom implements UploadFromInterface {
    * @param {FileProgress} progress
    */
   protected handleUploading = (progress?: FileProgress): void => {
-    this.setProgress(ProgressState.Uploading, progress)
+    this.setProgress(UploadingProgressState.Uploading, progress)
 
     if (typeof this.onProgress === 'function') {
       this.onProgress(this.getProgress())
@@ -181,14 +159,16 @@ export abstract class UploadFrom implements UploadFromInterface {
       originalImageInfo: null,
     })
 
-    this.setProgress(ProgressState.Uploaded)
+    this.setProgress(UploadingProgressState.Uploaded)
 
     if (typeof this.onUploaded === 'function') {
       this.onUploaded(uuid)
     }
 
     return checkFileIsReady({
-      uuid, timeout: 100, settings
+      uuid,
+      timeout: 100,
+      settings,
     })
       .then(info => {
         this.setFile(prettyFileInfo(info, settings))
@@ -202,7 +182,7 @@ export abstract class UploadFrom implements UploadFromInterface {
    * Handle uploaded file that ready on CDN.
    */
   protected handleReady = (): Promise<UploadcareFile> => {
-    this.setProgress(ProgressState.Ready)
+    this.setProgress(UploadingProgressState.Ready)
 
     if (typeof this.onProgress === 'function') {
       this.onProgress(this.getProgress())
@@ -220,7 +200,11 @@ export abstract class UploadFrom implements UploadFromInterface {
    * @param error
    */
   protected handleError = (error) => {
-    this.setProgress(ProgressState.Error)
+    this.setProgress(UploadingProgressState.Error)
+
+    if (error.name === 'CancelError') {
+      this.handleCancelling()
+    }
 
     return Promise.reject(error)
   }

@@ -1,4 +1,29 @@
+import {Thenable} from './Thenable'
+
 const MAX_TIMEOUT = 300
+
+interface PollPromiseInterface<T> extends Promise<T> {
+  cancel: VoidFunction
+}
+
+interface ExecutorFunction {
+  (resolve: Function, reject: Function): void
+}
+
+class PollPromise<T> extends Thenable<T> implements PollPromiseInterface<T> {
+  protected request: Promise<T>
+  private readonly timerId: any
+
+  constructor(executor: ExecutorFunction, timerId?: any) {
+    super()
+    this.request = new Promise(executor)
+    this.timerId = timerId
+  }
+
+  cancel() {
+    clearTimeout(this.timerId)
+  }
+}
 
 /**
  * Polling function on promises.
@@ -7,7 +32,8 @@ const MAX_TIMEOUT = 300
  * @param {number} interval
  */
 export default function poll<T>(fn, timeout, interval): Promise<T> {
-  let endTime = Number(new Date()) + (timeout || 2000)
+  let endTime = Number(new Date()) + (timeout || MAX_TIMEOUT)
+  let timerId
   interval = interval || 100
 
   const checkCondition = (resolve, reject) => {
@@ -19,7 +45,7 @@ export default function poll<T>(fn, timeout, interval): Promise<T> {
     }
     // If the condition isn't met but the timeout hasn't elapsed, go again
     else if (Number(new Date()) < endTime) {
-      setTimeout(checkCondition, interval, resolve, reject);
+      timerId = setTimeout(checkCondition, interval, resolve, reject);
     }
     // Didn't match and too much time, reject!
     else {
@@ -27,5 +53,5 @@ export default function poll<T>(fn, timeout, interval): Promise<T> {
     }
   };
 
-  return new Promise(checkCondition);
+  return new PollPromise(checkCondition, timerId)
 }

@@ -20,7 +20,7 @@ const checkFileIsReady = ({uuid, timeout, settings = {}}: CheckFileIsReadyParams
       return false
     },
     timeout,
-    150
+    150,
   )
 
 export default checkFileIsReady

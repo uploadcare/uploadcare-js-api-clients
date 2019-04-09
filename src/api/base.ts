@@ -1,6 +1,7 @@
 import request, {createCancelController, HandleProgressFunction, prepareOptions} from './request'
 import {RequestOptions} from './request'
 import {Settings, FileData} from '../types'
+import {Thenable} from '../tools/Thenable'
 
 export type BaseProgress = ProgressEvent
 
@@ -9,33 +10,24 @@ export type BaseResponse = {
 }
 
 export interface DirectUploadInterface extends Promise<BaseResponse> {
-  readonly [Symbol.toStringTag]: string
   readonly options: RequestOptions
-  readonly cancel: (() => void)
+  readonly cancel: VoidFunction
 
   onProgress: HandleProgressFunction | null
-  onCancel: (() => void) | null
-
-  then<TFulfilled = BaseResponse, TRejected = never>(
-    onFulfilled?: ((value: BaseResponse) => (PromiseLike<TFulfilled> | TFulfilled)) | undefined | null,
-    onRejected?: ((reason: any) => (PromiseLike<TRejected> | TRejected)) | undefined | null
-  ): Promise<TFulfilled | TRejected>
-  catch<TRejected = never>(
-    onRejected?: ((reason: any) => (PromiseLike<TRejected> | TRejected)) | undefined | null
-  ): Promise<BaseResponse | TRejected>
+  onCancel: VoidFunction | null
 }
 
-export class DirectUpload implements DirectUploadInterface {
+class DirectUpload extends Thenable<BaseResponse> implements DirectUploadInterface {
   protected request: Promise<BaseResponse>
 
-  readonly [Symbol.toStringTag]: string
   readonly options: RequestOptions
-  readonly cancel: (() => void)
+  readonly cancel: VoidFunction
 
   onProgress: HandleProgressFunction | null = null
-  onCancel: (() => void) | null = null
+  onCancel: VoidFunction | null = null
 
   constructor(options: RequestOptions) {
+    super()
     const cancelController = createCancelController()
 
     this.options = {
@@ -58,18 +50,6 @@ export class DirectUpload implements DirectUploadInterface {
 
         return Promise.reject(error)
       })
-  }
-
-  then<TFulfilled = BaseResponse, TRejected = never>(
-    onFulfilled?: ((value: BaseResponse) => (PromiseLike<TFulfilled> | TFulfilled)) | undefined | null,
-    onRejected?: ((reason: any) => (PromiseLike<TRejected> | TRejected)) | undefined | null
-  ): Promise<TFulfilled | TRejected> {
-    return this.request.then(onFulfilled, onRejected)
-  }
-  catch<TRejected = never>(
-    onRejected?: ((reason: any) => (PromiseLike<TRejected> | TRejected)) | undefined | null
-  ): Promise<BaseResponse | TRejected> {
-    return this.request.catch(onRejected)
   }
 }
 

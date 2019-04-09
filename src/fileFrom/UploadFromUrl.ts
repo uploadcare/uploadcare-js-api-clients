@@ -9,6 +9,7 @@ import fromUrlStatus, {
 } from '../api/fromUrlStatus'
 import {UploadFrom} from './UploadFrom'
 import checkFileIsUploaded from '../checkFileIsUploaded'
+import CancelError from '../errors/CancelError'
 
 export class UploadFromUrl extends UploadFrom {
   protected request: Promise<UploadcareFile>
@@ -27,6 +28,7 @@ export class UploadFromUrl extends UploadFrom {
       if (this.timerId) {
         clearTimeout(this.timerId)
       }
+      throw new CancelError()
     }
     this.request = this.getFilePromise()
   }
@@ -35,7 +37,6 @@ export class UploadFromUrl extends UploadFrom {
     const urlPromise = fromUrl(this.data, this.settings)
 
     this.handleUploading()
-    this.handleCancelling()
 
     return urlPromise
       .then(this.handleFromUrlResponse)
@@ -59,9 +60,10 @@ export class UploadFromUrl extends UploadFrom {
   }
 
   private handleFromUrlStatusResponse = (token: string, response: FromUrlStatusResponse) => {
+    // Now just ignore 'unknown' response and make request again
+    // TODO: Remake into polling
     if (isUnknownResponse(response)) {
-      // TODO: More info about error
-      return this.handleError(new Error('Unknown response'))
+      return this.getFilePromise()
     }
 
     if (isErrorResponse(response)) {
@@ -75,7 +77,9 @@ export class UploadFromUrl extends UploadFrom {
       })
 
       return checkFileIsUploaded({
-        token, timeout: 100, settings: this.settings
+        token,
+        timeout: 100,
+        settings: this.settings
       })
         .then(status => this.handleFromUrlStatusResponse(token, status))
         .catch(error => Promise.reject(error))

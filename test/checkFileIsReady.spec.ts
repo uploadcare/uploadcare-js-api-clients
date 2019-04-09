@@ -11,7 +11,17 @@ describe('checkFileIsReady', () => {
 
     expect(info.is_ready).toBeTruthy()
   })
-  it('should be cancellable', async() => {
-
+  it('should be cancelable', (done) => {
+    checkFileIsReady({
+      uuid: factory.uuid('image'),
+      timeout: 50,
+      settings: {publicKey: factory.publicKey('image')}
+    })
+      .then(() => done.fail())
+      .catch((error) => {
+        if (error.name !== 'CancelError') {
+          done.fail(error)
+        }
+      })
   })
 })
