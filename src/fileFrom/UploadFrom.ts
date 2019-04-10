@@ -32,17 +32,17 @@ export interface UploadFromInterface extends Promise<UploadcareFile> {
   onReady: ((file: UploadcareFile) => void) | null
   onCancel: VoidFunction | null
 
-  cancel: VoidFunction
+  cancel(): void
 }
 
 /**
  * Base abstract `thenable` implementation of `UploadFromInterface`.
  * You need to use this as base class for all uploading methods of `fileFrom`.
- * All that you need to implement — `request` and `cancel` properties.
+ * All that you need to implement — `promise` and `cancel` properties.
  */
 export abstract class UploadFrom extends Thenable<UploadcareFile> implements UploadFromInterface {
-  protected abstract request: Promise<UploadcareFile>
-  abstract cancel: VoidFunction
+  protected abstract readonly promise: Promise<UploadcareFile>
+  abstract cancel(): void
 
   protected progress: UploadingProgress = {
     state: ProgressState.Pending,
@@ -50,7 +50,6 @@ export abstract class UploadFrom extends Thenable<UploadcareFile> implements Upl
     value: 0,
   }
   protected file: UploadcareFile | undefined
-  protected timerId: any
 
   onProgress: ((progress: UploadingProgress) => void) | null = null
   onUploaded: ((uuid: string) => void) | null = null

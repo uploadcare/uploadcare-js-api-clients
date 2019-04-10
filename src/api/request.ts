@@ -1,4 +1,4 @@
-import axios, {CancelToken} from 'axios'
+import axios, {CancelToken, CancelTokenSource} from 'axios'
 import * as FormData from 'form-data'
 import defaultSettings, {getUserAgent} from '../defaultSettings'
 import RequestError from '../errors/RequestError'
@@ -6,6 +6,7 @@ import CancelError from '../errors/CancelError'
 import UploadcareError from '../errors/UploadcareError'
 import {FileData, Settings} from '../types'
 import {BaseProgress} from './base'
+import {Thenable} from '../tools/Thenable'
 
 export type Query = {
   [key: string]: string | boolean | number | void,
@@ -93,69 +94,15 @@ export default function request({
   body,
   headers,
   baseURL,
-  ...axiosOptions
-}: RequestOptions): Promise<RequestResponse> {
-  const data = body && buildFormData({
-    ...body,
-    source: body.source || 'local',
+}: RequestOptions): RequestInterface {
+  return new Request({
+    method,
+    path,
+    query,
+    body,
+    headers,
+    baseURL,
   })
-
-  return axios({
-    method: method || 'GET',
-    baseURL: baseURL || defaultSettings.baseURL,
-    url: path,
-    params: {
-      jsonerrors: 1,
-      ...query,
-    },
-    data,
-    maxContentLength: MAX_CONTENT_LENGTH,
-    headers: {
-      'X-UC-User-Agent': getUserAgent(),
-      ...headers,
-      ...((data && data.getHeaders) ? data.getHeaders() : {}),
-    },
-    ...axiosOptions,
-  })
-    .catch((error) => {
-      if (axios.isCancel(error)) {
-        throw new CancelError()
-      }
-
-      if (error.response) {
-        throw new RequestError({
-          headers: error.config.headers,
-          url: error.config.url,
-        }, {
-          status: error.response.status,
-          statusText: error.response.statusText,
-        })
-      }
-
-      throw error
-    })
-    .then(axiosResponse => {
-      const url = axiosResponse.config.url || path
-
-      if (axiosResponse.data.error) {
-        const {status_code: code, content} = axiosResponse.data.error
-
-        throw new UploadcareError({
-          headers: axiosResponse.config.headers,
-          url,
-        }, {
-          status: code,
-          statusText: content,
-        })
-      }
-
-      return {
-        headers: axiosResponse.headers,
-        url,
-        data: axiosResponse.data,
-      }
-    })
-    .catch((error) => Promise.reject(error))
 }
 
 /**
@@ -198,6 +145,131 @@ export function buildFormData(body: Body): FormData {
  *
  * @returns {*}
  */
-export function createCancelController() {
+function createCancelController() {
   return axios.CancelToken.source()
+}
+
+export interface RequestInterface extends Promise<RequestResponse> {
+  cancel(): void
+}
+
+class Request extends Thenable<RequestResponse> implements RequestInterface {
+  protected readonly promise: Promise<RequestResponse>
+  protected readonly options: RequestOptions
+  private readonly cancelController: CancelTokenSource
+
+  constructor(options: RequestOptions) {
+    super()
+
+    this.options = options
+    this.cancelController = createCancelController()
+    this.promise = this.getRequestPromise()
+  }
+
+  protected getRequestPromise() {
+    const options = this.getRequestOptions()
+
+    return axios(options)
+      .catch(this.handleError)
+      .then(this.handleResponse)
+      .catch((error) => Promise.reject(error))
+  }
+
+  protected getRequestOptions() {
+    const {path} = this.options
+
+    return {
+      method: this.getRequestMethod(),
+      baseURL: this.getRequestBaseURL(),
+      url: path,
+      params: this.getRequestParams(),
+      data: this.getRequestData(),
+      maxContentLength: MAX_CONTENT_LENGTH,
+      headers: this.getRequestHeaders(),
+      cancelToken: this.cancelController.token,
+    }
+  }
+
+  protected getRequestMethod() {
+    const {method} = this.options
+
+    return method || 'GET'
+  }
+
+  protected getRequestBaseURL() {
+    const {baseURL} = this.options
+
+    return baseURL || defaultSettings.baseURL
+  }
+
+  protected getRequestParams() {
+    const {query} = this.options
+
+    return {
+      jsonerrors: 1,
+      ...query,
+    }
+  }
+
+  protected getRequestData() {
+    const {body} = this.options
+    return body && buildFormData({
+      ...body,
+      source: body.source || 'local',
+    })
+  }
+
+  protected getRequestHeaders() {
+    const {headers} = this.options
+    const data = this.getRequestData()
+
+    return {
+      'X-UC-User-Agent': getUserAgent(),
+      ...headers,
+      ...((data && data.getHeaders) ? data.getHeaders() : {}),
+    }
+  }
+
+  private handleError = (error) => {
+    if (axios.isCancel(error)) {
+      throw new CancelError()
+    }
+
+    if (error.response) {
+      throw new RequestError({
+        headers: error.config.headers,
+        url: error.config.url,
+      }, {
+        status: error.response.status,
+        statusText: error.response.statusText,
+      })
+    }
+
+    throw error
+  }
+
+  private handleResponse = response => {
+    const {path} = this.options
+    const url = response.config.url || path
+
+    if (response.data.error) {
+      const {status_code: code, content} = response.data.error
+
+      throw new UploadcareError({
+        headers: response.config.headers,
+        url,
+      }, {
+        status: code,
+        statusText: content,
+      })
+    }
+
+    return {
+      headers: response.headers,
+      url,
+      data: response.data,
+    }
+  }
+
+  cancel = (): void => this.cancelController.cancel()
 }

@@ -1,4 +1,4 @@
-import request, {buildFormData, createCancelController} from '../../src/api/request'
+import request, {buildFormData} from '../../src/api/request'
 import * as factory from '../_fixtureFactory'
 import axios from 'axios'
 import {sleep} from '../_helpers'
@@ -88,17 +88,16 @@ describe('API – request', () => {
       axios.interceptors.response.eject(interceptor)
     })
 
-    it('if request canceled', (done) => {
-      const source = createCancelController()
-
-      request({
+    it('if promise canceled', (done) => {
+      const requestWithOptions = request({
         path: '/info/',
         query: {
           pub_key: factory.publicKey('image'),
           file_id: factory.uuid('image'),
         },
-        cancelToken: source.token,
       })
+
+      requestWithOptions
         .then(() => done.fail())
         .catch(error => {
           (error.name === 'CancelError')
@@ -106,7 +105,7 @@ describe('API – request', () => {
             : done.fail(error)
         })
 
-      source.cancel()
+      requestWithOptions.cancel()
     })
   })
 })

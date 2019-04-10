@@ -9,7 +9,7 @@ describe('API - base', () => {
     const directUpload = base(fileToUpload.data, {publicKey: factory.publicKey('demo')})
     const {file} = await directUpload
 
-    expect(file).toEqual(jasmine.any(String))
+    expect(typeof file).toBe('string')
   })
 
   it('should accept integration setting', (done) => {
@@ -41,7 +41,7 @@ describe('API - base', () => {
 
     setTimeout(() => {
       directUpload.cancel()
-    }, 10)
+    }, 5)
 
     directUpload
       .then(() => done.fail())

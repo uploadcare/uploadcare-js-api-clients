@@ -1,7 +1,7 @@
-import request, {prepareOptions} from './request'
+import request, {prepareOptions, RequestInterface} from './request'
 import {Settings} from '../types'
-import {RequestOptions} from './request'
 import {FileInfo} from './types'
+import {Thenable} from '../tools/Thenable'
 
 export type Url = string
 
@@ -37,6 +37,51 @@ export const isFileInfoResponse = (response: FromUrlResponse): response is FileI
   return response.type !== undefined && response.type === TypeEnum.Token;
 }
 
+export interface FromUrlInterface extends Promise<FromUrlResponse> {
+  cancel(): void
+}
+
+class FromUrl extends Thenable<FromUrlResponse> implements FromUrlInterface {
+  protected readonly request: RequestInterface
+  protected readonly promise: Promise<FromUrlResponse>
+
+  protected readonly sourceUrl: Url
+  protected readonly settings: Settings
+
+  constructor(sourceUrl: Url, settings: Settings) {
+    super()
+
+    this.sourceUrl = sourceUrl
+    this.settings = settings
+    this.request = request(this.getRequestOptions())
+    this.promise = this.request
+      .then(response => response.data)
+  }
+
+  protected getRequestOptions() {
+    const getRequestQuery = (sourceUrl: Url, settings: Settings) => ({
+      pub_key: settings.publicKey || '',
+      source_url: sourceUrl,
+      store: settings.doNotStore ? '' : 'auto',
+      filename: settings.fileName || '',
+      check_URL_duplicates: settings.checkForUrlDuplicates ? 1 : 0,
+      save_URL_duplicates: settings.saveUrlForRecurrentUploads ? 1 : 0,
+      signature: settings.secureSignature || '',
+      expire: settings.secureExpire || '',
+    })
+
+    return prepareOptions({
+      method: 'POST',
+      path: '/from_url/',
+      query: getRequestQuery(this.sourceUrl, this.settings),
+    }, this.settings)
+  }
+
+  cancel(): void {
+    return this.request.cancel()
+  }
+}
+
 /**
  * Uploading files from URL.
  *
@@ -46,22 +91,6 @@ export const isFileInfoResponse = (response: FromUrlResponse): response is FileI
  */
 export default function fromUrl(
   sourceUrl: Url, settings: Settings = {}
-): Promise<FromUrlResponse> {
-  const options: RequestOptions = prepareOptions({
-    method: 'POST',
-    path: '/from_url/',
-    query: {
-      pub_key: settings.publicKey || '',
-      source_url: sourceUrl,
-      store: settings.doNotStore ? '' : 'auto',
-      filename: settings.fileName || '',
-      check_URL_duplicates: settings.checkForUrlDuplicates ? 1 : 0,
-      save_URL_duplicates: settings.saveUrlForRecurrentUploads ? 1 : 0,
-      signature: settings.secureSignature || '',
-      expire: settings.secureExpire || '',
-    },
-  }, settings)
-
-  return request(options)
-    .then(response => response.data)
+): FromUrlInterface {
+  return new FromUrl(sourceUrl, settings)
 }

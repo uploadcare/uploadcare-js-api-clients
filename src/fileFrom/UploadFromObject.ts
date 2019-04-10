@@ -3,33 +3,24 @@ import base, {DirectUploadInterface} from '../api/base'
 import {UploadFrom} from './UploadFrom'
 
 export class UploadFromObject extends UploadFrom {
-  protected request: Promise<UploadcareFile>
-  private readonly directUpload: DirectUploadInterface
+  protected readonly request: DirectUploadInterface
+  protected readonly promise: Promise<UploadcareFile>
 
-  readonly data: FileData
-  readonly settings: Settings
-
-  cancel: VoidFunction
+  protected readonly data: FileData
+  protected readonly settings: Settings
 
   constructor(data: FileData, settings: Settings) {
     super()
+
     this.data = data
     this.settings = settings
 
-    this.directUpload = base(this.data, this.settings)
-
-    this.cancel = () => {
-      if (this.timerId) {
-        clearTimeout(this.timerId)
-      }
-
-      this.directUpload.cancel()
-    }
-    this.request = this.getFilePromise()
+    this.request = base(this.data, this.settings)
+    this.promise = this.getFilePromise()
   }
 
   private getFilePromise(): Promise<UploadcareFile> {
-    const filePromise = this.directUpload
+    const filePromise = this.request
 
     this.handleUploading()
 
@@ -48,5 +39,9 @@ export class UploadFromObject extends UploadFrom {
       })
       .then(this.handleReady)
       .catch(this.handleError)
+  }
+
+  cancel(): void {
+    return this.request.cancel()
   }
 }

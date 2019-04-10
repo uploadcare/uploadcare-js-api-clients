@@ -1,4 +1,4 @@
-import request, {createCancelController, HandleProgressFunction, prepareOptions} from './request'
+import request, {HandleProgressFunction, prepareOptions, RequestInterface} from './request'
 import {RequestOptions} from './request'
 import {Settings, FileData} from '../types'
 import {Thenable} from '../tools/Thenable'
@@ -10,38 +10,26 @@ export type BaseResponse = {
 }
 
 export interface DirectUploadInterface extends Promise<BaseResponse> {
-  readonly options: RequestOptions
-  readonly cancel: VoidFunction
-
   onProgress: HandleProgressFunction | null
   onCancel: VoidFunction | null
+
+  cancel(): void
 }
 
 class DirectUpload extends Thenable<BaseResponse> implements DirectUploadInterface {
-  protected request: Promise<BaseResponse>
-
-  readonly options: RequestOptions
-  readonly cancel: VoidFunction
+  protected readonly request: RequestInterface
+  protected readonly promise: Promise<BaseResponse>
+  protected readonly options: RequestOptions
 
   onProgress: HandleProgressFunction | null = null
   onCancel: VoidFunction | null = null
 
   constructor(options: RequestOptions) {
     super()
-    const cancelController = createCancelController()
 
-    this.options = {
-      ...options,
-      /* TODO Add support of progress for Node.js */
-      onUploadProgress: (progressEvent: BaseProgress) => {
-        if (typeof this.onProgress === 'function') {
-          this.onProgress(progressEvent)
-        }
-      },
-      cancelToken: cancelController.token,
-    }
-    this.cancel = cancelController.cancel
-    this.request = request(this.options)
+    this.options = options
+    this.request = request(this.getRequestOptions())
+    this.promise = this.request
       .then(response => Promise.resolve(response.data))
       .catch(error => {
         if (error.name === 'CancelError' && typeof this.onCancel === 'function') {
@@ -50,6 +38,22 @@ class DirectUpload extends Thenable<BaseResponse> implements DirectUploadInterfa
 
         return Promise.reject(error)
       })
+  }
+
+  protected getRequestOptions() {
+    return {
+      ...this.options,
+      /* TODO Add support of progress for Node.js */
+      onUploadProgress: (progressEvent: BaseProgress) => {
+        if (typeof this.onProgress === 'function') {
+          this.onProgress(progressEvent)
+        }
+      },
+    }
+  }
+
+  cancel(): void {
+    return this.request.cancel()
   }
 }
 

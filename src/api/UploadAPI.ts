@@ -15,35 +15,34 @@ export default class UploadAPI {
     this.client = client
   }
 
+  protected getRequestOptions = (options) => {
+    return prepareOptions(options, this.client.settings)
+  }
+
+  protected getSettings = (settings) => {
+    return {
+      ...this.client.settings,
+      ...settings,
+    }
+  }
+
   request(options: RequestOptions): Promise<RequestResponse> {
-    return request(prepareOptions(options, this.client.settings))
+    return request(this.getRequestOptions(options))
   }
 
   base(data: FileData, settings: Settings = {}): DirectUploadInterface {
-    return base(data, {
-      ...this.client.settings,
-      ...settings,
-    })
+    return base(data, this.getSettings(settings))
   }
 
   info(uuid: string, settings: Settings = {}): Promise<InfoResponse> {
-    return info(uuid, {
-      ...this.client.settings,
-      ...settings,
-    })
+    return info(uuid, this.getSettings(settings))
   }
 
   fromUrl(sourceUrl: Url, settings: Settings = {}): Promise<FromUrlResponse> {
-    return fromUrl(sourceUrl, {
-      ...this.client.settings,
-      ...settings,
-    })
+    return fromUrl(sourceUrl, this.getSettings(settings))
   }
 
   fromUrlStatus(token: string, settings: Settings = {}): Promise<FromUrlStatusResponse> {
-    return fromUrlStatus(token,  {
-      ...this.client.settings,
-      ...settings,
-    })
+    return fromUrlStatus(token,this.getSettings(settings))
   }
 }

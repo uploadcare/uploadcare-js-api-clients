@@ -30,15 +30,11 @@ describe('fileFrom', () => {
 
       setTimeout(() => {
         filePromise.cancel()
-      }, 10)
+      }, 5)
 
       filePromise
         .then(() => done.fail())
-        .catch((error) => {
-          if (error.name !== 'CancelError') {
-            done.fail(error)
-          }
-        })
+        .catch((error) => error.name === 'CancelError' ? done() : done.fail(error))
     })
 
     it('should accept new file name setting', async() => {
@@ -149,15 +145,11 @@ describe('fileFrom', () => {
 
       setTimeout(() => {
         filePromise.cancel()
-      }, 10)
+      }, 5)
 
       filePromise
         .then(() => done.fail())
-        .catch(error => {
-          (error.name === 'CancelError')
-            ? done()
-            : done.fail(error)
-        })
+        .catch(error => error.name === 'CancelError' ? done() : done.fail(error))
     })
 
     it('should accept new file name setting', async() => {

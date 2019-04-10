@@ -5,6 +5,11 @@ import {RequestOptions} from './request'
 
 export type InfoResponse = FileInfo
 
+const getRequestQuery = (uuid: string, settings: Settings) => ({
+  pub_key: settings.publicKey || '',
+  file_id: uuid,
+})
+
 /**
  * Returns a JSON dictionary holding file info
  *
@@ -15,10 +20,7 @@ export type InfoResponse = FileInfo
 export default function info(uuid: string, settings: Settings = {}): Promise<InfoResponse> {
   const options: RequestOptions = prepareOptions({
     path: '/info/',
-    query: {
-      pub_key: settings.publicKey || '',
-      file_id: uuid,
-    },
+    query: getRequestQuery(uuid, settings),
   }, settings)
 
   return request(options)
