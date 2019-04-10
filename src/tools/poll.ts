@@ -1,12 +1,12 @@
 import {Thenable} from './Thenable'
 import TimeoutError from '../errors/TimeoutError'
+import {CancelableInterface} from '../api/types'
+import CancelError from '../errors/CancelError'
 
 const MAX_TIMEOUT = 300
 const MAX_INTERVAL = 100
 
-interface PollPromiseInterface<T> extends Promise<T> {
-  cancel: VoidFunction
-}
+export interface PollPromiseInterface<T> extends Promise<T>, CancelableInterface {}
 
 type ExecutorFunction = {
   (resolve: Function, reject: Function): void
@@ -24,10 +24,11 @@ class PollPromise<T> extends Thenable<T> implements PollPromiseInterface<T> {
 
   cancel() {
     clearTimeout(this.timeoutId)
+    throw new CancelError()
   }
 }
 
-interface CheckConditionFunction<T> {
+type CheckConditionFunction<T> = {
   (): boolean | T
 }
 

@@ -4,12 +4,34 @@ import {StatusEnum} from '../src/api/fromUrlStatus'
 
 describe('checkFileIsUploaded', () => {
   it('should be resolved if file is uploaded', async() => {
-    const status = await checkFileIsUploaded({
-      token: factory.uuid('token'),
+    checkFileIsUploaded({
+      token: factory.token('valid'),
+      timeout: 50,
+      settings: {publicKey: factory.publicKey('token')}
+    })
+      .then(info => {
+        expect(info.status).toBe(StatusEnum.Success)
+      })
+  })
+  it('should be cancelable', (done) => {
+    const polling = checkFileIsUploaded({
+      token: factory.token('valid'),
       timeout: 50,
       settings: {publicKey: factory.publicKey('token')}
     })
 
-    expect(status.status).toBe(StatusEnum.Success)
+    setTimeout(() => {
+      polling.cancel()
+    }, 5)
+
+    polling
+      .then(() => done.fail())
+      .catch((error) => {
+        if (error.name === 'CancelError') {
+          done()
+        } else {
+          done.fail(error)
+        }
+      })
   })
 })

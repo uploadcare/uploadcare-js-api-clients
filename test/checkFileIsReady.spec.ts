@@ -12,14 +12,22 @@ describe('checkFileIsReady', () => {
     expect(info.is_ready).toBeTruthy()
   })
   it('should be cancelable', (done) => {
-    checkFileIsReady({
+    const polling = checkFileIsReady({
       uuid: factory.uuid('image'),
       timeout: 50,
       settings: {publicKey: factory.publicKey('image')}
     })
+
+    setTimeout(() => {
+      polling.cancel()
+    }, 5)
+
+    polling
       .then(() => done.fail())
       .catch((error) => {
-        if (error.name !== 'CancelError') {
+        if (error.name === 'CancelError') {
+          done()
+        } else {
           done.fail(error)
         }
       })
