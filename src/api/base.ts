@@ -2,6 +2,7 @@ import request, {HandleProgressFunction, prepareOptions, RequestInterface} from 
 import {RequestOptions} from './request'
 import {Settings, FileData} from '../types'
 import {Thenable} from '../tools/Thenable'
+import {CancelableInterface} from './types'
 
 export type BaseProgress = ProgressEvent
 
@@ -9,11 +10,9 @@ export type BaseResponse = {
   file: string
 }
 
-export interface DirectUploadInterface extends Promise<BaseResponse> {
+export interface DirectUploadInterface extends Promise<BaseResponse>, CancelableInterface {
   onProgress: HandleProgressFunction | null
   onCancel: VoidFunction | null
-
-  cancel(): void
 }
 
 class DirectUpload extends Thenable<BaseResponse> implements DirectUploadInterface {

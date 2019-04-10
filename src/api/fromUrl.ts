@@ -1,6 +1,6 @@
 import request, {prepareOptions, RequestInterface} from './request'
 import {Settings} from '../types'
-import {FileInfo} from './types'
+import {CancelableInterface, FileInfo} from './types'
 import {Thenable} from '../tools/Thenable'
 
 export type Url = string
@@ -37,9 +37,7 @@ export const isFileInfoResponse = (response: FromUrlResponse): response is FileI
   return response.type !== undefined && response.type === TypeEnum.Token;
 }
 
-export interface FromUrlInterface extends Promise<FromUrlResponse> {
-  cancel(): void
-}
+export interface FromUrlInterface extends Promise<FromUrlResponse>, CancelableInterface {}
 
 class FromUrl extends Thenable<FromUrlResponse> implements FromUrlInterface {
   protected readonly request: RequestInterface

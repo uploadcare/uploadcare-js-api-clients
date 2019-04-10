@@ -2,6 +2,7 @@ import {Settings, UploadcareFile} from '../types'
 import checkFileIsReady from '../checkFileIsReady'
 import prettyFileInfo from '../prettyFileInfo'
 import {Thenable} from '../tools/Thenable'
+import {CancelableInterface} from '../api/types'
 
 export enum ProgressState {
   Pending = 'pending',
@@ -26,13 +27,11 @@ export type UploadingProgress = {
 /**
  * Base `thenable` interface for uploading `fileFrom` (`object`, `url`, `input`, `uploaded`).
  */
-export interface UploadFromInterface extends Promise<UploadcareFile> {
+export interface UploadFromInterface extends Promise<UploadcareFile>, CancelableInterface {
   onProgress: ((progress: UploadingProgress) => void) | null
   onUploaded: ((uuid: string) => void) | null
   onReady: ((file: UploadcareFile) => void) | null
   onCancel: VoidFunction | null
-
-  cancel(): void
 }
 
 /**

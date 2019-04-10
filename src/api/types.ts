@@ -64,3 +64,7 @@ export interface FileInfoInterface extends ProgressInterface, ImageInfoInterface
 }
 
 export type FileInfo = FileInfoInterface
+
+export interface CancelableInterface {
+  cancel(): void
+}

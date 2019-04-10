@@ -7,6 +7,7 @@ import UploadcareError from '../errors/UploadcareError'
 import {FileData, Settings} from '../types'
 import {BaseProgress} from './base'
 import {Thenable} from '../tools/Thenable'
+import {CancelableInterface} from './types'
 
 export type Query = {
   [key: string]: string | boolean | number | void,
@@ -141,9 +142,7 @@ export function buildFormData(body: Body): FormData {
   return formData
 }
 
-export interface RequestInterface extends Promise<RequestResponse> {
-  cancel(): void
-}
+export interface RequestInterface extends Promise<RequestResponse>, CancelableInterface {}
 
 class Request extends Thenable<RequestResponse> implements RequestInterface {
   protected readonly promise: Promise<RequestResponse>
@@ -205,6 +204,7 @@ class Request extends Thenable<RequestResponse> implements RequestInterface {
 
   protected getRequestData() {
     const {body} = this.options
+
     return body && buildFormData({
       ...body,
       source: body.source || 'local',

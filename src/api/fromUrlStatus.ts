@@ -1,6 +1,6 @@
 import request, {prepareOptions, RequestInterface} from './request'
 import {Settings} from '../types'
-import {FileInfo, ProgressStatus} from './types'
+import {CancelableInterface, FileInfo, ProgressStatus} from './types'
 import {Thenable} from '../tools/Thenable'
 
 export enum StatusEnum {
@@ -61,9 +61,7 @@ export const isSuccessResponse = (response: FromUrlStatusResponse): response is 
   return response.status !== undefined && response.status === StatusEnum.Success;
 }
 
-export interface FromUrlStatusInterface extends Promise<FromUrlStatusResponse> {
-  cancel(): void
-}
+export interface FromUrlStatusInterface extends Promise<FromUrlStatusResponse>, CancelableInterface {}
 
 class FromUrlStatus extends Thenable<FromUrlStatusResponse> implements FromUrlStatusInterface {
   protected readonly request: RequestInterface
