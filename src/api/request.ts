@@ -25,7 +25,7 @@ export type Headers = {
   [key: string]: string,
 }
 
-export interface HandleProgressFunction {
+export type HandleProgressFunction = {
   (progressEvent: BaseProgress): void
 }
 
@@ -37,10 +37,9 @@ export type RequestOptions = {
   headers?: Headers,
   baseURL?: string,
   onUploadProgress?: HandleProgressFunction,
-  cancelToken?: CancelToken,
 }
 
-export interface RequestResponse {
+export type RequestResponse = {
   headers?: object,
   url: string,
   data: any,
@@ -79,8 +78,8 @@ export function prepareOptions(options: RequestOptions, settings: Settings): Req
  *
  * @export
  * @param {RequestOptions} options – The options for making requests.
- * @param {string} [options.method=GET] – The request method.
- * @param {string} options.path – The path to requested method, without endpoint and with slashes.
+ * @param {string} [options.method = GET] – The request method.
+ * @param {string} [options.path] – The path to requested method, without endpoint and with slashes.
  * @param {Object} [options.query] – The URL parameters.
  * @param {Object} [options.body] – The data to be sent as the body. Only for 'PUT', 'POST', 'PATCH'.
  * @param {Object} [options.headers] – The custom headers to be sent.
@@ -94,6 +93,7 @@ export default function request({
   body,
   headers,
   baseURL,
+  ...requestOptions
 }: RequestOptions): RequestInterface {
   return new Request({
     method,
@@ -102,6 +102,7 @@ export default function request({
     body,
     headers,
     baseURL,
+    ...requestOptions,
   })
 }
 
@@ -140,15 +141,6 @@ export function buildFormData(body: Body): FormData {
   return formData
 }
 
-/**
- * Creates controller to cancel any request
- *
- * @returns {*}
- */
-function createCancelController() {
-  return axios.CancelToken.source()
-}
-
 export interface RequestInterface extends Promise<RequestResponse> {
   cancel(): void
 }
@@ -162,7 +154,7 @@ class Request extends Thenable<RequestResponse> implements RequestInterface {
     super()
 
     this.options = options
-    this.cancelController = createCancelController()
+    this.cancelController = axios.CancelToken.source()
     this.promise = this.getRequestPromise()
   }
 
