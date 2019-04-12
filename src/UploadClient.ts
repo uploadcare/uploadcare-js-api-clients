@@ -11,13 +11,17 @@ export interface UploadClientInterface {
 
   getSettings(): Settings
 
+  addUpdateSettingsListener(listener: Function): void
+
+  removeUpdateSettingsListener(listener: Function): void
+
   fileFrom(from: FileFrom, data: FileData | Url, settings?: Settings): UploadFromInterface
 }
 
 class UploadClient implements UploadClientInterface {
   protected settings: Settings
   protected updateSettingsListeners: Array<Function>
-  api: UploadAPIInterface
+  readonly api: UploadAPIInterface
 
   constructor(settings: Settings = {}) {
     this.settings = {

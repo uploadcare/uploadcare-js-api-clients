@@ -21,7 +21,7 @@ export interface UploadAPIInterface {
 }
 
 class UploadAPI implements UploadAPIInterface {
-  client: UploadClient
+  readonly client: UploadClient
 
   constructor(client: UploadClient) {
     this.client = client
