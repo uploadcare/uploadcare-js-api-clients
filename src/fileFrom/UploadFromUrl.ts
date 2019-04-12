@@ -8,13 +8,12 @@ import fromUrlStatus, {
   isUnknownResponse,
 } from '../api/fromUrlStatus'
 import {UploadFrom} from './UploadFrom'
-import checkFileIsUploaded from '../checkFileIsUploaded'
+import checkFileIsUploadedFromUrl from '../checkFileIsUploadedFromUrl'
+import {PollPromiseInterface} from '../tools/poll'
 
 export class UploadFromUrl extends UploadFrom {
-  protected readonly uploadRequest: Promise<FromUrlResponse>
-  protected statusRequest: Promise<FromUrlStatusResponse> | null = null
-
   protected readonly promise: Promise<UploadcareFile>
+  private polling: PollPromiseInterface<FromUrlStatusResponse> | null = null
 
   protected readonly data: Url
   protected readonly settings: Settings
@@ -24,21 +23,15 @@ export class UploadFromUrl extends UploadFrom {
 
     this.data = data
     this.settings = settings
-    this.uploadRequest = fromUrl(this.data, this.settings)
 
     this.handleUploading()
-    this.promise = this.uploadRequest
-      .then(this.handleFromUrlResponse)
-      .then(this.handleReady)
-      .catch(this.handleError)
+    this.promise = this.getFilePromise()
   }
 
   private getFilePromise(): Promise<UploadcareFile> {
-    const urlPromise = this.uploadRequest
-
     this.handleUploading()
 
-    return urlPromise
+    return fromUrl(this.data, this.settings)
       .then(this.handleFromUrlResponse)
       .then(this.handleReady)
       .catch(this.handleError)
@@ -47,9 +40,8 @@ export class UploadFromUrl extends UploadFrom {
   private handleFromUrlResponse = (response: FromUrlResponse) => {
     if (isTokenResponse(response)) {
       const {token} = response
-      this.statusRequest = fromUrlStatus(token, this.settings)
 
-      return this.statusRequest
+      return fromUrlStatus(token, this.settings)
         .then(response => this.handleFromUrlStatusResponse(token, response) )
         .catch(this.handleError)
     } else if (isFileInfoResponse(response)) {
@@ -76,10 +68,11 @@ export class UploadFromUrl extends UploadFrom {
         loaded: response.done,
       })
 
-      return checkFileIsUploaded({
+      this.polling = checkFileIsUploadedFromUrl({
         token,
         timeout: 100,
         onProgress: (response) => {
+          // Update uploading progress
           this.handleUploading({
             total: response.total,
             loaded: response.done,
@@ -87,6 +80,8 @@ export class UploadFromUrl extends UploadFrom {
         },
         settings: this.settings
       })
+
+      return this.polling
         .then(status => this.handleFromUrlStatusResponse(token, status))
         .catch(error => this.handleError(error))
     }
@@ -99,6 +94,8 @@ export class UploadFromUrl extends UploadFrom {
   }
 
   cancel(): void {
-    // TODO: Implement this
+    if (this.polling) {
+      this.polling.cancel()
+    }
   }
 }

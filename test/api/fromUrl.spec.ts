@@ -1,10 +1,15 @@
 import fromUrl, {TypeEnum} from '../../src/api/fromUrl'
 import * as factory from '../_fixtureFactory'
+import {Environment, getEnvironmentSettings} from '../_helpers'
+
+const environment = Environment.Staging
 
 describe('API - from url', () => {
   it('should return token for file', async() => {
     const sourceUrl = factory.imageUrl('valid')
-    const settings = {publicKey: factory.publicKey('demo')}
+    const settings = getEnvironmentSettings({
+      publicKey: factory.publicKey('demo')
+    }, environment)
     const data = await fromUrl(sourceUrl, settings)
 
     expect(data.type).toEqual(TypeEnum.Token)
@@ -16,11 +21,11 @@ describe('API - from url', () => {
 
   it('should return file info', async() => {
     const sourceUrl = factory.imageUrl('valid')
-    const settings = {
+    const settings = getEnvironmentSettings({
       publicKey: factory.publicKey('image'),
       checkForUrlDuplicates: true,
       saveUrlForRecurrentUploads: true,
-    }
+    }, environment)
     const data = await fromUrl(sourceUrl, settings)
 
     expect(data.type).toEqual(TypeEnum.FileInfo)
@@ -28,7 +33,9 @@ describe('API - from url', () => {
 
   it('should be rejected with bad options', (done) => {
     const sourceUrl = factory.imageUrl('valid')
-    const settings = {publicKey: factory.publicKey('invalid')}
+    const settings = getEnvironmentSettings({
+      publicKey: factory.publicKey('invalid')
+    }, environment)
 
     fromUrl(sourceUrl, settings)
       .then(() => done.fail())
@@ -41,7 +48,9 @@ describe('API - from url', () => {
 
   it('should be rejected with image that does not exists', (done) => {
     const sourceUrl = factory.imageUrl('doesNotExist')
-    const settings = {publicKey: factory.publicKey('demo')}
+    const settings = getEnvironmentSettings({
+      publicKey: factory.publicKey('demo')
+    }, environment)
 
     fromUrl(sourceUrl, settings)
       .then(() => done.fail())
@@ -54,7 +63,9 @@ describe('API - from url', () => {
 
   it('should be rejected with image from private IP', (done) => {
     const sourceUrl = factory.imageUrl('privateIP')
-    const settings = {publicKey: factory.publicKey('demo')}
+    const settings = getEnvironmentSettings({
+      publicKey: factory.publicKey('demo')
+    }, environment)
 
     fromUrl(sourceUrl, settings)
       .then(() => done.fail())

@@ -1,4 +1,7 @@
-import {dataURItoBlob, dataURItoBuffer, isNode} from './_helpers'
+import {dataURItoBlob, dataURItoBuffer, Environment, getEnvironmentSettings, isNode} from './_helpers'
+
+const environment = Environment.Testing
+const settings = getEnvironmentSettings({}, environment)
 
 /* eslint-disable max-len */
 const images: {[key: string]: string} = {
@@ -105,12 +108,12 @@ export function publicKey(id: string): string {
 }
 
 export function linkTo(uuid: string): string {
-  return `https://ucarecdn.com/${uuid}/`
+  return `${settings.baseCDN}/${uuid}/`
 }
 
 export function imageUrl(id: string): string {
   const images = {
-    valid: 'https://ucarecdn.com/d3275f8b-686d-4980-916a-53a1fc17450b/1findfacecropgrayscale.jpg',
+    valid: `${settings.baseCDN}/d3275f8b-686d-4980-916a-53a1fc17450b/1findfacecropgrayscale.jpg`,
     doesNotExist: 'https://1.com/1.jpg',
     privateIP: 'http://192.168.1.10/1.jpg',
   }

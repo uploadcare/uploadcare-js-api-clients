@@ -2,7 +2,6 @@
  * Base generic abstract implementation of Promise interface.
  * You need only implement `promise` property.
  */
-
 export abstract class Thenable<T> implements Promise<T> {
   readonly [Symbol.toStringTag]: string
 

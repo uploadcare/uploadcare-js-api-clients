@@ -14,17 +14,14 @@ type ExecutorFunction = {
 
 class PollPromise<T> extends Thenable<T> implements PollPromiseInterface<T> {
   protected promise: Promise<T>
-  private readonly timeoutId: any
 
-  constructor(executor: ExecutorFunction, timeoutId?: any) {
+  constructor(executor: ExecutorFunction) {
     super()
     this.promise = new Promise(executor)
-    this.timeoutId = timeoutId
   }
 
   cancel() {
-    clearTimeout(this.timeoutId)
-    throw new CancelError()
+    return Promise.reject(new CancelError())
   }
 }
 
@@ -37,8 +34,9 @@ type CheckConditionFunction<T> = {
  * @param {CheckConditionFunction} checkConditionFunction Function to check condition of polling.
  * @param {number} timeout
  * @param {number} interval
+ * @return {PollPromiseInterface}
  */
-export default function poll<T>(checkConditionFunction, timeout: number, interval: number): Promise<T> {
+export default function poll<T>(checkConditionFunction, timeout: number, interval: number): PollPromiseInterface<T> {
   let endTime = Number(new Date()) + Math.min(timeout, MAX_TIMEOUT)
   interval = Math.min(interval, MAX_INTERVAL)
 
@@ -59,5 +57,5 @@ export default function poll<T>(checkConditionFunction, timeout: number, interva
     }
   };
 
-  return new Promise(checkCondition)
+  return new PollPromise(checkCondition)
 }

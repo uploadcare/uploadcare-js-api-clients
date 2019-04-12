@@ -1,22 +1,29 @@
 import base from '../../src/api/base'
 import * as factory from '../_fixtureFactory'
 import {getUserAgent} from '../../src/defaultSettings'
+import {Environment, getEnvironmentSettings} from '../_helpers'
+
+const environment = Environment.Staging
 
 describe('API - base', () => {
   const fileToUpload = factory.image('blackSquare')
 
   it('should be able to upload data', async() => {
-    const directUpload = base(fileToUpload.data, {publicKey: factory.publicKey('demo')})
+    const settings = getEnvironmentSettings({
+      publicKey: factory.publicKey('demo')
+    }, environment)
+    console.log(settings)
+    const directUpload = base(fileToUpload.data, settings)
     const {file} = await directUpload
 
     expect(typeof file).toBe('string')
   })
 
   it('should accept integration setting', (done) => {
-    const settings = {
+    const settings = getEnvironmentSettings({
       publicKey: 'test',
       integration: 'Test',
-    }
+    }, environment)
     const directUpload = base(fileToUpload.data, settings)
 
     directUpload
@@ -37,7 +44,10 @@ describe('API - base', () => {
   })
 
   it('should be able to cancel uploading', (done) => {
-    const directUpload = base(fileToUpload.data, {publicKey: factory.publicKey('demo')})
+    const settings = getEnvironmentSettings({
+      publicKey: factory.publicKey('demo')
+    }, environment)
+    const directUpload = base(fileToUpload.data, settings)
 
     setTimeout(() => {
       directUpload.cancel()
@@ -49,7 +59,10 @@ describe('API - base', () => {
   })
 
   it('should be able to handle cancel uploading', (done) => {
-    const directUpload = base(fileToUpload.data, {publicKey: factory.publicKey('demo')})
+    const settings = getEnvironmentSettings({
+      publicKey: factory.publicKey('demo')
+    }, environment)
+    const directUpload = base(fileToUpload.data, settings)
 
     setTimeout(() => {
       directUpload.cancel()
@@ -70,7 +83,10 @@ describe('API - base', () => {
 
   it('should be able to handle progress', (done) => {
     let progressValue = 0
-    const directUpload = base(fileToUpload.data, {publicKey: factory.publicKey('demo')})
+    const settings = getEnvironmentSettings({
+      publicKey: factory.publicKey('demo')
+    }, environment)
+    const directUpload = base(fileToUpload.data, settings)
 
     directUpload.onProgress = (progress) => {
       progressValue = Math.round((progress.loaded * 100) / progress.total)

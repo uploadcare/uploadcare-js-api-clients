@@ -1,23 +1,30 @@
 import * as factory from './_fixtureFactory'
-import checkFileIsUploaded from '../src/checkFileIsUploaded'
+import checkFileIsUploadedFromUrl from '../src/checkFileIsUploadedFromUrl'
 import {StatusEnum} from '../src/api/fromUrlStatus'
+import {Environment, getEnvironmentSettings} from './_helpers'
 
-describe('checkFileIsUploaded', () => {
+const environment = Environment.Staging
+
+describe('checkFileIsUploadedFromUrl', () => {
+  const settings = getEnvironmentSettings({
+    publicKey: factory.publicKey('token'),
+  }, environment)
+
   it('should be resolved if file is uploaded', async() => {
-    checkFileIsUploaded({
+    checkFileIsUploadedFromUrl({
       token: factory.token('valid'),
       timeout: 50,
-      settings: {publicKey: factory.publicKey('token')}
+      settings,
     })
       .then(info => {
         expect(info.status).toBe(StatusEnum.Success)
       })
   })
   it('should be cancelable', (done) => {
-    const polling = checkFileIsUploaded({
+    const polling = checkFileIsUploadedFromUrl({
       token: factory.token('valid'),
       timeout: 50,
-      settings: {publicKey: factory.publicKey('token')}
+      settings,
     })
 
     setTimeout(() => {

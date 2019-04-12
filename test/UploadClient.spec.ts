@@ -1,9 +1,15 @@
 import UploadClient from '../src/UploadClient'
 import * as factory from './_fixtureFactory'
+import {Environment, getEnvironmentSettings} from './_helpers'
+
+const environment = Environment.Staging
 
 describe('UploadClient', () => {
+  const settings = getEnvironmentSettings({}, environment)
+
   describe('should request to the right base url', () => {
     const requestOptions = {
+      baseURL: settings.baseURL,
       path: '/info/',
       query: {
         pub_key: factory.publicKey('image'),
@@ -18,7 +24,7 @@ describe('UploadClient', () => {
 
       await expectAsync(req).toBeResolved()
       req.then(({url}) => {
-        expect(url).toBe('https://upload.uploadcare.com/info/')
+        expect(url).toBe(`${settings.baseURL}/info/`)
       })
     })
     it('with constructor settings', async() => {

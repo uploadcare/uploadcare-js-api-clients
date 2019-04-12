@@ -56,6 +56,23 @@ class DirectUpload extends Thenable<BaseResponse> implements DirectUploadInterfa
   }
 }
 
+const getRequestBody = (file: FileData, settings: Settings) => ({
+  UPLOADCARE_PUB_KEY: settings.publicKey || '',
+  signature: settings.secureSignature || '',
+  expire: settings.secureExpire || '',
+  UPLOADCARE_STORE: settings.doNotStore ? '' : 'auto',
+  file: file,
+  source: 'local',
+})
+
+const getRequestOptions = (file: FileData, settings: Settings): RequestOptions => {
+  return prepareOptions({
+    method: 'POST',
+    path: '/base/',
+    body: getRequestBody(file, settings),
+  }, settings)
+}
+
 /**
  * Performs file uploading request to Uploadcare Upload API.
  * Can be canceled and has progress.
@@ -65,18 +82,7 @@ class DirectUpload extends Thenable<BaseResponse> implements DirectUploadInterfa
  * @return {DirectUploadInterface}
  */
 export default function base(file: FileData, settings: Settings = {}): DirectUploadInterface {
-  const options: RequestOptions = prepareOptions({
-    method: 'POST',
-    path: '/base/',
-    body: {
-      UPLOADCARE_PUB_KEY: settings.publicKey || '',
-      signature: settings.secureSignature || '',
-      expire: settings.secureExpire || '',
-      UPLOADCARE_STORE: settings.doNotStore ? '' : 'auto',
-      file: file,
-      source: 'local',
-    },
-  }, settings)
+  const options = getRequestOptions(file, settings)
 
   return new DirectUpload(options)
 }

@@ -1,5 +1,5 @@
 import {Settings} from './types'
-import poll from './tools/poll'
+import poll, {PollPromiseInterface} from './tools/poll'
 import fromUrlStatus, {FromUrlStatusResponse, isSuccessResponse} from './api/fromUrlStatus'
 
 type CheckFileIsUploadedParams = {
@@ -9,7 +9,7 @@ type CheckFileIsUploadedParams = {
   settings?: Settings
 }
 
-const checkFileIsUploaded = ({token, timeout, onProgress, settings = {}}: CheckFileIsUploadedParams): Promise<FromUrlStatusResponse> =>
+const checkFileIsUploadedFromUrl = ({token, timeout, onProgress, settings = {}}: CheckFileIsUploadedParams): PollPromiseInterface<FromUrlStatusResponse> =>
   poll<FromUrlStatusResponse>(
     async () => {
       const response = await fromUrlStatus(token, settings)
@@ -28,4 +28,4 @@ const checkFileIsUploaded = ({token, timeout, onProgress, settings = {}}: CheckF
     150,
   )
 
-export default checkFileIsUploaded
+export default checkFileIsUploadedFromUrl
