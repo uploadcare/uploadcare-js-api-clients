@@ -8,7 +8,19 @@ import {InfoResponse} from './info'
 import fromUrl, {FromUrlResponse, Url} from './fromUrl'
 import fromUrlStatus, {FromUrlStatusResponse} from './fromUrlStatus'
 
-export default class UploadAPI {
+export interface UploadAPIInterface {
+  request(options: RequestOptions): Promise<RequestResponse>
+
+  base(data: FileData, settings?: Settings): DirectUploadInterface
+
+  info(uuid: string, settings?: Settings): Promise<InfoResponse>
+
+  fromUrl(sourceUrl: Url, settings?: Settings): Promise<FromUrlResponse>
+
+  fromUrlStatus(token: string, settings?: Settings): Promise<FromUrlStatusResponse>
+}
+
+class UploadAPI implements UploadAPIInterface {
   client: UploadClient
 
   constructor(client: UploadClient) {
@@ -16,12 +28,12 @@ export default class UploadAPI {
   }
 
   private getRequestOptions = (options) => {
-    return prepareOptions(options, this.client.settings)
+    return prepareOptions(options, this.client.getSettings())
   }
 
   private getSettings = (settings) => {
     return {
-      ...this.client.settings,
+      ...this.client.getSettings(),
       ...settings,
     }
   }
@@ -46,3 +58,5 @@ export default class UploadAPI {
     return fromUrlStatus(token,this.getSettings(settings))
   }
 }
+
+export default UploadAPI

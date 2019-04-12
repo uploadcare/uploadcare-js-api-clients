@@ -20,7 +20,7 @@ export type FileProgress = {
 
 export type UploadingProgress = {
   state: ProgressState,
-  upload: null | FileProgress,
+  uploaded: null | FileProgress,
   value: number,
 }
 
@@ -45,7 +45,7 @@ export abstract class UploadFrom extends Thenable<UploadcareFile> implements Upl
 
   protected progress: UploadingProgress = {
     state: ProgressState.Pending,
-    upload: null,
+    uploaded: null,
     value: 0,
   }
   protected file: UploadcareFile | null = null
@@ -60,14 +60,14 @@ export abstract class UploadFrom extends Thenable<UploadcareFile> implements Upl
       case ProgressState.Pending:
         this.progress = {
           state: ProgressState.Pending,
-          upload: null,
+          uploaded: null,
           value: 0,
         }
         break
       case ProgressState.Uploading:
         this.progress = {
           state: ProgressState.Uploading,
-          upload: progress || null,
+          uploaded: progress || null,
           // leave 1 percent for uploaded and 1 for ready on cdn
           value: progress ? Math.round((progress.loaded * 98) / progress.total) : 0,
         }
@@ -75,28 +75,28 @@ export abstract class UploadFrom extends Thenable<UploadcareFile> implements Upl
       case ProgressState.Uploaded:
         this.progress = {
           state: ProgressState.Uploaded,
-          upload: null,
+          uploaded: null,
           value: 99,
         }
         break
       case ProgressState.Ready:
         this.progress = {
           state: ProgressState.Ready,
-          upload: null,
+          uploaded: null,
           value: 100,
         }
         break
       case ProgressState.Canceled:
         this.progress = {
           state: ProgressState.Canceled,
-          upload: null,
+          uploaded: null,
           value: 0,
         }
         break
       case ProgressState.Error:
         this.progress = {
           state: ProgressState.Error,
-          upload: null,
+          uploaded: null,
           value: 0,
         }
         break

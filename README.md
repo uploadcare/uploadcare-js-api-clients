@@ -54,7 +54,7 @@ filePromise
 
 filePromise.onProgress = (progress => {
   console.log(progress.state)
-  console.log(progress.uploadProgress.total / progress.uploadProgress.loaded)
+  console.log(progress.uploaded.total / progress.uploaded.loaded)
   console.log(progress.value)
 })
 ```
