@@ -38,21 +38,20 @@ type CheckConditionFunction<T> = {
  * @param {number} timeout
  * @param {number} interval
  */
-export default function poll<T>(checkConditionFunction, timeout: number, interval: number): PollPromiseInterface<T> {
+export default function poll<T>(checkConditionFunction, timeout: number, interval: number): Promise<T> {
   let endTime = Number(new Date()) + Math.min(timeout, MAX_TIMEOUT)
-  let timeoutId
   interval = Math.min(interval, MAX_INTERVAL)
 
-  const checkCondition: ExecutorFunction = (resolve, reject) => {
+  const checkCondition: ExecutorFunction = async (resolve, reject) => {
     // If the condition is met, we're done!
-    const result = checkConditionFunction()
+    const result = await checkConditionFunction()
 
     if (result) {
       resolve(result)
     }
     // If the condition isn't met but the timeout hasn't elapsed, go again
     else if (Number(new Date()) < endTime) {
-      timeoutId = setTimeout(checkCondition, interval, resolve, reject);
+      setTimeout(checkCondition, interval, resolve, reject);
     }
     // Didn't match and too much time, reject!
     else {
@@ -60,5 +59,5 @@ export default function poll<T>(checkConditionFunction, timeout: number, interva
     }
   };
 
-  return new PollPromise(checkCondition, timeoutId)
+  return new Promise(checkCondition)
 }

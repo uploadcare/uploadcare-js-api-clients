@@ -1,19 +1,18 @@
-import fromUrl, {FromUrlInterface, FromUrlResponse, isFileInfoResponse, isTokenResponse, Url} from '../api/fromUrl'
+import fromUrl, {FromUrlResponse, isFileInfoResponse, isTokenResponse, Url} from '../api/fromUrl'
 import {Settings, UploadcareFile} from '../types'
 import fromUrlStatus, {
-  FromUrlStatusInterface,
   FromUrlStatusResponse,
   isErrorResponse,
   isProgressResponse,
   isSuccessResponse,
   isUnknownResponse,
 } from '../api/fromUrlStatus'
-import {ProgressState, UploadFrom} from './UploadFrom'
+import {UploadFrom} from './UploadFrom'
 import checkFileIsUploaded from '../checkFileIsUploaded'
 
 export class UploadFromUrl extends UploadFrom {
-  protected readonly uploadRequest: FromUrlInterface
-  protected statusRequest: FromUrlStatusInterface | null = null
+  protected readonly uploadRequest: Promise<FromUrlResponse>
+  protected statusRequest: Promise<FromUrlStatusResponse> | null = null
 
   protected readonly promise: Promise<UploadcareFile>
 
@@ -80,10 +79,16 @@ export class UploadFromUrl extends UploadFrom {
       return checkFileIsUploaded({
         token,
         timeout: 100,
+        onProgress: (response) => {
+          this.handleUploading({
+            total: response.total,
+            loaded: response.done,
+          })
+        },
         settings: this.settings
       })
         .then(status => this.handleFromUrlStatusResponse(token, status))
-        .catch(error => Promise.reject(error))
+        .catch(error => this.handleError(error))
     }
 
     if (isSuccessResponse(response)) {
@@ -94,14 +99,6 @@ export class UploadFromUrl extends UploadFrom {
   }
 
   cancel(): void {
-    const {state, value} = this.getProgress()
-
-    if (state === ProgressState.Pending || (state === ProgressState.Uploading && value === 0)) {
-      return this.uploadRequest.cancel()
-    } else {
-      if (this.statusRequest) {
-        return this.statusRequest.cancel()
-      }
-    }
+    // TODO: Implement this
   }
 }

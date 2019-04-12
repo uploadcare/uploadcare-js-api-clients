@@ -1,7 +1,6 @@
-import request, {prepareOptions, RequestInterface} from './request'
+import request, {prepareOptions, RequestOptions} from './request'
 import {Settings} from '../types'
 import {CancelableInterface, FileInfo, ProgressStatus} from './types'
-import {Thenable} from '../tools/Thenable'
 
 export enum StatusEnum {
   Unknown = 'unknown',
@@ -61,40 +60,16 @@ export const isSuccessResponse = (response: FromUrlStatusResponse): response is 
   return response.status !== undefined && response.status === StatusEnum.Success;
 }
 
-export interface FromUrlStatusInterface extends Promise<FromUrlStatusResponse>, CancelableInterface {}
+const getRequestQuery = (token: string, settings: Settings) => ({
+  token: token,
+  pub_key: settings.publicKey || '',
+})
 
-class FromUrlStatus extends Thenable<FromUrlStatusResponse> implements FromUrlStatusInterface {
-  protected readonly request: RequestInterface
-  protected readonly promise: Promise<FromUrlStatusResponse>
-
-  protected readonly token: string
-  protected readonly settings: Settings
-
-  constructor(token: string, settings: Settings) {
-    super()
-
-    this.token = token
-    this.settings = settings
-    this.request = request(this.getRequestOptions())
-    this.promise = this.request
-      .then(response => response.data)
-  }
-
-  protected getRequestOptions() {
-    const getRequestQuery = (token: string, settings: Settings) => ({
-      token: token,
-      pub_key: settings.publicKey || '',
-    })
-
-    return prepareOptions({
-      path: '/from_url/status/',
-      query: getRequestQuery(this.token, this.settings),
-    }, this.settings)
-  }
-
-  cancel(): void {
-    return this.request.cancel()
-  }
+const getRequestOptions = (token: string, settings: Settings): RequestOptions => {
+  return prepareOptions({
+    path: '/from_url/status/',
+    query: getRequestQuery(token, settings),
+  }, settings)
 }
 
 /**
@@ -105,6 +80,9 @@ class FromUrlStatus extends Thenable<FromUrlStatusResponse> implements FromUrlSt
  * @throws {UploadcareError}
  * @return {Promise<FromUrlStatusResponse>}
  */
-export default function fromUrlStatus(token: string, settings: Settings = {}): FromUrlStatusInterface {
-  return new FromUrlStatus(token, settings)
+export default function fromUrlStatus(token: string, settings: Settings = {}): Promise<FromUrlStatusResponse> {
+  const options = getRequestOptions(token, settings)
+
+  return request(options)
+    .then(response => response.data)
 }

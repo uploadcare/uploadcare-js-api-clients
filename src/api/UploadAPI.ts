@@ -15,11 +15,11 @@ export default class UploadAPI {
     this.client = client
   }
 
-  protected getRequestOptions = (options) => {
+  private getRequestOptions = (options) => {
     return prepareOptions(options, this.client.settings)
   }
 
-  protected getSettings = (settings) => {
+  private getSettings = (settings) => {
     return {
       ...this.client.settings,
       ...settings,

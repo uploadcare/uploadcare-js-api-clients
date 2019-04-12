@@ -1,4 +1,4 @@
-import axios, {CancelToken, CancelTokenSource} from 'axios'
+import axios, {CancelTokenSource} from 'axios'
 import * as FormData from 'form-data'
 import defaultSettings, {getUserAgent} from '../defaultSettings'
 import RequestError from '../errors/RequestError'
@@ -94,6 +94,7 @@ export default function request({
   body,
   headers,
   baseURL,
+  onUploadProgress,
   ...requestOptions
 }: RequestOptions): RequestInterface {
   return new Request({
@@ -103,6 +104,7 @@ export default function request({
     body,
     headers,
     baseURL,
+    onUploadProgress,
     ...requestOptions,
   })
 }

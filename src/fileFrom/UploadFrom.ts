@@ -48,7 +48,7 @@ export abstract class UploadFrom extends Thenable<UploadcareFile> implements Upl
     upload: null,
     value: 0,
   }
-  protected file: UploadcareFile | undefined
+  protected file: UploadcareFile | null = null
 
   onProgress: ((progress: UploadingProgress) => void) | null = null
   onUploaded: ((uuid: string) => void) | null = null

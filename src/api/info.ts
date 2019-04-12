@@ -10,6 +10,13 @@ const getRequestQuery = (uuid: string, settings: Settings) => ({
   file_id: uuid,
 })
 
+const getRequestOptions = (uuid: string, settings: Settings): RequestOptions => {
+  return prepareOptions({
+    path: '/info/',
+    query: getRequestQuery(uuid, settings),
+  }, settings)
+}
+
 /**
  * Returns a JSON dictionary holding file info
  *
@@ -18,10 +25,7 @@ const getRequestQuery = (uuid: string, settings: Settings) => ({
  * @return {Promise<InfoResponse>}
  */
 export default function info(uuid: string, settings: Settings = {}): Promise<InfoResponse> {
-  const options: RequestOptions = prepareOptions({
-    path: '/info/',
-    query: getRequestQuery(uuid, settings),
-  }, settings)
+  const options = getRequestOptions(uuid, settings)
 
   return request(options)
     .then(response => response.data)
