@@ -21,11 +21,28 @@ export enum Environment {
   Production = 'production',
 }
 
-export const getEnvironmentSettings = (settings = {}, environment: Environment = Environment.Testing) => {
-  switch (environment) {
+/**
+ * Get testing environment both (for Node and Browser).
+ */
+const getTestingEnvironment = (): string => {
+  // @ts-ignore
+  return process.argv.find(element => element.startsWith('--env=')).substring(6)
+}
+
+export const getSettingsForTesting = (settings = {}, environment: Environment | null = null) => {
+  const env = environment || getTestingEnvironment()
+
+  switch (env) {
+    case Environment.Testing:
+      // TODO: Need to replace when we will have a mock server
+      return {
+        baseCDN: 'https://staging0.ucarecdn.com',
+        baseURL: 'https://upload.staging0.uploadcare.com',
+        ...settings,
+      }
     case Environment.Staging:
       return {
-        baseCDN: 'https://ucarecdn.com',
+        baseCDN: 'https://staging0.ucarecdn.com',
         baseURL: 'https://upload.staging0.uploadcare.com',
         ...settings,
       }
@@ -37,7 +54,7 @@ export const getEnvironmentSettings = (settings = {}, environment: Environment =
       }
     default:
       return {
-        baseCDN: 'https://ucarecdn.com',
+        baseCDN: 'https://staging0.ucarecdn.com',
         baseURL: 'https://upload.staging0.uploadcare.com',
         ...settings,
       }

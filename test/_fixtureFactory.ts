@@ -1,7 +1,7 @@
-import {dataURItoBlob, dataURItoBuffer, Environment, getEnvironmentSettings, isNode} from './_helpers'
+import {dataURItoBlob, dataURItoBuffer, Environment, getSettingsForTesting, isNode} from './_helpers'
 
 const environment = Environment.Testing
-const settings = getEnvironmentSettings({}, environment)
+const settings = getSettingsForTesting({}, environment)
 
 /* eslint-disable max-len */
 const images: {[key: string]: string} = {

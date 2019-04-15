@@ -1,13 +1,13 @@
 import fromUrl, {TypeEnum} from '../../src/api/fromUrl'
 import * as factory from '../_fixtureFactory'
-import {Environment, getEnvironmentSettings} from '../_helpers'
+import {Environment, getSettingsForTesting} from '../_helpers'
 
 const environment = Environment.Staging
 
 describe('API - from url', () => {
   it('should return token for file', async() => {
     const sourceUrl = factory.imageUrl('valid')
-    const settings = getEnvironmentSettings({
+    const settings = getSettingsForTesting({
       publicKey: factory.publicKey('demo')
     }, environment)
     const data = await fromUrl(sourceUrl, settings)
@@ -21,7 +21,7 @@ describe('API - from url', () => {
 
   it('should return file info', async() => {
     const sourceUrl = factory.imageUrl('valid')
-    const settings = getEnvironmentSettings({
+    const settings = getSettingsForTesting({
       publicKey: factory.publicKey('image'),
       checkForUrlDuplicates: true,
       saveUrlForRecurrentUploads: true,
@@ -33,7 +33,7 @@ describe('API - from url', () => {
 
   it('should be rejected with bad options', (done) => {
     const sourceUrl = factory.imageUrl('valid')
-    const settings = getEnvironmentSettings({
+    const settings = getSettingsForTesting({
       publicKey: factory.publicKey('invalid')
     }, environment)
 
@@ -48,7 +48,7 @@ describe('API - from url', () => {
 
   it('should be rejected with image that does not exists', (done) => {
     const sourceUrl = factory.imageUrl('doesNotExist')
-    const settings = getEnvironmentSettings({
+    const settings = getSettingsForTesting({
       publicKey: factory.publicKey('demo')
     }, environment)
 
@@ -63,7 +63,7 @@ describe('API - from url', () => {
 
   it('should be rejected with image from private IP', (done) => {
     const sourceUrl = factory.imageUrl('privateIP')
-    const settings = getEnvironmentSettings({
+    const settings = getSettingsForTesting({
       publicKey: factory.publicKey('demo')
     }, environment)
 

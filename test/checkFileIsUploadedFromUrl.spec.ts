@@ -1,12 +1,12 @@
 import * as factory from './_fixtureFactory'
 import checkFileIsUploadedFromUrl from '../src/checkFileIsUploadedFromUrl'
 import {StatusEnum} from '../src/api/fromUrlStatus'
-import {Environment, getEnvironmentSettings} from './_helpers'
+import {Environment, getSettingsForTesting} from './_helpers'
 
 const environment = Environment.Staging
 
 describe('checkFileIsUploadedFromUrl', () => {
-  const settings = getEnvironmentSettings({
+  const settings = getSettingsForTesting({
     publicKey: factory.publicKey('token'),
   }, environment)
 

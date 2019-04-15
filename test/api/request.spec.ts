@@ -1,7 +1,7 @@
 import request, {buildFormData} from '../../src/api/request'
 import * as factory from '../_fixtureFactory'
 import axios from 'axios'
-import {Environment, getEnvironmentSettings, sleep} from '../_helpers'
+import {Environment, getSettingsForTesting, sleep} from '../_helpers'
 
 const environment = Environment.Staging
 
@@ -22,7 +22,7 @@ describe('buildFormData', () => {
 })
 
 describe('API – request', () => {
-  const settings = getEnvironmentSettings({}, environment)
+  const settings = getSettingsForTesting({}, environment)
 
   it('should return Promise', () => {
     const options = {

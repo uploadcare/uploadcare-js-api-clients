@@ -1,12 +1,12 @@
 import info from '../../src/api/info'
 import * as factory from '../_fixtureFactory'
-import {Environment, getEnvironmentSettings} from '../_helpers'
+import {Environment, getSettingsForTesting} from '../_helpers'
 
 const environment = Environment.Staging
 
 describe('API - info', () => {
   it('should return file info', async() => {
-    const settings = getEnvironmentSettings({
+    const settings = getSettingsForTesting({
       publicKey: factory.publicKey('image')
     }, environment)
     const data = await info(factory.uuid('image'), settings)
@@ -15,7 +15,7 @@ describe('API - info', () => {
   })
 
   it('should be rejected with bad options', (done) => {
-    const settings = getEnvironmentSettings({
+    const settings = getSettingsForTesting({
       publicKey: factory.publicKey('empty'),
     }, environment)
 

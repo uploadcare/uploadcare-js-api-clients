@@ -1,12 +1,12 @@
 import checkFileIsReady from '../src/checkFileIsReady'
 import * as factory from './_fixtureFactory'
-import {Environment, getEnvironmentSettings} from './_helpers'
+import {Environment, getSettingsForTesting} from './_helpers'
 
 const environment = Environment.Staging
 
 describe('checkFileIsReady', () => {
   it('should be resolved if file is ready', async() => {
-    const settings = getEnvironmentSettings({
+    const settings = getSettingsForTesting({
       publicKey: factory.publicKey('image'),
     }, environment)
     const info = await checkFileIsReady({
@@ -18,7 +18,7 @@ describe('checkFileIsReady', () => {
     expect(info.is_ready).toBeTruthy()
   })
   it('should be cancelable', (done) => {
-    const settings = getEnvironmentSettings({
+    const settings = getSettingsForTesting({
       publicKey: factory.publicKey('image'),
     }, environment)
     const polling = checkFileIsReady({

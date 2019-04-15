@@ -1,11 +1,11 @@
 import UploadClient from '../src/UploadClient'
 import * as factory from './_fixtureFactory'
-import {Environment, getEnvironmentSettings} from './_helpers'
+import {Environment, getSettingsForTesting} from './_helpers'
 
 const environment = Environment.Staging
 
 describe('UploadClient', () => {
-  const settings = getEnvironmentSettings({}, environment)
+  const settings = getSettingsForTesting({}, environment)
 
   describe('should request to the right base url', () => {
     const requestOptions = {
