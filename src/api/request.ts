@@ -94,8 +94,7 @@ export default function request({
   body,
   headers,
   baseURL,
-  onUploadProgress,
-  ...requestOptions
+  onUploadProgress
 }: RequestOptions): RequestInterface {
   return new Request({
     method,
@@ -104,8 +103,7 @@ export default function request({
     body,
     headers,
     baseURL,
-    onUploadProgress,
-    ...requestOptions,
+    onUploadProgress
   })
 }
 
@@ -169,7 +167,7 @@ class Request extends Thenable<RequestResponse> implements RequestInterface {
   }
 
   protected getRequestOptions() {
-    const {path} = this.options
+    const {path, onUploadProgress} = this.options
 
     return {
       method: this.getRequestMethod(),
@@ -180,6 +178,7 @@ class Request extends Thenable<RequestResponse> implements RequestInterface {
       maxContentLength: MAX_CONTENT_LENGTH,
       headers: this.getRequestHeaders(),
       cancelToken: this.cancelController.token,
+      onUploadProgress,
     }
   }
 

@@ -55,6 +55,17 @@ export abstract class UploadFrom extends Thenable<UploadcareFile> implements Upl
   onReady: ((file: UploadcareFile) => void) | null = null
   onCancel: VoidFunction | null = null
 
+  protected constructor() {
+    super()
+    this.setProgress = this.setProgress.bind(this)
+    this.setFile = this.setFile.bind(this)
+    this.handleCancelling = this.handleCancelling.bind(this)
+    this.handleUploading = this.handleUploading.bind(this)
+    this.handleUploaded = this.handleUploaded.bind(this)
+    this.handleReady = this.handleReady.bind(this)
+    this.handleError = this.handleError.bind(this)
+  }
+
   protected setProgress(state: ProgressState, progress?: FileProgress) {
     switch (state) {
       case ProgressState.Pending:
@@ -118,7 +129,7 @@ export abstract class UploadFrom extends Thenable<UploadcareFile> implements Upl
   /**
    * Handle cancelling of uploading file.
    */
-  protected handleCancelling = (): void => {
+  protected handleCancelling(): void {
     this.setProgress(ProgressState.Canceled)
 
     if (typeof this.onCancel === 'function') {
@@ -130,7 +141,7 @@ export abstract class UploadFrom extends Thenable<UploadcareFile> implements Upl
    * Handle file uploading.
    * @param {FileProgress} progress
    */
-  protected handleUploading = (progress?: FileProgress): void => {
+  protected handleUploading(progress?: FileProgress): void {
     this.setProgress(ProgressState.Uploading, progress)
 
     if (typeof this.onProgress === 'function') {
@@ -143,7 +154,7 @@ export abstract class UploadFrom extends Thenable<UploadcareFile> implements Upl
    * @param {string} uuid
    * @param {Settings} settings
    */
-  protected handleUploaded = (uuid: string, settings: Settings): Promise<UploadcareFile> => {
+  protected handleUploaded(uuid: string, settings: Settings): Promise<UploadcareFile> {
     this.setFile({
       uuid,
       name: null,
@@ -165,7 +176,7 @@ export abstract class UploadFrom extends Thenable<UploadcareFile> implements Upl
 
     return checkFileIsReady({
       uuid,
-      timeout: 100,
+      timeout: 500,
       settings,
     })
       .then(info => {
@@ -179,7 +190,7 @@ export abstract class UploadFrom extends Thenable<UploadcareFile> implements Upl
   /**
    * Handle uploaded file that ready on CDN.
    */
-  protected handleReady = (): Promise<UploadcareFile> => {
+  protected handleReady(): Promise<UploadcareFile> {
     this.setProgress(ProgressState.Ready)
 
     if (typeof this.onProgress === 'function') {
@@ -197,7 +208,7 @@ export abstract class UploadFrom extends Thenable<UploadcareFile> implements Upl
    * Handle uploading error
    * @param error
    */
-  protected handleError = (error) => {
+  protected handleError(error) {
     this.setProgress(ProgressState.Error)
 
     if (error.name === 'CancelError') {

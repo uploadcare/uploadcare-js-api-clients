@@ -25,13 +25,9 @@ class PollPromise<T> extends Thenable<T> implements PollPromiseInterface<T> {
   }
 }
 
-type CheckConditionFunction<T> = {
-  (): boolean | T
-}
-
 /**
  * Polling function on promises.
- * @param {CheckConditionFunction} checkConditionFunction Function to check condition of polling.
+ * @param {Function} checkConditionFunction Function to check condition of polling.
  * @param {number} timeout
  * @param {number} interval
  * @return {PollPromiseInterface}

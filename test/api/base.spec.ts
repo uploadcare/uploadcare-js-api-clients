@@ -3,7 +3,7 @@ import * as factory from '../_fixtureFactory'
 import {getUserAgent} from '../../src/defaultSettings'
 import {Environment, getSettingsForTesting} from '../_helpers'
 
-const environment = Environment.Staging
+const environment = Environment.Testing
 
 describe('API - base', () => {
   const fileToUpload = factory.image('blackSquare')
@@ -12,7 +12,6 @@ describe('API - base', () => {
     const settings = getSettingsForTesting({
       publicKey: factory.publicKey('demo')
     }, environment)
-    console.log(settings)
     const directUpload = base(fileToUpload.data, settings)
     const {file} = await directUpload
 
@@ -88,8 +87,8 @@ describe('API - base', () => {
     }, environment)
     const directUpload = base(fileToUpload.data, settings)
 
-    directUpload.onProgress = (progress) => {
-      progressValue = Math.round((progress.loaded * 100) / progress.total)
+    directUpload.onProgress = (progressEvent) => {
+      progressValue = Math.round((progressEvent.loaded * 100) / progressEvent.total)
     }
 
     directUpload

@@ -2,7 +2,7 @@ import UploadClient from '../src/UploadClient'
 import * as factory from './_fixtureFactory'
 import {Environment, getSettingsForTesting} from './_helpers'
 
-const environment = Environment.Staging
+const environment = Environment.Testing
 
 describe('UploadClient', () => {
   const settings = getSettingsForTesting({}, environment)

@@ -2,7 +2,7 @@ import info from '../../src/api/info'
 import * as factory from '../_fixtureFactory'
 import {Environment, getSettingsForTesting} from '../_helpers'
 
-const environment = Environment.Staging
+const environment = Environment.Testing
 
 describe('API - info', () => {
   it('should return file info', async() => {

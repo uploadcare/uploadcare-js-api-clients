@@ -3,7 +3,7 @@ import checkFileIsUploadedFromUrl from '../src/checkFileIsUploadedFromUrl'
 import {StatusEnum} from '../src/api/fromUrlStatus'
 import {Environment, getSettingsForTesting} from './_helpers'
 
-const environment = Environment.Staging
+const environment = Environment.Testing
 
 describe('checkFileIsUploadedFromUrl', () => {
   const settings = getSettingsForTesting({

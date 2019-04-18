@@ -2,7 +2,7 @@ import * as factory from '../_fixtureFactory'
 import fileFrom, {FileFrom} from '../../src/fileFrom/fileFrom'
 import {Environment, getSettingsForTesting, sleep} from '../_helpers'
 
-const environment = Environment.Staging
+const environment = Environment.Testing
 
 describe('fileFrom', () => {
   describe('Object', () => {

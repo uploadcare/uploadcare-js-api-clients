@@ -3,7 +3,7 @@ import * as factory from '../_fixtureFactory'
 import axios from 'axios'
 import {Environment, getSettingsForTesting, sleep} from '../_helpers'
 
-const environment = Environment.Staging
+const environment = Environment.Testing
 
 describe('buildFormData', () => {
   it('should return FormData with nice input object', () => {
@@ -43,29 +43,30 @@ describe('API – request', () => {
           file_id: factory.uuid('image'),
         },
       }
+      const result = await request(options)
 
-      await expectAsync(request(options)).toBeResolvedTo({
-        headers: jasmine.any(Object),
-        url: `${settings.baseURL}/info/`,
-        data: jasmine.objectContaining({uuid: factory.uuid('image')}),
-      })
+      expect(typeof result.headers).toBe('object')
+      expect(result.url).toBe(`${settings.baseURL}/info/`)
+      expect(typeof result.data).toBe('object')
+      expect(result.data.uuid).toBe(factory.uuid('image'))
     })
 
     it('on valid POST request', async() => {
       const file = factory.image('blackSquare')
-
-      await expectAsync(request({
+      const options = {
         method: 'POST',
         path: '/base/',
         body: {
           UPLOADCARE_PUB_KEY: factory.publicKey('demo'),
           file: file.data,
         },
-      })).toBeResolvedTo({
-        headers: jasmine.any(Object),
-        url: `${settings.baseURL}/base/`,
-        data: {file: jasmine.any(String)},
-      })
+      }
+      const result = await request(options)
+
+      expect(typeof result.headers).toBe('object')
+      expect(result.url).toBe(`${settings.baseURL}/base/`)
+      expect(typeof result.data).toBe('object')
+      expect(typeof result.data.file).toBe('string')
     })
   })
 

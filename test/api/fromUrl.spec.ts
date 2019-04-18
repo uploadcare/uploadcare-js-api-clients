@@ -2,7 +2,7 @@ import fromUrl, {TypeEnum} from '../../src/api/fromUrl'
 import * as factory from '../_fixtureFactory'
 import {Environment, getSettingsForTesting} from '../_helpers'
 
-const environment = Environment.Staging
+const environment = Environment.Testing
 
 describe('API - from url', () => {
   it('should return token for file', async() => {
