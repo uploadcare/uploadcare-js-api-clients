@@ -24,11 +24,10 @@ export class UploadFromUrl extends UploadFrom {
     this.data = data
     this.settings = settings
 
-    this.handleUploading()
     this.promise = this.getFilePromise()
   }
 
-  private getFilePromise(): Promise<UploadcareFile> {
+  private getFilePromise = (): Promise<UploadcareFile> => {
     this.handleUploading()
 
     return fromUrl(this.data, this.settings)
@@ -70,7 +69,7 @@ export class UploadFromUrl extends UploadFrom {
 
       this.polling = checkFileIsUploadedFromUrl({
         token,
-        timeout: 100,
+        timeout: 1000,
         onProgress: (response) => {
           // Update uploading progress
           this.handleUploading({
@@ -83,13 +82,15 @@ export class UploadFromUrl extends UploadFrom {
 
       return this.polling
         .then(status => this.handleFromUrlStatusResponse(token, status))
-        .catch(error => this.handleError(error))
+        .catch(this.handleError)
     }
 
     if (isSuccessResponse(response)) {
       const {uuid} = response
 
       return this.handleUploaded(uuid, this.settings)
+        .then(this.handleReady)
+        .catch(this.handleError)
     }
   }
 

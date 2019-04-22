@@ -252,8 +252,8 @@ class Request extends Thenable<RequestResponse> implements RequestInterface {
         headers: response.config.headers,
         url,
       }, {
-        status: code,
-        statusText: content,
+        status: code || response.data.error.slice(-3),
+        statusText: content || response.data.error,
       })
     }
 

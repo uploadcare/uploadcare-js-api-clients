@@ -102,7 +102,7 @@ describe('fileFrom', () => {
 
         filePromise
           .then(() =>
-            progressValue
+            progressValue > 0
               ? done()
               : done.fail()
           )

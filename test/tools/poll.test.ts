@@ -41,7 +41,7 @@ describe('poll', () => {
 
   it('should be able to cancel polling', (done) => {
     const polling = poll<InfoResponse>(
-      async () => {
+      async() => {
         const response = await info(uuid, settings)
 
         if (response.is_ready) {
@@ -55,7 +55,7 @@ describe('poll', () => {
         return false
       },
       timeout,
-      150,
+      interval,
     )
 
     setTimeout(() => {

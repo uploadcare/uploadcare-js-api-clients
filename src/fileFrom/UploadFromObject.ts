@@ -24,19 +24,16 @@ export class UploadFromObject extends UploadFrom {
 
     this.handleUploading()
 
-    filePromise.onProgress = (progressEvent) => {
+    filePromise.onProgress = (progressEvent) =>
       this.handleUploading({
         total: progressEvent.total,
         loaded: progressEvent.loaded,
       })
-    }
 
     filePromise.onCancel = this.handleCancelling
 
     return filePromise
-      .then(({file: uuid}) => {
-        return this.handleUploaded(uuid, this.settings)
-      })
+      .then(({file: uuid}) => this.handleUploaded(uuid, this.settings))
       .then(this.handleReady)
       .catch(this.handleError)
   }
