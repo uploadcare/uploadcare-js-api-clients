@@ -3,16 +3,16 @@ import {InfoResponse} from '../../src/api/info'
 import info from '../../src/api/info'
 import {Environment, getSettingsForTesting} from '../_helpers'
 import * as factory from '../_fixtureFactory'
+import CancelError from '../../src/errors/CancelError'
 
-const environment = Environment.Testing
+const environment = Environment.Production
 
 describe('poll', () => {
   const uuid = factory.uuid('image')
   const settings = getSettingsForTesting({
     publicKey: factory.publicKey('image'),
   }, environment)
-  const timeout = 50
-  const interval = 150
+  const timeout = 500
   const onProgress = (response) => {
     return response
   }
@@ -33,7 +33,6 @@ describe('poll', () => {
         return false
       },
       timeout,
-      interval,
     )
 
     expect(result.is_ready).toBeTruthy()
@@ -55,7 +54,6 @@ describe('poll', () => {
         return false
       },
       timeout,
-      interval,
     )
 
     setTimeout(() => {

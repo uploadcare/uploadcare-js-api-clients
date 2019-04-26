@@ -25,7 +25,6 @@ const checkFileIsReady = ({uuid, timeout, onProgress, settings = {}}: CheckFileI
       return false
     },
     timeout,
-    150,
   )
 
 export default checkFileIsReady

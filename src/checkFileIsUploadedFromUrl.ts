@@ -25,7 +25,6 @@ const checkFileIsUploadedFromUrl = ({token, timeout, onProgress, settings = {}}:
       return false
     },
     timeout,
-    150,
   )
 
 export default checkFileIsUploadedFromUrl

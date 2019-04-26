@@ -2,7 +2,7 @@ import checkFileIsReady from '../src/checkFileIsReady'
 import * as factory from './_fixtureFactory'
 import {Environment, getSettingsForTesting} from './_helpers'
 
-const environment = Environment.Testing
+const environment = Environment.Production
 
 const settings = getSettingsForTesting({
   publicKey: factory.publicKey('image'),
@@ -12,7 +12,7 @@ describe('checkFileIsReady', () => {
   it('should be resolved if file is ready', async() => {
     const info = await checkFileIsReady({
       uuid: factory.uuid('image'),
-      timeout: 50,
+      timeout: 500,
       settings,
     })
 

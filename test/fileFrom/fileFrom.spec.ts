@@ -2,7 +2,7 @@ import * as factory from '../_fixtureFactory'
 import fileFrom, {FileFrom} from '../../src/fileFrom/fileFrom'
 import {Environment, getSettingsForTesting, sleep} from '../_helpers'
 
-const environment = Environment.Testing
+const environment = Environment.Production
 
 describe('fileFrom', () => {
   describe('Object', () => {
@@ -42,7 +42,7 @@ describe('fileFrom', () => {
       }, 5)
 
       filePromise
-        .then(() => done.fail())
+        .then(() => done.fail('Resolved'))
         .catch((error) => error.name === 'CancelError' ? done() : done.fail(error))
     })
 
@@ -79,7 +79,7 @@ describe('fileFrom', () => {
         }
 
         filePromise
-          .then(() => done.fail())
+          .then(() => done.fail('Resolved'))
           .catch((error) => {
             if (error.name !== 'CancelError') {
               done.fail(error)
@@ -120,7 +120,7 @@ describe('fileFrom', () => {
         }
 
         filePromise
-          .then(() => done.fail())
+          .then(() => done.fail('Resolved'))
           .catch(error => done.fail(error))
       })
 
@@ -177,7 +177,7 @@ describe('fileFrom', () => {
       }, 5)
 
       filePromise
-        .then(() => done.fail())
+        .then(() => done.fail('Resolved'))
         .catch(error => error.name === 'CancelError' ? done() : done.fail(error))
     })
 
@@ -214,7 +214,7 @@ describe('fileFrom', () => {
         }
 
         filePromise
-          .then(() => done.fail())
+          .then(() => done.fail('Resolved'))
           .catch((error) => {
             if (error.name !== 'CancelError') {
               done.fail(error)
@@ -251,7 +251,6 @@ describe('fileFrom', () => {
         }
 
         filePromise
-          .then(() => done.fail())
           .catch(error => done.fail(error))
       })
 

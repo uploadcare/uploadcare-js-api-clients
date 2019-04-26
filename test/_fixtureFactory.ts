@@ -1,6 +1,6 @@
 import {dataURItoBlob, dataURItoBuffer, Environment, getSettingsForTesting, isNode} from './_helpers'
 
-const environment = Environment.Testing
+const environment = Environment.Production
 const settings = getSettingsForTesting({}, environment)
 
 /* eslint-disable max-len */

@@ -3,6 +3,8 @@ import checkFileIsReady from '../checkFileIsReady'
 import prettyFileInfo from '../prettyFileInfo'
 import {Thenable} from '../tools/Thenable'
 import {CancelableInterface} from '../api/types'
+import {PollPromiseInterface} from '../tools/poll'
+import {InfoResponse} from '../api/info'
 
 export enum ProgressState {
   Pending = 'pending',
@@ -41,6 +43,7 @@ export interface UploadFromInterface extends Promise<UploadcareFile>, Cancelable
  */
 export abstract class UploadFrom extends Thenable<UploadcareFile> implements UploadFromInterface {
   protected abstract readonly promise: Promise<UploadcareFile>
+  protected isFileReadyPolling: PollPromiseInterface<InfoResponse> | null = null
   abstract cancel(): void
 
   protected progress: UploadingProgress = {
@@ -168,11 +171,13 @@ export abstract class UploadFrom extends Thenable<UploadcareFile> implements Upl
       this.onUploaded(uuid)
     }
 
-    return checkFileIsReady({
+    this.isFileReadyPolling = checkFileIsReady({
       uuid,
       timeout: 1000,
       settings,
     })
+
+    return this.isFileReadyPolling
       .then(info => {
         this.setFile(prettyFileInfo(info, settings))
 

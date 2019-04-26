@@ -6,6 +6,7 @@ module.exports = function(config) {
     browsers: ['ChromeHeadless'],
     reporters: ['progress', 'karma-typescript'],
     frameworks: ['jasmine', 'karma-typescript'],
+    captureConsole: true,
 
     files: [
       {

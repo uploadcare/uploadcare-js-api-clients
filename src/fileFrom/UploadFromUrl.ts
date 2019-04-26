@@ -7,13 +7,15 @@ import fromUrlStatus, {
   isSuccessResponse,
   isUnknownResponse,
 } from '../api/fromUrlStatus'
-import {UploadFrom} from './UploadFrom'
+import {ProgressState, UploadFrom} from './UploadFrom'
 import checkFileIsUploadedFromUrl from '../checkFileIsUploadedFromUrl'
 import {PollPromiseInterface} from '../tools/poll'
+import CancelError from '../errors/CancelError'
 
 export class UploadFromUrl extends UploadFrom {
   protected readonly promise: Promise<UploadcareFile>
-  private polling: PollPromiseInterface<FromUrlStatusResponse> | null = null
+  private isFileUploadedFromUrlPolling: PollPromiseInterface<FromUrlStatusResponse> | null = null
+  private isCancelled: boolean = false
 
   protected readonly data: Url
   protected readonly settings: Settings
@@ -51,10 +53,8 @@ export class UploadFromUrl extends UploadFrom {
   }
 
   private handleFromUrlStatusResponse = (token: string, response: FromUrlStatusResponse) => {
-    // Now just ignore 'unknown' response and make request again
-    // TODO: Remake into polling
     if (isUnknownResponse(response)) {
-      return this.getFilePromise()
+      return Promise.reject(`Token "${token}" not found.`)
     }
 
     if (isErrorResponse(response)) {
@@ -62,12 +62,16 @@ export class UploadFromUrl extends UploadFrom {
     }
 
     if (isProgressResponse(response)) {
+      if (this.isCancelled) {
+        return Promise.reject(new CancelError())
+      }
+
       this.handleUploading({
         total: response.total,
         loaded: response.done,
       })
 
-      this.polling = checkFileIsUploadedFromUrl({
+      this.isFileUploadedFromUrlPolling = checkFileIsUploadedFromUrl({
         token,
         timeout: 1000,
         onProgress: (response) => {
@@ -80,13 +84,17 @@ export class UploadFromUrl extends UploadFrom {
         settings: this.settings
       })
 
-      return this.polling
+      return this.isFileUploadedFromUrlPolling
         .then(status => this.handleFromUrlStatusResponse(token, status))
         .catch(this.handleError)
     }
 
     if (isSuccessResponse(response)) {
       const {uuid} = response
+
+      if (this.isCancelled) {
+        return Promise.reject(new CancelError())
+      }
 
       return this.handleUploaded(uuid, this.settings)
         .then(this.handleReady)
@@ -95,8 +103,24 @@ export class UploadFromUrl extends UploadFrom {
   }
 
   cancel(): void {
-    if (this.polling) {
-      this.polling.cancel()
+    const {state} = this.getProgress()
+
+    switch (state) {
+      case ProgressState.Uploading:
+        if (this.isFileUploadedFromUrlPolling) {
+          this.isFileUploadedFromUrlPolling.cancel()
+        } else {
+          this.isCancelled = true
+        }
+        break
+      case ProgressState.Uploaded:
+      case ProgressState.Ready:
+        if (this.isFileReadyPolling) {
+          this.isFileReadyPolling.cancel()
+        } else {
+          this.isCancelled = true
+        }
+        break
     }
   }
 }
