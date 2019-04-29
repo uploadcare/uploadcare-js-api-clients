@@ -31,7 +31,7 @@ class UploadAPI implements UploadAPIInterface {
     return prepareOptions(options, this.client.getSettings())
   }
 
-  private getSettings = (settings) => {
+  private getResultSettings = (settings) => {
     return {
       ...this.client.getSettings(),
       ...settings,
@@ -43,19 +43,19 @@ class UploadAPI implements UploadAPIInterface {
   }
 
   base(data: FileData, settings: Settings = {}): DirectUploadInterface {
-    return base(data, this.getSettings(settings))
+    return base(data, this.getResultSettings(settings))
   }
 
   info(uuid: string, settings: Settings = {}): Promise<InfoResponse> {
-    return info(uuid, this.getSettings(settings))
+    return info(uuid, this.getResultSettings(settings))
   }
 
   fromUrl(sourceUrl: Url, settings: Settings = {}): Promise<FromUrlResponse> {
-    return fromUrl(sourceUrl, this.getSettings(settings))
+    return fromUrl(sourceUrl, this.getResultSettings(settings))
   }
 
   fromUrlStatus(token: string, settings: Settings = {}): Promise<FromUrlStatusResponse> {
-    return fromUrlStatus(token,this.getSettings(settings))
+    return fromUrlStatus(token,this.getResultSettings(settings))
   }
 }
 

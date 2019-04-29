@@ -36,7 +36,6 @@ class PollPromise<T> extends Thenable<T> implements PollPromiseInterface<T> {
 
   cancel() {
     this.canceled = true
-    throw new CancelError()
   }
 }
 
