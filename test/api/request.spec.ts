@@ -3,7 +3,7 @@ import * as factory from '../_fixtureFactory'
 import axios from 'axios'
 import {Environment, getSettingsForTesting, sleep} from '../_helpers'
 
-const environment = Environment.Testing
+const environment = Environment.Production
 
 describe('buildFormData', () => {
   it('should return FormData with nice input object', () => {

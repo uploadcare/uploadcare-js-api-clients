@@ -2,7 +2,7 @@ import fromUrlStatus, {StatusEnum} from '../../src/api/fromUrlStatus'
 import * as factory from '../_fixtureFactory'
 import {Environment, getSettingsForTesting} from '../_helpers'
 
-const environment = Environment.Testing
+const environment = Environment.Production
 
 describe('API - from url status', () => {
   it('should return info about file uploaded from url', async() => {

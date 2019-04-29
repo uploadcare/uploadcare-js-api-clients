@@ -3,7 +3,7 @@ import * as factory from '../_fixtureFactory'
 import {getUserAgent} from '../../src/defaultSettings'
 import {Environment, getSettingsForTesting} from '../_helpers'
 
-const environment = Environment.Testing
+const environment = Environment.Production
 
 describe('API - base', () => {
   const fileToUpload = factory.image('blackSquare')

@@ -36,8 +36,8 @@ export const getSettingsForTesting = (settings = {}, environment: Environment | 
     case Environment.Testing:
       // TODO: Need to replace when we will have a mock server
       return {
-        baseCDN: 'https://staging0.ucarecdn.com',
-        baseURL: 'https://upload.staging0.uploadcare.com',
+        baseCDN: 'http://localhost:3000',
+        baseURL: 'http://localhost:3000',
         ...settings,
       }
     case Environment.Staging:
@@ -54,8 +54,8 @@ export const getSettingsForTesting = (settings = {}, environment: Environment | 
       }
     default:
       return {
-        baseCDN: 'https://staging0.ucarecdn.com',
-        baseURL: 'https://upload.staging0.uploadcare.com',
+        baseCDN: 'http://localhost:3000',
+        baseURL: 'http://localhost:3000',
         ...settings,
       }
   }
