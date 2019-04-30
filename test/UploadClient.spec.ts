@@ -9,7 +9,6 @@ describe('UploadClient', () => {
 
   describe('should request to the right base url', () => {
     const requestOptions = {
-      baseURL: settings.baseURL,
       path: '/info/',
       query: {
         pub_key: factory.publicKey('image'),
