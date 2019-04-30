@@ -1,23 +1,29 @@
-import jasmine from 'jasmine'
 import base from '../../src/api/base'
 import * as factory from '../_fixtureFactory'
 import {getUserAgent} from '../../src/defaultSettings'
+import {Environment, getSettingsForTesting} from '../_helpers'
+
+const environment = Environment.Production
 
 describe('API - base', () => {
   const fileToUpload = factory.image('blackSquare')
 
   it('should be able to upload data', async() => {
-    const directUpload = base(fileToUpload.data, {publicKey: factory.publicKey('demo')})
+    const settings = getSettingsForTesting({
+      publicKey: factory.publicKey('demo')
+    }, environment)
+    const directUpload = base(fileToUpload.data, settings)
+    const {file} = await directUpload
 
-    await expectAsync(directUpload).toBeResolvedTo({file: jasmine.any(String)})
+    expect(typeof file).toBe('string')
   })
 
   it('should accept integration setting', (done) => {
-    const settings = {
+    const settings = getSettingsForTesting({
       publicKey: 'test',
       integration: 'Test',
-    }
-    const directUpload = base('', settings)
+    }, environment)
+    const directUpload = base(fileToUpload.data, settings)
 
     directUpload
       .then(() => done.fail())
@@ -37,11 +43,14 @@ describe('API - base', () => {
   })
 
   it('should be able to cancel uploading', (done) => {
-    const directUpload = base(fileToUpload.data, {publicKey: factory.publicKey('demo')})
+    const settings = getSettingsForTesting({
+      publicKey: factory.publicKey('demo')
+    }, environment)
+    const directUpload = base(fileToUpload.data, settings)
 
     setTimeout(() => {
       directUpload.cancel()
-    }, 10)
+    }, 5)
 
     directUpload
       .then(() => done.fail())
@@ -49,7 +58,10 @@ describe('API - base', () => {
   })
 
   it('should be able to handle cancel uploading', (done) => {
-    const directUpload = base(fileToUpload.data, {publicKey: factory.publicKey('demo')})
+    const settings = getSettingsForTesting({
+      publicKey: factory.publicKey('demo')
+    }, environment)
+    const directUpload = base(fileToUpload.data, settings)
 
     setTimeout(() => {
       directUpload.cancel()
@@ -69,15 +81,18 @@ describe('API - base', () => {
   })
 
   it('should be able to handle progress', (done) => {
-    let progress = 0
-    const directUpload = base(fileToUpload.data, {publicKey: factory.publicKey('demo')})
+    let progressValue = 0
+    const settings = getSettingsForTesting({
+      publicKey: factory.publicKey('demo')
+    }, environment)
+    const directUpload = base(fileToUpload.data, settings)
 
-    directUpload.onProgress = () => {
-      progress += 1
+    directUpload.onProgress = (progressEvent) => {
+      progressValue = Math.round((progressEvent.loaded * 100) / progressEvent.total)
     }
 
     directUpload
-      .then(() => progress ? done() : done.fail())
+      .then(() => progressValue > 0 ? done() : done.fail())
       .catch(error => done.fail(error))
   })
 })

@@ -1,11 +1,16 @@
 import fromUrl, {TypeEnum} from '../../src/api/fromUrl'
 import * as factory from '../_fixtureFactory'
+import {Environment, getSettingsForTesting} from '../_helpers'
+
+const environment = Environment.Production
 
 describe('API - from url', () => {
   it('should return token for file', async() => {
     const sourceUrl = factory.imageUrl('valid')
-    const settings = {publicKey: factory.publicKey('demo')}
-    const data = await fromUrl({sourceUrl}, settings)
+    const settings = getSettingsForTesting({
+      publicKey: factory.publicKey('demo')
+    }, environment)
+    const data = await fromUrl(sourceUrl, settings)
 
     expect(data.type).toEqual(TypeEnum.Token)
 
@@ -16,22 +21,23 @@ describe('API - from url', () => {
 
   it('should return file info', async() => {
     const sourceUrl = factory.imageUrl('valid')
-    const urlData = {
-      sourceUrl,
+    const settings = getSettingsForTesting({
+      publicKey: factory.publicKey('image'),
       checkForUrlDuplicates: true,
       saveUrlForRecurrentUploads: true,
-    }
-    const settings = {publicKey: factory.publicKey('image')}
-    const data = await fromUrl(urlData, settings)
+    }, environment)
+    const data = await fromUrl(sourceUrl, settings)
 
     expect(data.type).toEqual(TypeEnum.FileInfo)
   })
 
   it('should be rejected with bad options', (done) => {
     const sourceUrl = factory.imageUrl('valid')
-    const settings = {publicKey: factory.publicKey('invalid')}
+    const settings = getSettingsForTesting({
+      publicKey: factory.publicKey('invalid')
+    }, environment)
 
-    fromUrl({sourceUrl}, settings)
+    fromUrl(sourceUrl, settings)
       .then(() => done.fail())
       .catch(error => {
         (error.name === 'UploadcareError')
@@ -42,9 +48,11 @@ describe('API - from url', () => {
 
   it('should be rejected with image that does not exists', (done) => {
     const sourceUrl = factory.imageUrl('doesNotExist')
-    const settings = {publicKey: factory.publicKey('demo')}
+    const settings = getSettingsForTesting({
+      publicKey: factory.publicKey('demo')
+    }, environment)
 
-    fromUrl({sourceUrl}, settings)
+    fromUrl(sourceUrl, settings)
       .then(() => done.fail())
       .catch(error => {
         (error.name === 'UploadcareError')
@@ -55,9 +63,11 @@ describe('API - from url', () => {
 
   it('should be rejected with image from private IP', (done) => {
     const sourceUrl = factory.imageUrl('privateIP')
-    const settings = {publicKey: factory.publicKey('demo')}
+    const settings = getSettingsForTesting({
+      publicKey: factory.publicKey('demo')
+    }, environment)
 
-    fromUrl({sourceUrl}, settings)
+    fromUrl(sourceUrl, settings)
       .then(() => done.fail())
       .catch(error => {
         (error.name === 'UploadcareError')

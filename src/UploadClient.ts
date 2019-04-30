@@ -1,13 +1,27 @@
 import defaultSettings from './defaultSettings'
 import UploadAPI from './api/index'
-import fileFrom from './fileFrom'
+import fileFrom, {FileFrom} from './fileFrom/fileFrom'
 import {FileData, Settings} from './types'
-import {FilePromise} from './fileFrom'
+import {UploadFromInterface} from './fileFrom/UploadFrom'
+import {Url} from './api/fromUrl'
+import {UploadAPIInterface} from './api/UploadAPI'
 
-export default class UploadClient {
-  settings: Settings
-  updateSettingsListeners: Array<Function>
-  api: UploadAPI
+export interface UploadClientInterface {
+  setSettings(newSettings: Settings): void
+
+  getSettings(): Settings
+
+  addUpdateSettingsListener(listener: Function): void
+
+  removeUpdateSettingsListener(listener: Function): void
+
+  fileFrom(from: FileFrom, data: FileData | Url, settings?: Settings): UploadFromInterface
+}
+
+class UploadClient implements UploadClientInterface {
+  protected settings: Settings
+  protected updateSettingsListeners: Array<Function>
+  readonly api: UploadAPIInterface
 
   constructor(settings: Settings = {}) {
     this.settings = {
@@ -31,6 +45,10 @@ export default class UploadClient {
     })
   }
 
+  getSettings(): Settings {
+    return this.settings
+  }
+
   addUpdateSettingsListener(listener: Function): void {
     this.updateSettingsListeners.push(listener)
   }
@@ -45,10 +63,12 @@ export default class UploadClient {
     }
   }
 
-  fileFrom(from: string, data: FileData, settings: Settings = {}): FilePromise {
+  fileFrom(from: FileFrom, data: FileData | Url, settings: Settings = {}): UploadFromInterface {
     return fileFrom(from, data, {
       ...this.settings,
       ...settings,
     })
   }
 }
+
+export default UploadClient

@@ -1,7 +1,9 @@
 import request, {buildFormData} from '../../src/api/request'
 import * as factory from '../_fixtureFactory'
 import axios from 'axios'
-import {sleep} from '../_helpers'
+import {Environment, getSettingsForTesting, sleep} from '../_helpers'
+
+const environment = Environment.Production
 
 describe('buildFormData', () => {
   it('should return FormData with nice input object', () => {
@@ -20,40 +22,51 @@ describe('buildFormData', () => {
 })
 
 describe('API – request', () => {
+  const settings = getSettingsForTesting({}, environment)
+
   it('should return Promise', () => {
-    expect(typeof request({path: '/info/'}).then).toBe('function')
+    const options = {
+      baseURL: settings.baseURL,
+      path: '/info/',
+    }
+
+    expect(typeof request(options).then).toBe('function')
   })
 
   describe('should be resolved', () => {
     it('on valid GET request', async() => {
-      await expectAsync(request({
+      const options = {
+        baseURL: settings.baseURL,
         path: '/info/',
         query: {
           pub_key: factory.publicKey('image'),
           file_id: factory.uuid('image'),
         },
-      })).toBeResolvedTo({
-        headers: jasmine.any(Object),
-        url: 'https://upload.uploadcare.com/info/',
-        data: jasmine.objectContaining({uuid: factory.uuid('image')}),
-      })
+      }
+      const result = await request(options)
+
+      expect(typeof result.headers).toBe('object')
+      expect(result.url).toBe(`${settings.baseURL}/info/`)
+      expect(typeof result.data).toBe('object')
+      expect(result.data.uuid).toBe(factory.uuid('image'))
     })
 
     it('on valid POST request', async() => {
       const file = factory.image('blackSquare')
-
-      await expectAsync(request({
+      const options = {
         method: 'POST',
         path: '/base/',
         body: {
           UPLOADCARE_PUB_KEY: factory.publicKey('demo'),
           file: file.data,
         },
-      })).toBeResolvedTo({
-        headers: jasmine.any(Object),
-        url: 'https://upload.uploadcare.com/base/',
-        data: {file: jasmine.any(String)},
-      })
+      }
+      const result = await request(options)
+
+      expect(typeof result.headers).toBe('object')
+      expect(result.url).toBe(`${settings.baseURL}/base/`)
+      expect(typeof result.data).toBe('object')
+      expect(typeof result.data.file).toBe('string')
     })
   })
 
@@ -64,45 +77,54 @@ describe('API – request', () => {
     })
 
     it('if Uploadcare returns error', (done) => {
-      request({
+      const options = {
+        baseURL: settings.baseURL,
         path: '/info/',
         query: {pub_key: factory.publicKey('image')},
-      })
+      }
+
+      request(options)
         .then(() => done.fail())
         .catch((error) => error.name === 'UploadcareError' ? done() : done.fail(error))
     })
 
     it('on connection error', async() => {
       const interceptor = axios.interceptors.response.use(() => Promise.reject('error'))
-
-      const req = request({
+      const options = {
+        baseURL: settings.baseURL,
         path: '/info/',
         query: {
           pub_key: factory.publicKey('image'),
           file_id: factory.uuid('image'),
         },
-      })
+      }
+      const requestWithOptions = request(options)
 
-      await expectAsync(req).toBeRejected()
+      await expectAsync(requestWithOptions).toBeRejected()
 
       axios.interceptors.response.eject(interceptor)
     })
 
-    it('if request canceled', (done) => {
-      const source = axios.CancelToken.source()
-
-      request({
+    it('if promise canceled', (done) => {
+      const options = {
+        baseURL: settings.baseURL,
         path: '/info/',
         query: {
           pub_key: factory.publicKey('image'),
           file_id: factory.uuid('image'),
         },
-        cancelToken: source.token,
-      })
-        .then(() => done.fail())
-        .catch((error) => error.name === 'CancelError' ? done() : done.fail(error))
+      }
+      const requestWithOptions = request(options)
 
-      source.cancel()
+      requestWithOptions
+        .then(() => done.fail())
+        .catch(error => {
+          (error.name === 'CancelError')
+            ? done()
+            : done.fail(error)
+        })
+
+      requestWithOptions.cancel()
     })
   })
 })

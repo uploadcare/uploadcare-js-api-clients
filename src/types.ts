@@ -7,12 +7,29 @@ export type Settings = {
   secureSignature?: string,
   secureExpire?: string,
   integration?: string,
+  checkForUrlDuplicates?: boolean,
+  saveUrlForRecurrentUploads?: boolean,
 }
 
 export type FileData = Blob | File | Buffer
 
+export type OriginalImageInfo = {
+  width: number,
+  height: number,
+  format: string,
+  datetimeOriginal: null | string,
+  geoLocation: null | {
+    latitude: number,
+    longitude: number,
+  },
+  orientation: null | number,
+  dpi: null | Array<number>,
+  colorMode: string,
+  sequence?: boolean,
+}
+
 /* TODO Add sourceInfo */
-export type UFile = {
+export type UploadcareFile = {
   uuid: string,
   name: null | string,
   size: null | number,
@@ -21,18 +38,6 @@ export type UFile = {
   cdnUrl: null | string,
   cdnUrlModifiers: null | string,
   originalUrl: null | string,
-  originalImageInfo: null | {
-    width: number,
-    height: number,
-    format: string,
-    datetimeOriginal: null | string,
-    geoLocation: null | {
-      latitude: number,
-      longitude: number,
-    },
-    orientation: null | number,
-    dpi: null | Array<number>,
-    colorMode: string,
-    sequence?: boolean,
-  },
+  originalFilename: null | string,
+  originalImageInfo: null | OriginalImageInfo,
 }

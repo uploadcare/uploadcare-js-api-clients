@@ -1,4 +1,7 @@
-import {dataURItoBlob, dataURItoBuffer, isNode} from './_helpers'
+import {dataURItoBlob, dataURItoBuffer, Environment, getSettingsForTesting, isNode} from './_helpers'
+
+const environment = Environment.Production
+const settings = getSettingsForTesting({}, environment)
 
 /* eslint-disable max-len */
 const images: {[key: string]: string} = {
@@ -12,12 +15,20 @@ const uuids: {[key: string]: {publicKey: string, uuid: string}} = {
     publicKey: '657ec3b474e01b9045f7',
     uuid: 'd3275f8b-686d-4980-916a-53a1fc17450b',
   },
+  token: {
+    publicKey: '657ec3b474e01b9045f7',
+    uuid: 'b6aac6aa-be7b-46d2-9fc3-208290c78024',
+  },
   demo: {
     publicKey: 'demopublickey',
     uuid: '',
   },
   invalid: {
     publicKey: 'invalidpublickey',
+    uuid: '',
+  },
+  empty: {
+    publicKey: '',
     uuid: '',
   },
 }
@@ -97,12 +108,12 @@ export function publicKey(id: string): string {
 }
 
 export function linkTo(uuid: string): string {
-  return `https://ucarecdn.com/${uuid}/`
+  return `${settings.baseCDN}/${uuid}/`
 }
 
 export function imageUrl(id: string): string {
   const images = {
-    valid: 'https://ucarecdn.com/d3275f8b-686d-4980-916a-53a1fc17450b/1findfacecropgrayscale.jpg',
+    valid: `${settings.baseCDN}/d3275f8b-686d-4980-916a-53a1fc17450b/1findfacecropgrayscale.jpg`,
     doesNotExist: 'https://1.com/1.jpg',
     privateIP: 'http://192.168.1.10/1.jpg',
   }
@@ -112,7 +123,7 @@ export function imageUrl(id: string): string {
 
 export function token(id: string): string {
   const tokens = {
-    valid: '945ebb27-1fd6-46c6-a859-b9893712d650',
+    valid: '0a875b4b-da2b-4e2a-b93b-0964f8f54f53',
     empty: '',
   }
 

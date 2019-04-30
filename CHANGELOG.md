@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Changed
+
+* Project was moved from Flow notations to TypeScript.
+* The `base` function now returns object that implements `DirectUploadInterface`.
+* The `fileFrom` function now returns object that implements `UploadFromInterface`.
+* The `UCFile` type renamed to `UploadcareFile`.
+* The progress of `fileFrom` now based on the `UploadingProgress` type.
+
+### Added
+
+* Low-level request wrappers for `/from_url/` and `/from_url/status/` paths of Upload API.
+* Settings: the support of setting `baseCDN`, `checkForUrlDuplicates`, `saveUrlForRecurrentUploads`.
+
 [Unreleased]: https://github.com/uploadcare/uploadcare-upload-client/compare/v1.0.0-alpha.1...HEAD
 
 ## [1.0.0-alpha.1]
@@ -21,8 +34,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
   instead of using the `promise` property.
 * The `fileFrom` function returns `thenable` object called `FilePromise`
   instead of using the `promise` property.
-* The `FileInfo` type renamed to `UFile` and updated.
-* The `FilePromise` resolved with an object of the `UFile` type.
+* The `FileInfo` type renamed to `UCFile` and updated.
+* The `FilePromise` resolved with an object of the `UploadcareFile` type.
 * The progress of `fileFrom` now based on the `FilePromiseProgress` type.
 * Updated the `InfoResponse` type.
 
