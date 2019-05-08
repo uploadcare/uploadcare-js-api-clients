@@ -191,10 +191,10 @@ class Request extends Thenable<RequestResponse> implements RequestInterface {
   protected getRequestData() {
     const {body} = this.options
 
-    return body && buildFormData({
+    return (body && buildFormData({
       source: body.source || 'local',
       ...body,
-    })
+    })) || null
   }
 
   protected getRequestHeaders(data) {
