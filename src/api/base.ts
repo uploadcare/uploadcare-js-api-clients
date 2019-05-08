@@ -61,8 +61,8 @@ const getRequestBody = (file: FileData, settings: Settings) => ({
   signature: settings.secureSignature || '',
   expire: settings.secureExpire || '',
   UPLOADCARE_STORE: settings.doNotStore ? '' : 'auto',
-  file: file,
   source: 'local',
+  file: file,
 })
 
 const getRequestOptions = (file: FileData, settings: Settings): RequestOptions => {

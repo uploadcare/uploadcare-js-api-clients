@@ -87,24 +87,8 @@ export function prepareOptions(options: RequestOptions, settings: Settings): Req
  * @param {string} [options.baseURL] – The Upload API endpoint.
  * @returns {Promise<RequestResponse>}
  */
-export default function request({
-  method,
-  path,
-  query,
-  body,
-  headers,
-  baseURL,
-  onUploadProgress
-}: RequestOptions): RequestInterface {
-  return new Request({
-    method,
-    path,
-    query,
-    body,
-    headers,
-    baseURL,
-    onUploadProgress
-  })
+export default function request(options: RequestOptions): RequestInterface {
+  return new Request(options)
 }
 
 /**
@@ -168,15 +152,16 @@ class Request extends Thenable<RequestResponse> implements RequestInterface {
 
   protected getRequestOptions() {
     const {path, onUploadProgress} = this.options
+    const data = this.getRequestData()
 
     return {
       method: this.getRequestMethod(),
       baseURL: this.getRequestBaseURL(),
       url: path,
       params: this.getRequestParams(),
-      data: this.getRequestData(),
+      data,
       maxContentLength: MAX_CONTENT_LENGTH,
-      headers: this.getRequestHeaders(),
+      headers: this.getRequestHeaders(data),
       cancelToken: this.cancelController.token,
       onUploadProgress,
     }
@@ -207,14 +192,13 @@ class Request extends Thenable<RequestResponse> implements RequestInterface {
     const {body} = this.options
 
     return body && buildFormData({
-      ...body,
       source: body.source || 'local',
+      ...body,
     })
   }
 
-  protected getRequestHeaders() {
+  protected getRequestHeaders(data) {
     const {headers} = this.options
-    const data = this.getRequestData()
 
     return {
       'X-UC-User-Agent': getUserAgent(),
