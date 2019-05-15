@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+[Unreleased]: https://github.com/uploadcare/uploadcare-upload-client/compare/v1.0.0-alpha.2...HEAD
+
+## [1.0.0-alpha.2]
+
 ### Changed
 
 * Project was moved from Flow notations to TypeScript.
@@ -20,7 +24,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 * Low-level request wrappers for `/from_url/` and `/from_url/status/` paths of Upload API.
 * Settings: the support of setting `baseCDN`, `checkForUrlDuplicates`, `saveUrlForRecurrentUploads`.
 
-[Unreleased]: https://github.com/uploadcare/uploadcare-upload-client/compare/v1.0.0-alpha.1...HEAD
+[1.0.0-alpha.2]: https://github.com/uploadcare/uploadcare-upload-client/compare/v1.0.0-alpha.1...v1.0.0-alpha.2
 
 ## [1.0.0-alpha.1]
 
