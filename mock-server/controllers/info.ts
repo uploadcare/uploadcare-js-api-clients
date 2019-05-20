@@ -6,7 +6,11 @@ import {find} from '../utils/find'
  * @param {object} ctx
  */
 const uuid = (ctx) => {
-  ctx.body = find(json, 'info')
+  if (ctx.query && ctx.query.file_id || ctx.query.uuid) {
+    ctx.body = find(json, 'info')
+  } else {
+    ctx.status = 400
+  }
 }
 
 export {
