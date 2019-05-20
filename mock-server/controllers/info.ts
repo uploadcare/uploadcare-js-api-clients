@@ -2,7 +2,8 @@ import * as json from '../data/info.json'
 import {find} from '../utils/find'
 
 /**
- * '/info/:uuid'
+ * '/info?uuid=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx'
+ * '/info?file_id=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx'
  * @param {object} ctx
  */
 const uuid = (ctx) => {
