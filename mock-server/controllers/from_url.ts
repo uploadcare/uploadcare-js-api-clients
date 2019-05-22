@@ -1,21 +1,69 @@
 import * as jsonIndex from '../data/from_url/index.json'
 import * as jsonStatus from '../data/from_url/status.json'
-import {find} from '../utils/find'
+import find from '../utils/find'
+import error from '../utils/error'
+
+import {PORT} from '../config'
 
 /**
- * '/from_url/'
+ * '/from_url/?pub_key='
  * @param {object} ctx
  */
 const index = (ctx) => {
-  ctx.body = find(jsonIndex, 'token')
+  const isValid = (url: string): boolean => url.includes('.jpg') || url.includes('.png')
+  const isPrivateIP = (url: string): boolean => url.includes('192.168.') || url.includes('localhost') && !url.includes(`http://localhost:${PORT}/`)
+  const doesNotExist = (url: string): boolean => url === 'https://1.com/1.jpg'
+
+  const sourceUrl = ctx.query && ctx.query.source_url
+  const checkForUrlDuplicates = ctx.query && !!ctx.query.check_URL_duplicates
+  const saveUrlForRecurrentUploads = ctx.query && !!ctx.query.save_URL_duplicates
+
+  // Check params
+  if (!sourceUrl) {
+    error(ctx, {
+      statusText: 'source_url is required.',
+    })
+  }
+
+  if (doesNotExist(sourceUrl)) {
+    error(ctx, {
+      statusText: 'Host does not exist.',
+    })
+  }
+
+  if (isPrivateIP(sourceUrl)) {
+    error(ctx, {
+      statusText: 'Only public IPs are allowed.',
+    })
+  }
+
+  if (isValid(sourceUrl)) {
+    error(ctx, {
+      statusText: 'Only public IPs are allowed.',
+    })
+  }
+
+  if (checkForUrlDuplicates && saveUrlForRecurrentUploads) {
+    ctx.body = find(jsonStatus, 'info')
+  } else {
+    ctx.body = find(jsonIndex, 'token')
+  }
 }
 
 /**
- * '/from_url/status/'
+ * '/from_url/status/?pub_key=XXXXXXXXXXXXXXXXXXXX&token=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX'
  * @param {object} ctx
  */
 const status = (ctx) => {
-  ctx.body = find(jsonStatus, 'progress')
+  const token = ctx.query && ctx.query.token
+
+  if (token) {
+    ctx.body = find(jsonStatus, 'progress')
+  } else {
+    error(ctx, {
+      statusText: 'token is required.',
+    })
+  }
 }
 
 export {

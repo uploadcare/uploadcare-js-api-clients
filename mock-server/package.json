@@ -17,7 +17,9 @@
     "typescript": "^3.4.5"
   },
   "dependencies": {
+    "@koa/cors": "^2.2.3",
     "busboy": "^0.3.1",
+    "chalk": "^2.4.2",
     "koa": "^2.7.0",
     "koa-add-trailing-slashes": "^2.0.1",
     "koa-route": "^3.2.0"

@@ -6,6 +6,4 @@
 const find = (json: object, value: string): object =>
   json.hasOwnProperty(value) && json[value] || {}
 
-export {
-  find,
-}
+export default find

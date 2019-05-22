@@ -1,5 +1,5 @@
-const Busboy = require('busboy')
-const inspect = require('util').inspect
+import Busboy from 'busboy'
+import {inspect} from 'util'
 
 /**
  * Extract multipart fields.

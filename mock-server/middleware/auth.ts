@@ -1,10 +1,24 @@
-const {ALLOWED_PUBLIC_KEYS, PROTECTED_ROUTES} = require('../config')
+import {ROUTES, RouteType} from '../routes'
+import {ALLOWED_PUBLIC_KEYS} from '../config'
+
+/**
+ * Routes protected by Auth.
+ */
+const protectedRoutes: Array<string> = ROUTES
+  .filter((route: RouteType) => {
+    const path = Object.keys(route).shift()
+
+    return route[path].isProtected
+  })
+  .map((route: RouteType) => {
+    return Object.keys(route).shift()
+  })
 
 /**
  * Check is url protected by auth.
  * @param url
  */
-const isProtected = (url: string) => PROTECTED_ROUTES.filter((path: string) => url.startsWith(path))
+const isProtected = (url: string) => protectedRoutes.filter((path: string) => url.startsWith(path))
 
 type IsAuthorizedParams = {
   url: string,

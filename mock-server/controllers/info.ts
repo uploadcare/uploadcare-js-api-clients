@@ -1,13 +1,12 @@
 import * as json from '../data/info.json'
-import {find} from '../utils/find'
+import find from '../utils/find'
 
 /**
- * '/info?uuid=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx'
- * '/info?file_id=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx'
+ * '/info?pub_key=XXXXXXXXXXXXXXXXXXXX&file_id=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX'
  * @param {object} ctx
  */
-const uuid = (ctx) => {
-  if (ctx.query && ctx.query.file_id || ctx.query.uuid) {
+const index = (ctx) => {
+  if (ctx.query && ctx.query.file_id) {
     ctx.body = find(json, 'info')
   } else {
     ctx.status = 400
@@ -15,5 +14,5 @@ const uuid = (ctx) => {
 }
 
 export {
-  uuid,
+  index,
 }
