@@ -5,10 +5,10 @@ import chalk from 'chalk'
 // Middleware
 import cors from '@koa/cors'
 import addTrailingSlashes from 'koa-add-trailing-slashes'
+import koaBody from 'koa-body'
 
 import logger from './middleware/logger'
-// import auth from './middleware/auth'
-// import multipart from './middleware/multipart'
+import auth from './middleware/auth'
 
 // Config
 import {PORT} from './config'
@@ -22,8 +22,10 @@ const app = new Koa()
 app.use(cors())
 app.use(addTrailingSlashes())
 app.use(logger)
-// app.use(multipart)
-// app.use(auth)
+app.use(koaBody({
+  multipart: true,
+}))
+app.use(auth)
 
 // Routes
 ROUTES.forEach((route: RouteType) => {

@@ -1,8 +1,9 @@
 import {ROUTES, RouteType} from '../routes'
 import {ALLOWED_PUBLIC_KEYS} from '../config'
+import error from '../utils/error'
 
 /**
- * Routes protected by Auth.
+ * Routes protected by auth.
  */
 const protectedRoutes: Array<string> = ROUTES
   .filter((route: RouteType) => {
@@ -16,7 +17,8 @@ const protectedRoutes: Array<string> = ROUTES
 
 /**
  * Check is url protected by auth.
- * @param url
+ * @param {string} url
+ * @return {boolean}
  */
 const isProtected = (url: string) => protectedRoutes.filter((path: string) => url.startsWith(path))
 
@@ -27,9 +29,10 @@ type IsAuthorizedParams = {
 }
 /**
  * Check auth.
- * @param url
- * @param source
- * @param key
+ * @param {string} url
+ * @param {object} source
+ * @param {string} key
+ * @return {boolean}
  */
 const isAuthorized = ({url, source, key = 'pub_key'}: IsAuthorizedParams) => {
   if (!isProtected(url)) {
@@ -52,15 +55,18 @@ const auth = (ctx, next) => {
     source: ctx.query,
   }
 
-  if (ctx.url === 'base') {
+  if (ctx.url.includes('base')) {
     params.key = 'UPLOADCARE_PUB_KEY'
-    params.source = ctx.request.multipart.fields
+    params.source = ctx.request.body
   }
 
   if (isAuthorized(params)) {
     next()
   } else {
-    ctx.status = 401
+    error(ctx, {
+      status: 403,
+      statusText: `${params.key || 'pub_key'} is required.`,
+    })
   }
 }
 

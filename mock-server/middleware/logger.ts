@@ -8,6 +8,13 @@ import chalk from 'chalk'
 const pretty = (json: object): string => JSON.stringify(json, null, 2)
 
 /**
+ * Check is empty object.
+ * @param {object} object
+ * @return {boolean}
+ */
+const isEmptyObject = (object: object): boolean => Object.keys(object).length === 0 && object.constructor === Object
+
+/**
  * Logger for requests and responses.
  * @param {object} ctx
  * @param {function} next
@@ -30,12 +37,12 @@ const logger = async (ctx, next) => {
 
   console.log(request)
 
-  if (requestBody) {
+  if (!isEmptyObject(requestBody)) {
     console.log('Request Body:')
     console.log(pretty(requestBody))
   }
 
-  if (requestQuery) {
+  if (!isEmptyObject(requestQuery)) {
     console.log('Request Query:')
     console.log(pretty(requestQuery))
   }
@@ -47,6 +54,8 @@ const logger = async (ctx, next) => {
     console.log('Response Body:')
     console.log(pretty(responseBody))
   }
+
+  console.log()
 }
 
 export default logger
