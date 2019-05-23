@@ -1,9 +1,10 @@
 import request, {prepareOptions, RequestOptions} from './request'
 import {Settings} from '../types'
-import {CancelableInterface, FileInfo, ProgressStatus} from './types'
+import {FileInfo, ProgressStatus} from './types'
 
 export enum StatusEnum {
   Unknown = 'unknown',
+  Waiting = 'waiting',
   Progress = 'progress',
   Error = 'error',
   Success = 'success'
@@ -11,6 +12,10 @@ export enum StatusEnum {
 
 type UnknownResponse = {
   status: StatusEnum.Unknown
+}
+
+type WaitingResponse = {
+  status: StatusEnum.Waiting
 }
 
 type ProgressResponse = ProgressStatus & {
@@ -26,7 +31,7 @@ type SuccessResponse = {
   status: StatusEnum.Success,
 } & FileInfo
 
-export type FromUrlStatusResponse = UnknownResponse | ProgressResponse | ErrorResponse | SuccessResponse
+export type FromUrlStatusResponse = UnknownResponse | WaitingResponse | ProgressResponse | ErrorResponse | SuccessResponse
 
 /**
  * UnknownResponse Type Guard
@@ -34,6 +39,14 @@ export type FromUrlStatusResponse = UnknownResponse | ProgressResponse | ErrorRe
  */
 export const isUnknownResponse = (response: FromUrlStatusResponse): response is UnknownResponse => {
   return response.status !== undefined && response.status === StatusEnum.Unknown;
+}
+
+/**
+ * WaitingResponse Type Guard
+ * @param {FromUrlStatusResponse} response
+ */
+export const isWaitingResponse = (response: FromUrlStatusResponse): response is WaitingResponse => {
+  return response.status !== undefined && response.status === StatusEnum.Waiting;
 }
 
 /**

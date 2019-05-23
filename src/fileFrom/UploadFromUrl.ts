@@ -6,6 +6,7 @@ import fromUrlStatus, {
   isProgressResponse,
   isSuccessResponse,
   isUnknownResponse,
+  isWaitingResponse,
 } from '../api/fromUrlStatus'
 import {ProgressState, UploadFrom} from './UploadFrom'
 import checkFileIsUploadedFromUrl from '../checkFileIsUploadedFromUrl'
@@ -53,8 +54,27 @@ export class UploadFromUrl extends UploadFrom {
   }
 
   private handleFromUrlStatusResponse = (token: string, response: FromUrlStatusResponse) => {
+    this.isFileUploadedFromUrlPolling = checkFileIsUploadedFromUrl({
+      token,
+      timeout: 1000,
+      onProgress: (response) => {
+        // Update uploading progress
+        this.handleUploading({
+          total: response.total,
+          loaded: response.done,
+        })
+      },
+      settings: this.settings
+    })
+
     if (isUnknownResponse(response)) {
       return Promise.reject(`Token "${token}" not found.`)
+    }
+
+    if (isWaitingResponse(response)) {
+      return this.isFileUploadedFromUrlPolling
+        .then(status => this.handleFromUrlStatusResponse(token, status))
+        .catch(this.handleError)
     }
 
     if (isErrorResponse(response)) {
@@ -69,19 +89,6 @@ export class UploadFromUrl extends UploadFrom {
       this.handleUploading({
         total: response.total,
         loaded: response.done,
-      })
-
-      this.isFileUploadedFromUrlPolling = checkFileIsUploadedFromUrl({
-        token,
-        timeout: 1000,
-        onProgress: (response) => {
-          // Update uploading progress
-          this.handleUploading({
-            total: response.total,
-            loaded: response.done,
-          })
-        },
-        settings: this.settings
       })
 
       return this.isFileUploadedFromUrlPolling
