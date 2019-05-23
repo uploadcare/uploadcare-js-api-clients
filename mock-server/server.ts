@@ -45,7 +45,7 @@ app.on('error', (err, ctx) => {
 
 // Listen server
 app.listen(PORT, () => {
-  console.log(`🚀 ${chalk.green('Server started at')} ${chalk.bold(`http://localhost:${PORT}`)}`, '\n')
+  console.log(`🚀 ${chalk.bold('Server started at')} ${chalk.green(chalk.bold(`http://localhost:${PORT}`))}`, '\n')
   console.log('Available routes:', '\n')
 
   // Print all available routes
@@ -53,7 +53,7 @@ app.listen(PORT, () => {
     const path = Object.keys(route).shift()
     const method = route[path].method.toUpperCase()
 
-    console.log(`  ${chalk.bold(method)}: '${path}'`)
+    console.log(`  ${chalk.bold(method)}: '${chalk.green(path)}'`)
   })
   console.log()
 })

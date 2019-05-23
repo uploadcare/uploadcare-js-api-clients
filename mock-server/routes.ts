@@ -27,7 +27,7 @@ export const ROUTES: Array<RouteType> = [
     '/from_url/status': {
       method: 'get',
       fn: fromUrl.status,
-      isProtected: true,
+      isProtected: false,
     }
   }, {
     '/info': {

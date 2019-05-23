@@ -9,6 +9,7 @@
     "error": "HTTPError: 404."
   },
   "info": {
+    "status": "success",
     "is_stored": true,
     "done": 2667636,
     "file_id": "be3b4d5e-179d-460e-8a5d-69112ac86cbb",

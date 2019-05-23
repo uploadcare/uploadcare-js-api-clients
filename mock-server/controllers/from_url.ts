@@ -44,7 +44,7 @@ const index = (ctx) => {
   }
 
   if (checkForUrlDuplicates && saveUrlForRecurrentUploads) {
-    ctx.body = find(jsonStatus, 'info')
+    ctx.body = find(jsonIndex, 'info')
   } else {
     ctx.body = find(jsonIndex, 'token')
   }

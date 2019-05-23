@@ -20,7 +20,7 @@ const protectedRoutes: Array<string> = ROUTES
  * @param {string} url
  * @return {boolean}
  */
-const isProtected = (url: string) => protectedRoutes.filter((path: string) => url.startsWith(path))
+const isProtected = (url: string) => !!protectedRoutes.filter((path: string) => url === path).length
 
 type IsAuthorizedParams = {
   url: string,
@@ -51,7 +51,7 @@ const isAuthorized = ({url, source, key = 'pub_key'}: IsAuthorizedParams) => {
  */
 const auth = (ctx, next) => {
   let params: IsAuthorizedParams = {
-    url: ctx.url,
+    url: ctx.url.split('?').shift(),
     source: ctx.query,
   }
 
