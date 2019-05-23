@@ -22,24 +22,29 @@ const protectedRoutes: Array<string> = ROUTES
  */
 const isProtected = (url: string) => !!protectedRoutes.filter((path: string) => url === path).length
 
+/**
+ * Get public key value from request.
+ * @param {object} source
+ * @param {string} key
+ */
+const getPublicKeyFromSource = (source: object, key: string): string => {
+  return typeof source[key] !== 'undefined' && source[key]
+}
+
 type IsAuthorizedParams = {
   url: string,
-  source: object,
-  key?: string,
+  publicKey: string,
 }
 /**
  * Check auth.
  * @param {string} url
- * @param {object} source
- * @param {string} key
+ * @param {object} publicKey
  * @return {boolean}
  */
-const isAuthorized = ({url, source, key = 'pub_key'}: IsAuthorizedParams) => {
+const isAuthorized = ({url, publicKey}: IsAuthorizedParams) => {
   if (!isProtected(url)) {
     return true
   }
-
-  const publicKey = typeof source[key] !== 'undefined' && source[key]
 
   return !!(publicKey && ALLOWED_PUBLIC_KEYS.includes(publicKey))
 }
@@ -50,14 +55,18 @@ const isAuthorized = ({url, source, key = 'pub_key'}: IsAuthorizedParams) => {
  * @param {function} next
  */
 const auth = (ctx, next) => {
+  const urlWithSlash = ctx.url.split('?').shift()
+  const url = urlWithSlash.substring(0, urlWithSlash.length-1)
+
+  let key = 'pub_key'
   let params: IsAuthorizedParams = {
-    url: ctx.url.split('?').shift(),
-    source: ctx.query,
+    url,
+    publicKey: getPublicKeyFromSource(ctx.query, key),
   }
 
-  if (ctx.url.includes('base')) {
-    params.key = 'UPLOADCARE_PUB_KEY'
-    params.source = ctx.request.body
+  if (url.includes('base')) {
+    key = 'UPLOADCARE_PUB_KEY'
+    params.publicKey = getPublicKeyFromSource(ctx.request.body, key)
   }
 
   if (isAuthorized(params)) {
@@ -65,7 +74,7 @@ const auth = (ctx, next) => {
   } else {
     error(ctx, {
       status: 403,
-      statusText: `${params.key || 'pub_key'} is required.`,
+      statusText: params.publicKey ? `${key} is invalid.` : `${key} is required.`,
     })
   }
 }

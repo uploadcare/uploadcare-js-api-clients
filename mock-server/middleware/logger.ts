@@ -23,6 +23,7 @@ const logger = async (ctx, next) => {
   await next();
 
   const request = `${chalk.gray('-->')} ${chalk.bold(ctx.request.method)} ${chalk.gray(ctx.request.url)}`
+  const requestHeaders = ctx.request.headers
   const requestBody = ctx.request.body
   const requestQuery = ctx.request.query
 
@@ -36,6 +37,11 @@ const logger = async (ctx, next) => {
   const responseBody = ctx.response.body
 
   console.log(request)
+
+  if (!isEmptyObject(requestHeaders)) {
+    console.log('Request Headers:')
+    console.log(pretty(requestHeaders))
+  }
 
   if (!isEmptyObject(requestBody)) {
     console.log('Request Body:')
