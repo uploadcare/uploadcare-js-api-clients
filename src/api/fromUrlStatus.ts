@@ -1,6 +1,6 @@
 import request, {prepareOptions, RequestOptions} from './request'
 import {Settings} from '../types'
-import {CancelableInterface, FileInfo, ProgressStatus} from './types'
+import {FileInfo, ProgressStatus} from './types'
 
 export enum StatusEnum {
   Unknown = 'unknown',

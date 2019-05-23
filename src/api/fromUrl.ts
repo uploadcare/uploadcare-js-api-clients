@@ -45,6 +45,7 @@ const getRequestQuery = (sourceUrl: Url, settings: Settings) => ({
   save_URL_duplicates: settings.saveUrlForRecurrentUploads ? 1 : 0,
   signature: settings.secureSignature || '',
   expire: settings.secureExpire || '',
+  source: 'url',
 })
 
 const getRequestOptions = (sourceUrl: Url, settings: Settings): RequestOptions => {
