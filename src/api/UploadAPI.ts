@@ -3,7 +3,7 @@ import base, {DirectUploadInterface} from './base'
 import UploadClient from '../UploadClient'
 import {RequestOptions, RequestResponse} from './request'
 import {FileData, Settings} from '../types'
-import info from './info'
+import info, {Uuid} from './info'
 import {InfoResponse} from './info'
 import fromUrl, {FromUrlResponse, Url} from './fromUrl'
 import fromUrlStatus, {FromUrlStatusResponse} from './fromUrlStatus'
@@ -13,7 +13,7 @@ export interface UploadAPIInterface {
 
   base(data: FileData, settings?: Settings): DirectUploadInterface
 
-  info(uuid: string, settings?: Settings): Promise<InfoResponse>
+  info(uuid: Uuid, settings?: Settings): Promise<InfoResponse>
 
   fromUrl(sourceUrl: Url, settings?: Settings): Promise<FromUrlResponse>
 
