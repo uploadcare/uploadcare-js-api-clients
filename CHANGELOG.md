@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Added
 
-* Support of `waiting` status from `/from_url/status` endpoint.
+* Support of `waiting` status from `/from_url/status/` endpoint.
 
 [Unreleased]: https://github.com/uploadcare/uploadcare-upload-client/compare/v1.0.0-alpha.2...HEAD
 
