@@ -1,5 +1,6 @@
 import * as json from '../data/info.json'
 import find from '../utils/find'
+import error from '../utils/error'
 
 /**
  * '/info?pub_key=XXXXXXXXXXXXXXXXXXXX&file_id=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX'
@@ -9,7 +10,9 @@ const index = (ctx) => {
   if (ctx.query && ctx.query.file_id) {
     ctx.body = find(json, 'info')
   } else {
-    ctx.status = 400
+    error(ctx, {
+      statusText: 'file_id is required.'
+    })
   }
 }
 
