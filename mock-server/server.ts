@@ -52,8 +52,9 @@ app.listen(PORT, () => {
   ROUTES.forEach((route: RouteType) => {
     const path = Object.keys(route).shift()
     const method = route[path].method.toUpperCase()
+    const description = route[path].description || path
 
-    console.log(`  ${chalk.bold(method)}: '${chalk.green(path)}'`)
+    console.log(`  ${chalk.bold(method)}: '${chalk.green(description)}'`)
   })
   console.log()
 })

@@ -6,44 +6,43 @@ import error from '../utils/error'
 import {PORT} from '../config'
 
 /**
- * '/from_url/?pub_key='
+ * '/from_url/?pub_key=XXXXXXXXXXXXXXXXXXXX'
  * @param {object} ctx
  */
 const index = (ctx) => {
-  const isValid = (url: string): boolean => url.includes('.jpg') || url.includes('.png')
   const isPrivateIP = (url: string): boolean => url.includes('192.168.') || url.includes('localhost') && !url.includes(`http://localhost:${PORT}/`)
   const doesNotExist = (url: string): boolean => url === 'https://1.com/1.jpg'
 
   const sourceUrl = ctx.query && ctx.query.source_url
-  const checkForUrlDuplicates = ctx.query && !!ctx.query.check_URL_duplicates
-  const saveUrlForRecurrentUploads = ctx.query && !!ctx.query.save_URL_duplicates
+  const checkForUrlDuplicates = !!parseInt(ctx.query && ctx.query.check_URL_duplicates)
+  const saveUrlForRecurrentUploads = !!parseInt(ctx.query && ctx.query.save_URL_duplicates)
 
   // Check params
   if (!sourceUrl) {
     error(ctx, {
       statusText: 'source_url is required.',
     })
+
+    return
   }
 
   if (doesNotExist(sourceUrl)) {
     error(ctx, {
       statusText: 'Host does not exist.',
     })
+
+    return
   }
 
   if (isPrivateIP(sourceUrl)) {
     error(ctx, {
       statusText: 'Only public IPs are allowed.',
     })
+
+    return
   }
 
-  if (isValid(sourceUrl)) {
-    error(ctx, {
-      statusText: 'Only public IPs are allowed.',
-    })
-  }
-
-  if (checkForUrlDuplicates && saveUrlForRecurrentUploads) {
+  if (checkForUrlDuplicates === true && saveUrlForRecurrentUploads === true) {
     ctx.body = find(jsonIndex, 'info')
   } else {
     ctx.body = find(jsonIndex, 'token')
