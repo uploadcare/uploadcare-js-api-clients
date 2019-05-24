@@ -1,16 +1,16 @@
 {
   "info": {
-    "is_stored": true,
+    "is_stored": false,
     "done": 2667636,
     "file_id": "d3275f8b-686d-4980-916a-53a1fc17450b",
     "total": 2667636,
     "size": 2667636,
     "uuid": "d3275f8b-686d-4980-916a-53a1fc17450b",
     "is_image": true,
-    "filename": "IMG_0412.JPG",
+    "filename": "newFileName.jpg",
     "video_info": null,
     "is_ready": true,
-    "original_filename": "IMG_0412.JPG",
+    "original_filename": "newFileName.jpg",
     "image_info": {
       "orientation": 6,
       "format": "JPEG",
