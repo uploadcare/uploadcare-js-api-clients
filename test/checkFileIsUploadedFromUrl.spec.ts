@@ -29,7 +29,7 @@ describe('checkFileIsUploadedFromUrl', () => {
 
     setTimeout(() => {
       polling.cancel()
-    }, 5)
+    }, 1)
 
     polling
       .then(() => done.fail())
