@@ -64,7 +64,7 @@ describe('API – request', () => {
       const result = await request(options)
 
       expect(typeof result.headers).toBe('object')
-      expect(result.url).toBe(`${settings.baseURL}/base/`)
+      expect(result.url).toBe(`https://upload.uploadcare.com/base/`)
       expect(typeof result.data).toBe('object')
       expect(typeof result.data.file).toBe('string')
     })

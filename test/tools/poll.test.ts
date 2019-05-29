@@ -58,7 +58,7 @@ describe('poll', () => {
 
     setTimeout(() => {
       polling.cancel()
-    }, 50)
+    }, 1)
 
     polling
       .then(() => done.fail())

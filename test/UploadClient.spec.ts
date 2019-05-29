@@ -23,7 +23,7 @@ describe('UploadClient', () => {
 
       await expectAsync(req).toBeResolved()
       req.then(({url}) => {
-        expect(url).toBe(`${settings.baseURL}/info/`)
+        expect(url).toBe('https://upload.uploadcare.com/info/')
       })
     })
     it('with constructor settings', async() => {

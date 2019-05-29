@@ -27,7 +27,7 @@ describe('checkFileIsReady', () => {
 
     setTimeout(() => {
       polling.cancel()
-    }, 5)
+    }, 1)
 
     polling
       .then(() => done.fail())

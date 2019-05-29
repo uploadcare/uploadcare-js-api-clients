@@ -1,0 +1,7 @@
+node_modules
+dist
+.idea
+.log
+.vscode
+.rpt2_cache
+coverage
