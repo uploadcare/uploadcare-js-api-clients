@@ -14,7 +14,10 @@ export class UploadFromUploaded extends UploadFrom {
     super()
 
     this.data = data
-    this.settings = settings
+    this.settings = {
+      ...settings,
+      source: 'uploaded',
+    }
 
     this.promise = this.getFilePromise()
   }

@@ -7,10 +7,21 @@ export type Uuid = string
 
 export type InfoResponse = FileInfo
 
-const getRequestQuery = (uuid: Uuid, settings: Settings) => ({
-  pub_key: settings.publicKey || '',
-  file_id: uuid,
-})
+const getRequestQuery = (uuid: Uuid, settings: Settings) => {
+  const query = {
+    pub_key: settings.publicKey || '',
+    file_id: uuid,
+  }
+
+  if (settings.source) {
+    return {
+      ...query,
+      source: settings.source,
+    }
+  }
+
+  return  {...query}
+}
 
 const getRequestOptions = (uuid: Uuid, settings: Settings): RequestOptions => {
   return prepareOptions({
