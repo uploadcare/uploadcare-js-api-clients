@@ -25,28 +25,23 @@ export enum Environment {
  */
 const getTestingEnvironment = (): string => {
   // @ts-ignore
-  return process.argv.find(element => element.startsWith('--env=')).substring(6)
+  return process.argv.find(element => element.startsWith('--env=')).substring(6) || 'testing'
 }
 
 export const getSettingsForTesting = (settings = {}, environment: Environment | null = null) => {
-  const env = environment || getTestingEnvironment()
-  const testing = {
-    baseCDN: 'http://localhost:3000',
-    baseURL: 'http://localhost:3000',
-    ...settings,
-  }
-  const production = {
-    baseCDN: 'https://ucarecdn.com',
-    baseURL: 'https://upload.uploadcare.com',
-    ...settings,
+  const selectedEnvironment = environment || getTestingEnvironment()
+  const allEnvironments = {
+    testing: {
+      baseCDN: 'http://localhost:3000',
+      baseURL: 'http://localhost:3000',
+      ...settings,
+    },
+    production: {
+      baseCDN: 'https://ucarecdn.com',
+      baseURL: 'https://upload.uploadcare.com',
+      ...settings,
+    }
   }
 
-  switch (env) {
-    case Environment.Testing:
-      return testing
-    case Environment.Production:
-      return production
-    default:
-      return testing
-  }
+  return allEnvironments[selectedEnvironment]
 }
