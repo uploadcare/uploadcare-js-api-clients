@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/uploadcare/uploadcare-upload-client.svg?branch=master)](https://travis-ci.org/uploadcare/uploadcare-upload-client)
+
 # Uploadcare Upload Client
 
 <a href="https://uploadcare.com/?utm_source=github&utm_campaign=uploadcare-upload-client">

@@ -17,7 +17,6 @@ export const sleep = (ms: number): Promise<void> => new Promise(resolve => setTi
 
 export enum Environment {
   Testing = 'testing',
-  Staging = 'staging',
   Production = 'production',
 }
 
@@ -31,32 +30,23 @@ const getTestingEnvironment = (): string => {
 
 export const getSettingsForTesting = (settings = {}, environment: Environment | null = null) => {
   const env = environment || getTestingEnvironment()
+  const testing = {
+    baseCDN: 'http://localhost:3000',
+    baseURL: 'http://localhost:3000',
+    ...settings,
+  }
+  const production = {
+    baseCDN: 'https://ucarecdn.com',
+    baseURL: 'https://upload.uploadcare.com',
+    ...settings,
+  }
 
   switch (env) {
     case Environment.Testing:
-      // TODO: Need to replace when we will have a mock server
-      return {
-        baseCDN: 'http://localhost:3000',
-        baseURL: 'http://localhost:3000',
-        ...settings,
-      }
-    case Environment.Staging:
-      return {
-        baseCDN: 'https://staging0.ucarecdn.com',
-        baseURL: 'https://upload.staging0.uploadcare.com',
-        ...settings,
-      }
+      return testing
     case Environment.Production:
-      return {
-        baseCDN: 'https://ucarecdn.com',
-        baseURL: 'https://upload.uploadcare.com',
-        ...settings,
-      }
+      return production
     default:
-      return {
-        baseCDN: 'http://localhost:3000',
-        baseURL: 'http://localhost:3000',
-        ...settings,
-      }
+      return testing
   }
 }
