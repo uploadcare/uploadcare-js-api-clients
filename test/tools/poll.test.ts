@@ -12,7 +12,6 @@ describe('poll', () => {
   const settings = getSettingsForTesting({
     publicKey: factory.publicKey('image'),
   }, environment)
-  const timeout = 500
   const onProgress = (response) => {
     return response
   }
@@ -32,7 +31,6 @@ describe('poll', () => {
 
         return false
       },
-      timeout,
     )
 
     expect(result.is_ready).toBeTruthy()
@@ -53,7 +51,6 @@ describe('poll', () => {
 
         return false
       },
-      timeout,
     )
 
     setTimeout(() => {

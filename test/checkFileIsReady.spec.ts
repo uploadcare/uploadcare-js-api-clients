@@ -12,7 +12,6 @@ describe('checkFileIsReady', () => {
   it('should be resolved if file is ready', async() => {
     const info = await checkFileIsReady({
       uuid: factory.uuid('image'),
-      timeout: 500,
       settings,
     })
 
@@ -21,7 +20,6 @@ describe('checkFileIsReady', () => {
   it('should be cancelable', (done) => {
     const polling = checkFileIsReady({
       uuid: factory.uuid('image'),
-      timeout: 50,
       settings,
     })
 

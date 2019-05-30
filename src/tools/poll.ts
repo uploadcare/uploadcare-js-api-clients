@@ -3,8 +3,8 @@ import TimeoutError from '../errors/TimeoutError'
 import {CancelableInterface} from '../api/types'
 import CancelError from '../errors/CancelError'
 
-const MAX_TIMEOUT = 3000
-const MAX_INTERVAL = 500
+export const DEFAULT_TIMEOUT = 10000
+const DEFAULT_INTERVAL = 500
 
 export interface PollPromiseInterface<T> extends Promise<T>, CancelableInterface {}
 
@@ -46,11 +46,9 @@ class PollPromise<T> extends Thenable<T> implements PollPromiseInterface<T> {
  * @param {number} interval
  * @return {PollPromiseInterface}
  */
-export default function poll<T>(checkConditionFunction: Function, timeout: number, interval: number = 150): PollPromiseInterface<T> {
+export default function poll<T>(checkConditionFunction: Function, timeout: number = DEFAULT_TIMEOUT, interval: number = DEFAULT_INTERVAL): PollPromiseInterface<T> {
   const startTime = Number(new Date())
-  const endTime = startTime + Math.min(timeout, MAX_TIMEOUT)
-
-  interval = Math.min(interval, MAX_INTERVAL)
+  const endTime = startTime + timeout
 
   const checkCondition: ExecutorFunction = async (resolve, reject) => {
     // If the condition is met, we're done!
