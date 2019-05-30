@@ -17,6 +17,7 @@ export class UploadFromUrl extends UploadFrom {
   protected readonly promise: Promise<UploadcareFile>
   private isFileUploadedFromUrlPolling: PollPromiseInterface<FromUrlStatusResponse> | null = null
   private isCancelled: boolean = false
+  private unknownStatusWasTimes: number = 0
 
   protected readonly data: Url
   protected readonly settings: Settings
@@ -68,7 +69,15 @@ export class UploadFromUrl extends UploadFrom {
     })
 
     if (isUnknownResponse(response)) {
-      return Promise.reject(`Token "${token}" not found.`)
+      this.unknownStatusWasTimes++
+
+      if (this.unknownStatusWasTimes === 3) {
+        return Promise.reject(`Token "${token}" was not found.`)
+      } else {
+        return this.isFileUploadedFromUrlPolling
+          .then(status => this.handleFromUrlStatusResponse(token, status))
+          .catch(this.handleError)
+      }
     }
 
     if (isWaitingResponse(response)) {
