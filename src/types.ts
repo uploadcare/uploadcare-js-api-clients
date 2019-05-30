@@ -9,6 +9,7 @@ export type Settings = {
   integration?: string,
   checkForUrlDuplicates?: boolean,
   saveUrlForRecurrentUploads?: boolean,
+  source?: string,
 }
 
 export type FileData = Blob | File | Buffer
