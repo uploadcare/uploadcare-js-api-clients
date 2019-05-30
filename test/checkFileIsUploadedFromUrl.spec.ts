@@ -13,7 +13,6 @@ describe('checkFileIsUploadedFromUrl', () => {
   it('should be resolved if file is uploaded', async() => {
     checkFileIsUploadedFromUrl({
       token: factory.token('valid'),
-      timeout: 50,
       settings,
     })
       .then(info => {
@@ -23,8 +22,7 @@ describe('checkFileIsUploadedFromUrl', () => {
   it('should be cancelable', (done) => {
     const polling = checkFileIsUploadedFromUrl({
       token: factory.token('valid'),
-      timeout: 50,
-      settings,
+       settings,
     })
 
     setTimeout(() => {

@@ -12,6 +12,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 * Support `fileFrom` 'uploaded' file (uuid)
 * Support of `waiting` status from `/from_url/status/` endpoint.
 
+## Fixed
+
+* Default timeout for polling functions increased from 3s to 10s.
+* Removed restrictions for timeout and interval.
+
 [Unreleased]: https://github.com/uploadcare/uploadcare-upload-client/compare/v1.0.0-alpha.2...HEAD
 
 ## [1.0.0-alpha.2]

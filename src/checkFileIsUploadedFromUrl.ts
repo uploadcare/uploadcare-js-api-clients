@@ -1,15 +1,15 @@
 import {Settings} from './types'
-import poll, {PollPromiseInterface} from './tools/poll'
+import poll, {DEFAULT_TIMEOUT, PollPromiseInterface} from './tools/poll'
 import fromUrlStatus, {FromUrlStatusResponse, isSuccessResponse} from './api/fromUrlStatus'
 
 type CheckFileIsUploadedParams = {
   token: string,
-  timeout: number,
+  timeout?: number,
   onProgress?: Function,
   settings?: Settings
 }
 
-const checkFileIsUploadedFromUrl = ({token, timeout, onProgress, settings = {}}: CheckFileIsUploadedParams): PollPromiseInterface<FromUrlStatusResponse> =>
+const checkFileIsUploadedFromUrl = ({token, timeout = DEFAULT_TIMEOUT, onProgress, settings = {}}: CheckFileIsUploadedParams): PollPromiseInterface<FromUrlStatusResponse> =>
   poll<FromUrlStatusResponse>(
     async () => {
       const response = await fromUrlStatus(token, settings)
