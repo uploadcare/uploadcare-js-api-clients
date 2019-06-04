@@ -4,7 +4,7 @@ node_js:
   - 'stable'
 
 install:
-  - npm install
+  - NODE_ENV=dev npm install
 
 env:
   - NODE_ENV=production
