@@ -57,7 +57,6 @@ export class UploadFromUrl extends UploadFrom {
   private handleFromUrlStatusResponse = (token: string, response: FromUrlStatusResponse) => {
     this.isFileUploadedFromUrlPolling = checkFileIsUploadedFromUrl({
       token,
-      timeout: 1000,
       onProgress: (response) => {
         // Update uploading progress
         this.handleUploading({

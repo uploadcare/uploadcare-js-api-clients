@@ -22,7 +22,7 @@ describe('checkFileIsUploadedFromUrl', () => {
   it('should be cancelable', (done) => {
     const polling = checkFileIsUploadedFromUrl({
       token: factory.token('valid'),
-       settings,
+      settings,
     })
 
     setTimeout(() => {
@@ -30,7 +30,6 @@ describe('checkFileIsUploadedFromUrl', () => {
     }, 1)
 
     polling
-      .then(() => done.fail())
       .catch((error) => {
         if (error.name === 'CancelError') {
           done()

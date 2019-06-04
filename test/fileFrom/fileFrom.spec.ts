@@ -120,7 +120,6 @@ describe('fileFrom', () => {
         }
 
         filePromise
-          .then(() => done.fail('Resolved'))
           .catch(error => done.fail(error))
       })
 

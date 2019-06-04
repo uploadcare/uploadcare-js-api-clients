@@ -173,7 +173,6 @@ export abstract class UploadFrom extends Thenable<UploadcareFile> implements Upl
 
     this.isFileReadyPolling = checkFileIsReady({
       uuid,
-      timeout: 1000,
       settings,
     })
 
