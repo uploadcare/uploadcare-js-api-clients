@@ -1,9 +1,7 @@
 import request, {buildFormData} from '../../src/api/request'
 import * as factory from '../_fixtureFactory'
 import axios from 'axios'
-import {Environment, getSettingsForTesting, sleep} from '../_helpers'
-
-const environment = Environment.Production
+import {getSettingsForTesting, sleep} from '../_helpers'
 
 describe('buildFormData', () => {
   it('should return FormData with nice input object', () => {
@@ -22,7 +20,7 @@ describe('buildFormData', () => {
 })
 
 describe('API – request', () => {
-  const settings = getSettingsForTesting({}, environment)
+  const settings = getSettingsForTesting()
 
   it('should return Promise', () => {
     const options = {

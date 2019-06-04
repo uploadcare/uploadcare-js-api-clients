@@ -1,15 +1,13 @@
 import fromUrl, {TypeEnum} from '../../src/api/fromUrl'
 import * as factory from '../_fixtureFactory'
-import {Environment, getSettingsForTesting} from '../_helpers'
-
-const environment = Environment.Production
+import {getSettingsForTesting} from '../_helpers'
 
 describe('API - from url', () => {
   it('should return token for file', async() => {
     const sourceUrl = factory.imageUrl('valid')
     const settings = getSettingsForTesting({
       publicKey: factory.publicKey('demo')
-    }, environment)
+    })
     const data = await fromUrl(sourceUrl, settings)
 
     expect(data.type).toEqual(TypeEnum.Token)
@@ -25,7 +23,7 @@ describe('API - from url', () => {
       publicKey: factory.publicKey('image'),
       checkForUrlDuplicates: true,
       saveUrlForRecurrentUploads: true,
-    }, environment)
+    })
     const data = await fromUrl(sourceUrl, settings)
 
     expect(data.type).toEqual(TypeEnum.FileInfo)
@@ -35,7 +33,7 @@ describe('API - from url', () => {
     const sourceUrl = factory.imageUrl('valid')
     const settings = getSettingsForTesting({
       publicKey: factory.publicKey('invalid')
-    }, environment)
+    })
 
     fromUrl(sourceUrl, settings)
       .then(() => done.fail())
@@ -50,7 +48,7 @@ describe('API - from url', () => {
     const sourceUrl = factory.imageUrl('doesNotExist')
     const settings = getSettingsForTesting({
       publicKey: factory.publicKey('demo')
-    }, environment)
+    })
 
     fromUrl(sourceUrl, settings)
       .then(() => done.fail())
@@ -65,7 +63,7 @@ describe('API - from url', () => {
     const sourceUrl = factory.imageUrl('privateIP')
     const settings = getSettingsForTesting({
       publicKey: factory.publicKey('demo')
-    }, environment)
+    })
 
     fromUrl(sourceUrl, settings)
       .then(() => done.fail())

@@ -17,46 +17,24 @@ export const sleep = (ms: number): Promise<void> => new Promise(resolve => setTi
 
 export enum Environment {
   Testing = 'testing',
-  Staging = 'staging',
   Production = 'production',
 }
 
-/**
- * Get testing environment both (for Node and Browser).
- */
-const getTestingEnvironment = (): string => {
-  // @ts-ignore
-  return process.argv.find(element => element.startsWith('--env=')).substring(6)
-}
-
 export const getSettingsForTesting = (settings = {}, environment: Environment | null = null) => {
-  const env = environment || getTestingEnvironment()
+  const selectedEnvironment = environment || process.env.NODE_ENV || Environment.Testing
 
-  switch (env) {
-    case Environment.Testing:
-      // TODO: Need to replace when we will have a mock server
-      return {
-        baseCDN: 'http://localhost:3000',
-        baseURL: 'http://localhost:3000',
-        ...settings,
-      }
-    case Environment.Staging:
-      return {
-        baseCDN: 'https://staging0.ucarecdn.com',
-        baseURL: 'https://upload.staging0.uploadcare.com',
-        ...settings,
-      }
-    case Environment.Production:
-      return {
-        baseCDN: 'https://ucarecdn.com',
-        baseURL: 'https://upload.uploadcare.com',
-        ...settings,
-      }
-    default:
-      return {
-        baseCDN: 'http://localhost:3000',
-        baseURL: 'http://localhost:3000',
-        ...settings,
-      }
+  const allEnvironments = {
+    testing: {
+      baseCDN: 'http://localhost:3000',
+      baseURL: 'http://localhost:3000',
+      ...settings,
+    },
+    production: {
+      baseCDN: 'https://ucarecdn.com',
+      baseURL: 'https://upload.uploadcare.com',
+      ...settings,
+    }
   }
+
+  return allEnvironments[selectedEnvironment]
 }
