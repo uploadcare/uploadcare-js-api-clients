@@ -17,6 +17,7 @@ Library for work with Uploadcare [Upload API][uc-docs-upload-api] in Node.js and
 
 * [Install](#install)
 * [Usage](#usage)
+* [Testing](#testing)
 * [Security issues](#security-issues)
 * [Feedback](#feedback)
 
@@ -59,6 +60,28 @@ fileUpload.onProgress = (progress => {
   console.log(progress.uploaded.total / progress.uploaded.loaded)
   console.log(progress.value)
 })
+```
+
+## Testing 
+
+By default testing environment is local and for this you need to start a mock server for local tests.
+
+To start a mock server you need to run next command:
+
+```
+npm run mock:start
+```
+
+and after that you can run:
+
+```
+npm run test
+```
+
+If you want to run tests on production servers you need to set `NODE_ENV` as `production`:
+
+```
+NODE_ENV=production npm run test
 ```
 
 ## Security issues
