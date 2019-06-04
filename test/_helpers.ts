@@ -20,16 +20,9 @@ export enum Environment {
   Production = 'production',
 }
 
-/**
- * Get testing environment both (for Node and Browser).
- */
-const getTestingEnvironment = (): string => {
-  // @ts-ignore
-  return process.argv.find(element => element.startsWith('--env=')).substring(6) || 'testing'
-}
-
 export const getSettingsForTesting = (settings = {}, environment: Environment | null = null) => {
-  const selectedEnvironment = environment || getTestingEnvironment()
+  const selectedEnvironment = environment || process.env.NODE_ENV || Environment.Testing
+
   const allEnvironments = {
     testing: {
       baseCDN: 'http://localhost:3000',
