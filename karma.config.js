@@ -1,7 +1,5 @@
 process.env.CHROME_BIN = require('puppeteer').executablePath()
 
-console.log(process.env.NODE_ENV)
-
 module.exports = function(config) {
   config.set({
     browserNoActivityTimeout: 60000,
