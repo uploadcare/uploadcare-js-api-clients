@@ -1,9 +1,7 @@
 import base from '../../src/api/base'
 import * as factory from '../_fixtureFactory'
 import {getUserAgent} from '../../src/defaultSettings'
-import {Environment, getSettingsForTesting} from '../_helpers'
-
-const environment = Environment.Production
+import {getSettingsForTesting} from '../_helpers'
 
 describe('API - base', () => {
   const fileToUpload = factory.image('blackSquare')
@@ -11,7 +9,7 @@ describe('API - base', () => {
   it('should be able to upload data', async() => {
     const settings = getSettingsForTesting({
       publicKey: factory.publicKey('demo')
-    }, environment)
+    })
     const directUpload = base(fileToUpload.data, settings)
     const {file} = await directUpload
 
@@ -22,7 +20,7 @@ describe('API - base', () => {
     const settings = getSettingsForTesting({
       publicKey: 'test',
       integration: 'Test',
-    }, environment)
+    })
     const directUpload = base(fileToUpload.data, settings)
 
     directUpload
@@ -45,7 +43,7 @@ describe('API - base', () => {
   it('should be able to cancel uploading', (done) => {
     const settings = getSettingsForTesting({
       publicKey: factory.publicKey('demo')
-    }, environment)
+    })
     const directUpload = base(fileToUpload.data, settings)
 
     setTimeout(() => {
@@ -60,7 +58,7 @@ describe('API - base', () => {
   it('should be able to handle cancel uploading', (done) => {
     const settings = getSettingsForTesting({
       publicKey: factory.publicKey('demo')
-    }, environment)
+    })
     const directUpload = base(fileToUpload.data, settings)
 
     setTimeout(() => {
@@ -84,7 +82,7 @@ describe('API - base', () => {
     let progressValue = 0
     const settings = getSettingsForTesting({
       publicKey: factory.publicKey('demo')
-    }, environment)
+    })
     const directUpload = base(fileToUpload.data, settings)
 
     directUpload.onProgress = (progressEvent) => {

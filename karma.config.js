@@ -28,7 +28,10 @@ module.exports = function(config) {
     preprocessors: {'**/*.ts': ['karma-typescript']},
 
     karmaTypescriptConfig: {
-      bundlerOptions: {addNodeGlobals: true},
+      bundlerOptions: {
+        addNodeGlobals: true,
+        constants: {'process.env': {NODE_ENV: process.env.NODE_ENV}},
+      },
       compilerOptions: {
         target: 'es5',
         lib: ['es2015', 'dom'],

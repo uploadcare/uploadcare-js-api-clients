@@ -1,0 +1,10 @@
+language: node_js
+
+node_js:
+  - 'stable'
+
+install:
+  - NODE_ENV=dev npm install
+
+env:
+  - NODE_ENV=production

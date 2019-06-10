@@ -1,3 +1,4 @@
 dist
 coverage
 mock-server/node_modules
+scripts
