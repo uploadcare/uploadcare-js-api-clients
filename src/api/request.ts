@@ -144,6 +144,7 @@ class Request extends Thenable<RequestResponse> implements RequestInterface {
   protected getRequestPromise() {
     const options = this.getRequestOptions()
 
+    // @ts-ignore
     return axios(options)
       .catch(this.handleError)
       .then(this.handleResponse)

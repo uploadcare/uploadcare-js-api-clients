@@ -19,4 +19,8 @@ export abstract class Thenable<T> implements Promise<T> {
   ): Promise<T | TRejected> {
     return this.promise.catch(onRejected)
   }
+
+  finally(onFinally?: (() => void) | null | undefined): Promise<T> {
+    return this.promise.finally(onFinally)
+  }
 }
