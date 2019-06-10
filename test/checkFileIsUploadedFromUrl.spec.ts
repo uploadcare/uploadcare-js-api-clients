@@ -27,7 +27,7 @@ describe('checkFileIsUploadedFromUrl', () => {
     }, 1)
 
     polling
-      .then(() => done.fail())
+      .then(() => done.fail('Promise should not to be resolved'))
       .catch((error) => {
         if (error.name === 'CancelError') {
           done()

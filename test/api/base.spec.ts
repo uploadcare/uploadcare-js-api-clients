@@ -24,7 +24,7 @@ describe('API - base', () => {
     const directUpload = base(fileToUpload.data, settings)
 
     directUpload
-      .then(() => done.fail())
+      .then(() => done.fail('Promise should not to be resolved'))
       .catch((error) => {
         if (
           error.request &&
@@ -51,7 +51,7 @@ describe('API - base', () => {
     }, 1)
 
     directUpload
-      .then(() => done.fail())
+      .then(() => done.fail('Promise should not to be resolved'))
       .catch((error) => error.name === 'CancelError' ? done() : done.fail(error))
   })
 
@@ -70,7 +70,7 @@ describe('API - base', () => {
     }
 
     directUpload
-      .then(() => done.fail())
+      .then(() => done.fail('Promise should not to be resolved'))
       .catch((error) => {
         if (error.name !== 'CancelError') {
           done.fail(error)

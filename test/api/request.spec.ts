@@ -73,7 +73,7 @@ describe('API – request', () => {
       }
 
       request(options)
-        .then(() => done.fail())
+        .then(() => done.fail('Promise should not to be resolved'))
         .catch((error) => error.name === 'UploadcareError' ? done() : done.fail(error))
     })
 
@@ -106,7 +106,7 @@ describe('API – request', () => {
       const requestWithOptions = request(options)
 
       requestWithOptions
-        .then(() => done.fail())
+        .then(() => done.fail('Promise should not to be resolved'))
         .catch(error => {
           (error.name === 'CancelError')
             ? done()

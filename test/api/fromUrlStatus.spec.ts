@@ -23,7 +23,7 @@ describe('API - from url status', () => {
     const settings = getSettingsForTesting()
 
     fromUrlStatus(token, settings)
-      .then(() => done.fail())
+      .then(() => done.fail('Promise should not to be resolved'))
       .catch(error => {
         (error.name === 'UploadcareError')
           ? done()
