@@ -9,13 +9,12 @@ describe('checkFileIsUploadedFromUrl', () => {
   })
 
   it('should be resolved if file is uploaded', async() => {
-    checkFileIsUploadedFromUrl({
+    const info = await checkFileIsUploadedFromUrl({
       token: factory.token('valid'),
       settings,
     })
-      .then(info => {
-        expect(info.status).toBe(StatusEnum.Success)
-      })
+
+    expect(info.status).toBe(StatusEnum.Success)
   })
   it('should be cancelable', (done) => {
     const polling = checkFileIsUploadedFromUrl({
@@ -28,6 +27,7 @@ describe('checkFileIsUploadedFromUrl', () => {
     }, 1)
 
     polling
+      .then(() => done.fail())
       .catch((error) => {
         if (error.name === 'CancelError') {
           done()

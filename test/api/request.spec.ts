@@ -22,15 +22,6 @@ describe('buildFormData', () => {
 describe('API – request', () => {
   const settings = getSettingsForTesting()
 
-  it('should return Promise', () => {
-    const options = {
-      baseURL: settings.baseURL,
-      path: '/info/',
-    }
-
-    expect(typeof request(options).then).toBe('function')
-  })
-
   describe('should be resolved', () => {
     it('on valid GET request', async() => {
       const options = {

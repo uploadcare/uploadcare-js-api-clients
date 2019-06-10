@@ -152,23 +152,28 @@ class Request extends Thenable<RequestResponse> implements RequestInterface {
   }
 
   protected getRequestOptions() {
-    const {path, onUploadProgress} = this.options
+    const {path: url, onUploadProgress} = this.options
+    const method = this.getRequestMethod()
+    const baseURL = this.getRequestBaseURL()
     const data = this.getRequestData()
+    const params = this.getRequestParams()
+    const headers = this.getRequestHeaders(data)
+    const cancelToken = this.cancelController.token
 
     return {
-      method: this.getRequestMethod(),
-      baseURL: this.getRequestBaseURL(),
-      url: path,
-      params: this.getRequestParams(),
+      method,
+      baseURL,
+      url,
+      params,
       data,
       maxContentLength: MAX_CONTENT_LENGTH,
-      headers: this.getRequestHeaders(data),
-      cancelToken: this.cancelController.token,
+      headers,
+      cancelToken,
       onUploadProgress,
     }
   }
 
-  protected getRequestMethod() {
+  protected getRequestMethod(): string {
     const {method} = this.options
 
     return method || 'GET'
@@ -192,10 +197,16 @@ class Request extends Thenable<RequestResponse> implements RequestInterface {
   protected getRequestData() {
     const {body} = this.options
 
-    return (body && buildFormData({
-      source: body.source,
-      ...body,
-    })) || null
+    if (body) {
+      const newBody = body.source ? {
+        source: body.source,
+        ...body
+      } : body
+
+      return buildFormData(newBody)
+    }
+
+    return null
   }
 
   protected getRequestHeaders(data) {

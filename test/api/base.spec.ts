@@ -48,7 +48,7 @@ describe('API - base', () => {
 
     setTimeout(() => {
       directUpload.cancel()
-    }, 5)
+    }, 1)
 
     directUpload
       .then(() => done.fail())
@@ -63,7 +63,7 @@ describe('API - base', () => {
 
     setTimeout(() => {
       directUpload.cancel()
-    }, 10)
+    }, 1)
 
     directUpload.onCancel = () => {
       done()
