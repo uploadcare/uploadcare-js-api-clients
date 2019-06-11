@@ -16,15 +16,15 @@ export const isNode = (): boolean => {
 export const sleep = (ms: number): Promise<void> => new Promise(resolve => setTimeout(resolve, ms))
 
 export enum Environment {
-  Testing = 'testing',
+  Development = 'development',
   Production = 'production',
 }
 
 export const getSettingsForTesting = (settings = {}, environment: Environment | null = null) => {
-  const selectedEnvironment = environment || process.env.NODE_ENV || Environment.Testing
+  const selectedEnvironment = environment || process.env.NODE_ENV || Environment.Development
 
   const allEnvironments = {
-    testing: {
+    development: {
       baseCDN: 'http://localhost:3000',
       baseURL: 'http://localhost:3000',
       ...settings,
