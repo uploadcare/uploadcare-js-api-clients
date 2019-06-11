@@ -4,7 +4,7 @@ import UploadClient from '../UploadClient'
 import {RequestOptions, RequestResponse} from './request'
 import {FileData, Settings} from '../types'
 import info from './info'
-import {Uuid} from './types'
+import {Token, Uuid} from './types'
 import {InfoResponse} from './info'
 import fromUrl, {FromUrlResponse, Url} from './fromUrl'
 import fromUrlStatus, {FromUrlStatusResponse} from './fromUrlStatus'
@@ -18,7 +18,7 @@ export interface UploadAPIInterface {
 
   fromUrl(sourceUrl: Url, settings?: Settings): Promise<FromUrlResponse>
 
-  fromUrlStatus(token: Uuid, settings?: Settings): Promise<FromUrlStatusResponse>
+  fromUrlStatus(token: Token, settings?: Settings): Promise<FromUrlStatusResponse>
 }
 
 class UploadAPI implements UploadAPIInterface {
@@ -55,7 +55,7 @@ class UploadAPI implements UploadAPIInterface {
     return fromUrl(sourceUrl, this.getResultSettings(settings))
   }
 
-  fromUrlStatus(token: Uuid, settings: Settings = {}): Promise<FromUrlStatusResponse> {
+  fromUrlStatus(token: Token, settings: Settings = {}): Promise<FromUrlStatusResponse> {
     return fromUrlStatus(token,this.getResultSettings(settings))
   }
 }

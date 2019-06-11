@@ -69,4 +69,6 @@ export interface CancelableInterface {
   cancel(): void
 }
 
+export type Token = string
+
 export type Uuid = string

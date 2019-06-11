@@ -1,7 +1,6 @@
 import request, {prepareOptions, RequestOptions} from './request'
 import {Settings} from '../types'
-import {FileInfo, ProgressStatus} from './types'
-import {Uuid} from './types'
+import {FileInfo, ProgressStatus, Token} from './types'
 
 export enum StatusEnum {
   Unknown = 'unknown',
@@ -79,7 +78,7 @@ const getRequestQuery = (token: string, settings: Settings) => ({
   pub_key: settings.publicKey || '',
 })
 
-const getRequestOptions = (token: Uuid, settings: Settings): RequestOptions => {
+const getRequestOptions = (token: Token, settings: Settings): RequestOptions => {
   return prepareOptions({
     path: '/from_url/status/',
     query: getRequestQuery(token, settings),
@@ -89,12 +88,12 @@ const getRequestOptions = (token: Uuid, settings: Settings): RequestOptions => {
 /**
  * Checking upload status and working with file tokens.
  *
- * @param {Uuid} token – Source file URL, which should be a public HTTP or HTTPS link.
+ * @param {Token} token – Source file URL, which should be a public HTTP or HTTPS link.
  * @param {Settings} settings
  * @throws {UploadcareError}
  * @return {Promise<FromUrlStatusResponse>}
  */
-export default function fromUrlStatus(token: Uuid, settings: Settings = {}): Promise<FromUrlStatusResponse> {
+export default function fromUrlStatus(token: Token, settings: Settings = {}): Promise<FromUrlStatusResponse> {
   const options = getRequestOptions(token, settings)
 
   return request(options)
