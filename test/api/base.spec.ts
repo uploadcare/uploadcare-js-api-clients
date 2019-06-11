@@ -78,7 +78,7 @@ describe('API - base', () => {
       })
   })
 
-  it('should be able to handle progress', (done) => {
+  xit('should be able to handle progress', (done) => {
     let progressValue = 0
     const settings = getSettingsForTesting({
       publicKey: factory.publicKey('demo')
