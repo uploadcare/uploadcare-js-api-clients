@@ -36,7 +36,7 @@ describe('API - from url', () => {
     })
 
     fromUrl(sourceUrl, settings)
-      .then(() => done.fail())
+      .then(() => done.fail('Promise should not to be resolved'))
       .catch(error => {
         (error.name === 'UploadcareError')
           ? done()
@@ -51,7 +51,7 @@ describe('API - from url', () => {
     })
 
     fromUrl(sourceUrl, settings)
-      .then(() => done.fail())
+      .then(() => done.fail('Promise should not to be resolved'))
       .catch(error => {
         (error.name === 'UploadcareError')
           ? done()
@@ -66,7 +66,7 @@ describe('API - from url', () => {
     })
 
     fromUrl(sourceUrl, settings)
-      .then(() => done.fail())
+      .then(() => done.fail('Promise should not to be resolved'))
       .catch(error => {
         (error.name === 'UploadcareError')
           ? done()

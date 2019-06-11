@@ -25,7 +25,10 @@ module.exports = function(config) {
       'karma-jasmine',
     ],
 
-    preprocessors: {'**/*.ts': ['karma-typescript']},
+    preprocessors: {
+      'src/**/*.ts': ['karma-typescript'],
+      'test/**/*.ts': ['karma-typescript'],
+    },
 
     karmaTypescriptConfig: {
       bundlerOptions: {

@@ -18,7 +18,7 @@ describe('API - info', () => {
     })
 
     info(factory.uuid('image'), settings)
-      .then(() => done.fail())
+      .then(() => done.fail('Promise should not to be resolved'))
       .catch(error => {
         (error.name === 'UploadcareError')
           ? done()

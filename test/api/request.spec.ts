@@ -22,15 +22,6 @@ describe('buildFormData', () => {
 describe('API – request', () => {
   const settings = getSettingsForTesting()
 
-  it('should return Promise', () => {
-    const options = {
-      baseURL: settings.baseURL,
-      path: '/info/',
-    }
-
-    expect(typeof request(options).then).toBe('function')
-  })
-
   describe('should be resolved', () => {
     it('on valid GET request', async() => {
       const options = {
@@ -82,7 +73,7 @@ describe('API – request', () => {
       }
 
       request(options)
-        .then(() => done.fail())
+        .then(() => done.fail('Promise should not to be resolved'))
         .catch((error) => error.name === 'UploadcareError' ? done() : done.fail(error))
     })
 
@@ -115,7 +106,7 @@ describe('API – request', () => {
       const requestWithOptions = request(options)
 
       requestWithOptions
-        .then(() => done.fail())
+        .then(() => done.fail('Promise should not to be resolved'))
         .catch(error => {
           (error.name === 'CancelError')
             ? done()

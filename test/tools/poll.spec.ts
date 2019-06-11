@@ -1,17 +1,15 @@
 import poll from '../../src/tools/poll'
 import {InfoResponse} from '../../src/api/info'
 import info from '../../src/api/info'
-import {Environment, getSettingsForTesting} from '../_helpers'
+import {getSettingsForTesting} from '../_helpers'
 import * as factory from '../_fixtureFactory'
 import CancelError from '../../src/errors/CancelError'
-
-const environment = Environment.Production
 
 describe('poll', () => {
   const uuid = factory.uuid('image')
   const settings = getSettingsForTesting({
     publicKey: factory.publicKey('image'),
-  }, environment)
+  })
   const onProgress = (response) => {
     return response
   }
@@ -58,7 +56,7 @@ describe('poll', () => {
     }, 1)
 
     polling
-      .then(() => done.fail())
+      .then(() => done.fail('Promise should not to be resolved'))
       .catch((error) => error.name === 'CancelError' ? done() : done.fail(error))
   })
 })

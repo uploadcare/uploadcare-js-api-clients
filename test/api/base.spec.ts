@@ -24,7 +24,7 @@ describe('API - base', () => {
     const directUpload = base(fileToUpload.data, settings)
 
     directUpload
-      .then(() => done.fail())
+      .then(() => done.fail('Promise should not to be resolved'))
       .catch((error) => {
         if (
           error.request &&
@@ -48,10 +48,10 @@ describe('API - base', () => {
 
     setTimeout(() => {
       directUpload.cancel()
-    }, 5)
+    }, 1)
 
     directUpload
-      .then(() => done.fail())
+      .then(() => done.fail('Promise should not to be resolved'))
       .catch((error) => error.name === 'CancelError' ? done() : done.fail(error))
   })
 
@@ -63,14 +63,14 @@ describe('API - base', () => {
 
     setTimeout(() => {
       directUpload.cancel()
-    }, 10)
+    }, 1)
 
     directUpload.onCancel = () => {
       done()
     }
 
     directUpload
-      .then(() => done.fail())
+      .then(() => done.fail('Promise should not to be resolved'))
       .catch((error) => {
         if (error.name !== 'CancelError') {
           done.fail(error)
@@ -78,7 +78,7 @@ describe('API - base', () => {
       })
   })
 
-  it('should be able to handle progress', (done) => {
+  xit('should be able to handle progress', (done) => {
     let progressValue = 0
     const settings = getSettingsForTesting({
       publicKey: factory.publicKey('demo')

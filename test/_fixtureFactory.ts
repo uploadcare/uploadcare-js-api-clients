@@ -122,7 +122,7 @@ export function imageUrl(id: string): string {
 
 export function token(id: string): string {
   const tokens = {
-    valid: '0a875b4b-da2b-4e2a-b93b-0964f8f54f53',
+    valid: 'ee5b6d12-ee19-48fd-b226-b94ab61ce191',
     empty: '',
   }
 
