@@ -1,9 +1,10 @@
 import info, {InfoResponse} from './api/info'
 import {Settings} from './types'
 import poll, {DEFAULT_TIMEOUT, PollPromiseInterface} from './tools/poll'
+import {Uuid} from './api/types'
 
 type CheckFileIsReadyParams = {
-  uuid: string,
+  uuid: Uuid,
   timeout?: number,
   onProgress?: Function,
   settings?: Settings

@@ -12,6 +12,7 @@ import {ProgressState, UploadFrom} from './UploadFrom'
 import checkFileIsUploadedFromUrl from '../checkFileIsUploadedFromUrl'
 import {PollPromiseInterface} from '../tools/poll'
 import CancelError from '../errors/CancelError'
+import {Uuid} from '../api/types'
 
 export class UploadFromUrl extends UploadFrom {
   protected readonly promise: Promise<UploadcareFile>
@@ -54,7 +55,7 @@ export class UploadFromUrl extends UploadFrom {
     }
   }
 
-  private handleFromUrlStatusResponse = (token: string, response: FromUrlStatusResponse) => {
+  private handleFromUrlStatusResponse = (token: Uuid, response: FromUrlStatusResponse) => {
     this.isFileUploadedFromUrlPolling = checkFileIsUploadedFromUrl({
       token,
       timeout: 1000,

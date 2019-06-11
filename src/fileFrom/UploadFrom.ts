@@ -2,7 +2,7 @@ import {Settings, UploadcareFile} from '../types'
 import checkFileIsReady from '../checkFileIsReady'
 import prettyFileInfo from '../prettyFileInfo'
 import {Thenable} from '../tools/Thenable'
-import {CancelableInterface} from '../api/types'
+import {CancelableInterface, Uuid} from '../api/types'
 import {PollPromiseInterface} from '../tools/poll'
 import {InfoResponse} from '../api/info'
 
@@ -148,10 +148,10 @@ export abstract class UploadFrom extends Thenable<UploadcareFile> implements Upl
 
   /**
    * Handle uploaded file.
-   * @param {string} uuid
+   * @param {Uuid} uuid
    * @param {Settings} settings
    */
-  protected handleUploaded(uuid: string, settings: Settings): Promise<UploadcareFile> {
+  protected handleUploaded(uuid: Uuid, settings: Settings): Promise<UploadcareFile> {
     this.setFile({
       uuid,
       name: null,

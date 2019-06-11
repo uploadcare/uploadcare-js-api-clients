@@ -1,6 +1,6 @@
 import {FileData, Settings} from '../types'
 import {Url} from '../api/fromUrl'
-import {Uuid} from '../api/info'
+import {Uuid} from '../api/types'
 import {UploadFromObject} from './UploadFromObject'
 import {UploadFromUrl} from './UploadFromUrl'
 import {UploadFromInterface} from './UploadFrom'

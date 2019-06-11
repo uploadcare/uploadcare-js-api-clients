@@ -53,8 +53,8 @@ interface VideoInfoInterface {
 }
 
 export interface FileInfoInterface extends ProgressInterface, ImageInfoInterface, VideoInfoInterface {
-  uuid: string,
-  file_id: string,
+  uuid: Uuid,
+  file_id: Uuid,
   original_filename: string,
   filename: string,
   mime_type: string,
@@ -68,3 +68,5 @@ export type FileInfo = FileInfoInterface
 export interface CancelableInterface {
   cancel(): void
 }
+
+export type Uuid = string
