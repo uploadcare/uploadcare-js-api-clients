@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 * Support `fileFrom` 'uploaded' file (uuid)
 * Support of `waiting` status from `/from_url/status/` endpoint.
+* Export some main types from `index.ts` file. 
+  So you can import them now directly from `@uploadcare/upload-client`
 
 ## Fixed
 

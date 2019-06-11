@@ -1,6 +1,7 @@
 import {Settings, UploadcareFile} from '../types'
 import {ProgressState, UploadFrom} from './UploadFrom'
-import info, {InfoResponse, Uuid} from '../api/info'
+import info, {InfoResponse} from '../api/info'
+import {Uuid} from '../api/types'
 import CancelError from '../errors/CancelError'
 
 export class UploadFromUploaded extends UploadFrom {
