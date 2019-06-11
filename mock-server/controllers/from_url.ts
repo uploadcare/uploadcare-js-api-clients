@@ -55,9 +55,14 @@ const index = (ctx) => {
  */
 const status = (ctx) => {
   const token = ctx.query && ctx.query.token
+  const publicKey = ctx.query && ctx.query.publicKey
 
   if (token) {
-    ctx.body = find(jsonStatus, 'progress')
+    if (publicKey !== 'demopublickey') {
+      ctx.body = find(jsonStatus, 'info')
+    } else {
+      ctx.body = find(jsonStatus, 'progress')
+    }
   } else {
     error(ctx, {
       statusText: 'token is required.',
