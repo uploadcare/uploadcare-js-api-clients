@@ -1,5 +1,6 @@
 import axios, {CancelTokenSource} from 'axios'
 import * as FormData from 'form-data'
+import FormDataNode from 'formdata-node'
 import defaultSettings, {getUserAgent} from '../defaultSettings'
 import RequestError from '../errors/RequestError'
 import CancelError from '../errors/CancelError'
@@ -8,6 +9,7 @@ import {FileData, Settings} from '../types'
 import {BaseProgress} from './base'
 import {Thenable} from '../tools/Thenable'
 import {CancelableInterface} from './types'
+import {isNode} from '../../test/_helpers'
 
 export type Query = {
   [key: string]: string | boolean | number | void,
@@ -100,7 +102,7 @@ export default function request(options: RequestOptions): RequestInterface {
  * @returns {FormData} FormData instance
  */
 export function buildFormData(body: Body): FormData {
-  const formData = new FormData()
+  const formData = isNode() ? new FormDataNode() : new FormData()
 
   for (let key of Object.keys(body)) {
     let value = body[key]
@@ -113,7 +115,7 @@ export function buildFormData(body: Body): FormData {
       value.forEach(val => formData.append(key + '[]', val))
     }
     else if (key === 'file') {
-      const file = body.file as File
+      const file = value as File
       const fileName = file.name || DEFAULT_FILE_NAME
 
       formData.append('file', value, fileName)
@@ -123,6 +125,7 @@ export function buildFormData(body: Body): FormData {
     }
   }
 
+  // @ts-ignore
   return formData
 }
 
@@ -143,12 +146,35 @@ class Request extends Thenable<RequestResponse> implements RequestInterface {
 
   protected getRequestPromise() {
     const options = this.getRequestOptions()
+    const {data, onUploadProgress} = options
+
+    this.handleNodeProgress(data, onUploadProgress)
 
     // @ts-ignore
     return axios(options)
       .catch(this.handleError)
       .then(this.handleResponse)
       .catch((error) => Promise.reject(error))
+  }
+
+  protected handleNodeProgress(data, onUploadProgress: HandleProgressFunction | undefined) {
+    if (data.stream && typeof onUploadProgress !== 'undefined') {
+      const stream = data.stream
+
+      data.getComputedLength().then(total => {
+        let loaded = 0
+
+        stream.on('data', (chunk) => {
+          loaded += chunk.length
+
+          onUploadProgress({
+            total,
+            loaded,
+            lengthComputable: true,
+          } as ProgressEvent)
+        })
+      })
+    }
   }
 
   protected getRequestOptions() {
