@@ -102,9 +102,11 @@ export default function request(options: RequestOptions): RequestInterface {
  * @returns {FormData} FormData instance
  */
 export function buildFormData(body: Body): FormData {
-  const formData = isNode() ? new FormDataNode() : new FormData()
+  const keys = Object.keys(body)
+  const bodyHasFile = keys.includes('file')
+  const formData = isNode() && bodyHasFile ? new FormDataNode() : new FormData()
 
-  for (let key of Object.keys(body)) {
+  for (let key of keys) {
     let value = body[key]
 
     if (typeof value === 'boolean') {
@@ -158,7 +160,7 @@ class Request extends Thenable<RequestResponse> implements RequestInterface {
   }
 
   protected handleNodeProgress(data, onUploadProgress: HandleProgressFunction | undefined) {
-    if (data.stream && typeof onUploadProgress !== 'undefined') {
+    if (data && data.stream && typeof onUploadProgress !== 'undefined') {
       const stream = data.stream
 
       data.getComputedLength().then(total => {
