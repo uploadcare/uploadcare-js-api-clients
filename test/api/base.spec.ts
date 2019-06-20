@@ -6,7 +6,7 @@ import {getSettingsForTesting} from '../_helpers'
 describe('API - base', () => {
   const fileToUpload = factory.image('blackSquare')
 
-  it('should be able to upload data', async() => {
+  fit('should be able to upload data', async() => {
     const settings = getSettingsForTesting({
       publicKey: factory.publicKey('demo')
     })
@@ -78,7 +78,7 @@ describe('API - base', () => {
       })
   })
 
-  it('should be able to handle progress', (done) => {
+  fit('should be able to handle progress', (done) => {
     let progressValue = 0
     const settings = getSettingsForTesting({
       publicKey: factory.publicKey('demo')

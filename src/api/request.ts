@@ -101,7 +101,7 @@ export default function request(options: RequestOptions): RequestInterface {
  * @param {Body} body
  * @returns {FormData} FormData instance
  */
-export function buildFormData(body: Body): FormData {
+export function buildFormData(body: Body) {
   const keys = Object.keys(body)
   const bodyHasFile = keys.includes('file')
   const formData = isNode() && bodyHasFile ? new FormDataNode() : new FormData()
@@ -193,7 +193,8 @@ class Request extends Thenable<RequestResponse> implements RequestInterface {
       baseURL,
       url,
       params,
-      data,
+      // @ts-ignore
+      data: isNode() ? (data && data.stream) : data,
       maxContentLength: MAX_CONTENT_LENGTH,
       headers,
       cancelToken,
@@ -239,11 +240,14 @@ class Request extends Thenable<RequestResponse> implements RequestInterface {
 
   protected getRequestHeaders(data) {
     const {headers} = this.options
+    const headersFromData = (data && data.getHeaders) ?
+      data.getHeaders() : (data && data.headers) ?
+        data.headers : {}
 
     return {
       'X-UC-User-Agent': getUserAgent(),
       ...headers,
-      ...((data && data.getHeaders) ? data.getHeaders() : {}),
+      ...headersFromData,
     }
   }
 
