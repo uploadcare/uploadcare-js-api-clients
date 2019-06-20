@@ -9,11 +9,11 @@ describe('checkFileIsUploadedFromUrl', async() => {
   const settings = getSettingsForTesting({
     publicKey: factory.publicKey('demo')
   })
-  const data = await fromUrl(sourceUrl, settings)
-  // @ts-ignore
-  const {token} = data
 
   it('should be resolved if file is uploaded', async() => {
+    const data = await fromUrl(sourceUrl, settings)
+    // @ts-ignore
+    const {token} = data
     const info = await checkFileIsUploadedFromUrl({
       token,
       settings,
@@ -21,7 +21,10 @@ describe('checkFileIsUploadedFromUrl', async() => {
 
     expect(info.status).toBe(StatusEnum.Success)
   })
-  it('should be cancelable', (done) => {
+  it('should be cancelable', async(done) => {
+    const data = await fromUrl(sourceUrl, settings)
+    // @ts-ignore
+    const {token} = data
     const polling = checkFileIsUploadedFromUrl({
       token,
       settings,
