@@ -132,6 +132,6 @@ describe('API – request', () => {
       request(options)
         .then(() => done.fail('Promise should not to be resolved'))
         .catch((error) => error.name === 'RequestWasThrottledError' ? done() : done.fail(error))
-    })
+    }, 20000)
   })
 })

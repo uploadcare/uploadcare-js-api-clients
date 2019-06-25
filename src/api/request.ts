@@ -1,4 +1,4 @@
-import axios, {CancelTokenSource} from 'axios'
+import axios, {AxiosError, CancelTokenSource} from 'axios'
 import * as FormData from 'form-data'
 import defaultSettings, {getUserAgent} from '../defaultSettings'
 import RequestError from '../errors/RequestError'
@@ -50,7 +50,7 @@ export type RequestResponse = {
 /* Set max upload body size for node.js to 50M (default is 10M) */
 const MAX_CONTENT_LENGTH = 50 * 1000 * 1000
 const DEFAULT_FILE_NAME = 'original'
-const DEFAULT_TIMEOUT = 15000
+const DEFAULT_RETRY_AFTER_TIMEOUT = 15000
 
 /**
  * Updates options with Uploadcare Settings
@@ -75,6 +75,12 @@ export function prepareOptions(options: RequestOptions, settings: Settings): Req
 
   return newOptions
 }
+
+/**
+ * setTimeout as Promise.
+ * @param {number} ms Timeout in milliseconds.
+ */
+const delay = (ms: number): Promise<void> => new Promise(resolve => setTimeout(resolve, ms))
 
 /**
  * Performs request to Uploadcare Upload API
@@ -134,7 +140,6 @@ class Request extends Thenable<RequestResponse> implements RequestInterface {
   protected readonly promise: Promise<RequestResponse>
   protected readonly options: RequestOptions
   private readonly cancelController: CancelTokenSource
-  private isThrottled: boolean = false
   private throttledTimes: number = 0
   private readonly retryThrottledMaxTimes: number = 1
 
@@ -151,9 +156,9 @@ class Request extends Thenable<RequestResponse> implements RequestInterface {
 
     // @ts-ignore
     return axios(options)
-      .catch(this.handleError)
+      .catch(this.handleRequestError)
       .then(this.handleResponse)
-      .catch((error) => Promise.reject(error))
+      .catch(this.handleError)
   }
 
   protected getRequestOptions() {
@@ -224,7 +229,9 @@ class Request extends Thenable<RequestResponse> implements RequestInterface {
     }
   }
 
-  private handleError = (error) => {
+  private handleRequestError = (error: AxiosError) => {
+    const {path: url} = this.options
+
     if (axios.isCancel(error)) {
       throw new CancelError()
     }
@@ -232,7 +239,7 @@ class Request extends Thenable<RequestResponse> implements RequestInterface {
     if (error.response) {
       throw new RequestError({
         headers: error.config.headers,
-        url: error.config.url,
+        url: error.config.url || url,
       }, {
         status: error.response.status,
         statusText: error.response.statusText,
@@ -240,6 +247,16 @@ class Request extends Thenable<RequestResponse> implements RequestInterface {
     }
 
     throw error
+  }
+
+  private handleError = (error: Error) => {
+    if (error.name === 'RequestWasThrottledError' && (this.throttledTimes <= this.retryThrottledMaxTimes)) {
+      const timeout = this.getTimeoutFromThrottledRequest(error as RequestWasThrottledError) || DEFAULT_RETRY_AFTER_TIMEOUT
+
+      return delay(timeout).then(() => this.getRequestPromise())
+    }
+
+    return Promise.reject(error)
   }
 
   private handleResponse = response => {
@@ -257,8 +274,14 @@ class Request extends Thenable<RequestResponse> implements RequestInterface {
         statusText: content || response.data.error,
       }
 
+      // If request was throttled
       if (code === 429) {
-        return this.handleThrottledResponse(response, errorRequestInfo, errorResponseInfo)
+        this.throttledTimes++
+        throw new RequestWasThrottledError(
+          errorRequestInfo,
+          errorResponseInfo,
+          `Request was throttled more than ${this.retryThrottledMaxTimes}`
+        )
       }
 
       throw new UploadcareError(errorRequestInfo, errorResponseInfo)
@@ -271,31 +294,10 @@ class Request extends Thenable<RequestResponse> implements RequestInterface {
     }
   }
 
-  private handleThrottledResponse = (response, errorRequestInfo, errorResponseInfo) => {
-    this.isThrottled = true
-    this.throttledTimes++
+  private getTimeoutFromThrottledRequest = (error: RequestWasThrottledError) => {
+    const {headers} = error.request
 
-    if (this.throttledTimes <= this.retryThrottledMaxTimes) {
-      const timeout = this.getTimeoutFromThrottledRequest(response) || DEFAULT_TIMEOUT
-
-      return setTimeout(() => {
-        console.log(timeout)
-
-        return this.getRequestPromise()
-      }, timeout)
-    }
-
-    throw new RequestWasThrottledError(
-      errorRequestInfo,
-      errorResponseInfo,
-      `Request was throttled more than ${this.retryThrottledMaxTimes}`
-    )
-  }
-
-  private getTimeoutFromThrottledRequest = response => {
-    const {headers} = response
-
-    return headers['x-throttle-wait-seconds'] || null
+    return headers['x-throttle-wait-seconds'] * 1000 || null
   }
 
   cancel = (): void => this.cancelController.cancel()
