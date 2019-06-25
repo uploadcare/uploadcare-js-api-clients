@@ -3,7 +3,7 @@ import {getSettingsForTesting} from '../_helpers'
 import group from '../../src/api/group'
 import groupInfo from '../../src/api/groupInfo'
 
-describe('API - group info', () => {
+fdescribe('API - group info', () => {
   it('should return info about uploaded group of files', async() => {
     const files = factory.groupOfFiles('valid')
     const settings = getSettingsForTesting({publicKey: factory.publicKey('image')})

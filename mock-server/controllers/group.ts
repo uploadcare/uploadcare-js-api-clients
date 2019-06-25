@@ -1,4 +1,4 @@
-import * as json from '../data/info.json'
+import * as json from '../data/group.json'
 import find from '../utils/find'
 import error from '../utils/error'
 
@@ -7,7 +7,7 @@ import error from '../utils/error'
  * @param {object} ctx
  */
 const index = (ctx) => {
-  // TODO
+  ctx.body = find(json, 'info')
 }
 
 /**
@@ -15,7 +15,7 @@ const index = (ctx) => {
  * @param {object} ctx
  */
 const info = (ctx) => {
-  // TODO
+  ctx.body = find(json, 'info')
 }
 
 export {

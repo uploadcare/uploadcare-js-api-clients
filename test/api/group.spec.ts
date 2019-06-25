@@ -2,7 +2,7 @@ import * as factory from '../_fixtureFactory'
 import {getSettingsForTesting} from '../_helpers'
 import group from '../../src/api/group'
 
-describe('API - group', () => {
+fdescribe('API - group', () => {
   it('should upload group of files', async() => {
     const files = factory.groupOfFiles('valid')
     const settings = getSettingsForTesting({publicKey: factory.publicKey('image')})
