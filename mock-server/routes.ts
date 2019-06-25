@@ -8,7 +8,7 @@ export type RouteType = {
     method: string,
     fn: Function,
     isProtected: boolean,
-    isFake: boolean,
+    isFake?: boolean,
     description?: string,
   }
 }
@@ -19,14 +19,12 @@ export const ROUTES: Array<RouteType> = [
       method: 'post',
       fn: base.index,
       isProtected: true,
-      isFake: false,
     }
   }, {
     '/from_url': {
       method: 'post',
       fn: fromUrl.index,
       isProtected: true,
-      isFake: false,
       description: '/from_url/?pub_key=XXXXXXXXXXXXXXXXXXXX',
     }
   }, {
@@ -34,7 +32,6 @@ export const ROUTES: Array<RouteType> = [
       method: 'get',
       fn: fromUrl.status,
       isProtected: false,
-      isFake: false,
       description: '/from_url/status/?pub_key=XXXXXXXXXXXXXXXXXXXX&token=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX',
     }
   }, {
@@ -42,7 +39,6 @@ export const ROUTES: Array<RouteType> = [
       method: 'get',
       fn: info.index,
       isProtected: true,
-      isFake: false,
       description: '/info?pub_key=XXXXXXXXXXXXXXXXXXXX&file_id=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX',
     }
   }, {

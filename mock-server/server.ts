@@ -54,7 +54,7 @@ app.listen(PORT, () => {
     const routePath = route[path]
     const method = routePath.method.toUpperCase()
     const description = routePath.description || path
-    const isFake = routePath.isFake
+    const isFake = routePath.isFake || false
 
     console.log(`  ${chalk.bold(method)}: '${isFake ? chalk.gray(description) : chalk.green(description)}'`)
   })
