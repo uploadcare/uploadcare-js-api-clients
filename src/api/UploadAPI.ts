@@ -4,10 +4,12 @@ import UploadClient from '../UploadClient'
 import {RequestOptions, RequestResponse} from './request'
 import {FileData, Settings} from '../types'
 import info from './info'
-import {Token, Uuid} from './types'
+import {GroupId, Token, Uuid} from './types'
 import {InfoResponse} from './info'
 import fromUrl, {FromUrlResponse, Url} from './fromUrl'
 import fromUrlStatus, {FromUrlStatusResponse} from './fromUrlStatus'
+import group, {GroupInfoResponse} from './group'
+import groupInfo from './groupInfo'
 
 export interface UploadAPIInterface {
   request(options: RequestOptions): Promise<RequestResponse>
@@ -19,6 +21,10 @@ export interface UploadAPIInterface {
   fromUrl(sourceUrl: Url, settings?: Settings): Promise<FromUrlResponse>
 
   fromUrlStatus(token: Token, settings?: Settings): Promise<FromUrlStatusResponse>
+
+  group(files: Array<Uuid>, settings: Settings): Promise<GroupInfoResponse>
+
+  groupInfo(id: GroupId, settings: Settings): Promise<GroupInfoResponse>
 }
 
 class UploadAPI implements UploadAPIInterface {
@@ -56,7 +62,15 @@ class UploadAPI implements UploadAPIInterface {
   }
 
   fromUrlStatus(token: Token, settings: Settings = {}): Promise<FromUrlStatusResponse> {
-    return fromUrlStatus(token,this.getResultSettings(settings))
+    return fromUrlStatus(token, this.getResultSettings(settings))
+  }
+
+  group(files: Array<Uuid>, settings: Settings): Promise<GroupInfoResponse> {
+    return group(files, this.getResultSettings(settings))
+  }
+
+  groupInfo(id: GroupId, settings: Settings): Promise<GroupInfoResponse> {
+    return groupInfo(id, this.getResultSettings(settings))
   }
 }
 

@@ -1,6 +1,7 @@
 import * as base from './controllers/base'
 import * as fromUrl from './controllers/from_url'
 import * as info from './controllers/info'
+import * as group from './controllers/group'
 
 export type RouteType = {
   [path: string]: {
@@ -37,7 +38,21 @@ export const ROUTES: Array<RouteType> = [
       method: 'get',
       fn: info.index,
       isProtected: true,
-      description: '/info?pub_key=XXXXXXXXXXXXXXXXXXXX&file_id=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX',
+      description: '/info/?pub_key=XXXXXXXXXXXXXXXXXXXX&file_id=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX',
+    }
+  }, {
+    '/group': {
+      method: 'post',
+      fn: group.index,
+      isProtected: true,
+      description: '/group/',
+    }
+  }, {
+    '/group/info': {
+      method: 'get',
+      fn: group.info,
+      isProtected: true,
+      description: '/group/info/?pub_key=XXXXXXXXXXXXXXXXXXXX&group_id=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX~N',
     }
   },
 ]
