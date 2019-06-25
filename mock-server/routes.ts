@@ -1,6 +1,7 @@
 import * as base from './controllers/base'
 import * as fromUrl from './controllers/from_url'
 import * as info from './controllers/info'
+import * as throttle from './controllers/throttle'
 
 export type RouteType = {
   [path: string]: {
@@ -38,6 +39,12 @@ export const ROUTES: Array<RouteType> = [
       fn: info.index,
       isProtected: true,
       description: '/info?pub_key=XXXXXXXXXXXXXXXXXXXX&file_id=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX',
+    }
+  }, {
+    '/throttle': {
+      method: 'post',
+      fn: throttle.index,
+      isProtected: true,
     }
   },
 ]

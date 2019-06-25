@@ -115,5 +115,23 @@ describe('API – request', () => {
 
       requestWithOptions.cancel()
     })
+
+    fit('if request was throttled', (done) => {
+      // Run this case only in dev mode
+      if (process.env.NODE_ENV === 'production') {
+        done()
+      }
+
+      const options = {
+        method: 'POST',
+        baseURL: settings.baseURL,
+        path: '/throttle/',
+        query: {pub_key: factory.publicKey('demo')},
+      }
+
+      request(options)
+        .then(() => done.fail('Promise should not to be resolved'))
+        .catch((error) => error.name === 'RequestWasThrottledError' ? done() : done.fail(error))
+    })
   })
 })
