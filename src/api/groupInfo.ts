@@ -6,25 +6,25 @@ import {RequestOptions} from './request'
 export type GroupInfoResponse = GroupInfo
 
 const getRequestQuery = (id: GroupId, settings: Settings) => {
-  const body = {
+  const query = {
     pub_key: settings.publicKey || '',
     group_id: id,
   }
 
   if (settings.source) {
     return {
-      ...body,
+      ...query,
       source: settings.source,
     }
   }
 
-  return  {...body}
+  return  {...query}
 }
 
 const getRequestOptions = (id: GroupId, settings: Settings): RequestOptions => {
   return prepareOptions({
     path: '/group/info/',
-    body: getRequestQuery(id, settings),
+    query: getRequestQuery(id, settings),
   }, settings)
 }
 
