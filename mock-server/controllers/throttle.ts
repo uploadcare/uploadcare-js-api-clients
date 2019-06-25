@@ -9,12 +9,16 @@ let times = 0
 const index = (ctx) => {
   times++;
 
-  console.log(times)
+  if (times === 2) {
+    times = 0
 
-  error(ctx, {
-    status: 429,
-    statusText: 'Request was throttled.'
-  })
+    return ctx.status = 200
+  } else {
+    return error(ctx, {
+      status: 429,
+      statusText: 'Request was throttled.'
+    })
+  }
 }
 
 export {

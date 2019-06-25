@@ -93,10 +93,11 @@ const delay = (ms: number): Promise<void> => new Promise(resolve => setTimeout(r
  * @param {Object} [options.body] – The data to be sent as the body. Only for 'PUT', 'POST', 'PATCH'.
  * @param {Object} [options.headers] – The custom headers to be sent.
  * @param {string} [options.baseURL] – The Upload API endpoint.
+ * @param {number} retryThrottledMaxTimes – How much times retry throttled request.
  * @returns {Promise<RequestResponse>}
  */
-export default function request(options: RequestOptions): RequestInterface {
-  return new Request(options)
+export default function request(options: RequestOptions, retryThrottledMaxTimes: number = 1): RequestInterface {
+  return new Request(options, retryThrottledMaxTimes)
 }
 
 /**
@@ -141,12 +142,13 @@ class Request extends Thenable<RequestResponse> implements RequestInterface {
   protected readonly options: RequestOptions
   private readonly cancelController: CancelTokenSource
   private throttledTimes: number = 0
-  private readonly retryThrottledMaxTimes: number = 1
+  private readonly retryThrottledMaxTimes: number
 
-  constructor(options: RequestOptions) {
+  constructor(options: RequestOptions, retryThrottledMaxTimes) {
     super()
 
     this.options = options
+    this.retryThrottledMaxTimes = retryThrottledMaxTimes
     this.cancelController = axios.CancelToken.source()
     this.promise = this.getRequestPromise()
   }
@@ -250,8 +252,11 @@ class Request extends Thenable<RequestResponse> implements RequestInterface {
   }
 
   private handleError = (error: Error) => {
-    if (error.name === 'RequestWasThrottledError' && (this.throttledTimes <= this.retryThrottledMaxTimes)) {
-      const timeout = this.getTimeoutFromThrottledRequest(error as RequestWasThrottledError) || DEFAULT_RETRY_AFTER_TIMEOUT
+    if (error.name === 'RequestWasThrottledError'
+      && (this.throttledTimes <= this.retryThrottledMaxTimes)
+    ) {
+      const timeout = this.getTimeoutFromThrottledRequest(error as RequestWasThrottledError)
+        || DEFAULT_RETRY_AFTER_TIMEOUT
 
       return delay(timeout).then(() => this.getRequestPromise())
     }
