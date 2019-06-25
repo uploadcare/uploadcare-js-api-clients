@@ -3,7 +3,7 @@ import error from '../utils/error'
 let times = 0
 
 /**
- * '/base/'
+ * '/throttle/'
  * @param {object} ctx
  */
 const index = (ctx) => {
