@@ -51,10 +51,12 @@ app.listen(PORT, () => {
   // Print all available routes
   ROUTES.forEach((route: RouteType) => {
     const path = Object.keys(route).shift()
-    const method = route[path].method.toUpperCase()
-    const description = route[path].description || path
+    const routePath = route[path]
+    const method = routePath.method.toUpperCase()
+    const description = routePath.description || path
+    const isFake = routePath.isFake
 
-    console.log(`  ${chalk.bold(method)}: '${chalk.green(description)}'`)
+    console.log(`  ${chalk.bold(method)}: '${isFake ? chalk.gray(description) : chalk.green(description)}'`)
   })
   console.log()
 })
