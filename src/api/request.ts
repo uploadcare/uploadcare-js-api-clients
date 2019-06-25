@@ -10,7 +10,7 @@ import {Thenable} from '../tools/Thenable'
 import {CancelableInterface} from './types'
 
 export type Query = {
-  [key: string]: string | boolean | number | void,
+  [key: string]: string | string[] | boolean | number | void,
 }
 
 export type Body = {

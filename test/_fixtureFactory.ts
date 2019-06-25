@@ -131,7 +131,7 @@ export function token(id: string): string {
 
 export function groupId(id: string): string {
   const groupIds = {
-    valid: '945ebb27-1fd6-46c6-a859-b9893712d650',
+    valid: '01136e2a-7d57-4546-81be-1043e7774e70~2',
     invalid: '123ebb27-1fd6-46c6-a859-b9893',
   }
 
@@ -141,8 +141,8 @@ export function groupId(id: string): string {
 export function groupOfFiles(id: string): Array<string> {
   const groupOfFiles = {
     valid: [
-      '89827330-e200-41bc-9fba-7d51c8e9ea15',
-      '89827330-e200-41bc-9fba-7d51c8e9ea15/-/resize/x800/',
+      'd3275f8b-686d-4980-916a-53a1fc17450b',
+      'b7db68d6-6dc5-4fd7-90b2-9077030f206d/-/resize/x800/',
     ],
     invalid: [
       '2e6b7f23-9143-4b71-94e7-338bb',

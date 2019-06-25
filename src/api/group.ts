@@ -5,9 +5,9 @@ import {RequestOptions} from './request'
 
 export type GroupInfoResponse = GroupInfo
 
-const getRequestBody = (files: Array<Uuid>, settings: Settings) => {
-  const body = {
-    pub_key: settings.publicKey || undefined,
+const getRequestQuery = (files: Array<Uuid>, settings: Settings) => {
+  const query = {
+    pub_key: settings.publicKey || '',
     files,
     callback: settings.jsonpCallback || undefined,
     signature: settings.secureSignature || undefined,
@@ -16,19 +16,19 @@ const getRequestBody = (files: Array<Uuid>, settings: Settings) => {
 
   if (settings.source) {
     return {
-      ...body,
+      ...query,
       source: settings.source,
     }
   }
 
-  return  {...body}
+  return  {...query}
 }
 
 const getRequestOptions = (files: Array<Uuid>, settings: Settings): RequestOptions => {
   return prepareOptions({
     method: 'POST',
     path: '/group/',
-    body: getRequestBody(files, settings),
+    query: getRequestQuery(files, settings),
   }, settings)
 }
 
