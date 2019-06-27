@@ -7,6 +7,37 @@ import error from '../utils/error'
  * @param {object} ctx
  */
 const index = (ctx) => {
+  const files = ctx.query && ctx.query['files[]']
+  const publicKey = ctx.query && ctx.query.pub_key
+
+  if (!files || files.length === 0) {
+    return error(ctx, {
+      statusText: 'no files[N] parameters found.'
+    })
+  }
+
+  if (files && files.length > 0) {
+    for (let key in files) {
+      if (files.hasOwnProperty(key)) {
+        const file = files[key]
+        const array = file.split('/')
+        const uuid = array[0]
+
+        if (uuid.length < 36) {
+          return error(ctx, {
+            statusText: `this is not valid file url: ${file}`
+          })
+        }
+      }
+    }
+  }
+
+  if (publicKey === 'demopublickey' && files.length > 0) {
+    return error(ctx, {
+      statusText: 'some files not found.'
+    })
+  }
+
   ctx.body = find(json, 'info')
 }
 
@@ -15,6 +46,21 @@ const index = (ctx) => {
  * @param {object} ctx
  */
 const info = (ctx) => {
+  const groupId = ctx.query && ctx.query.group_id
+
+  if (!groupId) {
+    return error(ctx, {
+      statusText: 'group_id is required.'
+    })
+  }
+
+  if (groupId.length < 37) {
+    return error(ctx, {
+      status: 404,
+      statusText: 'group_id is invalid.'
+    })
+  }
+
   ctx.body = find(json, 'info')
 }
 

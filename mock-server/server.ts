@@ -58,3 +58,12 @@ app.listen(PORT, () => {
   })
   console.log()
 })
+//
+// app.use(() => {
+//
+// })
+//
+// app.use(async (ctx, next) => {
+//   process.stdout.write('\x1Bc')
+//   await next()
+// })
