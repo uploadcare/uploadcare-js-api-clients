@@ -1,5 +1,5 @@
 import fromUrl, {FromUrlResponse, isFileInfoResponse, isTokenResponse, Url} from '../api/fromUrl'
-import {Settings, UploadcareFile} from '../types'
+import {Settings, UploadcareFile, ProgressState} from '../types'
 import fromUrlStatus, {
   FromUrlStatusResponse,
   isErrorResponse,
@@ -8,7 +8,7 @@ import fromUrlStatus, {
   isUnknownResponse,
   isWaitingResponse,
 } from '../api/fromUrlStatus'
-import {ProgressState, UploadFrom} from './UploadFrom'
+import {UploadFrom} from './UploadFrom'
 import checkFileIsUploadedFromUrl from '../checkFileIsUploadedFromUrl'
 import {PollPromiseInterface} from '../tools/poll'
 import CancelError from '../errors/CancelError'

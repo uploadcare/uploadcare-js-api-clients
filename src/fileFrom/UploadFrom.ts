@@ -1,40 +1,11 @@
-import {Settings, UploadcareFile} from '../types'
+import {Settings, UploadcareFile, UploadingProgress, ProgressState, ProgressParams} from '../types'
 import checkFileIsReady from '../checkFileIsReady'
 import prettyFileInfo from '../prettyFileInfo'
 import {Thenable} from '../tools/Thenable'
-import {CancelableInterface, Uuid} from '../api/types'
+import {Uuid} from '../api/types'
 import {PollPromiseInterface} from '../tools/poll'
 import {InfoResponse} from '../api/info'
-
-export enum ProgressState {
-  Pending = 'pending',
-  Uploading = 'uploading',
-  Uploaded = 'uploaded',
-  Ready = 'ready',
-  Canceled = 'canceled',
-  Error = 'error',
-}
-
-export type FileProgress = {
-  total: number,
-  loaded: number,
-}
-
-export type UploadingProgress = {
-  state: ProgressState,
-  uploaded: null | FileProgress,
-  value: number,
-}
-
-/**
- * Base `thenable` interface for uploading `fileFrom` (`object`, `url`, `input`, `uploaded`).
- */
-export interface UploadFromInterface extends Promise<UploadcareFile>, CancelableInterface {
-  onProgress: ((progress: UploadingProgress) => void) | null
-  onUploaded: ((uuid: string) => void) | null
-  onReady: ((file: UploadcareFile) => void) | null
-  onCancel: VoidFunction | null
-}
+import {UploadFromInterface} from './types'
 
 /**
  * Base abstract `thenable` implementation of `UploadFromInterface`.
@@ -63,7 +34,7 @@ export abstract class UploadFrom extends Thenable<UploadcareFile> implements Upl
     this.handleCancelling = this.handleCancelling.bind(this)
   }
 
-  protected setProgress(state: ProgressState, progress?: FileProgress) {
+  protected setProgress(state: ProgressState, progress?: ProgressParams) {
     switch (state) {
       case ProgressState.Pending:
         this.progress = {
@@ -136,9 +107,9 @@ export abstract class UploadFrom extends Thenable<UploadcareFile> implements Upl
 
   /**
    * Handle file uploading.
-   * @param {FileProgress} progress
+   * @param {ProgressParams} progress
    */
-  protected handleUploading(progress?: FileProgress): void {
+  protected handleUploading(progress?: ProgressParams): void {
     this.setProgress(ProgressState.Uploading, progress)
 
     if (typeof this.onProgress === 'function') {

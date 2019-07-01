@@ -3,15 +3,8 @@ import {Url} from '../api/fromUrl'
 import {Uuid} from '../api/types'
 import {UploadFromObject} from './UploadFromObject'
 import {UploadFromUrl} from './UploadFromUrl'
-import {UploadFromInterface} from './UploadFrom'
 import {UploadFromUploaded} from './UploadFromUploaded'
-
-export enum FileFrom {
-  Object = 'object',
-  URL = 'url',
-  DOM = 'input',
-  Uploaded = 'uploaded',
-}
+import {UploadFromInterface, FileFrom} from './types'
 
 /**
  * Uploads file from provided data

@@ -1,5 +1,5 @@
-import {Settings, UploadcareFile} from '../types'
-import {ProgressState, UploadFrom} from './UploadFrom'
+import {Settings, UploadcareFile, ProgressState} from '../types'
+import {UploadFrom} from './UploadFrom'
 import info, {InfoResponse} from '../api/info'
 import {Uuid} from '../api/types'
 import CancelError from '../errors/CancelError'
