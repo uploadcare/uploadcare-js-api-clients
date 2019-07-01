@@ -2,6 +2,9 @@ import * as json from '../data/group.json'
 import find from '../utils/find'
 import error from '../utils/error'
 
+const UUID_REGEX = '[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}'
+const GROUP_ID_REGEX = `${UUID_REGEX}~[1-9][0-9]*$`
+
 /**
  * '/group/'
  * @param {object} ctx
@@ -22,8 +25,9 @@ const index = (ctx) => {
         const file = files[key]
         const array = file.split('/')
         const uuid = array[0]
+        const isValidUUID = (new RegExp(UUID_REGEX)).exec(uuid)
 
-        if (uuid.length < 36) {
+        if (!isValidUUID) {
           return error(ctx, {
             statusText: `this is not valid file url: ${file}`
           })
@@ -54,7 +58,9 @@ const info = (ctx) => {
     })
   }
 
-  if (groupId.length < 37) {
+  const isValidGroupId = (new RegExp(GROUP_ID_REGEX)).exec(groupId)
+
+  if (!isValidGroupId) {
     return error(ctx, {
       status: 404,
       statusText: 'group_id is invalid.'
