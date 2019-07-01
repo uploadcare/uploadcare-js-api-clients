@@ -7,19 +7,27 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+[Unreleased]: https://github.com/uploadcare/uploadcare-upload-client/compare/v1.0.0-alpha.3...HEAD
+
+## [1.0.0-alpha.3]
+
 ## Added
 
-* Support `fileFrom` 'uploaded' file (uuid)
+* Support `fileFrom` 'uploaded' file (`uuid`)
 * Support of `waiting` status from `/from_url/status/` endpoint.
 * Export some main types from `index.ts` file. 
   So you can import them now directly from `@uploadcare/upload-client`
+* Throttling for `request`
+* `retryThrottledMaxTimes` param to set count of max retries after throttled request (1 by default)
+* `Uuid` type
+* Mock server for local testing
 
 ## Fixed
 
 * Default timeout for polling functions increased from 3s to 10s.
 * Removed restrictions for timeout and interval.
 
-[Unreleased]: https://github.com/uploadcare/uploadcare-upload-client/compare/v1.0.0-alpha.2...HEAD
+[1.0.0-alpha.3]: https://github.com/uploadcare/uploadcare-upload-client/compare/v1.0.0-alpha.2...v1.0.0-alpha.3
 
 ## [1.0.0-alpha.2]
 

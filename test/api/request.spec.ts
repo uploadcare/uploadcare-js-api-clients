@@ -57,6 +57,23 @@ describe('API – request', () => {
       expect(typeof result.data).toBe('object')
       expect(typeof result.data.file).toBe('string')
     })
+
+    it('if request was throttled and max retries 1', (done) => {
+      // Run this case only in dev mode
+      if (process.env.NODE_ENV === 'production') {
+        done()
+      }
+
+      const options = {
+        method: 'POST',
+        baseURL: settings.baseURL,
+        path: '/throttle/',
+        query: {pub_key: factory.publicKey('demo')},
+      }
+
+      request(options)
+        .then(done)
+    }, 20000)
   })
 
   describe('should be rejected', () => {
@@ -115,5 +132,23 @@ describe('API – request', () => {
 
       requestWithOptions.cancel()
     })
+
+    it('if request was throttled and max retries 0', (done) => {
+      // Run this case only in dev mode
+      if (process.env.NODE_ENV === 'production') {
+        done()
+      }
+
+      const options = {
+        method: 'POST',
+        baseURL: settings.baseURL,
+        path: '/throttle/',
+        query: {pub_key: factory.publicKey('demo')},
+      }
+
+      request(options, 0)
+        .then(() => done.fail('Promise should not to be resolved'))
+        .catch((error) => error.name === 'RequestWasThrottledError' ? done() : done.fail(error))
+    }, 20000)
   })
 })

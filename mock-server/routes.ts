@@ -2,12 +2,14 @@ import * as base from './controllers/base'
 import * as fromUrl from './controllers/from_url'
 import * as info from './controllers/info'
 import * as group from './controllers/group'
+import * as throttle from './controllers/throttle'
 
 export type RouteType = {
   [path: string]: {
     method: string,
     fn: Function,
     isProtected: boolean,
+    isFake?: boolean,
     description?: string,
   }
 }
@@ -53,6 +55,13 @@ export const ROUTES: Array<RouteType> = [
       fn: group.info,
       isProtected: true,
       description: '/group/info/?pub_key=XXXXXXXXXXXXXXXXXXXX&group_id=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX~N',
+    }
+  }, {
+    '/throttle': {
+      method: 'post',
+      fn: throttle.index,
+      isFake: true,
+      isProtected: true,
     }
   },
 ]
