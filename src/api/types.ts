@@ -65,6 +65,16 @@ export interface FileInfoInterface extends ProgressInterface, ImageInfoInterface
 
 export type FileInfo = FileInfoInterface
 
+export type GroupInfo = {
+  datetime_created: string,
+  datetime_stored: string | null,
+  files_count: string,
+  cdn_url: string,
+  files: Array<FileInfo>,
+  url: string,
+  id: GroupId,
+}
+
 export interface CancelableInterface {
   cancel(): void
 }
@@ -72,3 +82,5 @@ export interface CancelableInterface {
 export type Token = string
 
 export type Uuid = string
+
+export type GroupId = string

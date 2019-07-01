@@ -10,6 +10,7 @@ export type Settings = {
   checkForUrlDuplicates?: boolean,
   saveUrlForRecurrentUploads?: boolean,
   source?: string,
+  jsonpCallback?: string,
 }
 
 export type FileData = Blob | File | Buffer
