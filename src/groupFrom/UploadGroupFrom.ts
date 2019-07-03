@@ -1,13 +1,13 @@
 import {ProgressParams, Settings, UploadcareFiles, UploadcareGroup} from '../types'
 import {Thenable} from '../tools/Thenable'
 import {ProgressState, UploadingProgress} from '../types'
-import {UploadGroupFromInterface} from './types'
 import {GroupInfo} from '../api/types'
-import {UploadGroupLifecycleInterface} from '../lifecycle/types'
+import {GroupUploadLifecycleInterface} from '../lifecycle/types'
+import {GroupUploadInterface} from './types'
 
-export abstract class UploadGroupFrom extends Thenable<UploadcareGroup> implements UploadGroupFromInterface {
+export abstract class UploadGroupFrom extends Thenable<UploadcareGroup> implements GroupUploadInterface {
   protected abstract readonly promise: Promise<UploadcareGroup>
-  protected abstract lifecycle: UploadGroupLifecycleInterface
+  protected abstract lifecycle: GroupUploadLifecycleInterface
   abstract cancel(): void
   abstract getFiles(): Promise<UploadcareFiles>
 

@@ -1,3 +1,5 @@
+import {UploadcareFile, UploadcareGroup} from '../types'
+
 interface StatusInterface {
   status: string,
 }
@@ -70,7 +72,7 @@ export type GroupInfo = {
   datetime_stored: string | null,
   files_count: string,
   cdn_url: string,
-  files: Array<FileInfo>,
+  files: FileInfo[],
   url: string,
   id: GroupId,
 }

@@ -1,8 +1,9 @@
 import defaultSettings from './defaultSettings'
 import UploadAPI from './api/index'
-import fileFrom, {FileFrom} from './fileFrom/fileFrom'
+import fileFrom from './fileFrom/fileFrom'
+import {FileFrom} from './fileFrom/types'
 import {FileData, Settings} from './types'
-import {UploadFromInterface} from './fileFrom/UploadFrom'
+import {FileUploadInterface} from './fileFrom/types'
 import {Url} from './api/fromUrl'
 import {UploadAPIInterface} from './api/UploadAPI'
 import {Uuid} from './api/types'
@@ -16,7 +17,7 @@ export interface UploadClientInterface {
 
   removeUpdateSettingsListener(listener: Function): void
 
-  fileFrom(from: FileFrom, data: FileData | Url | Uuid, settings?: Settings): UploadFromInterface
+  fileFrom(from: FileFrom, data: FileData | Url | Uuid, settings?: Settings): FileUploadInterface
 }
 
 class UploadClient implements UploadClientInterface {
@@ -64,7 +65,7 @@ class UploadClient implements UploadClientInterface {
     }
   }
 
-  fileFrom(from: FileFrom, data: FileData | Url | Uuid, settings: Settings = {}): UploadFromInterface {
+  fileFrom(from: FileFrom, data: FileData | Url | Uuid, settings: Settings = {}): FileUploadInterface {
     return fileFrom(from, data, {
       ...this.settings,
       ...settings,

@@ -1,5 +1,5 @@
-import {UploadcareFiles, UploadcareGroup, UploadingProgress} from '../types'
-import {CancelableInterface} from '../api/types'
+import {UploadcareGroup} from '../types'
+import {UploadInterface} from '../lifecycle/types'
 
 export enum GroupFrom {
   Object = 'object',
@@ -11,11 +11,4 @@ export enum GroupFrom {
 /**
  * Base `thenable` interface for uploading `filesGroupFrom` (`object`, `url`, `input`, `uploaded`).
  */
-export interface UploadGroupFromInterface extends Promise<UploadcareGroup>, CancelableInterface {
-  onProgress: ((progress: UploadingProgress) => void) | null
-  onUploaded: ((uuid: string) => void) | null
-  onReady: ((group: UploadcareGroup) => void) | null
-  onCancel: VoidFunction | null
-
-  getFiles(): Promise<UploadcareFiles>
-}
+export interface GroupUploadInterface extends UploadInterface<UploadcareGroup> {}

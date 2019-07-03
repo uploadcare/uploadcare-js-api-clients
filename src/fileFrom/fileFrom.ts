@@ -1,10 +1,12 @@
-import {FileData, Settings} from '../types'
+import {FileData, Settings, UploadcareFile} from '../types'
 import {Url} from '../api/fromUrl'
 import {Uuid} from '../api/types'
 import {UploadFromObject} from './UploadFromObject'
 import {UploadFromUrl} from './UploadFromUrl'
 import {UploadFromUploaded} from './UploadFromUploaded'
-import {UploadFromInterface, FileFrom} from './types'
+import {FileUploadInterface, FileFrom} from './types'
+import {UploadLifecycle} from '../lifecycle/UploadLifecycle'
+import {FileUploadLifecycle} from '../lifecycle/FileUploadLifecycle'
 
 /**
  * Uploads file from provided data
@@ -13,12 +15,15 @@ import {UploadFromInterface, FileFrom} from './types'
  * @param {FileData} data
  * @param {Settings} settings
  * @throws Error
- * @returns {UploadFromInterface}
+ * @returns {FileUploadInterface}
  */
-export default function fileFrom(from: FileFrom, data: FileData | Url | Uuid, settings: Settings = {}): UploadFromInterface {
+export default function fileFrom(from: FileFrom, data: FileData | Url | Uuid, settings: Settings = {}): FileUploadInterface {
+  const uploadLifecycle = new UploadLifecycle<UploadcareFile>()
+  const uploadFileLifecycle = new FileUploadLifecycle(uploadLifecycle)
+
   switch (from) {
     case FileFrom.Object:
-      return new UploadFromObject(data as FileData, settings)
+      return new UploadFromObject(uploadFileLifecycle, data as FileData, settings)
     case FileFrom.URL:
       return new UploadFromUrl(data as Url, settings)
     case FileFrom.Uploaded:

@@ -1,12 +1,16 @@
-import {ProgressParams, ProgressState, UploadcareFile, UploadcareGroup, UploadingProgress} from '../types'
-import {UploadLifecycleInterface, UploadFileLifecycleInterface, UploadGroupLifecycleInterface} from './types'
+import {ProgressParams, UploadingProgress} from '../types'
+import {
+  LifecycleInterface,
+  LifecycleStateInterface
+} from './types'
+import {UploadingState} from './UploadingState'
+import {CancelledState} from './CancelledState'
+import {ReadyState} from './ReadyState'
+import {ErrorState} from './ErrorState'
+import {PendingState} from './PendingState'
 
-abstract class UploadLifecycle<T> implements UploadLifecycleInterface<T> {
-  protected progress: UploadingProgress = {
-    state: ProgressState.Pending,
-    uploaded: null,
-    value: 0,
-  }
+export class UploadLifecycle<T> implements LifecycleInterface<T> {
+  protected state: LifecycleStateInterface
   protected entity: T | null = null
 
   onProgress: ((progress: UploadingProgress) => void) | null = null
@@ -14,56 +18,21 @@ abstract class UploadLifecycle<T> implements UploadLifecycleInterface<T> {
   onReady: ((entity: T) => void) | null = null
   onCancel: VoidFunction | null = null
 
-  updateProgress(state: ProgressState, progress?: ProgressParams): void {
-    switch (state) {
-      case ProgressState.Pending:
-        this.progress = {
-          state: ProgressState.Pending,
-          uploaded: null,
-          value: 0,
-        }
-        break
-      case ProgressState.Uploading:
-        this.progress = {
-          state: ProgressState.Uploading,
-          uploaded: progress || null,
-          // leave 1 percent for uploaded and 1 for ready on cdn
-          value: progress ? Math.round((progress.loaded * 98) / progress.total) : 0,
-        }
-        break
-      case ProgressState.Uploaded:
-        this.progress = {
-          state: ProgressState.Uploaded,
-          uploaded: null,
-          value: 99,
-        }
-        break
-      case ProgressState.Ready:
-        this.progress = {
-          state: ProgressState.Ready,
-          uploaded: null,
-          value: 100,
-        }
-        break
-      case ProgressState.Canceled:
-        this.progress = {
-          state: ProgressState.Canceled,
-          uploaded: null,
-          value: 0,
-        }
-        break
-      case ProgressState.Error:
-        this.progress = {
-          state: ProgressState.Error,
-          uploaded: null,
-          value: 0,
-        }
-        break
+  constructor() {
+    this.state = new PendingState()
+  }
+
+  updateState(state: LifecycleStateInterface): void {
+    if (this.state.isCanBeChangedTo(state)) {
+      this.state = state
+    } else {
+      // TODO: Make a new Exception
+      throw new Error(`${this.state.progress.state} can't be changed to ${state.progress.state}`)
     }
   }
 
   getProgress(): UploadingProgress {
-    return this.progress
+    return this.state.progress
   }
 
   updateEntity(entity: T): void {
@@ -79,7 +48,9 @@ abstract class UploadLifecycle<T> implements UploadLifecycleInterface<T> {
   }
 
   handleUploading(progress?: ProgressParams): void {
-    this.updateProgress(ProgressState.Uploading, progress)
+    if (progress) {
+      this.updateState(new UploadingState(progress))
+    }
 
     if (typeof this.onProgress === 'function') {
       this.onProgress(this.getProgress())
@@ -87,7 +58,7 @@ abstract class UploadLifecycle<T> implements UploadLifecycleInterface<T> {
   }
 
   handleCancelling(): void {
-    this.updateProgress(ProgressState.Canceled)
+    this.updateState(new CancelledState())
 
     if (typeof this.onCancel === 'function') {
       this.onCancel()
@@ -95,7 +66,7 @@ abstract class UploadLifecycle<T> implements UploadLifecycleInterface<T> {
   }
 
   handleReady(): Promise<T> {
-    this.updateProgress(ProgressState.Ready)
+    this.updateState(new ReadyState())
 
     if (typeof this.onProgress === 'function') {
       this.onProgress(this.getProgress())
@@ -109,7 +80,7 @@ abstract class UploadLifecycle<T> implements UploadLifecycleInterface<T> {
   }
 
   handleError(error: Error) {
-    this.updateProgress(ProgressState.Error)
+    this.updateState(new ErrorState())
 
     if (error.name === 'CancelError') {
       this.handleCancelling()
@@ -117,12 +88,4 @@ abstract class UploadLifecycle<T> implements UploadLifecycleInterface<T> {
 
     return Promise.reject(error)
   }
-}
-
-export class UploadFileLifecycle extends UploadLifecycle<UploadcareFile> implements UploadFileLifecycleInterface {
-
-}
-
-export class UploadGroupLifecycle extends UploadLifecycle<UploadcareGroup> implements UploadGroupLifecycleInterface {
-
 }

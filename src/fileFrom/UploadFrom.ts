@@ -5,14 +5,14 @@ import {Thenable} from '../tools/Thenable'
 import {Uuid} from '../api/types'
 import {PollPromiseInterface} from '../tools/poll'
 import {InfoResponse} from '../api/info'
-import {UploadFromInterface} from './types'
+import {FileUploadInterface} from './types'
 
 /**
- * Base abstract `thenable` implementation of `UploadFromInterface`.
+ * Base abstract `thenable` implementation of `FileUploadInterface`.
  * You need to use this as base class for all uploading methods of `fileFrom`.
  * All that you need to implement — `promise` property and `cancel` method.
  */
-export abstract class UploadFrom extends Thenable<UploadcareFile> implements UploadFromInterface {
+export abstract class UploadFrom extends Thenable<UploadcareFile> implements FileUploadInterface {
   protected abstract readonly promise: Promise<UploadcareFile>
   protected isFileReadyPolling: PollPromiseInterface<InfoResponse> | null = null
   abstract cancel(): void
