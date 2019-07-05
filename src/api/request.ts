@@ -52,6 +52,36 @@ const MAX_CONTENT_LENGTH = 50 * 1000 * 1000
 const DEFAULT_FILE_NAME = 'original'
 const DEFAULT_RETRY_AFTER_TIMEOUT = 15000
 
+if (process.env.FOR_NODE) {
+  axios.interceptors.request.use(
+    function(config) {
+      const {data, onUploadProgress} = config
+      if (!onUploadProgress) {
+        return config
+      }
+
+      const total = data.getLengthSync()
+
+      let loaded = 0
+
+      data.on('data', chunk => {
+        console.log(chunk)
+        loaded += chunk.length
+
+        onUploadProgress({
+          total,
+          loaded,
+        } as ProgressEvent)
+      })
+
+      return config
+    },
+    function(error) {
+      return Promise.reject(error)
+    }
+  )
+}
+
 /**
  * Updates options with Uploadcare Settings
  *

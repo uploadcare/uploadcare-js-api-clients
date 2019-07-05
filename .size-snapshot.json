@@ -19,13 +19,51 @@
     "gzipped": 5533
   },
   "dist/uploadcare-upload-client.js": {
-    "bundled": 93833,
-    "minified": 29688,
-    "gzipped": 9090
+    "bundled": 96243,
+    "minified": 30471,
+    "gzipped": 9199
   },
   "dist/uploadcare-upload-client.min.js": {
-    "bundled": 29872,
-    "minified": 29672,
-    "gzipped": 9111
+    "bundled": 30655,
+    "minified": 30435,
+    "gzipped": 9207
+  },
+  "dist/uploadcare-upload-client.browser.esm.js": {
+    "bundled": 48230,
+    "minified": 21381,
+    "gzipped": 5627,
+    "treeshaked": {
+      "rollup": {
+        "code": 16124,
+        "import_statements": 49
+      },
+      "webpack": {
+        "code": 19594
+      }
+    }
+  },
+  "dist/uploadcare-upload-client.browser.cjs.js": {
+    "bundled": 48318,
+    "minified": 21457,
+    "gzipped": 5652
+  },
+  "dist/uploadcare-upload-client.node.esm.js": {
+    "bundled": 48828,
+    "minified": 21625,
+    "gzipped": 5724,
+    "treeshaked": {
+      "rollup": {
+        "code": 16364,
+        "import_statements": 49
+      },
+      "webpack": {
+        "code": 19836
+      }
+    }
+  },
+  "dist/uploadcare-upload-client.node.cjs.js": {
+    "bundled": 48916,
+    "minified": 21701,
+    "gzipped": 5749
   }
 }

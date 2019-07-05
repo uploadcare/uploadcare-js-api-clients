@@ -7,9 +7,12 @@ import {terser} from 'rollup-plugin-terser'
 import {sizeSnapshot} from 'rollup-plugin-size-snapshot'
 import json from 'rollup-plugin-json'
 
-const getPlugins = (format, minify = false) =>
+const getPlugins = (format, env, minify = false) =>
   [
-    replace({'process.env.NODE_ENV': process.env.NODE_ENV}),
+    replace({
+      'process.env.NODE_ENV': process.env.NODE_ENV,
+      'process.env.FOR_NODE': env === 'node',
+    }),
     json(),
     resolve({browser: format === 'umd'}),
     format === 'umd' &&
@@ -30,19 +33,19 @@ const getPlugins = (format, minify = false) =>
     sizeSnapshot(),
   ].filter(plugin => !!plugin)
 
-const chosePostfix = (format, minify = false) => {
+const chosePostfix = (format, env, minify = false) => {
   if (minify) return '.min'
   if (format === 'umd') return ''
-  else return `.${format}`
+  else return `.${env}.${format}`
 }
 
-const getConfig = (format, minify = false) => ({
+const getConfig = (format, env, minify = false) => ({
   input: 'src/index.ts',
-  plugins: getPlugins(format, minify),
+  plugins: getPlugins(format, env, minify),
   external: format === 'umd' ? [] : ['axios', 'form-data'],
   output: [
     {
-      file: `dist/uploadcare-upload-client${chosePostfix(format, minify)}.js`,
+      file: `dist/uploadcare-upload-client${chosePostfix(format, env, minify)}.js`,
       format,
       name: 'uploadcareAPI',
       interop: false,
@@ -50,4 +53,12 @@ const getConfig = (format, minify = false) => ({
   ],
 })
 
-export default [getConfig('esm'), getConfig('cjs'), getConfig('umd'), getConfig('umd', true)]
+export default [
+  getConfig('esm', 'browser'),
+  getConfig('cjs', 'browser'),
+  getConfig('umd', 'browser'),
+  getConfig('umd', 'browser', true),
+
+  getConfig('esm', 'node'),
+  getConfig('cjs', 'node'),
+]
