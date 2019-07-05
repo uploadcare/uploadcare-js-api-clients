@@ -1,4 +1,4 @@
-import {UploadcareGroup} from '../types'
+import {UploadcareGroupInterface} from '../types'
 import {UploadInterface} from '../lifecycle/types'
 
 export enum GroupFrom {
@@ -11,4 +11,4 @@ export enum GroupFrom {
 /**
  * Base `thenable` interface for uploading `filesGroupFrom` (`object`, `url`, `input`, `uploaded`).
  */
-export interface GroupUploadInterface extends UploadInterface<UploadcareGroup> {}
+export interface GroupUploadInterface extends UploadInterface<UploadcareGroupInterface> {}

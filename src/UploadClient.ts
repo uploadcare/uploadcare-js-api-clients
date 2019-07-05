@@ -7,6 +7,8 @@ import {FileUploadInterface} from './fileFrom/types'
 import {Url} from './api/fromUrl'
 import {UploadAPIInterface} from './api/UploadAPI'
 import {Uuid} from './api/types'
+import groupFrom from './groupFrom/groupFrom'
+import {GroupFrom, GroupUploadInterface} from './groupFrom/types'
 
 export interface UploadClientInterface {
   setSettings(newSettings: Settings): void
@@ -18,6 +20,8 @@ export interface UploadClientInterface {
   removeUpdateSettingsListener(listener: Function): void
 
   fileFrom(from: FileFrom, data: FileData | Url | Uuid, settings?: Settings): FileUploadInterface
+
+  groupFrom(from: GroupFrom, data: FileData[] | Url[] | Uuid[], settings?: Settings): GroupUploadInterface
 }
 
 class UploadClient implements UploadClientInterface {
@@ -67,6 +71,13 @@ class UploadClient implements UploadClientInterface {
 
   fileFrom(from: FileFrom, data: FileData | Url | Uuid, settings: Settings = {}): FileUploadInterface {
     return fileFrom(from, data, {
+      ...this.settings,
+      ...settings,
+    })
+  }
+
+  groupFrom(from: GroupFrom, data: FileData[] | Url[] | Uuid[], settings: Settings = {}): GroupUploadInterface {
+    return groupFrom(from, data, {
       ...this.settings,
       ...settings,
     })

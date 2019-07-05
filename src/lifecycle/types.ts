@@ -1,4 +1,4 @@
-import {ProgressParams, Settings, UploadcareFile, UploadcareGroup, UploadingProgress} from '../types'
+import {ProgressParams, Settings, UploadcareFileInterface, UploadcareGroupInterface, UploadingProgress} from '../types'
 import {Uuid} from '..'
 import {CancelableInterface, GroupInfo} from '../api/types'
 
@@ -10,8 +10,8 @@ export interface HooksInterface<T> {
 }
 
 export interface UploadInterface<T> extends
-  Promise<T>,
   HooksInterface<T>,
+  Promise<T>,
   CancelableInterface {
 }
 
@@ -28,15 +28,15 @@ export interface LifecycleInterface<T> extends HooksInterface<T> {
   handleUploading(progress?: ProgressParams): void
   handleCancelling(): void
   handleReady(): Promise<T>
-  handleError(error: Error): void
+  handleError(error: Error)
 }
 
 export interface FileUploadLifecycleInterface {
-  getUploadLifecycle(): LifecycleInterface<UploadcareFile>
-  handleUploadedFile(uuid: Uuid, settings: Settings): Promise<UploadcareFile>
+  getUploadLifecycle(): LifecycleInterface<UploadcareFileInterface>
+  handleUploadedFile(uuid: Uuid, settings: Settings): Promise<UploadcareFileInterface>
 }
 
 export interface GroupUploadLifecycleInterface {
-  getUploadLifecycle(): LifecycleInterface<UploadcareGroup>
-  handleUploadedGroup(groupInfo: GroupInfo, settings: Settings): Promise<UploadcareGroup>
+  getUploadLifecycle(): LifecycleInterface<UploadcareGroupInterface>
+  handleUploadedGroup(groupInfo: GroupInfo, settings: Settings): Promise<UploadcareGroupInterface>
 }

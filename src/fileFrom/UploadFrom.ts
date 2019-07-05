@@ -1,4 +1,4 @@
-import {Settings, UploadcareFile, UploadingProgress, ProgressState, ProgressParams} from '../types'
+import {Settings, UploadcareFileInterface, UploadingProgress, ProgressState, ProgressParams} from '../types'
 import checkFileIsReady from '../checkFileIsReady'
 import prettyFileInfo from '../prettyFileInfo'
 import {Thenable} from '../tools/Thenable'
@@ -6,14 +6,16 @@ import {Uuid} from '../api/types'
 import {PollPromiseInterface} from '../tools/poll'
 import {InfoResponse} from '../api/info'
 import {FileUploadInterface} from './types'
+import {UploadcareFile} from '../UploadcareFile'
+import set = Reflect.set
 
 /**
  * Base abstract `thenable` implementation of `FileUploadInterface`.
  * You need to use this as base class for all uploading methods of `fileFrom`.
  * All that you need to implement — `promise` property and `cancel` method.
  */
-export abstract class UploadFrom extends Thenable<UploadcareFile> implements FileUploadInterface {
-  protected abstract readonly promise: Promise<UploadcareFile>
+export abstract class UploadFrom extends Thenable<UploadcareFileInterface> implements FileUploadInterface {
+  protected abstract readonly promise: Promise<UploadcareFileInterface>
   protected isFileReadyPolling: PollPromiseInterface<InfoResponse> | null = null
   abstract cancel(): void
 
@@ -22,11 +24,11 @@ export abstract class UploadFrom extends Thenable<UploadcareFile> implements Fil
     uploaded: null,
     value: 0,
   }
-  protected file: UploadcareFile | null = null
+  protected file: UploadcareFileInterface | null = null
 
   onProgress: ((progress: UploadingProgress) => void) | null = null
   onUploaded: ((uuid: string) => void) | null = null
-  onReady: ((file: UploadcareFile) => void) | null = null
+  onReady: ((file: UploadcareFileInterface) => void) | null = null
   onCancel: VoidFunction | null = null
 
   protected constructor() {
@@ -86,12 +88,12 @@ export abstract class UploadFrom extends Thenable<UploadcareFile> implements Fil
     return this.progress
   }
 
-  protected setFile(file: UploadcareFile) {
+  protected setFile(file: UploadcareFileInterface) {
     this.file = file
   }
 
-  protected getFile(): UploadcareFile {
-    return this.file as UploadcareFile
+  protected getFile(): UploadcareFileInterface {
+    return this.file as UploadcareFileInterface
   }
 
   /**
@@ -122,10 +124,11 @@ export abstract class UploadFrom extends Thenable<UploadcareFile> implements Fil
    * @param {Uuid} uuid
    * @param {Settings} settings
    */
-  protected handleUploaded(uuid: Uuid, settings: Settings): Promise<UploadcareFile> {
-    this.setFile({
+  protected handleUploaded(uuid: Uuid, settings: Settings): Promise<UploadcareFileInterface> {
+    this.setFile(new UploadcareFile({
       uuid,
       name: null,
+      // @ts-ignore
       size: null,
       isStored: null,
       isImage: null,
@@ -134,7 +137,7 @@ export abstract class UploadFrom extends Thenable<UploadcareFile> implements Fil
       originalUrl: null,
       originalFilename: null,
       originalImageInfo: null,
-    })
+    }, settings))
 
     this.setProgress(ProgressState.Uploaded)
 
@@ -149,7 +152,7 @@ export abstract class UploadFrom extends Thenable<UploadcareFile> implements Fil
 
     return this.isFileReadyPolling
       .then(info => {
-        this.setFile(prettyFileInfo(info, settings))
+        this.setFile(new UploadcareFile(info, settings))
 
         return Promise.resolve(this.getFile())
       })
@@ -159,7 +162,7 @@ export abstract class UploadFrom extends Thenable<UploadcareFile> implements Fil
   /**
    * Handle uploaded file that ready on CDN.
    */
-  protected handleReady = (): Promise<UploadcareFile> => {
+  protected handleReady = (): Promise<UploadcareFileInterface> => {
     this.setProgress(ProgressState.Ready)
 
     if (typeof this.onProgress === 'function') {

@@ -1,6 +1,6 @@
 import {AbstractState} from './AbstractState'
-import {LifecycleStateInterface} from './types'
-import {ProgressState, UploadingProgress} from '../types'
+import {LifecycleStateInterface} from '../types'
+import {ProgressState, UploadingProgress} from '../../types'
 
 export class CancelledState extends AbstractState implements LifecycleStateInterface {
   readonly progress: UploadingProgress = {
@@ -8,7 +8,5 @@ export class CancelledState extends AbstractState implements LifecycleStateInter
     uploaded: null,
     value: 0,
   }
-  protected next: ProgressState[] = [
-    ProgressState.Error,
-  ]
+  protected nextPossibleState: ProgressState[] = []
 }

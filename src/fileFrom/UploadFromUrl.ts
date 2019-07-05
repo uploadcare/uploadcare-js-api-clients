@@ -1,5 +1,5 @@
 import fromUrl, {FromUrlResponse, isFileInfoResponse, isTokenResponse, Url} from '../api/fromUrl'
-import {Settings, UploadcareFile, ProgressState} from '../types'
+import {Settings, UploadcareFileInterface, ProgressState} from '../types'
 import fromUrlStatus, {
   FromUrlStatusResponse,
   isErrorResponse,
@@ -15,7 +15,7 @@ import CancelError from '../errors/CancelError'
 import {Uuid} from '../api/types'
 
 export class UploadFromUrl extends UploadFrom {
-  protected readonly promise: Promise<UploadcareFile>
+  protected readonly promise: Promise<UploadcareFileInterface>
   private isFileUploadedFromUrlPolling: PollPromiseInterface<FromUrlStatusResponse> | null = null
   private isCancelled: boolean = false
   private unknownStatusWasTimes: number = 0
@@ -32,7 +32,7 @@ export class UploadFromUrl extends UploadFrom {
     this.promise = this.getFilePromise()
   }
 
-  private getFilePromise = (): Promise<UploadcareFile> => {
+  private getFilePromise = (): Promise<UploadcareFileInterface> => {
     this.handleUploading()
 
     return fromUrl(this.data, this.settings)

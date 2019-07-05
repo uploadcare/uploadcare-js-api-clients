@@ -1,13 +1,14 @@
-import {FileData, Settings, UploadcareFile, UploadingProgress} from '../types'
+import {FileData, Settings, UploadcareFileInterface, UploadingProgress} from '../types'
 import base, {DirectUploadInterface} from '../api/base'
-import {FileUploadLifecycleInterface} from '../lifecycle/types'
+import {FileUploadLifecycleInterface, LifecycleInterface} from '../lifecycle/types'
 import {Thenable} from '../tools/Thenable'
 import {FileUploadInterface} from './types'
 
-export class UploadFromObject extends Thenable<UploadcareFile> implements FileUploadInterface {
-  protected readonly promise: Promise<UploadcareFile>
+export class UploadFromObject extends Thenable<UploadcareFileInterface> implements FileUploadInterface {
+  protected readonly promise: Promise<UploadcareFileInterface>
 
-  private readonly lifecycle: FileUploadLifecycleInterface
+  private readonly fileUploadLifecycle: FileUploadLifecycleInterface
+  private readonly uploadLifecycle: LifecycleInterface<UploadcareFileInterface>
   private readonly data: FileData
   private readonly settings: Settings
 
@@ -15,58 +16,49 @@ export class UploadFromObject extends Thenable<UploadcareFile> implements FileUp
 
   onProgress: ((progress: UploadingProgress) => void) | null = null
   onUploaded: ((uuid: string) => void) | null = null
-  onReady: ((file: UploadcareFile) => void) | null = null
+  onReady: ((file: UploadcareFileInterface) => void) | null = null
   onCancel: VoidFunction | null = null
 
   constructor(lifecycle: FileUploadLifecycleInterface, data: FileData, settings: Settings) {
     super()
-    this.lifecycle = lifecycle
-
-    this.lifecycle.getUploadLifecycle().onProgress = this.onProgress
-    this.lifecycle.getUploadLifecycle().onUploaded = this.onUploaded
-    this.lifecycle.getUploadLifecycle().onReady = this.onReady
-    this.lifecycle.getUploadLifecycle().onCancel = this.onCancel
+    this.fileUploadLifecycle = lifecycle
+    this.uploadLifecycle = this.fileUploadLifecycle.getUploadLifecycle()
 
     this.data = data
     this.settings = settings
 
     this.request = base(this.data, this.settings)
     this.promise = this.getFilePromise()
+
+    console.log(this.onProgress, this.onUploaded, this.onReady, this.onCancel)
   }
 
-  private async getFilePromise(): Promise<UploadcareFile> {
-    const fileUpload = this.request
-    const lifecycle = this.lifecycle.getUploadLifecycle()
+  private getFilePromise(): Promise<UploadcareFileInterface> {
+    this.uploadLifecycle.onProgress = this.onProgress
+    this.uploadLifecycle.onUploaded = this.onUploaded
+    this.uploadLifecycle.onReady = this.onReady
+    this.uploadLifecycle.onCancel = this.onCancel
 
-    lifecycle.handleUploading()
+    const fileUpload = this.request
+    const uploadLifecycle = this.uploadLifecycle
+    const fileUploadLifecycle = this.fileUploadLifecycle
+
+    uploadLifecycle.handleUploading()
 
     fileUpload.onProgress = (progressEvent) =>
-      lifecycle.handleUploading({
+      uploadLifecycle.handleUploading({
         total: progressEvent.total,
         loaded: progressEvent.loaded,
       })
 
-    fileUpload.onCancel = lifecycle.handleCancelling
+    fileUpload.onCancel = uploadLifecycle.handleCancelling
 
-    const {file: uuid} = await fileUpload
+    // console.log(fileUploadLifecycle, uploadLifecycle)
 
-    await this.lifecycle.handleUploadedFile(uuid, this.settings)
-
-    return lifecycle.handleReady()
-
-    // return new Promise((resolve, reject) => {
-    //   lifecycle.handleReady, lifecycle.handleError
-    // })
-
-    // try {
-    //   const {file: uuid} = await fileUpload
-    //
-    //   await lifecycle.handleUploadedFile(uuid, this.settings)
-    //
-    //   return lifecycle.handleReady()
-    // } catch (error) {
-    //   lifecycle.handleError(error)
-    // }
+    return fileUpload
+      .then(({file: uuid}) => fileUploadLifecycle.handleUploadedFile(uuid, this.settings))
+      .then(uploadLifecycle.handleReady)
+      .catch(uploadLifecycle.handleError)
   }
 
   cancel(): void {

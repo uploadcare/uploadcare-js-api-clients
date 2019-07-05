@@ -33,31 +33,31 @@ export type OriginalImageInfo = {
 }
 
 /* TODO Add sourceInfo */
-export type UploadcareFile = {
-  uuid: string,
-  name: null | string,
-  size: null | number,
-  isStored: null | boolean,
-  isImage: null | boolean,
-  cdnUrl: null | string,
-  cdnUrlModifiers: null | string,
-  originalUrl: null | string,
-  originalFilename: null | string,
-  originalImageInfo: null | OriginalImageInfo,
+export interface UploadcareFileInterface {
+  readonly uuid: string,
+  readonly name: null | string,
+  readonly size: null | number,
+  readonly isStored: null | boolean,
+  readonly isImage: null | boolean,
+  readonly cdnUrl: null | string,
+  readonly cdnUrlModifiers: null | string,
+  readonly originalUrl: null | string,
+  readonly originalFilename: null | string,
+  readonly originalImageInfo: null | OriginalImageInfo,
 }
 
-export type UploadcareFiles = Array<UploadcareFile>
+export type UploadcareFiles = UploadcareFileInterface[]
 
-export type UploadcareGroup = {
-  uuid: GroupId,
-  filesCount: string,
-  totalSize: number,
-  isStored: boolean,
-  isImage: boolean,
-  cdnUrl: string,
-  files: Array<FileInfo>,
-  createdAt: string,
-  storedAt: string | null,
+export interface UploadcareGroupInterface {
+  readonly uuid: GroupId,
+  readonly filesCount: string,
+  readonly totalSize: number,
+  readonly isStored: boolean,
+  readonly isImage: boolean,
+  readonly cdnUrl: string,
+  readonly files: FileInfo[],
+  readonly createdAt: string,
+  readonly storedAt: string | null,
 }
 
 export enum ProgressState {

@@ -1,12 +1,14 @@
-import {ProgressParams, Settings, UploadcareFiles, UploadcareGroup} from '../types'
+import {ProgressParams, Settings, UploadcareFiles, UploadcareGroupInterface} from '../types'
 import {Thenable} from '../tools/Thenable'
 import {ProgressState, UploadingProgress} from '../types'
 import {GroupInfo} from '../api/types'
 import {GroupUploadLifecycleInterface} from '../lifecycle/types'
 import {GroupUploadInterface} from './types'
+import {UploadedState} from '../lifecycle/state/UploadedState'
+import {UploadcareGroup} from '../UploadcareGroup'
 
-export abstract class UploadGroupFrom extends Thenable<UploadcareGroup> implements GroupUploadInterface {
-  protected abstract readonly promise: Promise<UploadcareGroup>
+export abstract class UploadGroupFrom extends Thenable<UploadcareGroupInterface> implements GroupUploadInterface {
+  protected abstract readonly promise: Promise<UploadcareGroupInterface>
   protected abstract lifecycle: GroupUploadLifecycleInterface
   abstract cancel(): void
   abstract getFiles(): Promise<UploadcareFiles>
@@ -17,11 +19,11 @@ export abstract class UploadGroupFrom extends Thenable<UploadcareGroup> implemen
     value: 0,
   }
   protected files: UploadcareFiles | null = null
-  protected group: UploadcareGroup | null = null
+  protected group: UploadcareGroupInterface | null = null
 
   onProgress: ((progress: UploadingProgress) => void) | null = null
   onUploaded: ((uuid: string) => void) | null = null
-  onReady: ((group: UploadcareGroup) => void) | null = null
+  onReady: ((group: UploadcareGroupInterface) => void) | null = null
   onCancel: VoidFunction | null = null
 
   /**
@@ -29,25 +31,16 @@ export abstract class UploadGroupFrom extends Thenable<UploadcareGroup> implemen
    * @param {GroupInfo} groupInfo
    * @param {Settings} settings
    */
-  protected handleUploaded(groupInfo: GroupInfo, settings: Settings): Promise<UploadcareGroup> {
-    this.lifecycle.updateEntity({
-      uuid: groupInfo.id,
-      filesCount: groupInfo.files_count,
-      totalSize: groupInfo.files.reduce((acc, file) => acc + file.size, 0),
-      isStored: !!groupInfo.datetime_stored,
-      isImage: !!groupInfo.files.filter(file => file.is_image).length,
-      cdnUrl: groupInfo.cdn_url,
-      files: groupInfo.files,
-      createdAt: groupInfo.datetime_created,
-      storedAt: groupInfo.datetime_stored,
-    })
+  protected handleUploaded(groupInfo: GroupInfo, settings: Settings): Promise<UploadcareGroupInterface> {
+    const uploadLifecycle = this.lifecycle.getUploadLifecycle()
+    uploadLifecycle.updateEntity(new UploadcareGroup(groupInfo))
 
-    this.lifecycle.updateProgress(ProgressState.Uploaded)
+    uploadLifecycle.updateState(new UploadedState())
 
     if (typeof this.onUploaded === 'function') {
       this.onUploaded(groupInfo.id)
     }
 
-    return Promise.resolve(this.lifecycle.getEntity())
+    return Promise.resolve(uploadLifecycle.getEntity())
   }
 }

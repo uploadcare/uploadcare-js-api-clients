@@ -1,21 +1,21 @@
 import {FileUploadLifecycleInterface, LifecycleInterface} from './types'
-import {Settings, UploadcareFile} from '../types'
+import {Settings, UploadcareFileInterface} from '../types'
 import {Uuid} from '..'
 import checkFileIsReady from '../checkFileIsReady'
 import prettyFileInfo from '../prettyFileInfo'
-import {UploadedState} from './UploadedState'
+import {UploadedState} from './state/UploadedState'
 import {PollPromiseInterface} from '../tools/poll'
 import {InfoResponse} from '../api/info'
 
 export class FileUploadLifecycle implements FileUploadLifecycleInterface {
-  private readonly lifecycle: LifecycleInterface<UploadcareFile>
-  protected isFileReadyPolling: PollPromiseInterface<InfoResponse> | null = null
+  private readonly lifecycle: LifecycleInterface<UploadcareFileInterface>
+  private isFileReadyPolling: PollPromiseInterface<InfoResponse> | null = null
 
-  constructor(lifecycle: LifecycleInterface<UploadcareFile>) {
+  constructor(lifecycle: LifecycleInterface<UploadcareFileInterface>) {
     this.lifecycle = lifecycle
   }
 
-  handleUploadedFile(uuid: Uuid, settings: Settings): Promise<UploadcareFile> {
+  handleUploadedFile(uuid: Uuid, settings: Settings): Promise<UploadcareFileInterface> {
     this.lifecycle.updateEntity({
       uuid,
       name: null,
@@ -49,7 +49,7 @@ export class FileUploadLifecycle implements FileUploadLifecycleInterface {
       .catch(error => Promise.reject(error))
   }
 
-  getUploadLifecycle(): LifecycleInterface<UploadcareFile> {
+  getUploadLifecycle(): LifecycleInterface<UploadcareFileInterface> {
     return this.lifecycle
   }
 }

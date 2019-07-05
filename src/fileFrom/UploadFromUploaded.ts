@@ -1,11 +1,11 @@
-import {Settings, UploadcareFile, ProgressState} from '../types'
+import {Settings, UploadcareFileInterface, ProgressState} from '../types'
 import {UploadFrom} from './UploadFrom'
 import info, {InfoResponse} from '../api/info'
 import {Uuid} from '../api/types'
 import CancelError from '../errors/CancelError'
 
 export class UploadFromUploaded extends UploadFrom {
-  protected readonly promise: Promise<UploadcareFile>
+  protected readonly promise: Promise<UploadcareFileInterface>
   private isCancelled: boolean = false
 
   protected readonly data: Uuid
@@ -23,7 +23,7 @@ export class UploadFromUploaded extends UploadFrom {
     this.promise = this.getFilePromise()
   }
 
-  private getFilePromise = (): Promise<UploadcareFile> => {
+  private getFilePromise = (): Promise<UploadcareFileInterface> => {
     this.handleUploading()
 
     return info(this.data, this.settings)

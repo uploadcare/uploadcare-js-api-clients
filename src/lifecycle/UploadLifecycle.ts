@@ -3,11 +3,11 @@ import {
   LifecycleInterface,
   LifecycleStateInterface
 } from './types'
-import {UploadingState} from './UploadingState'
-import {CancelledState} from './CancelledState'
-import {ReadyState} from './ReadyState'
-import {ErrorState} from './ErrorState'
-import {PendingState} from './PendingState'
+import {UploadingState} from './state/UploadingState'
+import {CancelledState} from './state/CancelledState'
+import {ReadyState} from './state/ReadyState'
+import {ErrorState} from './state/ErrorState'
+import {PendingState} from './state/PendingState'
 
 export class UploadLifecycle<T> implements LifecycleInterface<T> {
   protected state: LifecycleStateInterface
@@ -20,6 +20,14 @@ export class UploadLifecycle<T> implements LifecycleInterface<T> {
 
   constructor() {
     this.state = new PendingState()
+    this.updateState = this.updateState.bind(this)
+    this.getProgress = this.getProgress.bind(this)
+    this.updateEntity = this.updateEntity.bind(this)
+    this.getEntity = this.getEntity.bind(this)
+    this.handleUploading = this.handleUploading.bind(this)
+    this.handleCancelling = this.handleCancelling.bind(this)
+    this.handleReady = this.handleReady.bind(this)
+    this.handleError = this.handleError.bind(this)
   }
 
   updateState(state: LifecycleStateInterface): void {

@@ -1,4 +1,4 @@
-import {UploadcareFile, UploadcareGroup} from '../types'
+import {UploadcareFileInterface, UploadcareGroupInterface} from '../types'
 
 interface StatusInterface {
   status: string,

@@ -1,10 +1,10 @@
 import {AbstractState} from './AbstractState'
-import {LifecycleStateInterface} from './types'
-import {ProgressParams, ProgressState, UploadingProgress} from '../types'
+import {LifecycleStateInterface} from '../types'
+import {ProgressParams, ProgressState, UploadingProgress} from '../../types'
 
 export class UploadingState extends AbstractState implements LifecycleStateInterface {
   readonly progress: UploadingProgress
-  protected next: ProgressState[] = [
+  protected nextPossibleState: ProgressState[] = [
     ProgressState.Uploaded,
     ProgressState.Ready,
     ProgressState.Canceled,

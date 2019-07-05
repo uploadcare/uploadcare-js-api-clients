@@ -1,22 +1,26 @@
 import {GroupUploadLifecycleInterface, LifecycleInterface} from './types'
 import {GroupInfo} from '../api/types'
-import {Settings, UploadcareGroup} from '../types'
-import {UploadedState} from './UploadedState'
+import {Settings, UploadcareGroupInterface} from '../types'
+import {UploadedState} from './state/UploadedState'
 
 export class GroupUploadLifecycle implements GroupUploadLifecycleInterface {
-  private readonly lifecycle: LifecycleInterface<UploadcareGroup>
+  private readonly lifecycle: LifecycleInterface<UploadcareGroupInterface>
 
-  constructor(lifecycle: LifecycleInterface<UploadcareGroup>) {
+  constructor(lifecycle: LifecycleInterface<UploadcareGroupInterface>) {
     this.lifecycle = lifecycle
   }
 
-  handleUploadedGroup(groupInfo: GroupInfo, settings: Settings): Promise<UploadcareGroup> {
+  handleUploadedGroup(groupInfo: GroupInfo, settings: Settings): Promise<UploadcareGroupInterface> {
+    const totalSize = groupInfo.files.reduce((acc, file) => acc + file.size, 0)
+    const isStored = !!groupInfo.datetime_stored
+    const isImage = !!groupInfo.files.filter(file => file.is_image).length
+
     this.lifecycle.updateEntity({
       uuid: groupInfo.id,
       filesCount: groupInfo.files_count,
-      totalSize: groupInfo.files.reduce((acc, file) => acc + file.size, 0),
-      isStored: !!groupInfo.datetime_stored,
-      isImage: !!groupInfo.files.filter(file => file.is_image).length,
+      totalSize,
+      isStored,
+      isImage,
       cdnUrl: groupInfo.cdn_url,
       files: groupInfo.files,
       createdAt: groupInfo.datetime_created,
@@ -32,7 +36,7 @@ export class GroupUploadLifecycle implements GroupUploadLifecycleInterface {
     return Promise.resolve(this.lifecycle.getEntity())
   }
 
-  getUploadLifecycle(): LifecycleInterface<UploadcareGroup> {
+  getUploadLifecycle(): LifecycleInterface<UploadcareGroupInterface> {
     return this.lifecycle
   }
 }

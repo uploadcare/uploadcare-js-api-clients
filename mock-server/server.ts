@@ -65,7 +65,7 @@ app.listen(PORT, () => {
 //
 // })
 //
-// app.use(async (ctx, next) => {
+// app.use(async (ctx, nextPossibleState) => {
 //   process.stdout.write('\x1Bc')
-//   await next()
+//   await nextPossibleState()
 // })
