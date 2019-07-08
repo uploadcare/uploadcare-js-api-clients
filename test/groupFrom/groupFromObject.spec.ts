@@ -4,7 +4,7 @@ import {GroupFrom} from '../../src/groupFrom/types'
 import {getSettingsForTesting} from '../_helpers'
 
 fdescribe('groupFrom', () => {
-  describe('Object', () => {
+  describe('Object[]', () => {
     const fileToUpload = factory.image('blackSquare')
 
     it('should resolves when file is ready on CDN', (done) => {
@@ -44,18 +44,6 @@ fdescribe('groupFrom', () => {
       groupPromise
         .then(() => done.fail('Promise should not to be resolved'))
         .catch((error) => error.name === 'CancelError' ? done() : done.fail(error))
-    })
-
-    it('should accept new file name setting', async() => {
-      const settings = getSettingsForTesting({
-        publicKey: factory.publicKey('demo'),
-        doNotStore: true,
-        fileName: 'newFileName.jpg',
-      })
-      const groupPromise = groupFrom(GroupFrom.Object, [fileToUpload.data], settings)
-      const group = await groupPromise
-
-      expect(group.name).toEqual('newFileName.jpg')
     })
 
     describe('should be able to handle', () => {
