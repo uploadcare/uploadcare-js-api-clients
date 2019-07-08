@@ -52,7 +52,7 @@ const MAX_CONTENT_LENGTH = 50 * 1000 * 1000
 const DEFAULT_FILE_NAME = 'original'
 const DEFAULT_RETRY_AFTER_TIMEOUT = 15000
 
-if (process.env.FOR_NODE) {
+if (process.env.BUNDLE_ENV === 'node') {
   axios.interceptors.request.use(
     function(config) {
       const {data, onUploadProgress} = config

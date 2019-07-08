@@ -11,7 +11,7 @@ const getPlugins = (format, env, minify = false) =>
   [
     replace({
       'process.env.NODE_ENV': process.env.NODE_ENV,
-      'process.env.FOR_NODE': env === 'node',
+      'process.env.BUNDLE_ENV': env,
     }),
     json(),
     resolve({browser: format === 'umd'}),
