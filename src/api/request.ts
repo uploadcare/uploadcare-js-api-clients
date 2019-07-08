@@ -54,7 +54,7 @@ const DEFAULT_RETRY_AFTER_TIMEOUT = 15000
 
 if (process.env.BUNDLE_ENV === 'node') {
   axios.interceptors.request.use(
-    function(config) {
+    config => {
       const {data, onUploadProgress} = config
       if (!onUploadProgress) {
         return config
@@ -75,7 +75,7 @@ if (process.env.BUNDLE_ENV === 'node') {
 
       return config
     },
-    function(error) {
+    error => {
       return Promise.reject(error)
     }
   )
