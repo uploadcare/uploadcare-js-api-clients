@@ -65,7 +65,6 @@ if (process.env.BUNDLE_ENV === 'node') {
       let loaded = 0
 
       data.on('data', chunk => {
-        console.log(chunk)
         loaded += chunk.length
 
         onUploadProgress({
