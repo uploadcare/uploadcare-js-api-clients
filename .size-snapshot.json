@@ -1,69 +1,31 @@
 {
   "dist/uploadcare-upload-client.esm.js": {
-    "bundled": 46088,
-    "minified": 20378,
-    "gzipped": 5507,
+    "bundled": 49011,
+    "minified": 21736,
+    "gzipped": 5769,
     "treeshaked": {
       "rollup": {
-        "code": 16124,
+        "code": 16463,
         "import_statements": 49
       },
       "webpack": {
-        "code": 18789
+        "code": 19935
       }
     }
   },
   "dist/uploadcare-upload-client.cjs.js": {
-    "bundled": 46176,
-    "minified": 20454,
-    "gzipped": 5533
+    "bundled": 49099,
+    "minified": 21812,
+    "gzipped": 5794
   },
   "dist/uploadcare-upload-client.js": {
-    "bundled": 96243,
-    "minified": 30471,
-    "gzipped": 9199
+    "bundled": 97142,
+    "minified": 30810,
+    "gzipped": 9310
   },
   "dist/uploadcare-upload-client.min.js": {
-    "bundled": 30655,
-    "minified": 30435,
-    "gzipped": 9207
-  },
-  "dist/uploadcare-upload-client.browser.esm.js": {
-    "bundled": 48230,
-    "minified": 21381,
-    "gzipped": 5627,
-    "treeshaked": {
-      "rollup": {
-        "code": 16124,
-        "import_statements": 49
-      },
-      "webpack": {
-        "code": 19594
-      }
-    }
-  },
-  "dist/uploadcare-upload-client.browser.cjs.js": {
-    "bundled": 48318,
-    "minified": 21457,
-    "gzipped": 5652
-  },
-  "dist/uploadcare-upload-client.node.esm.js": {
-    "bundled": 48828,
-    "minified": 21625,
-    "gzipped": 5724,
-    "treeshaked": {
-      "rollup": {
-        "code": 16364,
-        "import_statements": 49
-      },
-      "webpack": {
-        "code": 19836
-      }
-    }
-  },
-  "dist/uploadcare-upload-client.node.cjs.js": {
-    "bundled": 48916,
-    "minified": 21701,
-    "gzipped": 5749
+    "bundled": 30994,
+    "minified": 30774,
+    "gzipped": 9311
   }
 }
