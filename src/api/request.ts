@@ -9,6 +9,7 @@ import {FileData, Settings} from '../types'
 import {BaseProgress} from './base'
 import {Thenable} from '../tools/Thenable'
 import {CancelableInterface} from './types'
+import {isNode} from '../tools/isNode'
 
 export type Query = {
   [key: string]: string | string[] | boolean | number | void,
@@ -52,7 +53,7 @@ const MAX_CONTENT_LENGTH = 50 * 1000 * 1000
 const DEFAULT_FILE_NAME = 'original'
 const DEFAULT_RETRY_AFTER_TIMEOUT = 15000
 
-if (process.env.BUNDLE_ENV === 'node') {
+if (isNode()) {
   axios.interceptors.request.use(
     config => {
       const {data, onUploadProgress} = config
