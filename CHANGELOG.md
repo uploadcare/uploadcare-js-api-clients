@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## Added
 
 * Wrappers for group paths of Upload API (`group`, `groupInfo`)
+* `onUploadProgress` for Node.js
 
 [Unreleased]: https://github.com/uploadcare/uploadcare-upload-client/compare/v1.0.0-alpha.3...HEAD
 
@@ -19,7 +20,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 * Support `fileFrom` 'uploaded' file (`uuid`)
 * Support of `waiting` status from `/from_url/status/` endpoint.
-* Export some main types from `index.ts` file. 
+* Export some main types from `index.ts` file.
   So you can import them now directly from `@uploadcare/upload-client`
 * Throttling for `request`
 * `retryThrottledMaxTimes` param to set count of max retries after throttled request (1 by default)
@@ -87,7 +88,7 @@ The first public alpha release.
 * Low-level request wrappers for `/base/` and `/info/` paths of Upload API.
 * `UploadClient` class with settings and `fileFrom` method that supports
   only direct uploads now.
-* Support of following Uploadcare Settings: `publicKey`, `baseUrl`, 
+* Support of following Uploadcare Settings: `publicKey`, `baseUrl`,
   `doNotStore`, `integration`, `secureExpire`, `secureSignature`.
 * Test environment for both Node.js and browsers
 
