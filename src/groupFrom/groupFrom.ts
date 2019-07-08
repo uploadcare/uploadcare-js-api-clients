@@ -1,11 +1,15 @@
-import {FileData, Settings} from '../types'
+import {FileData, Settings, UploadcareGroupInterface} from '../types'
 import {Url} from '../api/fromUrl'
 import {Uuid} from '../api/types'
 import {GroupFrom} from './types'
 import {GroupUploadInterface} from './types'
-import fileFrom from '../fileFrom/fileFrom'
-import group from '../api/group'
-// import {UploadGroupFromObject} from './UploadGroupFromObject'
+import {GroupUpload} from './GroupUpload'
+import {GroupUploadLifecycle} from '../lifecycle/GroupUploadLifecycle'
+import {UploadLifecycle} from '../lifecycle/UploadLifecycle'
+import {ObjectFilesGroupUploadHandler} from './ObjectFilesGroupUploadHandler'
+import {GroupCancelHandler} from './GroupCancelHandler'
+import {UrlFilesGroupUploadHandler} from './UrlFilesGroupUploadHandler'
+import {UploadedFilesGroupUploadHandler} from './UploadedFilesGroupUploadHandler'
 
 /**
  * Uploads group of files from provided data
@@ -15,19 +19,25 @@ import group from '../api/group'
  * @param {Settings} settings
  */
 export default function groupFrom(from: GroupFrom, data: FileData[] | Url[] | Uuid[], settings: Settings = {}): GroupUploadInterface {
+  const lifecycle = new UploadLifecycle<UploadcareGroupInterface>()
+  const groupUploadLifecycle = new GroupUploadLifecycle(lifecycle)
+  const groupCancelUpload = new GroupCancelHandler()
 
+  let groupUploadHandler
 
   switch (from) {
     case GroupFrom.Object:
-      const promises = data.map(item => fileFrom(from, item as FileData, settings))
-
-      return Promise.all(promises).then(files => {
-        const uuids = files.map(file => file.uuid)
-        return group(uuids, settings)
-      })
-
-      // return new UploadGroupFromObject(data as FileData[], settings)
+      groupUploadHandler = new ObjectFilesGroupUploadHandler(from, data as FileData[], settings)
+      break
+    case GroupFrom.URL:
+      groupUploadHandler = new UrlFilesGroupUploadHandler(from, data as Url[], settings)
+      break
+    case GroupFrom.Uploaded:
+      groupUploadHandler = new UploadedFilesGroupUploadHandler(from, data as Uuid[], settings)
+      break
     default:
-      throw new Error(`Files group uploading from "${from}" is not supported`)
+      throw new Error(`Group uploading from "${from}" is not supported`)
   }
+
+  return new GroupUpload(groupUploadLifecycle, groupUploadHandler, groupCancelUpload)
 }

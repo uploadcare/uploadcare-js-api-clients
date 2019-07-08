@@ -9,6 +9,6 @@ export enum GroupFrom {
 }
 
 /**
- * Base `thenable` interface for uploading `filesGroupFrom` (`object`, `url`, `input`, `uploaded`).
+ * Base `thenable` interface for uploading `groupFrom` (`object`, `url`, `input`, `uploaded`).
  */
 export interface GroupUploadInterface extends UploadInterface<UploadcareGroupInterface> {}

@@ -1,4 +1,4 @@
-import {Settings, UploadcareFileInterface, ProgressState} from '../types'
+import {Settings, ProgressState, UploadcareFileInterface} from '../types'
 import {UploadFrom} from './UploadFrom'
 import info, {InfoResponse} from '../api/info'
 import {Uuid} from '../api/types'

@@ -1,9 +1,9 @@
 import * as factory from '../_fixtureFactory'
-import fileFrom from '../../src/fileFrom/fileFrom'
-import {FileFrom} from '../../src/fileFrom/types'
+import groupFrom from '../../src/groupFrom/groupFrom'
+import {GroupFrom} from '../../src/groupFrom/types'
 import {getSettingsForTesting} from '../_helpers'
 
-describe('fileFrom', () => {
+fdescribe('groupFrom', () => {
   describe('Object', () => {
     const fileToUpload = factory.image('blackSquare')
 
@@ -11,11 +11,11 @@ describe('fileFrom', () => {
       const settings = getSettingsForTesting({
         publicKey: factory.publicKey('demo'),
       })
-      const filePromise = fileFrom(FileFrom.Object, fileToUpload.data, settings)
+      const groupPromise = groupFrom(GroupFrom.Object, [fileToUpload.data], settings)
 
-      filePromise
-        .then(file => {
-          expect(file.cdnUrl).toBeTruthy()
+      groupPromise
+        .then(group => {
+          expect(group.cdnUrl).toBeTruthy()
           done()
         })
     })
@@ -25,23 +25,23 @@ describe('fileFrom', () => {
         publicKey: factory.publicKey('demo'),
         doNotStore: true,
       })
-      const filePromise = fileFrom(FileFrom.Object, fileToUpload.data, settings)
-      const file = await filePromise
+      const groupPromise = groupFrom(GroupFrom.Object, [fileToUpload.data], settings)
+      const group = await groupPromise
 
-      expect(file.isStored).toBeFalsy()
+      expect(group.isStored).toBeFalsy()
     })
 
     it('should be able to cancel uploading', (done) => {
       const settings = getSettingsForTesting({
         publicKey: factory.publicKey('demo'),
       })
-      const filePromise = fileFrom(FileFrom.Object, fileToUpload.data, settings)
+      const groupPromise = groupFrom(GroupFrom.Object, [fileToUpload.data], settings)
 
       setTimeout(() => {
-        filePromise.cancel()
+        groupPromise.cancel()
       }, 1)
 
-      filePromise
+      groupPromise
         .then(() => done.fail('Promise should not to be resolved'))
         .catch((error) => error.name === 'CancelError' ? done() : done.fail(error))
     })
@@ -52,10 +52,10 @@ describe('fileFrom', () => {
         doNotStore: true,
         fileName: 'newFileName.jpg',
       })
-      const filePromise = fileFrom(FileFrom.Object, fileToUpload.data, settings)
-      const file = await filePromise
+      const groupPromise = groupFrom(GroupFrom.Object, [fileToUpload.data], settings)
+      const group = await groupPromise
 
-      expect(file.name).toEqual('newFileName.jpg')
+      expect(group.name).toEqual('newFileName.jpg')
     })
 
     describe('should be able to handle', () => {
@@ -63,17 +63,17 @@ describe('fileFrom', () => {
         const settings = getSettingsForTesting({
           publicKey: factory.publicKey('demo'),
         })
-        const filePromise = fileFrom(FileFrom.Object, fileToUpload.data, settings)
+        const groupPromise = groupFrom(GroupFrom.Object, [fileToUpload.data], settings)
 
         setTimeout(() => {
-          filePromise.cancel()
+          groupPromise.cancel()
         }, 1)
 
-        filePromise.onCancel = () => {
+        groupPromise.onCancel = () => {
           done()
         }
 
-        filePromise
+        groupPromise
           .then(() => done.fail('Promise should not to be resolved'))
           .catch((error) => {
             if (error.name !== 'CancelError') {
@@ -87,15 +87,15 @@ describe('fileFrom', () => {
         const settings = getSettingsForTesting({
           publicKey: factory.publicKey('demo'),
         })
-        const filePromise = fileFrom(FileFrom.Object, fileToUpload.data, settings)
+        const groupPromise = groupFrom(GroupFrom.Object, [fileToUpload.data], settings)
 
-        filePromise.onProgress = (progress) => {
+        groupPromise.onProgress = (progress) => {
           const {value} = progress
 
           progressValue = value
         }
 
-        filePromise
+        groupPromise
           .then(() =>
             progressValue > 0
               ? done()
@@ -108,13 +108,13 @@ describe('fileFrom', () => {
         const settings = getSettingsForTesting({
           publicKey: factory.publicKey('demo'),
         })
-        const filePromise = fileFrom(FileFrom.Object, fileToUpload.data, settings)
+        const groupPromise = groupFrom(GroupFrom.Object, [fileToUpload.data], settings)
 
-        filePromise.onUploaded = () => {
+        groupPromise.onUploaded = () => {
           done()
         }
 
-        filePromise
+        groupPromise
           .catch(error => done.fail(error))
       })
 
@@ -122,13 +122,13 @@ describe('fileFrom', () => {
         const settings = getSettingsForTesting({
           publicKey: factory.publicKey('demo'),
         })
-        const filePromise = fileFrom(FileFrom.Object, fileToUpload.data, settings)
+        const groupPromise = groupFrom(GroupFrom.Object, [fileToUpload.data], settings)
 
-        filePromise.onReady = () => {
+        groupPromise.onReady = () => {
           done()
         }
 
-        filePromise
+        groupPromise
           .catch(error => done.fail(error))
       })
     })

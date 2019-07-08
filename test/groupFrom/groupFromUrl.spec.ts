@@ -4,23 +4,33 @@ import {FileFrom} from '../../src/fileFrom/types'
 import {getSettingsForTesting} from '../_helpers'
 
 describe('fileFrom', () => {
-  describe('Uploaded', () => {
-    const uuid = factory.uuid('image')
+  describe('URL', () => {
+    const sourceUrl = factory.imageUrl('valid')
 
     it('should resolves when file is ready on CDN', async() => {
       const settings = getSettingsForTesting({
-        publicKey: factory.publicKey('image'),
+        publicKey: factory.publicKey('demo'),
       })
-      const file = await fileFrom(FileFrom.Uploaded, uuid, settings)
+      const file = await fileFrom(FileFrom.URL, sourceUrl, settings)
 
       expect(file.cdnUrl).toBeTruthy()
     })
 
+    it('should accept doNotStore setting', async() => {
+      const settings = getSettingsForTesting({
+        publicKey: factory.publicKey('demo'),
+        doNotStore: true,
+      })
+      const file = await fileFrom(FileFrom.URL, sourceUrl, settings)
+
+      expect(file.isStored).toBeFalsy()
+    })
+
     it('should be able to cancel uploading', (done) => {
       const settings = getSettingsForTesting({
-        publicKey: factory.publicKey('image'),
+        publicKey: factory.publicKey('demo'),
       })
-      const filePromise = fileFrom(FileFrom.Uploaded, uuid, settings)
+      const filePromise = fileFrom(FileFrom.URL, sourceUrl, settings)
 
       setTimeout(() => {
         filePromise.cancel()
@@ -33,11 +43,11 @@ describe('fileFrom', () => {
 
     it('should accept new file name setting', async() => {
       const settings = getSettingsForTesting({
-        publicKey: factory.publicKey('image'),
+        publicKey: factory.publicKey('demo'),
         doNotStore: true,
         fileName: 'newFileName.jpg',
       })
-      const file = await fileFrom(FileFrom.Uploaded, uuid, settings)
+      const file = await fileFrom(FileFrom.URL, sourceUrl, settings)
 
       expect(file.name).toEqual('newFileName.jpg')
     })
@@ -45,9 +55,9 @@ describe('fileFrom', () => {
     describe('should be able to handle', () => {
       it('cancel uploading', (done) => {
         const settings = getSettingsForTesting({
-          publicKey: factory.publicKey('image'),
+          publicKey: factory.publicKey('demo'),
         })
-        const filePromise = fileFrom(FileFrom.Uploaded, uuid, settings)
+        const filePromise = fileFrom(FileFrom.URL, sourceUrl, settings)
 
         setTimeout(() => {
           filePromise.cancel()
@@ -69,9 +79,9 @@ describe('fileFrom', () => {
       it('progress', (done) => {
         let progressValue = 0
         const settings = getSettingsForTesting({
-          publicKey: factory.publicKey('image'),
+          publicKey: factory.publicKey('demo'),
         })
-        const filePromise = fileFrom(FileFrom.Uploaded, uuid, settings)
+        const filePromise = fileFrom(FileFrom.URL, sourceUrl, settings)
 
         filePromise.onProgress = (progress) => {
           const {value} = progress
@@ -86,9 +96,9 @@ describe('fileFrom', () => {
 
       it('uploaded', (done) => {
         const settings = getSettingsForTesting({
-          publicKey: factory.publicKey('image'),
+          publicKey: factory.publicKey('demo'),
         })
-        const filePromise = fileFrom(FileFrom.Uploaded, uuid, settings)
+        const filePromise = fileFrom(FileFrom.URL, sourceUrl, settings)
 
         filePromise.onUploaded = () => {
           done()
@@ -100,9 +110,9 @@ describe('fileFrom', () => {
 
       it('ready', (done) => {
         const settings = getSettingsForTesting({
-          publicKey: factory.publicKey('image'),
+          publicKey: factory.publicKey('demo'),
         })
-        const filePromise = fileFrom(FileFrom.Uploaded, uuid, settings)
+        const filePromise = fileFrom(FileFrom.URL, sourceUrl, settings)
 
         filePromise.onReady = () => {
           done()

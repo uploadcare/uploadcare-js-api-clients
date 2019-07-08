@@ -6,8 +6,6 @@ import {Uuid} from '../api/types'
 import {PollPromiseInterface} from '../tools/poll'
 import {InfoResponse} from '../api/info'
 import {FileUploadInterface} from './types'
-import {UploadcareFile} from '../UploadcareFile'
-import set = Reflect.set
 
 /**
  * Base abstract `thenable` implementation of `FileUploadInterface`.
@@ -109,7 +107,7 @@ export abstract class UploadFrom extends Thenable<UploadcareFileInterface> imple
 
   /**
    * Handle file uploading.
-   * @param {ProgressParams} progress
+   * @param {FileProgress} progress
    */
   protected handleUploading(progress?: ProgressParams): void {
     this.setProgress(ProgressState.Uploading, progress)
@@ -125,10 +123,9 @@ export abstract class UploadFrom extends Thenable<UploadcareFileInterface> imple
    * @param {Settings} settings
    */
   protected handleUploaded(uuid: Uuid, settings: Settings): Promise<UploadcareFileInterface> {
-    this.setFile(new UploadcareFile({
+    this.setFile({
       uuid,
       name: null,
-      // @ts-ignore
       size: null,
       isStored: null,
       isImage: null,
@@ -137,7 +134,7 @@ export abstract class UploadFrom extends Thenable<UploadcareFileInterface> imple
       originalUrl: null,
       originalFilename: null,
       originalImageInfo: null,
-    }, settings))
+    })
 
     this.setProgress(ProgressState.Uploaded)
 
@@ -152,7 +149,7 @@ export abstract class UploadFrom extends Thenable<UploadcareFileInterface> imple
 
     return this.isFileReadyPolling
       .then(info => {
-        this.setFile(new UploadcareFile(info, settings))
+        this.setFile(prettyFileInfo(info, settings))
 
         return Promise.resolve(this.getFile())
       })
