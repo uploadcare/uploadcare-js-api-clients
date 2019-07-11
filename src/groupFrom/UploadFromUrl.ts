@@ -1,27 +1,18 @@
-import fromUrl, {FromUrlResponse, isFileInfoResponse, isTokenResponse, Url} from '../api/fromUrl'
-import {Settings, UploadcareGroupInterface, ProgressState} from '../types'
-import fromUrlStatus, {
-  FromUrlStatusResponse,
-  isErrorResponse,
-  isProgressResponse,
-  isSuccessResponse,
-  isUnknownResponse,
-  isWaitingResponse,
-} from '../api/fromUrlStatus'
+import {Settings, UploadcareFileInterface, UploadcareGroupInterface} from '../types'
 import {UploadFrom} from './UploadFrom'
-import checkFileIsUploadedFromUrl from '../checkFileIsUploadedFromUrl'
-import {PollPromiseInterface} from '../tools/poll'
+import group, {GroupInfoResponse} from '../api/group'
 import CancelError from '../errors/CancelError'
-import {Uuid} from '../api/types'
+import fileFrom from '../fileFrom/fileFrom'
+import {FileFrom, FileUploadInterface} from '../fileFrom/types'
+import {Url} from '..'
 
 export class UploadFromUrl extends UploadFrom {
   protected readonly promise: Promise<UploadcareGroupInterface>
-  private isFileUploadedFromUrlPolling: PollPromiseInterface<FromUrlStatusResponse> | null = null
-  private isCancelled: boolean = false
-  private unknownStatusWasTimes: number = 0
 
-  protected readonly data: Url[]
-  protected readonly settings: Settings
+  private readonly data: Url[]
+  private readonly settings: Settings
+  private readonly uploads: FileUploadInterface[]
+  private readonly files: Promise<UploadcareFileInterface[]>
 
   constructor(data: Url[], settings: Settings) {
     super()
@@ -29,114 +20,59 @@ export class UploadFromUrl extends UploadFrom {
     this.data = data
     this.settings = settings
 
+    this.uploads = this.getUploadsPromises()
+    this.files = this.getFilesPromise()
     this.promise = this.getGroupPromise()
+  }
+
+  private getUploadsPromises = (): FileUploadInterface[] => {
+    const filesTotalCount = this.data.length
+
+    return this.data.map((sourceUrl: Url, index: number) => {
+      const fileUpload = fileFrom(FileFrom.URL, sourceUrl, this.settings)
+      const fileNumber = index + 1
+
+      fileUpload.onCancel = this.handleCancelling
+
+      fileUpload.onUploaded = (() => {
+        this.handleUploading({
+          total: filesTotalCount,
+          loaded: fileNumber
+        })
+      })
+
+      return fileUpload
+    })
+  }
+
+  private getFilesPromise = (): Promise<UploadcareFileInterface[]> => {
+    return Promise.all(this.uploads)
   }
 
   private getGroupPromise = (): Promise<UploadcareGroupInterface> => {
     this.handleUploading()
 
-    return fromUrl(this.data, this.settings)
-      .then(this.handleFromUrlResponse)
+    return this.getFilesPromise()
+      .then(files => {
+        const uuids = files.map(file => file.uuid)
+
+        return group(uuids, this.settings)
+      })
+      .then(this.handleInfoResponse)
       .then(this.handleReady)
       .catch(this.handleError)
   }
 
-  private handleFromUrlResponse = (response: FromUrlResponse) => {
-    if (isTokenResponse(response)) {
-      const {token} = response
-
-      return fromUrlStatus(token, this.settings)
-        .then(response => this.handleFromUrlStatusResponse(token, response) )
-        .catch(this.handleError)
-    } else if (isFileInfoResponse(response)) {
-      const {uuid} = response
-
-      return this.handleUploaded(uuid, this.settings)
-    }
-  }
-
-  private handleFromUrlStatusResponse = (token: Uuid, response: FromUrlStatusResponse) => {
-    this.isFileUploadedFromUrlPolling = checkFileIsUploadedFromUrl({
-      token,
-      onProgress: (response) => {
-        // Update uploading progress
-        this.handleUploading({
-          total: response.total,
-          loaded: response.done,
-        })
-      },
-      settings: this.settings
-    })
-
-    if (isUnknownResponse(response)) {
-      this.unknownStatusWasTimes++
-
-      if (this.unknownStatusWasTimes === 3) {
-        return Promise.reject(`Token "${token}" was not found.`)
-      } else {
-        return this.isFileUploadedFromUrlPolling
-          .then(status => this.handleFromUrlStatusResponse(token, status))
-          .catch(this.handleError)
-      }
+  private handleInfoResponse = (groupInfo: GroupInfoResponse) => {
+    if (this.isCancelled) {
+      return Promise.reject(new CancelError())
     }
 
-    if (isWaitingResponse(response)) {
-      return this.isFileUploadedFromUrlPolling
-        .then(status => this.handleFromUrlStatusResponse(token, status))
-        .catch(this.handleError)
-    }
-
-    if (isErrorResponse(response)) {
-      return this.handleError(response.error)
-    }
-
-    if (isProgressResponse(response)) {
-      if (this.isCancelled) {
-        return Promise.reject(new CancelError())
-      }
-
-      this.handleUploading({
-        total: response.total,
-        loaded: response.done,
-      })
-
-      return this.isFileUploadedFromUrlPolling
-        .then(status => this.handleFromUrlStatusResponse(token, status))
-        .catch(this.handleError)
-    }
-
-    if (isSuccessResponse(response)) {
-      const {uuid} = response
-
-      if (this.isCancelled) {
-        return Promise.reject(new CancelError())
-      }
-
-      return this.handleUploaded(uuid, this.settings)
-        .then(this.handleReady)
-        .catch(this.handleError)
-    }
+    return this.handleUploaded(groupInfo, this.settings)
   }
 
   cancel(): void {
-    const {state} = this.getProgress()
-
-    switch (state) {
-      case ProgressState.Uploading:
-        if (this.isFileUploadedFromUrlPolling) {
-          this.isFileUploadedFromUrlPolling.cancel()
-        } else {
-          this.isCancelled = true
-        }
-        break
-      case ProgressState.Uploaded:
-      case ProgressState.Ready:
-        if (this.isFileReadyPolling) {
-          this.isFileReadyPolling.cancel()
-        } else {
-          this.isCancelled = true
-        }
-        break
-    }
+    this.uploads.forEach(upload => upload.cancel())
+    this.isCancelled = true
   }
 }

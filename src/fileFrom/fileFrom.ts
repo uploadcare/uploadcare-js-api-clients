@@ -25,4 +25,5 @@ export default function fileFrom(from: FileFrom, data: FileData | Url | Uuid, se
       return new UploadFromUploaded(data as Uuid, settings)
     default:
       throw new Error(`File uploading from "${from}" is not supported`)
+  }
 }

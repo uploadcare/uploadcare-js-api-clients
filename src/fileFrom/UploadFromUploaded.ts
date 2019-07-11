@@ -8,8 +8,8 @@ export class UploadFromUploaded extends UploadFrom {
   protected readonly promise: Promise<UploadcareFileInterface>
   private isCancelled: boolean = false
 
-  protected readonly data: Uuid
-  protected readonly settings: Settings
+  private readonly data: Uuid
+  private readonly settings: Settings
 
   constructor(data: Uuid, settings: Settings) {
     super()

@@ -3,11 +3,11 @@ import base, {DirectUploadInterface} from '../api/base'
 import {UploadFrom} from './UploadFrom'
 
 export class UploadFromObject extends UploadFrom {
-  protected readonly request: DirectUploadInterface
+  private readonly request: DirectUploadInterface
   protected readonly promise: Promise<UploadcareFileInterface>
 
-  protected readonly data: FileData
-  protected readonly settings: Settings
+  private readonly data: FileData
+  private readonly settings: Settings
 
   constructor(data: FileData, settings: Settings) {
     super()

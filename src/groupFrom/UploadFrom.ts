@@ -1,8 +1,6 @@
 import {Settings, UploadcareGroupInterface, UploadingProgress, ProgressState, ProgressParams} from '../types'
 import {Thenable} from '../tools/Thenable'
 import {GroupInfo} from '../api/types'
-import {PollPromiseInterface} from '../tools/poll'
-import {InfoResponse} from '../api/info'
 import {GroupUploadInterface} from './types'
 import {UploadcareGroup} from '../UploadcareGroup'
 
@@ -13,7 +11,7 @@ import {UploadcareGroup} from '../UploadcareGroup'
  */
 export abstract class UploadFrom extends Thenable<UploadcareGroupInterface> implements GroupUploadInterface {
   protected abstract readonly promise: Promise<UploadcareGroupInterface>
-  protected isFileReadyPolling: PollPromiseInterface<InfoResponse> | null = null
+  protected isCancelled: boolean = false
   abstract cancel(): void
 
   protected progress: UploadingProgress = {
@@ -155,10 +153,10 @@ export abstract class UploadFrom extends Thenable<UploadcareGroupInterface> impl
    * @param error
    */
   protected handleError = (error) => {
-    this.setProgress(ProgressState.Error)
-
     if (error.name === 'CancelError') {
       this.handleCancelling()
+    } else {
+      this.setProgress(ProgressState.Error)
     }
 
     return Promise.reject(error)

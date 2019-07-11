@@ -20,8 +20,8 @@ export class UploadFromUrl extends UploadFrom {
   private isCancelled: boolean = false
   private unknownStatusWasTimes: number = 0
 
-  protected readonly data: Url
-  protected readonly settings: Settings
+  private readonly data: Url
+  private readonly settings: Settings
 
   constructor(data: Url, settings: Settings) {
     super()
