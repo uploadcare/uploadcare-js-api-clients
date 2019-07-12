@@ -1,11 +1,13 @@
-import * as Koa from 'koa'
+// @ts-ignore
+import Koa from 'koa'
 import * as router from 'koa-route'
 import chalk from 'chalk'
 
 // Middleware
 import cors from '@koa/cors'
 import addTrailingSlashes from 'koa-add-trailing-slashes'
-import * as koaBody from 'koa-body'
+// @ts-ignore
+import koaBody from 'koa-body'
 
 import logger from './middleware/logger'
 import auth from './middleware/auth'
