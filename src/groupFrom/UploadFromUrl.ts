@@ -72,7 +72,6 @@ export class UploadFromUrl extends UploadFrom {
   }
 
   cancel(): void {
-    this.uploads.forEach(upload => upload.cancel())
     this.isCancelled = true
   }
 }

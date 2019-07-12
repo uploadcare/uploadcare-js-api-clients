@@ -88,10 +88,10 @@ export class UploadLifecycle<T> implements LifecycleInterface<T> {
   }
 
   handleError(error: Error) {
-    this.updateState(new ErrorState())
-
     if (error.name === 'CancelError') {
       this.handleCancelling()
+    } else {
+      this.updateState(new ErrorState())
     }
 
     return Promise.reject(error)

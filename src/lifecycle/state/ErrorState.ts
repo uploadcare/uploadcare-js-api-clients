@@ -8,7 +8,5 @@ export class ErrorState extends AbstractState implements LifecycleStateInterface
     uploaded: null,
     value: 0,
   }
-  protected nextPossibleState: ProgressState[] = [
-    ProgressState.Canceled
-  ]
+  protected nextPossibleState: ProgressState[] = []
 }

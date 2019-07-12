@@ -31,7 +31,7 @@ fdescribe('groupFrom', () => {
       expect(group.isStored).toBeFalsy()
     })
 
-    xit('should be able to cancel uploading', (done) => {
+    it('should be able to cancel uploading', (done) => {
       const settings = getSettingsForTesting({
         publicKey: factory.publicKey('image'),
       })
@@ -47,7 +47,7 @@ fdescribe('groupFrom', () => {
     })
 
     describe('should be able to handle', () => {
-      xit('cancel uploading', (done) => {
+      it('cancel uploading', (done) => {
         const settings = getSettingsForTesting({
           publicKey: factory.publicKey('image'),
         })

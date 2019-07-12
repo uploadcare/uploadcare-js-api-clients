@@ -1,5 +1,5 @@
-import {UploadcareFileInterface, UploadcareGroupInterface} from '../types'
-import {FileUploadLifecycleInterface, GroupUploadLifecycleInterface, UploadInterface} from '../lifecycle/types'
+import {UploadcareFileInterface} from '../types'
+import {UploadInterface} from '../lifecycle/types'
 
 export enum FileFrom {
   Object = 'object',
@@ -18,5 +18,3 @@ export interface HandlerInterface<T> {
 }
 
 export interface FileHandlerInterface extends HandlerInterface<UploadcareFileInterface> {}
-
-export interface GroupHandlerInterface extends HandlerInterface<UploadcareGroupInterface> {}

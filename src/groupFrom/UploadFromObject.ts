@@ -63,15 +63,14 @@ export class UploadFromObject extends UploadFrom {
   }
 
   private handleInfoResponse = (groupInfo: GroupInfoResponse) => {
-    // if (this.isCancelled) {
-    //   return Promise.reject(new CancelError())
-    // }
+    if (this.isCancelled) {
+      return Promise.reject(new CancelError())
+    }
 
     return this.handleUploaded(groupInfo, this.settings)
   }
 
   cancel(): void {
-    this.uploads.forEach(upload => upload.cancel())
-    // this.isCancelled = true
+    this.isCancelled = true
   }
 }

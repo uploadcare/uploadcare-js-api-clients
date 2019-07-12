@@ -16,7 +16,7 @@ module.exports = function(config) {
       {
         pattern: 'test/**/*.ts',
         watched: false,
-      },
+      }
     ],
 
     plugins: [
