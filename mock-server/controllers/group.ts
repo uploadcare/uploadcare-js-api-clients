@@ -6,11 +6,52 @@ const UUID_REGEX = '[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}
 const GROUP_ID_REGEX = `${UUID_REGEX}~[1-9][0-9]*$`
 
 /**
+ * Check file UUID.
+ * @param {string} uuid
+ * @return {boolean}
+ */
+const isValidUuid = (uuid: string): boolean => (new RegExp(UUID_REGEX)).test(uuid)
+
+/**
+ * Check group id.
+ * @param {string} groupId
+ * @return {boolean}
+ */
+const isValidGroupId = (groupId: string): boolean => (new RegExp(GROUP_ID_REGEX)).test(groupId)
+
+/**
+ * Get UUID from file
+ * @param {string} file
+ * @return {string}
+ */
+const getFileUuid = (file: string): string => {
+  // If file contains CDN operations
+  if ((new RegExp(/\//)).test(file)) {
+    const array = file.split('/')
+
+    return array[0]
+  }
+
+  return file
+}
+
+/**
+ * Is valid file?
+ * @param {string} file
+ * @return {boolean}
+ */
+const isValidFile = (file: string): boolean => {
+  const uuid = getFileUuid(file)
+
+  return isValidUuid(uuid)
+}
+
+/**
  * '/group/'
  * @param {object} ctx
  */
 const index = (ctx) => {
-  const files = ctx.query && ctx.query['files[]']
+  let files = ctx.query && ctx.query['files[]']
   const publicKey = ctx.query && ctx.query.pub_key
 
   if (!files || files.length === 0) {
@@ -19,20 +60,16 @@ const index = (ctx) => {
     })
   }
 
-  if (files && files.length > 0) {
-    for (let key in files) {
-      if (files.hasOwnProperty(key)) {
-        const file = files[key]
-        const array = file.split('/')
-        const uuid = array[0]
-        const isValidUUID = (new RegExp(UUID_REGEX)).exec(uuid)
+  // If `files` contains only `string` – convert in array
+  if (!Array.isArray(files)) {
+    files = [files]
+  }
 
-        if (!isValidUUID) {
-          return error(ctx, {
-            statusText: `this is not valid file url: ${file}`
-          })
-        }
-      }
+  for (const file of files) {
+    if (!isValidFile(file)) {
+      return error(ctx, {
+        statusText: `this is not valid file url: ${file}`
+      })
     }
   }
 
@@ -58,9 +95,7 @@ const info = (ctx) => {
     })
   }
 
-  const isValidGroupId = (new RegExp(GROUP_ID_REGEX)).exec(groupId)
-
-  if (!isValidGroupId) {
+  if (!isValidGroupId(groupId)) {
     return error(ctx, {
       status: 404,
       statusText: 'group_id is invalid.'

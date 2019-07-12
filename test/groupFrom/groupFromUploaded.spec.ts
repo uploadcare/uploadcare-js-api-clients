@@ -3,7 +3,7 @@ import {getSettingsForTesting} from '../_helpers'
 import groupFrom from '../../src/groupFrom/groupFrom'
 import {GroupFrom} from '../../src/groupFrom/types'
 
-fdescribe('groupFrom', () => {
+describe('groupFrom', () => {
   describe('Uploaded[]', () => {
     const uuid = factory.uuid('image')
 

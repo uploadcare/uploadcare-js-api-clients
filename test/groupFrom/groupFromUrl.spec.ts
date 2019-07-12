@@ -3,15 +3,15 @@ import {getSettingsForTesting} from '../_helpers'
 import groupFrom from '../../src/groupFrom/groupFrom'
 import {GroupFrom} from '../../src/groupFrom/types'
 
-fdescribe('groupFrom', () => {
+describe('groupFrom', () => {
   describe('Url[]', () => {
     const sourceUrl = factory.imageUrl('valid')
 
     it('should resolves when file is ready on CDN', (done) => {
       const settings = getSettingsForTesting({
-        publicKey: factory.publicKey('demo'),
+        publicKey: factory.publicKey('image'),
       })
-      const groupPromise = groupFrom(GroupFrom.URL, [sourceUrl], settings)
+      const groupPromise = groupFrom(GroupFrom.URL, [sourceUrl, sourceUrl], settings)
 
       groupPromise
         .then(group => {
@@ -22,10 +22,10 @@ fdescribe('groupFrom', () => {
 
     it('should accept doNotStore setting', async() => {
       const settings = getSettingsForTesting({
-        publicKey: factory.publicKey('demo'),
+        publicKey: factory.publicKey('image'),
         doNotStore: true,
       })
-      const groupPromise = groupFrom(GroupFrom.URL, [sourceUrl], settings)
+      const groupPromise = groupFrom(GroupFrom.URL, [sourceUrl, sourceUrl], settings)
       const group = await groupPromise
 
       expect(group.isStored).toBeFalsy()
@@ -33,9 +33,9 @@ fdescribe('groupFrom', () => {
 
     it('should be able to cancel uploading', (done) => {
       const settings = getSettingsForTesting({
-        publicKey: factory.publicKey('demo'),
+        publicKey: factory.publicKey('image'),
       })
-      const groupPromise = groupFrom(GroupFrom.URL, [sourceUrl], settings)
+      const groupPromise = groupFrom(GroupFrom.URL, [sourceUrl, sourceUrl], settings)
 
       setTimeout(() => {
         groupPromise.cancel()
@@ -49,9 +49,9 @@ fdescribe('groupFrom', () => {
     describe('should be able to handle', () => {
       it('cancel uploading', (done) => {
         const settings = getSettingsForTesting({
-          publicKey: factory.publicKey('demo'),
+          publicKey: factory.publicKey('image'),
         })
-        const groupPromise = groupFrom(GroupFrom.URL, [sourceUrl], settings)
+        const groupPromise = groupFrom(GroupFrom.URL, [sourceUrl, sourceUrl], settings)
 
         setTimeout(() => {
           groupPromise.cancel()
@@ -73,9 +73,9 @@ fdescribe('groupFrom', () => {
       it('progress', (done) => {
         let progressValue = 0
         const settings = getSettingsForTesting({
-          publicKey: factory.publicKey('demo'),
+          publicKey: factory.publicKey('image'),
         })
-        const groupPromise = groupFrom(GroupFrom.URL, [sourceUrl], settings)
+        const groupPromise = groupFrom(GroupFrom.URL, [sourceUrl, sourceUrl], settings)
 
         groupPromise.onProgress = (progress) => {
           const {value} = progress
@@ -94,9 +94,9 @@ fdescribe('groupFrom', () => {
 
       it('uploaded', (done) => {
         const settings = getSettingsForTesting({
-          publicKey: factory.publicKey('demo'),
+          publicKey: factory.publicKey('image'),
         })
-        const groupPromise = groupFrom(GroupFrom.URL, [sourceUrl], settings)
+        const groupPromise = groupFrom(GroupFrom.URL, [sourceUrl, sourceUrl], settings)
 
         groupPromise.onUploaded = () => {
           done()
@@ -108,9 +108,9 @@ fdescribe('groupFrom', () => {
 
       it('ready', (done) => {
         const settings = getSettingsForTesting({
-          publicKey: factory.publicKey('demo'),
+          publicKey: factory.publicKey('image'),
         })
-        const groupPromise = groupFrom(GroupFrom.URL, [sourceUrl], settings)
+        const groupPromise = groupFrom(GroupFrom.URL, [sourceUrl, sourceUrl], settings)
 
         groupPromise.onReady = () => {
           done()
