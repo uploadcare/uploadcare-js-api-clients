@@ -1,11 +1,11 @@
-import Koa from 'koa'
+import * as Koa from 'koa'
 import * as router from 'koa-route'
 import chalk from 'chalk'
 
 // Middleware
 import cors from '@koa/cors'
 import addTrailingSlashes from 'koa-add-trailing-slashes'
-import koaBody from 'koa-body'
+import * as koaBody from 'koa-body'
 
 import logger from './middleware/logger'
 import auth from './middleware/auth'
@@ -29,7 +29,8 @@ app.use(auth)
 
 // Routes
 ROUTES.forEach((route: RouteType) => {
-  const path = Object.keys(route).shift()
+  const keys = Object.keys(route)
+  const path = keys[0]
   const method = route[path].method
   const fn = route[path].fn
 
@@ -50,7 +51,8 @@ app.listen(PORT, () => {
 
   // Print all available routes
   ROUTES.forEach((route: RouteType) => {
-    const path = Object.keys(route).shift()
+    const keys = Object.keys(route)
+    const path = keys[0]
     const routePath = route[path]
     const method = routePath.method.toUpperCase()
     const description = routePath.description || path
@@ -60,12 +62,3 @@ app.listen(PORT, () => {
   })
   console.log()
 })
-//
-// app.use(() => {
-//
-// })
-//
-// app.use(async (ctx, nextPossibleState) => {
-//   process.stdout.write('\x1Bc')
-//   await nextPossibleState()
-// })
