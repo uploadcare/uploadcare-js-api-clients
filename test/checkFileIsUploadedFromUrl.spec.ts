@@ -4,7 +4,7 @@ import {StatusEnum} from '../src/api/fromUrlStatus'
 import {getSettingsForTesting} from './_helpers'
 import fromUrl from '../src/api/fromUrl'
 
-describe('checkFileIsUploadedFromUrl', async() => {
+describe('checkFileIsUploadedFromUrl', () => {
   const sourceUrl = factory.imageUrl('valid')
   const settings = getSettingsForTesting({
     publicKey: factory.publicKey('demo')
