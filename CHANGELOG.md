@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 * Wrappers for group paths of Upload API (`group`, `groupInfo`).
 * The high-level function for group uploading, aka filesGroupFrom.
+* Uploading progress for Node.js in `base` method.
 
 ### Changed
 
