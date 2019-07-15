@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+[Unreleased]: https://github.com/uploadcare/uploadcare-upload-client/compare/v1.0.0-alpha.4...HEAD
+
+## [1.0.0-alpha.4]
+
 ## Added
 
 * Wrappers for group paths of Upload API (`group`, `groupInfo`).
@@ -19,7 +23,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 * `FileProgress` was renamed to `ProgressParams`.
 * `UploadcareFile` was renamed to `UploadcareFileInterface`.
 
-[Unreleased]: https://github.com/uploadcare/uploadcare-upload-client/compare/v1.0.0-alpha.3...HEAD
+[1.0.0-alpha.4]: https://github.com/uploadcare/uploadcare-upload-client/compare/v1.0.0-alpha.3...v1.0.0-alpha.4
 
 ## [1.0.0-alpha.3]
 
