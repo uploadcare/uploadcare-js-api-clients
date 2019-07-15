@@ -9,6 +9,7 @@ import {FileData, Settings} from '../types'
 import {BaseProgress} from './base'
 import {Thenable} from '../tools/Thenable'
 import {CancelableInterface} from './types'
+import {isNode} from '../tools/isNode'
 
 export type Query = {
   [key: string]: string | string[] | boolean | number | void,
@@ -51,6 +52,35 @@ export type RequestResponse = {
 const MAX_CONTENT_LENGTH = 50 * 1000 * 1000
 const DEFAULT_FILE_NAME = 'original'
 const DEFAULT_RETRY_AFTER_TIMEOUT = 15000
+
+if (isNode()) {
+  axios.interceptors.request.use(
+    config => {
+      const {data, onUploadProgress} = config
+      if (!onUploadProgress) {
+        return config
+      }
+
+      const total = data.getLengthSync()
+
+      let loaded = 0
+
+      data.on('data', chunk => {
+        loaded += chunk.length
+
+        onUploadProgress({
+          total,
+          loaded,
+        } as ProgressEvent)
+      })
+
+      return config
+    },
+    error => {
+      return Promise.reject(error)
+    }
+  )
+}
 
 /**
  * Updates options with Uploadcare Settings

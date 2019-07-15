@@ -100,7 +100,7 @@ The first public alpha release.
 * Low-level request wrappers for `/base/` and `/info/` paths of Upload API.
 * `UploadClient` class with settings and `fileFrom` method that supports
   only direct uploads now.
-* Support of following Uploadcare Settings: `publicKey`, `baseUrl`, 
+* Support of following Uploadcare Settings: `publicKey`, `baseUrl`,
   `doNotStore`, `integration`, `secureExpire`, `secureSignature`.
 * Test environment for both Node.js and browsers
 
