@@ -3,15 +3,8 @@ import {Url} from '../api/fromUrl'
 import {Uuid} from '../api/types'
 import {UploadFromObject} from './UploadFromObject'
 import {UploadFromUrl} from './UploadFromUrl'
-import {UploadFromInterface} from './UploadFrom'
 import {UploadFromUploaded} from './UploadFromUploaded'
-
-export enum FileFrom {
-  Object = 'object',
-  URL = 'url',
-  DOM = 'input',
-  Uploaded = 'uploaded',
-}
+import {FileUploadInterface, FileFrom} from './types'
 
 /**
  * Uploads file from provided data
@@ -20,9 +13,9 @@ export enum FileFrom {
  * @param {FileData} data
  * @param {Settings} settings
  * @throws Error
- * @returns {UploadFromInterface}
+ * @returns {FileUploadInterface}
  */
-export default function fileFrom(from: FileFrom, data: FileData | Url | Uuid, settings: Settings = {}): UploadFromInterface {
+export default function fileFrom(from: FileFrom, data: FileData | Url | Uuid, settings: Settings = {}): FileUploadInterface {
   switch (from) {
     case FileFrom.Object:
       return new UploadFromObject(data as FileData, settings)

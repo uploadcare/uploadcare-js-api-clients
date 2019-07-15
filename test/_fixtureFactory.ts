@@ -106,10 +106,6 @@ export function publicKey(id: string): string {
   return publicKey
 }
 
-export function linkTo(uuid: string): string {
-  return `${settings.baseCDN}/${uuid}/`
-}
-
 export function imageUrl(id: string): string {
   const images = {
     valid: `${settings.baseCDN}/d3275f8b-686d-4980-916a-53a1fc17450b/1findfacecropgrayscale.jpg`,

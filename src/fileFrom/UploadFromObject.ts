@@ -1,13 +1,13 @@
-import {FileData, Settings, UploadcareFile} from '../types'
+import {FileData, Settings, UploadcareFileInterface} from '../types'
 import base, {DirectUploadInterface} from '../api/base'
 import {UploadFrom} from './UploadFrom'
 
 export class UploadFromObject extends UploadFrom {
-  protected readonly request: DirectUploadInterface
-  protected readonly promise: Promise<UploadcareFile>
+  private readonly request: DirectUploadInterface
+  protected readonly promise: Promise<UploadcareFileInterface>
 
-  protected readonly data: FileData
-  protected readonly settings: Settings
+  private readonly data: FileData
+  private readonly settings: Settings
 
   constructor(data: FileData, settings: Settings) {
     super()
@@ -19,7 +19,7 @@ export class UploadFromObject extends UploadFrom {
     this.promise = this.getFilePromise()
   }
 
-  private getFilePromise(): Promise<UploadcareFile> {
+  private getFilePromise(): Promise<UploadcareFileInterface> {
     const fileUpload = this.request
 
     this.handleUploading()

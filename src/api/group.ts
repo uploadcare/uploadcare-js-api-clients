@@ -5,7 +5,7 @@ import {RequestOptions} from './request'
 
 export type GroupInfoResponse = GroupInfo
 
-const getRequestQuery = (files: Array<Uuid>, settings: Settings) => {
+const getRequestQuery = (files: Uuid[], settings: Settings) => {
   const query = {
     pub_key: settings.publicKey || '',
     files,
@@ -24,7 +24,7 @@ const getRequestQuery = (files: Array<Uuid>, settings: Settings) => {
   return  {...query}
 }
 
-const getRequestOptions = (files: Array<Uuid>, settings: Settings): RequestOptions => {
+const getRequestOptions = (files: Uuid[], settings: Settings): RequestOptions => {
   return prepareOptions({
     method: 'POST',
     path: '/group/',
@@ -35,11 +35,11 @@ const getRequestOptions = (files: Array<Uuid>, settings: Settings): RequestOptio
 /**
  * Create files group
  *
- * @param {Array<Uuid>} files – A set of files you want to join in a group.
+ * @param {Uuid[]} files – A set of files you want to join in a group.
  * @param {Settings} settings
  * @return {Promise<GroupInfoResponse>}
  */
-export default function group(files: Array<Uuid>, settings: Settings = {}): Promise<GroupInfoResponse> {
+export default function group(files: Uuid[], settings: Settings = {}): Promise<GroupInfoResponse> {
   const options = getRequestOptions(files, settings)
 
   return request(options)

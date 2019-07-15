@@ -22,7 +22,7 @@ export interface UploadAPIInterface {
 
   fromUrlStatus(token: Token, settings?: Settings): Promise<FromUrlStatusResponse>
 
-  group(files: Array<Uuid>, settings: Settings): Promise<GroupInfoResponse>
+  group(files: Uuid[], settings: Settings): Promise<GroupInfoResponse>
 
   groupInfo(id: GroupId, settings: Settings): Promise<GroupInfoResponse>
 }
@@ -65,7 +65,7 @@ class UploadAPI implements UploadAPIInterface {
     return fromUrlStatus(token, this.getResultSettings(settings))
   }
 
-  group(files: Array<Uuid>, settings: Settings): Promise<GroupInfoResponse> {
+  group(files: Uuid[], settings: Settings): Promise<GroupInfoResponse> {
     return group(files, this.getResultSettings(settings))
   }
 

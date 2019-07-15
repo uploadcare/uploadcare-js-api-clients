@@ -1,3 +1,5 @@
+import {FileInfo, GroupId} from './api/types'
+
 export type Settings = {
   baseCDN?: string,
   baseURL?: string,
@@ -31,15 +33,49 @@ export type OriginalImageInfo = {
 }
 
 /* TODO Add sourceInfo */
-export type UploadcareFile = {
-  uuid: string,
-  name: null | string,
-  size: null | number,
-  isStored: null | boolean,
-  isImage: null | boolean,
-  cdnUrl: null | string,
-  cdnUrlModifiers: null | string,
-  originalUrl: null | string,
-  originalFilename: null | string,
-  originalImageInfo: null | OriginalImageInfo,
+export interface UploadcareFileInterface {
+  readonly uuid: string,
+  readonly name: null | string,
+  readonly size: null | number,
+  readonly isStored: null | boolean,
+  readonly isImage: null | boolean,
+  readonly cdnUrl: null | string,
+  readonly cdnUrlModifiers: null | string,
+  readonly originalUrl: null | string,
+  readonly originalFilename: null | string,
+  readonly originalImageInfo: null | OriginalImageInfo,
+}
+
+export type UploadcareFiles = UploadcareFileInterface[]
+
+export interface UploadcareGroupInterface {
+  readonly uuid: GroupId,
+  readonly filesCount: string,
+  readonly totalSize: number,
+  readonly isStored: boolean,
+  readonly isImage: boolean,
+  readonly cdnUrl: string,
+  readonly files: FileInfo[],
+  readonly createdAt: string,
+  readonly storedAt: string | null,
+}
+
+export enum ProgressState {
+  Pending = 'pending',
+  Uploading = 'uploading',
+  Uploaded = 'uploaded',
+  Ready = 'ready',
+  Canceled = 'canceled',
+  Error = 'error',
+}
+
+export type ProgressParams = {
+  total: number,
+  loaded: number,
+}
+
+export type UploadingProgress = {
+  state: ProgressState,
+  uploaded: null | ProgressParams,
+  value: number,
 }

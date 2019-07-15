@@ -39,7 +39,7 @@ class DirectUpload extends Thenable<BaseResponse> implements DirectUploadInterfa
       })
   }
 
-  protected getRequestOptions() {
+  private getRequestOptions() {
     return {
       ...this.options,
       /* TODO Add support of progress for Node.js */

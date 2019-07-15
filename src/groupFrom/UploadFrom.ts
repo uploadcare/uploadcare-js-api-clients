@@ -1,20 +1,17 @@
-import {Settings, UploadcareFileInterface, UploadingProgress, ProgressState, ProgressParams} from '../types'
-import checkFileIsReady from '../checkFileIsReady'
-import prettyFileInfo from '../prettyFileInfo'
+import {Settings, UploadcareGroupInterface, UploadingProgress, ProgressState, ProgressParams} from '../types'
 import {Thenable} from '../tools/Thenable'
-import {Uuid} from '../api/types'
-import {PollPromiseInterface} from '../tools/poll'
-import {InfoResponse} from '../api/info'
-import {FileUploadInterface} from './types'
+import {GroupInfo} from '../api/types'
+import {GroupUploadInterface} from './types'
+import {UploadcareGroup} from '../UploadcareGroup'
 
 /**
- * Base abstract `thenable` implementation of `FileUploadInterface`.
+ * Base abstract `thenable` implementation of `GroupUploadInterface`.
  * You need to use this as base class for all uploading methods of `fileFrom`.
  * All that you need to implement — `promise` property and `cancel` method.
  */
-export abstract class UploadFrom extends Thenable<UploadcareFileInterface> implements FileUploadInterface {
-  protected abstract readonly promise: Promise<UploadcareFileInterface>
-  protected isFileReadyPolling: PollPromiseInterface<InfoResponse> | null = null
+export abstract class UploadFrom extends Thenable<UploadcareGroupInterface> implements GroupUploadInterface {
+  protected abstract readonly promise: Promise<UploadcareGroupInterface>
+  protected isCancelled: boolean = false
   abstract cancel(): void
 
   protected progress: UploadingProgress = {
@@ -22,11 +19,11 @@ export abstract class UploadFrom extends Thenable<UploadcareFileInterface> imple
     uploaded: null,
     value: 0,
   }
-  protected file: UploadcareFileInterface | null = null
+  protected group: UploadcareGroupInterface | null = null
 
   onProgress: ((progress: UploadingProgress) => void) | null = null
   onUploaded: ((uuid: string) => void) | null = null
-  onReady: ((file: UploadcareFileInterface) => void) | null = null
+  onReady: ((group: UploadcareGroupInterface) => void) | null = null
   onCancel: VoidFunction | null = null
 
   protected constructor() {
@@ -86,12 +83,12 @@ export abstract class UploadFrom extends Thenable<UploadcareFileInterface> imple
     return this.progress
   }
 
-  protected setFile(file: UploadcareFileInterface) {
-    this.file = file
+  protected setGroup(group: UploadcareGroupInterface) {
+    this.group = group
   }
 
-  protected getFile(): UploadcareFileInterface {
-    return this.file as UploadcareFileInterface
+  protected getGroup(): UploadcareGroupInterface {
+    return this.group as UploadcareGroupInterface
   }
 
   /**
@@ -119,47 +116,25 @@ export abstract class UploadFrom extends Thenable<UploadcareFileInterface> imple
 
   /**
    * Handle uploaded file.
-   * @param {Uuid} uuid
+   * @param {GroupInfo} groupInfo
    * @param {Settings} settings
    */
-  protected handleUploaded(uuid: Uuid, settings: Settings): Promise<UploadcareFileInterface> {
-    this.setFile({
-      uuid,
-      name: null,
-      size: null,
-      isStored: null,
-      isImage: null,
-      cdnUrl: null,
-      cdnUrlModifiers: null,
-      originalUrl: null,
-      originalFilename: null,
-      originalImageInfo: null,
-    })
+  protected handleUploaded(groupInfo: GroupInfo, settings: Settings): Promise<UploadcareGroupInterface> {
+    this.setGroup(new UploadcareGroup(groupInfo))
 
     this.setProgress(ProgressState.Uploaded)
 
     if (typeof this.onUploaded === 'function') {
-      this.onUploaded(uuid)
+      this.onUploaded(this.getGroup().uuid)
     }
 
-    this.isFileReadyPolling = checkFileIsReady({
-      uuid,
-      settings,
-    })
-
-    return this.isFileReadyPolling
-      .then(info => {
-        this.setFile(prettyFileInfo(info, settings))
-
-        return Promise.resolve(this.getFile())
-      })
-      .catch(error => Promise.reject(error))
+    return Promise.resolve(this.getGroup())
   }
 
   /**
    * Handle uploaded file that ready on CDN.
    */
-  protected handleReady = (): Promise<UploadcareFileInterface> => {
+  protected handleReady = (): Promise<UploadcareGroupInterface> => {
     this.setProgress(ProgressState.Ready)
 
     if (typeof this.onProgress === 'function') {
@@ -167,10 +142,10 @@ export abstract class UploadFrom extends Thenable<UploadcareFileInterface> imple
     }
 
     if (typeof this.onReady === 'function') {
-      this.onReady(this.getFile())
+      this.onReady(this.getGroup())
     }
 
-    return Promise.resolve(this.getFile())
+    return Promise.resolve(this.getGroup())
   }
 
   /**

@@ -1,6 +1,7 @@
 import * as factory from '../_fixtureFactory'
-import fileFrom, {FileFrom} from '../../src/fileFrom/fileFrom'
-import {getSettingsForTesting, sleep} from '../_helpers'
+import fileFrom from '../../src/fileFrom/fileFrom'
+import {FileFrom} from '../../src/fileFrom/types'
+import {getSettingsForTesting} from '../_helpers'
 
 describe('fileFrom', () => {
   describe('Uploaded', () => {

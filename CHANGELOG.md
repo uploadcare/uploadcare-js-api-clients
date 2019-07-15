@@ -9,8 +9,15 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Added
 
-* Wrappers for group paths of Upload API (`group`, `groupInfo`)
-* `onUploadProgress` for Node.js
+* Wrappers for group paths of Upload API (`group`, `groupInfo`).
+* The high-level function for group uploading, aka filesGroupFrom.
+* Uploading progress for Node.js in `base` method.
+
+### Changed
+
+* `UploadFromInterface` was renamed to `FileUploadInterface`.
+* `FileProgress` was renamed to `ProgressParams`.
+* `UploadcareFile` was renamed to `UploadcareFileInterface`.
 
 [Unreleased]: https://github.com/uploadcare/uploadcare-upload-client/compare/v1.0.0-alpha.3...HEAD
 
@@ -18,14 +25,15 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Added
 
-* Support `fileFrom` 'uploaded' file (`uuid`)
+* Support `fileFrom` 'uploaded' file (`uuid`).
 * Support of `waiting` status from `/from_url/status/` endpoint.
-* Export some main types from `index.ts` file.
-  So you can import them now directly from `@uploadcare/upload-client`
-* Throttling for `request`
-* `retryThrottledMaxTimes` param to set count of max retries after throttled request (1 by default)
-* `Uuid` type
-* Mock server for local testing
+* Export some main types from `index.ts` file. 
+  So you can import them now directly from `@uploadcare/upload-client`.
+* Throttling for `request`.
+* `retryThrottledMaxTimes` param to set count of max retries after 
+  throttled request (1 by default).
+* `Uuid` type.
+* Mock server for local testing.
 
 ## Fixed
 
@@ -39,15 +47,19 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Changed
 
 * Project was moved from Flow notations to TypeScript.
-* The `base` function now returns object that implements `DirectUploadInterface`.
-* The `fileFrom` function now returns object that implements `UploadFromInterface`.
+* The `base` function now returns object that implements 
+  `DirectUploadInterface`.
+* The `fileFrom` function now returns object that implements 
+  `UploadFromInterface`.
 * The `UCFile` type renamed to `UploadcareFile`.
 * The progress of `fileFrom` now based on the `UploadingProgress` type.
 
 ### Added
 
-* Low-level request wrappers for `/from_url/` and `/from_url/status/` paths of Upload API.
-* Settings: the support of setting `baseCDN`, `checkForUrlDuplicates`, `saveUrlForRecurrentUploads`.
+* Low-level request wrappers for `/from_url/` and `/from_url/status/` 
+  paths of Upload API.
+* Settings: the support of setting `baseCDN`, `checkForUrlDuplicates`, 
+  `saveUrlForRecurrentUploads`.
 
 [1.0.0-alpha.2]: https://github.com/uploadcare/uploadcare-upload-client/compare/v1.0.0-alpha.1...v1.0.0-alpha.2
 
@@ -55,7 +67,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Fixed
 
-* Use the version from the `package.json` file to create Uploadcare User Agent.
+* Use the version from the `package.json` file to create Uploadcare User 
+  Agent.
 
 ### Changed
 

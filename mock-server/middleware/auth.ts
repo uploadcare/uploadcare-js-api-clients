@@ -7,12 +7,15 @@ import error from '../utils/error'
  */
 const protectedRoutes: Array<string> = ROUTES
   .filter((route: RouteType) => {
-    const path = Object.keys(route).shift()
+    const keys = Object.keys(route)
+    const path = keys[0]
 
     return route[path].isProtected
   })
   .map((route: RouteType) => {
-    return Object.keys(route).shift()
+    const keys = Object.keys(route)
+
+    return keys[0]
   })
 
 /**
