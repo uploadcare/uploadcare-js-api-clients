@@ -50,8 +50,9 @@ export type RequestResponse = {
 
 /* Set max upload body size for node.js to 50M (default is 10M) */
 const MAX_CONTENT_LENGTH = 50 * 1000 * 1000
-const DEFAULT_FILE_NAME = 'original'
-const DEFAULT_RETRY_AFTER_TIMEOUT = 15000
+export const DEFAULT_FILE_NAME = 'original'
+export const DEFAULT_RETRY_AFTER_TIMEOUT = 15000
+export const DEFAULT_PART_SIZE = 5242880
 
 if (isNode()) {
   axios.interceptors.request.use(

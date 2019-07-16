@@ -13,6 +13,7 @@ export type Settings = {
   saveUrlForRecurrentUploads?: boolean,
   source?: string,
   jsonpCallback?: string,
+  multipartPartSize?: number,
 }
 
 export type FileData = Blob | File | Buffer
