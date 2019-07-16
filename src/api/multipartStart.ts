@@ -1,6 +1,6 @@
 import request, {DEFAULT_FILE_NAME, DEFAULT_PART_SIZE, prepareOptions, RequestOptions} from './request'
 import {FileData, Settings} from '../types'
-import {CancelableInterface, FileInfo, Uuid} from './types'
+import {Uuid} from './types'
 
 export type MultipartStartResponse = {
   parts: string[],
