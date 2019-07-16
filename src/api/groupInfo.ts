@@ -29,7 +29,7 @@ const getRequestOptions = (id: GroupId, settings: Settings): RequestOptions => {
 }
 
 /**
- * Create files group
+ * Get info about group.
  *
  * @param {GroupId} id – Group ID. Group IDs look like UUID~N.
  * @param {Settings} settings
