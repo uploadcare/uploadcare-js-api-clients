@@ -2,13 +2,11 @@ import multipartStart from '../../src/api/multipartStart'
 import * as factory from '../_fixtureFactory'
 import {getSettingsForTesting} from '../_helpers'
 
-fdescribe('API - multipartStart', () => {
-  const fileToUpload = factory.image('blackSquare')
-
+describe('API - multipartStart', () => {
   it('should be able to start upload data', async() => {
+    const fileToUpload = factory.file(11)
     const settings = getSettingsForTesting({
       publicKey: factory.publicKey('demo'),
-      multipartPartSize: 10585760,
     })
     const multipartStartUpload = multipartStart(fileToUpload.data, settings)
     const {uuid, parts} = await multipartStartUpload
@@ -18,6 +16,7 @@ fdescribe('API - multipartStart', () => {
   })
 
   it('should be rejected with bad options', (done) => {
+    const fileToUpload = factory.file(9)
     const settings = getSettingsForTesting({
       publicKey: factory.publicKey('demo'),
     })

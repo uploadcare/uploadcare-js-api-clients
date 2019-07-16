@@ -76,7 +76,7 @@ export function file(mbSize: number): FixtureFile {
 }
 
 function fileBuffer(bytes: number): FixtureFile {
-  const buffer = new Buffer(bytes)
+  const buffer = Buffer.alloc(bytes)
 
   return {
     data: buffer,

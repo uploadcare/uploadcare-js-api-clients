@@ -42,7 +42,6 @@ class DirectUpload extends Thenable<BaseResponse> implements DirectUploadInterfa
   private getRequestOptions() {
     return {
       ...this.options,
-      /* TODO Add support of progress for Node.js */
       onUploadProgress: (progressEvent: BaseProgress) => {
         if (typeof this.onProgress === 'function') {
           this.onProgress(progressEvent)

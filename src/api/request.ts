@@ -52,7 +52,8 @@ export type RequestResponse = {
 const MAX_CONTENT_LENGTH = 50 * 1000 * 1000
 export const DEFAULT_FILE_NAME = 'original'
 export const DEFAULT_RETRY_AFTER_TIMEOUT = 15000
-export const DEFAULT_PART_SIZE = 5242880
+export const DEFAULT_PART_SIZE = 5242880 // 5MB
+export const MIN_MULTIPART_UPLOAD_SIZE = 10485760 // 10 MB
 
 if (isNode()) {
   axios.interceptors.request.use(
