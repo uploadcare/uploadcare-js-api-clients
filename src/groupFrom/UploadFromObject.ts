@@ -3,7 +3,7 @@ import {UploadFrom} from './UploadFrom'
 import group, {GroupInfoResponse} from '../api/group'
 import CancelError from '../errors/CancelError'
 import fileFrom from '../fileFrom/fileFrom'
-import {FileFrom, FileUploadInterface} from '../fileFrom/types'
+import {FileFrom, FileUploadInterface} from '..'
 
 export class UploadFromObject extends UploadFrom {
   protected readonly promise: Promise<UploadcareGroupInterface>

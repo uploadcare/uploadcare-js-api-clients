@@ -1,7 +1,8 @@
-import request, {prepareOptions} from './request'
+import request from './request/request'
+import {prepareOptions} from './request/prepareOptions'
+import {RequestOptions} from './request/types'
 import {FileInfo, Uuid} from './types'
 import {Settings} from '../types'
-import {RequestOptions} from './request'
 
 export type InfoResponse = FileInfo
 

@@ -1,4 +1,6 @@
-import request, {prepareOptions, RequestOptions} from './request'
+import request from './request/request'
+import {prepareOptions} from './request/prepareOptions'
+import {RequestOptions} from './request/types'
 import {Settings} from '../types'
 import {FileInfo, ProgressStatus, Token} from './types'
 

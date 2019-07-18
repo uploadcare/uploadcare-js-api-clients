@@ -1,4 +1,10 @@
-import {UploadcareFileInterface, UploadcareGroupInterface} from '../types'
+import {RequestOptions, RequestResponse} from './request/types'
+import {FileData, Settings} from '../types'
+import {DirectUploadInterface} from './base'
+import {InfoResponse} from './info'
+import {FromUrlResponse, Url} from './fromUrl'
+import {FromUrlStatusResponse} from './fromUrlStatus'
+import {GroupInfoResponse} from './group'
 
 interface StatusInterface {
   status: string,
@@ -86,3 +92,19 @@ export type Token = string
 export type Uuid = string
 
 export type GroupId = string
+
+export interface UploadAPIInterface {
+  request(options: RequestOptions): Promise<RequestResponse>
+
+  base(data: FileData, settings?: Settings): DirectUploadInterface
+
+  info(uuid: Uuid, settings?: Settings): Promise<InfoResponse>
+
+  fromUrl(sourceUrl: Url, settings?: Settings): Promise<FromUrlResponse>
+
+  fromUrlStatus(token: Token, settings?: Settings): Promise<FromUrlStatusResponse>
+
+  group(files: Uuid[], settings: Settings): Promise<GroupInfoResponse>
+
+  groupInfo(id: GroupId, settings: Settings): Promise<GroupInfoResponse>
+}

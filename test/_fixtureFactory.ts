@@ -1,4 +1,5 @@
-import {dataURItoBlob, dataURItoBuffer, getSettingsForTesting, isNode} from './_helpers'
+import {dataURItoBlob, dataURItoBuffer, getSettingsForTesting} from './_helpers'
+import {isNode} from '../src/tools/isNode'
 
 const settings = getSettingsForTesting()
 

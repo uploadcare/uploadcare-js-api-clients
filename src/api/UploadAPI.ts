@@ -1,31 +1,15 @@
-import request, {prepareOptions} from './request'
-import base, {DirectUploadInterface} from './base'
+import info, {InfoResponse} from './info'
 import UploadClient from '../UploadClient'
-import {RequestOptions, RequestResponse} from './request'
-import {FileData, Settings} from '../types'
-import info from './info'
-import {GroupId, Token, Uuid} from './types'
-import {InfoResponse} from './info'
-import fromUrl, {FromUrlResponse, Url} from './fromUrl'
 import fromUrlStatus, {FromUrlStatusResponse} from './fromUrlStatus'
-import group, {GroupInfoResponse} from './group'
+import base, {DirectUploadInterface} from './base'
+import {GroupId, Token, UploadAPIInterface, Uuid} from './types'
+import {RequestOptions, RequestResponse} from './request/types'
+import fromUrl, {FromUrlResponse, Url} from './fromUrl'
 import groupInfo from './groupInfo'
-
-export interface UploadAPIInterface {
-  request(options: RequestOptions): Promise<RequestResponse>
-
-  base(data: FileData, settings?: Settings): DirectUploadInterface
-
-  info(uuid: Uuid, settings?: Settings): Promise<InfoResponse>
-
-  fromUrl(sourceUrl: Url, settings?: Settings): Promise<FromUrlResponse>
-
-  fromUrlStatus(token: Token, settings?: Settings): Promise<FromUrlStatusResponse>
-
-  group(files: Uuid[], settings: Settings): Promise<GroupInfoResponse>
-
-  groupInfo(id: GroupId, settings: Settings): Promise<GroupInfoResponse>
-}
+import {FileData, Settings} from '../types'
+import {prepareOptions} from './request/prepareOptions'
+import group, {GroupInfoResponse} from './group'
+import request from './request/request'
 
 class UploadAPI implements UploadAPIInterface {
   readonly client: UploadClient

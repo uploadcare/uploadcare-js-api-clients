@@ -1,7 +1,9 @@
-import request, {DEFAULT_FILE_NAME, DEFAULT_PART_SIZE, prepareOptions, RequestOptions} from './request'
+import request, {DEFAULT_FILE_NAME, DEFAULT_PART_SIZE} from './request/request'
+import {prepareOptions} from './request/prepareOptions'
+import {RequestOptions} from './request/types'
 import {FileData, Settings} from '../types'
 import {Uuid} from './types'
-import {isNode} from '../../test/_helpers'
+import {isNode} from '../tools/isNode'
 
 export type MultipartPart = string
 
@@ -10,8 +12,14 @@ export type MultipartStartResponse = {
   uuid: Uuid,
 }
 
+const getFileSize = (file: FileData): number => {
+  return isNode() ?
+    (file as Buffer).length :
+    (file as Blob).size
+}
+
 const getRequestBody = (file: FileData, settings: Settings) => {
-  const size: number = isNode() ? (file as Buffer).length : (file as Blob).size
+  const size: number = getFileSize(file)
 
   return {
     filename: settings.fileName || DEFAULT_FILE_NAME,

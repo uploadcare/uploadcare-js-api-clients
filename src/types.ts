@@ -47,8 +47,6 @@ export interface UploadcareFileInterface {
   readonly originalImageInfo: null | OriginalImageInfo,
 }
 
-export type UploadcareFiles = UploadcareFileInterface[]
-
 export interface UploadcareGroupInterface {
   readonly uuid: GroupId,
   readonly filesCount: string,
