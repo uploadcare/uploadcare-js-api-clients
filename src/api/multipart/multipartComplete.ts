@@ -1,10 +1,9 @@
-import request from './request/request'
-import {prepareOptions} from './request/prepareOptions'
-import {RequestOptions} from './request/types'
-import {Settings} from '../types'
-import {FileInfo, Uuid} from './types'
-
-export type MultipartCompleteResponse = FileInfo
+import request from '../request/request'
+import {prepareOptions} from '../request/prepareOptions'
+import {RequestOptions} from '../request/types'
+import {Settings} from '../../types'
+import {Uuid} from '../types'
+import {MultipartCompleteResponse} from './types'
 
 const getRequestBody = (uuid: Uuid, settings: Settings) => ({
   uuid,
@@ -21,6 +20,7 @@ const getRequestOptions = (uuid: Uuid, settings: Settings): RequestOptions => {
 
 /**
  * Complete multipart uploading.
+ *
  * @param {Uuid} uuid
  * @param {Settings} settings
  * @return {Promise<MultipartCompleteResponse>}

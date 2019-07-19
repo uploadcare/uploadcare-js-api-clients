@@ -1,7 +1,7 @@
-import multipartUploadPart from '../../../src/api/multipartUpload/multipartUploadPart'
+import multipartUploadPart from '../../../src/api/multipart/multipartUploadPart'
 import * as factory from '../../_fixtureFactory'
 import {getSettingsForTesting} from '../../_helpers'
-import multipartStart from '../../../src/api/multipartStart'
+import multipartStart from '../../../src/api/multipart/multipartStart'
 import {DEFAULT_PART_SIZE} from '../../../src/api/request/request'
 
 describe('API - multipartUploadPart', () => {
@@ -14,7 +14,7 @@ describe('API - multipartUploadPart', () => {
     })
     const multipartStartUpload = multipartStart(fileToUpload, settings)
     const {parts} = await multipartStartUpload
-    const firstPart = parts[0]
+    const [firstPart] = parts
     const fileSliceToUpload = fileToUpload.slice(0, DEFAULT_PART_SIZE)
 
     const multipartUploadPromise = multipartUploadPart(firstPart, fileSliceToUpload)

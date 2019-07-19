@@ -5,6 +5,12 @@ import {InfoResponse} from './info'
 import {FromUrlResponse, Url} from './fromUrl'
 import {FromUrlStatusResponse} from './fromUrlStatus'
 import {GroupInfoResponse} from './group'
+import {
+  MultipartCompleteResponse,
+  MultipartPart,
+  MultipartStartResponse,
+  MultipartUploadInterface
+} from './multipart/types'
 
 interface StatusInterface {
   status: string,
@@ -107,4 +113,10 @@ export interface UploadAPIInterface {
   group(files: Uuid[], settings: Settings): Promise<GroupInfoResponse>
 
   groupInfo(id: GroupId, settings: Settings): Promise<GroupInfoResponse>
+
+  multipartStart(file: FileData, settings: Settings): Promise<MultipartStartResponse>
+
+  multipartUpload(file: FileData, parts: MultipartPart[], settings: Settings): MultipartUploadInterface
+
+  multipartComplete(uuid: Uuid, settings: Settings): Promise<MultipartCompleteResponse>
 }

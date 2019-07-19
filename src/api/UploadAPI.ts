@@ -10,6 +10,15 @@ import {FileData, Settings} from '../types'
 import {prepareOptions} from './request/prepareOptions'
 import group, {GroupInfoResponse} from './group'
 import request from './request/request'
+import {
+  MultipartCompleteResponse,
+  MultipartPart,
+  MultipartStartResponse,
+  MultipartUploadInterface
+} from './multipart/types'
+import multipartComplete from './multipart/multipartComplete'
+import multipartStart from './multipart/multipartStart'
+import multipartUpload from './multipart/multipartUpload'
 
 class UploadAPI implements UploadAPIInterface {
   readonly client: UploadClient
@@ -55,6 +64,18 @@ class UploadAPI implements UploadAPIInterface {
 
   groupInfo(id: GroupId, settings: Settings): Promise<GroupInfoResponse> {
     return groupInfo(id, this.getResultSettings(settings))
+  }
+
+  multipartStart(file: FileData, settings: Settings): Promise<MultipartStartResponse> {
+    return multipartStart(file, this.getResultSettings(settings))
+  }
+
+  multipartUpload(file: FileData, parts: MultipartPart[], settings: Settings): MultipartUploadInterface {
+    return multipartUpload(file, parts, this.getResultSettings(settings))
+  }
+
+  multipartComplete(uuid: Uuid, settings: Settings): Promise<MultipartCompleteResponse> {
+    return multipartComplete(uuid, this.getResultSettings(settings))
   }
 }
 

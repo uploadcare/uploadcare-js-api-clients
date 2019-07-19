@@ -1,22 +1,12 @@
 import * as FormData from 'form-data'
-import {CancelableInterface} from '../types'
 import {HandleProgressFunction} from '../request/types'
 import {Thenable} from '../../tools/Thenable'
-import {MultipartPart} from '../multipartStart'
-import {FileData, Settings} from '../../types'
+import {FileData} from '../../types'
 import {BaseProgress} from '../base'
 import {DEFAULT_MAX_CONTENT_LENGTH} from '../request/request'
 import axios, {AxiosRequestConfig, CancelTokenSource} from 'axios'
 import {isNode} from '../../tools/isNode'
-
-export type MultipartUploadResponse = {
-  code: number,
-}
-
-export interface MultipartUploadInterface extends Promise<MultipartUploadResponse>, CancelableInterface {
-  onProgress: HandleProgressFunction | null
-  onCancel: VoidFunction | null
-}
+import {MultipartPart, MultipartUploadInterface, MultipartUploadResponse} from './types'
 
 const nodeUploadBufferProgress = (config: AxiosRequestConfig): AxiosRequestConfig => {
   const {data, onUploadProgress} = config
@@ -43,7 +33,7 @@ const nodeUploadBufferProgress = (config: AxiosRequestConfig): AxiosRequestConfi
   return config
 }
 
-class MultipartUpload extends Thenable<MultipartUploadResponse> implements MultipartUploadInterface {
+class MultipartUploadPart extends Thenable<MultipartUploadResponse> implements MultipartUploadInterface {
   onProgress: HandleProgressFunction | null = null
   onCancel: VoidFunction | null = null
 
@@ -95,10 +85,11 @@ class MultipartUpload extends Thenable<MultipartUploadResponse> implements Multi
 
 /**
  * Upload part of multipart file.
+ *
  * @param {MultipartPart} partUrl
  * @param {FileData} file
  * @return {MultipartUploadInterface}
  */
 export default function multipartUploadPart(partUrl: MultipartPart, file: FileData): MultipartUploadInterface {
-  return new MultipartUpload(partUrl, file)
+  return new MultipartUploadPart(partUrl, file)
 }
