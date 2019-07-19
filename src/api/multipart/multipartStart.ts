@@ -1,17 +1,18 @@
-import request, {DEFAULT_FILE_NAME, DEFAULT_PART_SIZE} from '../request/request'
+import request from '../request/request'
 import {prepareOptions} from '../request/prepareOptions'
 import {RequestOptions} from '../request/types'
 import {FileData, Settings} from '../../types'
 import {MultipartStartResponse} from './types'
 import {getFileSize} from './getFileSize'
+import defaultSettings from '../../defaultSettings'
 
 const getRequestBody = (file: FileData, settings: Settings) => {
   const size: number = getFileSize(file)
 
   return {
-    filename: settings.fileName || DEFAULT_FILE_NAME,
+    filename: settings.fileName || defaultSettings.fileName,
     size,
-    partSize: settings.multipartChunkSize || DEFAULT_PART_SIZE,
+    partSize: settings.multipartChunkSize || defaultSettings.multipartChunkSize,
     content_type: 'application/octet-stream',
     UPLOADCARE_STORE: settings.doNotStore ? '' : 'auto',
     UPLOADCARE_PUB_KEY: settings.publicKey || '',

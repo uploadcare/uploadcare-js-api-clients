@@ -8,8 +8,8 @@ import * as FormData from 'form-data'
  * @param {Body} body
  * @returns {FormData} FormData instance
  */
-import {DEFAULT_FILE_NAME} from './request'
 import {Body} from './types'
+import defaultSettings from '../../defaultSettings'
 
 export function buildFormData(body: Body): FormData | Body {
   const formData = new FormData()
@@ -26,7 +26,7 @@ export function buildFormData(body: Body): FormData | Body {
     }
     else if (key === 'file') {
       const file = body.file as File
-      const fileName = file.name || DEFAULT_FILE_NAME
+      const fileName = file.name || defaultSettings.fileName
 
       formData.append('file', value, fileName)
     }

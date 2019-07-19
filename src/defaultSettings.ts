@@ -2,11 +2,7 @@ import {version} from '../package.json'
 import {Settings} from './types'
 
 /*
-Settings for future support:
-  baseCDN: 'https://ucarecdn.com',
-  multipartMinFileSize: 25 * 1024 * 1024,
-  multipartChunkSize: 5 * 1024 * 1024,
-  multipartMinLastPartSize: 1024 * 1024,
+  Settings for future support:
   multipartConcurrency: 4,
   multipartMaxAttempts: 3,
   parallelDirectUploads: 10,
@@ -15,6 +11,11 @@ Settings for future support:
 const defaultSettings: Settings = {
   baseCDN: 'https://ucarecdn.com',
   baseURL: 'https://upload.uploadcare.com',
+  fileName: 'original',
+  retryThrottledRequestMaxTimes: 1,
+  multipartMinFileSize: 25 * 1024 * 1024, // 25 MB
+  multipartChunkSize: 5 * 1024 * 1024, // 5 MB
+  multipartMinLastPartSize: 1024 * 1024, // 1MB
 }
 
 export default defaultSettings

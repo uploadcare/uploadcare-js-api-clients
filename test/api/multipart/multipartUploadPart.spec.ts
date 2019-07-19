@@ -2,7 +2,7 @@ import multipartUploadPart from '../../../src/api/multipart/multipartUploadPart'
 import * as factory from '../../_fixtureFactory'
 import {getSettingsForTesting} from '../../_helpers'
 import multipartStart from '../../../src/api/multipart/multipartStart'
-import {DEFAULT_PART_SIZE} from '../../../src/api/request/request'
+import defaultSettings from '../../../src/defaultSettings'
 
 describe('API - multipartUploadPart', () => {
   jasmine.DEFAULT_TIMEOUT_INTERVAL = 100000
@@ -15,7 +15,7 @@ describe('API - multipartUploadPart', () => {
     const multipartStartUpload = multipartStart(fileToUpload, settings)
     const {parts} = await multipartStartUpload
     const [firstPart] = parts
-    const fileSliceToUpload = fileToUpload.slice(0, DEFAULT_PART_SIZE)
+    const fileSliceToUpload = fileToUpload.slice(0, defaultSettings.multipartChunkSize)
 
     const multipartUploadPromise = multipartUploadPart(firstPart, fileSliceToUpload)
     const {code} = await multipartUploadPromise

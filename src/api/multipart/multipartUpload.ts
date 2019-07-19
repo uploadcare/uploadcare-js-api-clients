@@ -6,7 +6,7 @@ import {ChunkType, MultipartPart, MultipartUploadInterface} from './types'
 import {BaseProgress} from '../base'
 import {getFileSize} from './getFileSize'
 import {getChunks} from './getChunks'
-import {DEFAULT_PART_SIZE} from '../request/request'
+import defaultSettings from '../../defaultSettings'
 
 class MultipartUpload extends Thenable<any> implements MultipartUploadInterface {
   onProgress: HandleProgressFunction | null = null
@@ -19,7 +19,7 @@ class MultipartUpload extends Thenable<any> implements MultipartUploadInterface 
     super()
 
     const fileSize = getFileSize(file)
-    const chunkSize = settings.multipartChunkSize || DEFAULT_PART_SIZE
+    const chunkSize = settings.multipartChunkSize || defaultSettings.multipartChunkSize
     const chunks = getChunks(fileSize, chunkSize)
     const chunksCount = chunks.length
 

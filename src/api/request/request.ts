@@ -14,10 +14,7 @@ const DEFAULT_RETRY_THROTTLED_MAX_TIMES = 1
 const REQUEST_WAS_THROTTLED_CODE = 429
 /* Set max upload body size for node.js to 50M (default is 10M) */
 export const DEFAULT_MAX_CONTENT_LENGTH = 50 * 1000 * 1000
-export const DEFAULT_FILE_NAME = 'original'
 export const DEFAULT_RETRY_AFTER_TIMEOUT = 15000
-export const DEFAULT_PART_SIZE = 5242880 // 5MB
-export const MIN_MULTIPART_UPLOAD_SIZE = 10485760 // 10 MB
 
 const nodeUploadProgress = (config: AxiosRequestConfig): AxiosRequestConfig => {
   const {data, onUploadProgress} = config
