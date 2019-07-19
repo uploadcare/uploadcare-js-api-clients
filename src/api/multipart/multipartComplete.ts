@@ -7,7 +7,8 @@ import {MultipartCompleteResponse} from './types'
 
 const getRequestBody = (uuid: Uuid, settings: Settings) => ({
   uuid,
-  UPLOADCARE_PUB_KEY: settings.publicKey || ''
+  UPLOADCARE_PUB_KEY: settings.publicKey || '',
+  source: settings.source || 'local',
 })
 
 const getRequestOptions = (uuid: Uuid, settings: Settings): RequestOptions => {
