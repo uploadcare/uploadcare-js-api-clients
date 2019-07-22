@@ -39,7 +39,7 @@ export const isTokenResponse = (response: FromUrlResponse): response is TokenRes
  * @param {FromUrlResponse} response
  */
 export const isFileInfoResponse = (response: FromUrlResponse): response is FileInfoResponse => {
-  return response.type !== undefined && response.type === TypeEnum.Token;
+  return response.type !== undefined && response.type === TypeEnum.FileInfo;
 }
 
 const getRequestQuery = (sourceUrl: Url, settings: Settings) => ({
