@@ -1,5 +1,7 @@
 import request from './request/request'
 import {prepareOptions} from './request/prepareOptions'
+
+/* Types */
 import {RequestOptions} from './request/types'
 import {FileInfo, Uuid} from './types'
 import {Settings} from '../types'
@@ -19,7 +21,7 @@ const getRequestQuery = (uuid: Uuid, settings: Settings) => {
     }
   }
 
-  return  {...query}
+  return query
 }
 
 const getRequestOptions = (uuid: Uuid, settings: Settings): RequestOptions => {
@@ -30,7 +32,7 @@ const getRequestOptions = (uuid: Uuid, settings: Settings): RequestOptions => {
 }
 
 /**
- * Returns a JSON dictionary holding file info
+ * Returns a JSON dictionary holding file info.
  *
  * @param {Uuid} uuid – UUID of a target file to request its info.
  * @param {Settings} settings

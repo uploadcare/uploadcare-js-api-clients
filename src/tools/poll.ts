@@ -65,7 +65,8 @@ export default function poll<T>(checkConditionFunction: Function, timeout: numbe
       }
       // Didn't match and too much time, reject!
       else {
-        reject(new TimeoutError(checkConditionFunction))
+        // TODO: Pass function name as param
+        reject(new TimeoutError(''))
       }
     } catch (error) {
       reject(error)

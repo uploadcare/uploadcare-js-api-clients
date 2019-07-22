@@ -1,13 +1,15 @@
-import {FileData, Settings} from '../types'
-import {Url} from '../api/fromUrl'
-import {Uuid} from '../api/types'
 import {UploadFromObject} from './UploadFromObject'
 import {UploadFromUrl} from './UploadFromUrl'
 import {UploadFromUploaded} from './UploadFromUploaded'
+
+/* Types */
+import {FileData, Settings} from '../types'
+import {Url} from '../api/fromUrl'
+import {Uuid} from '../api/types'
 import {FileUploadInterface, FileFrom} from './types'
 
 /**
- * Uploads file from provided data
+ * Uploads file from provided data.
  *
  * @param {FileFrom} from
  * @param {FileData} data

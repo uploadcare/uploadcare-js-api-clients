@@ -4,7 +4,7 @@ import {InfoResponse} from './api/info'
 import {Settings, UploadcareFileInterface} from './types'
 
 /**
- * Transforms file info getting from Upload API to pretty info
+ * Transforms file info getting from Upload API to pretty info.
  *
  * @param {InfoResponse} info
  * @param {Settings} settings

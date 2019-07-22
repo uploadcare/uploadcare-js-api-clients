@@ -1,12 +1,14 @@
 import {Thenable} from '../../tools/Thenable'
-import {HandleProgressFunction} from '../request/types'
 import multipartUploadPart from './multipartUploadPart'
-import {FileData, Settings} from '../../types'
-import {ChunkType, MultipartPart, MultipartUploadInterface} from './types'
-import {BaseProgress} from '../base'
 import {getFileSize} from './getFileSize'
 import {getChunks} from './getChunks'
 import defaultSettings from '../../defaultSettings'
+
+/* Types */
+import {HandleProgressFunction} from '../request/types'
+import {FileData, Settings} from '../../types'
+import {ChunkType, MultipartPart, MultipartUploadInterface} from './types'
+import {BaseProgress} from '../types'
 
 class MultipartUpload extends Thenable<any> implements MultipartUploadInterface {
   onProgress: HandleProgressFunction | null = null

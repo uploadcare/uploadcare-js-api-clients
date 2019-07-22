@@ -1,5 +1,5 @@
 import {version} from '../package.json'
-import {Settings} from './types'
+import {DefaultSettings, Settings} from './types'
 
 /*
   Settings for future support:
@@ -8,7 +8,7 @@ import {Settings} from './types'
   parallelDirectUploads: 10,
   pusherKey: '79ae88bd931ea68464d9',
  */
-const defaultSettings: Settings = {
+const defaultSettings: DefaultSettings = {
   baseCDN: 'https://ucarecdn.com',
   baseURL: 'https://upload.uploadcare.com',
   fileName: 'original',

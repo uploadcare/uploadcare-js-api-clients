@@ -1,16 +1,17 @@
 import {ErrorRequestInfo, ErrorResponseInfo} from './types'
+import RequestError from './RequestError'
 
 export default class UploadcareError extends Error {
-  request: ErrorRequestInfo
-  response: ErrorResponseInfo
+  readonly request: ErrorRequestInfo
+  readonly response: ErrorResponseInfo
 
-  constructor(request: ErrorRequestInfo, response: ErrorResponseInfo) {
+  constructor(requestError: RequestError) {
     super()
 
     this.name = 'UploadcareError'
-    this.message = `[${response.status}] ${response.statusText}`
-    this.request = request
-    this.response = response
+    this.message = `[${requestError.response.status}] ${requestError.response.statusText}`
+    this.request = requestError.request
+    this.response = requestError.response
 
     if (Error.captureStackTrace) {
       Error.captureStackTrace(this, UploadcareError)

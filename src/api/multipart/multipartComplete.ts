@@ -1,5 +1,7 @@
 import request from '../request/request'
 import {prepareOptions} from '../request/prepareOptions'
+
+/* Types */
 import {RequestOptions} from '../request/types'
 import {Settings} from '../../types'
 import {Uuid} from '../types'

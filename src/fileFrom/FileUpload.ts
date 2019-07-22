@@ -1,5 +1,7 @@
-import {FileHandlerInterface, FileUploadInterface} from './types'
 import {Thenable} from '../tools/Thenable'
+
+/* Types */
+import {FileHandlerInterface, FileUploadInterface} from './types'
 import {UploadcareFileInterface, UploadingProgress} from '../types'
 import {FileUploadLifecycleInterface} from '../lifecycle/types'
 import {CancelableInterface} from '../api/types'
@@ -11,6 +13,7 @@ export class FileUpload extends Thenable<UploadcareFileInterface> implements Fil
   onCancel: VoidFunction | null = null
 
   protected readonly promise: Promise<UploadcareFileInterface>
+
   private readonly cancelable: CancelableInterface
 
   constructor(lifecycle: FileUploadLifecycleInterface, handler: FileHandlerInterface, cancelable: CancelableInterface) {

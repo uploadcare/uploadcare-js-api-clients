@@ -1,11 +1,15 @@
+/* Vendors */
 import * as FormData from 'form-data'
-import {HandleProgressFunction} from '../request/types'
-import {Thenable} from '../../tools/Thenable'
-import {FileData} from '../../types'
-import {BaseProgress} from '../base'
-import {DEFAULT_MAX_CONTENT_LENGTH} from '../request/request'
 import axios, {AxiosRequestConfig, CancelTokenSource} from 'axios'
+
+import {Thenable} from '../../tools/Thenable'
+import {DEFAULT_MAX_CONTENT_LENGTH} from '../request/request'
 import {isNode} from '../../tools/isNode'
+
+/* Types */
+import {HandleProgressFunction} from '../request/types'
+import {FileData} from '../../types'
+import {BaseProgress} from '../types'
 import {MultipartPart, MultipartUploadInterface, MultipartUploadResponse} from './types'
 
 const nodeUploadBufferProgress = (config: AxiosRequestConfig): AxiosRequestConfig => {

@@ -1,6 +1,5 @@
 import {FileData} from '../../types'
-import {BaseProgress} from '../base'
-import {CancelableInterface} from '../types'
+import {CancelableInterface, BaseProgress} from '../types'
 
 export type Query = {
   [key: string]: string | string[] | boolean | number | void,

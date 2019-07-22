@@ -1,5 +1,7 @@
 import request from './request/request'
 import {prepareOptions} from './request/prepareOptions'
+
+/* Types */
 import {RequestOptions} from './request/types'
 import {GroupInfo, Uuid} from './types'
 import {Settings} from '../types'
@@ -34,7 +36,7 @@ const getRequestOptions = (files: Uuid[], settings: Settings): RequestOptions =>
 }
 
 /**
- * Create files group
+ * Create files group.
  *
  * @param {Uuid[]} files – A set of files you want to join in a group.
  * @param {Settings} settings

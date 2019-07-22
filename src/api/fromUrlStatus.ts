@@ -1,5 +1,7 @@
 import request from './request/request'
 import {prepareOptions} from './request/prepareOptions'
+
+/* Types */
 import {RequestOptions} from './request/types'
 import {Settings} from '../types'
 import {FileInfo, ProgressStatus, Token} from './types'
@@ -36,7 +38,8 @@ type SuccessResponse = {
 export type FromUrlStatusResponse = UnknownResponse | WaitingResponse | ProgressResponse | ErrorResponse | SuccessResponse
 
 /**
- * UnknownResponse Type Guard
+ * UnknownResponse Type Guard.
+ *
  * @param {FromUrlStatusResponse} response
  */
 export const isUnknownResponse = (response: FromUrlStatusResponse): response is UnknownResponse => {
@@ -44,7 +47,8 @@ export const isUnknownResponse = (response: FromUrlStatusResponse): response is 
 }
 
 /**
- * WaitingResponse Type Guard
+ * WaitingResponse Type Guard.
+ *
  * @param {FromUrlStatusResponse} response
  */
 export const isWaitingResponse = (response: FromUrlStatusResponse): response is WaitingResponse => {
@@ -52,7 +56,8 @@ export const isWaitingResponse = (response: FromUrlStatusResponse): response is 
 }
 
 /**
- * UnknownResponse Type Guard
+ * UnknownResponse Type Guard.
+ *
  * @param {FromUrlStatusResponse} response
  */
 export const isProgressResponse = (response: FromUrlStatusResponse): response is ProgressResponse => {
@@ -60,7 +65,8 @@ export const isProgressResponse = (response: FromUrlStatusResponse): response is
 }
 
 /**
- * UnknownResponse Type Guard
+ * UnknownResponse Type Guard.
+ *
  * @param {FromUrlStatusResponse} response
  */
 export const isErrorResponse = (response: FromUrlStatusResponse): response is ErrorResponse => {
@@ -68,7 +74,8 @@ export const isErrorResponse = (response: FromUrlStatusResponse): response is Er
 }
 
 /**
- * SuccessResponse Type Guard
+ * SuccessResponse Type Guard.
+ *
  * @param {FromUrlStatusResponse} response
  */
 export const isSuccessResponse = (response: FromUrlStatusResponse): response is SuccessResponse => {

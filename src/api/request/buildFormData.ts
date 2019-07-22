@@ -1,16 +1,19 @@
+/* Vendors */
 import * as FormData from 'form-data'
 
+import defaultSettings from '../../defaultSettings'
+
+/* Types */
+import {Body} from './types'
+
 /**
- * Constructs FormData instance from object
+ * Constructs FormData instance from object.
  * Uses 'form-data' package which internally use native FormData
- * in browsers and the polyfill in node env
+ * in browsers and the polyfill in node env.
  *
  * @param {Body} body
  * @returns {FormData} FormData instance
  */
-import {Body} from './types'
-import defaultSettings from '../../defaultSettings'
-
 export function buildFormData(body: Body): FormData | Body {
   const formData = new FormData()
 

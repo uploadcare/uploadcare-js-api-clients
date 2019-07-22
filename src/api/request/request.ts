@@ -1,17 +1,22 @@
+/* Vendors */
 import axios, {AxiosError, AxiosRequestConfig, CancelTokenSource} from 'axios'
+
+import {Thenable} from '../../tools/Thenable'
+import {isNode} from '../../tools/isNode'
+import {buildFormData} from './buildFormData'
+import {delay} from './delay'
 import defaultSettings, {getUserAgent} from '../../defaultSettings'
+
 import RequestError from '../../errors/RequestError'
 import CancelError from '../../errors/CancelError'
 import UploadcareError from '../../errors/UploadcareError'
 import RequestWasThrottledError from '../../errors/RequestWasThrottledError'
-import {Thenable} from '../../tools/Thenable'
-import {isNode} from '../../tools/isNode'
-import {RequestInterface, RequestOptions, RequestResponse} from './types'
-import {buildFormData} from './buildFormData'
-import {delay} from './delay'
 
-const DEFAULT_RETRY_THROTTLED_MAX_TIMES = 1
+/* Types */
+import {RequestInterface, RequestOptions, RequestResponse} from './types'
+
 const REQUEST_WAS_THROTTLED_CODE = 429
+
 /* Set max upload body size for node.js to 50M (default is 10M) */
 export const DEFAULT_MAX_CONTENT_LENGTH = 50 * 1000 * 1000
 export const DEFAULT_RETRY_AFTER_TIMEOUT = 15000
@@ -49,7 +54,7 @@ class Request extends Thenable<RequestResponse> implements RequestInterface {
     super()
 
     this.options = options
-    this.retryThrottledMaxTimes = options.retryThrottledMaxTimes || DEFAULT_RETRY_THROTTLED_MAX_TIMES
+    this.retryThrottledMaxTimes = options.retryThrottledMaxTimes || defaultSettings.retryThrottledRequestMaxTimes
     this.cancelController = axios.CancelToken.source()
     this.promise = this.getRequestPromise()
   }
@@ -186,17 +191,19 @@ class Request extends Thenable<RequestResponse> implements RequestInterface {
         statusText: content || response.data.error,
       }
 
+      const requestError = new RequestError(errorRequestInfo, errorResponseInfo)
+
       // If request was throttled
       if (code === REQUEST_WAS_THROTTLED_CODE) {
         this.throttledTimes++
+
         throw new RequestWasThrottledError(
-          errorRequestInfo,
-          errorResponseInfo,
-          `Request was throttled more than ${this.retryThrottledMaxTimes}`
+          requestError,
+          this.retryThrottledMaxTimes
         )
       }
 
-      throw new UploadcareError(errorRequestInfo, errorResponseInfo)
+      throw new UploadcareError(requestError)
     }
 
     return {
@@ -217,7 +224,7 @@ class Request extends Thenable<RequestResponse> implements RequestInterface {
 }
 
 /**
- * Performs request to Uploadcare Upload API
+ * Performs request to Uploadcare Upload API.
  *
  * @export
  * @param {RequestOptions} options – The options for making requests.

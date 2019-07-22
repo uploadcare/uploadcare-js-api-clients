@@ -1,13 +1,21 @@
-import {FileData, Settings, UploadcareFileInterface} from '../types'
-import base, {DirectUploadInterface} from '../api/base'
+import base from '../api/base'
+import {getFileSize} from '../api/multipart/getFileSize'
+import multipart from '../api/multipart/multipart'
+
+/* Types */
 import {UploadFrom} from './UploadFrom'
+import {FileData, Settings, UploadcareFileInterface} from '../types'
+import {MultipartInterface} from '../api/multipart/types'
+import {DirectUploadInterface} from '../api/types'
+import defaultSettings from '../defaultSettings'
 
 export class UploadFromObject extends UploadFrom {
-  private readonly request: DirectUploadInterface
   protected readonly promise: Promise<UploadcareFileInterface>
 
+  private readonly request: DirectUploadInterface | MultipartInterface
   private readonly data: FileData
   private readonly settings: Settings
+  private readonly isMultipart: boolean = false
 
   constructor(data: FileData, settings: Settings) {
     super()
@@ -15,7 +23,16 @@ export class UploadFromObject extends UploadFrom {
     this.data = data
     this.settings = settings
 
-    this.request = base(this.data, this.settings)
+    const fileSize = getFileSize(data)
+    const multipartMinFileSize = settings.multipartMinFileSize || defaultSettings.multipartMinFileSize
+
+    if (fileSize < multipartMinFileSize) {
+      this.request = base(this.data, this.settings)
+    } else {
+      this.isMultipart = true
+      this.request = multipart(this.data, this.settings)
+    }
+
     this.promise = this.getFilePromise()
   }
 
@@ -32,7 +49,14 @@ export class UploadFromObject extends UploadFrom {
 
     fileUpload.onCancel = this.handleCancelling
 
-    return fileUpload
+    if (this.isMultipart) {
+      return (fileUpload as MultipartInterface)
+        .then(({uuid}) => this.handleUploaded(uuid, this.settings))
+        .then(this.handleReady)
+        .catch(this.handleError)
+    }
+
+    return (fileUpload as DirectUploadInterface)
       .then(({file: uuid}) => this.handleUploaded(uuid, this.settings))
       .then(this.handleReady)
       .catch(this.handleError)

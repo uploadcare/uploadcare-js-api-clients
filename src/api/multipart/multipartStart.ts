@@ -1,10 +1,12 @@
 import request from '../request/request'
 import {prepareOptions} from '../request/prepareOptions'
+import {getFileSize} from './getFileSize'
+import defaultSettings from '../../defaultSettings'
+
+/* Types */
 import {RequestOptions} from '../request/types'
 import {FileData, Settings} from '../../types'
 import {MultipartStartResponse} from './types'
-import {getFileSize} from './getFileSize'
-import defaultSettings from '../../defaultSettings'
 
 const getRequestBody = (file: FileData, settings: Settings) => {
   const size: number = getFileSize(file)

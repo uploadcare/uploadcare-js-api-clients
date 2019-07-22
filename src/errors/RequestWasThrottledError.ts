@@ -1,10 +1,23 @@
 import {ErrorRequestInfo, ErrorResponseInfo} from './types'
-import UploadcareError from './UploadcareError'
+import RequestError from './RequestError'
 
-export default class RequestWasThrottledError extends UploadcareError {
-  constructor(request: ErrorRequestInfo, response: ErrorResponseInfo, message) {
-    super(request, response)
+export default class RequestWasThrottledError extends Error {
+  readonly request: ErrorRequestInfo
+  readonly response: ErrorResponseInfo
+
+  constructor(requestError: RequestError, retryThrottledMaxTimes: number) {
+    super()
+
     this.name = 'RequestWasThrottledError'
-    this.message = message
+    this.message = `Request was throttled more than ${retryThrottledMaxTimes}`
+    this.request = requestError.request
+    this.response = requestError.response
+
+    if (Error.captureStackTrace) {
+      Error.captureStackTrace(this, RequestWasThrottledError)
+    }
+    else {
+      this.stack = (new Error()).stack
+    }
   }
 }

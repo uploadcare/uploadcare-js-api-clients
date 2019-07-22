@@ -19,4 +19,9 @@ export interface MultipartUploadInterface extends Promise<MultipartUploadRespons
   onCancel: VoidFunction | null
 }
 
+export interface MultipartInterface extends Promise<MultipartCompleteResponse>, CancelableInterface {
+  onProgress: HandleProgressFunction | null
+  onCancel: VoidFunction | null
+}
+
 export type ChunkType = [number, number]

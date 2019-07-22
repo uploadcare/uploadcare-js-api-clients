@@ -1,6 +1,6 @@
 import {FileInfo, GroupId} from './api/types'
 
-export type Settings = {
+export interface Settings {
   baseCDN?: string,
   baseURL?: string,
   publicKey?: string | null,
@@ -17,6 +17,16 @@ export type Settings = {
   multipartChunkSize?: number,
   multipartMinFileSize?: number,
   multipartMinLastPartSize?: number,
+}
+
+export interface DefaultSettings extends Settings {
+  baseCDN: string,
+  baseURL: string,
+  fileName: string,
+  retryThrottledRequestMaxTimes: number,
+  multipartMinFileSize: number,
+  multipartChunkSize: number,
+  multipartMinLastPartSize: number,
 }
 
 export type FileData = Blob | File | Buffer

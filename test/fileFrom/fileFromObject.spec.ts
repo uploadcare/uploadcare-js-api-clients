@@ -58,6 +58,20 @@ describe('fileFrom', () => {
       expect(file.name).toEqual('newFileName.jpg')
     })
 
+    it('should be able to upload big files (multipart)', (done) => {
+      const settings = getSettingsForTesting({
+        publicKey: factory.publicKey('demo'),
+      })
+      const bigFileToUpload = factory.file(11).data
+      const filePromise = fileFrom(FileFrom.Object, bigFileToUpload, settings)
+
+      filePromise
+        .then(file => {
+          expect(file.cdnUrl).toBeTruthy()
+          done()
+        })
+    })
+
     describe('should be able to handle', () => {
       it('cancel uploading', (done) => {
         const settings = getSettingsForTesting({

@@ -1,13 +1,15 @@
-import {Settings, ProgressState, UploadcareFileInterface} from '../types'
 import {UploadFrom} from './UploadFrom'
 import info, {InfoResponse} from '../api/info'
-import {Uuid} from '../api/types'
 import CancelError from '../errors/CancelError'
+
+/* Types */
+import {Settings, ProgressState, UploadcareFileInterface} from '../types'
+import {Uuid} from '../api/types'
 
 export class UploadFromUploaded extends UploadFrom {
   protected readonly promise: Promise<UploadcareFileInterface>
-  private isCancelled: boolean = false
 
+  private isCancelled: boolean = false
   private readonly data: Uuid
   private readonly settings: Settings
 

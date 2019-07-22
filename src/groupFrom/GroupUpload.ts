@@ -1,4 +1,6 @@
 import {Thenable} from '../tools/Thenable'
+
+/* Types */
 import {UploadcareGroupInterface, UploadingProgress} from '../types'
 import {GroupHandlerInterface} from './types'
 import {CancelableInterface} from '../api/types'

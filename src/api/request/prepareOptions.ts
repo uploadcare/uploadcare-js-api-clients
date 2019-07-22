@@ -1,9 +1,11 @@
-import {RequestOptions} from './types'
-import {Settings} from '../../types'
 import {getUserAgent} from '../../defaultSettings'
 
+/* Types */
+import {RequestOptions} from './types'
+import {Settings} from '../../types'
+
 /**
- * Updates options with Uploadcare Settings
+ * Updates options with Uploadcare Settings.
  *
  * @param {RequestOptions} options
  * @param {Settings} settings

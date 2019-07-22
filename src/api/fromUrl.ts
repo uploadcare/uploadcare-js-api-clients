@@ -1,5 +1,7 @@
 import request from './request/request'
 import {prepareOptions} from './request/prepareOptions'
+
+/* Types */
 import {RequestOptions} from './request/types'
 import {Settings} from '../types'
 import {FileInfo} from './types'
@@ -23,7 +25,8 @@ type FileInfoResponse = {
 export type FromUrlResponse = FileInfoResponse | TokenResponse
 
 /**
- * TokenResponse Type Guard
+ * TokenResponse Type Guard.
+ *
  * @param {FromUrlResponse} response
  */
 export const isTokenResponse = (response: FromUrlResponse): response is TokenResponse => {
@@ -31,7 +34,8 @@ export const isTokenResponse = (response: FromUrlResponse): response is TokenRes
 }
 
 /**
- * InfoResponse Type Guard
+ * InfoResponse Type Guard.
+ *
  * @param {FromUrlResponse} response
  */
 export const isFileInfoResponse = (response: FromUrlResponse): response is FileInfoResponse => {

@@ -1,5 +1,7 @@
 import request from './request/request'
 import {prepareOptions} from './request/prepareOptions'
+
+/* Types */
 import {RequestOptions} from './request/types'
 import {GroupInfo, GroupId} from './types'
 import {Settings} from '../types'
@@ -19,7 +21,7 @@ const getRequestQuery = (id: GroupId, settings: Settings) => {
     }
   }
 
-  return  {...query}
+  return query
 }
 
 const getRequestOptions = (id: GroupId, settings: Settings): RequestOptions => {

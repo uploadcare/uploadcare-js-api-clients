@@ -1,29 +1,21 @@
 import request from './request/request'
 import {prepareOptions} from './request/prepareOptions'
+
+/* Types */
 import {HandleProgressFunction, RequestInterface} from './request/types'
 import {RequestOptions} from './request/types'
 import {Settings, FileData} from '../types'
 import {Thenable} from '../tools/Thenable'
-import {CancelableInterface, Uuid} from './types'
-
-export type BaseProgress = ProgressEvent
-
-export type BaseResponse = {
-  file: Uuid
-}
-
-export interface DirectUploadInterface extends Promise<BaseResponse>, CancelableInterface {
-  onProgress: HandleProgressFunction | null
-  onCancel: VoidFunction | null
-}
+import {BaseProgress, BaseResponse, DirectUploadInterface} from './types'
 
 class DirectUpload extends Thenable<BaseResponse> implements DirectUploadInterface {
-  protected readonly request: RequestInterface
-  protected readonly promise: Promise<BaseResponse>
-  protected readonly options: RequestOptions
-
   onProgress: HandleProgressFunction | null = null
   onCancel: VoidFunction | null = null
+
+  protected readonly promise: Promise<BaseResponse>
+
+  private readonly request: RequestInterface
+  private readonly options: RequestOptions
 
   constructor(options: RequestOptions) {
     super()

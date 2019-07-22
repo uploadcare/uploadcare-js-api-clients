@@ -1,8 +1,8 @@
 import {ErrorRequestInfo, ErrorResponseInfo} from './types'
 
 export default class RequestError extends Error {
-  request: ErrorRequestInfo
-  response: ErrorResponseInfo
+  readonly request: ErrorRequestInfo
+  readonly response: ErrorResponseInfo
 
   constructor(request: ErrorRequestInfo, response: ErrorResponseInfo) {
     super()

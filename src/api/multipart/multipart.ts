@@ -1,8 +1,42 @@
-import {MultipartCompleteResponse} from './types'
-import {FileData, Settings} from '../../types'
 import multipartStart from './multipartStart'
 import multipartUpload from './multipartUpload'
 import multipartComplete from './multipartComplete'
+import {Thenable} from '../../tools/Thenable'
+
+/* Types */
+import {MultipartCompleteResponse, MultipartInterface, MultipartUploadInterface} from './types'
+import {FileData, Settings} from '../../types'
+import {HandleProgressFunction} from '../request/types'
+import {Uuid} from '../types'
+
+/**
+ * Upload parts.
+ *
+ * @param {FileData} file
+ * @param {Settings} settings
+ */
+const upload = async (file: FileData, settings: Settings) => {
+  const multipartStartUpload = multipartStart(file, settings)
+  const {uuid, parts} = await multipartStartUpload
+
+  return multipartUpload(file, parts, settings).then(() => Promise.resolve(uuid))
+}
+
+class Multipart extends Thenable<MultipartCompleteResponse> implements MultipartInterface {
+  onCancel: VoidFunction | null = null
+  onProgress: HandleProgressFunction | null = null
+
+  protected readonly promise: Promise<MultipartCompleteResponse>
+
+  constructor(file: FileData, settings: Settings) {
+    super()
+    this.promise = upload(file, settings)
+      .then((uuid: Uuid) => multipartComplete(uuid, settings))
+  }
+
+  cancel(): void {
+  }
+}
 
 /**
  * Upload multipart file.
@@ -11,11 +45,6 @@ import multipartComplete from './multipartComplete'
  * @param {Settings} settings
  * @return {MultipartUploadInterface}
  */
-export default async function multipart(file: FileData, settings: Settings = {}): Promise<MultipartCompleteResponse> {
-  const multipartStartUpload = multipartStart(file, settings)
-  const {uuid: completeUuid, parts} = await multipartStartUpload
-
-  await multipartUpload(file, parts, settings)
-
-  return multipartComplete(completeUuid, settings)
+export default function multipart(file: FileData, settings: Settings = {}): MultipartInterface {
+  return new Multipart(file, settings)
 }

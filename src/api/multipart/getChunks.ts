@@ -1,7 +1,7 @@
 import {ChunkType} from './types'
 
 /**
- * Split file size to chunks
+ * Split file size to chunks.
  *
  * @param {number} fileSize
  * @param {number} chunkSize

@@ -1,6 +1,5 @@
-import {RequestOptions, RequestResponse} from './request/types'
+import {HandleProgressFunction, RequestOptions, RequestResponse} from './request/types'
 import {FileData, Settings} from '../types'
-import {DirectUploadInterface} from './base'
 import {InfoResponse} from './info'
 import {FromUrlResponse, Url} from './fromUrl'
 import {FromUrlStatusResponse} from './fromUrlStatus'
@@ -87,6 +86,18 @@ export type GroupInfo = {
   files: FileInfo[],
   url: string,
   id: GroupId,
+}
+
+/* Base */
+export type BaseProgress = ProgressEvent
+
+export type BaseResponse = {
+  file: Uuid
+}
+
+export interface DirectUploadInterface extends Promise<BaseResponse>, CancelableInterface {
+  onProgress: HandleProgressFunction | null
+  onCancel: VoidFunction | null
 }
 
 export interface CancelableInterface {

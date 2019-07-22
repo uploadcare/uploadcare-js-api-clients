@@ -10,21 +10,22 @@ import {UploadcareGroup} from '../UploadcareGroup'
  * All that you need to implement — `promise` property and `cancel` method.
  */
 export abstract class UploadFrom extends Thenable<UploadcareGroupInterface> implements GroupUploadInterface {
-  protected abstract readonly promise: Promise<UploadcareGroupInterface>
-  protected isCancelled: boolean = false
-  abstract cancel(): void
-
-  protected progress: UploadingProgress = {
-    state: ProgressState.Pending,
-    uploaded: null,
-    value: 0,
-  }
-  protected group: UploadcareGroupInterface | null = null
-
   onProgress: ((progress: UploadingProgress) => void) | null = null
   onUploaded: ((uuid: string) => void) | null = null
   onReady: ((group: UploadcareGroupInterface) => void) | null = null
   onCancel: VoidFunction | null = null
+
+  abstract cancel(): void
+
+  protected abstract readonly promise: Promise<UploadcareGroupInterface>
+  protected isCancelled: boolean = false
+
+  private progress: UploadingProgress = {
+    state: ProgressState.Pending,
+    uploaded: null,
+    value: 0,
+  }
+  private group: UploadcareGroupInterface | null = null
 
   protected constructor() {
     super()

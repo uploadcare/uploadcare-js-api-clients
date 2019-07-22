@@ -1,7 +1,9 @@
-import {Settings, UploadcareFileInterface, UploadingProgress, ProgressState, ProgressParams} from '../types'
 import checkFileIsReady from '../checkFileIsReady'
 import prettyFileInfo from '../prettyFileInfo'
 import {Thenable} from '../tools/Thenable'
+
+/* Types */
+import {Settings, UploadcareFileInterface, UploadingProgress, ProgressState, ProgressParams} from '../types'
 import {Uuid} from '../api/types'
 import {PollPromiseInterface} from '../tools/poll'
 import {InfoResponse} from '../api/info'
@@ -13,21 +15,22 @@ import {FileUploadInterface} from './types'
  * All that you need to implement — `promise` property and `cancel` method.
  */
 export abstract class UploadFrom extends Thenable<UploadcareFileInterface> implements FileUploadInterface {
-  protected abstract readonly promise: Promise<UploadcareFileInterface>
-  protected isFileReadyPolling: PollPromiseInterface<InfoResponse> | null = null
-  abstract cancel(): void
-
-  protected progress: UploadingProgress = {
-    state: ProgressState.Pending,
-    uploaded: null,
-    value: 0,
-  }
-  protected file: UploadcareFileInterface | null = null
-
   onProgress: ((progress: UploadingProgress) => void) | null = null
   onUploaded: ((uuid: string) => void) | null = null
   onReady: ((file: UploadcareFileInterface) => void) | null = null
   onCancel: VoidFunction | null = null
+
+  abstract cancel(): void
+
+  protected abstract readonly promise: Promise<UploadcareFileInterface>
+  protected isFileReadyPolling: PollPromiseInterface<InfoResponse> | null = null
+
+  private progress: UploadingProgress = {
+    state: ProgressState.Pending,
+    uploaded: null,
+    value: 0,
+  }
+  private file: UploadcareFileInterface | null = null
 
   protected constructor() {
     super()
