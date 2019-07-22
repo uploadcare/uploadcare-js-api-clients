@@ -12,6 +12,7 @@ const defaultSettings: DefaultSettings = {
   baseCDN: 'https://ucarecdn.com',
   baseURL: 'https://upload.uploadcare.com',
   fileName: 'original',
+  maxContentLength: 50 * 1024 * 1024, // 50 MB
   retryThrottledRequestMaxTimes: 1,
   multipartMinFileSize: 25 * 1024 * 1024, // 25 MB
   multipartChunkSize: 5 * 1024 * 1024, // 5 MB

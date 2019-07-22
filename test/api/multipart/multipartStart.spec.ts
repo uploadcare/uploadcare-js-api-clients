@@ -2,7 +2,7 @@ import multipartStart from '../../../src/api/multipart/multipartStart'
 import * as factory from '../../_fixtureFactory'
 import {getSettingsForTesting} from '../../_helpers'
 
-describe('API - multipartStart', () => {
+fdescribe('API - multipartStart', () => {
   it('should be able to start upload data', async() => {
     const fileToUpload = factory.file(11)
     const settings = getSettingsForTesting({

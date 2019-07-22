@@ -4,8 +4,8 @@ import {getSettingsForTesting} from '../../_helpers'
 import multipartStart from '../../../src/api/multipart/multipartStart'
 import multipartUpload from '../../../src/api/multipart/multipartUpload'
 
-describe('API - multipartComplete', () => {
-  it('should be able to start upload data', async() => {
+fdescribe('API - multipartComplete', () => {
+  it('should be able to complete upload data', async() => {
     const fileToUpload = factory.file(11).data
     const settings = getSettingsForTesting({
       publicKey: factory.publicKey('demo'),

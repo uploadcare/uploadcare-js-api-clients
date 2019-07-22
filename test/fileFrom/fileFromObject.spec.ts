@@ -58,7 +58,7 @@ describe('fileFrom', () => {
       expect(file.name).toEqual('newFileName.jpg')
     })
 
-    it('should be able to upload big files (multipart)', (done) => {
+    fit('should be able to upload big files (multipart)', (done) => {
       const settings = getSettingsForTesting({
         publicKey: factory.publicKey('demo'),
       })

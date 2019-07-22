@@ -5,7 +5,7 @@ import {Thenable} from '../../tools/Thenable'
 
 /* Types */
 import {MultipartCompleteResponse, MultipartInterface, MultipartUploadInterface} from './types'
-import {FileData, Settings} from '../../types'
+import {FileData, ProgressState, Settings, UploadingProgress} from '../../types'
 import {HandleProgressFunction} from '../request/types'
 import {Uuid} from '../types'
 
@@ -16,8 +16,7 @@ import {Uuid} from '../types'
  * @param {Settings} settings
  */
 const upload = async (file: FileData, settings: Settings) => {
-  const multipartStartUpload = multipartStart(file, settings)
-  const {uuid, parts} = await multipartStartUpload
+  const {uuid, parts} = await multipartStart(file, settings)
 
   return multipartUpload(file, parts, settings).then(() => Promise.resolve(uuid))
 }

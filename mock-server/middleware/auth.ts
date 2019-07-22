@@ -67,7 +67,10 @@ const auth = (ctx, next) => {
     publicKey: getPublicKeyFromSource(ctx.query, key),
   }
 
-  if (url.includes('base')) {
+  // UPLOADCARE_PUB_KEY in body
+  if (url.includes('base')
+    || url.includes('multipart/start')
+    || url.includes('multipart/complete')) {
     key = 'UPLOADCARE_PUB_KEY'
     params.publicKey = getPublicKeyFromSource(ctx.request.body, key)
   }

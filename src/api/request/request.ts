@@ -17,8 +17,6 @@ import {RequestInterface, RequestOptions, RequestResponse} from './types'
 
 const REQUEST_WAS_THROTTLED_CODE = 429
 
-/* Set max upload body size for node.js to 50M (default is 10M) */
-export const DEFAULT_MAX_CONTENT_LENGTH = 50 * 1000 * 1000
 export const DEFAULT_RETRY_AFTER_TIMEOUT = 15000
 
 const nodeUploadProgress = (config: AxiosRequestConfig): AxiosRequestConfig => {
@@ -90,7 +88,7 @@ class Request extends Thenable<RequestResponse> implements RequestInterface {
       url,
       params,
       data,
-      maxContentLength: DEFAULT_MAX_CONTENT_LENGTH,
+      maxContentLength: defaultSettings.maxContentLength,
       headers,
       cancelToken,
       onUploadProgress,
@@ -151,13 +149,16 @@ class Request extends Thenable<RequestResponse> implements RequestInterface {
     }
 
     if (error.response) {
-      throw new RequestError({
+      const errorRequestInfo = {
         headers: error.config.headers,
         url: error.config.url || url,
-      }, {
+      }
+      const errorResponseInfo = {
         status: error.response.status,
         statusText: error.response.statusText,
-      })
+      }
+
+      throw new RequestError(errorRequestInfo, errorResponseInfo)
     }
 
     throw error

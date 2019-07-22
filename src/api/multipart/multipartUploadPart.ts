@@ -3,12 +3,12 @@ import * as FormData from 'form-data'
 import axios, {AxiosRequestConfig, CancelTokenSource} from 'axios'
 
 import {Thenable} from '../../tools/Thenable'
-import {DEFAULT_MAX_CONTENT_LENGTH} from '../request/request'
+import defaultSettings from '../../defaultSettings'
 import {isNode} from '../../tools/isNode'
 
 /* Types */
 import {HandleProgressFunction} from '../request/types'
-import {FileData} from '../../types'
+import {FileData, Settings} from '../../types'
 import {BaseProgress} from '../types'
 import {MultipartPart, MultipartUploadInterface, MultipartUploadResponse} from './types'
 
@@ -44,7 +44,7 @@ class MultipartUploadPart extends Thenable<MultipartUploadResponse> implements M
   protected readonly promise: Promise<MultipartUploadResponse>
   private readonly cancelController: CancelTokenSource
 
-  constructor(partUrl: MultipartPart, file: FileData) {
+  constructor(partUrl: MultipartPart, file: FileData, settings: Settings) {
     super()
 
     this.cancelController = axios.CancelToken.source()
@@ -53,7 +53,7 @@ class MultipartUploadPart extends Thenable<MultipartUploadResponse> implements M
       url: partUrl,
       method: 'PUT',
       cancelToken: this.cancelController.token,
-      maxContentLength: DEFAULT_MAX_CONTENT_LENGTH,
+      maxContentLength: settings.maxContentLength || defaultSettings.maxContentLength,
       onUploadProgress: (progressEvent: BaseProgress) => {
         if (typeof this.onProgress === 'function') {
           this.onProgress(progressEvent)
@@ -92,8 +92,9 @@ class MultipartUploadPart extends Thenable<MultipartUploadResponse> implements M
  *
  * @param {MultipartPart} partUrl
  * @param {FileData} file
+ * @param {Settings} settings
  * @return {MultipartUploadInterface}
  */
-export default function multipartUploadPart(partUrl: MultipartPart, file: FileData): MultipartUploadInterface {
-  return new MultipartUploadPart(partUrl, file)
+export default function multipartUploadPart(partUrl: MultipartPart, file: FileData, settings: Settings = {}): MultipartUploadInterface {
+  return new MultipartUploadPart(partUrl, file, settings)
 }

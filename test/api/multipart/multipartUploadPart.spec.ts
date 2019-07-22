@@ -4,7 +4,7 @@ import {getSettingsForTesting} from '../../_helpers'
 import multipartStart from '../../../src/api/multipart/multipartStart'
 import defaultSettings from '../../../src/defaultSettings'
 
-describe('API - multipartUploadPart', () => {
+fdescribe('API - multipartUploadPart', () => {
   jasmine.DEFAULT_TIMEOUT_INTERVAL = 100000
   const fileToUpload = factory.file(11).data
 
