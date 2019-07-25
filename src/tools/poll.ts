@@ -1,4 +1,4 @@
-import {Thenable} from './Thenable'
+import {Thenable} from '../thenable/Thenable'
 import TimeoutError from '../errors/TimeoutError'
 import {CancelableInterface} from '../api/types'
 import CancelError from '../errors/CancelError'

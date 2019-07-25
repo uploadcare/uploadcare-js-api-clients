@@ -48,7 +48,7 @@ const directUpload = client.api.base(fileData)
 directUpload
   .then(data => console.log(data.file))
 
-directUpload.onProgress = (progressEvent) => console.log(progressEvent.total / progressEvent.loaded)
+directUpload.onProgress = (progressEvent) => console.log(progressEvent.loaded / progressEvent.total)
 
 const fileUpload = client.fileFrom(FileFrom.Object, fileData)
 

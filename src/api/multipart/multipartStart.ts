@@ -1,4 +1,3 @@
-import request from '../request/request'
 import {prepareOptions} from '../request/prepareOptions'
 import {getFileSize} from './getFileSize'
 import defaultSettings from '../../defaultSettings'
@@ -7,6 +6,8 @@ import defaultSettings from '../../defaultSettings'
 import {RequestOptions} from '../request/types'
 import {FileData, Settings} from '../../types'
 import {MultipartStartResponse} from './types'
+import {UploadThenableInterface} from '../../thenable/types'
+import {UploadThenable} from '../../thenable/UploadThenable'
 
 const getRequestBody = (file: FileData, settings: Settings) => {
   const size: number = getFileSize(file)
@@ -37,11 +38,10 @@ const getRequestOptions = (file: FileData, settings: Settings): RequestOptions =
  *
  * @param {FileData} file
  * @param {Settings} settings
- * @return {Promise<MultipartStartResponse>}
+ * @return {UploadThenableInterface<MultipartStartResponse>}
  */
-export default function multipartStart(file: FileData, settings: Settings = {}): Promise<MultipartStartResponse> {
+export default function multipartStart(file: FileData, settings: Settings = {}): UploadThenableInterface<MultipartStartResponse> {
   const options = getRequestOptions(file, settings)
 
-  return request(options)
-    .then(response => response.data)
+  return new UploadThenable<MultipartStartResponse>(options)
 }

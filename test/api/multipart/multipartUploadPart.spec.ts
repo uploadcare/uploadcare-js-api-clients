@@ -4,7 +4,7 @@ import {getSettingsForTesting} from '../../_helpers'
 import multipartStart from '../../../src/api/multipart/multipartStart'
 import defaultSettings from '../../../src/defaultSettings'
 
-fdescribe('API - multipartUploadPart', () => {
+describe('API - multipartUploadPart', () => {
   jasmine.DEFAULT_TIMEOUT_INTERVAL = 100000
   const fileToUpload = factory.file(11).data
 
@@ -17,8 +17,8 @@ fdescribe('API - multipartUploadPart', () => {
     const [firstPart] = parts
     const fileSliceToUpload = fileToUpload.slice(0, defaultSettings.multipartChunkSize)
 
-    const multipartUploadPromise = multipartUploadPart(firstPart, fileSliceToUpload)
-    const {code} = await multipartUploadPromise
+    const upload = multipartUploadPart(firstPart, fileSliceToUpload)
+    const {code} = await upload
 
     expect(code).toBeTruthy()
   })

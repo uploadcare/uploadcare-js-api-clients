@@ -1,4 +1,4 @@
-import {Thenable} from '../tools/Thenable'
+import {Thenable} from '../thenable/Thenable'
 
 /* Types */
 import {UploadcareGroupInterface, UploadingProgress} from '../types'

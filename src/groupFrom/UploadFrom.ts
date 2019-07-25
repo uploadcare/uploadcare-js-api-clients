@@ -1,5 +1,5 @@
 import {Settings, UploadcareGroupInterface, UploadingProgress, ProgressState, ProgressParams} from '../types'
-import {Thenable} from '../tools/Thenable'
+import {Thenable} from '../thenable/Thenable'
 import {GroupInfo} from '../api/types'
 import {GroupUploadInterface} from './types'
 import {UploadcareGroup} from '../UploadcareGroup'

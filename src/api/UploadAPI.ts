@@ -12,13 +12,12 @@ import group, {GroupInfoResponse} from './group'
 import request from './request/request'
 import {
   MultipartCompleteResponse,
-  MultipartPart,
-  MultipartStartResponse,
-  MultipartUploadInterface
+  MultipartPart, MultipartStartResponse,
 } from './multipart/types'
 import multipartComplete from './multipart/multipartComplete'
 import multipartStart from './multipart/multipartStart'
 import multipartUpload from './multipart/multipartUpload'
+import {UploadThenableInterface} from '../thenable/types'
 
 class UploadAPI implements UploadAPIInterface {
   readonly client: UploadClient
@@ -66,15 +65,15 @@ class UploadAPI implements UploadAPIInterface {
     return groupInfo(id, this.getResultSettings(settings))
   }
 
-  multipartStart(file: FileData, settings: Settings): Promise<MultipartStartResponse> {
+  multipartStart(file: FileData, settings: Settings): UploadThenableInterface<MultipartStartResponse> {
     return multipartStart(file, this.getResultSettings(settings))
   }
 
-  multipartUpload(file: FileData, parts: MultipartPart[], settings: Settings): MultipartUploadInterface {
+  multipartUpload(file: FileData, parts: MultipartPart[], settings: Settings): UploadThenableInterface<any> {
     return multipartUpload(file, parts, this.getResultSettings(settings))
   }
 
-  multipartComplete(uuid: Uuid, settings: Settings): Promise<MultipartCompleteResponse> {
+  multipartComplete(uuid: Uuid, settings: Settings): UploadThenableInterface<MultipartCompleteResponse> {
     return multipartComplete(uuid, this.getResultSettings(settings))
   }
 }

@@ -2,13 +2,13 @@ import multipartStart from '../../../src/api/multipart/multipartStart'
 import * as factory from '../../_fixtureFactory'
 import {getSettingsForTesting} from '../../_helpers'
 
-fdescribe('API - multipartStart', () => {
+describe('API - multipartStart', () => {
   it('should be able to start upload data', async() => {
-    const fileToUpload = factory.file(11)
+    const fileToUpload = factory.file(11).data
     const settings = getSettingsForTesting({
       publicKey: factory.publicKey('demo'),
     })
-    const multipartStartUpload = multipartStart(fileToUpload.data, settings)
+    const multipartStartUpload = multipartStart(fileToUpload, settings)
     const {uuid, parts} = await multipartStartUpload
 
     expect(uuid).toBeTruthy()
@@ -16,12 +16,12 @@ fdescribe('API - multipartStart', () => {
   })
 
   it('should be rejected with bad options', (done) => {
-    const fileToUpload = factory.file(9)
+    const fileToUpload = factory.file(9).data
     const settings = getSettingsForTesting({
       publicKey: factory.publicKey('demo'),
     })
 
-    multipartStart(fileToUpload.data, settings)
+    multipartStart(fileToUpload, settings)
       .then(() => done.fail('Promise should not to be resolved'))
       .catch(error => {
         (error.name === 'UploadcareError')

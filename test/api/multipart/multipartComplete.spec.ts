@@ -4,18 +4,18 @@ import {getSettingsForTesting} from '../../_helpers'
 import multipartStart from '../../../src/api/multipart/multipartStart'
 import multipartUpload from '../../../src/api/multipart/multipartUpload'
 
-fdescribe('API - multipartComplete', () => {
+describe('API - multipartComplete', () => {
   it('should be able to complete upload data', async() => {
     const fileToUpload = factory.file(11).data
     const settings = getSettingsForTesting({
       publicKey: factory.publicKey('demo'),
     })
     const multipartStartUpload = multipartStart(fileToUpload, settings)
-    const {uuid: completeUuid, parts} = await multipartStartUpload
+    const {uuid: completedUuid, parts} = await multipartStartUpload
 
     await multipartUpload(fileToUpload, parts, settings)
 
-    const multipartCompleteUpload = multipartComplete(completeUuid, settings)
+    const multipartCompleteUpload = multipartComplete(completedUuid, settings)
     const {uuid} = await multipartCompleteUpload
 
     expect(uuid).toBeTruthy()

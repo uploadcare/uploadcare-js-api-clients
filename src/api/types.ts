@@ -8,8 +8,8 @@ import {
   MultipartCompleteResponse,
   MultipartPart,
   MultipartStartResponse,
-  MultipartUploadInterface
 } from './multipart/types'
+import {UploadThenableInterface} from '../thenable/types'
 
 interface StatusInterface {
   status: string,
@@ -125,9 +125,9 @@ export interface UploadAPIInterface {
 
   groupInfo(id: GroupId, settings: Settings): Promise<GroupInfoResponse>
 
-  multipartStart(file: FileData, settings: Settings): Promise<MultipartStartResponse>
+  multipartStart(file: FileData, settings: Settings): UploadThenableInterface<MultipartStartResponse>
 
-  multipartUpload(file: FileData, parts: MultipartPart[], settings: Settings): MultipartUploadInterface
+  multipartUpload(file: FileData, parts: MultipartPart[], settings: Settings): UploadThenableInterface<any>
 
-  multipartComplete(uuid: Uuid, settings: Settings): Promise<MultipartCompleteResponse>
+  multipartComplete(uuid: Uuid, settings: Settings): UploadThenableInterface<MultipartCompleteResponse>
 }

@@ -1,7 +1,7 @@
 /* Vendors */
 import axios, {AxiosError, AxiosRequestConfig, CancelTokenSource} from 'axios'
 
-import {Thenable} from '../../tools/Thenable'
+import {Thenable} from '../../thenable/Thenable'
 import {isNode} from '../../tools/isNode'
 import {buildFormData} from './buildFormData'
 import {delay} from './delay'

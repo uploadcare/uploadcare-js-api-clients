@@ -1,18 +1,19 @@
 import base from '../api/base'
 import {getFileSize} from '../api/multipart/getFileSize'
-import multipart from '../api/multipart/multipart'
+import multipart from '../multipart/multipart'
 
 /* Types */
 import {UploadFrom} from './UploadFrom'
 import {FileData, Settings, UploadcareFileInterface} from '../types'
-import {MultipartInterface} from '../api/multipart/types'
+import {MultipartCompleteResponse} from '../api/multipart/types'
 import {DirectUploadInterface} from '../api/types'
 import defaultSettings from '../defaultSettings'
+import {UploadThenableInterface} from '../thenable/types'
 
 export class UploadFromObject extends UploadFrom {
   protected readonly promise: Promise<UploadcareFileInterface>
 
-  private readonly request: DirectUploadInterface | MultipartInterface
+  private readonly request: DirectUploadInterface | UploadThenableInterface<MultipartCompleteResponse>
   private readonly data: FileData
   private readonly settings: Settings
   private readonly isMultipart: boolean = false
@@ -50,7 +51,7 @@ export class UploadFromObject extends UploadFrom {
     fileUpload.onCancel = this.handleCancelling
 
     if (this.isMultipart) {
-      return (fileUpload as MultipartInterface)
+      return (fileUpload as UploadThenableInterface<MultipartCompleteResponse>)
         .then(({uuid}) => this.handleUploaded(uuid, this.settings))
         .then(this.handleReady)
         .catch(this.handleError)

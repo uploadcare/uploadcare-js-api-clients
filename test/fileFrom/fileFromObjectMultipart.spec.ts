@@ -4,8 +4,8 @@ import {FileFrom} from '../../src/fileFrom/types'
 import {getSettingsForTesting} from '../_helpers'
 
 describe('fileFrom', () => {
-  describe('Object', () => {
-    const fileToUpload = factory.image('blackSquare')
+  describe('Object (multipart)', () => {
+    const fileToUpload = factory.file(11)
 
     it('should resolves when file is ready on CDN', (done) => {
       const settings = getSettingsForTesting({
@@ -56,20 +56,6 @@ describe('fileFrom', () => {
       const file = await filePromise
 
       expect(file.name).toEqual('newFileName.jpg')
-    })
-
-    it('should be able to upload big files (multipart)', (done) => {
-      const settings = getSettingsForTesting({
-        publicKey: factory.publicKey('demo'),
-      })
-      const bigFileToUpload = factory.file(11).data
-      const filePromise = fileFrom(FileFrom.Object, bigFileToUpload, settings)
-
-      filePromise
-        .then(file => {
-          expect(file.cdnUrl).toBeTruthy()
-          done()
-        })
     })
 
     describe('should be able to handle', () => {

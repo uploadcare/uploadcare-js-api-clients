@@ -1,6 +1,6 @@
 import checkFileIsReady from '../checkFileIsReady'
 import prettyFileInfo from '../prettyFileInfo'
-import {Thenable} from '../tools/Thenable'
+import {Thenable} from '../thenable/Thenable'
 
 /* Types */
 import {Settings, UploadcareFileInterface, UploadingProgress, ProgressState, ProgressParams} from '../types'

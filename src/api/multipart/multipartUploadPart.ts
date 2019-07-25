@@ -2,7 +2,7 @@
 import * as FormData from 'form-data'
 import axios, {AxiosRequestConfig, CancelTokenSource} from 'axios'
 
-import {Thenable} from '../../tools/Thenable'
+import {Thenable} from '../../thenable/Thenable'
 import defaultSettings from '../../defaultSettings'
 import {isNode} from '../../tools/isNode'
 
@@ -10,7 +10,8 @@ import {isNode} from '../../tools/isNode'
 import {HandleProgressFunction} from '../request/types'
 import {FileData, Settings} from '../../types'
 import {BaseProgress} from '../types'
-import {MultipartPart, MultipartUploadInterface, MultipartUploadResponse} from './types'
+import {MultipartPart, MultipartUploadResponse} from './types'
+import {UploadThenableInterface} from '../../thenable/types'
 
 const nodeUploadBufferProgress = (config: AxiosRequestConfig): AxiosRequestConfig => {
   const {data, onUploadProgress} = config
@@ -37,7 +38,7 @@ const nodeUploadBufferProgress = (config: AxiosRequestConfig): AxiosRequestConfi
   return config
 }
 
-class MultipartUploadPart extends Thenable<MultipartUploadResponse> implements MultipartUploadInterface {
+class MultipartUploadPart extends Thenable<MultipartUploadResponse> implements UploadThenableInterface<MultipartUploadResponse> {
   onProgress: HandleProgressFunction | null = null
   onCancel: VoidFunction | null = null
 
@@ -93,8 +94,8 @@ class MultipartUploadPart extends Thenable<MultipartUploadResponse> implements M
  * @param {MultipartPart} partUrl
  * @param {FileData} file
  * @param {Settings} settings
- * @return {MultipartUploadInterface}
+ * @return {UploadThenableInterface<MultipartUploadResponse>}
  */
-export default function multipartUploadPart(partUrl: MultipartPart, file: FileData, settings: Settings = {}): MultipartUploadInterface {
+export default function multipartUploadPart(partUrl: MultipartPart, file: FileData, settings: Settings = {}): UploadThenableInterface<MultipartUploadResponse> {
   return new MultipartUploadPart(partUrl, file, settings)
 }

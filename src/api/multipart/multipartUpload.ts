@@ -1,4 +1,4 @@
-import {Thenable} from '../../tools/Thenable'
+import {Thenable} from '../../thenable/Thenable'
 import multipartUploadPart from './multipartUploadPart'
 import {getFileSize} from './getFileSize'
 import {getChunks} from './getChunks'
@@ -7,15 +7,16 @@ import defaultSettings from '../../defaultSettings'
 /* Types */
 import {HandleProgressFunction} from '../request/types'
 import {FileData, Settings} from '../../types'
-import {ChunkType, MultipartPart, MultipartUploadInterface} from './types'
+import {ChunkType, MultipartPart} from './types'
 import {BaseProgress} from '../types'
+import {UploadThenableInterface} from '../../thenable/types'
 
-class MultipartUpload extends Thenable<any> implements MultipartUploadInterface {
+class MultipartUpload extends Thenable<any> implements UploadThenableInterface<any> {
   onProgress: HandleProgressFunction | null = null
   onCancel: VoidFunction | null = null
 
   protected readonly promise: Promise<any>
-  private readonly requests: MultipartUploadInterface[]
+  private readonly requests: UploadThenableInterface<any>[]
 
   constructor(file: FileData, parts: MultipartPart[], settings: Settings = {}) {
     super()
@@ -47,6 +48,13 @@ class MultipartUpload extends Thenable<any> implements MultipartUploadInterface 
       return uploadPartPromise
     })
     this.promise = Promise.all(this.requests)
+      .catch(error => {
+        if (error.name === 'CancelError' && typeof this.onCancel === 'function') {
+          this.onCancel()
+        }
+
+        return Promise.reject(error)
+      })
   }
 
   cancel(): void {
@@ -60,9 +68,9 @@ class MultipartUpload extends Thenable<any> implements MultipartUploadInterface 
  * @param {FileData} file
  * @param {MultipartPart[]} parts
  * @param {Settings} settings
- * @return {MultipartUploadInterface}
+ * @return {UploadThenableInterface<any>}
  */
-export default function multipartUpload(file: FileData, parts: MultipartPart[], settings: Settings = {}): MultipartUploadInterface {
+export default function multipartUpload(file: FileData, parts: MultipartPart[], settings: Settings = {}): UploadThenableInterface<any> {
   return new MultipartUpload(file, parts, settings)
 }
 

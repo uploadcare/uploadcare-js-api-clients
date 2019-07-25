@@ -1,5 +1,4 @@
-import {CancelableInterface, FileInfo, Uuid} from '../types'
-import {HandleProgressFunction} from '../request/types'
+import {FileInfo, Uuid} from '../types'
 
 export type MultipartCompleteResponse = FileInfo
 
@@ -12,16 +11,6 @@ export type MultipartStartResponse = {
 
 export type MultipartUploadResponse = {
   code: number,
-}
-
-export interface MultipartUploadInterface extends Promise<MultipartUploadResponse>, CancelableInterface {
-  onProgress: HandleProgressFunction | null
-  onCancel: VoidFunction | null
-}
-
-export interface MultipartInterface extends Promise<MultipartCompleteResponse>, CancelableInterface {
-  onProgress: HandleProgressFunction | null
-  onCancel: VoidFunction | null
 }
 
 export type ChunkType = [number, number]

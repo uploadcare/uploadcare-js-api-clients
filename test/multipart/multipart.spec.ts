@@ -1,32 +1,24 @@
-import * as factory from '../../_fixtureFactory'
-import multipartUpload from '../../../src/api/multipart/multipartUpload'
-import {getSettingsForTesting} from '../../_helpers'
-import multipartStart from '../../../src/api/multipart/multipartStart'
+import * as factory from '../_fixtureFactory'
+import {getSettingsForTesting} from '../_helpers'
+import multipart from '../../src/multipart/multipart'
 
-fdescribe('API - multipartUpload', () => {
-  jasmine.DEFAULT_TIMEOUT_INTERVAL = 100000
-  const fileToUpload = factory.file(11).data
-
-  it('should be able to upload multipart file', async(done) => {
+fdescribe('API - multipart', () => {
+  it('should be able to upload multipart file', async() => {
+    const fileToUpload = factory.file(11).data
     const settings = getSettingsForTesting({
       publicKey: factory.publicKey('demo'),
     })
-    const multipartStartUpload = multipartStart(fileToUpload, settings)
-    const {parts} = await multipartStartUpload
+    const {uuid} = await multipart(fileToUpload, settings)
 
-    multipartUpload(fileToUpload, parts, settings)
-      .then(done)
-      .catch(done.fail)
+    expect(uuid).toBeTruthy()
   })
 
   it('should be able to cancel uploading', async(done) => {
+    const fileToUpload = factory.file(11).data
     const settings = getSettingsForTesting({
       publicKey: factory.publicKey('demo'),
     })
-    const multipartStartUpload = multipartStart(fileToUpload, settings)
-    const {parts} = await multipartStartUpload
-
-    const upload = multipartUpload(fileToUpload, parts, settings)
+    const upload = multipart(fileToUpload, settings)
 
     setTimeout(() => {
       upload.cancel()
@@ -38,13 +30,11 @@ fdescribe('API - multipartUpload', () => {
   })
 
   it('should be able to handle cancel uploading', async (done) => {
+    const fileToUpload = factory.file(11).data
     const settings = getSettingsForTesting({
       publicKey: factory.publicKey('demo'),
     })
-    const multipartStartUpload = multipartStart(fileToUpload, settings)
-    const {parts} = await multipartStartUpload
-
-    const upload = multipartUpload(fileToUpload, parts, settings)
+    const upload = multipart(fileToUpload, settings)
 
     setTimeout(() => {
       upload.cancel()
@@ -65,13 +55,11 @@ fdescribe('API - multipartUpload', () => {
 
   it('should be able to handle progress', async(done) => {
     let progressValue = 0
+    const fileToUpload = factory.file(11).data
     const settings = getSettingsForTesting({
       publicKey: factory.publicKey('demo'),
     })
-    const multipartStartUpload = multipartStart(fileToUpload, settings)
-    const {parts} = await multipartStartUpload
-
-    const upload = multipartUpload(fileToUpload, parts, settings)
+    const upload = multipart(fileToUpload, settings)
 
     upload.onProgress = (progressEvent) => {
       progressValue = Math.round((progressEvent.loaded * 100) / progressEvent.total)
