@@ -3,7 +3,7 @@ import multipartUpload from '../../../src/api/multipart/multipartUpload'
 import {getSettingsForTesting} from '../../_helpers'
 import multipartStart from '../../../src/api/multipart/multipartStart'
 
-fdescribe('API - multipartUpload', () => {
+describe('API - multipartUpload', () => {
   jasmine.DEFAULT_TIMEOUT_INTERVAL = 100000
   const fileToUpload = factory.file(11).data
 
@@ -63,7 +63,7 @@ fdescribe('API - multipartUpload', () => {
       })
   })
 
-  it('should be able to handle progress', async(done) => {
+  fit('should be able to handle progress', async(done) => {
     let progressValue = 0
     const settings = getSettingsForTesting({
       publicKey: factory.publicKey('demo'),

@@ -11,12 +11,27 @@ import {ChunkType, MultipartPart} from './types'
 import {BaseProgress} from '../types'
 import {UploadThenableInterface} from '../../thenable/types'
 
+function throttle(callback, limit = 1) {
+  let wait = false                  // Initially, we're not waiting
+
+  return function (...args) {               // We return a throttled function
+    if (!wait) {                   // If we're not waiting
+      callback(...args)           // Execute users function
+      wait = true               // Prevent future invocations
+      setTimeout(function () {   // After a period of time
+        wait = false          // And allow future invocations
+      }, limit);
+    }
+  }
+}
+
 class MultipartUpload extends Thenable<any> implements UploadThenableInterface<any> {
   onProgress: HandleProgressFunction | null = null
   onCancel: VoidFunction | null = null
 
   protected readonly promise: Promise<any>
   private readonly requests: UploadThenableInterface<any>[]
+  private readonly loaded: number[]
 
   constructor(file: FileData, parts: MultipartPart[], settings: Settings = {}) {
     super()
@@ -26,6 +41,21 @@ class MultipartUpload extends Thenable<any> implements UploadThenableInterface<a
     const chunks = getChunks(fileSize, chunkSize)
     const chunksCount = chunks.length
 
+    this.loaded = Array.from(new Array(chunksCount)).fill(0)
+
+    const updateProgress = throttle((progressEvent) => {
+      if (typeof this.onProgress === 'function') {
+        const loaded = this.loaded.reduce((sum, chunk) => chunk + sum, 0)
+
+        console.log(loaded)
+        this.onProgress({
+          ...progressEvent,
+          loaded,
+          total: fileSize,
+        })
+      }
+    })
+
     this.requests = chunks.map((chunk: ChunkType, index: number) => {
       const [start, end] = chunk
       const fileChunk = file.slice(start, end)
@@ -34,14 +64,8 @@ class MultipartUpload extends Thenable<any> implements UploadThenableInterface<a
 
       uploadPartPromise.onProgress = (progressEvent: BaseProgress) => {
         if (typeof this.onProgress === 'function') {
-          const loaded = progressEvent.loaded * 100 / chunksCount
-          const total = progressEvent.total * 100 / chunksCount
-
-          this.onProgress({
-            ...progressEvent,
-            loaded,
-            total,
-          })
+          this.loaded[index] = progressEvent.loaded
+          updateProgress(progressEvent)
         }
       }
 

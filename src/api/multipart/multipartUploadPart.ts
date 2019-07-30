@@ -5,6 +5,8 @@ import axios, {AxiosRequestConfig, CancelTokenSource} from 'axios'
 import {Thenable} from '../../thenable/Thenable'
 import defaultSettings from '../../defaultSettings'
 import {isNode} from '../../tools/isNode'
+import CancelError from '../../errors/CancelError'
+import RequestError from '../../errors/RequestError'
 
 /* Types */
 import {HandleProgressFunction} from '../request/types'
@@ -73,6 +75,28 @@ class MultipartUploadPart extends Thenable<MultipartUploadResponse> implements U
     }
 
     this.promise = instance(options as AxiosRequestConfig)
+      .catch(error => {
+        const {url} = options
+
+        if (axios.isCancel(error)) {
+          throw new CancelError()
+        }
+
+        if (error.response) {
+          const errorRequestInfo = {
+            headers: error.config.headers,
+            url: error.config.url || url,
+          }
+          const errorResponseInfo = {
+            status: error.response.status,
+            statusText: error.response.statusText,
+          }
+
+          throw new RequestError(errorRequestInfo, errorResponseInfo)
+        }
+
+        throw error
+      })
       .then(response => Promise.resolve({code: response.status}))
       .catch(error => {
         if (error.name === 'CancelError' && typeof this.onCancel === 'function') {

@@ -30,6 +30,8 @@ module.exports = function(config) {
       'test/**/*.ts': ['karma-typescript'],
     },
 
+    logLevel: config.LOG_DEBUG,
+
     karmaTypescriptConfig: {
       bundlerOptions: {
         addNodeGlobals: true,

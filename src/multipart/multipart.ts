@@ -9,6 +9,7 @@ import {MultipartCompleteResponse} from '../api/multipart/types'
 import {HandleProgressFunction} from '../api/request/types'
 import {Uuid} from '..'
 import {UploadThenableInterface} from '../thenable/types'
+import {BaseProgress} from '../api/types'
 
 class Multipart extends Thenable<MultipartCompleteResponse> implements UploadThenableInterface<MultipartCompleteResponse> {
   onCancel: VoidFunction | null = null
@@ -21,9 +22,20 @@ class Multipart extends Thenable<MultipartCompleteResponse> implements UploadThe
     super()
 
     this.request = multipartStart(file, settings)
+
     this.promise = this.request
       .then(({uuid, parts}) => {
         this.request = multipartUpload(file, parts, settings)
+
+        this.request.onProgress = (progressEvent: BaseProgress) => {
+          if (typeof this.onProgress === 'function') {
+            this.onProgress({
+              ...progressEvent,
+              loaded: progressEvent.loaded,
+              total: progressEvent.total,
+            })
+          }
+        }
 
         return this.request
           .then(() => Promise.resolve(uuid))
