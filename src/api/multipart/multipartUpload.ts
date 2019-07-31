@@ -9,7 +9,7 @@ import {HandleProgressFunction} from '../request/types'
 import {FileData, Settings} from '../../types'
 import {ChunkType, MultipartPart} from './types'
 import {BaseProgress} from '../types'
-import {UploadThenableInterface} from '../../thenable/types'
+import {BaseThenableInterface} from '../../thenable/types'
 
 function throttle(callback, limit = 1) {
   let wait = false                  // Initially, we're not waiting
@@ -25,12 +25,12 @@ function throttle(callback, limit = 1) {
   }
 }
 
-class MultipartUpload extends Thenable<any> implements UploadThenableInterface<any> {
+class MultipartUpload extends Thenable<any> implements BaseThenableInterface<any> {
   onProgress: HandleProgressFunction | null = null
   onCancel: VoidFunction | null = null
 
   protected readonly promise: Promise<any>
-  private readonly requests: UploadThenableInterface<any>[]
+  private readonly requests: BaseThenableInterface<any>[]
   private readonly loaded: number[]
 
   constructor(file: FileData, parts: MultipartPart[], settings: Settings = {}) {
@@ -92,9 +92,9 @@ class MultipartUpload extends Thenable<any> implements UploadThenableInterface<a
  * @param {FileData} file
  * @param {MultipartPart[]} parts
  * @param {Settings} settings
- * @return {UploadThenableInterface<any>}
+ * @return {BaseThenableInterface<any>}
  */
-export default function multipartUpload(file: FileData, parts: MultipartPart[], settings: Settings = {}): UploadThenableInterface<any> {
+export default function multipartUpload(file: FileData, parts: MultipartPart[], settings: Settings = {}): BaseThenableInterface<any> {
   return new MultipartUpload(file, parts, settings)
 }
 

@@ -13,22 +13,19 @@ import {HandleProgressFunction} from '../request/types'
 import {FileData, Settings} from '../../types'
 import {BaseProgress} from '../types'
 import {MultipartPart, MultipartUploadResponse} from './types'
-import {UploadThenableInterface} from '../../thenable/types'
+import {BaseThenableInterface} from '../../thenable/types'
 
-const nodeUploadBufferProgress = (config: AxiosRequestConfig): AxiosRequestConfig => {
+const nodeUploadProgress = (config: AxiosRequestConfig): AxiosRequestConfig => {
   const {data, onUploadProgress} = config
   if (!onUploadProgress) {
     return config
   }
 
-  const formData = new FormData()
-  formData.append('data', data)
-
-  const total = formData.getLengthSync()
+  const total = data.getLengthSync()
 
   let loaded = 0
 
-  formData.on('data', chunk => {
+  data.on('data', chunk => {
     loaded += chunk.length
 
     onUploadProgress({
@@ -40,7 +37,7 @@ const nodeUploadBufferProgress = (config: AxiosRequestConfig): AxiosRequestConfi
   return config
 }
 
-class MultipartUploadPart extends Thenable<MultipartUploadResponse> implements UploadThenableInterface<MultipartUploadResponse> {
+class MultipartUploadPart extends Thenable<MultipartUploadResponse> implements BaseThenableInterface<MultipartUploadResponse> {
   onProgress: HandleProgressFunction | null = null
   onCancel: VoidFunction | null = null
 
@@ -51,8 +48,11 @@ class MultipartUploadPart extends Thenable<MultipartUploadResponse> implements U
     super()
 
     this.cancelController = axios.CancelToken.source()
+    const formData = new FormData()
+    formData.append('data', file)
+
     const options = {
-      data: file,
+      data: formData,
       url: partUrl,
       method: 'PUT',
       cancelToken: this.cancelController.token,
@@ -62,12 +62,13 @@ class MultipartUploadPart extends Thenable<MultipartUploadResponse> implements U
           this.onProgress(progressEvent)
         }
       },
+      headers: formData.getHeaders()
     }
 
     const instance = axios.create()
 
     if (isNode()) {
-      instance.interceptors.request.use(nodeUploadBufferProgress,
+      instance.interceptors.request.use(nodeUploadProgress,
         error => {
           return Promise.reject(error)
         }
@@ -118,8 +119,8 @@ class MultipartUploadPart extends Thenable<MultipartUploadResponse> implements U
  * @param {MultipartPart} partUrl
  * @param {FileData} file
  * @param {Settings} settings
- * @return {UploadThenableInterface<MultipartUploadResponse>}
+ * @return {BaseThenableInterface<MultipartUploadResponse>}
  */
-export default function multipartUploadPart(partUrl: MultipartPart, file: FileData, settings: Settings = {}): UploadThenableInterface<MultipartUploadResponse> {
+export default function multipartUploadPart(partUrl: MultipartPart, file: FileData, settings: Settings = {}): BaseThenableInterface<MultipartUploadResponse> {
   return new MultipartUploadPart(partUrl, file, settings)
 }

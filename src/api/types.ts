@@ -9,7 +9,7 @@ import {
   MultipartPart,
   MultipartStartResponse,
 } from './multipart/types'
-import {UploadThenableInterface} from '../thenable/types'
+import {BaseThenableInterface, CancelableThenableInterface} from '../thenable/types'
 
 interface StatusInterface {
   status: string,
@@ -113,7 +113,7 @@ export type GroupId = string
 export interface UploadAPIInterface {
   request(options: RequestOptions): Promise<RequestResponse>
 
-  base(data: FileData, settings?: Settings): DirectUploadInterface
+  base(data: FileData, settings?: Settings): BaseThenableInterface<BaseResponse>
 
   info(uuid: Uuid, settings?: Settings): Promise<InfoResponse>
 
@@ -125,9 +125,9 @@ export interface UploadAPIInterface {
 
   groupInfo(id: GroupId, settings: Settings): Promise<GroupInfoResponse>
 
-  multipartStart(file: FileData, settings: Settings): UploadThenableInterface<MultipartStartResponse>
+  multipartStart(file: FileData, settings: Settings): CancelableThenableInterface<MultipartStartResponse>
 
-  multipartUpload(file: FileData, parts: MultipartPart[], settings: Settings): UploadThenableInterface<any>
+  multipartUpload(file: FileData, parts: MultipartPart[], settings: Settings): BaseThenableInterface<any>
 
-  multipartComplete(uuid: Uuid, settings: Settings): UploadThenableInterface<MultipartCompleteResponse>
+  multipartComplete(uuid: Uuid, settings: Settings): CancelableThenableInterface<MultipartCompleteResponse>
 }

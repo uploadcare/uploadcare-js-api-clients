@@ -5,8 +5,8 @@ import {RequestOptions} from '../request/types'
 import {Settings} from '../../types'
 import {Uuid} from '../types'
 import {MultipartCompleteResponse} from './types'
-import {UploadThenableInterface} from '../../thenable/types'
-import {UploadThenable} from '../../thenable/UploadThenable'
+import {CancelableThenableInterface} from '../../thenable/types'
+import {CancelableThenable} from '../../thenable/CancelableThenable'
 
 const getRequestBody = (uuid: Uuid, settings: Settings) => ({
   uuid,
@@ -27,10 +27,10 @@ const getRequestOptions = (uuid: Uuid, settings: Settings): RequestOptions => {
  *
  * @param {Uuid} uuid
  * @param {Settings} settings
- * @return {UploadThenableInterface<MultipartCompleteResponse>}
+ * @return {CancelableThenableInterface<MultipartCompleteResponse>}
  */
-export default function multipartComplete(uuid: Uuid, settings: Settings = {}): UploadThenableInterface<MultipartCompleteResponse> {
+export default function multipartComplete(uuid: Uuid, settings: Settings = {}): CancelableThenableInterface<MultipartCompleteResponse> {
   const options = getRequestOptions(uuid, settings)
 
-  return new UploadThenable<MultipartCompleteResponse>(options)
+  return new CancelableThenable<MultipartCompleteResponse>(options)
 }

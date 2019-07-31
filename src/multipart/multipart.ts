@@ -8,15 +8,15 @@ import {FileData, Settings} from '../types'
 import {MultipartCompleteResponse} from '../api/multipart/types'
 import {HandleProgressFunction} from '../api/request/types'
 import {Uuid} from '..'
-import {UploadThenableInterface} from '../thenable/types'
+import {BaseThenableInterface, CancelableThenableInterface} from '../thenable/types'
 import {BaseProgress} from '../api/types'
 
-class Multipart extends Thenable<MultipartCompleteResponse> implements UploadThenableInterface<MultipartCompleteResponse> {
+class Multipart extends Thenable<MultipartCompleteResponse> implements BaseThenableInterface<MultipartCompleteResponse> {
   onCancel: VoidFunction | null = null
   onProgress: HandleProgressFunction | null = null
 
   protected readonly promise: Promise<MultipartCompleteResponse>
-  private request: UploadThenableInterface<any>
+  private request: BaseThenableInterface<any> | CancelableThenableInterface<any>
 
   constructor(file: FileData, settings: Settings) {
     super()
@@ -27,6 +27,7 @@ class Multipart extends Thenable<MultipartCompleteResponse> implements UploadThe
       .then(({uuid, parts}) => {
         this.request = multipartUpload(file, parts, settings)
 
+        // @ts-ignore
         this.request.onProgress = (progressEvent: BaseProgress) => {
           if (typeof this.onProgress === 'function') {
             this.onProgress({
@@ -64,8 +65,8 @@ class Multipart extends Thenable<MultipartCompleteResponse> implements UploadThe
  *
  * @param {FileData} file
  * @param {Settings} settings
- * @return {UploadThenableInterface<MultipartCompleteResponse>}
+ * @return {BaseThenableInterface<MultipartCompleteResponse>}
  */
-export default function multipart(file: FileData, settings: Settings = {}): UploadThenableInterface<MultipartCompleteResponse> {
+export default function multipart(file: FileData, settings: Settings = {}): BaseThenableInterface<MultipartCompleteResponse> {
   return new Multipart(file, settings)
 }

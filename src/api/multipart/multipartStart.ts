@@ -6,8 +6,8 @@ import defaultSettings from '../../defaultSettings'
 import {RequestOptions} from '../request/types'
 import {FileData, Settings} from '../../types'
 import {MultipartStartResponse} from './types'
-import {UploadThenableInterface} from '../../thenable/types'
-import {UploadThenable} from '../../thenable/UploadThenable'
+import {CancelableThenableInterface} from '../../thenable/types'
+import {CancelableThenable} from '../../thenable/CancelableThenable'
 
 const getRequestBody = (file: FileData, settings: Settings) => {
   const size: number = getFileSize(file)
@@ -38,10 +38,10 @@ const getRequestOptions = (file: FileData, settings: Settings): RequestOptions =
  *
  * @param {FileData} file
  * @param {Settings} settings
- * @return {UploadThenableInterface<MultipartStartResponse>}
+ * @return {CancelableThenableInterface<MultipartStartResponse>}
  */
-export default function multipartStart(file: FileData, settings: Settings = {}): UploadThenableInterface<MultipartStartResponse> {
+export default function multipartStart(file: FileData, settings: Settings = {}): CancelableThenableInterface<MultipartStartResponse> {
   const options = getRequestOptions(file, settings)
 
-  return new UploadThenable<MultipartStartResponse>(options)
+  return new CancelableThenable<MultipartStartResponse>(options)
 }

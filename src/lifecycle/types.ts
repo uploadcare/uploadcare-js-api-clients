@@ -1,6 +1,37 @@
 import {ProgressParams, Settings, UploadcareFileInterface, UploadcareGroupInterface, UploadingProgress} from '../types'
 import {Uuid} from '..'
-import {CancelableInterface, GroupInfo} from '../api/types'
+import {BaseProgress, CancelableInterface, GroupInfo} from '../api/types'
+
+export interface ProgressHookInterface<T> {
+  onProgress: ((progress: T) => void) | null
+}
+
+export interface CancelHookInterface {
+  onCancel: (() => void) | null
+}
+
+export interface BaseHooksInterface extends
+  ProgressHookInterface<BaseProgress>,
+  CancelHookInterface {
+}
+
+export interface UploadHooksInterface<T> extends
+  ProgressHookInterface<UploadingProgress> {
+  onUploaded: ((uuid: string) => void) | null
+  onReady: ((entity: T) => void) | null
+}
+
+export interface LifecycleHooksInterface<T> extends
+  UploadHooksInterface<T>,
+  CancelHookInterface {
+}
+
+
+
+
+
+
+
 
 export interface HooksInterface<T> {
   onProgress: ((progress: UploadingProgress) => void) | null

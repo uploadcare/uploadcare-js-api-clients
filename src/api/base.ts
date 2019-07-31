@@ -4,8 +4,8 @@ import {prepareOptions} from './request/prepareOptions'
 import {RequestOptions} from './request/types'
 import {Settings, FileData} from '../types'
 import {BaseResponse} from './types'
-import {UploadThenableInterface} from '../thenable/types'
-import {UploadThenable} from '../thenable/UploadThenable'
+import {BaseThenableInterface} from '../thenable/types'
+import {BaseThenable} from '../thenable/BaseThenable'
 
 const getRequestBody = (file: FileData, settings: Settings) => ({
   UPLOADCARE_PUB_KEY: settings.publicKey || '',
@@ -30,10 +30,10 @@ const getRequestOptions = (file: FileData, settings: Settings): RequestOptions =
  *
  * @param {FileData} file
  * @param {Settings} settings
- * @return {UploadThenableInterface<BaseResponse>}
+ * @return {BaseThenableInterface<BaseResponse>}
  */
-export default function base(file: FileData, settings: Settings = {}): UploadThenableInterface<BaseResponse> {
+export default function base(file: FileData, settings: Settings = {}): BaseThenableInterface<BaseResponse> {
   const options = getRequestOptions(file, settings)
 
-  return new UploadThenable<BaseResponse>(options)
+  return new BaseThenable<BaseResponse>(options)
 }

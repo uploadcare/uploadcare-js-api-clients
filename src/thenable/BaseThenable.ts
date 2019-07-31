@@ -1,10 +1,10 @@
 import {Thenable} from './Thenable'
-import {UploadThenableInterface} from './types'
+import {BaseThenableInterface} from './types'
 import {HandleProgressFunction, RequestInterface, RequestOptions} from '../api/request/types'
 import request from '../api/request/request'
 import {BaseProgress} from '../api/types'
 
-export class UploadThenable<T> extends Thenable<T> implements UploadThenableInterface<T> {
+export class BaseThenable<T> extends Thenable<T> implements BaseThenableInterface<T> {
   onProgress: HandleProgressFunction | null = null
   onCancel: VoidFunction | null = null
 

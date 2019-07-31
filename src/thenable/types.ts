@@ -1,7 +1,14 @@
 import {CancelableInterface} from '../api/types'
-import {HandleProgressFunction} from '../api/request/types'
+import {BaseHooksInterface, CancelHookInterface} from '../lifecycle/types'
 
-export interface UploadThenableInterface<T> extends Promise<T>, CancelableInterface {
-  onProgress: HandleProgressFunction | null
-  onCancel: VoidFunction | null
+export interface CancelableThenableInterface<T> extends
+  CancelHookInterface,
+  Promise<T>,
+  CancelableInterface {
+}
+
+export interface BaseThenableInterface<T> extends
+  BaseHooksInterface,
+  Promise<T>,
+  CancelableInterface {
 }
