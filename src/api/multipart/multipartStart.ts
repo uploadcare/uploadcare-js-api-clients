@@ -3,7 +3,7 @@ import {getFileSize} from './getFileSize'
 import defaultSettings from '../../defaultSettings'
 
 /* Types */
-import {RequestOptions} from '../request/types'
+import {RequestOptionsInterface} from '../request/types'
 import {FileData, SettingsInterface} from '../../types'
 import {MultipartStartResponse} from './types'
 import {CancelableThenableInterface} from '../../thenable/types'
@@ -25,7 +25,7 @@ const getRequestBody = (file: FileData, settings: SettingsInterface) => {
   }
 }
 
-const getRequestOptions = (file: FileData, settings: SettingsInterface): RequestOptions => {
+const getRequestOptions = (file: FileData, settings: SettingsInterface): RequestOptionsInterface => {
   return prepareOptions({
     method: 'POST',
     path: '/multipart/start/',

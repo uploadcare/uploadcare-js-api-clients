@@ -1,7 +1,7 @@
 import {prepareOptions} from './request/prepareOptions'
 
 /* Types */
-import {RequestOptions} from './request/types'
+import {RequestOptionsInterface} from './request/types'
 import {SettingsInterface, FileData} from '../types'
 import {Uuid} from './types'
 import {BaseThenableInterface} from '../thenable/types'
@@ -20,7 +20,7 @@ const getRequestBody = (file: FileData, settings: SettingsInterface) => ({
   file: file,
 })
 
-const getRequestOptions = (file: FileData, settings: SettingsInterface): RequestOptions => {
+const getRequestOptions = (file: FileData, settings: SettingsInterface): RequestOptionsInterface => {
   return prepareOptions({
     method: 'POST',
     path: '/base/',

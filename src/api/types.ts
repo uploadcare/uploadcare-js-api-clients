@@ -1,4 +1,4 @@
-import {RequestOptions, RequestResponse} from './request/types'
+import {RequestOptionsInterface, RequestResponse} from './request/types'
 import {FileData, SettingsInterface} from '../types'
 import {FromUrlResponse, Url} from './fromUrl'
 import {FromUrlStatusResponse} from './fromUrlStatus'
@@ -89,7 +89,7 @@ export type Uuid = string
 export type GroupId = string
 
 export interface UploadAPIInterface {
-  request(options: RequestOptions): Promise<RequestResponse>
+  request(options: RequestOptionsInterface): Promise<RequestResponse>
 
   base(data: FileData, settings?: SettingsInterface): BaseThenableInterface<BaseResponse>
 

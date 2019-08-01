@@ -3,7 +3,7 @@ import UploadClient from '../UploadClient'
 import fromUrlStatus, {FromUrlStatusResponse} from './fromUrlStatus'
 import base, {BaseResponse} from './base'
 import {FileInfoInterface, GroupId, GroupInfoInterface, Token, UploadAPIInterface, Uuid} from './types'
-import {RequestOptions, RequestResponse} from './request/types'
+import {RequestOptionsInterface, RequestResponse} from './request/types'
 import fromUrl, {FromUrlResponse, Url} from './fromUrl'
 import groupInfo from './groupInfo'
 import {FileData, SettingsInterface} from '../types'
@@ -32,7 +32,7 @@ class UploadAPI implements UploadAPIInterface {
     }
   }
 
-  request(options: RequestOptions): Promise<RequestResponse> {
+  request(options: RequestOptionsInterface): Promise<RequestResponse> {
     const preparedOptions = prepareOptions(options, this.client.getSettings())
 
     return request(preparedOptions)

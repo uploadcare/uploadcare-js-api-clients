@@ -2,7 +2,7 @@ import request from './request/request'
 import {prepareOptions} from './request/prepareOptions'
 
 /* Types */
-import {RequestOptions} from './request/types'
+import {RequestOptionsInterface} from './request/types'
 import {FileInfoInterface, Uuid} from './types'
 import {SettingsInterface} from '../types'
 
@@ -22,7 +22,7 @@ const getRequestQuery = (uuid: Uuid, settings: SettingsInterface) => {
   return query
 }
 
-const getRequestOptions = (uuid: Uuid, settings: SettingsInterface): RequestOptions => {
+const getRequestOptions = (uuid: Uuid, settings: SettingsInterface): RequestOptionsInterface => {
   return prepareOptions({
     path: '/info/',
     query: getRequestQuery(uuid, settings),

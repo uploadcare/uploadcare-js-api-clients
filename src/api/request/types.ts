@@ -18,7 +18,7 @@ export type Headers = {
   [key: string]: string,
 }
 
-export type RequestOptions = {
+export interface RequestOptionsInterface {
   method?: string,
   path: string,
   query?: Query,

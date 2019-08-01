@@ -1,6 +1,6 @@
 import {Thenable} from './Thenable'
 import {BaseThenableInterface} from './types'
-import {RequestInterface, RequestOptions} from '../api/request/types'
+import {RequestInterface, RequestOptionsInterface} from '../api/request/types'
 import request from '../api/request/request'
 
 export class BaseThenable<T> extends Thenable<T> implements BaseThenableInterface<T> {
@@ -11,7 +11,7 @@ export class BaseThenable<T> extends Thenable<T> implements BaseThenableInterfac
 
   private readonly request: RequestInterface
 
-  constructor(options: RequestOptions) {
+  constructor(options: RequestOptionsInterface) {
     super()
 
     this.request = request({

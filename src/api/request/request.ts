@@ -13,7 +13,7 @@ import UploadcareError from '../../errors/UploadcareError'
 import RequestWasThrottledError from '../../errors/RequestWasThrottledError'
 
 /* Types */
-import {RequestInterface, RequestOptions, RequestResponse} from './types'
+import {RequestInterface, RequestOptionsInterface, RequestResponse} from './types'
 
 const REQUEST_WAS_THROTTLED_CODE = 429
 
@@ -43,12 +43,12 @@ const nodeUploadProgress = (config: AxiosRequestConfig): AxiosRequestConfig => {
 
 class Request extends Thenable<RequestResponse> implements RequestInterface {
   protected readonly promise: Promise<RequestResponse>
-  private readonly options: RequestOptions
+  private readonly options: RequestOptionsInterface
   private readonly cancelController: CancelTokenSource
   private throttledTimes: number = 0
   private readonly retryThrottledMaxTimes: number
 
-  constructor(options: RequestOptions) {
+  constructor(options: RequestOptionsInterface) {
     super()
 
     this.options = options
@@ -228,7 +228,7 @@ class Request extends Thenable<RequestResponse> implements RequestInterface {
  * Performs request to Uploadcare Upload API.
  *
  * @export
- * @param {RequestOptions} options – The options for making requests.
+ * @param {RequestOptionsInterface} options – The options for making requests.
  * @param {string} [options.method = GET] – The request method.
  * @param {string} [options.path] – The path to requested method, without endpoint and with slashes.
  * @param {Object} [options.query] – The URL parameters.
@@ -238,7 +238,7 @@ class Request extends Thenable<RequestResponse> implements RequestInterface {
  * @param {number} [options.retryThrottledMaxTimes] – How much times retry throttled request (1 by default)
  * @returns {Promise<RequestResponse>}
  */
-const request = (options: RequestOptions): RequestInterface => {
+const request = (options: RequestOptionsInterface): RequestInterface => {
   return new Request(options)
 }
 

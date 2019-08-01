@@ -2,7 +2,7 @@ import request from './request/request'
 import {prepareOptions} from './request/prepareOptions'
 
 /* Types */
-import {RequestOptions} from './request/types'
+import {RequestOptionsInterface} from './request/types'
 import {GroupInfoInterface, GroupId} from './types'
 import {SettingsInterface} from '../types'
 
@@ -22,7 +22,7 @@ const getRequestQuery = (id: GroupId, settings: SettingsInterface) => {
   return query
 }
 
-const getRequestOptions = (id: GroupId, settings: SettingsInterface): RequestOptions => {
+const getRequestOptions = (id: GroupId, settings: SettingsInterface): RequestOptionsInterface => {
   return prepareOptions({
     path: '/group/info/',
     query: getRequestQuery(id, settings),

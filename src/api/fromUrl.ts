@@ -2,7 +2,7 @@ import request from './request/request'
 import {prepareOptions} from './request/prepareOptions'
 
 /* Types */
-import {RequestOptions} from './request/types'
+import {RequestOptionsInterface} from './request/types'
 import {SettingsInterface} from '../types'
 import {FileInfoInterface} from './types'
 
@@ -54,7 +54,7 @@ const getRequestQuery = (sourceUrl: Url, settings: SettingsInterface) => ({
   source: settings.source || 'url',
 })
 
-const getRequestOptions = (sourceUrl: Url, settings: SettingsInterface): RequestOptions => {
+const getRequestOptions = (sourceUrl: Url, settings: SettingsInterface): RequestOptionsInterface => {
   return prepareOptions({
     method: 'POST',
     path: '/from_url/',

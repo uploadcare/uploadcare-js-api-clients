@@ -2,7 +2,7 @@ import request from './request/request'
 import {prepareOptions} from './request/prepareOptions'
 
 /* Types */
-import {RequestOptions} from './request/types'
+import {RequestOptionsInterface} from './request/types'
 import {SettingsInterface} from '../types'
 import {FileInfoInterface, ProgressStatusInterface, Token} from './types'
 
@@ -87,7 +87,7 @@ const getRequestQuery = (token: string, settings: SettingsInterface) => ({
   pub_key: settings.publicKey || '',
 })
 
-const getRequestOptions = (token: Token, settings: SettingsInterface): RequestOptions => {
+const getRequestOptions = (token: Token, settings: SettingsInterface): RequestOptionsInterface => {
   return prepareOptions({
     path: '/from_url/status/',
     query: getRequestQuery(token, settings),

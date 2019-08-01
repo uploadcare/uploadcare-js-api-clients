@@ -1,7 +1,7 @@
 import {prepareOptions} from '../request/prepareOptions'
 
 /* Types */
-import {RequestOptions} from '../request/types'
+import {RequestOptionsInterface} from '../request/types'
 import {SettingsInterface} from '../../types'
 import {FileInfoInterface, Uuid} from '../types'
 import {CancelableThenableInterface} from '../../thenable/types'
@@ -13,7 +13,7 @@ const getRequestBody = (uuid: Uuid, settings: SettingsInterface) => ({
   source: settings.source || 'local',
 })
 
-const getRequestOptions = (uuid: Uuid, settings: SettingsInterface): RequestOptions => {
+const getRequestOptions = (uuid: Uuid, settings: SettingsInterface): RequestOptionsInterface => {
   return prepareOptions({
     method: 'POST',
     path: '/multipart/complete/',

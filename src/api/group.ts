@@ -2,7 +2,7 @@ import request from './request/request'
 import {prepareOptions} from './request/prepareOptions'
 
 /* Types */
-import {RequestOptions} from './request/types'
+import {RequestOptionsInterface} from './request/types'
 import {GroupInfoInterface, Uuid} from './types'
 import {SettingsInterface} from '../types'
 
@@ -25,7 +25,7 @@ const getRequestQuery = (uuids: Uuid[], settings: SettingsInterface) => {
   return  {...query}
 }
 
-const getRequestOptions = (uuids: Uuid[], settings: SettingsInterface): RequestOptions => {
+const getRequestOptions = (uuids: Uuid[], settings: SettingsInterface): RequestOptionsInterface => {
   return prepareOptions({
     method: 'POST',
     path: '/group/',

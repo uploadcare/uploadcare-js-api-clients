@@ -1,6 +1,6 @@
 import {Thenable} from './Thenable'
 import {CancelableThenableInterface} from './types'
-import {RequestInterface, RequestOptions} from '../api/request/types'
+import {RequestInterface, RequestOptionsInterface} from '../api/request/types'
 import request from '../api/request/request'
 
 export class CancelableThenable<T> extends Thenable<T> implements CancelableThenableInterface<T> {
@@ -10,7 +10,7 @@ export class CancelableThenable<T> extends Thenable<T> implements CancelableThen
 
   private readonly request: RequestInterface
 
-  constructor(options: RequestOptions) {
+  constructor(options: RequestOptionsInterface) {
     super()
 
     this.request = request(options)

@@ -6,7 +6,7 @@ export {Url} from './api/fromUrl'
 export {Uuid, UploadAPIInterface} from './api/types'
 export {FileUploadInterface} from './fileFrom/types'
 export {UploadClientInterface} from './UploadClient'
-export {RequestOptions, RequestInterface} from './api/request/types'
+export {RequestOptionsInterface, RequestInterface} from './api/request/types'
 export {FileFromEnum} from './fileFrom/types'
 
 export default UploadClient
