@@ -1,10 +1,10 @@
-import {ErrorRequestInfo, ErrorResponseInfo} from './types'
+import {ErrorRequestInfoInterface, ErrorResponseInfoInterface} from './types'
 
 export default class RequestError extends Error {
-  readonly request: ErrorRequestInfo
-  readonly response: ErrorResponseInfo
+  readonly request: ErrorRequestInfoInterface
+  readonly response: ErrorResponseInfoInterface
 
-  constructor(request: ErrorRequestInfo, response: ErrorResponseInfo) {
+  constructor(request: ErrorRequestInfoInterface, response: ErrorResponseInfoInterface) {
     super()
 
     this.name = 'RequestError'

@@ -3,12 +3,10 @@ import {prepareOptions} from './request/prepareOptions'
 
 /* Types */
 import {RequestOptions} from './request/types'
-import {FileInfo, Uuid} from './types'
-import {Settings} from '../types'
+import {FileInfoInterface, Uuid} from './types'
+import {SettingsInterface} from '../types'
 
-export type InfoResponse = FileInfo
-
-const getRequestQuery = (uuid: Uuid, settings: Settings) => {
+const getRequestQuery = (uuid: Uuid, settings: SettingsInterface) => {
   const query = {
     pub_key: settings.publicKey || '',
     file_id: uuid,
@@ -24,7 +22,7 @@ const getRequestQuery = (uuid: Uuid, settings: Settings) => {
   return query
 }
 
-const getRequestOptions = (uuid: Uuid, settings: Settings): RequestOptions => {
+const getRequestOptions = (uuid: Uuid, settings: SettingsInterface): RequestOptions => {
   return prepareOptions({
     path: '/info/',
     query: getRequestQuery(uuid, settings),
@@ -35,10 +33,10 @@ const getRequestOptions = (uuid: Uuid, settings: Settings): RequestOptions => {
  * Returns a JSON dictionary holding file info.
  *
  * @param {Uuid} uuid – UUID of a target file to request its info.
- * @param {Settings} settings
- * @return {Promise<InfoResponse>}
+ * @param {SettingsInterface} settings
+ * @return {Promise<FileInfoInterface>}
  */
-export default function info(uuid: Uuid, settings: Settings = {}): Promise<InfoResponse> {
+export default function info(uuid: Uuid, settings: SettingsInterface = {}): Promise<FileInfoInterface> {
   const options = getRequestOptions(uuid, settings)
 
   return request(options)

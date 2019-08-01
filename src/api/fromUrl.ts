@@ -3,8 +3,8 @@ import {prepareOptions} from './request/prepareOptions'
 
 /* Types */
 import {RequestOptions} from './request/types'
-import {Settings} from '../types'
-import {FileInfo} from './types'
+import {SettingsInterface} from '../types'
+import {FileInfoInterface} from './types'
 
 export type Url = string
 
@@ -20,7 +20,7 @@ type TokenResponse = {
 
 type FileInfoResponse = {
   type: TypeEnum.FileInfo,
-} & FileInfo
+} & FileInfoInterface
 
 export type FromUrlResponse = FileInfoResponse | TokenResponse
 
@@ -42,7 +42,7 @@ export const isFileInfoResponse = (response: FromUrlResponse): response is FileI
   return response.type !== undefined && response.type === TypeEnum.FileInfo;
 }
 
-const getRequestQuery = (sourceUrl: Url, settings: Settings) => ({
+const getRequestQuery = (sourceUrl: Url, settings: SettingsInterface) => ({
   pub_key: settings.publicKey || '',
   source_url: sourceUrl,
   store: settings.doNotStore ? '' : 'auto',
@@ -54,7 +54,7 @@ const getRequestQuery = (sourceUrl: Url, settings: Settings) => ({
   source: settings.source || 'url',
 })
 
-const getRequestOptions = (sourceUrl: Url, settings: Settings): RequestOptions => {
+const getRequestOptions = (sourceUrl: Url, settings: SettingsInterface): RequestOptions => {
   return prepareOptions({
     method: 'POST',
     path: '/from_url/',
@@ -66,11 +66,11 @@ const getRequestOptions = (sourceUrl: Url, settings: Settings): RequestOptions =
  * Uploading files from URL.
  *
  * @param {Url} sourceUrl – Source file URL, which should be a public HTTP or HTTPS link.
- * @param {Settings} settings
+ * @param {SettingsInterface} settings
  * @return {Promise<FromUrlResponse>}
  */
 export default function fromUrl(
-  sourceUrl: Url, settings: Settings = {}
+  sourceUrl: Url, settings: SettingsInterface = {}
 ): Promise<FromUrlResponse> {
   const options = getRequestOptions(sourceUrl, settings)
 

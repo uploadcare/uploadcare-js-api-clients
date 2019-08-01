@@ -3,12 +3,10 @@ import {prepareOptions} from './request/prepareOptions'
 
 /* Types */
 import {RequestOptions} from './request/types'
-import {GroupInfo, GroupId} from './types'
-import {Settings} from '../types'
+import {GroupInfoInterface, GroupId} from './types'
+import {SettingsInterface} from '../types'
 
-export type GroupInfoResponse = GroupInfo
-
-const getRequestQuery = (id: GroupId, settings: Settings) => {
+const getRequestQuery = (id: GroupId, settings: SettingsInterface) => {
   const query = {
     pub_key: settings.publicKey || '',
     group_id: id,
@@ -24,7 +22,7 @@ const getRequestQuery = (id: GroupId, settings: Settings) => {
   return query
 }
 
-const getRequestOptions = (id: GroupId, settings: Settings): RequestOptions => {
+const getRequestOptions = (id: GroupId, settings: SettingsInterface): RequestOptions => {
   return prepareOptions({
     path: '/group/info/',
     query: getRequestQuery(id, settings),
@@ -35,10 +33,10 @@ const getRequestOptions = (id: GroupId, settings: Settings): RequestOptions => {
  * Get info about group.
  *
  * @param {GroupId} id – Group ID. Group IDs look like UUID~N.
- * @param {Settings} settings
- * @return {Promise<GroupInfoResponse>}
+ * @param {SettingsInterface} settings
+ * @return {Promise<GroupInfoInterface>}
  */
-export default function groupInfo(id: GroupId, settings: Settings = {}): Promise<GroupInfoResponse> {
+export default function groupInfo(id: GroupId, settings: SettingsInterface = {}): Promise<GroupInfoInterface> {
   const options = getRequestOptions(id, settings)
 
   return request(options)

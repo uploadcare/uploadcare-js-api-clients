@@ -3,14 +3,13 @@ import {Thenable} from '../thenable/Thenable'
 /* Types */
 import {FileHandlerInterface, FileUploadInterface} from './types'
 import {UploadcareFileInterface, UploadingProgress} from '../types'
-import {FileUploadLifecycleInterface} from '../lifecycle/types'
-import {CancelableInterface} from '../api/types'
+import {CancelableInterface, FileUploadLifecycleInterface} from '../lifecycle/types'
 
 export class FileUpload extends Thenable<UploadcareFileInterface> implements FileUploadInterface {
   onProgress: ((progress: UploadingProgress) => void) | null = null
   onUploaded: ((uuid: string) => void) | null = null
   onReady: ((file: UploadcareFileInterface) => void) | null = null
-  onCancel: VoidFunction | null = null
+  onCancel: (() => void) | null = null
 
   protected readonly promise: Promise<UploadcareFileInterface>
 

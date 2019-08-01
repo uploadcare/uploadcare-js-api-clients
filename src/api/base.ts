@@ -2,12 +2,16 @@ import {prepareOptions} from './request/prepareOptions'
 
 /* Types */
 import {RequestOptions} from './request/types'
-import {Settings, FileData} from '../types'
-import {BaseResponse} from './types'
+import {SettingsInterface, FileData} from '../types'
+import {Uuid} from './types'
 import {BaseThenableInterface} from '../thenable/types'
 import {BaseThenable} from '../thenable/BaseThenable'
 
-const getRequestBody = (file: FileData, settings: Settings) => ({
+export type BaseResponse = {
+  file: Uuid
+}
+
+const getRequestBody = (file: FileData, settings: SettingsInterface) => ({
   UPLOADCARE_PUB_KEY: settings.publicKey || '',
   signature: settings.secureSignature || '',
   expire: settings.secureExpire || '',
@@ -16,7 +20,7 @@ const getRequestBody = (file: FileData, settings: Settings) => ({
   file: file,
 })
 
-const getRequestOptions = (file: FileData, settings: Settings): RequestOptions => {
+const getRequestOptions = (file: FileData, settings: SettingsInterface): RequestOptions => {
   return prepareOptions({
     method: 'POST',
     path: '/base/',
@@ -29,10 +33,10 @@ const getRequestOptions = (file: FileData, settings: Settings): RequestOptions =
  * Can be canceled and has progress.
  *
  * @param {FileData} file
- * @param {Settings} settings
+ * @param {SettingsInterface} settings
  * @return {BaseThenableInterface<BaseResponse>}
  */
-export default function base(file: FileData, settings: Settings = {}): BaseThenableInterface<BaseResponse> {
+export default function base(file: FileData, settings: SettingsInterface = {}): BaseThenableInterface<BaseResponse> {
   const options = getRequestOptions(file, settings)
 
   return new BaseThenable<BaseResponse>(options)

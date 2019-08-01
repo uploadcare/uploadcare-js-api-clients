@@ -1,9 +1,9 @@
-import {OriginalImageInfo, Settings, UploadcareFileInterface} from './types'
-import {FileInfo} from './api/types'
+import {OriginalImageInfoInterface, SettingsInterface, UploadcareFileInterface} from './types'
 import prettyFileInfo from './prettyFileInfo'
+import {FileInfoInterface} from './api/types'
 
 export class UploadcareFile implements UploadcareFileInterface {
-  private readonly fileInfo: FileInfo
+  private readonly fileInfo: FileInfoInterface
 
   readonly uuid: string
   readonly name: null | string = null
@@ -14,9 +14,9 @@ export class UploadcareFile implements UploadcareFileInterface {
   readonly cdnUrlModifiers: null | string = null
   readonly originalUrl: null | string = null
   readonly originalFilename: null | string = null
-  readonly originalImageInfo: null | OriginalImageInfo = null
+  readonly originalImageInfo: null | OriginalImageInfoInterface = null
 
-  constructor(fileInfo: FileInfo, settings: Settings) {
+  constructor(fileInfo: FileInfoInterface, settings: SettingsInterface) {
     this.fileInfo = fileInfo
     const pretty = prettyFileInfo(fileInfo, settings)
 

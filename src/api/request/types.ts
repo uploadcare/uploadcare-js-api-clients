@@ -1,12 +1,12 @@
 import {FileData} from '../../types'
-import {CancelableInterface, BaseProgress} from '../types'
+import {CancelableInterface} from '../../lifecycle/types'
 
 export type Query = {
   [key: string]: string | string[] | boolean | number | void,
 }
 
 export type Body = {
-  [key: string]: Array<string>
+  [key: string]: string[]
     | string
     | boolean
     | number
@@ -18,10 +18,6 @@ export type Headers = {
   [key: string]: string,
 }
 
-export type HandleProgressFunction = {
-  (progressEvent: BaseProgress): void
-}
-
 export type RequestOptions = {
   method?: string,
   path: string,
@@ -29,7 +25,7 @@ export type RequestOptions = {
   body?: Body,
   headers?: Headers,
   baseURL?: string,
-  onUploadProgress?: HandleProgressFunction,
+  onUploadProgress?: (progressEvent: ProgressEvent) => void,
   retryThrottledMaxTimes?: number
 }
 

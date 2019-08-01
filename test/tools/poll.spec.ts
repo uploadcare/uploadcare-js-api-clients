@@ -1,9 +1,9 @@
 import poll from '../../src/tools/poll'
-import {InfoResponse} from '../../src/api/info'
 import info from '../../src/api/info'
 import {getSettingsForTesting} from '../_helpers'
 import * as factory from '../_fixtureFactory'
 import CancelError from '../../src/errors/CancelError'
+import {FileInfoInterface} from '../../src/api/types'
 
 describe('poll', () => {
   const uuid = factory.uuid('image')
@@ -15,7 +15,7 @@ describe('poll', () => {
   }
 
   it('should be resolved', async() => {
-    const result = await poll<InfoResponse>(
+    const result = await poll<FileInfoInterface>(
       async () => {
         const response = await info(uuid, settings)
 
@@ -35,7 +35,7 @@ describe('poll', () => {
   })
 
   it('should be able to cancel polling', (done) => {
-    const polling = poll<InfoResponse>(
+    const polling = poll<FileInfoInterface>(
       async() => {
         const response = await info(uuid, settings)
 

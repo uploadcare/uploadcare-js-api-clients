@@ -1,19 +1,19 @@
 import {UploadFrom} from './UploadFrom'
-import info, {InfoResponse} from '../api/info'
+import info from '../api/info'
 import CancelError from '../errors/CancelError'
 
 /* Types */
-import {Settings, ProgressState, UploadcareFileInterface} from '../types'
-import {Uuid} from '../api/types'
+import {SettingsInterface, ProgressStateEnum, UploadcareFileInterface} from '../types'
+import {FileInfoInterface, Uuid} from '../api/types'
 
 export class UploadFromUploaded extends UploadFrom {
   protected readonly promise: Promise<UploadcareFileInterface>
 
   private isCancelled: boolean = false
   private readonly data: Uuid
-  private readonly settings: Settings
+  private readonly settings: SettingsInterface
 
-  constructor(data: Uuid, settings: Settings) {
+  constructor(data: Uuid, settings: SettingsInterface) {
     super()
 
     this.data = data
@@ -34,7 +34,7 @@ export class UploadFromUploaded extends UploadFrom {
       .catch(this.handleError)
   }
 
-  private handleInfoResponse = (response: InfoResponse) => {
+  private handleInfoResponse = (response: FileInfoInterface) => {
     if (this.isCancelled) {
       return Promise.reject(new CancelError())
     }
@@ -48,11 +48,11 @@ export class UploadFromUploaded extends UploadFrom {
     const {state} = this.getProgress()
 
     switch (state) {
-      case ProgressState.Uploading:
+      case ProgressStateEnum.Uploading:
         this.isCancelled = true
         break
-      case ProgressState.Uploaded:
-      case ProgressState.Ready:
+      case ProgressStateEnum.Uploaded:
+      case ProgressStateEnum.Ready:
         if (this.isFileReadyPolling) {
           this.isFileReadyPolling.cancel()
         } else {

@@ -1,17 +1,16 @@
-import info, {InfoResponse} from './info'
+import info from './info'
 import UploadClient from '../UploadClient'
 import fromUrlStatus, {FromUrlStatusResponse} from './fromUrlStatus'
-import base from './base'
-import {BaseResponse, DirectUploadInterface, GroupId, Token, UploadAPIInterface, Uuid} from './types'
+import base, {BaseResponse} from './base'
+import {FileInfoInterface, GroupId, GroupInfoInterface, Token, UploadAPIInterface, Uuid} from './types'
 import {RequestOptions, RequestResponse} from './request/types'
 import fromUrl, {FromUrlResponse, Url} from './fromUrl'
 import groupInfo from './groupInfo'
-import {FileData, Settings} from '../types'
+import {FileData, SettingsInterface} from '../types'
 import {prepareOptions} from './request/prepareOptions'
-import group, {GroupInfoResponse} from './group'
+import group from './group'
 import request from './request/request'
 import {
-  MultipartCompleteResponse,
   MultipartPart, MultipartStartResponse,
 } from './multipart/types'
 import multipartComplete from './multipart/multipartComplete'
@@ -39,39 +38,39 @@ class UploadAPI implements UploadAPIInterface {
     return request(preparedOptions)
   }
 
-  base(data: FileData, settings: Settings = {}): BaseThenableInterface<BaseResponse> {
+  base(data: FileData, settings: SettingsInterface = {}): BaseThenableInterface<BaseResponse> {
     return base(data, this.getResultSettings(settings))
   }
 
-  info(uuid: Uuid, settings: Settings = {}): Promise<InfoResponse> {
+  info(uuid: Uuid, settings: SettingsInterface = {}): Promise<FileInfoInterface> {
     return info(uuid, this.getResultSettings(settings))
   }
 
-  fromUrl(sourceUrl: Url, settings: Settings = {}): Promise<FromUrlResponse> {
+  fromUrl(sourceUrl: Url, settings: SettingsInterface = {}): Promise<FromUrlResponse> {
     return fromUrl(sourceUrl, this.getResultSettings(settings))
   }
 
-  fromUrlStatus(token: Token, settings: Settings = {}): Promise<FromUrlStatusResponse> {
+  fromUrlStatus(token: Token, settings: SettingsInterface = {}): Promise<FromUrlStatusResponse> {
     return fromUrlStatus(token, this.getResultSettings(settings))
   }
 
-  group(files: Uuid[], settings: Settings): Promise<GroupInfoResponse> {
-    return group(files, this.getResultSettings(settings))
+  group(uuids: Uuid[], settings: SettingsInterface): Promise<GroupInfoInterface> {
+    return group(uuids, this.getResultSettings(settings))
   }
 
-  groupInfo(id: GroupId, settings: Settings): Promise<GroupInfoResponse> {
+  groupInfo(id: GroupId, settings: SettingsInterface): Promise<GroupInfoInterface> {
     return groupInfo(id, this.getResultSettings(settings))
   }
 
-  multipartStart(file: FileData, settings: Settings): CancelableThenableInterface<MultipartStartResponse> {
+  multipartStart(file: FileData, settings: SettingsInterface): CancelableThenableInterface<MultipartStartResponse> {
     return multipartStart(file, this.getResultSettings(settings))
   }
 
-  multipartUpload(file: FileData, parts: MultipartPart[], settings: Settings): BaseThenableInterface<any> {
+  multipartUpload(file: FileData, parts: MultipartPart[], settings: SettingsInterface): BaseThenableInterface<any> {
     return multipartUpload(file, parts, this.getResultSettings(settings))
   }
 
-  multipartComplete(uuid: Uuid, settings: Settings): CancelableThenableInterface<MultipartCompleteResponse> {
+  multipartComplete(uuid: Uuid, settings: SettingsInterface): CancelableThenableInterface<FileInfoInterface> {
     return multipartComplete(uuid, this.getResultSettings(settings))
   }
 }

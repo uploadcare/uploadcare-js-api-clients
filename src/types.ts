@@ -1,6 +1,6 @@
-import {FileInfo, GroupId} from './api/types'
+import {FileInfoInterface, GroupId} from './api/types'
 
-export interface Settings {
+export interface SettingsInterface {
   baseCDN?: string,
   baseURL?: string,
   publicKey?: string | null,
@@ -20,7 +20,7 @@ export interface Settings {
   multipartMinLastPartSize?: number,
 }
 
-export interface DefaultSettings extends Settings {
+export interface DefaultSettingsInterface extends SettingsInterface {
   baseCDN: string,
   baseURL: string,
   fileName: string,
@@ -33,7 +33,7 @@ export interface DefaultSettings extends Settings {
 
 export type FileData = Blob | File | Buffer
 
-export type OriginalImageInfo = {
+export interface OriginalImageInfoInterface {
   width: number,
   height: number,
   format: string,
@@ -43,7 +43,7 @@ export type OriginalImageInfo = {
     longitude: number,
   },
   orientation: null | number,
-  dpi: null | Array<number>,
+  dpi: null | number[],
   colorMode: string,
   sequence?: boolean,
 }
@@ -59,7 +59,7 @@ export interface UploadcareFileInterface {
   readonly cdnUrlModifiers: null | string,
   readonly originalUrl: null | string,
   readonly originalFilename: null | string,
-  readonly originalImageInfo: null | OriginalImageInfo,
+  readonly originalImageInfo: null | OriginalImageInfoInterface,
 }
 
 export interface UploadcareGroupInterface {
@@ -69,12 +69,12 @@ export interface UploadcareGroupInterface {
   readonly isStored: boolean,
   readonly isImage: boolean,
   readonly cdnUrl: string,
-  readonly files: FileInfo[],
+  readonly files: FileInfoInterface[],
   readonly createdAt: string,
   readonly storedAt: string | null,
 }
 
-export enum ProgressState {
+export enum ProgressStateEnum {
   Pending = 'pending',
   Uploading = 'uploading',
   Uploaded = 'uploaded',
@@ -83,13 +83,13 @@ export enum ProgressState {
   Error = 'error',
 }
 
-export type ProgressParams = {
+export interface ProgressParamsInterface {
   total: number,
   loaded: number,
 }
 
 export type UploadingProgress = {
-  state: ProgressState,
-  uploaded: null | ProgressParams,
+  state: ProgressStateEnum,
+  uploaded: null | ProgressParamsInterface,
   value: number,
 }

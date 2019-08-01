@@ -1,6 +1,6 @@
 import {GroupUploadLifecycleInterface, LifecycleInterface} from './types'
-import {GroupInfo} from '../api/types'
-import {Settings, UploadcareGroupInterface} from '../types'
+import {GroupInfoInterface} from '../api/types'
+import {SettingsInterface, UploadcareGroupInterface} from '../types'
 import {UploadedState} from './state/UploadedState'
 
 export class GroupUploadLifecycle implements GroupUploadLifecycleInterface {
@@ -10,7 +10,7 @@ export class GroupUploadLifecycle implements GroupUploadLifecycleInterface {
     this.lifecycle = lifecycle
   }
 
-  handleUploadedGroup(groupInfo: GroupInfo, settings: Settings): Promise<UploadcareGroupInterface> {
+  handleUploadedGroup(groupInfo: GroupInfoInterface, settings: SettingsInterface): Promise<UploadcareGroupInterface> {
     const totalSize = groupInfo.files.reduce((acc, file) => acc + file.size, 0)
     const isStored = !!groupInfo.datetime_stored
     const isImage = !!groupInfo.files.filter(file => file.is_image).length

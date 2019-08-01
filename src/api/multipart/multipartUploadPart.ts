@@ -9,9 +9,7 @@ import CancelError from '../../errors/CancelError'
 import RequestError from '../../errors/RequestError'
 
 /* Types */
-import {HandleProgressFunction} from '../request/types'
-import {FileData, Settings} from '../../types'
-import {BaseProgress} from '../types'
+import {FileData, SettingsInterface} from '../../types'
 import {MultipartPart, MultipartUploadResponse} from './types'
 import {BaseThenableInterface} from '../../thenable/types'
 
@@ -38,13 +36,13 @@ const nodeUploadProgress = (config: AxiosRequestConfig): AxiosRequestConfig => {
 }
 
 class MultipartUploadPart extends Thenable<MultipartUploadResponse> implements BaseThenableInterface<MultipartUploadResponse> {
-  onProgress: HandleProgressFunction | null = null
-  onCancel: VoidFunction | null = null
+  onProgress: ((progressEvent: ProgressEvent) => void) | null = null
+  onCancel: (() => void) | null = null
 
   protected readonly promise: Promise<MultipartUploadResponse>
   private readonly cancelController: CancelTokenSource
 
-  constructor(partUrl: MultipartPart, file: FileData, settings: Settings) {
+  constructor(partUrl: MultipartPart, file: FileData, settings: SettingsInterface) {
     super()
 
     this.cancelController = axios.CancelToken.source()
@@ -57,12 +55,11 @@ class MultipartUploadPart extends Thenable<MultipartUploadResponse> implements B
       method: 'PUT',
       cancelToken: this.cancelController.token,
       maxContentLength: settings.maxContentLength || defaultSettings.maxContentLength,
-      onUploadProgress: (progressEvent: BaseProgress) => {
+      onUploadProgress: (progressEvent: ProgressEvent) => {
         if (typeof this.onProgress === 'function') {
           this.onProgress(progressEvent)
         }
-      },
-      headers: formData.getHeaders()
+      }
     }
 
     const instance = axios.create()
@@ -118,9 +115,9 @@ class MultipartUploadPart extends Thenable<MultipartUploadResponse> implements B
  *
  * @param {MultipartPart} partUrl
  * @param {FileData} file
- * @param {Settings} settings
+ * @param {SettingsInterface} settings
  * @return {BaseThenableInterface<MultipartUploadResponse>}
  */
-export default function multipartUploadPart(partUrl: MultipartPart, file: FileData, settings: Settings = {}): BaseThenableInterface<MultipartUploadResponse> {
+export default function multipartUploadPart(partUrl: MultipartPart, file: FileData, settings: SettingsInterface = {}): BaseThenableInterface<MultipartUploadResponse> {
   return new MultipartUploadPart(partUrl, file, settings)
 }

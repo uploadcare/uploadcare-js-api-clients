@@ -1,7 +1,7 @@
 import {Thenable} from '../thenable/Thenable'
 import TimeoutError from '../errors/TimeoutError'
-import {CancelableInterface} from '../api/types'
 import CancelError from '../errors/CancelError'
+import {CancelableInterface} from '../lifecycle/types'
 
 export const DEFAULT_TIMEOUT = 10000
 const DEFAULT_INTERVAL = 500

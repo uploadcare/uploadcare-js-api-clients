@@ -1,12 +1,11 @@
 import {Thenable} from './Thenable'
 import {BaseThenableInterface} from './types'
-import {HandleProgressFunction, RequestInterface, RequestOptions} from '../api/request/types'
+import {RequestInterface, RequestOptions} from '../api/request/types'
 import request from '../api/request/request'
-import {BaseProgress} from '../api/types'
 
 export class BaseThenable<T> extends Thenable<T> implements BaseThenableInterface<T> {
-  onProgress: HandleProgressFunction | null = null
-  onCancel: VoidFunction | null = null
+  onProgress: ((progressEvent: ProgressEvent) => void) | null = null
+  onCancel: (() => void) | null = null
 
   protected readonly promise: Promise<T>
 
@@ -17,7 +16,7 @@ export class BaseThenable<T> extends Thenable<T> implements BaseThenableInterfac
 
     this.request = request({
       ...options,
-      onUploadProgress: (progressEvent: BaseProgress) => {
+      onUploadProgress: (progressEvent: ProgressEvent) => {
         if (typeof this.onProgress === 'function') {
           this.onProgress(progressEvent)
         }

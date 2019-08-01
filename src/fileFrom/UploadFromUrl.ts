@@ -1,5 +1,5 @@
 import fromUrl, {FromUrlResponse, isFileInfoResponse, isTokenResponse, Url} from '../api/fromUrl'
-import {Settings, UploadcareFileInterface, ProgressState} from '../types'
+import {SettingsInterface, UploadcareFileInterface, ProgressStateEnum} from '../types'
 import fromUrlStatus, {
   FromUrlStatusResponse,
   isErrorResponse,
@@ -21,9 +21,9 @@ export class UploadFromUrl extends UploadFrom {
   private isCancelled: boolean = false
   private unknownStatusWasTimes: number = 0
   private readonly data: Url
-  private readonly settings: Settings
+  private readonly settings: SettingsInterface
 
-  constructor(data: Url, settings: Settings) {
+  constructor(data: Url, settings: SettingsInterface) {
     super()
 
     this.data = data
@@ -122,15 +122,15 @@ export class UploadFromUrl extends UploadFrom {
     const {state} = this.getProgress()
 
     switch (state) {
-      case ProgressState.Uploading:
+      case ProgressStateEnum.Uploading:
         if (this.isFileUploadedFromUrlPolling) {
           this.isFileUploadedFromUrlPolling.cancel()
         } else {
           this.isCancelled = true
         }
         break
-      case ProgressState.Uploaded:
-      case ProgressState.Ready:
+      case ProgressStateEnum.Uploaded:
+      case ProgressStateEnum.Ready:
         if (this.isFileReadyPolling) {
           this.isFileReadyPolling.cancel()
         } else {

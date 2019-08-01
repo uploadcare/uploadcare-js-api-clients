@@ -2,16 +2,16 @@ import {getUserAgent} from '../../defaultSettings'
 
 /* Types */
 import {RequestOptions} from './types'
-import {Settings} from '../../types'
+import {SettingsInterface} from '../../types'
 
 /**
- * Updates options with Uploadcare Settings.
+ * Updates options with Uploadcare SettingsInterface.
  *
  * @param {RequestOptions} options
- * @param {Settings} settings
+ * @param {SettingsInterface} settings
  * @returns {RequestOptions}
  */
-export function prepareOptions(options: RequestOptions, settings: Settings): RequestOptions {
+export function prepareOptions(options: RequestOptions, settings: SettingsInterface): RequestOptions {
   const newOptions = {...options}
 
   if (!options.baseURL && settings.baseURL) {

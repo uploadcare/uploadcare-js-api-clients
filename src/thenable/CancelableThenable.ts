@@ -4,7 +4,7 @@ import {RequestInterface, RequestOptions} from '../api/request/types'
 import request from '../api/request/request'
 
 export class CancelableThenable<T> extends Thenable<T> implements CancelableThenableInterface<T> {
-  onCancel: VoidFunction | null = null
+  onCancel: (() => void) | null = null
 
   protected readonly promise: Promise<T>
 

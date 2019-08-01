@@ -3,29 +3,29 @@ import {UploadFromUrl} from './UploadFromUrl'
 import {UploadFromUploaded} from './UploadFromUploaded'
 
 /* Types */
-import {FileData, Settings} from '../types'
+import {FileData, SettingsInterface} from '../types'
 import {Url} from '../api/fromUrl'
 import {Uuid} from '../api/types'
-import {GroupFrom, GroupUploadInterface} from './types'
+import {GroupFromEnum, GroupUploadInterface} from './types'
 
 /**
  * Uploads file from provided data.
  *
- * @param {FileFrom} from
+ * @param {FileFromEnum} from
  * @param {FileData} data
- * @param {Settings} settings
+ * @param {SettingsInterface} settings
  * @throws Error
  * @returns {FileUploadInterface}
  */
-export default function groupFrom(from: GroupFrom, data: FileData[] | Url[] | Uuid[], settings: Settings = {}): GroupUploadInterface {
+export default function groupFrom(from: GroupFromEnum, data: FileData[] | Url[] | Uuid[], settings: SettingsInterface = {}): GroupUploadInterface {
   switch (from) {
-    case GroupFrom.Object:
+    case GroupFromEnum.Object:
       return new UploadFromObject(data as FileData[], settings)
-    case GroupFrom.URL:
+    case GroupFromEnum.URL:
       return new UploadFromUrl(data as Url[], settings)
-    case GroupFrom.Uploaded:
+    case GroupFromEnum.Uploaded:
       return new UploadFromUploaded(data as Uuid[], settings)
     default:
-      throw new Error(`Group uploading from "${from}" is not supported`)
+      throw new TypeError(`Group uploading from "${from}" is not supported`)
   }
 }

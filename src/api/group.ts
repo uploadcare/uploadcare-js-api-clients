@@ -3,15 +3,13 @@ import {prepareOptions} from './request/prepareOptions'
 
 /* Types */
 import {RequestOptions} from './request/types'
-import {GroupInfo, Uuid} from './types'
-import {Settings} from '../types'
+import {GroupInfoInterface, Uuid} from './types'
+import {SettingsInterface} from '../types'
 
-export type GroupInfoResponse = GroupInfo
-
-const getRequestQuery = (files: Uuid[], settings: Settings) => {
+const getRequestQuery = (uuids: Uuid[], settings: SettingsInterface) => {
   const query = {
     pub_key: settings.publicKey || '',
-    files,
+    files: uuids,
     callback: settings.jsonpCallback || undefined,
     signature: settings.secureSignature || undefined,
     expire: settings.secureExpire || undefined,
@@ -27,23 +25,23 @@ const getRequestQuery = (files: Uuid[], settings: Settings) => {
   return  {...query}
 }
 
-const getRequestOptions = (files: Uuid[], settings: Settings): RequestOptions => {
+const getRequestOptions = (uuids: Uuid[], settings: SettingsInterface): RequestOptions => {
   return prepareOptions({
     method: 'POST',
     path: '/group/',
-    query: getRequestQuery(files, settings),
+    query: getRequestQuery(uuids, settings),
   }, settings)
 }
 
 /**
  * Create files group.
  *
- * @param {Uuid[]} files – A set of files you want to join in a group.
- * @param {Settings} settings
- * @return {Promise<GroupInfoResponse>}
+ * @param {Uuid[]} uuids – A set of files you want to join in a group.
+ * @param {SettingsInterface} settings
+ * @return {Promise<GroupInfoInterface>}
  */
-export default function group(files: Uuid[], settings: Settings = {}): Promise<GroupInfoResponse> {
-  const options = getRequestOptions(files, settings)
+export default function group(uuids: Uuid[], settings: SettingsInterface = {}): Promise<GroupInfoInterface> {
+  const options = getRequestOptions(uuids, settings)
 
   return request(options)
     .then(response => response.data)

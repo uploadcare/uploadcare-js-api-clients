@@ -1,9 +1,9 @@
-import {ErrorRequestInfo, ErrorResponseInfo} from './types'
+import {ErrorRequestInfoInterface, ErrorResponseInfoInterface} from './types'
 import RequestError from './RequestError'
 
 export default class UploadcareError extends Error {
-  readonly request: ErrorRequestInfo
-  readonly response: ErrorResponseInfo
+  readonly request: ErrorRequestInfoInterface
+  readonly response: ErrorResponseInfoInterface
 
   constructor(requestError: RequestError) {
     super()

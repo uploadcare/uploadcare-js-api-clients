@@ -63,7 +63,7 @@ describe('API - multipartUpload', () => {
       })
   })
 
-  fit('should be able to handle progress', async(done) => {
+  it('should be able to handle progress', async(done) => {
     let progressValue = 0
     const settings = getSettingsForTesting({
       publicKey: factory.publicKey('demo'),

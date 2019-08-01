@@ -64,7 +64,7 @@ export type FileInfo = {
   },
 }
 
-export type GroupInfo = {
+export type GroupInfoInterface = {
   id: string,
   datetime_created: string,
   datetime_stored: any,

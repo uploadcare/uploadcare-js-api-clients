@@ -1,6 +1,4 @@
-import {FileInfo, Uuid} from '../types'
-
-export type MultipartCompleteResponse = FileInfo
+import {Uuid} from '../types'
 
 export type MultipartPart = string
 

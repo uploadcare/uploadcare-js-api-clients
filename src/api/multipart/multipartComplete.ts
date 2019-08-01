@@ -2,19 +2,18 @@ import {prepareOptions} from '../request/prepareOptions'
 
 /* Types */
 import {RequestOptions} from '../request/types'
-import {Settings} from '../../types'
-import {Uuid} from '../types'
-import {MultipartCompleteResponse} from './types'
+import {SettingsInterface} from '../../types'
+import {FileInfoInterface, Uuid} from '../types'
 import {CancelableThenableInterface} from '../../thenable/types'
 import {CancelableThenable} from '../../thenable/CancelableThenable'
 
-const getRequestBody = (uuid: Uuid, settings: Settings) => ({
+const getRequestBody = (uuid: Uuid, settings: SettingsInterface) => ({
   uuid,
   UPLOADCARE_PUB_KEY: settings.publicKey || '',
   source: settings.source || 'local',
 })
 
-const getRequestOptions = (uuid: Uuid, settings: Settings): RequestOptions => {
+const getRequestOptions = (uuid: Uuid, settings: SettingsInterface): RequestOptions => {
   return prepareOptions({
     method: 'POST',
     path: '/multipart/complete/',
@@ -26,11 +25,11 @@ const getRequestOptions = (uuid: Uuid, settings: Settings): RequestOptions => {
  * Complete multipart uploading.
  *
  * @param {Uuid} uuid
- * @param {Settings} settings
- * @return {CancelableThenableInterface<MultipartCompleteResponse>}
+ * @param {SettingsInterface} settings
+ * @return {CancelableThenableInterface<FileInfoInterface>}
  */
-export default function multipartComplete(uuid: Uuid, settings: Settings = {}): CancelableThenableInterface<MultipartCompleteResponse> {
+export default function multipartComplete(uuid: Uuid, settings: SettingsInterface = {}): CancelableThenableInterface<FileInfoInterface> {
   const options = getRequestOptions(uuid, settings)
 
-  return new CancelableThenable<MultipartCompleteResponse>(options)
+  return new CancelableThenable<FileInfoInterface>(options)
 }

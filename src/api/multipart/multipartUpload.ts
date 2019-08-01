@@ -5,10 +5,8 @@ import {getChunks} from './getChunks'
 import defaultSettings from '../../defaultSettings'
 
 /* Types */
-import {HandleProgressFunction} from '../request/types'
-import {FileData, Settings} from '../../types'
+import {FileData, SettingsInterface} from '../../types'
 import {ChunkType, MultipartPart} from './types'
-import {BaseProgress} from '../types'
 import {BaseThenableInterface} from '../../thenable/types'
 
 function throttle(callback, limit = 1) {
@@ -26,14 +24,14 @@ function throttle(callback, limit = 1) {
 }
 
 class MultipartUpload extends Thenable<any> implements BaseThenableInterface<any> {
-  onProgress: HandleProgressFunction | null = null
-  onCancel: VoidFunction | null = null
+  onProgress: ((progressEvent: ProgressEvent) => void) | null = null
+  onCancel: (() => void) | null = null
 
   protected readonly promise: Promise<any>
   private readonly requests: BaseThenableInterface<any>[]
   private readonly loaded: number[]
 
-  constructor(file: FileData, parts: MultipartPart[], settings: Settings = {}) {
+  constructor(file: FileData, parts: MultipartPart[], settings: SettingsInterface = {}) {
     super()
 
     const fileSize = getFileSize(file)
@@ -62,7 +60,7 @@ class MultipartUpload extends Thenable<any> implements BaseThenableInterface<any
       const partUrl = parts[index]
       const uploadPartPromise = multipartUploadPart(partUrl, fileChunk)
 
-      uploadPartPromise.onProgress = (progressEvent: BaseProgress) => {
+      uploadPartPromise.onProgress = (progressEvent: ProgressEvent) => {
         if (typeof this.onProgress === 'function') {
           this.loaded[index] = progressEvent.loaded
           updateProgress(progressEvent)
@@ -91,10 +89,10 @@ class MultipartUpload extends Thenable<any> implements BaseThenableInterface<any
  *
  * @param {FileData} file
  * @param {MultipartPart[]} parts
- * @param {Settings} settings
+ * @param {SettingsInterface} settings
  * @return {BaseThenableInterface<any>}
  */
-export default function multipartUpload(file: FileData, parts: MultipartPart[], settings: Settings = {}): BaseThenableInterface<any> {
+export default function multipartUpload(file: FileData, parts: MultipartPart[], settings: SettingsInterface = {}): BaseThenableInterface<any> {
   return new MultipartUpload(file, parts, settings)
 }
 

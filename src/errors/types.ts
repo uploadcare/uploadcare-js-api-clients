@@ -1,9 +1,9 @@
-export type ErrorRequestInfo = {
+export interface ErrorRequestInfoInterface {
   headers: object,
   url: string,
 }
 
-export type ErrorResponseInfo = {
+export interface ErrorResponseInfoInterface {
   status: number,
   statusText: string,
 }

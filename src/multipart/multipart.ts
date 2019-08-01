@@ -4,21 +4,19 @@ import multipartComplete from '../api/multipart/multipartComplete'
 import {Thenable} from '../thenable/Thenable'
 
 /* Types */
-import {FileData, Settings} from '../types'
-import {MultipartCompleteResponse} from '../api/multipart/types'
-import {HandleProgressFunction} from '../api/request/types'
+import {FileData, SettingsInterface} from '../types'
 import {Uuid} from '..'
 import {BaseThenableInterface, CancelableThenableInterface} from '../thenable/types'
-import {BaseProgress} from '../api/types'
+import {FileInfoInterface} from '../api/types'
 
-class Multipart extends Thenable<MultipartCompleteResponse> implements BaseThenableInterface<MultipartCompleteResponse> {
-  onCancel: VoidFunction | null = null
-  onProgress: HandleProgressFunction | null = null
+class Multipart extends Thenable<FileInfoInterface> implements BaseThenableInterface<FileInfoInterface> {
+  onCancel: (() => void) | null = null
+  onProgress: ((progressEvent: ProgressEvent) => void) | null = null
 
-  protected readonly promise: Promise<MultipartCompleteResponse>
+  protected readonly promise: Promise<FileInfoInterface>
   private request: BaseThenableInterface<any> | CancelableThenableInterface<any>
 
-  constructor(file: FileData, settings: Settings) {
+  constructor(file: FileData, settings: SettingsInterface) {
     super()
 
     this.request = multipartStart(file, settings)
@@ -28,7 +26,7 @@ class Multipart extends Thenable<MultipartCompleteResponse> implements BaseThena
         this.request = multipartUpload(file, parts, settings)
 
         // @ts-ignore
-        this.request.onProgress = (progressEvent: BaseProgress) => {
+        this.request.onProgress = (progressEvent: ProgressEvent) => {
           if (typeof this.onProgress === 'function') {
             this.onProgress({
               ...progressEvent,
@@ -64,9 +62,9 @@ class Multipart extends Thenable<MultipartCompleteResponse> implements BaseThena
  * Upload multipart file.
  *
  * @param {FileData} file
- * @param {Settings} settings
- * @return {BaseThenableInterface<MultipartCompleteResponse>}
+ * @param {SettingsInterface} settings
+ * @return {BaseThenableInterface<FileInfoInterface>}
  */
-export default function multipart(file: FileData, settings: Settings = {}): BaseThenableInterface<MultipartCompleteResponse> {
+export default function multipart(file: FileData, settings: SettingsInterface = {}): BaseThenableInterface<FileInfoInterface> {
   return new Multipart(file, settings)
 }

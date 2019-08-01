@@ -3,8 +3,8 @@ import {prepareOptions} from './request/prepareOptions'
 
 /* Types */
 import {RequestOptions} from './request/types'
-import {Settings} from '../types'
-import {FileInfo, ProgressStatus, Token} from './types'
+import {SettingsInterface} from '../types'
+import {FileInfoInterface, ProgressStatusInterface, Token} from './types'
 
 export enum StatusEnum {
   Unknown = 'unknown',
@@ -22,9 +22,9 @@ type WaitingResponse = {
   status: StatusEnum.Waiting
 }
 
-type ProgressResponse = ProgressStatus & {
+type ProgressResponse = {
   status: StatusEnum.Progress
-}
+} & ProgressStatusInterface
 
 type ErrorResponse = {
   status: StatusEnum.Error,
@@ -33,7 +33,7 @@ type ErrorResponse = {
 
 type SuccessResponse = {
   status: StatusEnum.Success,
-} & FileInfo
+} & FileInfoInterface
 
 export type FromUrlStatusResponse = UnknownResponse | WaitingResponse | ProgressResponse | ErrorResponse | SuccessResponse
 
@@ -82,12 +82,12 @@ export const isSuccessResponse = (response: FromUrlStatusResponse): response is 
   return response.status !== undefined && response.status === StatusEnum.Success;
 }
 
-const getRequestQuery = (token: string, settings: Settings) => ({
+const getRequestQuery = (token: string, settings: SettingsInterface) => ({
   token: token,
   pub_key: settings.publicKey || '',
 })
 
-const getRequestOptions = (token: Token, settings: Settings): RequestOptions => {
+const getRequestOptions = (token: Token, settings: SettingsInterface): RequestOptions => {
   return prepareOptions({
     path: '/from_url/status/',
     query: getRequestQuery(token, settings),
@@ -98,11 +98,11 @@ const getRequestOptions = (token: Token, settings: Settings): RequestOptions => 
  * Checking upload status and working with file tokens.
  *
  * @param {Token} token – Source file URL, which should be a public HTTP or HTTPS link.
- * @param {Settings} settings
+ * @param {SettingsInterface} settings
  * @throws {UploadcareError}
  * @return {Promise<FromUrlStatusResponse>}
  */
-export default function fromUrlStatus(token: Token, settings: Settings = {}): Promise<FromUrlStatusResponse> {
+export default function fromUrlStatus(token: Token, settings: SettingsInterface = {}): Promise<FromUrlStatusResponse> {
   const options = getRequestOptions(token, settings)
 
   return request(options)

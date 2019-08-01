@@ -1,5 +1,4 @@
-import {CancelableInterface} from '../api/types'
-import {BaseHooksInterface, CancelHookInterface} from '../lifecycle/types'
+import {BaseHooksInterface, CancelableInterface, CancelHookInterface} from '../lifecycle/types'
 
 export interface CancelableThenableInterface<T> extends
   CancelHookInterface,
