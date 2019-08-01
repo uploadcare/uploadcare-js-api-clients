@@ -5,6 +5,8 @@ import {prepareOptions} from './request/prepareOptions'
 import {RequestOptionsInterface} from './request/types'
 import {GroupInfoInterface, Uuid} from './types'
 import {SettingsInterface} from '../types'
+import {CancelableThenable} from '../thenable/CancelableThenable'
+import {CancelableThenableInterface} from '../thenable/types'
 
 const getRequestQuery = (uuids: Uuid[], settings: SettingsInterface) => {
   const query = {
@@ -38,11 +40,10 @@ const getRequestOptions = (uuids: Uuid[], settings: SettingsInterface): RequestO
  *
  * @param {Uuid[]} uuids – A set of files you want to join in a group.
  * @param {SettingsInterface} settings
- * @return {Promise<GroupInfoInterface>}
+ * @return {CancelableThenableInterface<GroupInfoInterface>}
  */
-export default function group(uuids: Uuid[], settings: SettingsInterface = {}): Promise<GroupInfoInterface> {
+export default function group(uuids: Uuid[], settings: SettingsInterface = {}): CancelableThenableInterface<GroupInfoInterface> {
   const options = getRequestOptions(uuids, settings)
 
-  return request(options)
-    .then(response => response.data)
+  return new CancelableThenable(options)
 }

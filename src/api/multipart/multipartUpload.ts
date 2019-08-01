@@ -41,11 +41,10 @@ class MultipartUpload extends Thenable<any> implements BaseThenableInterface<any
 
     this.loaded = Array.from(new Array(chunksCount)).fill(0)
 
-    const updateProgress = throttle((progressEvent) => {
+    const updateProgress = throttle((progressEvent: ProgressEvent) => {
       if (typeof this.onProgress === 'function') {
         const loaded = this.loaded.reduce((sum, chunk) => chunk + sum, 0)
 
-        console.log(loaded)
         this.onProgress({
           ...progressEvent,
           loaded,

@@ -42,23 +42,23 @@ class UploadAPI implements UploadAPIInterface {
     return base(data, this.getResultSettings(settings))
   }
 
-  info(uuid: Uuid, settings: SettingsInterface = {}): Promise<FileInfoInterface> {
+  info(uuid: Uuid, settings: SettingsInterface = {}): CancelableThenableInterface<FileInfoInterface> {
     return info(uuid, this.getResultSettings(settings))
   }
 
-  fromUrl(sourceUrl: Url, settings: SettingsInterface = {}): Promise<FromUrlResponse> {
+  fromUrl(sourceUrl: Url, settings: SettingsInterface = {}): CancelableThenableInterface<FromUrlResponse> {
     return fromUrl(sourceUrl, this.getResultSettings(settings))
   }
 
-  fromUrlStatus(token: Token, settings: SettingsInterface = {}): Promise<FromUrlStatusResponse> {
+  fromUrlStatus(token: Token, settings: SettingsInterface = {}): CancelableThenableInterface<FromUrlStatusResponse> {
     return fromUrlStatus(token, this.getResultSettings(settings))
   }
 
-  group(uuids: Uuid[], settings: SettingsInterface): Promise<GroupInfoInterface> {
+  group(uuids: Uuid[], settings: SettingsInterface): CancelableThenableInterface<GroupInfoInterface> {
     return group(uuids, this.getResultSettings(settings))
   }
 
-  groupInfo(id: GroupId, settings: SettingsInterface): Promise<GroupInfoInterface> {
+  groupInfo(id: GroupId, settings: SettingsInterface): CancelableThenableInterface<GroupInfoInterface> {
     return groupInfo(id, this.getResultSettings(settings))
   }
 

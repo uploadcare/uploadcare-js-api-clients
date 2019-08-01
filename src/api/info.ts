@@ -5,6 +5,8 @@ import {prepareOptions} from './request/prepareOptions'
 import {RequestOptionsInterface} from './request/types'
 import {FileInfoInterface, Uuid} from './types'
 import {SettingsInterface} from '../types'
+import {CancelableThenable} from '../thenable/CancelableThenable'
+import {CancelableThenableInterface} from '../thenable/types'
 
 const getRequestQuery = (uuid: Uuid, settings: SettingsInterface) => {
   const query = {
@@ -34,11 +36,10 @@ const getRequestOptions = (uuid: Uuid, settings: SettingsInterface): RequestOpti
  *
  * @param {Uuid} uuid – UUID of a target file to request its info.
  * @param {SettingsInterface} settings
- * @return {Promise<FileInfoInterface>}
+ * @return {CancelableThenableInterface<FileInfoInterface>}
  */
-export default function info(uuid: Uuid, settings: SettingsInterface = {}): Promise<FileInfoInterface> {
+export default function info(uuid: Uuid, settings: SettingsInterface = {}): CancelableThenableInterface<FileInfoInterface> {
   const options = getRequestOptions(uuid, settings)
 
-  return request(options)
-    .then(response => response.data)
+  return new CancelableThenable(options)
 }

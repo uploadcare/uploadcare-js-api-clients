@@ -5,6 +5,8 @@ import {prepareOptions} from './request/prepareOptions'
 import {RequestOptionsInterface} from './request/types'
 import {GroupInfoInterface, GroupId} from './types'
 import {SettingsInterface} from '../types'
+import {CancelableThenable} from '../thenable/CancelableThenable'
+import {CancelableThenableInterface} from '../thenable/types'
 
 const getRequestQuery = (id: GroupId, settings: SettingsInterface) => {
   const query = {
@@ -34,11 +36,10 @@ const getRequestOptions = (id: GroupId, settings: SettingsInterface): RequestOpt
  *
  * @param {GroupId} id – Group ID. Group IDs look like UUID~N.
  * @param {SettingsInterface} settings
- * @return {Promise<GroupInfoInterface>}
+ * @return {CancelableThenableInterface<GroupInfoInterface>}
  */
-export default function groupInfo(id: GroupId, settings: SettingsInterface = {}): Promise<GroupInfoInterface> {
+export default function groupInfo(id: GroupId, settings: SettingsInterface = {}): CancelableThenableInterface<GroupInfoInterface> {
   const options = getRequestOptions(id, settings)
 
-  return request(options)
-    .then(response => response.data)
+  return new CancelableThenable(options)
 }

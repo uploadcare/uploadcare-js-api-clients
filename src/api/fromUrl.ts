@@ -5,6 +5,8 @@ import {prepareOptions} from './request/prepareOptions'
 import {RequestOptionsInterface} from './request/types'
 import {SettingsInterface} from '../types'
 import {FileInfoInterface} from './types'
+import {CancelableThenable} from '../thenable/CancelableThenable'
+import {CancelableThenableInterface} from '../thenable/types'
 
 export type Url = string
 
@@ -71,9 +73,8 @@ const getRequestOptions = (sourceUrl: Url, settings: SettingsInterface): Request
  */
 export default function fromUrl(
   sourceUrl: Url, settings: SettingsInterface = {}
-): Promise<FromUrlResponse> {
+): CancelableThenableInterface<FromUrlResponse> {
   const options = getRequestOptions(sourceUrl, settings)
 
-  return request(options)
-    .then(response => response.data)
+  return new CancelableThenable(options)
 }

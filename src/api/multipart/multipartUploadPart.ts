@@ -1,6 +1,6 @@
 /* Vendors */
 import * as FormData from 'form-data'
-import axios, {AxiosRequestConfig, CancelTokenSource} from 'axios'
+import axios, {AxiosRequestConfig, AxiosResponse, CancelTokenSource} from 'axios'
 
 import {Thenable} from '../../thenable/Thenable'
 import defaultSettings from '../../defaultSettings'
@@ -13,26 +13,42 @@ import {FileData, SettingsInterface} from '../../types'
 import {MultipartPart, MultipartUploadResponse} from './types'
 import {BaseThenableInterface} from '../../thenable/types'
 
-const nodeUploadProgress = (config: AxiosRequestConfig): AxiosRequestConfig => {
+const updateProgress = ({data, loaded = false, onUploadProgress}: {
+  data: Buffer,
+  loaded: boolean,
+  onUploadProgress: (progressEvent: ProgressEvent) => void
+}): void => {
+  const formData = new FormData()
+  formData.append('data', data)
+
+  const total = formData.getLengthSync()
+
+  onUploadProgress({
+    total,
+    loaded: loaded ? total : 0,
+  } as ProgressEvent)
+}
+
+const nodeUploadProgressRequestInterceptor = (config: AxiosRequestConfig): AxiosRequestConfig => {
   const {data, onUploadProgress} = config
   if (!onUploadProgress) {
     return config
   }
 
-  const total = data.getLengthSync()
-
-  let loaded = 0
-
-  data.on('data', chunk => {
-    loaded += chunk.length
-
-    onUploadProgress({
-      total,
-      loaded,
-    } as ProgressEvent)
-  })
+  updateProgress({data, loaded: false, onUploadProgress})
 
   return config
+}
+
+const nodeUploadProgressResponseInterceptor = (response: AxiosResponse): AxiosResponse => {
+  const {data, onUploadProgress} = response.config
+  if (!onUploadProgress) {
+    return response
+  }
+
+  updateProgress({data, loaded: true, onUploadProgress})
+
+  return response
 }
 
 class MultipartUploadPart extends Thenable<MultipartUploadResponse> implements BaseThenableInterface<MultipartUploadResponse> {
@@ -46,11 +62,9 @@ class MultipartUploadPart extends Thenable<MultipartUploadResponse> implements B
     super()
 
     this.cancelController = axios.CancelToken.source()
-    const formData = new FormData()
-    formData.append('data', file)
 
     const options = {
-      data: formData,
+      data: file,
       url: partUrl,
       method: 'PUT',
       cancelToken: this.cancelController.token,
@@ -59,13 +73,18 @@ class MultipartUploadPart extends Thenable<MultipartUploadResponse> implements B
         if (typeof this.onProgress === 'function') {
           this.onProgress(progressEvent)
         }
-      }
+      },
     }
 
     const instance = axios.create()
 
     if (isNode()) {
-      instance.interceptors.request.use(nodeUploadProgress,
+      instance.interceptors.request.use(nodeUploadProgressRequestInterceptor,
+        error => {
+          return Promise.reject(error)
+        }
+      )
+      instance.interceptors.response.use(nodeUploadProgressResponseInterceptor,
         error => {
           return Promise.reject(error)
         }

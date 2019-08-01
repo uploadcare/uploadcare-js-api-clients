@@ -93,15 +93,15 @@ export interface UploadAPIInterface {
 
   base(data: FileData, settings?: SettingsInterface): BaseThenableInterface<BaseResponse>
 
-  info(uuid: Uuid, settings?: SettingsInterface): Promise<FileInfoInterface>
+  info(uuid: Uuid, settings?: SettingsInterface): CancelableThenableInterface<FileInfoInterface>
 
-  fromUrl(sourceUrl: Url, settings?: SettingsInterface): Promise<FromUrlResponse>
+  fromUrl(sourceUrl: Url, settings?: SettingsInterface): CancelableThenableInterface<FromUrlResponse>
 
-  fromUrlStatus(token: Token, settings?: SettingsInterface): Promise<FromUrlStatusResponse>
+  fromUrlStatus(token: Token, settings?: SettingsInterface): CancelableThenableInterface<FromUrlStatusResponse>
 
-  group(files: Uuid[], settings: SettingsInterface): Promise<GroupInfoInterface>
+  group(files: Uuid[], settings: SettingsInterface): CancelableThenableInterface<GroupInfoInterface>
 
-  groupInfo(id: GroupId, settings: SettingsInterface): Promise<GroupInfoInterface>
+  groupInfo(id: GroupId, settings: SettingsInterface): CancelableThenableInterface<GroupInfoInterface>
 
   multipartStart(file: FileData, settings: SettingsInterface): CancelableThenableInterface<MultipartStartResponse>
 
