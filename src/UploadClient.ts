@@ -1,13 +1,14 @@
 import defaultSettings from './defaultSettings'
 import UploadAPI from './api/index'
 import fileFrom from './fileFrom/fileFrom'
+import groupFrom from './groupFrom/groupFrom'
+
+/* Types */
 import {FileFromEnum} from './fileFrom/types'
 import {FileData, SettingsInterface} from './types'
 import {FileUploadInterface} from './fileFrom/types'
 import {Url} from './api/fromUrl'
-import {UploadAPIInterface} from './api/types'
-import {Uuid} from './api/types'
-import groupFrom from './groupFrom/groupFrom'
+import {UploadAPIInterface, Uuid} from './api/types'
 import {GroupFromEnum, GroupUploadInterface} from './groupFrom/types'
 
 export interface UploadClientInterface {
