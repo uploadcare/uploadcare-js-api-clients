@@ -33,7 +33,7 @@ npm install @uploadcare/upload-client --save
 
 ```javascript
 import UploadClient from '@uploadcare/upload-client'
-import {FileFrom} from '@uploadcare/upload-client'
+import {FileFromEnum} from '@uploadcare/upload-client'
 
 const client = new UploadClient({publicKey: 'YOUR_PUBLIC_KEY'})
 
@@ -50,14 +50,14 @@ directUpload
 
 directUpload.onProgress = (progressEvent) => console.log(progressEvent.loaded / progressEvent.total)
 
-const fileUpload = client.fileFrom(FileFrom.Object, fileData)
+const fileUpload = client.fileFrom(FileFromEnum.Object, fileData)
 
 fileUpload
   .then(file => console.log(file.uuid))
 
 fileUpload.onProgress = (progress => {
   console.log(progress.state)
-  console.log(progress.uploaded.total / progress.uploaded.loaded)
+  console.log(progress.uploaded.loaded / progress.uploaded.total)
   console.log(progress.value)
 })
 ```
