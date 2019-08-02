@@ -9,9 +9,49 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 [Unreleased]: https://github.com/uploadcare/uploadcare-upload-client/compare/v1.0.0-alpha.4...HEAD
 
+### Added
+
+* Support of multipart and uploading of big files: `multipartStart`, 
+`multipartUpload` and `multipartComplete` methods to `UploadAPI`.
+* Support of cancel and handling canceling uploads for all api methods
+(`info`, `fromUrl`, `fromUrlStatus`, `group`, `groupInfo`).
+* `DefaultSettingsInterface` with required properties.
+
+### Changed
+
+* `FileFrom` enum was renamed to `FileFromEnum`.
+* `GroupFrom` enum was renamed to `GroupFromEnum`.
+* `Settings` was renamed to `SettingsInterface`. 
+* `FileInfo` was renamed to `FileInfoInterface`.
+* `GroupInfo` was renamed to `GroupInfoInfoInterface`.
+* `OriginalImageInfo` was renamed to `OriginalImageInfoInterface`.
+* `RequestOptions` was renamed to `RequestOptionsInterface`.
+* `ProgressStatus` was renamed to `ProgressStatusInterface`.
+* `Audio` type was renamed to `AudioInterface`.
+* `Video` type was renamed to `VideoInterface`.
+* `ErrorRequestInfo` type was renamed to `ErrorRequestInfoInterface`.
+* `ErrorResponseInfoInfo` type was renamed to `ErrorResponseInfoInterface`.
+* `ProgressState` was renamed to `ProgressStateEnum`.
+* `ProgressParams` was renamed to `ProgressParamsInterface`.
+* `base` method of Upload API now returns `BaseThenableInterface<BaseResponse>`
+instead of `DirectUploadInterface`.
+* `info`, `fromUrl`, `fromUrlStatus`, `group`, `groupInfo` now returns 
+`CancelableThenableInterface`.
+
+### Fixed
+
+* Example with `directUpload.onProgress` in `README.md`.
+
+### Removed
+
+* `DirectUploadInterface` was removed in favor of `BaseThenableInterface<BaseResponse>`.
+* `BaseProgress` was removed in favor of native `ProgressEvent`.
+* `InfoResponse` was removed in favor of `FileInfoInterface`.
+* Old code in folder `./.back`.
+
 ## [1.0.0-alpha.4]
 
-## Added
+### Added
 
 * Wrappers for group paths of Upload API (`group`, `groupInfo`).
 * The high-level function for group uploading, aka filesGroupFrom.
@@ -27,7 +67,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [1.0.0-alpha.3]
 
-## Added
+### Added
 
 * Support `fileFrom` 'uploaded' file (`uuid`).
 * Support of `waiting` status from `/from_url/status/` endpoint.
@@ -39,7 +79,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 * `Uuid` type.
 * Mock server for local testing.
 
-## Fixed
+### Fixed
 
 * Default timeout for polling functions increased from 3s to 10s.
 * Removed restrictions for timeout and interval.

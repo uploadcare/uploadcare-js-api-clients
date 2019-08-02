@@ -236,7 +236,7 @@ class Request extends Thenable<RequestResponse> implements RequestInterface {
  * @param {Object} [options.headers] – The custom headers to be sent.
  * @param {string} [options.baseURL] – The Upload API endpoint.
  * @param {number} [options.retryThrottledMaxTimes] – How much times retry throttled request (1 by default)
- * @returns {Promise<RequestResponse>}
+ * @returns {RequestInterface}
  */
 const request = (options: RequestOptionsInterface): RequestInterface => {
   return new Request(options)

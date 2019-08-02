@@ -69,7 +69,7 @@ const getRequestOptions = (sourceUrl: Url, settings: SettingsInterface): Request
  *
  * @param {Url} sourceUrl – Source file URL, which should be a public HTTP or HTTPS link.
  * @param {SettingsInterface} settings
- * @return {Promise<FromUrlResponse>}
+ * @return {CancelableThenableInterface<FromUrlResponse>}
  */
 export default function fromUrl(
   sourceUrl: Url, settings: SettingsInterface = {}
