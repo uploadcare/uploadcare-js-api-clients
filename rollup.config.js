@@ -50,4 +50,22 @@ const getConfig = (format, minify = false) => ({
   ],
 })
 
-export default [getConfig('esm'), getConfig('cjs'), getConfig('umd'), getConfig('umd', true)]
+export default [
+  getConfig('esm'),
+  getConfig('cjs'),
+  getConfig('umd'),
+  getConfig('umd', true),
+  {
+    input: 'src/cli/index.ts',
+    plugins: getPlugins('cjs', false),
+    external: ['axios', 'form-data'],
+    output: [
+      {
+        file: 'dist/uploadcare-upload-client-cli.cjs.js',
+        format: 'cjs',
+        name: 'uploadcareCLI',
+        interop: false,
+      },
+    ],
+  },
+]
