@@ -1,17 +1,17 @@
-import info, {InfoResponse} from './api/info'
-import {Settings} from './types'
+import info from './api/info'
+import {SettingsInterface} from './types'
 import poll, {DEFAULT_TIMEOUT, PollPromiseInterface} from './tools/poll'
-import {Uuid} from './api/types'
+import {FileInfoInterface, Uuid} from './api/types'
 
 type FileIsReadyParams = {
   uuid: Uuid,
   timeout?: number,
   onProgress?: Function,
-  settings?: Settings
+  settings?: SettingsInterface
 }
 
-const checkFileIsReady = ({uuid, timeout = DEFAULT_TIMEOUT, onProgress, settings = {}}: FileIsReadyParams): PollPromiseInterface<InfoResponse> =>
-  poll<InfoResponse>(
+const checkFileIsReady = ({uuid, timeout = DEFAULT_TIMEOUT, onProgress, settings = {}}: FileIsReadyParams): PollPromiseInterface<FileInfoInterface> =>
+  poll<FileInfoInterface>(
     async () => {
       const response = await info(uuid, settings)
 

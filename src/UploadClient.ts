@@ -1,35 +1,36 @@
 import defaultSettings from './defaultSettings'
 import UploadAPI from './api/index'
 import fileFrom from './fileFrom/fileFrom'
-import {FileFrom} from './fileFrom/types'
-import {FileData, Settings} from './types'
+import groupFrom from './groupFrom/groupFrom'
+
+/* Types */
+import {FileFromEnum} from './fileFrom/types'
+import {FileData, SettingsInterface} from './types'
 import {FileUploadInterface} from './fileFrom/types'
 import {Url} from './api/fromUrl'
-import {UploadAPIInterface} from './api/UploadAPI'
-import {Uuid} from './api/types'
-import groupFrom from './groupFrom/groupFrom'
-import {GroupFrom, GroupUploadInterface} from './groupFrom/types'
+import {UploadAPIInterface, Uuid} from './api/types'
+import {GroupFromEnum, GroupUploadInterface} from './groupFrom/types'
 
 export interface UploadClientInterface {
-  setSettings(newSettings: Settings): void
+  setSettings(newSettings: SettingsInterface): void
 
-  getSettings(): Settings
+  getSettings(): SettingsInterface
 
   addUpdateSettingsListener(listener: Function): void
 
   removeUpdateSettingsListener(listener: Function): void
 
-  fileFrom(from: FileFrom, data: FileData | Url | Uuid, settings?: Settings): FileUploadInterface
+  fileFrom(from: FileFromEnum, data: FileData | Url | Uuid, settings?: SettingsInterface): FileUploadInterface
 
-  groupFrom(from: GroupFrom, data: FileData[] | Url[] | Uuid[], settings?: Settings): GroupUploadInterface
+  groupFrom(from: GroupFromEnum, data: FileData[] | Url[] | Uuid[], settings?: SettingsInterface): GroupUploadInterface
 }
 
 class UploadClient implements UploadClientInterface {
-  protected settings: Settings
-  protected updateSettingsListeners: Array<Function>
+  protected settings: SettingsInterface
+  protected updateSettingsListeners: Function[]
   readonly api: UploadAPIInterface
 
-  constructor(settings: Settings = {}) {
+  constructor(settings: SettingsInterface = {}) {
     this.settings = {
       ...defaultSettings,
       ...settings,
@@ -38,7 +39,7 @@ class UploadClient implements UploadClientInterface {
     this.api = new UploadAPI(this)
   }
 
-  setSettings(newSettings: Settings = {}): void {
+  setSettings(newSettings: SettingsInterface = {}): void {
     const prevSettings = {...this.settings}
 
     this.settings = {
@@ -51,7 +52,7 @@ class UploadClient implements UploadClientInterface {
     })
   }
 
-  getSettings(): Settings {
+  getSettings(): SettingsInterface {
     return this.settings
   }
 
@@ -69,14 +70,14 @@ class UploadClient implements UploadClientInterface {
     }
   }
 
-  fileFrom(from: FileFrom, data: FileData | Url | Uuid, settings: Settings = {}): FileUploadInterface {
+  fileFrom(from: FileFromEnum, data: FileData | Url | Uuid, settings: SettingsInterface = {}): FileUploadInterface {
     return fileFrom(from, data, {
       ...this.settings,
       ...settings,
     })
   }
 
-  groupFrom(from: GroupFrom, data: FileData[] | Url[] | Uuid[], settings: Settings = {}): GroupUploadInterface {
+  groupFrom(from: GroupFromEnum, data: FileData[] | Url[] | Uuid[], settings: SettingsInterface = {}): GroupUploadInterface {
     return groupFrom(from, data, {
       ...this.settings,
       ...settings,

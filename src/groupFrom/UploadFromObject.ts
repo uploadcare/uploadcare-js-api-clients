@@ -1,19 +1,20 @@
-import {FileData, Settings, UploadcareFileInterface, UploadcareGroupInterface} from '../types'
+import {FileData, SettingsInterface, UploadcareFileInterface, UploadcareGroupInterface} from '../types'
 import {UploadFrom} from './UploadFrom'
-import group, {GroupInfoResponse} from '../api/group'
+import group from '../api/group'
 import CancelError from '../errors/CancelError'
 import fileFrom from '../fileFrom/fileFrom'
-import {FileFrom, FileUploadInterface} from '../fileFrom/types'
+import {FileFromEnum, FileUploadInterface} from '..'
+import {GroupInfoInterface} from '../api/types'
 
 export class UploadFromObject extends UploadFrom {
   protected readonly promise: Promise<UploadcareGroupInterface>
 
   private readonly data: FileData[]
-  private readonly settings: Settings
+  private readonly settings: SettingsInterface
   private readonly uploads: FileUploadInterface[]
   private readonly files: Promise<UploadcareFileInterface[]>
 
-  constructor(data: FileData[], settings: Settings) {
+  constructor(data: FileData[], settings: SettingsInterface) {
     super()
 
     this.data = data
@@ -28,7 +29,7 @@ export class UploadFromObject extends UploadFrom {
     const filesTotalCount = this.data.length
 
     return this.data.map((file: FileData, index: number) => {
-      const fileUpload = fileFrom(FileFrom.Object, file, this.settings)
+      const fileUpload = fileFrom(FileFromEnum.Object, file, this.settings)
       const fileNumber = index + 1
 
       fileUpload.onCancel = this.handleCancelling
@@ -62,7 +63,7 @@ export class UploadFromObject extends UploadFrom {
       .catch(this.handleError)
   }
 
-  private handleInfoResponse = (groupInfo: GroupInfoResponse) => {
+  private handleInfoResponse = (groupInfo: GroupInfoInterface) => {
     if (this.isCancelled) {
       return Promise.reject(new CancelError())
     }

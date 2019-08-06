@@ -1,4 +1,13 @@
-import {UploadcareFileInterface, UploadcareGroupInterface} from '../types'
+import {RequestOptionsInterface, RequestResponse} from './request/types'
+import {FileData, SettingsInterface} from '../types'
+import {FromUrlResponse, Url} from './fromUrl'
+import {FromUrlStatusResponse} from './fromUrlStatus'
+import {
+  MultipartPart,
+  MultipartStartResponse,
+} from './multipart/types'
+import {BaseThenableInterface, CancelableThenableInterface} from '../thenable/types'
+import {BaseResponse} from './base'
 
 interface StatusInterface {
   status: string,
@@ -10,9 +19,7 @@ interface ProgressInterface {
   total: number,
 }
 
-interface ProgressStatusInterface extends StatusInterface, ProgressInterface {}
-
-export type ProgressStatus = ProgressStatusInterface
+export interface ProgressStatusInterface extends StatusInterface, ProgressInterface {}
 
 interface GeoLocationInterface {
   latitude: number,
@@ -26,19 +33,19 @@ interface ImageInfoInterface {
   datetime_original: string,
   format: string,
   color_mode: string,
-  dpi: null | Array<number>,
+  dpi: null | number[],
   orientation: null | number,
   sequence?: boolean,
 }
 
-type Audio = {
+interface AudioInterface {
   bitrate: number | null,
   codec: string | null,
   sample_rate: number | null,
   channels: string | null,
 }
 
-type Video = {
+interface VideoInterface {
   height: number,
   width: number,
   frame_rate: number,
@@ -50,8 +57,8 @@ interface VideoInfoInterface {
   duration: number,
   format: string,
   bitrate: number,
-  audio: Audio | null,
-  video: Video
+  audio: AudioInterface | null,
+  video: VideoInterface
 }
 
 export interface FileInfoInterface extends ProgressInterface, ImageInfoInterface, VideoInfoInterface {
@@ -65,20 +72,14 @@ export interface FileInfoInterface extends ProgressInterface, ImageInfoInterface
   is_ready: string,
 }
 
-export type FileInfo = FileInfoInterface
-
-export type GroupInfo = {
+export interface GroupInfoInterface {
   datetime_created: string,
   datetime_stored: string | null,
   files_count: string,
   cdn_url: string,
-  files: FileInfo[],
+  files: FileInfoInterface[],
   url: string,
   id: GroupId,
-}
-
-export interface CancelableInterface {
-  cancel(): void
 }
 
 export type Token = string
@@ -86,3 +87,25 @@ export type Token = string
 export type Uuid = string
 
 export type GroupId = string
+
+export interface UploadAPIInterface {
+  request(options: RequestOptionsInterface): Promise<RequestResponse>
+
+  base(data: FileData, settings?: SettingsInterface): BaseThenableInterface<BaseResponse>
+
+  info(uuid: Uuid, settings?: SettingsInterface): CancelableThenableInterface<FileInfoInterface>
+
+  fromUrl(sourceUrl: Url, settings?: SettingsInterface): CancelableThenableInterface<FromUrlResponse>
+
+  fromUrlStatus(token: Token, settings?: SettingsInterface): CancelableThenableInterface<FromUrlStatusResponse>
+
+  group(files: Uuid[], settings: SettingsInterface): CancelableThenableInterface<GroupInfoInterface>
+
+  groupInfo(id: GroupId, settings: SettingsInterface): CancelableThenableInterface<GroupInfoInterface>
+
+  multipartStart(file: FileData, settings: SettingsInterface): CancelableThenableInterface<MultipartStartResponse>
+
+  multipartUpload(file: FileData, parts: MultipartPart[], settings: SettingsInterface): BaseThenableInterface<any>
+
+  multipartComplete(uuid: Uuid, settings: SettingsInterface): CancelableThenableInterface<FileInfoInterface>
+}

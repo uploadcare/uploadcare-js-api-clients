@@ -1,11 +1,14 @@
-import request, {prepareOptions} from './request'
-import {FileInfo, Uuid} from './types'
-import {Settings} from '../types'
-import {RequestOptions} from './request'
+import request from './request/request'
+import {prepareOptions} from './request/prepareOptions'
 
-export type InfoResponse = FileInfo
+/* Types */
+import {RequestOptionsInterface} from './request/types'
+import {FileInfoInterface, Uuid} from './types'
+import {SettingsInterface} from '../types'
+import {CancelableThenable} from '../thenable/CancelableThenable'
+import {CancelableThenableInterface} from '../thenable/types'
 
-const getRequestQuery = (uuid: Uuid, settings: Settings) => {
+const getRequestQuery = (uuid: Uuid, settings: SettingsInterface) => {
   const query = {
     pub_key: settings.publicKey || '',
     file_id: uuid,
@@ -18,10 +21,10 @@ const getRequestQuery = (uuid: Uuid, settings: Settings) => {
     }
   }
 
-  return  {...query}
+  return query
 }
 
-const getRequestOptions = (uuid: Uuid, settings: Settings): RequestOptions => {
+const getRequestOptions = (uuid: Uuid, settings: SettingsInterface): RequestOptionsInterface => {
   return prepareOptions({
     path: '/info/',
     query: getRequestQuery(uuid, settings),
@@ -29,15 +32,14 @@ const getRequestOptions = (uuid: Uuid, settings: Settings): RequestOptions => {
 }
 
 /**
- * Returns a JSON dictionary holding file info
+ * Returns a JSON dictionary holding file info.
  *
  * @param {Uuid} uuid – UUID of a target file to request its info.
- * @param {Settings} settings
- * @return {Promise<InfoResponse>}
+ * @param {SettingsInterface} settings
+ * @return {CancelableThenableInterface<FileInfoInterface>}
  */
-export default function info(uuid: Uuid, settings: Settings = {}): Promise<InfoResponse> {
+export default function info(uuid: Uuid, settings: SettingsInterface = {}): CancelableThenableInterface<FileInfoInterface> {
   const options = getRequestOptions(uuid, settings)
 
-  return request(options)
-    .then(response => response.data)
+  return new CancelableThenable(options)
 }

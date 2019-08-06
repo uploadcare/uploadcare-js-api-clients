@@ -1,41 +1,28 @@
-import request, {prepareOptions} from './request'
-import base, {DirectUploadInterface} from './base'
-import UploadClient from '../UploadClient'
-import {RequestOptions, RequestResponse} from './request'
-import {FileData, Settings} from '../types'
 import info from './info'
-import {GroupId, Token, Uuid} from './types'
-import {InfoResponse} from './info'
-import fromUrl, {FromUrlResponse, Url} from './fromUrl'
+import UploadClient from '../UploadClient'
 import fromUrlStatus, {FromUrlStatusResponse} from './fromUrlStatus'
-import group, {GroupInfoResponse} from './group'
+import base, {BaseResponse} from './base'
+import {FileInfoInterface, GroupId, GroupInfoInterface, Token, UploadAPIInterface, Uuid} from './types'
+import {RequestOptionsInterface, RequestResponse} from './request/types'
+import fromUrl, {FromUrlResponse, Url} from './fromUrl'
 import groupInfo from './groupInfo'
-
-export interface UploadAPIInterface {
-  request(options: RequestOptions): Promise<RequestResponse>
-
-  base(data: FileData, settings?: Settings): DirectUploadInterface
-
-  info(uuid: Uuid, settings?: Settings): Promise<InfoResponse>
-
-  fromUrl(sourceUrl: Url, settings?: Settings): Promise<FromUrlResponse>
-
-  fromUrlStatus(token: Token, settings?: Settings): Promise<FromUrlStatusResponse>
-
-  group(files: Uuid[], settings: Settings): Promise<GroupInfoResponse>
-
-  groupInfo(id: GroupId, settings: Settings): Promise<GroupInfoResponse>
-}
+import {FileData, SettingsInterface} from '../types'
+import {prepareOptions} from './request/prepareOptions'
+import group from './group'
+import request from './request/request'
+import {
+  MultipartPart, MultipartStartResponse,
+} from './multipart/types'
+import multipartComplete from './multipart/multipartComplete'
+import multipartStart from './multipart/multipartStart'
+import multipartUpload from './multipart/multipartUpload'
+import {BaseThenableInterface, CancelableThenableInterface} from '../thenable/types'
 
 class UploadAPI implements UploadAPIInterface {
   readonly client: UploadClient
 
   constructor(client: UploadClient) {
     this.client = client
-  }
-
-  private getRequestOptions = (options) => {
-    return prepareOptions(options, this.client.getSettings())
   }
 
   private getResultSettings = (settings) => {
@@ -45,32 +32,46 @@ class UploadAPI implements UploadAPIInterface {
     }
   }
 
-  request(options: RequestOptions): Promise<RequestResponse> {
-    return request(this.getRequestOptions(options))
+  request(options: RequestOptionsInterface): Promise<RequestResponse> {
+    const preparedOptions = prepareOptions(options, this.client.getSettings())
+
+    return request(preparedOptions)
   }
 
-  base(data: FileData, settings: Settings = {}): DirectUploadInterface {
+  base(data: FileData, settings: SettingsInterface = {}): BaseThenableInterface<BaseResponse> {
     return base(data, this.getResultSettings(settings))
   }
 
-  info(uuid: Uuid, settings: Settings = {}): Promise<InfoResponse> {
+  info(uuid: Uuid, settings: SettingsInterface = {}): CancelableThenableInterface<FileInfoInterface> {
     return info(uuid, this.getResultSettings(settings))
   }
 
-  fromUrl(sourceUrl: Url, settings: Settings = {}): Promise<FromUrlResponse> {
+  fromUrl(sourceUrl: Url, settings: SettingsInterface = {}): CancelableThenableInterface<FromUrlResponse> {
     return fromUrl(sourceUrl, this.getResultSettings(settings))
   }
 
-  fromUrlStatus(token: Token, settings: Settings = {}): Promise<FromUrlStatusResponse> {
+  fromUrlStatus(token: Token, settings: SettingsInterface = {}): CancelableThenableInterface<FromUrlStatusResponse> {
     return fromUrlStatus(token, this.getResultSettings(settings))
   }
 
-  group(files: Uuid[], settings: Settings): Promise<GroupInfoResponse> {
-    return group(files, this.getResultSettings(settings))
+  group(uuids: Uuid[], settings: SettingsInterface): CancelableThenableInterface<GroupInfoInterface> {
+    return group(uuids, this.getResultSettings(settings))
   }
 
-  groupInfo(id: GroupId, settings: Settings): Promise<GroupInfoResponse> {
+  groupInfo(id: GroupId, settings: SettingsInterface): CancelableThenableInterface<GroupInfoInterface> {
     return groupInfo(id, this.getResultSettings(settings))
+  }
+
+  multipartStart(file: FileData, settings: SettingsInterface): CancelableThenableInterface<MultipartStartResponse> {
+    return multipartStart(file, this.getResultSettings(settings))
+  }
+
+  multipartUpload(file: FileData, parts: MultipartPart[], settings: SettingsInterface): BaseThenableInterface<any> {
+    return multipartUpload(file, parts, this.getResultSettings(settings))
+  }
+
+  multipartComplete(uuid: Uuid, settings: SettingsInterface): CancelableThenableInterface<FileInfoInterface> {
+    return multipartComplete(uuid, this.getResultSettings(settings))
   }
 }
 

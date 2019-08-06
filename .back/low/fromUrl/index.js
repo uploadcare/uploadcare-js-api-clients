@@ -1,1 +1,0 @@
-export {fromUrl} from './fromUrl'

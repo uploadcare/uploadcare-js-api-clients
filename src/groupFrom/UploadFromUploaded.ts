@@ -1,16 +1,17 @@
-import {Settings, UploadcareGroupInterface} from '../types'
+import {SettingsInterface, UploadcareGroupInterface} from '../types'
 import {UploadFrom} from './UploadFrom'
 import {Uuid} from '..'
 import CancelError from '../errors/CancelError'
-import group, {GroupInfoResponse} from '../api/group'
+import group from '../api/group'
+import {GroupInfoInterface} from '../api/types'
 
 export class UploadFromUploaded extends UploadFrom {
   protected readonly promise: Promise<UploadcareGroupInterface>
 
   private readonly data: Uuid[]
-  private readonly settings: Settings
+  private readonly settings: SettingsInterface
 
-  constructor(data: Uuid[], settings: Settings) {
+  constructor(data: Uuid[], settings: SettingsInterface) {
     super()
 
     this.data = data
@@ -31,7 +32,7 @@ export class UploadFromUploaded extends UploadFrom {
       .catch(this.handleError)
   }
 
-  private handleInfoResponse = (groupInfo: GroupInfoResponse) => {
+  private handleInfoResponse = (groupInfo: GroupInfoInterface) => {
     if (this.isCancelled) {
       return Promise.reject(new CancelError())
     }

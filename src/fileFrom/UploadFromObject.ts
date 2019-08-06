@@ -1,21 +1,38 @@
-import {FileData, Settings, UploadcareFileInterface} from '../types'
-import base, {DirectUploadInterface} from '../api/base'
+import base, {BaseResponse} from '../api/base'
+import {getFileSize} from '../api/multipart/getFileSize'
+import multipart from '../multipart/multipart'
+
+/* Types */
 import {UploadFrom} from './UploadFrom'
+import {FileData, SettingsInterface, UploadcareFileInterface} from '../types'
+import defaultSettings from '../defaultSettings'
+import {BaseThenableInterface} from '../thenable/types'
+import {FileInfoInterface} from '../api/types'
 
 export class UploadFromObject extends UploadFrom {
-  private readonly request: DirectUploadInterface
   protected readonly promise: Promise<UploadcareFileInterface>
 
+  private readonly request: BaseThenableInterface<BaseResponse> | BaseThenableInterface<FileInfoInterface>
   private readonly data: FileData
-  private readonly settings: Settings
+  private readonly settings: SettingsInterface
+  private readonly isMultipart: boolean = false
 
-  constructor(data: FileData, settings: Settings) {
+  constructor(data: FileData, settings: SettingsInterface) {
     super()
 
     this.data = data
     this.settings = settings
 
-    this.request = base(this.data, this.settings)
+    const fileSize = getFileSize(data)
+    const multipartMinFileSize = settings.multipartMinFileSize || defaultSettings.multipartMinFileSize
+
+    if (fileSize < multipartMinFileSize) {
+      this.request = base(this.data, this.settings)
+    } else {
+      this.isMultipart = true
+      this.request = multipart(this.data, this.settings)
+    }
+
     this.promise = this.getFilePromise()
   }
 
@@ -32,7 +49,14 @@ export class UploadFromObject extends UploadFrom {
 
     fileUpload.onCancel = this.handleCancelling
 
-    return fileUpload
+    if (this.isMultipart) {
+      return (fileUpload as BaseThenableInterface<FileInfoInterface>)
+        .then(({uuid}) => this.handleUploaded(uuid, this.settings))
+        .then(this.handleReady)
+        .catch(this.handleError)
+    }
+
+    return (fileUpload as BaseThenableInterface<BaseResponse>)
       .then(({file: uuid}) => this.handleUploaded(uuid, this.settings))
       .then(this.handleReady)
       .catch(this.handleError)

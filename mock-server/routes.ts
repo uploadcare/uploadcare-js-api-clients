@@ -3,6 +3,7 @@ import * as fromUrl from './controllers/from_url'
 import * as info from './controllers/info'
 import * as group from './controllers/group'
 import * as throttle from './controllers/throttle'
+import * as multipart from './controllers/multipart'
 
 export type RouteType = {
   [path: string]: {
@@ -55,6 +56,18 @@ export const ROUTES: Array<RouteType> = [
       fn: group.info,
       isProtected: true,
       description: '/group/info/?pub_key=XXXXXXXXXXXXXXXXXXXX&group_id=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX~N',
+    }
+  }, {
+    '/multipart/start': {
+      method: 'post',
+      fn: multipart.start,
+      isProtected: true,
+    }
+  }, {
+    '/multipart/complete': {
+      method: 'post',
+      fn: multipart.complete,
+      isProtected: true,
     }
   }, {
     '/throttle': {

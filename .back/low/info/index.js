@@ -1,1 +1,0 @@
-export {info} from './info'

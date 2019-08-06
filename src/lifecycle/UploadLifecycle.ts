@@ -1,4 +1,4 @@
-import {ProgressParams, UploadingProgress} from '../types'
+import {ProgressParamsInterface, UploadingProgress} from '../types'
 import {
   LifecycleInterface,
   LifecycleStateInterface
@@ -16,7 +16,7 @@ export class UploadLifecycle<T> implements LifecycleInterface<T> {
   onProgress: ((progress: UploadingProgress) => void) | null = null
   onUploaded: ((uuid: string) => void) | null = null
   onReady: ((entity: T) => void) | null = null
-  onCancel: VoidFunction | null = null
+  onCancel: (() => void) | null = null
 
   constructor() {
     this.state = new PendingState()
@@ -55,7 +55,7 @@ export class UploadLifecycle<T> implements LifecycleInterface<T> {
     return this.entity
   }
 
-  handleUploading(progress?: ProgressParams): void {
+  handleUploading(progress?: ProgressParamsInterface): void {
     if (progress) {
       this.updateState(new UploadingState(progress))
     }

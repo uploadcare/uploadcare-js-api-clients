@@ -1,7 +1,7 @@
-import {Thenable} from './Thenable'
+import {Thenable} from '../thenable/Thenable'
 import TimeoutError from '../errors/TimeoutError'
-import {CancelableInterface} from '../api/types'
 import CancelError from '../errors/CancelError'
+import {CancelableInterface} from '../lifecycle/types'
 
 export const DEFAULT_TIMEOUT = 10000
 const DEFAULT_INTERVAL = 500
@@ -65,7 +65,8 @@ export default function poll<T>(checkConditionFunction: Function, timeout: numbe
       }
       // Didn't match and too much time, reject!
       else {
-        reject(new TimeoutError(checkConditionFunction))
+        // TODO: Pass function name as param
+        reject(new TimeoutError(''))
       }
     } catch (error) {
       reject(error)

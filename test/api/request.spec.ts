@@ -1,4 +1,5 @@
-import request, {buildFormData} from '../../src/api/request'
+import request from '../../src/api/request/request'
+import {buildFormData} from '../../src/api/request/buildFormData'
 import * as factory from '../_fixtureFactory'
 import axios from 'axios'
 import {getSettingsForTesting, sleep} from '../_helpers'
@@ -144,9 +145,10 @@ describe('API – request', () => {
         baseURL: settings.baseURL,
         path: '/throttle/',
         query: {pub_key: factory.publicKey('demo')},
+        retryThrottledMaxTimes: 0,
       }
 
-      request(options, 0)
+      request(options)
         .then(() => done.fail('Promise should not to be resolved'))
         .catch((error) => error.name === 'RequestWasThrottledError' ? done() : done.fail(error))
     }, 20000)

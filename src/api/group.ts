@@ -1,14 +1,17 @@
-import request, {prepareOptions} from './request'
-import {GroupInfo, Uuid} from './types'
-import {Settings} from '../types'
-import {RequestOptions} from './request'
+import request from './request/request'
+import {prepareOptions} from './request/prepareOptions'
 
-export type GroupInfoResponse = GroupInfo
+/* Types */
+import {RequestOptionsInterface} from './request/types'
+import {GroupInfoInterface, Uuid} from './types'
+import {SettingsInterface} from '../types'
+import {CancelableThenable} from '../thenable/CancelableThenable'
+import {CancelableThenableInterface} from '../thenable/types'
 
-const getRequestQuery = (files: Uuid[], settings: Settings) => {
+const getRequestQuery = (uuids: Uuid[], settings: SettingsInterface) => {
   const query = {
     pub_key: settings.publicKey || '',
-    files,
+    files: uuids,
     callback: settings.jsonpCallback || undefined,
     signature: settings.secureSignature || undefined,
     expire: settings.secureExpire || undefined,
@@ -24,24 +27,23 @@ const getRequestQuery = (files: Uuid[], settings: Settings) => {
   return  {...query}
 }
 
-const getRequestOptions = (files: Uuid[], settings: Settings): RequestOptions => {
+const getRequestOptions = (uuids: Uuid[], settings: SettingsInterface): RequestOptionsInterface => {
   return prepareOptions({
     method: 'POST',
     path: '/group/',
-    query: getRequestQuery(files, settings),
+    query: getRequestQuery(uuids, settings),
   }, settings)
 }
 
 /**
- * Create files group
+ * Create files group.
  *
- * @param {Uuid[]} files – A set of files you want to join in a group.
- * @param {Settings} settings
- * @return {Promise<GroupInfoResponse>}
+ * @param {Uuid[]} uuids – A set of files you want to join in a group.
+ * @param {SettingsInterface} settings
+ * @return {CancelableThenableInterface<GroupInfoInterface>}
  */
-export default function group(files: Uuid[], settings: Settings = {}): Promise<GroupInfoResponse> {
-  const options = getRequestOptions(files, settings)
+export default function group(uuids: Uuid[], settings: SettingsInterface = {}): CancelableThenableInterface<GroupInfoInterface> {
+  const options = getRequestOptions(uuids, settings)
 
-  return request(options)
-    .then(response => response.data)
+  return new CancelableThenable(options)
 }

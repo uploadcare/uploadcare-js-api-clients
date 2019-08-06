@@ -1,6 +1,6 @@
 import * as factory from '../_fixtureFactory'
 import groupFrom from '../../src/groupFrom/groupFrom'
-import {GroupFrom} from '../../src/groupFrom/types'
+import {GroupFromEnum} from '../../src/groupFrom/types'
 import {getSettingsForTesting} from '../_helpers'
 
 describe('groupFrom', () => {
@@ -11,7 +11,7 @@ describe('groupFrom', () => {
       const settings = getSettingsForTesting({
         publicKey: factory.publicKey('image'),
       })
-      const groupPromise = groupFrom(GroupFrom.Object, [fileToUpload.data], settings)
+      const groupPromise = groupFrom(GroupFromEnum.Object, [fileToUpload.data], settings)
 
       groupPromise
         .then(group => {
@@ -25,7 +25,7 @@ describe('groupFrom', () => {
         publicKey: factory.publicKey('image'),
         doNotStore: true,
       })
-      const groupPromise = groupFrom(GroupFrom.Object, [fileToUpload.data], settings)
+      const groupPromise = groupFrom(GroupFromEnum.Object, [fileToUpload.data], settings)
       const group = await groupPromise
 
       expect(group.isStored).toBeFalsy()
@@ -35,7 +35,7 @@ describe('groupFrom', () => {
       const settings = getSettingsForTesting({
         publicKey: factory.publicKey('image'),
       })
-      const groupPromise = groupFrom(GroupFrom.Object, [fileToUpload.data], settings)
+      const groupPromise = groupFrom(GroupFromEnum.Object, [fileToUpload.data], settings)
 
       setTimeout(() => {
         groupPromise.cancel()
@@ -51,7 +51,7 @@ describe('groupFrom', () => {
         const settings = getSettingsForTesting({
           publicKey: factory.publicKey('image'),
         })
-        const groupPromise = groupFrom(GroupFrom.Object, [fileToUpload.data], settings)
+        const groupPromise = groupFrom(GroupFromEnum.Object, [fileToUpload.data], settings)
 
         setTimeout(() => {
           groupPromise.cancel()
@@ -75,7 +75,7 @@ describe('groupFrom', () => {
         const settings = getSettingsForTesting({
           publicKey: factory.publicKey('image'),
         })
-        const groupPromise = groupFrom(GroupFrom.Object, [fileToUpload.data], settings)
+        const groupPromise = groupFrom(GroupFromEnum.Object, [fileToUpload.data], settings)
 
         groupPromise.onProgress = (progress) => {
           const {value} = progress
@@ -96,7 +96,7 @@ describe('groupFrom', () => {
         const settings = getSettingsForTesting({
           publicKey: factory.publicKey('image'),
         })
-        const groupPromise = groupFrom(GroupFrom.Object, [fileToUpload.data], settings)
+        const groupPromise = groupFrom(GroupFromEnum.Object, [fileToUpload.data], settings)
 
         groupPromise.onUploaded = () => {
           done()
@@ -110,7 +110,7 @@ describe('groupFrom', () => {
         const settings = getSettingsForTesting({
           publicKey: factory.publicKey('image'),
         })
-        const groupPromise = groupFrom(GroupFrom.Object, [fileToUpload.data], settings)
+        const groupPromise = groupFrom(GroupFromEnum.Object, [fileToUpload.data], settings)
 
         groupPromise.onReady = () => {
           done()

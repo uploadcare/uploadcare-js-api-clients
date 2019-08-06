@@ -1,62 +1,17 @@
-import request, {HandleProgressFunction, prepareOptions, RequestInterface} from './request'
-import {RequestOptions} from './request'
-import {Settings, FileData} from '../types'
-import {Thenable} from '../tools/Thenable'
-import {CancelableInterface, Uuid} from './types'
+import {prepareOptions} from './request/prepareOptions'
 
-export type BaseProgress = ProgressEvent
+/* Types */
+import {RequestOptionsInterface} from './request/types'
+import {SettingsInterface, FileData} from '../types'
+import {Uuid} from './types'
+import {BaseThenableInterface} from '../thenable/types'
+import {BaseThenable} from '../thenable/BaseThenable'
 
 export type BaseResponse = {
   file: Uuid
 }
 
-export interface DirectUploadInterface extends Promise<BaseResponse>, CancelableInterface {
-  onProgress: HandleProgressFunction | null
-  onCancel: VoidFunction | null
-}
-
-class DirectUpload extends Thenable<BaseResponse> implements DirectUploadInterface {
-  protected readonly request: RequestInterface
-  protected readonly promise: Promise<BaseResponse>
-  protected readonly options: RequestOptions
-
-  onProgress: HandleProgressFunction | null = null
-  onCancel: VoidFunction | null = null
-
-  constructor(options: RequestOptions) {
-    super()
-
-    this.options = options
-    this.request = request(this.getRequestOptions())
-    this.promise = this.request
-      .then(response => Promise.resolve(response.data))
-      .catch(error => {
-        if (error.name === 'CancelError' && typeof this.onCancel === 'function') {
-          this.onCancel()
-        }
-
-        return Promise.reject(error)
-      })
-  }
-
-  private getRequestOptions() {
-    return {
-      ...this.options,
-      /* TODO Add support of progress for Node.js */
-      onUploadProgress: (progressEvent: BaseProgress) => {
-        if (typeof this.onProgress === 'function') {
-          this.onProgress(progressEvent)
-        }
-      },
-    }
-  }
-
-  cancel(): void {
-    return this.request.cancel()
-  }
-}
-
-const getRequestBody = (file: FileData, settings: Settings) => ({
+const getRequestBody = (file: FileData, settings: SettingsInterface) => ({
   UPLOADCARE_PUB_KEY: settings.publicKey || '',
   signature: settings.secureSignature || '',
   expire: settings.secureExpire || '',
@@ -65,7 +20,7 @@ const getRequestBody = (file: FileData, settings: Settings) => ({
   file: file,
 })
 
-const getRequestOptions = (file: FileData, settings: Settings): RequestOptions => {
+const getRequestOptions = (file: FileData, settings: SettingsInterface): RequestOptionsInterface => {
   return prepareOptions({
     method: 'POST',
     path: '/base/',
@@ -78,11 +33,11 @@ const getRequestOptions = (file: FileData, settings: Settings): RequestOptions =
  * Can be canceled and has progress.
  *
  * @param {FileData} file
- * @param {Settings} settings
- * @return {DirectUploadInterface}
+ * @param {SettingsInterface} settings
+ * @return {BaseThenableInterface<BaseResponse>}
  */
-export default function base(file: FileData, settings: Settings = {}): DirectUploadInterface {
+export default function base(file: FileData, settings: SettingsInterface = {}): BaseThenableInterface<BaseResponse> {
   const options = getRequestOptions(file, settings)
 
-  return new DirectUpload(options)
+  return new BaseThenable<BaseResponse>(options)
 }

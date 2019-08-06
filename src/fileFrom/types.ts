@@ -1,7 +1,7 @@
 import {UploadcareFileInterface} from '../types'
 import {UploadInterface} from '../lifecycle/types'
 
-export enum FileFrom {
+export enum FileFromEnum {
   Object = 'object',
   URL = 'url',
   DOM = 'input',

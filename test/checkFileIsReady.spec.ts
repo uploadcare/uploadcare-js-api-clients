@@ -1,23 +1,30 @@
 import checkFileIsReady from '../src/checkFileIsReady'
 import * as factory from './_fixtureFactory'
 import {getSettingsForTesting} from './_helpers'
-
-const settings = getSettingsForTesting({
-  publicKey: factory.publicKey('image'),
-})
+import info from '../src/api/info'
 
 describe('checkFileIsReady', () => {
-  it('should be resolved if file is ready', async() => {
-    const info = await checkFileIsReady({
-      uuid: factory.uuid('image'),
+  it('should be resolved if file is ready', async () => {
+    const settings = getSettingsForTesting({
+      publicKey: factory.publicKey('image')
+    })
+    const {uuid} = await info(factory.uuid('image'), settings)
+
+    const result = await checkFileIsReady({
+      uuid,
       settings,
     })
 
-    expect(info.is_ready).toBeTruthy()
+    expect(result.is_ready).toBeTruthy()
   })
-  it('should be cancelable', (done) => {
+  it('should be cancelable', async (done) => {
+    const settings = getSettingsForTesting({
+      publicKey: factory.publicKey('image')
+    })
+    const {uuid} = await info(factory.uuid('image'), settings)
+
     const polling = checkFileIsReady({
-      uuid: factory.uuid('image'),
+      uuid,
       settings,
     })
 

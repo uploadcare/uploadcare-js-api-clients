@@ -1,6 +1,12 @@
-import request, {prepareOptions, RequestOptions} from './request'
-import {Settings} from '../types'
-import {FileInfo} from './types'
+import request from './request/request'
+import {prepareOptions} from './request/prepareOptions'
+
+/* Types */
+import {RequestOptionsInterface} from './request/types'
+import {SettingsInterface} from '../types'
+import {FileInfoInterface} from './types'
+import {CancelableThenable} from '../thenable/CancelableThenable'
+import {CancelableThenableInterface} from '../thenable/types'
 
 export type Url = string
 
@@ -16,12 +22,13 @@ type TokenResponse = {
 
 type FileInfoResponse = {
   type: TypeEnum.FileInfo,
-} & FileInfo
+} & FileInfoInterface
 
 export type FromUrlResponse = FileInfoResponse | TokenResponse
 
 /**
- * TokenResponse Type Guard
+ * TokenResponse Type Guard.
+ *
  * @param {FromUrlResponse} response
  */
 export const isTokenResponse = (response: FromUrlResponse): response is TokenResponse => {
@@ -29,14 +36,15 @@ export const isTokenResponse = (response: FromUrlResponse): response is TokenRes
 }
 
 /**
- * InfoResponse Type Guard
+ * InfoResponse Type Guard.
+ *
  * @param {FromUrlResponse} response
  */
 export const isFileInfoResponse = (response: FromUrlResponse): response is FileInfoResponse => {
   return response.type !== undefined && response.type === TypeEnum.FileInfo;
 }
 
-const getRequestQuery = (sourceUrl: Url, settings: Settings) => ({
+const getRequestQuery = (sourceUrl: Url, settings: SettingsInterface) => ({
   pub_key: settings.publicKey || '',
   source_url: sourceUrl,
   store: settings.doNotStore ? '' : 'auto',
@@ -48,7 +56,7 @@ const getRequestQuery = (sourceUrl: Url, settings: Settings) => ({
   source: settings.source || 'url',
 })
 
-const getRequestOptions = (sourceUrl: Url, settings: Settings): RequestOptions => {
+const getRequestOptions = (sourceUrl: Url, settings: SettingsInterface): RequestOptionsInterface => {
   return prepareOptions({
     method: 'POST',
     path: '/from_url/',
@@ -60,14 +68,13 @@ const getRequestOptions = (sourceUrl: Url, settings: Settings): RequestOptions =
  * Uploading files from URL.
  *
  * @param {Url} sourceUrl – Source file URL, which should be a public HTTP or HTTPS link.
- * @param {Settings} settings
- * @return {Promise<FromUrlResponse>}
+ * @param {SettingsInterface} settings
+ * @return {CancelableThenableInterface<FromUrlResponse>}
  */
 export default function fromUrl(
-  sourceUrl: Url, settings: Settings = {}
-): Promise<FromUrlResponse> {
+  sourceUrl: Url, settings: SettingsInterface = {}
+): CancelableThenableInterface<FromUrlResponse> {
   const options = getRequestOptions(sourceUrl, settings)
 
-  return request(options)
-    .then(response => response.data)
+  return new CancelableThenable(options)
 }

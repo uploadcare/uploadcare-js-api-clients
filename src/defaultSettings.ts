@@ -1,31 +1,33 @@
 import {version} from '../package.json'
-import {Settings} from './types'
+import {DefaultSettingsInterface, SettingsInterface} from './types'
 
 /*
-Settings for future support:
-  baseCDN: 'https://ucarecdn.com',
-  multipartMinSize: 25 * 1024 * 1024,
-  multipartPartSize: 5 * 1024 * 1024,
-  multipartMinLastPartSize: 1024 * 1024,
+  SettingsInterface for future support:
   multipartConcurrency: 4,
   multipartMaxAttempts: 3,
   parallelDirectUploads: 10,
   pusherKey: '79ae88bd931ea68464d9',
  */
-const defaultSettings: Settings = {
+const defaultSettings: DefaultSettingsInterface = {
   baseCDN: 'https://ucarecdn.com',
   baseURL: 'https://upload.uploadcare.com',
+  fileName: 'original',
+  maxContentLength: 50 * 1024 * 1024, // 50 MB
+  retryThrottledRequestMaxTimes: 1,
+  multipartMinFileSize: 25 * 1024 * 1024, // 25 MB
+  multipartChunkSize: 5 * 1024 * 1024, // 5 MB
+  multipartMinLastPartSize: 1024 * 1024, // 1MB
 }
 
 export default defaultSettings
 
 /**
- * Returns User Agent based on version and settings
+ * Returns User Agent based on version and settings.
  *
- * @param {Settings} [settings]
+ * @param {SettingsInterface} [settings]
  * @returns {string}
  */
-export function getUserAgent(settings: Settings = {}): string {
+export function getUserAgent(settings: SettingsInterface = {}): string {
   const publicKey = settings.publicKey ? '/' + settings.publicKey : ''
   const integration = settings.integration ? '; ' + settings.integration : ''
 

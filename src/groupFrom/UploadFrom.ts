@@ -1,6 +1,6 @@
-import {Settings, UploadcareGroupInterface, UploadingProgress, ProgressState, ProgressParams} from '../types'
-import {Thenable} from '../tools/Thenable'
-import {GroupInfo} from '../api/types'
+import {SettingsInterface, UploadcareGroupInterface, UploadingProgress, ProgressStateEnum, ProgressParamsInterface} from '../types'
+import {Thenable} from '../thenable/Thenable'
+import {GroupInfoInterface} from '../api/types'
 import {GroupUploadInterface} from './types'
 import {UploadcareGroup} from '../UploadcareGroup'
 
@@ -10,68 +10,69 @@ import {UploadcareGroup} from '../UploadcareGroup'
  * All that you need to implement — `promise` property and `cancel` method.
  */
 export abstract class UploadFrom extends Thenable<UploadcareGroupInterface> implements GroupUploadInterface {
-  protected abstract readonly promise: Promise<UploadcareGroupInterface>
-  protected isCancelled: boolean = false
-  abstract cancel(): void
-
-  protected progress: UploadingProgress = {
-    state: ProgressState.Pending,
-    uploaded: null,
-    value: 0,
-  }
-  protected group: UploadcareGroupInterface | null = null
-
   onProgress: ((progress: UploadingProgress) => void) | null = null
   onUploaded: ((uuid: string) => void) | null = null
   onReady: ((group: UploadcareGroupInterface) => void) | null = null
-  onCancel: VoidFunction | null = null
+  onCancel: (() => void) | null = null
+
+  abstract cancel(): void
+
+  protected abstract readonly promise: Promise<UploadcareGroupInterface>
+  protected isCancelled: boolean = false
+
+  private progress: UploadingProgress = {
+    state: ProgressStateEnum.Pending,
+    uploaded: null,
+    value: 0,
+  }
+  private group: UploadcareGroupInterface | null = null
 
   protected constructor() {
     super()
     this.handleCancelling = this.handleCancelling.bind(this)
   }
 
-  protected setProgress(state: ProgressState, progress?: ProgressParams) {
+  protected setProgress(state: ProgressStateEnum, progress?: ProgressParamsInterface) {
     switch (state) {
-      case ProgressState.Pending:
+      case ProgressStateEnum.Pending:
         this.progress = {
-          state: ProgressState.Pending,
+          state: ProgressStateEnum.Pending,
           uploaded: null,
           value: 0,
         }
         break
-      case ProgressState.Uploading:
+      case ProgressStateEnum.Uploading:
         this.progress = {
-          state: ProgressState.Uploading,
+          state: ProgressStateEnum.Uploading,
           uploaded: progress || null,
           // leave 1 percent for uploaded and 1 for ready on cdn
           value: progress ? Math.round((progress.loaded * 98) / progress.total) : 0,
         }
         break
-      case ProgressState.Uploaded:
+      case ProgressStateEnum.Uploaded:
         this.progress = {
-          state: ProgressState.Uploaded,
+          state: ProgressStateEnum.Uploaded,
           uploaded: null,
           value: 99,
         }
         break
-      case ProgressState.Ready:
+      case ProgressStateEnum.Ready:
         this.progress = {
-          state: ProgressState.Ready,
+          state: ProgressStateEnum.Ready,
           uploaded: null,
           value: 100,
         }
         break
-      case ProgressState.Canceled:
+      case ProgressStateEnum.Canceled:
         this.progress = {
-          state: ProgressState.Canceled,
+          state: ProgressStateEnum.Canceled,
           uploaded: null,
           value: 0,
         }
         break
-      case ProgressState.Error:
+      case ProgressStateEnum.Error:
         this.progress = {
-          state: ProgressState.Error,
+          state: ProgressStateEnum.Error,
           uploaded: null,
           value: 0,
         }
@@ -95,7 +96,7 @@ export abstract class UploadFrom extends Thenable<UploadcareGroupInterface> impl
    * Handle cancelling of uploading file.
    */
   protected handleCancelling(): void {
-    this.setProgress(ProgressState.Canceled)
+    this.setProgress(ProgressStateEnum.Canceled)
 
     if (typeof this.onCancel === 'function') {
       this.onCancel()
@@ -104,10 +105,10 @@ export abstract class UploadFrom extends Thenable<UploadcareGroupInterface> impl
 
   /**
    * Handle file uploading.
-   * @param {ProgressParams} progress
+   * @param {ProgressParamsInterface} progress
    */
-  protected handleUploading(progress?: ProgressParams): void {
-    this.setProgress(ProgressState.Uploading, progress)
+  protected handleUploading(progress?: ProgressParamsInterface): void {
+    this.setProgress(ProgressStateEnum.Uploading, progress)
 
     if (typeof this.onProgress === 'function') {
       this.onProgress(this.getProgress())
@@ -116,13 +117,13 @@ export abstract class UploadFrom extends Thenable<UploadcareGroupInterface> impl
 
   /**
    * Handle uploaded file.
-   * @param {GroupInfo} groupInfo
-   * @param {Settings} settings
+   * @param {GroupInfoInterface} groupInfo
+   * @param {SettingsInterface} settings
    */
-  protected handleUploaded(groupInfo: GroupInfo, settings: Settings): Promise<UploadcareGroupInterface> {
+  protected handleUploaded(groupInfo: GroupInfoInterface, settings: SettingsInterface): Promise<UploadcareGroupInterface> {
     this.setGroup(new UploadcareGroup(groupInfo))
 
-    this.setProgress(ProgressState.Uploaded)
+    this.setProgress(ProgressStateEnum.Uploaded)
 
     if (typeof this.onUploaded === 'function') {
       this.onUploaded(this.getGroup().uuid)
@@ -135,7 +136,7 @@ export abstract class UploadFrom extends Thenable<UploadcareGroupInterface> impl
    * Handle uploaded file that ready on CDN.
    */
   protected handleReady = (): Promise<UploadcareGroupInterface> => {
-    this.setProgress(ProgressState.Ready)
+    this.setProgress(ProgressStateEnum.Ready)
 
     if (typeof this.onProgress === 'function') {
       this.onProgress(this.getProgress())
@@ -156,7 +157,7 @@ export abstract class UploadFrom extends Thenable<UploadcareGroupInterface> impl
     if (error.name === 'CancelError') {
       this.handleCancelling()
     } else {
-      this.setProgress(ProgressState.Error)
+      this.setProgress(ProgressStateEnum.Error)
     }
 
     return Promise.reject(error)

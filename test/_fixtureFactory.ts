@@ -1,4 +1,5 @@
-import {dataURItoBlob, dataURItoBuffer, getSettingsForTesting, isNode} from './_helpers'
+import {dataURItoBlob, dataURItoBuffer, getSettingsForTesting} from './_helpers'
+import {isNode} from '../src/tools/isNode'
 
 const settings = getSettingsForTesting()
 
@@ -76,7 +77,7 @@ export function file(mbSize: number): FixtureFile {
 }
 
 function fileBuffer(bytes: number): FixtureFile {
-  const buffer = new Buffer(bytes)
+  const buffer = Buffer.alloc(bytes)
 
   return {
     data: buffer,

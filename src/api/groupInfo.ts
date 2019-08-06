@@ -1,11 +1,14 @@
-import request, {prepareOptions} from './request'
-import {GroupInfo, GroupId} from './types'
-import {Settings} from '../types'
-import {RequestOptions} from './request'
+import request from './request/request'
+import {prepareOptions} from './request/prepareOptions'
 
-export type GroupInfoResponse = GroupInfo
+/* Types */
+import {RequestOptionsInterface} from './request/types'
+import {GroupInfoInterface, GroupId} from './types'
+import {SettingsInterface} from '../types'
+import {CancelableThenable} from '../thenable/CancelableThenable'
+import {CancelableThenableInterface} from '../thenable/types'
 
-const getRequestQuery = (id: GroupId, settings: Settings) => {
+const getRequestQuery = (id: GroupId, settings: SettingsInterface) => {
   const query = {
     pub_key: settings.publicKey || '',
     group_id: id,
@@ -18,10 +21,10 @@ const getRequestQuery = (id: GroupId, settings: Settings) => {
     }
   }
 
-  return  {...query}
+  return query
 }
 
-const getRequestOptions = (id: GroupId, settings: Settings): RequestOptions => {
+const getRequestOptions = (id: GroupId, settings: SettingsInterface): RequestOptionsInterface => {
   return prepareOptions({
     path: '/group/info/',
     query: getRequestQuery(id, settings),
@@ -29,15 +32,14 @@ const getRequestOptions = (id: GroupId, settings: Settings): RequestOptions => {
 }
 
 /**
- * Create files group
+ * Get info about group.
  *
  * @param {GroupId} id – Group ID. Group IDs look like UUID~N.
- * @param {Settings} settings
- * @return {Promise<GroupInfoResponse>}
+ * @param {SettingsInterface} settings
+ * @return {CancelableThenableInterface<GroupInfoInterface>}
  */
-export default function groupInfo(id: GroupId, settings: Settings = {}): Promise<GroupInfoResponse> {
+export default function groupInfo(id: GroupId, settings: SettingsInterface = {}): CancelableThenableInterface<GroupInfoInterface> {
   const options = getRequestOptions(id, settings)
 
-  return request(options)
-    .then(response => response.data)
+  return new CancelableThenable(options)
 }

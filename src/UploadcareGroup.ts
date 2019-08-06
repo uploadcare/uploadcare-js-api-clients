@@ -1,8 +1,8 @@
 import {UploadcareGroupInterface} from './types'
-import {FileInfo, GroupId, GroupInfo} from './api/types'
+import {FileInfoInterface, GroupId, GroupInfoInterface} from './api/types'
 
 export class UploadcareGroup implements UploadcareGroupInterface {
-  private readonly groupInfo: GroupInfo
+  private readonly groupInfo: GroupInfoInterface
 
   readonly uuid: GroupId
   readonly filesCount: string
@@ -10,11 +10,11 @@ export class UploadcareGroup implements UploadcareGroupInterface {
   readonly isStored: boolean
   readonly isImage: boolean
   readonly cdnUrl: string
-  readonly files: FileInfo[]
+  readonly files: FileInfoInterface[]
   readonly createdAt: string
   readonly storedAt: string | null = null
 
-  constructor(groupInfo: GroupInfo) {
+  constructor(groupInfo: GroupInfoInterface) {
     this.groupInfo = groupInfo
 
     this.uuid = groupInfo.id

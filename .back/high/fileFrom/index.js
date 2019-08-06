@@ -1,1 +1,0 @@
-export {fileFrom} from './fileFrom'

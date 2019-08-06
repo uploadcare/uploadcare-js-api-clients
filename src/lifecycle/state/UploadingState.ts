@@ -1,20 +1,20 @@
 import {AbstractState} from './AbstractState'
 import {LifecycleStateInterface} from '../types'
-import {ProgressParams, ProgressState, UploadingProgress} from '../../types'
+import {ProgressParamsInterface, ProgressStateEnum, UploadingProgress} from '../../types'
 
 export class UploadingState extends AbstractState implements LifecycleStateInterface {
   readonly progress: UploadingProgress
-  protected nextPossibleState: ProgressState[] = [
-    ProgressState.Uploaded,
-    ProgressState.Ready,
-    ProgressState.Canceled,
-    ProgressState.Error,
+  protected nextPossibleState: ProgressStateEnum[] = [
+    ProgressStateEnum.Uploaded,
+    ProgressStateEnum.Ready,
+    ProgressStateEnum.Canceled,
+    ProgressStateEnum.Error,
   ]
 
-  constructor(params: ProgressParams) {
+  constructor(params: ProgressParamsInterface) {
     super()
     this.progress = {
-      state: ProgressState.Uploading,
+      state: ProgressStateEnum.Uploading,
       uploaded: params,
       // leave 1 percent for uploaded and 1 for ready on cdn
       value: params ? Math.round((params.loaded * 98) / params.total) : 0,

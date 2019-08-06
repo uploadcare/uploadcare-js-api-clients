@@ -1,10 +1,11 @@
-import {Settings, UploadcareFileInterface, UploadingProgress, ProgressState, ProgressParams} from '../types'
 import checkFileIsReady from '../checkFileIsReady'
 import prettyFileInfo from '../prettyFileInfo'
-import {Thenable} from '../tools/Thenable'
-import {Uuid} from '../api/types'
+import {Thenable} from '../thenable/Thenable'
+
+/* Types */
+import {SettingsInterface, UploadcareFileInterface, UploadingProgress, ProgressStateEnum, ProgressParamsInterface} from '../types'
+import {FileInfoInterface, Uuid} from '../api/types'
 import {PollPromiseInterface} from '../tools/poll'
-import {InfoResponse} from '../api/info'
 import {FileUploadInterface} from './types'
 
 /**
@@ -13,68 +14,69 @@ import {FileUploadInterface} from './types'
  * All that you need to implement — `promise` property and `cancel` method.
  */
 export abstract class UploadFrom extends Thenable<UploadcareFileInterface> implements FileUploadInterface {
-  protected abstract readonly promise: Promise<UploadcareFileInterface>
-  protected isFileReadyPolling: PollPromiseInterface<InfoResponse> | null = null
-  abstract cancel(): void
-
-  protected progress: UploadingProgress = {
-    state: ProgressState.Pending,
-    uploaded: null,
-    value: 0,
-  }
-  protected file: UploadcareFileInterface | null = null
-
   onProgress: ((progress: UploadingProgress) => void) | null = null
   onUploaded: ((uuid: string) => void) | null = null
   onReady: ((file: UploadcareFileInterface) => void) | null = null
-  onCancel: VoidFunction | null = null
+  onCancel: (() => void) | null = null
+
+  abstract cancel(): void
+
+  protected abstract readonly promise: Promise<UploadcareFileInterface>
+  protected isFileReadyPolling: PollPromiseInterface<FileInfoInterface> | null = null
+
+  private progress: UploadingProgress = {
+    state: ProgressStateEnum.Pending,
+    uploaded: null,
+    value: 0,
+  }
+  private file: UploadcareFileInterface | null = null
 
   protected constructor() {
     super()
     this.handleCancelling = this.handleCancelling.bind(this)
   }
 
-  protected setProgress(state: ProgressState, progress?: ProgressParams) {
+  protected setProgress(state: ProgressStateEnum, progress?: ProgressParamsInterface) {
     switch (state) {
-      case ProgressState.Pending:
+      case ProgressStateEnum.Pending:
         this.progress = {
-          state: ProgressState.Pending,
+          state: ProgressStateEnum.Pending,
           uploaded: null,
           value: 0,
         }
         break
-      case ProgressState.Uploading:
+      case ProgressStateEnum.Uploading:
         this.progress = {
-          state: ProgressState.Uploading,
+          state: ProgressStateEnum.Uploading,
           uploaded: progress || null,
           // leave 1 percent for uploaded and 1 for ready on cdn
           value: progress ? Math.round((progress.loaded * 98) / progress.total) : 0,
         }
         break
-      case ProgressState.Uploaded:
+      case ProgressStateEnum.Uploaded:
         this.progress = {
-          state: ProgressState.Uploaded,
+          state: ProgressStateEnum.Uploaded,
           uploaded: null,
           value: 99,
         }
         break
-      case ProgressState.Ready:
+      case ProgressStateEnum.Ready:
         this.progress = {
-          state: ProgressState.Ready,
+          state: ProgressStateEnum.Ready,
           uploaded: null,
           value: 100,
         }
         break
-      case ProgressState.Canceled:
+      case ProgressStateEnum.Canceled:
         this.progress = {
-          state: ProgressState.Canceled,
+          state: ProgressStateEnum.Canceled,
           uploaded: null,
           value: 0,
         }
         break
-      case ProgressState.Error:
+      case ProgressStateEnum.Error:
         this.progress = {
-          state: ProgressState.Error,
+          state: ProgressStateEnum.Error,
           uploaded: null,
           value: 0,
         }
@@ -98,7 +100,7 @@ export abstract class UploadFrom extends Thenable<UploadcareFileInterface> imple
    * Handle cancelling of uploading file.
    */
   protected handleCancelling(): void {
-    this.setProgress(ProgressState.Canceled)
+    this.setProgress(ProgressStateEnum.Canceled)
 
     if (typeof this.onCancel === 'function') {
       this.onCancel()
@@ -107,10 +109,10 @@ export abstract class UploadFrom extends Thenable<UploadcareFileInterface> imple
 
   /**
    * Handle file uploading.
-   * @param {ProgressParams} progress
+   * @param {ProgressParamsInterface} progress
    */
-  protected handleUploading(progress?: ProgressParams): void {
-    this.setProgress(ProgressState.Uploading, progress)
+  protected handleUploading(progress?: ProgressParamsInterface): void {
+    this.setProgress(ProgressStateEnum.Uploading, progress)
 
     if (typeof this.onProgress === 'function') {
       this.onProgress(this.getProgress())
@@ -120,9 +122,9 @@ export abstract class UploadFrom extends Thenable<UploadcareFileInterface> imple
   /**
    * Handle uploaded file.
    * @param {Uuid} uuid
-   * @param {Settings} settings
+   * @param {SettingsInterface} settings
    */
-  protected handleUploaded(uuid: Uuid, settings: Settings): Promise<UploadcareFileInterface> {
+  protected handleUploaded(uuid: Uuid, settings: SettingsInterface): Promise<UploadcareFileInterface> {
     this.setFile({
       uuid,
       name: null,
@@ -136,7 +138,7 @@ export abstract class UploadFrom extends Thenable<UploadcareFileInterface> imple
       originalImageInfo: null,
     })
 
-    this.setProgress(ProgressState.Uploaded)
+    this.setProgress(ProgressStateEnum.Uploaded)
 
     if (typeof this.onUploaded === 'function') {
       this.onUploaded(uuid)
@@ -160,7 +162,7 @@ export abstract class UploadFrom extends Thenable<UploadcareFileInterface> imple
    * Handle uploaded file that ready on CDN.
    */
   protected handleReady = (): Promise<UploadcareFileInterface> => {
-    this.setProgress(ProgressState.Ready)
+    this.setProgress(ProgressStateEnum.Ready)
 
     if (typeof this.onProgress === 'function') {
       this.onProgress(this.getProgress())
@@ -181,7 +183,7 @@ export abstract class UploadFrom extends Thenable<UploadcareFileInterface> imple
     if (error.name === 'CancelError') {
       this.handleCancelling()
     } else {
-      this.setProgress(ProgressState.Error)
+      this.setProgress(ProgressStateEnum.Error)
     }
 
     return Promise.reject(error)

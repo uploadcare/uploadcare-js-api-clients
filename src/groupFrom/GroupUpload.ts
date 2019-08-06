@@ -1,15 +1,16 @@
-import {Thenable} from '../tools/Thenable'
+import {Thenable} from '../thenable/Thenable'
+
+/* Types */
 import {UploadcareGroupInterface, UploadingProgress} from '../types'
-import {GroupHandlerInterface} from '../groupFrom/types'
-import {CancelableInterface} from '../api/types'
-import {GroupUploadLifecycleInterface} from '../lifecycle/types'
+import {GroupHandlerInterface} from './types'
+import {CancelableInterface, GroupUploadLifecycleInterface} from '../lifecycle/types'
 import {GroupUploadInterface} from './types'
 
 export class GroupUpload extends Thenable<UploadcareGroupInterface> implements GroupUploadInterface {
   onProgress: ((progress: UploadingProgress) => void) | null = null
   onUploaded: ((uuid: string) => void) | null = null
   onReady: ((file: UploadcareGroupInterface) => void) | null = null
-  onCancel: VoidFunction | null = null
+  onCancel: (() => void) | null = null
 
   protected readonly promise: Promise<UploadcareGroupInterface>
   private readonly cancelable: CancelableInterface

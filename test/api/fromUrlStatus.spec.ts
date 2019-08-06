@@ -30,4 +30,40 @@ describe('API - from url status', () => {
           : done.fail(error)
       })
   })
+
+  it('should be able to cancel uploading', async(done) => {
+    const token = factory.token('valid')
+    const settings = getSettingsForTesting()
+    const upload = fromUrlStatus(token, settings)
+
+    setTimeout(() => {
+      upload.cancel()
+    }, 1)
+
+    upload
+      .then(() => done.fail('Promise should not to be resolved'))
+      .catch((error) => error.name === 'CancelError' ? done() : done.fail(error))
+  })
+
+  it('should be able to handle cancel uploading', async (done) => {
+    const token = factory.token('valid')
+    const settings = getSettingsForTesting()
+    const upload = fromUrlStatus(token, settings)
+
+    setTimeout(() => {
+      upload.cancel()
+    }, 1)
+
+    upload.onCancel = () => {
+      done()
+    }
+
+    upload
+      .then(() => done.fail('Promise should not to be resolved'))
+      .catch((error) => {
+        if (error.name !== 'CancelError') {
+          done.fail(error)
+        }
+      })
+  })
 })
