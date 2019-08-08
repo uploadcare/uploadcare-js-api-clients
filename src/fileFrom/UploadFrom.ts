@@ -7,6 +7,7 @@ import {SettingsInterface, UploadcareFileInterface, UploadingProgress, ProgressS
 import {FileInfoInterface, Uuid} from '../api/types'
 import {PollPromiseInterface} from '../tools/poll'
 import {FileUploadInterface} from './types'
+import defaultSettings from '../defaultSettings'
 
 /**
  * Base abstract `thenable` implementation of `FileUploadInterface`.
@@ -146,6 +147,7 @@ export abstract class UploadFrom extends Thenable<UploadcareFileInterface> imple
 
     this.isFileReadyPolling = checkFileIsReady({
       uuid,
+      timeout: settings.pollingTimeoutMilliseconds || defaultSettings.pollingTimeoutMilliseconds,
       settings,
     })
 
