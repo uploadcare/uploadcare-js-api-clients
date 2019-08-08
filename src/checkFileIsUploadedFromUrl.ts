@@ -1,7 +1,8 @@
 import {SettingsInterface} from './types'
-import poll, {DEFAULT_TIMEOUT, PollPromiseInterface} from './tools/poll'
+import poll, {PollPromiseInterface} from './tools/poll'
 import fromUrlStatus, {FromUrlStatusResponse, isSuccessResponse} from './api/fromUrlStatus'
 import {Uuid} from './api/types'
+import defaultSettings from './defaultSettings'
 
 type FileIsUploadedParams = {
   token: Uuid,
@@ -10,7 +11,7 @@ type FileIsUploadedParams = {
   settings?: SettingsInterface
 }
 
-const checkFileIsUploadedFromUrl = ({token, timeout = DEFAULT_TIMEOUT, onProgress, settings = {}}: FileIsUploadedParams): PollPromiseInterface<FromUrlStatusResponse> =>
+const checkFileIsUploadedFromUrl = ({token, timeout = defaultSettings.pollingTimeoutMilliseconds, onProgress, settings = {}}: FileIsUploadedParams): PollPromiseInterface<FromUrlStatusResponse> =>
   poll<FromUrlStatusResponse>(
     async () => {
       const response = await fromUrlStatus(token, settings)

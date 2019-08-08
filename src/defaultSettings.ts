@@ -17,6 +17,7 @@ const defaultSettings: DefaultSettingsInterface = {
   multipartMinFileSize: 25 * 1024 * 1024, // 25 MB
   multipartChunkSize: 5 * 1024 * 1024, // 5 MB
   multipartMinLastPartSize: 1024 * 1024, // 1MB
+  pollingTimeoutMilliseconds: 10000,
 }
 
 export default defaultSettings
