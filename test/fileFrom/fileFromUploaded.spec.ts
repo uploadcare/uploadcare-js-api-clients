@@ -80,7 +80,7 @@ describe('fileFrom', () => {
         }
 
         filePromise
-          .then(() => progressValue ? done() : done.fail())
+          .then(() => progressValue > 0 && progressValue <= 1 ? done() : done.fail())
           .catch(error => done.fail(error))
       })
 

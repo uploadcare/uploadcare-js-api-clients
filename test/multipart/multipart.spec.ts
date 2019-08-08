@@ -62,11 +62,11 @@ describe('API - multipart', () => {
     const upload = multipart(fileToUpload, settings)
 
     upload.onProgress = (progressEvent) => {
-      progressValue = Math.round((progressEvent.loaded * 100) / progressEvent.total)
+      progressValue = Math.round(progressEvent.loaded / progressEvent.total)
     }
 
     upload
-      .then(() => progressValue > 0 ? done() : done.fail())
+      .then(() => progressValue > 0 && progressValue <= 1 ? done() : done.fail())
       .catch(error => done.fail(error))
   })
 })
