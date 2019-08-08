@@ -50,21 +50,21 @@ export abstract class UploadFrom extends Thenable<UploadcareFileInterface> imple
           state: ProgressStateEnum.Uploading,
           uploaded: progress || null,
           // leave 1 percent for uploaded and 1 for ready on cdn
-          value: progress ? Math.round((progress.loaded * 98) / progress.total) : 0,
+          value: progress ? Math.round((progress.loaded / progress.total) * 0.98) : 0,
         }
         break
       case ProgressStateEnum.Uploaded:
         this.progress = {
           state: ProgressStateEnum.Uploaded,
           uploaded: null,
-          value: 99,
+          value: 0.99,
         }
         break
       case ProgressStateEnum.Ready:
         this.progress = {
           state: ProgressStateEnum.Ready,
           uploaded: null,
-          value: 100,
+          value: 1,
         }
         break
       case ProgressStateEnum.Canceled:
