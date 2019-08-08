@@ -6,7 +6,7 @@ export class UploadedState extends AbstractState implements LifecycleStateInterf
   readonly progress: UploadingProgress = {
     state: ProgressStateEnum.Uploaded,
     uploaded: null,
-    value: 99,
+    value: 0.99,
   }
   protected nextPossibleState: ProgressStateEnum[] = [
     ProgressStateEnum.Ready,
