@@ -3,7 +3,7 @@ import TimeoutError from '../errors/TimeoutError'
 import CancelError from '../errors/CancelError'
 import {CancelableInterface} from '../lifecycle/types'
 
-export const DEFAULT_TIMEOUT = 15000
+export const DEFAULT_TIMEOUT = 20000
 const DEFAULT_INTERVAL = 500
 
 export interface PollPromiseInterface<T> extends Promise<T>, CancelableInterface {}
