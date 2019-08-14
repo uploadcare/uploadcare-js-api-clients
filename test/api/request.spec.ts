@@ -1,26 +1,9 @@
 import request from '../../src/api/request/request'
-import {buildFormData} from '../../src/api/request/buildFormData'
 import * as factory from '../_fixtureFactory'
-import axios from 'axios'
 import {getSettingsForTesting, sleep} from '../_helpers'
+import axios from 'axios'
 
-describe('buildFormData', () => {
-  it('should return FormData with nice input object', () => {
-    const file = factory.image('blackSquare').data
-    const body = {
-      file,
-      UPLOADCARE_PUB_KEY: factory.publicKey('demo'),
-    }
-
-    const data = buildFormData(body)
-
-    expect(data).toBeDefined()
-    expect(typeof data).toBe('object')
-    expect(typeof data.append).toBe('function')
-  })
-})
-
-describe('API – request', () => {
+xdescribe('API – request', () => {
   const settings = getSettingsForTesting()
 
   describe('should be resolved', () => {
