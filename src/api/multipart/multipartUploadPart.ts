@@ -1,13 +1,13 @@
 /* Vendors */
 import * as FormData from 'form-data'
 import axios, {AxiosRequestConfig, AxiosResponse, CancelTokenSource} from 'axios'
-import {ConcurrencyManager} from 'axios-concurrency'
 
 import {Thenable} from '../../thenable/Thenable'
 import defaultSettings from '../../defaultSettings'
 import {isNode} from '../../tools/isNode'
 import CancelError from '../../errors/CancelError'
 import RequestError from '../../errors/RequestError'
+import {addMaxConcurrencyInterceptorsToAxiosInstance} from '../request/interceptors'
 
 /* Types */
 import {FileData, SettingsInterface} from '../../types'
@@ -78,10 +78,9 @@ class MultipartUploadPart extends Thenable<MultipartUploadResponse> implements B
     }
 
     const instance = axios.create()
-    // a concurrency parameter of 1 makes all api requests sequential
-    const MAX_CONCURRENT_REQUESTS = settings.maxConcurrentRequests || defaultSettings.maxConcurrentRequests
+    const maxConcurrentRequestsCount = settings.maxConcurrentRequests || defaultSettings.maxConcurrentRequests
 
-    ConcurrencyManager(instance, MAX_CONCURRENT_REQUESTS)
+    addMaxConcurrencyInterceptorsToAxiosInstance({instance, maxConcurrentRequestsCount})
 
     if (isNode()) {
       instance.interceptors.request.use(nodeUploadProgressRequestInterceptor,

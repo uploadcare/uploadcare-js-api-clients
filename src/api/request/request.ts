@@ -1,12 +1,12 @@
 /* Vendors */
 import axios, {AxiosError, AxiosRequestConfig, CancelTokenSource} from 'axios'
-import {ConcurrencyManager} from 'axios-concurrency'
 
 import {Thenable} from '../../thenable/Thenable'
 import {isNode} from '../../tools/isNode'
 import {buildFormData} from './buildFormData'
 import {delay} from './delay'
 import defaultSettings, {getUserAgent} from '../../defaultSettings'
+import {addMaxConcurrencyInterceptorsToAxiosInstance} from './interceptors'
 
 import RequestError from '../../errors/RequestError'
 import CancelError from '../../errors/CancelError'
@@ -61,10 +61,9 @@ class Request extends Thenable<RequestResponse> implements RequestInterface {
   private getRequestPromise() {
     const options = this.getRequestOptions()
     const instance = axios.create()
-    // a concurrency parameter of 1 makes all api requests sequential
-    const MAX_CONCURRENT_REQUESTS = this.options.maxConcurrentRequests || defaultSettings.maxConcurrentRequests
+    const maxConcurrentRequestsCount = this.options.maxConcurrentRequests || defaultSettings.maxConcurrentRequests
 
-    ConcurrencyManager(instance, MAX_CONCURRENT_REQUESTS)
+    addMaxConcurrencyInterceptorsToAxiosInstance({instance, maxConcurrentRequestsCount})
 
     if (isNode()) {
       instance.interceptors.request.use(nodeUploadProgress,
