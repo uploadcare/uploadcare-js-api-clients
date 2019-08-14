@@ -85,7 +85,7 @@ describe('groupFrom', () => {
 
         groupPromise
           .then(() =>
-            progressValue > 0
+            progressValue > 0 && progressValue <= 1
               ? done()
               : done.fail()
           )

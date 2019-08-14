@@ -1,4 +1,3 @@
-import request from './request/request'
 import {prepareOptions} from './request/prepareOptions'
 
 /* Types */

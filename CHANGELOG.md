@@ -16,6 +16,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 * Support of cancel and handling canceling uploads for all api methods
 (`info`, `fromUrl`, `fromUrlStatus`, `group`, `groupInfo`).
 * `DefaultSettingsInterface` with required properties.
+* `pollingTimeoutMilliseconds` to `SettingsInterface`.
+Now you can adjust the timeout for checking file is ready 
+and checking file is uploaded from url.
 
 ### Changed
 
