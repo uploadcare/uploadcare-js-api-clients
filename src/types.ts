@@ -18,6 +18,7 @@ export interface SettingsInterface {
   multipartChunkSize?: number,
   multipartMinFileSize?: number,
   multipartMinLastPartSize?: number,
+  maxConcurrentRequests?: number,
 }
 
 export interface DefaultSettingsInterface extends SettingsInterface {
@@ -29,6 +30,7 @@ export interface DefaultSettingsInterface extends SettingsInterface {
   multipartMinFileSize: number,
   multipartChunkSize: number,
   multipartMinLastPartSize: number,
+  maxConcurrentRequests: number,
 }
 
 export type FileData = Blob | File | Buffer
