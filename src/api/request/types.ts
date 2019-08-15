@@ -26,7 +26,8 @@ export interface RequestOptionsInterface {
   headers?: Headers,
   baseURL?: string,
   onUploadProgress?: (progressEvent: ProgressEvent) => void,
-  retryThrottledMaxTimes?: number
+  retryThrottledMaxTimes?: number,
+  maxConcurrentRequests?: number,
 }
 
 export type RequestResponse = {

@@ -3,7 +3,6 @@ import {DefaultSettingsInterface, SettingsInterface} from './types'
 
 /*
   SettingsInterface for future support:
-  multipartConcurrency: 4,
   multipartMaxAttempts: 3,
   parallelDirectUploads: 10,
   pusherKey: '79ae88bd931ea68464d9',
@@ -17,6 +16,7 @@ const defaultSettings: DefaultSettingsInterface = {
   multipartMinFileSize: 25 * 1024 * 1024, // 25 MB
   multipartChunkSize: 5 * 1024 * 1024, // 5 MB
   multipartMinLastPartSize: 1024 * 1024, // 1MB
+  maxConcurrentRequests: 4,
   pollingTimeoutMilliseconds: 10000,
 }
 
