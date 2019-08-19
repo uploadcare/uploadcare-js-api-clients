@@ -3,15 +3,15 @@ import {Uuid} from '..'
 import {GroupInfoInterface} from '../api/types'
 
 export interface CancelableInterface {
-  cancel(): void
+  cancel(): void;
 }
 
 export interface ProgressHookInterface<T> {
-  onProgress: ((progress: T) => void) | null
+  onProgress: ((progress: T) => void) | null;
 }
 
 export interface CancelHookInterface {
-  onCancel: (() => void) | null
+  onCancel: (() => void) | null;
 }
 
 export interface BaseHooksInterface extends
@@ -21,8 +21,8 @@ export interface BaseHooksInterface extends
 
 export interface UploadHooksInterface<T> extends
   ProgressHookInterface<UploadingProgress> {
-  onUploaded: ((uuid: string) => void) | null
-  onReady: ((entity: T) => void) | null
+  onUploaded: ((uuid: string) => void) | null;
+  onReady: ((entity: T) => void) | null;
 }
 
 export interface LifecycleHooksInterface<T> extends
@@ -37,27 +37,27 @@ export interface UploadInterface<T> extends
 }
 
 export interface LifecycleStateInterface {
-  readonly progress: UploadingProgress
-  isCanBeChangedTo(state: LifecycleStateInterface): boolean
+  readonly progress: UploadingProgress;
+  isCanBeChangedTo(state: LifecycleStateInterface): boolean;
 }
 
 export interface LifecycleInterface<T> extends LifecycleHooksInterface<T> {
-  updateState(state: LifecycleStateInterface): void
-  getProgress(): UploadingProgress
-  updateEntity(entity: T): void
-  getEntity(): T
-  handleUploading(progress?: ProgressParamsInterface): void
-  handleCancelling(): void
-  handleReady(): Promise<T>
-  handleError(error: Error)
+  updateState(state: LifecycleStateInterface): void;
+  getProgress(): UploadingProgress;
+  updateEntity(entity: T): void;
+  getEntity(): T;
+  handleUploading(progress?: ProgressParamsInterface): void;
+  handleCancelling(): void;
+  handleReady(): Promise<T>;
+  handleError(error: Error);
 }
 
 export interface FileUploadLifecycleInterface {
-  getUploadLifecycle(): LifecycleInterface<UploadcareFileInterface>
-  handleUploadedFile(uuid: Uuid, settings: SettingsInterface): Promise<UploadcareFileInterface>
+  getUploadLifecycle(): LifecycleInterface<UploadcareFileInterface>;
+  handleUploadedFile(uuid: Uuid, settings: SettingsInterface): Promise<UploadcareFileInterface>;
 }
 
 export interface GroupUploadLifecycleInterface {
-  getUploadLifecycle(): LifecycleInterface<UploadcareGroupInterface>
-  handleUploadedGroup(groupInfo: GroupInfoInterface, settings: SettingsInterface): Promise<UploadcareGroupInterface>
+  getUploadLifecycle(): LifecycleInterface<UploadcareGroupInterface>;
+  handleUploadedGroup(groupInfo: GroupInfoInterface, settings: SettingsInterface): Promise<UploadcareGroupInterface>;
 }

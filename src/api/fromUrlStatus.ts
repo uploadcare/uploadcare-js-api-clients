@@ -16,24 +16,24 @@ export enum StatusEnum {
 }
 
 type UnknownResponse = {
-  status: StatusEnum.Unknown
+  status: StatusEnum.Unknown;
 }
 
 type WaitingResponse = {
-  status: StatusEnum.Waiting
+  status: StatusEnum.Waiting;
 }
 
 type ProgressResponse = {
-  status: StatusEnum.Progress
+  status: StatusEnum.Progress;
 } & ProgressStatusInterface
 
 type ErrorResponse = {
-  status: StatusEnum.Error,
-  error: string,
+  status: StatusEnum.Error;
+  error: string;
 }
 
 type SuccessResponse = {
-  status: StatusEnum.Success,
+  status: StatusEnum.Success;
 } & FileInfoInterface
 
 export type FromUrlStatusResponse = UnknownResponse | WaitingResponse | ProgressResponse | ErrorResponse | SuccessResponse
@@ -44,7 +44,7 @@ export type FromUrlStatusResponse = UnknownResponse | WaitingResponse | Progress
  * @param {FromUrlStatusResponse} response
  */
 export const isUnknownResponse = (response: FromUrlStatusResponse): response is UnknownResponse => {
-  return response.status !== undefined && response.status === StatusEnum.Unknown;
+  return response.status !== undefined && response.status === StatusEnum.Unknown
 }
 
 /**
@@ -53,7 +53,7 @@ export const isUnknownResponse = (response: FromUrlStatusResponse): response is 
  * @param {FromUrlStatusResponse} response
  */
 export const isWaitingResponse = (response: FromUrlStatusResponse): response is WaitingResponse => {
-  return response.status !== undefined && response.status === StatusEnum.Waiting;
+  return response.status !== undefined && response.status === StatusEnum.Waiting
 }
 
 /**
@@ -62,7 +62,7 @@ export const isWaitingResponse = (response: FromUrlStatusResponse): response is 
  * @param {FromUrlStatusResponse} response
  */
 export const isProgressResponse = (response: FromUrlStatusResponse): response is ProgressResponse => {
-  return response.status !== undefined && response.status === StatusEnum.Progress;
+  return response.status !== undefined && response.status === StatusEnum.Progress
 }
 
 /**
@@ -71,7 +71,7 @@ export const isProgressResponse = (response: FromUrlStatusResponse): response is
  * @param {FromUrlStatusResponse} response
  */
 export const isErrorResponse = (response: FromUrlStatusResponse): response is ErrorResponse => {
-  return response.status !== undefined && response.status === StatusEnum.Error;
+  return response.status !== undefined && response.status === StatusEnum.Error
 }
 
 /**
@@ -80,7 +80,7 @@ export const isErrorResponse = (response: FromUrlStatusResponse): response is Er
  * @param {FromUrlStatusResponse} response
  */
 export const isSuccessResponse = (response: FromUrlStatusResponse): response is SuccessResponse => {
-  return response.status !== undefined && response.status === StatusEnum.Success;
+  return response.status !== undefined && response.status === StatusEnum.Success
 }
 
 const getRequestQuery = (token: string, settings: SettingsInterface) => ({

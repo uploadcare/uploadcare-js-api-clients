@@ -3,10 +3,11 @@ import {UploadFromUrl} from './UploadFromUrl'
 import {UploadFromUploaded} from './UploadFromUploaded'
 
 /* Types */
-import {FileData, SettingsInterface} from '../types'
+import {FileData, SettingsInterface, UploadcareFileInterface} from '../types'
 import {Url} from '../api/fromUrl'
 import {Uuid} from '../api/types'
-import {FileUploadInterface, FileFromEnum} from './types'
+import {FileFromEnum} from './types'
+import {UploadInterface} from '../lifecycle/types'
 
 /**
  * Uploads file from provided data.
@@ -15,9 +16,9 @@ import {FileUploadInterface, FileFromEnum} from './types'
  * @param {FileData} data
  * @param {SettingsInterface} settings
  * @throws Error
- * @returns {FileUploadInterface}
+ * @returns {UploadInterface<UploadcareFileInterface>}
  */
-export default function fileFrom(from: FileFromEnum, data: FileData | Url | Uuid, settings: SettingsInterface = {}): FileUploadInterface {
+export default function fileFrom(from: FileFromEnum, data: FileData | Url | Uuid, settings: SettingsInterface = {}): UploadInterface<UploadcareFileInterface> {
   switch (from) {
     case FileFromEnum.Object:
       return new UploadFromObject(data as FileData, settings)

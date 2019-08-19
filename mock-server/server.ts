@@ -1,4 +1,3 @@
-// @ts-ignore
 import Koa from 'koa'
 import * as router from 'koa-route'
 import chalk from 'chalk'
@@ -6,7 +5,6 @@ import chalk from 'chalk'
 // Middleware
 import cors from '@koa/cors'
 import addTrailingSlashes from 'koa-add-trailing-slashes'
-// @ts-ignore
 import koaBody from 'koa-body'
 
 import logger from './middleware/logger'
@@ -44,7 +42,7 @@ app.on('error', (err, ctx) => {
   console.error(`💔 ${chalk.red('Server error')}:`)
   console.error(err)
   console.error(ctx)
-});
+})
 
 // Listen server
 app.listen(PORT, () => {

@@ -6,15 +6,15 @@ import {Thenable} from '../thenable/Thenable'
 import {SettingsInterface, UploadcareFileInterface, UploadingProgress, ProgressStateEnum, ProgressParamsInterface} from '../types'
 import {FileInfoInterface, Uuid} from '../api/types'
 import {PollPromiseInterface} from '../tools/poll'
-import {FileUploadInterface} from './types'
+import {UploadInterface} from '../lifecycle/types'
 import defaultSettings from '../defaultSettings'
 
 /**
- * Base abstract `thenable` implementation of `FileUploadInterface`.
+ * Base abstract `thenable` implementation of `UploadInterface<UploadcareFileInterface>`.
  * You need to use this as base class for all uploading methods of `fileFrom`.
  * All that you need to implement — `promise` property and `cancel` method.
  */
-export abstract class UploadFrom extends Thenable<UploadcareFileInterface> implements FileUploadInterface {
+export abstract class UploadFrom extends Thenable<UploadcareFileInterface> implements UploadInterface<UploadcareFileInterface> {
   onProgress: ((progress: UploadingProgress) => void) | null = null
   onUploaded: ((uuid: string) => void) | null = null
   onReady: ((file: UploadcareFileInterface) => void) | null = null

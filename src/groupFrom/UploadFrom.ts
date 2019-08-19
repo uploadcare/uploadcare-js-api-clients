@@ -1,15 +1,15 @@
-import {SettingsInterface, UploadcareGroupInterface, UploadingProgress, ProgressStateEnum, ProgressParamsInterface} from '../types'
+import {UploadcareGroupInterface, UploadingProgress, ProgressStateEnum, ProgressParamsInterface} from '../types'
 import {Thenable} from '../thenable/Thenable'
 import {GroupInfoInterface} from '../api/types'
-import {GroupUploadInterface} from './types'
 import {UploadcareGroup} from '../UploadcareGroup'
+import {UploadInterface} from '../lifecycle/types'
 
 /**
- * Base abstract `thenable` implementation of `GroupUploadInterface`.
+ * Base abstract `thenable` implementation of `UploadInterface<UploadcareGroupInterface>`.
  * You need to use this as base class for all uploading methods of `fileFrom`.
  * All that you need to implement — `promise` property and `cancel` method.
  */
-export abstract class UploadFrom extends Thenable<UploadcareGroupInterface> implements GroupUploadInterface {
+export abstract class UploadFrom extends Thenable<UploadcareGroupInterface> implements UploadInterface<UploadcareGroupInterface> {
   onProgress: ((progress: UploadingProgress) => void) | null = null
   onUploaded: ((uuid: string) => void) | null = null
   onReady: ((group: UploadcareGroupInterface) => void) | null = null
@@ -18,7 +18,7 @@ export abstract class UploadFrom extends Thenable<UploadcareGroupInterface> impl
   abstract cancel(): void
 
   protected abstract readonly promise: Promise<UploadcareGroupInterface>
-  protected isCancelled: boolean = false
+  protected isCancelled = false
 
   private progress: UploadingProgress = {
     state: ProgressStateEnum.Pending,
@@ -118,9 +118,8 @@ export abstract class UploadFrom extends Thenable<UploadcareGroupInterface> impl
   /**
    * Handle uploaded file.
    * @param {GroupInfoInterface} groupInfo
-   * @param {SettingsInterface} settings
    */
-  protected handleUploaded(groupInfo: GroupInfoInterface, settings: SettingsInterface): Promise<UploadcareGroupInterface> {
+  protected handleUploaded(groupInfo: GroupInfoInterface): Promise<UploadcareGroupInterface> {
     this.setGroup(new UploadcareGroup(groupInfo))
 
     this.setProgress(ProgressStateEnum.Uploaded)

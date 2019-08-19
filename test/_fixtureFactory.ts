@@ -10,7 +10,7 @@ const images: {[key: string]: string} = {
 }
 /* eslint-enable max-len */
 
-const uuids: {[key: string]: {publicKey: string, uuid: string}} = {
+const uuids: {[key: string]: {publicKey: string; uuid: string}} = {
   image: {
     publicKey: '657ec3b474e01b9045f7',
     uuid: 'd3275f8b-686d-4980-916a-53a1fc17450b',
@@ -34,16 +34,8 @@ const uuids: {[key: string]: {publicKey: string, uuid: string}} = {
 }
 
 export type FixtureFile = {
-  data: Buffer | Blob,
-  size: number,
-}
-
-export function image(id: string): FixtureFile {
-  if (isNode()) {
-    return imageBuffer(id)
-  }
-
-  return imageBlob(id)
+  data: Buffer | Blob;
+  size: number;
 }
 
 function imageBuffer(id: string): FixtureFile {
@@ -66,14 +58,12 @@ function imageBlob(id: string): FixtureFile {
   }
 }
 
-export function file(mbSize: number): FixtureFile {
-  const byteLength = mbSize * 1000000
-
+export function image(id: string): FixtureFile {
   if (isNode()) {
-    return fileBuffer(byteLength)
+    return imageBuffer(id)
   }
 
-  return fileBlob(byteLength)
+  return imageBlob(id)
 }
 
 function fileBuffer(bytes: number): FixtureFile {
@@ -93,6 +83,16 @@ function fileBlob(bytes: number): FixtureFile {
     data: blob,
     size: blob.size,
   }
+}
+
+export function file(mbSize: number): FixtureFile {
+  const byteLength = mbSize * 1000000
+
+  if (isNode()) {
+    return fileBuffer(byteLength)
+  }
+
+  return fileBlob(byteLength)
 }
 
 export function uuid(id: string): string {

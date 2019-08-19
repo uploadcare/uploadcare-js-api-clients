@@ -3,15 +3,16 @@ import {UploadFrom} from './UploadFrom'
 import group from '../api/group'
 import CancelError from '../errors/CancelError'
 import fileFrom from '../fileFrom/fileFrom'
-import {FileFromEnum, FileUploadInterface} from '..'
 import {GroupInfoInterface} from '../api/types'
+import {UploadInterface} from '../lifecycle/types'
+import {FileFromEnum} from '..'
 
 export class UploadFromObject extends UploadFrom {
   protected readonly promise: Promise<UploadcareGroupInterface>
 
   private readonly data: FileData[]
   private readonly settings: SettingsInterface
-  private readonly uploads: FileUploadInterface[]
+  private readonly uploads: UploadInterface<UploadcareFileInterface>[]
   private readonly files: Promise<UploadcareFileInterface[]>
 
   constructor(data: FileData[], settings: SettingsInterface) {
@@ -25,7 +26,7 @@ export class UploadFromObject extends UploadFrom {
     this.promise = this.getGroupPromise()
   }
 
-  private getUploadsPromises = (): FileUploadInterface[] => {
+  private getUploadsPromises = (): UploadInterface<UploadcareFileInterface>[] => {
     const filesTotalCount = this.data.length
 
     return this.data.map((file: FileData, index: number) => {
@@ -68,7 +69,7 @@ export class UploadFromObject extends UploadFrom {
       return Promise.reject(new CancelError())
     }
 
-    return this.handleUploaded(groupInfo, this.settings)
+    return this.handleUploaded(groupInfo)
   }
 
   cancel(): void {

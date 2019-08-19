@@ -5,24 +5,24 @@ import groupFrom from './groupFrom/groupFrom'
 
 /* Types */
 import {FileFromEnum} from './fileFrom/types'
-import {FileData, SettingsInterface} from './types'
-import {FileUploadInterface} from './fileFrom/types'
+import {FileData, SettingsInterface, UploadcareFileInterface, UploadcareGroupInterface} from './types'
 import {Url} from './api/fromUrl'
 import {UploadAPIInterface, Uuid} from './api/types'
-import {GroupFromEnum, GroupUploadInterface} from './groupFrom/types'
+import {GroupFromEnum,} from './groupFrom/types'
+import {UploadInterface} from './lifecycle/types'
 
 export interface UploadClientInterface {
-  setSettings(newSettings: SettingsInterface): void
+  setSettings(newSettings: SettingsInterface): void;
 
-  getSettings(): SettingsInterface
+  getSettings(): SettingsInterface;
 
-  addUpdateSettingsListener(listener: Function): void
+  addUpdateSettingsListener(listener: Function): void;
 
-  removeUpdateSettingsListener(listener: Function): void
+  removeUpdateSettingsListener(listener: Function): void;
 
-  fileFrom(from: FileFromEnum, data: FileData | Url | Uuid, settings?: SettingsInterface): FileUploadInterface
+  fileFrom(from: FileFromEnum, data: FileData | Url | Uuid, settings?: SettingsInterface): UploadInterface<UploadcareFileInterface>;
 
-  groupFrom(from: GroupFromEnum, data: FileData[] | Url[] | Uuid[], settings?: SettingsInterface): GroupUploadInterface
+  groupFrom(from: GroupFromEnum, data: FileData[] | Url[] | Uuid[], settings?: SettingsInterface): UploadInterface<UploadcareGroupInterface>;
 }
 
 class UploadClient implements UploadClientInterface {
@@ -70,14 +70,14 @@ class UploadClient implements UploadClientInterface {
     }
   }
 
-  fileFrom(from: FileFromEnum, data: FileData | Url | Uuid, settings: SettingsInterface = {}): FileUploadInterface {
+  fileFrom(from: FileFromEnum, data: FileData | Url | Uuid, settings: SettingsInterface = {}): UploadInterface<UploadcareFileInterface> {
     return fileFrom(from, data, {
       ...this.settings,
       ...settings,
     })
   }
 
-  groupFrom(from: GroupFromEnum, data: FileData[] | Url[] | Uuid[], settings: SettingsInterface = {}): GroupUploadInterface {
+  groupFrom(from: GroupFromEnum, data: FileData[] | Url[] | Uuid[], settings: SettingsInterface = {}): UploadInterface<UploadcareGroupInterface> {
     return groupFrom(from, data, {
       ...this.settings,
       ...settings,

@@ -3,10 +3,11 @@ import {UploadFromUrl} from './UploadFromUrl'
 import {UploadFromUploaded} from './UploadFromUploaded'
 
 /* Types */
-import {FileData, SettingsInterface} from '../types'
+import {FileData, SettingsInterface, UploadcareGroupInterface} from '../types'
 import {Url} from '../api/fromUrl'
 import {Uuid} from '../api/types'
-import {GroupFromEnum, GroupUploadInterface} from './types'
+import {GroupFromEnum} from './types'
+import {UploadInterface} from '../lifecycle/types'
 
 /**
  * Uploads file from provided data.
@@ -15,9 +16,9 @@ import {GroupFromEnum, GroupUploadInterface} from './types'
  * @param {FileData} data
  * @param {SettingsInterface} settings
  * @throws Error
- * @returns {FileUploadInterface}
+ * @returns {UploadInterface<UploadcareGroupInterface>}
  */
-export default function groupFrom(from: GroupFromEnum, data: FileData[] | Url[] | Uuid[], settings: SettingsInterface = {}): GroupUploadInterface {
+export default function groupFrom(from: GroupFromEnum, data: FileData[] | Url[] | Uuid[], settings: SettingsInterface = {}): UploadInterface<UploadcareGroupInterface> {
   switch (from) {
     case GroupFromEnum.Object:
       return new UploadFromObject(data as FileData[], settings)

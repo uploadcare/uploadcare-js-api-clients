@@ -11,7 +11,7 @@ import {ChunkType} from './types'
 export const getChunks = (fileSize: number, chunkSize): ChunkType[] => {
   const chunksCount = Math.ceil(fileSize / chunkSize)
 
-  return Array.apply(null, Array(chunksCount)).map((value, index: number) => {
+  return Array(...Array(chunksCount)).map((value, index: number) => {
     const start = chunkSize * index
     const end = Math.min(start + chunkSize, fileSize)
 

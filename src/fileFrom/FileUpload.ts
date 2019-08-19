@@ -1,11 +1,11 @@
 import {Thenable} from '../thenable/Thenable'
 
 /* Types */
-import {FileHandlerInterface, FileUploadInterface} from './types'
 import {UploadcareFileInterface, UploadingProgress} from '../types'
-import {CancelableInterface, FileUploadLifecycleInterface} from '../lifecycle/types'
+import {CancelableInterface, FileUploadLifecycleInterface, UploadInterface} from '../lifecycle/types'
+import {HandlerInterface} from './types'
 
-export class FileUpload extends Thenable<UploadcareFileInterface> implements FileUploadInterface {
+export class FileUpload extends Thenable<UploadcareFileInterface> implements UploadInterface<UploadcareFileInterface> {
   onProgress: ((progress: UploadingProgress) => void) | null = null
   onUploaded: ((uuid: string) => void) | null = null
   onReady: ((file: UploadcareFileInterface) => void) | null = null
@@ -15,7 +15,7 @@ export class FileUpload extends Thenable<UploadcareFileInterface> implements Fil
 
   private readonly cancelable: CancelableInterface
 
-  constructor(lifecycle: FileUploadLifecycleInterface, handler: FileHandlerInterface, cancelable: CancelableInterface) {
+  constructor(lifecycle: FileUploadLifecycleInterface, handler: HandlerInterface<UploadcareFileInterface>, cancelable: CancelableInterface) {
     super()
     this.cancelable = cancelable
     const uploadLifecycle = lifecycle.getUploadLifecycle()

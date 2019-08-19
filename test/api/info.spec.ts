@@ -1,8 +1,6 @@
 import info from '../../src/api/info'
 import * as factory from '../_fixtureFactory'
 import {getSettingsForTesting} from '../_helpers'
-import group from '../../src/api/group'
-import groupInfo from '../../src/api/groupInfo'
 
 describe('API - info', () => {
   it('should return file info', async() => {

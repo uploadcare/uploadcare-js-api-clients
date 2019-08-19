@@ -19,8 +19,8 @@ export class UploadFromUrl extends UploadFrom {
   protected readonly promise: Promise<UploadcareFileInterface>
 
   private isFileUploadedFromUrlPolling: PollPromiseInterface<FromUrlStatusResponse> | null = null
-  private isCancelled: boolean = false
-  private unknownStatusWasTimes: number = 0
+  private isCancelled = false
+  private unknownStatusWasTimes = 0
   private readonly data: Url
   private readonly settings: SettingsInterface
 

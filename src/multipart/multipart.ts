@@ -23,10 +23,9 @@ class Multipart extends Thenable<FileInfoInterface> implements BaseThenableInter
 
     this.promise = this.request
       .then(({uuid, parts}) => {
-        this.request = multipartUpload(file, parts, settings)
+        const upload = multipartUpload(file, parts, settings)
 
-        // @ts-ignore
-        this.request.onProgress = (progressEvent: ProgressEvent) => {
+        upload.onProgress = (progressEvent: ProgressEvent) => {
           if (typeof this.onProgress === 'function') {
             this.onProgress({
               ...progressEvent,
@@ -35,6 +34,8 @@ class Multipart extends Thenable<FileInfoInterface> implements BaseThenableInter
             })
           }
         }
+
+        this.request = upload
 
         return this.request
           .then(() => Promise.resolve(uuid))

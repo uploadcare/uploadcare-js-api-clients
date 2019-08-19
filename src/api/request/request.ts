@@ -46,7 +46,7 @@ class Request extends Thenable<RequestResponse> implements RequestInterface {
   protected readonly promise: Promise<RequestResponse>
   private readonly options: RequestOptionsInterface
   private readonly cancelController: CancelTokenSource
-  private throttledTimes: number = 0
+  private throttledTimes = 0
   private readonly retryThrottledMaxTimes: number
 
   constructor(options: RequestOptionsInterface) {

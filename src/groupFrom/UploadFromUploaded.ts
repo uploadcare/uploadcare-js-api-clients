@@ -37,7 +37,7 @@ export class UploadFromUploaded extends UploadFrom {
       return Promise.reject(new CancelError())
     }
 
-    return this.handleUploaded(groupInfo, this.settings)
+    return this.handleUploaded(groupInfo)
   }
 
   cancel(): void {

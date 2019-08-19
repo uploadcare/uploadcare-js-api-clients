@@ -7,7 +7,7 @@ let times = 0
  * @param {object} ctx
  */
 const index = (ctx) => {
-  times++;
+  times++
 
   if (times === 2) {
     times = 0

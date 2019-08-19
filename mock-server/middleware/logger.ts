@@ -20,7 +20,7 @@ const isEmptyObject = (object: object): boolean => Object.keys(object).length ==
  * @param {function} next
  */
 const logger = async (ctx, next) => {
-  await next();
+  await next()
 
   const request = `${chalk.gray('-->')} ${chalk.bold(ctx.request.method)} ${chalk.gray(ctx.request.url)}`
   const requestHeaders = ctx.request.headers

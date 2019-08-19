@@ -7,7 +7,7 @@
   "types": "dist/src/index.d.ts",
   "scripts": {
     "clean": "rimraf dist",
-    "lint": "eslint .",
+    "lint": "eslint . --ext .ts",
     "mock:start": "cd ./mock-server && npm run start",
     "test": "npm-run-all lint test:node test:browser",
     "test:node": "jasmine-ts --project test/tsconfig.json --config=test/jasmine.config.json",
@@ -42,6 +42,8 @@
     "@types/form-data": "^2.2.1",
     "@types/jasmine": "^3.3.13",
     "@types/promise": "^7.1.30",
+    "@typescript-eslint/eslint-plugin": "^2.0.0",
+    "@typescript-eslint/parser": "^2.0.0",
     "@uploadcare/release-it": "^1.1.0",
     "data-uri-to-buffer": "^2.0.1",
     "dataurl-to-blob": "0.0.1",

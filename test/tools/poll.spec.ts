@@ -2,7 +2,6 @@ import poll from '../../src/tools/poll'
 import info from '../../src/api/info'
 import {getSettingsForTesting} from '../_helpers'
 import * as factory from '../_fixtureFactory'
-import CancelError from '../../src/errors/CancelError'
 import {FileInfoInterface} from '../../src/api/types'
 
 describe('poll', () => {
