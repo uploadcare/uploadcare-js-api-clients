@@ -1,13 +1,13 @@
 import {prepareOptions} from './request/prepareOptions'
 
 /* Types */
-import {RequestOptionsInterface} from './request/types'
+import {Query, RequestOptionsInterface} from './request/types'
 import {FileInfoInterface, Uuid} from './types'
 import {SettingsInterface} from '../types'
 import {CancelableThenable} from '../thenable/CancelableThenable'
 import {CancelableThenableInterface} from '../thenable/types'
 
-const getRequestQuery = (uuid: Uuid, settings: SettingsInterface) => {
+const getRequestQuery = (uuid: Uuid, settings: SettingsInterface): Query => {
   const query = {
     pub_key: settings.publicKey || '',
     file_id: uuid,

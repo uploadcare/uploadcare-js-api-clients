@@ -50,7 +50,7 @@ describe('API - multipartUpload', () => {
       upload.cancel()
     }, 1)
 
-    upload.onCancel = () => {
+    upload.onCancel = (): void => {
       done()
     }
 
@@ -73,7 +73,7 @@ describe('API - multipartUpload', () => {
 
     const upload = multipartUpload(fileToUpload, parts, settings)
 
-    upload.onProgress = (progressEvent) => {
+    upload.onProgress = (progressEvent): void => {
       progressValue = Math.round((progressEvent.loaded * 100) / progressEvent.total)
     }
 

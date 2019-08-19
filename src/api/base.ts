@@ -1,7 +1,7 @@
 import {prepareOptions} from './request/prepareOptions'
 
 /* Types */
-import {RequestOptionsInterface} from './request/types'
+import {Body, RequestOptionsInterface} from './request/types'
 import {SettingsInterface, FileData} from '../types'
 import {Uuid} from './types'
 import {BaseThenableInterface} from '../thenable/types'
@@ -11,7 +11,7 @@ export type BaseResponse = {
   file: Uuid;
 }
 
-const getRequestBody = (file: FileData, settings: SettingsInterface) => ({
+const getRequestBody = (file: FileData, settings: SettingsInterface): Body => ({
   UPLOADCARE_PUB_KEY: settings.publicKey || '',
   signature: settings.secureSignature || '',
   expire: settings.secureExpire || '',

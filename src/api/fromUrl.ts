@@ -1,7 +1,7 @@
 import {prepareOptions} from './request/prepareOptions'
 
 /* Types */
-import {RequestOptionsInterface} from './request/types'
+import {Query, RequestOptionsInterface} from './request/types'
 import {SettingsInterface} from '../types'
 import {FileInfoInterface} from './types'
 import {CancelableThenable} from '../thenable/CancelableThenable'
@@ -43,7 +43,7 @@ export const isFileInfoResponse = (response: FromUrlResponse): response is FileI
   return response.type !== undefined && response.type === TypeEnum.FileInfo
 }
 
-const getRequestQuery = (sourceUrl: Url, settings: SettingsInterface) => ({
+const getRequestQuery = (sourceUrl: Url, settings: SettingsInterface): Query => ({
   pub_key: settings.publicKey || '',
   source_url: sourceUrl,
   store: settings.doNotStore ? '' : 'auto',

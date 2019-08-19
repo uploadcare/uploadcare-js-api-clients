@@ -1,5 +1,6 @@
 /**
  * Safely get json value.
+ *
  * @param {object} json
  * @param {string} value
  */

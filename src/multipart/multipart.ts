@@ -25,7 +25,7 @@ class Multipart extends Thenable<FileInfoInterface> implements BaseThenableInter
       .then(({uuid, parts}) => {
         const upload = multipartUpload(file, parts, settings)
 
-        upload.onProgress = (progressEvent: ProgressEvent) => {
+        upload.onProgress = (progressEvent: ProgressEvent): void => {
           if (typeof this.onProgress === 'function') {
             this.onProgress({
               ...progressEvent,

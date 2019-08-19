@@ -3,7 +3,7 @@ type ErrorType = {
   statusText: string;
 }
 
-const error = (ctx, {status = 400, statusText}: ErrorType) => {
+const error = (ctx, {status = 400, statusText}: ErrorType): void => {
   const isJson = !!ctx.query.jsonerrors
 
   ctx.status = status

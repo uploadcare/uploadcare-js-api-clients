@@ -8,12 +8,12 @@ export class CancelableThenable<T> extends Thenable<T> implements CancelableThen
 
   protected readonly promise: Promise<T>
 
-  private readonly request: RequestInterface
+  private readonly request: RequestInterface<T>
 
   constructor(options: RequestOptionsInterface) {
     super()
 
-    this.request = request(options)
+    this.request = request<T>(options)
     this.promise = this.request
       .then(response => Promise.resolve(response.data))
       .catch(error => {

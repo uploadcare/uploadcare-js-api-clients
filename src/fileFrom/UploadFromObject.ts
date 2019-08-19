@@ -41,7 +41,7 @@ export class UploadFromObject extends UploadFrom {
 
     this.handleUploading()
 
-    fileUpload.onProgress = (progressEvent) =>
+    fileUpload.onProgress = (progressEvent): void =>
       this.handleUploading({
         total: progressEvent.total,
         loaded: progressEvent.loaded,

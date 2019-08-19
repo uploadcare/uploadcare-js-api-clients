@@ -15,7 +15,7 @@ export type RouteType = {
   };
 }
 
-export const ROUTES: Array<RouteType> = [
+export const ROUTES: RouteType[] = [
   {
     '/base': {
       method: 'post',

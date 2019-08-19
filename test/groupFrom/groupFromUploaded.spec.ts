@@ -57,7 +57,7 @@ describe('groupFrom', () => {
           groupPromise.cancel()
         }, 1)
 
-        groupPromise.onCancel = () => {
+        groupPromise.onCancel = (): void => {
           done()
         }
 
@@ -77,7 +77,7 @@ describe('groupFrom', () => {
         })
         const groupPromise = groupFrom(GroupFromEnum.Uploaded, [uuid], settings)
 
-        groupPromise.onProgress = (progress) => {
+        groupPromise.onProgress = (progress): void => {
           const {value} = progress
 
           progressValue = value
@@ -98,7 +98,7 @@ describe('groupFrom', () => {
         })
         const groupPromise = groupFrom(GroupFromEnum.Uploaded, [uuid], settings)
 
-        groupPromise.onUploaded = () => {
+        groupPromise.onUploaded = (): void => {
           done()
         }
 
@@ -112,7 +112,7 @@ describe('groupFrom', () => {
         })
         const groupPromise = groupFrom(GroupFromEnum.Uploaded, [uuid], settings)
 
-        groupPromise.onReady = () => {
+        groupPromise.onReady = (): void => {
           done()
         }
 

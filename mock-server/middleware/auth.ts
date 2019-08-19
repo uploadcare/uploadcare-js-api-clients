@@ -5,7 +5,7 @@ import error from '../utils/error'
 /**
  * Routes protected by auth.
  */
-const protectedRoutes: Array<string> = ROUTES
+const protectedRoutes: string[] = ROUTES
   .filter((route: RouteType) => {
     const keys = Object.keys(route)
     const path = keys[0]
@@ -23,7 +23,7 @@ const protectedRoutes: Array<string> = ROUTES
  * @param {string} url
  * @return {boolean}
  */
-const isProtected = (url: string) => !!protectedRoutes.filter((path: string) => url === path).length
+const isProtected = (url: string): boolean => !!protectedRoutes.filter((path: string) => url === path).length
 
 /**
  * Get public key value from request.
@@ -44,7 +44,7 @@ type IsAuthorizedParams = {
  * @param {object} publicKey
  * @return {boolean}
  */
-const isAuthorized = ({url, publicKey}: IsAuthorizedParams) => {
+const isAuthorized = ({url, publicKey}: IsAuthorizedParams): boolean => {
   if (!isProtected(url)) {
     return true
   }

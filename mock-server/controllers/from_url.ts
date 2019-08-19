@@ -9,7 +9,7 @@ import {PORT} from '../config'
  * '/from_url/?pub_key=XXXXXXXXXXXXXXXXXXXX'
  * @param {object} ctx
  */
-const index = (ctx) => {
+const index = (ctx): void => {
   const isPrivateIP = (url: string): boolean => url.includes('192.168.') || url.includes('localhost') && !url.includes(`http://localhost:${PORT}/`)
   const doesNotExist = (url: string): boolean => url === 'https://1.com/1.jpg'
 
@@ -53,7 +53,7 @@ const index = (ctx) => {
  * '/from_url/status/?pub_key=XXXXXXXXXXXXXXXXXXXX&token=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX'
  * @param {object} ctx
  */
-const status = (ctx) => {
+const status = (ctx): void => {
   const token = ctx.query && ctx.query.token
   const publicKey = ctx.query && ctx.query.publicKey
 

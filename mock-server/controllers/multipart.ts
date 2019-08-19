@@ -7,7 +7,7 @@ import error from '../utils/error'
  * '/multipart/start/'
  * @param {object} ctx
  */
-const start = (ctx) => {
+const start = (ctx): void => {
   if (ctx.request.body && !ctx.request.body.filename) {
     return error(ctx, {
       statusText: 'The "filename" parameter is missing.'
@@ -32,7 +32,7 @@ const start = (ctx) => {
     })
   }
 
-  return ctx.body = find(multipartJson, 'start')
+  ctx.body = find(multipartJson, 'start')
 }
 
 /**

@@ -1,7 +1,7 @@
 import {prepareOptions} from './request/prepareOptions'
 
 /* Types */
-import {RequestOptionsInterface} from './request/types'
+import {Query, RequestOptionsInterface} from './request/types'
 import {SettingsInterface} from '../types'
 import {FileInfoInterface, ProgressStatusInterface, Token} from './types'
 import {CancelableThenable} from '../thenable/CancelableThenable'
@@ -83,7 +83,7 @@ export const isSuccessResponse = (response: FromUrlStatusResponse): response is 
   return response.status !== undefined && response.status === StatusEnum.Success
 }
 
-const getRequestQuery = (token: string, settings: SettingsInterface) => ({
+const getRequestQuery = (token: string, settings: SettingsInterface): Query => ({
   token: token,
   pub_key: settings.publicKey || '',
 })

@@ -1,17 +1,18 @@
 import dataUriToBuffer from 'data-uri-to-buffer'
 import dataUriToBlob from 'dataurl-to-blob'
+import {SettingsInterface} from '../src'
 
 export const dataURItoBuffer: (uri: string) => Buffer = dataUriToBuffer
 export const dataURItoBlob: (uri: string) => Blob = dataUriToBlob
 
-export const sleep = (ms: number): Promise<void> => new Promise(resolve => setTimeout(resolve, ms))
+export const sleep = (ms: number): Promise<void> => new Promise((resolve): number => setTimeout(resolve, ms))
 
 export enum Environment {
   Development = 'development',
   Production = 'production',
 }
 
-export const getSettingsForTesting = (settings = {}, environment: Environment | null = null) => {
+export const getSettingsForTesting = (settings = {}, environment: Environment | null = null): SettingsInterface => {
   const selectedEnvironment = environment || process.env.NODE_ENV || Environment.Development
 
   const allEnvironments = {

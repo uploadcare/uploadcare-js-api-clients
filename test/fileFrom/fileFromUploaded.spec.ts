@@ -53,7 +53,7 @@ describe('fileFrom', () => {
           filePromise.cancel()
         }, 1)
 
-        filePromise.onCancel = () => {
+        filePromise.onCancel = (): void => {
           done()
         }
 
@@ -73,7 +73,7 @@ describe('fileFrom', () => {
         })
         const filePromise = fileFrom(FileFromEnum.Uploaded, uuid, settings)
 
-        filePromise.onProgress = (progress) => {
+        filePromise.onProgress = (progress): void => {
           const {value} = progress
 
           progressValue = value
@@ -90,7 +90,7 @@ describe('fileFrom', () => {
         })
         const filePromise = fileFrom(FileFromEnum.Uploaded, uuid, settings)
 
-        filePromise.onUploaded = () => {
+        filePromise.onUploaded = (): void => {
           done()
         }
 
@@ -104,7 +104,7 @@ describe('fileFrom', () => {
         })
         const filePromise = fileFrom(FileFromEnum.Uploaded, uuid, settings)
 
-        filePromise.onReady = () => {
+        filePromise.onReady = (): void => {
           done()
         }
 

@@ -37,7 +37,7 @@ export abstract class UploadFrom extends Thenable<UploadcareFileInterface> imple
     this.handleCancelling = this.handleCancelling.bind(this)
   }
 
-  protected setProgress(state: ProgressStateEnum, progress?: ProgressParamsInterface) {
+  protected setProgress(state: ProgressStateEnum, progress?: ProgressParamsInterface): void {
     switch (state) {
       case ProgressStateEnum.Pending:
         this.progress = {
@@ -89,7 +89,7 @@ export abstract class UploadFrom extends Thenable<UploadcareFileInterface> imple
     return this.progress
   }
 
-  protected setFile(file: UploadcareFileInterface) {
+  protected setFile(file: UploadcareFileInterface): void {
     this.file = file
   }
 
@@ -181,7 +181,7 @@ export abstract class UploadFrom extends Thenable<UploadcareFileInterface> imple
    * Handle uploading error
    * @param error
    */
-  protected handleError = (error) => {
+  protected handleError = (error): Promise<void | Error> => {
     if (error.name === 'CancelError') {
       this.handleCancelling()
     } else {

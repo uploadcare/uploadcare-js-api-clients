@@ -50,7 +50,7 @@ const isValidFile = (file: string): boolean => {
  * '/group/'
  * @param {object} ctx
  */
-const index = (ctx) => {
+const index = (ctx): void => {
   let files = ctx.query && ctx.query['files[]']
   const publicKey = ctx.query && ctx.query.pub_key
 
@@ -86,7 +86,7 @@ const index = (ctx) => {
  * '/group/info/?pub_key=XXXXXXXXXXXXXXXXXXXX&group_id=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX~N'
  * @param {object} ctx
  */
-const info = (ctx) => {
+const info = (ctx): void => {
   const groupId = ctx.query && ctx.query.group_id
 
   if (!groupId) {

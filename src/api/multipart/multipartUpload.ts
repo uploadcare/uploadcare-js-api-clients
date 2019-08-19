@@ -9,10 +9,10 @@ import {FileData, SettingsInterface} from '../../types'
 import {ChunkType, MultipartPart} from './types'
 import {BaseThenableInterface} from '../../thenable/types'
 
-function throttle(callback, limit = 1) {
+function throttle(callback, limit = 1): Function {
   let wait = false                  // Initially, we're not waiting
 
-  return function (...args) {               // We return a throttled function
+  return function (...args): void {               // We return a throttled function
     if (!wait) {                   // If we're not waiting
       callback(...args)           // Execute users function
       wait = true               // Prevent future invocations

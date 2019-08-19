@@ -101,7 +101,7 @@ describe('API - from url', () => {
       upload.cancel()
     }, 1)
 
-    upload.onCancel = () => {
+    upload.onCancel = (): void => {
       done()
     }
 

@@ -56,11 +56,11 @@ class UploadClient implements UploadClientInterface {
     return this.settings
   }
 
-  addUpdateSettingsListener(listener: Function): void {
+  addUpdateSettingsListener(listener: (settings: SettingsInterface) => void): void {
     this.updateSettingsListeners.push(listener)
   }
 
-  removeUpdateSettingsListener(listener: Function): void {
+  removeUpdateSettingsListener(listener: (settings: SettingsInterface) => void): void {
     for (let index = 0; index < this.updateSettingsListeners.length; index++) {
       if (this.updateSettingsListeners[index] === listener) {
         this.updateSettingsListeners.splice(index, 1)

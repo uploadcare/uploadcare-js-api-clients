@@ -17,7 +17,7 @@ const isEmptyObject = (object: object): boolean => Object.keys(object).length ==
 /**
  * Logger for requests and responses.
  * @param {object} ctx
- * @param {function} next
+ * @param {Function} next
  */
 const logger = async (ctx, next) => {
   await next()

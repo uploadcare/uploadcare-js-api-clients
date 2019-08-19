@@ -52,7 +52,7 @@ describe('API - group info', () => {
       upload.cancel()
     }, 1)
 
-    upload.onCancel = () => {
+    upload.onCancel = (): void => {
       done()
     }
 

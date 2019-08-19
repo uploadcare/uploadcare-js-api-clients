@@ -32,7 +32,7 @@ export class UploadFromUploaded extends UploadFrom {
       .catch(this.handleError)
   }
 
-  private handleInfoResponse = (groupInfo: GroupInfoInterface) => {
+  private handleInfoResponse = (groupInfo: GroupInfoInterface): Promise<UploadcareGroupInterface | Error> => {
     if (this.isCancelled) {
       return Promise.reject(new CancelError())
     }

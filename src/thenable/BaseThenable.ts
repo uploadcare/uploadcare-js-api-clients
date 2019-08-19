@@ -9,12 +9,12 @@ export class BaseThenable<T> extends Thenable<T> implements BaseThenableInterfac
 
   protected readonly promise: Promise<T>
 
-  private readonly request: RequestInterface
+  private readonly request: RequestInterface<T>
 
   constructor(options: RequestOptionsInterface) {
     super()
 
-    this.request = request({
+    this.request = request<T>({
       ...options,
       onUploadProgress: (progressEvent: ProgressEvent) => {
         if (typeof this.onProgress === 'function') {

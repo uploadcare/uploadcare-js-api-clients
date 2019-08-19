@@ -87,7 +87,7 @@ export class UploadLifecycle<T> implements LifecycleInterface<T> {
     return Promise.resolve(this.getEntity())
   }
 
-  handleError(error: Error) {
+  handleError(error: Error): Promise<void | Error> {
     if (error.name === 'CancelError') {
       this.handleCancelling()
     } else {

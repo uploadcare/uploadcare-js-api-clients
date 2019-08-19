@@ -34,7 +34,7 @@ export class UploadFromUploaded extends UploadFrom {
       .catch(this.handleError)
   }
 
-  private handleInfoResponse = (response: FileInfoInterface) => {
+  private handleInfoResponse = (response: FileInfoInterface): Promise<UploadcareFileInterface | Error> => {
     if (this.isCancelled) {
       return Promise.reject(new CancelError())
     }

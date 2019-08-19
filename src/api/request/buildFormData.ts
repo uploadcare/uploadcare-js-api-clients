@@ -14,7 +14,7 @@ import {Body} from './types'
  * @param {Body} body
  * @returns {FormData} FormData instance
  */
-export function buildFormData(body: Body): FormData | Body {
+export function buildFormData(body: Body): FormData {
   const formData = new FormData()
 
   for (const key of Object.keys(body)) {

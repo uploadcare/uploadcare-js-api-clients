@@ -135,7 +135,7 @@ export function groupId(id: string): string {
   return groupIds[id]
 }
 
-export function groupOfFiles(id: string): Array<string> {
+export function groupOfFiles(id: string): string[] {
   const groupOfFiles = {
     valid: [
       'd3275f8b-686d-4980-916a-53a1fc17450b',

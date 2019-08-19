@@ -42,7 +42,7 @@ export class UploadFromUrl extends UploadFrom {
       .catch(this.handleError)
   }
 
-  private handleFromUrlResponse = (response: FromUrlResponse) => {
+  private handleFromUrlResponse = (response: FromUrlResponse): Promise<UploadcareFileInterface> => {
     if (isTokenResponse(response)) {
       const {token} = response
 
@@ -56,7 +56,7 @@ export class UploadFromUrl extends UploadFrom {
     }
   }
 
-  private handleFromUrlStatusResponse = (token: Uuid, response: FromUrlStatusResponse) => {
+  private handleFromUrlStatusResponse = (token: Uuid, response: FromUrlStatusResponse): Promise<UploadcareFileInterface> => {
     this.isFileUploadedFromUrlPolling = checkFileIsUploadedFromUrl({
       token,
       timeout: this.settings.pollingTimeoutMilliseconds || defaultSettings.pollingTimeoutMilliseconds,

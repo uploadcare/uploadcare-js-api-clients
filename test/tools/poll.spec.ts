@@ -9,7 +9,7 @@ describe('poll', () => {
   const settings = getSettingsForTesting({
     publicKey: factory.publicKey('image'),
   })
-  const onProgress = (response) => {
+  const onProgress = (response: FileInfoInterface): FileInfoInterface => {
     return response
   }
 

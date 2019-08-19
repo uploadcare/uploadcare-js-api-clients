@@ -58,7 +58,7 @@ describe('API - multipartComplete', () => {
       upload.cancel()
     }, 1)
 
-    upload.onCancel = () => {
+    upload.onCancel = (): void => {
       done()
     }
 

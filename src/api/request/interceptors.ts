@@ -12,7 +12,7 @@ export const addMaxConcurrencyInterceptorsToAxiosInstance = ({
   let pendingRequestsCount = 0
 
   instance.interceptors.request.use((config) => {
-    return new Promise((resolve) => {
+    return new Promise((resolve): void => {
       const interval = setInterval(() => {
         if (pendingRequestsCount < maxConcurrentRequestsCount) {
           pendingRequestsCount++

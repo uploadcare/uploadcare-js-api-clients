@@ -34,7 +34,7 @@ class PollPromise<T> extends Thenable<T> implements PollPromiseInterface<T> {
       })
   }
 
-  cancel() {
+  cancel(): void {
     this.canceled = true
   }
 }

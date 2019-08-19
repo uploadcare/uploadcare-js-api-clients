@@ -30,10 +30,11 @@ export interface RequestOptionsInterface {
   maxConcurrentRequests?: number;
 }
 
-export type RequestResponse = {
+export type RequestResponse<T> = {
   headers?: object;
   url: string;
-  data: any;
+  data: T;
+  code: number;
 }
 
-export interface RequestInterface extends Promise<RequestResponse>, CancelableInterface {}
+export interface RequestInterface<T> extends Promise<RequestResponse<T>>, CancelableInterface {}

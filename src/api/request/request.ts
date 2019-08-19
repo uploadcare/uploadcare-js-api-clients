@@ -42,8 +42,8 @@ const nodeUploadProgress = (config: AxiosRequestConfig): AxiosRequestConfig => {
   return config
 }
 
-class Request extends Thenable<RequestResponse> implements RequestInterface {
-  protected readonly promise: Promise<RequestResponse>
+class Request<T> extends Thenable<RequestResponse<T>> implements RequestInterface<T> {
+  protected readonly promise: Promise<RequestResponse<T>>
   private readonly options: RequestOptionsInterface
   private readonly cancelController: CancelTokenSource
   private throttledTimes = 0
@@ -105,7 +105,7 @@ class Request extends Thenable<RequestResponse> implements RequestInterface {
     return method || 'GET'
   }
 
-  private getRequestBaseURL() {
+  private getRequestBaseURL(): string {
     const {baseURL} = this.options
 
     return baseURL || defaultSettings.baseURL
@@ -145,7 +145,7 @@ class Request extends Thenable<RequestResponse> implements RequestInterface {
     }
   }
 
-  private handleRequestError = (error: AxiosError) => {
+  private handleRequestError = (error: AxiosError): void => {
     const {path: url} = this.options
 
     if (axios.isCancel(error)) {
@@ -181,7 +181,7 @@ class Request extends Thenable<RequestResponse> implements RequestInterface {
     return Promise.reject(error)
   }
 
-  private handleResponse = response => {
+  private handleResponse = (response): RequestResponse<T> => {
     const {path} = this.options
     const url = response.config.url || path
 
@@ -219,7 +219,7 @@ class Request extends Thenable<RequestResponse> implements RequestInterface {
     }
   }
 
-  private getTimeoutFromThrottledRequest = (error: RequestWasThrottledError) => {
+  private getTimeoutFromThrottledRequest = (error: RequestWasThrottledError): number | null => {
     const {headers} = error.request
 
     return headers['x-throttle-wait-seconds'] * 1000 || null
@@ -242,8 +242,8 @@ class Request extends Thenable<RequestResponse> implements RequestInterface {
  * @param {number} [options.retryThrottledMaxTimes] – How much times retry throttled request (1 by default)
  * @returns {RequestInterface}
  */
-const request = (options: RequestOptionsInterface): RequestInterface => {
-  return new Request(options)
+const request = <T>(options: RequestOptionsInterface): RequestInterface<T> => {
+  return new Request<T>(options)
 }
 
 export default request

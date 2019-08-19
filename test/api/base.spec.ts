@@ -65,7 +65,7 @@ describe('API - base', () => {
       directUpload.cancel()
     }, 1)
 
-    directUpload.onCancel = () => {
+    directUpload.onCancel = (): void => {
       done()
     }
 
@@ -85,7 +85,7 @@ describe('API - base', () => {
     })
     const directUpload = base(fileToUpload.data, settings)
 
-    directUpload.onProgress = (progressEvent) => {
+    directUpload.onProgress = (progressEvent: ProgressEvent): void => {
       progressValue = Math.round((progressEvent.loaded * 100) / progressEvent.total)
     }
 
