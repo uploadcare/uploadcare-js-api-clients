@@ -3,7 +3,7 @@ import * as factory from './_fixtureFactory'
 import {getSettingsForTesting} from './_helpers'
 import info from '../src/api/info'
 
-describe('checkFileIsReady', () => {
+fdescribe('checkFileIsReady', () => {
   it('should be resolved if file is ready', async () => {
     const settings = getSettingsForTesting({
       publicKey: factory.publicKey('image')
@@ -32,7 +32,7 @@ describe('checkFileIsReady', () => {
       polling.cancel()
     }, 1)
 
-    polling
+    await polling
       .then(() => done.fail('Promise should not to be resolved'))
       .catch((error) => {
         if (error.name === 'CancelError') {
