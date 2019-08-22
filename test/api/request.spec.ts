@@ -20,7 +20,7 @@ describe('buildFormData', () => {
   })
 })
 
-fdescribe('API – request', () => {
+describe('API – request', () => {
   const settings = getSettingsForTesting()
 
   describe('should be resolved', () => {
