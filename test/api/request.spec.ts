@@ -131,7 +131,7 @@ describe('API – request', () => {
       requestWithOptions.cancel()
     })
 
-    it('if request was throttled and max retries 0', async() => {
+    fit('if request was throttled and max retries 0', async() => {
       // Run this case only in dev mode
       if (process.env.NODE_ENV === 'production') {
         return Promise.resolve()

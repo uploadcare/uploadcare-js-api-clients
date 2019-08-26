@@ -26,6 +26,8 @@ app.use(addTrailingSlashes())
 app.use(logger)
 app.use(koaBody({
   multipart: true,
+  formLimit: 50 * 1024 * 1024,
+  textLimit: 50 * 1024 * 1024,
 }))
 app.use(auth)
 
