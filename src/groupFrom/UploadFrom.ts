@@ -84,7 +84,7 @@ export abstract class UploadFrom extends Thenable<UploadcareGroupInterface> impl
     return this.progress
   }
 
-  protected setGroup(group: UploadcareGroupInterface) {
+  protected setGroup(group: UploadcareGroupInterface): void {
     this.group = group
   }
 

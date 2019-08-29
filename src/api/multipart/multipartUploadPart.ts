@@ -70,7 +70,7 @@ class MultipartUploadPart extends Thenable<MultipartUploadResponse> implements B
       method: 'PUT',
       cancelToken: this.cancelController.token,
       maxContentLength: settings.maxContentLength || defaultSettings.maxContentLength,
-      onUploadProgress: (progressEvent: ProgressEvent) => {
+      onUploadProgress: (progressEvent: ProgressEvent): void => {
         if (typeof this.onProgress === 'function') {
           this.onProgress(progressEvent)
         }

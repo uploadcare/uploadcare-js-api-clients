@@ -8,13 +8,14 @@ import {FileData, SettingsInterface} from '../types'
 import {Uuid} from '..'
 import {BaseThenableInterface, CancelableThenableInterface} from '../thenable/types'
 import {FileInfoInterface} from '../api/types'
+import {MultipartStartResponse} from '../api/multipart/types'
 
 class Multipart extends Thenable<FileInfoInterface> implements BaseThenableInterface<FileInfoInterface> {
   onCancel: (() => void) | null = null
   onProgress: ((progressEvent: ProgressEvent) => void) | null = null
 
   protected readonly promise: Promise<FileInfoInterface>
-  private request: BaseThenableInterface<any> | CancelableThenableInterface<any>
+  private request: BaseThenableInterface<void> | CancelableThenableInterface<MultipartStartResponse | FileInfoInterface>
 
   constructor(file: FileData, settings: SettingsInterface) {
     super()

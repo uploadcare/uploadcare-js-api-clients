@@ -59,7 +59,7 @@ class Request<T> extends Thenable<RequestResponse<T>> implements RequestInterfac
     this.promise = this.getRequestPromise()
   }
 
-  private getRequestPromise() {
+  private getRequestPromise(): Promise<RequestResponse<T>> {
     const options = this.getRequestOptions()
     const instance = axios.create()
     const maxConcurrentRequestsCount = this.options.maxConcurrentRequests || defaultSettings.maxConcurrentRequests
