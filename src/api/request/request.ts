@@ -53,7 +53,11 @@ class Request extends Thenable<RequestResponse> implements RequestInterface {
     super()
 
     this.options = options
-    this.retryThrottledMaxTimes = options.retryThrottledMaxTimes || defaultSettings.retryThrottledRequestMaxTimes
+    if (typeof options.retryThrottledMaxTimes !== 'undefined' && options.retryThrottledMaxTimes >= 0) {
+      this.retryThrottledMaxTimes = options.retryThrottledMaxTimes
+    } else {
+      this.retryThrottledMaxTimes = defaultSettings.retryThrottledRequestMaxTimes
+    }
     this.cancelController = axios.CancelToken.source()
     this.promise = this.getRequestPromise()
   }
