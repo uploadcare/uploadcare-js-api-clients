@@ -145,6 +145,7 @@ describe('API – request', () => {
         query: {pub_key: factory.publicKey('demo')},
         retryThrottledMaxTimes: 0,
       }
+
       const errorRequest = {
         headers: {
           "accept": "application/json, text/plain, */*",

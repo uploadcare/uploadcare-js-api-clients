@@ -65,6 +65,13 @@ export const ROUTES: RouteType[] = [
     }
   }, {
     '/multipart/upload/:uuid/original/': {
+      method: 'put',
+      fn: multipart.upload,
+      isProtected: false,
+      isFake: true,
+    }
+  }, {
+    '/multipart/upload/:uuid/original/': {
       method: 'get',
       fn: multipart.upload,
       isProtected: false,

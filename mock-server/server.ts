@@ -1,6 +1,6 @@
 // @ts-ignore
 import Koa from 'koa'
-import * as router from 'koa-route'
+import Router from '@koa/router'
 import chalk from 'chalk'
 
 // Middleware
@@ -19,6 +19,7 @@ import {PORT} from './config'
 import {ROUTES, RouteType} from './routes'
 
 const app = new Koa()
+const router = new Router()
 
 // Use middleware
 app.use(cors())
@@ -37,8 +38,9 @@ ROUTES.forEach((route: RouteType) => {
   const path = keys[0]
   const method = route[path].method
   const fn = route[path].fn
+  router[method](path, fn)
 
-  app.use(router[method](path, fn))
+  app.use(router.routes())
 })
 
 // Handle errors
