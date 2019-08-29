@@ -57,7 +57,7 @@ const isAuthorized = ({url, publicKey}: IsAuthorizedParams): boolean => {
  * @param {object} ctx
  * @param {function} next
  */
-const auth = (ctx, next) => {
+const auth = (ctx, next): void => {
   const urlWithSlash = ctx.url.split('?').shift()
   const url = urlWithSlash.substring(0, urlWithSlash.length-1)
 

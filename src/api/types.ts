@@ -89,7 +89,7 @@ export type Uuid = string
 export type GroupId = string
 
 export interface UploadAPIInterface {
-  request(options: RequestOptionsInterface): Promise<RequestResponse>;
+  request<T>(options: RequestOptionsInterface): Promise<RequestResponse<T>>;
 
   base(data: FileData, settings?: SettingsInterface): BaseThenableInterface<BaseResponse>;
 
@@ -105,7 +105,7 @@ export interface UploadAPIInterface {
 
   multipartStart(file: FileData, settings: SettingsInterface): CancelableThenableInterface<MultipartStartResponse>;
 
-  multipartUpload(file: FileData, parts: MultipartPart[], settings: SettingsInterface): BaseThenableInterface<any>;
+  multipartUpload(file: FileData, parts: MultipartPart[], settings: SettingsInterface): BaseThenableInterface<void>;
 
   multipartComplete(uuid: Uuid, settings: SettingsInterface): CancelableThenableInterface<FileInfoInterface>;
 }

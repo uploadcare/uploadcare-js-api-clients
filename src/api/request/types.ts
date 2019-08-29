@@ -1,5 +1,6 @@
 import {FileData} from '../../types'
 import {CancelableInterface} from '../../lifecycle/types'
+import {Method} from 'axios'
 
 export type Query = {
   [key: string]: string | string[] | boolean | number | void;
@@ -19,7 +20,7 @@ export type Headers = {
 }
 
 export interface RequestOptionsInterface {
-  method?: string;
+  method?: Method;
   path: string;
   query?: Query;
   body?: Body;

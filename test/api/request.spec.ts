@@ -1,7 +1,6 @@
 import request from '../../src/api/request/request'
 import {buildFormData} from '../../src/api/request/buildFormData'
 import * as factory from '../_fixtureFactory'
-import axios from 'axios'
 import {getSettingsForTesting, sleep} from '../_helpers'
 
 describe('buildFormData', () => {
@@ -91,23 +90,6 @@ describe('API – request', () => {
         .then(() => done.fail('Promise should not to be resolved'))
         .catch((error) => error.name === 'UploadcareError' ? done() : done.fail(error))
     })
-
-    // it('on connection error', async() => {
-    //   const interceptor = axios.interceptors.response.use(() => Promise.reject('error'))
-    //   const options = {
-    //     baseURL: settings.baseURL,
-    //     path: '/info/',
-    //     query: {
-    //       pub_key: factory.publicKey('image'),
-    //       file_id: factory.uuid('image'),
-    //     },
-    //   }
-    //   const requestWithOptions = request(options)
-
-    //   await expectAsync(requestWithOptions).toBeRejected()
-
-    //   axios.interceptors.response.eject(interceptor)
-    // })
 
     it('if promise canceled', (done) => {
       const options = {

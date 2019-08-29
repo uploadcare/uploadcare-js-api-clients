@@ -35,7 +35,7 @@ export class UploadFromObject extends UploadFrom {
 
       fileUpload.onCancel = this.handleCancelling
 
-      fileUpload.onUploaded = (() => {
+      fileUpload.onUploaded = ((): void => {
         this.handleUploading({
           total: filesTotalCount,
           loaded: fileNumber
@@ -64,7 +64,7 @@ export class UploadFromObject extends UploadFrom {
       .catch(this.handleError)
   }
 
-  private handleInfoResponse = (groupInfo: GroupInfoInterface): Promise<UploadcareGroupInterface | Error> => {
+  private handleInfoResponse = (groupInfo: GroupInfoInterface): Promise<UploadcareGroupInterface> => {
     if (this.isCancelled) {
       return Promise.reject(new CancelError())
     }

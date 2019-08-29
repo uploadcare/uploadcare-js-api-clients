@@ -25,14 +25,14 @@ class UploadAPI implements UploadAPIInterface {
     this.client = client
   }
 
-  private getResultSettings = (settings) => {
+  private getResultSettings = (settings): SettingsInterface => {
     return {
       ...this.client.getSettings(),
       ...settings,
     }
   }
 
-  request(options: RequestOptionsInterface): Promise<RequestResponse> {
+  request<T>(options: RequestOptionsInterface): Promise<RequestResponse<T>> {
     const preparedOptions = prepareOptions(options, this.client.getSettings())
 
     return request(preparedOptions)
@@ -66,7 +66,7 @@ class UploadAPI implements UploadAPIInterface {
     return multipartStart(file, this.getResultSettings(settings))
   }
 
-  multipartUpload(file: FileData, parts: MultipartPart[], settings: SettingsInterface): BaseThenableInterface<any> {
+  multipartUpload(file: FileData, parts: MultipartPart[], settings: SettingsInterface): BaseThenableInterface<void> {
     return multipartUpload(file, parts, this.getResultSettings(settings))
   }
 

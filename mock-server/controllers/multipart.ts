@@ -39,7 +39,7 @@ const start = (ctx): void => {
  * '/multipart/complete/'
  * @param {object} ctx
  */
-const complete = (ctx) => {
+const complete = (ctx): object | void => {
   if (ctx.request.body && !ctx.request.body.uuid) {
     return error(ctx, {
       statusText: 'The "uuid" parameter is missing.'

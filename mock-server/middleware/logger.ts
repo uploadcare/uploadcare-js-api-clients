@@ -19,7 +19,7 @@ const isEmptyObject = (object: object): boolean => Object.keys(object).length ==
  * @param {object} ctx
  * @param {Function} next
  */
-const logger = async (ctx, next) => {
+const logger = async (ctx, next): Promise<void> => {
   await next()
 
   const request = `${chalk.gray('-->')} ${chalk.bold(ctx.request.method)} ${chalk.gray(ctx.request.url)}`
