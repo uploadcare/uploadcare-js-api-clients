@@ -1,8 +1,9 @@
 import request from '../../src/api/request/request'
 import {buildFormData} from '../../src/api/request/buildFormData'
 import * as factory from '../_fixtureFactory'
-import axios from 'axios'
 import {getSettingsForTesting, sleep} from '../_helpers'
+import RequestWasThrottledError from '../../src/errors/RequestWasThrottledError'
+import RequestError from '../../src/errors/RequestError'
 
 describe('buildFormData', () => {
   it('should return FormData with nice input object', () => {
@@ -145,7 +146,26 @@ describe('API – request', () => {
         retryThrottledMaxTimes: 0,
       }
 
-      await expectAsync(request(options)).toBeRejectedWith({name: 'RequestWasThrottledError'})
+      const errorRequest = {
+        headers: {
+          "accept": "application/json, text/plain, */*",
+          "content-type": "application/x-www-form-urlencoded",
+          "x-uc-user-agent": "UploadcareUploadClient/1.0.0-alpha.4 (JavaScript)",
+          "user-agent": "axios/0.19.0",
+          "host": "localhost:3000",
+          "connection": "close",
+          "content-length": "0"
+        },
+        url: 'http://localhost:3000/throttle',
+      }
+      const errorResponse = {
+        status: 429,
+        statusText: 'Request was throttled.',
+      }
+      const requestError = new RequestError(errorRequest, errorResponse)
+      const error = new RequestWasThrottledError(requestError, options.retryThrottledMaxTimes)
+
+      await expectAsync(request(options)).toBeRejectedWith(error)
     }, 20000)
   })
 })
