@@ -131,13 +131,13 @@ describe('API – request', () => {
 
       const errorRequest = {
         headers: {
-          "accept": "application/json, text/plain, */*",
-          "content-type": "application/x-www-form-urlencoded",
-          "x-uc-user-agent": "UploadcareUploadClient/1.0.0-alpha.4 (JavaScript)",
-          "user-agent": "axios/0.19.0",
-          "host": "localhost:3000",
-          "connection": "close",
-          "content-length": "0"
+          'accept': 'application/json, text/plain, */*',
+          'content-type': 'application/x-www-form-urlencoded',
+          'x-uc-user-agent': 'UploadcareUploadClient/1.0.0-alpha.4 (JavaScript)',
+          'user-agent': 'axios/0.19.0',
+          'host': 'localhost:3000',
+          'connection': 'close',
+          'content-length': '0'
         },
         url: 'http://localhost:3000/throttle',
       }

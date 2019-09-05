@@ -39,22 +39,27 @@ const start = (ctx): void => {
  * '/multipart/upload/'
  * @param {object} ctx
  */
-const upload = (ctx) => {
-  return ctx.status = 200
+const upload = (ctx): void => {
+  ctx.status = 200
+
+  return
 }
 
 /**
  * '/multipart/complete/'
  * @param {object} ctx
  */
-const complete = (ctx): object | void => {
+const complete = (ctx): void => {
   if (ctx.request.body && !ctx.request.body.uuid) {
-    return error(ctx, {
+    error(ctx, {
       statusText: 'The "uuid" parameter is missing.'
     })
+
+    return
   }
 
-  return ctx.body = find(infoJson, 'info')
+  ctx.body = find(infoJson, 'info')
+  return
 }
 
 export {
