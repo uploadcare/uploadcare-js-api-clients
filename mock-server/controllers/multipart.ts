@@ -37,6 +37,7 @@ const start = (ctx): void => {
 
 /**
  * '/multipart/upload/'
+ *
  * @param {object} ctx
  */
 const upload = (ctx): void => {
@@ -47,6 +48,7 @@ const upload = (ctx): void => {
 
 /**
  * '/multipart/complete/'
+ *
  * @param {object} ctx
  */
 const complete = (ctx): void => {

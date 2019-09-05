@@ -4,6 +4,7 @@ import error from '../utils/error'
 
 /**
  * '/info?pub_key=XXXXXXXXXXXXXXXXXXXX&file_id=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX'
+ *
  * @param {object} ctx
  */
 const index = (ctx): void => {

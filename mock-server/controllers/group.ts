@@ -7,6 +7,7 @@ const GROUP_ID_REGEX = `${UUID_REGEX}~[1-9][0-9]*$`
 
 /**
  * Check file UUID.
+ *
  * @param {string} uuid
  * @return {boolean}
  */
@@ -14,13 +15,15 @@ const isValidUuid = (uuid: string): boolean => (new RegExp(UUID_REGEX)).test(uui
 
 /**
  * Check group id.
+ *
  * @param {string} groupId
  * @return {boolean}
  */
 const isValidGroupId = (groupId: string): boolean => (new RegExp(GROUP_ID_REGEX)).test(groupId)
 
 /**
- * Get UUID from file
+ * Get UUID from file.
+ *
  * @param {string} file
  * @return {string}
  */
@@ -37,6 +40,7 @@ const getFileUuid = (file: string): string => {
 
 /**
  * Is valid file?
+ *
  * @param {string} file
  * @return {boolean}
  */
@@ -48,6 +52,7 @@ const isValidFile = (file: string): boolean => {
 
 /**
  * '/group/'
+ *
  * @param {object} ctx
  */
 const index = (ctx): void => {
@@ -84,6 +89,7 @@ const index = (ctx): void => {
 
 /**
  * '/group/info/?pub_key=XXXXXXXXXXXXXXXXXXXX&group_id=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX~N'
+ *
  * @param {object} ctx
  */
 const info = (ctx): void => {

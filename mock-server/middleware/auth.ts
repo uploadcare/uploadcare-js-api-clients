@@ -20,6 +20,7 @@ const protectedRoutes: string[] = ROUTES
 
 /**
  * Check is url protected by auth.
+ *
  * @param {string} url
  * @return {boolean}
  */
@@ -27,6 +28,7 @@ const isProtected = (url: string): boolean => !!protectedRoutes.filter((path: st
 
 /**
  * Get public key value from request.
+ *
  * @param {object} source
  * @param {string} key
  */
@@ -40,6 +42,7 @@ type IsAuthorizedParams = {
 }
 /**
  * Check auth.
+ *
  * @param {string} url
  * @param {object} publicKey
  * @return {boolean}
@@ -54,6 +57,7 @@ const isAuthorized = ({url, publicKey}: IsAuthorizedParams): boolean => {
 
 /**
  * Uploadcare Auth middleware.
+ *
  * @param {object} ctx
  * @param {function} next
  */

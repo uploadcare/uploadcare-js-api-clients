@@ -2,6 +2,7 @@ import chalk from 'chalk'
 
 /**
  * Pretty print for JSON.
+ *
  * @param {object} json
  * @return {string}
  */
@@ -9,6 +10,7 @@ const pretty = (json: object): string => JSON.stringify(json, null, 2)
 
 /**
  * Check is empty object.
+ *
  * @param {object} object
  * @return {boolean}
  */
@@ -16,6 +18,7 @@ const isEmptyObject = (object: object): boolean => Object.keys(object).length ==
 
 /**
  * Logger for requests and responses.
+ *
  * @param {object} ctx
  * @param {Function} next
  */

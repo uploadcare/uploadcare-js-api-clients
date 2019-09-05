@@ -7,6 +7,7 @@ import {PORT} from '../config'
 
 /**
  * '/from_url/?pub_key=XXXXXXXXXXXXXXXXXXXX'
+ *
  * @param {object} ctx
  */
 const index = (ctx): void => {
@@ -51,6 +52,7 @@ const index = (ctx): void => {
 
 /**
  * '/from_url/status/?pub_key=XXXXXXXXXXXXXXXXXXXX&token=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX'
+ *
  * @param {object} ctx
  */
 const status = (ctx): void => {
