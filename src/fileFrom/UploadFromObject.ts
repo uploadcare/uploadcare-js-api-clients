@@ -62,6 +62,9 @@ export class UploadFromObject extends UploadFrom {
       .catch(this.handleError)
   }
 
+  /**
+   * Cancel uploading.
+   */
   cancel(): void {
     return this.request.cancel()
   }

@@ -9,7 +9,13 @@ import {FileData, SettingsInterface} from '../../types'
 import {ChunkType, MultipartPart, MultipartUploadResponse} from './types'
 import {BaseThenableInterface} from '../../thenable/types'
 
-function throttle(callback, limit = 1): Function {
+/**
+ * Throttle function.
+ *
+ * @param {Function} callback
+ * @param {number} limit
+ */
+function throttle(callback: Function, limit = 1): Function {
   let wait = false                  // Initially, we're not waiting
 
   return function (...args): void {               // We return a throttled function
@@ -79,6 +85,9 @@ class MultipartUpload extends Thenable<void> implements BaseThenableInterface<vo
       })
   }
 
+  /**
+   * Cancel uploading.
+   */
   cancel(): void {
     this.requests.forEach(request => request.cancel())
   }
@@ -87,9 +96,9 @@ class MultipartUpload extends Thenable<void> implements BaseThenableInterface<vo
 /**
  * Upload multipart file.
  *
- * @param {FileData} file
- * @param {MultipartPart[]} parts
- * @param {SettingsInterface} settings
+ * @param {FileData} file - File to upload.
+ * @param {MultipartPart[]} parts - Multipart parts (array of urls).
+ * @param {SettingsInterface} settings - Client settings.
  * @return {BaseThenableInterface<void>}
  */
 export default function multipartUpload(file: FileData, parts: MultipartPart[], settings: SettingsInterface = {}): BaseThenableInterface<void> {

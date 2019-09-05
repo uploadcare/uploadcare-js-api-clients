@@ -3,7 +3,7 @@ const SEPARATOR = /\W|_/g
 /**
  * Transforms a string to camelCased.
  *
- * @param {string} text
+ * @param {string} text - Text to camelize.
  * @returns {string}
  */
 export function camelize(text: string): string {
@@ -15,8 +15,8 @@ export function camelize(text: string): string {
 /**
  * Transforms keys of an object to camelCased recursively.
  *
- * @param {Object} source
- * @returns {Object}
+ * @param {object} source - Object to camelize.
+ * @returns {object}
  */
 export default function camelizeKeys(source: object): object {
   if (!source || typeof source !== 'object') {

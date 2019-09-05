@@ -36,8 +36,8 @@ const getRequestOptions = (file: FileData, settings: SettingsInterface): Request
 /**
  * Start multipart uploading.
  *
- * @param {FileData} file
- * @param {SettingsInterface} settings
+ * @param {FileData} file - File data to upload.
+ * @param {SettingsInterface} settings - Client settings.
  * @return {CancelableThenableInterface<MultipartStartResponse>}
  */
 export default function multipartStart(file: FileData, settings: SettingsInterface = {}): CancelableThenableInterface<MultipartStartResponse> {

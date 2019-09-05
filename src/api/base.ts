@@ -32,8 +32,8 @@ const getRequestOptions = (file: FileData, settings: SettingsInterface): Request
  * Performs file uploading request to Uploadcare Upload API.
  * Can be canceled and has progress.
  *
- * @param {FileData} file
- * @param {SettingsInterface} settings
+ * @param {FileData} file - File to upload.
+ * @param {SettingsInterface} settings - Client settings.
  * @return {BaseThenableInterface<BaseResponse>}
  */
 export default function base(file: FileData, settings: SettingsInterface = {}): BaseThenableInterface<BaseResponse> {

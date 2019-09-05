@@ -120,6 +120,9 @@ export class UploadFromUrl extends UploadFrom {
     }
   }
 
+  /**
+   * Cancel uploading.
+   */
   cancel(): void {
     const {state} = this.getProgress()
 

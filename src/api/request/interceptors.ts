@@ -1,14 +1,23 @@
 import {AxiosInstance} from 'axios'
 
+interface InterceptorConcurrencyParams {
+  instance: AxiosInstance;
+  maxConcurrentRequestsCount: number;
+  intervalToCheckPendingRequestsMs?: number;
+}
+
+/**
+ * This interceptor adds concurrency for requests.
+ *
+ * @param {AxiosInstance} instance - Axios instance.
+ * @param {number} maxConcurrentRequestsCount - Max count of concurrent requests.
+ * @param {number} intervalToCheckPendingRequestsMs - Interval to check pending requests.
+ */
 export const addMaxConcurrencyInterceptorsToAxiosInstance = ({
   instance,
   maxConcurrentRequestsCount,
   intervalToCheckPendingRequestsMs = 10,
-}: {
-  instance: AxiosInstance;
-  maxConcurrentRequestsCount: number;
-  intervalToCheckPendingRequestsMs?: number;
-}): void => {
+}: InterceptorConcurrencyParams): void => {
   let pendingRequestsCount = 0
 
   instance.interceptors.request.use((config) => {

@@ -34,7 +34,7 @@ const getRequestOptions = (uuid: Uuid, settings: SettingsInterface): RequestOpti
  * Returns a JSON dictionary holding file info.
  *
  * @param {Uuid} uuid – UUID of a target file to request its info.
- * @param {SettingsInterface} settings
+ * @param {SettingsInterface} settings - Client settings.
  * @return {CancelableThenableInterface<FileInfoInterface>}
  */
 export default function info(uuid: Uuid, settings: SettingsInterface = {}): CancelableThenableInterface<FileInfoInterface> {

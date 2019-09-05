@@ -6,6 +6,6 @@ describe('API - multipart, getFileSize', () => {
     const fileToUpload = factory.file(11).data
     const fileSize = getFileSize(fileToUpload)
 
-    expect(fileSize).toBe(11000000)
+    expect(fileSize).toBe(11534336)
   })
 })

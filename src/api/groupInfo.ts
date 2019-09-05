@@ -34,7 +34,7 @@ const getRequestOptions = (id: GroupId, settings: SettingsInterface): RequestOpt
  * Get info about group.
  *
  * @param {GroupId} id – Group ID. Group IDs look like UUID~N.
- * @param {SettingsInterface} settings
+ * @param {SettingsInterface} settings - Client settings.
  * @return {CancelableThenableInterface<GroupInfoInterface>}
  */
 export default function groupInfo(id: GroupId, settings: SettingsInterface = {}): CancelableThenableInterface<GroupInfoInterface> {

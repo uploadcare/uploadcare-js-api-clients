@@ -7,8 +7,8 @@ import {SettingsInterface} from '../../types'
 /**
  * Updates options with Uploadcare SettingsInterface.
  *
- * @param {RequestOptionsInterface} options
- * @param {SettingsInterface} settings
+ * @param {RequestOptionsInterface} options - Request options.
+ * @param {SettingsInterface} settings - Client settings.
  * @returns {RequestOptionsInterface}
  */
 export function prepareOptions(options: RequestOptionsInterface, settings: SettingsInterface): RequestOptionsInterface {

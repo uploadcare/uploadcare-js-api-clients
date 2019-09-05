@@ -25,6 +25,9 @@ export class CancelableThenable<T> extends Thenable<T> implements CancelableThen
       })
   }
 
+  /**
+   * Cancel promise.
+   */
   cancel(): void {
     return this.request.cancel()
   }

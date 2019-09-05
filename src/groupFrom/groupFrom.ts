@@ -12,10 +12,10 @@ import {UploadInterface} from '../lifecycle/types'
 /**
  * Uploads file from provided data.
  *
- * @param {FileFromEnum} from
- * @param {FileData} data
- * @param {SettingsInterface} settings
- * @throws Error
+ * @param {FileFromEnum} from - Method of uploading.
+ * @param {FileData} data - Data to upload.
+ * @param {SettingsInterface} settings - Client settings.
+ * @throws TypeError
  * @returns {UploadInterface<UploadcareGroupInterface>}
  */
 export default function groupFrom(from: GroupFromEnum, data: FileData[] | Url[] | Uuid[], settings: SettingsInterface = {}): UploadInterface<UploadcareGroupInterface> {

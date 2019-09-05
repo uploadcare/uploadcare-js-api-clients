@@ -72,6 +72,9 @@ export class UploadFromObject extends UploadFrom {
     return this.handleUploaded(groupInfo)
   }
 
+  /**
+   * Cancel uploading.
+   */
   cancel(): void {
     this.isCancelled = true
   }

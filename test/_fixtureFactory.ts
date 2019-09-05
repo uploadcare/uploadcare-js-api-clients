@@ -86,7 +86,7 @@ function fileBlob(bytes: number): FixtureFile {
 }
 
 export function file(mbSize: number): FixtureFile {
-  const byteLength = mbSize * 1000000
+  const byteLength = mbSize * 1024 * 1024
 
   if (isNode()) {
     return fileBuffer(byteLength)

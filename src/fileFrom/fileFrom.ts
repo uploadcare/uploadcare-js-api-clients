@@ -12,10 +12,10 @@ import {UploadInterface} from '../lifecycle/types'
 /**
  * Uploads file from provided data.
  *
- * @param {FileFromEnum} from
- * @param {FileData} data
- * @param {SettingsInterface} settings
- * @throws Error
+ * @param {FileFromEnum} from - Method of uploading.
+ * @param {FileData} data - Data to upload.
+ * @param {SettingsInterface} settings - Client settings.
+ * @throws TypeError
  * @returns {UploadInterface<UploadcareFileInterface>}
  */
 export default function fileFrom(from: FileFromEnum, data: FileData | Url | Uuid, settings: SettingsInterface = {}): UploadInterface<UploadcareFileInterface> {

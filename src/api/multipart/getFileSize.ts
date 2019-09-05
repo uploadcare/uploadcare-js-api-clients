@@ -6,7 +6,7 @@ import {FileData} from '../../types'
 /**
  * Get file size.
  *
- * @param {FileData} file
+ * @param {FileData} file - File to get size.
  */
 export const getFileSize = (file: FileData): number => {
   return isNode() ?

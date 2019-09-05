@@ -136,9 +136,9 @@ class MultipartUploadPart extends Thenable<MultipartUploadResponse> implements B
 /**
  * Upload part of multipart file.
  *
- * @param {MultipartPart} partUrl
- * @param {FileData} file
- * @param {SettingsInterface} settings
+ * @param {MultipartPart} partUrl - Multipart part (url)
+ * @param {FileData} file - File to upload.
+ * @param {SettingsInterface} settings - Client settings.
  * @return {BaseThenableInterface<MultipartUploadResponse>}
  */
 export default function multipartUploadPart(partUrl: MultipartPart, file: FileData, settings: SettingsInterface = {}): BaseThenableInterface<MultipartUploadResponse> {

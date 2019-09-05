@@ -55,6 +55,9 @@ class Multipart extends Thenable<FileInfoInterface> implements BaseThenableInter
       })
   }
 
+  /**
+   * Cancel uploading.
+   */
   cancel(): void {
     this.request.cancel()
   }
@@ -63,8 +66,8 @@ class Multipart extends Thenable<FileInfoInterface> implements BaseThenableInter
 /**
  * Upload multipart file.
  *
- * @param {FileData} file
- * @param {SettingsInterface} settings
+ * @param {FileData} file - File data to upload.
+ * @param {SettingsInterface} settings - Client settings.
  * @return {BaseThenableInterface<FileInfoInterface>}
  */
 export default function multipart(file: FileData, settings: SettingsInterface = {}): BaseThenableInterface<FileInfoInterface> {

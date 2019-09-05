@@ -67,7 +67,7 @@ const getRequestOptions = (sourceUrl: Url, settings: SettingsInterface): Request
  * Uploading files from URL.
  *
  * @param {Url} sourceUrl – Source file URL, which should be a public HTTP or HTTPS link.
- * @param {SettingsInterface} settings
+ * @param {SettingsInterface} settings - Client settings.
  * @return {CancelableThenableInterface<FromUrlResponse>}
  */
 export default function fromUrl(

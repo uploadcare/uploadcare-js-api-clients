@@ -40,6 +40,9 @@ export class UploadFromUploaded extends UploadFrom {
     return this.handleUploaded(groupInfo)
   }
 
+  /**
+   * Cancel uploading.
+   */
   cancel(): void {
     this.isCancelled = true
   }

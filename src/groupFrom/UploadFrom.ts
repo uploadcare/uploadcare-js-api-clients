@@ -105,6 +105,7 @@ export abstract class UploadFrom extends Thenable<UploadcareGroupInterface> impl
 
   /**
    * Handle file uploading.
+   *
    * @param {ProgressParamsInterface} progress
    */
   protected handleUploading(progress?: ProgressParamsInterface): void {
@@ -117,6 +118,7 @@ export abstract class UploadFrom extends Thenable<UploadcareGroupInterface> impl
 
   /**
    * Handle uploaded file.
+   *
    * @param {GroupInfoInterface} groupInfo
    */
   protected handleUploaded(groupInfo: GroupInfoInterface): Promise<UploadcareGroupInterface> {
@@ -149,10 +151,11 @@ export abstract class UploadFrom extends Thenable<UploadcareGroupInterface> impl
   }
 
   /**
-   * Handle uploading error
-   * @param error
+   * Handle uploading error.
+   *
+   * @param {Error} error
    */
-  protected handleError = (error): Promise<void | Error> => {
+  protected handleError = (error): Promise<Error> => {
     if (error.name === 'CancelError') {
       this.handleCancelling()
     } else {

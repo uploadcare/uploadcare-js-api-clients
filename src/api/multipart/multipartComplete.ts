@@ -24,8 +24,8 @@ const getRequestOptions = (uuid: Uuid, settings: SettingsInterface): RequestOpti
 /**
  * Complete multipart uploading.
  *
- * @param {Uuid} uuid
- * @param {SettingsInterface} settings
+ * @param {Uuid} uuid - File UUID.
+ * @param {SettingsInterface} settings - Client settings.
  * @return {CancelableThenableInterface<FileInfoInterface>}
  */
 export default function multipartComplete(uuid: Uuid, settings: SettingsInterface = {}): CancelableThenableInterface<FileInfoInterface> {

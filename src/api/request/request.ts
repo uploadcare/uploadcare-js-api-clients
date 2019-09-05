@@ -21,6 +21,12 @@ const REQUEST_WAS_THROTTLED_CODE = 429
 
 export const DEFAULT_RETRY_AFTER_TIMEOUT = 15000
 
+/**
+ * Request axios interceptor to check uploading progress in Node.js.
+ *
+ * @param {AxiosRequestConfig} config - Axios request config.
+ * @return {AxiosRequestConfig}
+ */
 const nodeUploadProgress = (config: AxiosRequestConfig): AxiosRequestConfig => {
   const {data, onUploadProgress} = config
   if (!onUploadProgress) {

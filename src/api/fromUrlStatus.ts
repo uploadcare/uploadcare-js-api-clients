@@ -99,7 +99,7 @@ const getRequestOptions = (token: Token, settings: SettingsInterface): RequestOp
  * Checking upload status and working with file tokens.
  *
  * @param {Token} token – Source file URL, which should be a public HTTP or HTTPS link.
- * @param {SettingsInterface} settings
+ * @param {SettingsInterface} settings - Client settings.
  * @throws {UploadcareError}
  * @return {CancelableThenableInterface<FromUrlStatusResponse>}
  */

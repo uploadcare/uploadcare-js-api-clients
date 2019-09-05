@@ -38,7 +38,7 @@ const getRequestOptions = (uuids: Uuid[], settings: SettingsInterface): RequestO
  * Create files group.
  *
  * @param {Uuid[]} uuids – A set of files you want to join in a group.
- * @param {SettingsInterface} settings
+ * @param {SettingsInterface} settings - Client settings.
  * @return {CancelableThenableInterface<GroupInfoInterface>}
  */
 export default function group(uuids: Uuid[], settings: SettingsInterface = {}): CancelableThenableInterface<GroupInfoInterface> {

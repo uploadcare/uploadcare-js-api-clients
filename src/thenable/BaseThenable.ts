@@ -33,6 +33,9 @@ export class BaseThenable<T> extends Thenable<T> implements BaseThenableInterfac
       })
   }
 
+  /**
+   * Cancel promise.
+   */
   cancel(): void {
     return this.request.cancel()
   }
