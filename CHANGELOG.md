@@ -7,7 +7,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
-[Unreleased]: https://github.com/uploadcare/uploadcare-upload-client/compare/v1.0.0-alpha.4...HEAD
+[Unreleased]: https://github.com/uploadcare/uploadcare-upload-client/compare/v1.0.0-alpha.5...HEAD
+
+## [1.0.0-alpha.5]
 
 ### Added
 
@@ -19,6 +21,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 * `pollingTimeoutMilliseconds` to `SettingsInterface`.
 Now you can adjust the timeout for checking file is ready 
 and checking file is uploaded from url.
+* `maxConcurrentRequests` setting that allows you to specify the number 
+of concurrent requests.
 
 ### Changed
 
@@ -40,10 +44,13 @@ and checking file is uploaded from url.
 instead of `DirectUploadInterface`.
 * `info`, `fromUrl`, `fromUrlStatus`, `group`, `groupInfo` now returns 
 `CancelableThenableInterface`.
+* Progress is now calculated from 0 to 1 instead of 0 to 100
 
 ### Fixed
 
 * Example with `directUpload.onProgress` in `README.md`.
+* All tests now passed.
+* Mock server tests are now passed.
 
 ### Removed
 
@@ -51,6 +58,8 @@ instead of `DirectUploadInterface`.
 * `BaseProgress` was removed in favor of native `ProgressEvent`.
 * `InfoResponse` was removed in favor of `FileInfoInterface`.
 * Old code in folder `./.back`.
+
+[1.0.0-alpha.5]: https://github.com/uploadcare/uploadcare-upload-client/compare/v1.0.0-alpha.4...v1.0.0-alpha.5
 
 ## [1.0.0-alpha.4]
 

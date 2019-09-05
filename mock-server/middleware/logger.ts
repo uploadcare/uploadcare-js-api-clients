@@ -44,8 +44,12 @@ const logger = async (ctx, next): Promise<void> => {
   }
 
   if (!isEmptyObject(requestBody)) {
-    console.log('Request Body:')
-    console.log(pretty(requestBody))
+    if (ctx.request.url.match(/\/multipart\/upload/)) {
+      console.log(`Request Body: ${chalk.gray('hidden (because a lot of binary data will be printed)')}`)
+    } else {
+      console.log('Request Body:')
+      console.log(pretty(requestBody))
+    }
   }
 
   if (!isEmptyObject(requestQuery)) {

@@ -8,7 +8,7 @@ import * as multipart from './controllers/multipart'
 export type RouteType = {
   [path: string]: {
     method: string;
-    fn: Function;
+    fn: (ctx: object) => void;
     isProtected: boolean;
     isFake?: boolean;
     description?: string;
@@ -62,6 +62,20 @@ export const ROUTES: RouteType[] = [
       method: 'post',
       fn: multipart.start,
       isProtected: true,
+    }
+  }, {
+    '/multipart/upload/:uuid/original/': {
+      method: 'put',
+      fn: multipart.upload,
+      isProtected: false,
+      isFake: true,
+    }
+  }, {
+    '/multipart/upload/:uuid/original/': {
+      method: 'get',
+      fn: multipart.upload,
+      isProtected: false,
+      isFake: true,
     }
   }, {
     '/multipart/complete': {
