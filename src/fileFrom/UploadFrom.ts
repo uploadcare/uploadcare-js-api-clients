@@ -1,13 +1,19 @@
 import checkFileIsReady from '../checkFileIsReady'
 import prettyFileInfo from '../prettyFileInfo'
 import {Thenable} from '../thenable/Thenable'
+import defaultSettings from '../defaultSettings'
 
 /* Types */
-import {SettingsInterface, UploadcareFileInterface, UploadingProgress, ProgressStateEnum, ProgressParamsInterface} from '../types'
+import {
+  SettingsInterface,
+  UploadcareFileInterface,
+  UploadingProgress,
+  ProgressStateEnum,
+  ProgressParamsInterface
+} from '../types'
 import {FileInfoInterface, Uuid} from '../api/types'
 import {PollPromiseInterface} from '../tools/poll'
 import {UploadInterface} from '../lifecycle/types'
-import defaultSettings from '../defaultSettings'
 
 /**
  * Base abstract `thenable` implementation of `UploadInterface<UploadcareFileInterface>`.
@@ -20,6 +26,9 @@ export abstract class UploadFrom extends Thenable<UploadcareFileInterface> imple
   onReady: ((file: UploadcareFileInterface) => void) | null = null
   onCancel: (() => void) | null = null
 
+  /**
+   * Cancel uploading.
+   */
   abstract cancel(): void
 
   protected abstract readonly promise: Promise<UploadcareFileInterface>
@@ -212,7 +221,7 @@ export abstract class UploadFrom extends Thenable<UploadcareFileInterface> imple
    * @param error
    * @return {Promise<Error>}
    */
-  protected handleError = (error): Promise<Error> => {
+  protected handleError = (error: Error): Promise<Error> => {
     if (error.name === 'CancelError') {
       this.handleCancelling()
     } else {

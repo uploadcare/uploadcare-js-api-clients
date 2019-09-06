@@ -4,17 +4,16 @@ import fileFrom from './fileFrom/fileFrom'
 import groupFrom from './groupFrom/groupFrom'
 
 /* Types */
-import {FileFromEnum} from './fileFrom/types'
 import {
   FileData,
   SettingsInterface,
   UploadcareFileInterface,
   UploadcareGroupInterface,
-  UploadClientInterface
+  UploadClientInterface,
+  UploadFromEnum
 } from './types'
 import {Url} from './api/fromUrl'
 import {UploadAPIInterface, Uuid} from './api/types'
-import {GroupFromEnum,} from './groupFrom/types'
 import {UploadInterface} from './lifecycle/types'
 
 class UploadClient implements UploadClientInterface {
@@ -88,12 +87,12 @@ class UploadClient implements UploadClientInterface {
   /**
    * Upload file.
    *
-   * @param {FileFromEnum} from - Method of uploading.
+   * @param {UploadFromEnum} from - Method of uploading.
    * @param {FileData | Url | Uuid} data - Data to upload.
    * @param {SettingsInterface} settings - Client settings.
    * @return {UploadInterface<UploadcareFileInterface>}
    */
-  fileFrom(from: FileFromEnum, data: FileData | Url | Uuid, settings: SettingsInterface = {}): UploadInterface<UploadcareFileInterface> {
+  fileFrom(from: UploadFromEnum, data: FileData | Url | Uuid, settings: SettingsInterface = {}): UploadInterface<UploadcareFileInterface> {
     return fileFrom(from, data, {
       ...this.settings,
       ...settings,
@@ -103,12 +102,12 @@ class UploadClient implements UploadClientInterface {
   /**
    * Upload group of files.
    *
-   * @param {GroupFromEnum} from - Method of uploading.
+   * @param {UploadFromEnum} from - Method of uploading.
    * @param {FileData[] | Url[] | Uuid[]} data - Data to upload.
    * @param {SettingsInterface} settings - Client settings.
    * @return {UploadInterface<UploadcareGroupInterface>}
    */
-  groupFrom(from: GroupFromEnum, data: FileData[] | Url[] | Uuid[], settings: SettingsInterface = {}): UploadInterface<UploadcareGroupInterface> {
+  groupFrom(from: UploadFromEnum, data: FileData[] | Url[] | Uuid[], settings: SettingsInterface = {}): UploadInterface<UploadcareGroupInterface> {
     return groupFrom(from, data, {
       ...this.settings,
       ...settings,

@@ -14,12 +14,12 @@ import CancelError from '../../errors/CancelError'
 import UploadcareError from '../../errors/UploadcareError'
 import RequestWasThrottledError from '../../errors/RequestWasThrottledError'
 
+/* Utils */
+const REQUEST_WAS_THROTTLED_CODE = 429
+export const DEFAULT_RETRY_AFTER_TIMEOUT = 15000
+
 /* Types */
 import {Query, RequestInterface, RequestOptionsInterface, RequestResponse} from './types'
-
-const REQUEST_WAS_THROTTLED_CODE = 429
-
-export const DEFAULT_RETRY_AFTER_TIMEOUT = 15000
 
 /**
  * Request axios interceptor to check uploading progress in Node.js.
@@ -179,7 +179,7 @@ class Request<T> extends Thenable<RequestResponse<T>> implements RequestInterfac
     throw error
   }
 
-  private handleError = (error: Error): Promise<Error | RequestResponse<T>> => {
+  private handleError = (error: Error): Promise<RequestResponse<T>> => {
     if (error.name === 'RequestWasThrottledError'
       && (this.throttledTimes <= this.retryThrottledMaxTimes)
     ) {
@@ -236,6 +236,9 @@ class Request<T> extends Thenable<RequestResponse<T>> implements RequestInterfac
     return headers['x-throttle-wait-seconds'] * 1000 || null
   }
 
+  /**
+   * Cancel request.
+   */
   cancel = (): void => this.cancelController.cancel()
 }
 

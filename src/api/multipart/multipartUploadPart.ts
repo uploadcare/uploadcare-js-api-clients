@@ -128,6 +128,9 @@ class MultipartUploadPart extends Thenable<MultipartUploadResponse> implements B
       })
   }
 
+  /**
+   * Cancel uploading.
+   */
   cancel(): void {
     return this.cancelController.cancel()
   }

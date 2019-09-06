@@ -3,28 +3,29 @@ import {UploadFromUrl} from './UploadFromUrl'
 import {UploadFromUploaded} from './UploadFromUploaded'
 
 /* Types */
-import {FileData, SettingsInterface, UploadcareFileInterface} from '../types'
+import {FileData, SettingsInterface, UploadcareFileInterface, UploadFromEnum} from '../types'
 import {Url} from '../api/fromUrl'
 import {Uuid} from '../api/types'
-import {FileFromEnum} from './types'
 import {UploadInterface} from '../lifecycle/types'
 
 /**
  * Uploads file from provided data.
  *
- * @param {FileFromEnum} from - Method of uploading.
+ * @param {UploadFromEnum} from - Method of uploading.
  * @param {FileData} data - Data to upload.
  * @param {SettingsInterface} settings - Client settings.
  * @throws TypeError
  * @returns {UploadInterface<UploadcareFileInterface>}
  */
-export default function fileFrom(from: FileFromEnum, data: FileData | Url | Uuid, settings: SettingsInterface = {}): UploadInterface<UploadcareFileInterface> {
+export default function fileFrom(
+  from: UploadFromEnum, data: FileData | Url | Uuid, settings: SettingsInterface = {}
+): UploadInterface<UploadcareFileInterface> {
   switch (from) {
-    case FileFromEnum.Object:
+    case UploadFromEnum.Object:
       return new UploadFromObject(data as FileData, settings)
-    case FileFromEnum.URL:
+    case UploadFromEnum.URL:
       return new UploadFromUrl(data as Url, settings)
-    case FileFromEnum.Uploaded:
+    case UploadFromEnum.Uploaded:
       return new UploadFromUploaded(data as Uuid, settings)
     default:
       throw new TypeError(`File uploading from "${from}" is not supported`)

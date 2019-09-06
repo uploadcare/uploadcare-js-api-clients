@@ -1,8 +1,13 @@
 import {FileInfoInterface, GeoLocationInterface, GroupId, Uuid} from './api/types'
-import {FileFromEnum} from './fileFrom/types'
 import {Url} from './api/fromUrl'
 import {UploadInterface} from './lifecycle/types'
-import {GroupFromEnum} from './groupFrom/types'
+
+export enum UploadFromEnum {
+  Object = 'object',
+  URL = 'url',
+  DOM = 'input',
+  Uploaded = 'uploaded',
+}
 
 export interface UploadClientInterface {
   /**
@@ -45,17 +50,17 @@ export interface UploadClientInterface {
    * @param {SettingsInterface} settings - Client settings.
    * @return {UploadInterface<UploadcareFileInterface>}
    */
-  fileFrom(from: FileFromEnum, data: FileData | Url | Uuid, settings?: SettingsInterface): UploadInterface<UploadcareFileInterface>;
+  fileFrom(from: UploadFromEnum, data: FileData | Url | Uuid, settings?: SettingsInterface): UploadInterface<UploadcareFileInterface>;
 
   /**
    * Upload group of files.
    *
-   * @param {GroupFromEnum} from - Method of uploading.
+   * @param {UploadFromEnum} from - Method of uploading.
    * @param {FileData[] | Url[] | Uuid[]} data - Data to upload.
    * @param {SettingsInterface} settings - Client settings.
    * @return {UploadInterface<UploadcareGroupInterface>}
    */
-  groupFrom(from: GroupFromEnum, data: FileData[] | Url[] | Uuid[], settings?: SettingsInterface): UploadInterface<UploadcareGroupInterface>;
+  groupFrom(from: UploadFromEnum, data: FileData[] | Url[] | Uuid[], settings?: SettingsInterface): UploadInterface<UploadcareGroupInterface>;
 }
 
 export interface SettingsInterface {

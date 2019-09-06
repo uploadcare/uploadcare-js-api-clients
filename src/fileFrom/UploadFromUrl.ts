@@ -47,12 +47,14 @@ export class UploadFromUrl extends UploadFrom {
       const {token} = response
 
       return fromUrlStatus(token, this.settings)
-        .then(response => this.handleFromUrlStatusResponse(token, response) )
+        .then(response => this.handleFromUrlStatusResponse(token, response))
         .catch(this.handleError)
     } else if (isFileInfoResponse(response)) {
       const {uuid} = response
 
       return this.handleUploaded(uuid, this.settings)
+    } else {
+      throw new Error(`Response type "${response}" is unknown`)
     }
   }
 
