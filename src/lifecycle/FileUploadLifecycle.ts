@@ -46,7 +46,7 @@ export class FileUploadLifecycle implements FileUploadLifecycleInterface {
 
         return Promise.resolve(this.lifecycle.getEntity())
       })
-      .catch(error => Promise.reject(error))
+      .catch(this.lifecycle.handleError)
   }
 
   getUploadLifecycle(): LifecycleInterface<UploadcareFileInterface> {

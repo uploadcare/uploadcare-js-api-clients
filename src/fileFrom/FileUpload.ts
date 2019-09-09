@@ -28,6 +28,9 @@ export class FileUpload extends Thenable<UploadcareFileInterface> implements Upl
     this.promise = handler.upload()
   }
 
+  /**
+   * Cancel uploading.
+   */
   cancel(): void {
     this.cancelable.cancel()
   }
