@@ -17,6 +17,11 @@ Library for work with Uploadcare [Upload API][uc-docs-upload-api] in Node.js and
 
 * [Install](#install)
 * [Usage](#usage)
+* [Usage](#usage)
+ * [High Level API](#high-level-api)
+ * [Middle Level API](#middle-level-api)
+ * [Low Level API](#low-level-api)
+ * [Settings](#settings)
 * [Testing](#testing)
 * [Security issues](#security-issues)
 * [Feedback](#feedback)
@@ -154,6 +159,46 @@ const client = new UploadClient({publicKey: 'YOUR_PUBLIC_KEY'})
 client.api.request({path: 'info', query})
   .then(response => console.log(response.data))
 ```
+
+### Settings
+
+#### baseCDN?: string
+
+#### baseURL?: string
+
+#### publicKey?: string | null
+
+#### fileName?: string
+
+#### doNotStore?: boolean
+
+#### secureSignature?: string
+
+#### secureExpire?: string
+
+#### integration?: string
+
+#### checkForUrlDuplicates?: boolean
+
+#### saveUrlForRecurrentUploads?: boolean
+
+#### source?: string
+
+#### jsonpCallback?: string
+
+#### pollingTimeoutMilliseconds?: number
+
+#### maxContentLength?: number
+
+#### retryThrottledRequestMaxTimes?: number
+
+#### multipartChunkSize?: number
+
+#### multipartMinFileSize?: number
+
+#### multipartMinLastPartSize?: number
+
+#### maxConcurrentRequests?: number
 
 ## Testing 
 
