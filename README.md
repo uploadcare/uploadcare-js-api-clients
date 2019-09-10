@@ -31,35 +31,128 @@ npm install @uploadcare/upload-client --save
 
 ## Usage
 
+### High Level API
+
+To get access to High Level API you need to create 
+an instance of `UploadClient` and provide settings to him:
+
 ```javascript
 import UploadClient from '@uploadcare/upload-client'
 import {FileFromEnum} from '@uploadcare/upload-client'
 
 const client = new UploadClient({publicKey: 'YOUR_PUBLIC_KEY'})
+```
 
-client.api.request({path: 'info', query})
-  .then(response => console.log(response.data))
+After that you can upload file from binary data:
 
-client.api.info(uuid)
-  .then(data => console.log(data.is_image))
+```javascript
+const fileUpload = client.fileFrom(FileFromEnum.Object, fileData)
+```
 
-const directUpload = client.api.base(fileData)
+Or from URL with file:
+
+```javascript
+const fileURL = 'https://example.com/file.jpg'
+const fileUpload = client.fileFrom(FileFromEnum.URL, fileURL)
+```
+
+Or even from `uploaded` before to Uploadcare file:
+```javascript
+const fileUUID = ''
+const fileUpload = client.fileFrom(FileFromEnum.Uploaded, fileUUID)
+
+fileUpload
+  .then(file => console.log(file.uuid))
+```
+
+You can track uploading progress:
+```javascript
+fileUpload.onProgress = (progress => {
+  console.log(progress.state)
+  console.log(progress.uploaded.loaded / progress.uploaded.total)
+  console.log(progress.value)
+})
+```
+
+Or set callback function that will be called when file was uploaded:
+```javascript
+fileUpload.onUploaded = (uuid => console.log(`File "${uuid}" was uploaded.`))
+```
+
+Or when file is ready on CDN:
+```javascript
+fileUpload.onReady = (file => console.log(`File "${file.uuid}" is ready on CDN.`))
+```
+
+You can cancel file uploading and track this event:
+```javascript
+// Set callback
+fileUpload.onCancel = (() => console.log(`File uploading was canceled.`))
+
+// Cancel uploading
+fileUpload.cancel()
+```
+
+### Middle Level API
+
+Also, you can use wrappers around low level to call the API endpoints:
+
+```javascript
+import UploadClient from '@uploadcare/upload-client'
+
+const client = new UploadClient({publicKey: 'YOUR_PUBLIC_KEY'})
+const api = client.api
+const directUpload = api.base(fileData) // fileData must be `Blob` or `File` or `Buffer`
 
 directUpload
   .then(data => console.log(data.file))
 
 directUpload.onProgress = (progressEvent) => console.log(progressEvent.loaded / progressEvent.total)
 
-const fileUpload = client.fileFrom(FileFromEnum.Object, fileData)
+// Also you can cancel upload:
+directUpload.cancel()
 
-fileUpload
-  .then(file => console.log(file.uuid))
+// and set callback to track cancel event:
+directUpload.onCancel = () => console.log('File upload was canceled.') 
+```
 
-fileUpload.onProgress = (progress => {
-  console.log(progress.state)
-  console.log(progress.uploaded.loaded / progress.uploaded.total)
-  console.log(progress.value)
-})
+List of all available low level API methods:
+
+```javascript
+interface UploadAPIInterface {
+  request(options: RequestOptionsInterface): Promise<RequestResponse>
+
+  base(data: FileData, settings?: SettingsInterface): BaseThenableInterface<BaseResponse>
+
+  info(uuid: Uuid, settings?: SettingsInterface): CancelableThenableInterface<FileInfoInterface>
+
+  fromUrl(sourceUrl: Url, settings?: SettingsInterface): CancelableThenableInterface<FromUrlResponse>
+
+  fromUrlStatus(token: Token, settings?: SettingsInterface): CancelableThenableInterface<FromUrlStatusResponse>
+
+  group(files: Uuid[], settings: SettingsInterface): CancelableThenableInterface<GroupInfoInterface>
+
+  groupInfo(id: GroupId, settings: SettingsInterface): CancelableThenableInterface<GroupInfoInterface>
+
+  multipartStart(file: FileData, settings: SettingsInterface): CancelableThenableInterface<MultipartStartResponse>
+
+  multipartUpload(file: FileData, parts: MultipartPart[], settings: SettingsInterface): BaseThenableInterface<any>
+
+  multipartComplete(uuid: Uuid, settings: SettingsInterface): CancelableThenableInterface<FileInfoInterface>
+}
+```
+
+### Low Level API
+
+If you want to use our low level API, you can do that something like this:
+
+```javascript
+import UploadClient from '@uploadcare/upload-client'
+
+const client = new UploadClient({publicKey: 'YOUR_PUBLIC_KEY'})
+
+client.api.request({path: 'info', query})
+  .then(response => console.log(response.data))
 ```
 
 ## Testing 
