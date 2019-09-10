@@ -123,7 +123,7 @@ directUpload.onCancel = () => console.log('File upload was canceled.')
 
 List of all available low level API methods:
 
-```javascript
+```typescript
 interface UploadAPIInterface {
   request(options: RequestOptionsInterface): Promise<RequestResponse>
 
