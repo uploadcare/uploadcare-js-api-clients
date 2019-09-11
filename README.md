@@ -1,13 +1,9 @@
 # Uploadcare Upload Client
 
 <a href="https://uploadcare.com/?utm_source=github&utm_campaign=uploadcare-upload-client">
-  <div style="box-sizing: border-box;
-    min-width: 0;
-    margin-left: 8px;
-    width: 64px;
-    height: 64px;
-    background: radial-gradient(27.35px at 117.86% 50%, rgb(255, 199, 0) 0%, rgb(255, 237, 171) 100%);
-    border-radius: 18px;"></div>
+    <img align="right" width="64" height="64"
+      src="https://ucarecdn.com/edfdf045-34c0-4087-bbdd-e3834921f890/userpiccircletransparent.svg"
+      alt="">
 </a>
 
 Library for work with Uploadcare [Upload API][uc-docs-upload-api] in Node.js and browsers.
