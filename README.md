@@ -52,6 +52,9 @@ After that you can upload file from binary data:
 
 ```javascript
 const fileUpload = client.fileFrom(FileFromEnum.Object, fileData)
+
+fileUpload
+  .then(file => console.log(file.uuid))
 ```
 
 Or from URL with file:
@@ -59,6 +62,9 @@ Or from URL with file:
 ```javascript
 const fileURL = 'https://example.com/file.jpg'
 const fileUpload = client.fileFrom(FileFromEnum.URL, fileURL)
+
+fileUpload
+  .then(file => console.log(file.uuid))
 ```
 
 Or even from `uploaded` before to Uploadcare file:
