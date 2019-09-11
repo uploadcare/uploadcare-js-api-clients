@@ -63,7 +63,7 @@ const fileUpload = client.fileFrom(FileFromEnum.URL, fileURL)
 
 Or even from `uploaded` before to Uploadcare file:
 ```javascript
-const fileUUID = ''
+const fileUUID = 'edfdf045-34c0-4087-bbdd-e3834921f890'
 const fileUpload = client.fileFrom(FileFromEnum.Uploaded, fileUUID)
 
 fileUpload
