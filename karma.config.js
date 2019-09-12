@@ -39,7 +39,7 @@ module.exports = function(config) {
       },
       compilerOptions: {
         target: 'es5',
-        lib: ['es2015', 'dom'],
+        lib: ['es2015', 'dom', 'es2018.promise'],
         strict: true,
         resolveJsonModule: true,
         noImplicitAny: false,
