@@ -6,7 +6,7 @@ describe('API - multipart', () => {
   it('should be able to upload multipart file', async() => {
     const fileToUpload = factory.file(11).data
     const settings = getSettingsForTesting({
-      publicKey: factory.publicKey('demo'),
+      publicKey: factory.publicKey('image'),
     })
     const {uuid} = await multipart(fileToUpload, settings)
 
@@ -16,7 +16,7 @@ describe('API - multipart', () => {
   it('should be able to cancel uploading', async(done) => {
     const fileToUpload = factory.file(11).data
     const settings = getSettingsForTesting({
-      publicKey: factory.publicKey('demo'),
+      publicKey: factory.publicKey('image'),
     })
     const upload = multipart(fileToUpload, settings)
 
@@ -32,7 +32,7 @@ describe('API - multipart', () => {
   it('should be able to handle cancel uploading', async (done) => {
     const fileToUpload = factory.file(11).data
     const settings = getSettingsForTesting({
-      publicKey: factory.publicKey('demo'),
+      publicKey: factory.publicKey('image'),
     })
     const upload = multipart(fileToUpload, settings)
 
@@ -57,7 +57,7 @@ describe('API - multipart', () => {
     let progressValue = 0
     const fileToUpload = factory.file(11).data
     const settings = getSettingsForTesting({
-      publicKey: factory.publicKey('demo'),
+      publicKey: factory.publicKey('image'),
     })
     const upload = multipart(fileToUpload, settings)
 

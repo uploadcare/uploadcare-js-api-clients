@@ -9,7 +9,7 @@ describe('fileFrom', () => {
 
     it('should resolves when file is ready on CDN', (done) => {
       const settings = getSettingsForTesting({
-        publicKey: factory.publicKey('demo'),
+        publicKey: factory.publicKey('image'),
       })
       const filePromise = fileFrom(FileFromEnum.Object, fileToUpload.data, settings)
 
@@ -22,7 +22,7 @@ describe('fileFrom', () => {
 
     it('should accept doNotStore setting', async() => {
       const settings = getSettingsForTesting({
-        publicKey: factory.publicKey('demo'),
+        publicKey: factory.publicKey('image'),
         doNotStore: true,
       })
       const filePromise = fileFrom(FileFromEnum.Object, fileToUpload.data, settings)
@@ -33,7 +33,7 @@ describe('fileFrom', () => {
 
     it('should be able to cancel uploading', (done) => {
       const settings = getSettingsForTesting({
-        publicKey: factory.publicKey('demo'),
+        publicKey: factory.publicKey('image'),
       })
       const filePromise = fileFrom(FileFromEnum.Object, fileToUpload.data, settings)
 
@@ -48,7 +48,7 @@ describe('fileFrom', () => {
 
     it('should accept new file name setting', async() => {
       const settings = getSettingsForTesting({
-        publicKey: factory.publicKey('demo'),
+        publicKey: factory.publicKey('image'),
         doNotStore: true,
         fileName: 'newFileName.jpg',
       })
@@ -61,7 +61,7 @@ describe('fileFrom', () => {
     describe('should be able to handle', () => {
       it('cancel uploading', (done) => {
         const settings = getSettingsForTesting({
-          publicKey: factory.publicKey('demo'),
+          publicKey: factory.publicKey('image'),
         })
         const filePromise = fileFrom(FileFromEnum.Object, fileToUpload.data, settings)
 
@@ -85,7 +85,7 @@ describe('fileFrom', () => {
       it('progress', (done) => {
         let progressValue = 0
         const settings = getSettingsForTesting({
-          publicKey: factory.publicKey('demo'),
+          publicKey: factory.publicKey('image'),
         })
         const filePromise = fileFrom(FileFromEnum.Object, fileToUpload.data, settings)
 
@@ -106,7 +106,7 @@ describe('fileFrom', () => {
 
       it('uploaded', (done) => {
         const settings = getSettingsForTesting({
-          publicKey: factory.publicKey('demo'),
+          publicKey: factory.publicKey('image'),
         })
         const filePromise = fileFrom(FileFromEnum.Object, fileToUpload.data, settings)
 
@@ -120,7 +120,7 @@ describe('fileFrom', () => {
 
       it('ready', (done) => {
         const settings = getSettingsForTesting({
-          publicKey: factory.publicKey('demo'),
+          publicKey: factory.publicKey('image'),
         })
         const filePromise = fileFrom(FileFromEnum.Object, fileToUpload.data, settings)
 

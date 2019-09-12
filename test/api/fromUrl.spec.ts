@@ -17,18 +17,6 @@ describe('API - from url', () => {
     }
   })
 
-  it('should return file info', async() => {
-    const sourceUrl = factory.imageUrl('valid')
-    const settings = getSettingsForTesting({
-      publicKey: factory.publicKey('image'),
-      checkForUrlDuplicates: true,
-      saveUrlForRecurrentUploads: true,
-    })
-    const data = await fromUrl(sourceUrl, settings)
-
-    expect(data.type).toEqual(TypeEnum.FileInfo)
-  })
-
   it('should be rejected with bad options', (done) => {
     const sourceUrl = factory.imageUrl('valid')
     const settings = getSettingsForTesting({

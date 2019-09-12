@@ -1,8 +1,9 @@
 import request from '../../src/api/request/request'
 import {buildFormData} from '../../src/api/request/buildFormData'
 import * as factory from '../_fixtureFactory'
-import axios from 'axios'
 import {getSettingsForTesting, sleep} from '../_helpers'
+import RequestWasThrottledError from '../../src/errors/RequestWasThrottledError'
+import RequestError from '../../src/errors/RequestError'
 
 describe('buildFormData', () => {
   it('should return FormData with nice input object', () => {
@@ -59,10 +60,10 @@ describe('API – request', () => {
       expect(typeof result.data.file).toBe('string')
     })
 
-    it('if request was throttled and max retries 1', (done) => {
+    it('if request was throttled and max retries 1', async() => {
       // Run this case only in dev mode
       if (process.env.NODE_ENV === 'production') {
-        done()
+        return Promise.resolve()
       }
 
       const options = {
@@ -72,45 +73,42 @@ describe('API – request', () => {
         query: {pub_key: factory.publicKey('demo')},
       }
 
-      request(options)
-        .then(done)
+      await expectAsync(request(options)).toBeResolved()
     }, 20000)
   })
 
   describe('should be rejected', () => {
     /* Wait to bypass the requests limits */
-    beforeAll((done) => {
-      sleep(1000).then(() => done())
-    })
+    beforeEach(() => sleep(1000))
 
-    it('if Uploadcare returns error', (done) => {
+    it('if Uploadcare returns error', async(done) => {
       const options = {
         baseURL: settings.baseURL,
         path: '/info/',
         query: {pub_key: factory.publicKey('image')},
       }
 
-      request(options)
+      await request(options)
         .then(() => done.fail('Promise should not to be resolved'))
         .catch((error) => error.name === 'UploadcareError' ? done() : done.fail(error))
     })
 
-    it('on connection error', async() => {
-      const interceptor = axios.interceptors.response.use(() => Promise.reject('error'))
-      const options = {
-        baseURL: settings.baseURL,
-        path: '/info/',
-        query: {
-          pub_key: factory.publicKey('image'),
-          file_id: factory.uuid('image'),
-        },
-      }
-      const requestWithOptions = request(options)
+    // it('on connection error', async() => {
+    //   const interceptor = axios.interceptors.response.use(() => Promise.reject('error'))
+    //   const options = {
+    //     baseURL: settings.baseURL,
+    //     path: '/info/',
+    //     query: {
+    //       pub_key: factory.publicKey('image'),
+    //       file_id: factory.uuid('image'),
+    //     },
+    //   }
+    //   const requestWithOptions = request(options)
 
-      await expectAsync(requestWithOptions).toBeRejected()
+    //   await expectAsync(requestWithOptions).toBeRejected()
 
-      axios.interceptors.response.eject(interceptor)
-    })
+    //   axios.interceptors.response.eject(interceptor)
+    // })
 
     it('if promise canceled', (done) => {
       const options = {
@@ -134,10 +132,10 @@ describe('API – request', () => {
       requestWithOptions.cancel()
     })
 
-    it('if request was throttled and max retries 0', (done) => {
+    it('if request was throttled and max retries 0', async() => {
       // Run this case only in dev mode
       if (process.env.NODE_ENV === 'production') {
-        done()
+        return Promise.resolve()
       }
 
       const options = {
@@ -148,9 +146,26 @@ describe('API – request', () => {
         retryThrottledMaxTimes: 0,
       }
 
-      request(options)
-        .then(() => done.fail('Promise should not to be resolved'))
-        .catch((error) => error.name === 'RequestWasThrottledError' ? done() : done.fail(error))
+      const errorRequest = {
+        headers: {
+          "accept": "application/json, text/plain, */*",
+          "content-type": "application/x-www-form-urlencoded",
+          "x-uc-user-agent": "UploadcareUploadClient/1.0.0-alpha.4 (JavaScript)",
+          "user-agent": "axios/0.19.0",
+          "host": "localhost:3000",
+          "connection": "close",
+          "content-length": "0"
+        },
+        url: 'http://localhost:3000/throttle',
+      }
+      const errorResponse = {
+        status: 429,
+        statusText: 'Request was throttled.',
+      }
+      const requestError = new RequestError(errorRequest, errorResponse)
+      const error = new RequestWasThrottledError(requestError, options.retryThrottledMaxTimes)
+
+      await expectAsync(request(options)).toBeRejectedWith(error)
     }, 20000)
   })
 })
