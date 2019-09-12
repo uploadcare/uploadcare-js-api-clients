@@ -32,7 +32,7 @@ describe('checkFileIsReady', () => {
       polling.cancel()
     }, 1)
 
-    polling
+    await polling
       .then(() => done.fail('Promise should not to be resolved'))
       .catch((error) => {
         if (error.name === 'CancelError') {

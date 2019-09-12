@@ -6,6 +6,7 @@ import {isNode} from '../../tools/isNode'
 import {buildFormData} from './buildFormData'
 import {delay} from './delay'
 import defaultSettings, {getUserAgent} from '../../defaultSettings'
+import {addMaxConcurrencyInterceptorsToAxiosInstance} from './interceptors'
 
 import RequestError from '../../errors/RequestError'
 import CancelError from '../../errors/CancelError'
@@ -52,7 +53,11 @@ class Request extends Thenable<RequestResponse> implements RequestInterface {
     super()
 
     this.options = options
-    this.retryThrottledMaxTimes = options.retryThrottledMaxTimes || defaultSettings.retryThrottledRequestMaxTimes
+    if (typeof options.retryThrottledMaxTimes !== 'undefined' && options.retryThrottledMaxTimes >= 0) {
+      this.retryThrottledMaxTimes = options.retryThrottledMaxTimes
+    } else {
+      this.retryThrottledMaxTimes = defaultSettings.retryThrottledRequestMaxTimes
+    }
     this.cancelController = axios.CancelToken.source()
     this.promise = this.getRequestPromise()
   }
@@ -60,6 +65,9 @@ class Request extends Thenable<RequestResponse> implements RequestInterface {
   private getRequestPromise() {
     const options = this.getRequestOptions()
     const instance = axios.create()
+    const maxConcurrentRequestsCount = this.options.maxConcurrentRequests || defaultSettings.maxConcurrentRequests
+
+    addMaxConcurrencyInterceptorsToAxiosInstance({instance, maxConcurrentRequestsCount})
 
     if (isNode()) {
       instance.interceptors.request.use(nodeUploadProgress,

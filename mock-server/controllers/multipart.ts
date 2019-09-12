@@ -36,6 +36,14 @@ const start = (ctx) => {
 }
 
 /**
+ * '/multipart/upload/'
+ * @param {object} ctx
+ */
+const upload = (ctx) => {
+  return ctx.status = 200
+}
+
+/**
  * '/multipart/complete/'
  * @param {object} ctx
  */
@@ -51,5 +59,6 @@ const complete = (ctx) => {
 
 export {
   start,
+  upload,
   complete,
 }

@@ -7,6 +7,7 @@ import defaultSettings from '../../defaultSettings'
 import {isNode} from '../../tools/isNode'
 import CancelError from '../../errors/CancelError'
 import RequestError from '../../errors/RequestError'
+import {addMaxConcurrencyInterceptorsToAxiosInstance} from '../request/interceptors'
 
 /* Types */
 import {FileData, SettingsInterface} from '../../types'
@@ -77,6 +78,9 @@ class MultipartUploadPart extends Thenable<MultipartUploadResponse> implements B
     }
 
     const instance = axios.create()
+    const maxConcurrentRequestsCount = settings.maxConcurrentRequests || defaultSettings.maxConcurrentRequests
+
+    addMaxConcurrencyInterceptorsToAxiosInstance({instance, maxConcurrentRequestsCount})
 
     if (isNode()) {
       instance.interceptors.request.use(nodeUploadProgressRequestInterceptor,

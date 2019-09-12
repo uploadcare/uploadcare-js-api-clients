@@ -13,11 +13,13 @@ export interface SettingsInterface {
   saveUrlForRecurrentUploads?: boolean,
   source?: string,
   jsonpCallback?: string,
+  pollingTimeoutMilliseconds?: number,
   maxContentLength?: number,
   retryThrottledRequestMaxTimes?: number,
   multipartChunkSize?: number,
   multipartMinFileSize?: number,
   multipartMinLastPartSize?: number,
+  maxConcurrentRequests?: number,
 }
 
 export interface DefaultSettingsInterface extends SettingsInterface {
@@ -29,6 +31,8 @@ export interface DefaultSettingsInterface extends SettingsInterface {
   multipartMinFileSize: number,
   multipartChunkSize: number,
   multipartMinLastPartSize: number,
+  maxConcurrentRequests: number,
+  pollingTimeoutMilliseconds: number,
 }
 
 export type FileData = Blob | File | Buffer

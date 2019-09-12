@@ -25,5 +25,13 @@ export function prepareOptions(options: RequestOptionsInterface, settings: Setti
     }
   }
 
+  if (settings.maxConcurrentRequests) {
+    newOptions.maxConcurrentRequests = settings.maxConcurrentRequests
+  }
+
+  if (settings.retryThrottledRequestMaxTimes) {
+    newOptions.retryThrottledMaxTimes = settings.retryThrottledRequestMaxTimes
+  }
+
   return newOptions
 }

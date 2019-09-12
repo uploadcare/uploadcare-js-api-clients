@@ -60,7 +60,7 @@ describe('fileFrom', () => {
 
     it('should be able to upload big files (multipart)', (done) => {
       const settings = getSettingsForTesting({
-        publicKey: factory.publicKey('demo'),
+        publicKey: factory.publicKey('image'),
       })
       const bigFileToUpload = factory.file(11).data
       const filePromise = fileFrom(FileFromEnum.Object, bigFileToUpload, settings)
@@ -111,7 +111,7 @@ describe('fileFrom', () => {
 
         filePromise
           .then(() =>
-            progressValue > 0
+            progressValue > 0 && progressValue <= 1
               ? done()
               : done.fail()
           )

@@ -1,3 +1,4 @@
+/* Types */
 import {ChunkType} from './types'
 
 /**
