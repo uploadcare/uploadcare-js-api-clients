@@ -168,43 +168,122 @@ client.api.request({path: 'info', query})
 
 ### Settings
 
-#### baseCDN?: string
+#### publicKey: string
 
-#### baseURL?: string
+The main use of a `publicKey` is to identify a target project for your uploads. 
+It is required when using Upload API.
 
-#### publicKey?: string | null
+#### baseCDN: string
 
-#### fileName?: string
+Defines your schema and CDN domain. Can be changed to one of 
+the predefined values or your custom CNAME. 
 
-#### doNotStore?: boolean
+Defaults to `https://ucarecdn.com/`.
 
-#### secureSignature?: string
+#### baseURL: string
 
-#### secureExpire?: string
+API base URL. 
 
-#### integration?: string
+Defaults to `https://upload.uploadcare.com`
 
-#### checkForUrlDuplicates?: boolean
+#### fileName: string
 
-#### saveUrlForRecurrentUploads?: boolean
+You can specify an original filename. 
 
-#### source?: string
+Defaults to `original`.
 
-#### jsonpCallback?: string
+#### doNotStore: boolean
 
-#### pollingTimeoutMilliseconds?: number
+Forces files uploaded with a widget not to be stored. 
+For instance, you might want to turn this on when automatic file storing 
+is enabled in your project, but you do not want to store files uploaded 
+with a particular instance.
 
-#### maxContentLength?: number
+#### secureSignature: string
 
-#### retryThrottledRequestMaxTimes?: number
+In case you enable signed uploads for your project, you’d need to provide 
+the client with signature and expire. 
 
-#### multipartChunkSize?: number
+The `secureSignature` is an MD5 hex-encoded hash from a concatenation 
+of `API secret key` and `secureExpire`.
 
-#### multipartMinFileSize?: number
+#### secureExpire: string
 
-#### multipartMinLastPartSize?: number
+Stands for the Unix time to which the signature is valid, e.g., `1454902434`.
 
-#### maxConcurrentRequests?: number
+#### integration: string
+
+`X-UC-User-Agent` header value.
+
+Defaults to `UploadcareUploadClient/${version}${publicKey} (JavaScript${integration})`
+
+#### checkForUrlDuplicates: boolean
+
+Runs the duplicate check and provides the immediate-download behavior.
+
+#### saveUrlForRecurrentUploads: boolean
+
+Provides the save/update URL behavior. The parameter can be used 
+if you believe a `sourceUrl` will be used more than once. 
+Using the parameter also updates an existing reference with a new 
+`sourceUrl` content.
+
+#### source: string
+
+Upload source. Each upload method has its own (as example: `local`, `url`, etc.)
+
+#### jsonpCallback: string
+
+Sets the name of your JSONP callback function to create files group from 
+a set of files by using their UUIDs.
+
+#### pollingTimeoutMilliseconds: number
+
+Internally upload client using polling to ensure that file is available on CDN 
+or its uploaded from url.
+
+Defaults to `10000` milliseconds (10 seconds).
+
+#### maxContentLength: number
+
+`maxContentLength` defines the max size of the http response content 
+in bytes allowed. 
+
+Defaults to `52428800` bytes (50 MB).
+
+#### retryThrottledRequestMaxTimes: number
+
+Sets the maximum number of attempts to retry throttled request.
+
+Defaults to `1`.
+
+#### multipartChunkSize: number
+
+This option is only applicable when handling local files.
+Sets the multipart chunk size. 
+
+Defaults to `5242880` bytes (5 MB).
+
+#### multipartMinFileSize: number
+
+This option is only applicable when handling local files. 
+Sets the multipart uploading file size threshold. 
+The value is limited to the range from `10485760` (10 MB) to `104857600` (100 MB). 
+
+Defaults to `26214400` (25 MB).
+
+#### multipartMinLastPartSize: number
+
+This option is only applicable when handling local files.
+Set the minimum size of the last multipart part.
+
+Defaults to `1048576` bytes (1 MB).
+
+#### maxConcurrentRequests: number
+
+Setting that allows you to specify the number of concurrent requests.
+
+Defaults to `4`.
 
 ## Testing 
 
