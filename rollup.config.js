@@ -46,6 +46,7 @@ const getConfig = (format, minify = false) => ({
       format,
       name: 'uploadcareAPI',
       interop: false,
+      exports: 'named',
     },
   ],
 })
