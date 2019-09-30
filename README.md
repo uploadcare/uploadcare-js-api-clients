@@ -6,7 +6,7 @@
       alt="">
 </a>
 
-Library for work with Uploadcare [Upload API][uc-docs-upload-api] in Node.js and browsers.
+This is an Uploadcare [Upload API][uc-docs-upload-api] wrapper to work with Node.js and browser.
 
 [![Build Status](https://travis-ci.org/uploadcare/uploadcare-upload-client.svg?branch=master)](https://travis-ci.org/uploadcare/uploadcare-upload-client)
 [![NPM version][npm-img]][npm-url]
@@ -18,9 +18,9 @@ Library for work with Uploadcare [Upload API][uc-docs-upload-api] in Node.js and
 * [Install](#install)
 * [Usage](#usage)
 * [Usage](#usage)
- * [High Level API](#high-level-api)
- * [Middle Level API](#middle-level-api)
- * [Low Level API](#low-level-api)
+ * [High-Level API](#high-level-api)
+ * [Middle-Level API](#middle-level-api)
+ * [Low-Level API](#low-level-api)
  * [Settings](#settings)
 * [Testing](#testing)
 * [Security issues](#security-issues)
@@ -36,10 +36,12 @@ npm install @uploadcare/upload-client --save
 
 ## Usage
 
-### High Level API
+### High-Level API
 
-To get access to High Level API you need to create 
-an instance of `UploadClient` and provide settings to him:
+To access the High-Level API, you need to create an instance 
+of `UploadClient` providing the necessary settings. 
+Specifying `YOUR_PUBLIC_KEY` is mandatory: it points to the specific 
+Uploadcare project:
 
 ```javascript
 import UploadClient from '@uploadcare/upload-client'
@@ -48,7 +50,8 @@ import {FileFromEnum} from '@uploadcare/upload-client'
 const client = new UploadClient({publicKey: 'YOUR_PUBLIC_KEY'})
 ```
 
-After that you can upload file from binary data:
+Once the UploadClient instance is created, you can start using 
+the wrapper to upload files from binary data:
 
 ```javascript
 const fileUpload = client.fileFrom(FileFromEnum.Object, fileData)
@@ -57,7 +60,7 @@ fileUpload
   .then(file => console.log(file.uuid))
 ```
 
-Or from URL with file:
+Another option is uploading files from URL, via the `fileFrom` method:
 
 ```javascript
 const fileURL = 'https://example.com/file.jpg'
@@ -67,7 +70,9 @@ fileUpload
   .then(file => console.log(file.uuid))
 ```
 
-Or even from `uploaded` before to Uploadcare file:
+You can also use the `fileFrom` method to get previously uploaded files 
+via their UUIDs:
+
 ```javascript
 const fileUUID = 'edfdf045-34c0-4087-bbdd-e3834921f890'
 const fileUpload = client.fileFrom(FileFromEnum.Uploaded, fileUUID)
@@ -122,7 +127,7 @@ interface UploadClientInterface {
 }
 ```
 
-### Middle Level API
+### Middle-Level API
 
 Also, you can use wrappers around low level to call the API endpoints:
 
@@ -171,16 +176,22 @@ interface UploadAPIInterface {
 }
 ```
 
-### Low Level API
+### Low-Level API
 
-If you want to use our low level API, you can do that something like this:
+The Low-Level API is accessible via `api.request()`, here's the basic example,
 
 ```javascript
 import UploadClient from '@uploadcare/upload-client'
 
 const client = new UploadClient({publicKey: 'YOUR_PUBLIC_KEY'})
 
-client.api.request({path: 'info', query})
+client.api.request({
+  path: 'info', 
+  query: {
+    pub_key: `YOUR_PUBLIC_KEY`,
+    file_id: `6db2621d-3ca4-4edc-9c67-832b641fae85`,
+  },
+})
   .then(response => console.log(response.data))
 ```
 
@@ -194,7 +205,7 @@ It is required when using Upload API.
 #### `baseCDN: string`
 
 Defines your schema and CDN domain. Can be changed to one of 
-the predefined values or your custom CNAME. 
+the predefined values (`https://ucarecdn.com/`) or your custom CNAME. 
 
 Defaults to `https://ucarecdn.com/`.
 
@@ -212,7 +223,7 @@ Defaults to `original`.
 
 #### `doNotStore: boolean`
 
-Forces files uploaded with a widget not to be stored. 
+Forces files uploaded with a `UploadClient` not to be stored. 
 For instance, you might want to turn this on when automatic file storing 
 is enabled in your project, but you do not want to store files uploaded 
 with a particular instance.
@@ -220,7 +231,7 @@ with a particular instance.
 #### `secureSignature: string`
 
 In case you enable signed uploads for your project, you’d need to provide 
-the client with signature and expire. 
+the client with `secureSignature` and `secureExpire` params. 
 
 The `secureSignature` is an MD5 hex-encoded hash from a concatenation 
 of `API secret key` and `secureExpire`.
@@ -248,7 +259,7 @@ Using the parameter also updates an existing reference with a new
 
 #### `source: string`
 
-Upload source. Each upload method has its own (as example: `local`, `url`, etc.)
+Defines the upload source to use, can be set to local, url, etc.
 
 #### `jsonpCallback: string`
 
@@ -257,21 +268,21 @@ a set of files by using their UUIDs.
 
 #### `pollingTimeoutMilliseconds: number`
 
-Internally upload client using polling to ensure that file is available on CDN 
-or its uploaded from url.
+Internally, Upload Client implements polling to ensure that a file 
+s available on CDN or has finished uploading from URL.
 
 Defaults to `10000` milliseconds (10 seconds).
 
 #### `maxContentLength: number`
 
-`maxContentLength` defines the max size of the http response content 
-in bytes allowed. 
+`maxContentLength` defines the maximum allowed size (in bytes) of 
+the HTTP response content.
 
 Defaults to `52428800` bytes (50 MB).
 
 #### `retryThrottledRequestMaxTimes: number`
 
-Sets the maximum number of attempts to retry throttled request.
+Sets the maximum number of attempts to retry throttled requests.
 
 Defaults to `1`.
 
@@ -285,7 +296,8 @@ Defaults to `5242880` bytes (5 MB).
 #### `multipartMinFileSize: number`
 
 This option is only applicable when handling local files. 
-Sets the multipart uploading file size threshold. 
+Sets the multipart uploading file size threshold: larger files 
+will be uploaded in the Multipart mode rather than via Direct Upload.
 The value is limited to the range from `10485760` (10 MB) to `104857600` (100 MB). 
 
 Defaults to `26214400` (25 MB).
@@ -299,13 +311,14 @@ Defaults to `1048576` bytes (1 MB).
 
 #### `maxConcurrentRequests: number`
 
-Setting that allows you to specify the number of concurrent requests.
+Allows specifying the number of concurrent requests.
 
 Defaults to `4`.
 
 ## Testing 
 
-By default testing environment is local and for this you need to start a mock server for local tests.
+By default, the testing environment is local and requires starting 
+a mock server to run tests.
 
 To start a mock server you need to run next command:
 
