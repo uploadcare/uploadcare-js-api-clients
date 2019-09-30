@@ -1,24 +1,33 @@
 {
-  "extends": ["uploadcare"],
+  "parser": "@typescript-eslint/parser",
+  "plugins": ["@typescript-eslint"],
+  "extends": [
+    "eslint:recommended",
+    "plugin:@typescript-eslint/eslint-recommended",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:@typescript-eslint/recommended-requiring-type-checking"
+  ],
   "parserOptions": {
     "ecmaVersion": 2018,
-    "sourceType": "module"
+    "sourceType": "module",
+    "project": "./tsconfig.json"
   },
-  "env": {"node": true},
   "rules": {
-    "max-len": ["error", {
-      "code": 120,
-      "comments": 120
-    }],
-    "max-nested-callbacks": ["error", 4],
-    "max-statements": ["error", 15],
-    "no-underscore-dangle": ["error", {"allowAfterThis": true}],
-    "arrow-body-style": 0
-  },
-  "overrides": [
-    {
-      "files": ["*.spec.js", "*.spec.ts"],
-      "env": {"node": true, "es6": true, "browser": true, "mocha": true, "jasmine": true, "jest": true}
-    }
-  ]
+    "semi": ["error", "never"],
+    "quotes": ["error", "single"],
+    "@typescript-eslint/indent": ["error", 2],
+    "@typescript-eslint/camelcase": ["error", { "allow": [
+      "pub_key",
+      "source_url",
+      "check_URL_duplicates",
+      "save_URL_duplicates",
+      "group_id",
+      "file_id",
+      "content_type",
+      "foo_bar",
+      "foo_bar_baz",
+      "Foo_bar_baz_4",
+      "one_more_thing"
+    ] }]
+  }
 }
