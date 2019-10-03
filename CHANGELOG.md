@@ -9,6 +9,15 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 [Unreleased]: https://github.com/uploadcare/uploadcare-upload-client/compare/v1.0.0-alpha.5...HEAD
 
+### Changed
+
+* Method `setSettings` of `UploadClientInterface` was renamed to `updateSettings`.
+
+### Removed
+
+* `addUpdateSettingsListener` and `removeUpdateSettingsListener` from 
+`UploadClientInterface`.
+
 ## [1.0.0-alpha.5]
 
 ### Added
