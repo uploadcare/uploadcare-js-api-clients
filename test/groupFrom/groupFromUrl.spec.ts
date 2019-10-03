@@ -1,7 +1,6 @@
 import * as factory from '../_fixtureFactory'
 import {getSettingsForTesting} from '../_helpers'
 import groupFrom from '../../src/groupFrom/groupFrom'
-import {GroupFromEnum} from '../../src/groupFrom/types'
 
 describe('groupFrom', () => {
   describe('Url[]', () => {
@@ -11,7 +10,7 @@ describe('groupFrom', () => {
       const settings = getSettingsForTesting({
         publicKey: factory.publicKey('image'),
       })
-      const groupPromise = groupFrom(GroupFromEnum.URL, [sourceUrl, sourceUrl], settings)
+      const groupPromise = groupFrom([sourceUrl, sourceUrl], settings)
 
       groupPromise
         .then(group => {
@@ -25,7 +24,7 @@ describe('groupFrom', () => {
         publicKey: factory.publicKey('image'),
         doNotStore: true,
       })
-      const groupPromise = groupFrom(GroupFromEnum.URL, [sourceUrl, sourceUrl], settings)
+      const groupPromise = groupFrom([sourceUrl, sourceUrl], settings)
       const group = await groupPromise
 
       expect(group.isStored).toBeFalsy()
@@ -35,7 +34,7 @@ describe('groupFrom', () => {
       const settings = getSettingsForTesting({
         publicKey: factory.publicKey('image'),
       })
-      const groupPromise = groupFrom(GroupFromEnum.URL, [sourceUrl, sourceUrl], settings)
+      const groupPromise = groupFrom([sourceUrl, sourceUrl], settings)
 
       setTimeout(() => {
         groupPromise.cancel()
@@ -51,7 +50,7 @@ describe('groupFrom', () => {
         const settings = getSettingsForTesting({
           publicKey: factory.publicKey('image'),
         })
-        const groupPromise = groupFrom(GroupFromEnum.URL, [sourceUrl, sourceUrl], settings)
+        const groupPromise = groupFrom([sourceUrl, sourceUrl], settings)
 
         setTimeout(() => {
           groupPromise.cancel()
@@ -75,7 +74,7 @@ describe('groupFrom', () => {
         const settings = getSettingsForTesting({
           publicKey: factory.publicKey('image'),
         })
-        const groupPromise = groupFrom(GroupFromEnum.URL, [sourceUrl, sourceUrl], settings)
+        const groupPromise = groupFrom([sourceUrl, sourceUrl], settings)
 
         groupPromise.onProgress = (progress) => {
           const {value} = progress
@@ -96,7 +95,7 @@ describe('groupFrom', () => {
         const settings = getSettingsForTesting({
           publicKey: factory.publicKey('image'),
         })
-        const groupPromise = groupFrom(GroupFromEnum.URL, [sourceUrl, sourceUrl], settings)
+        const groupPromise = groupFrom([sourceUrl, sourceUrl], settings)
 
         groupPromise.onUploaded = () => {
           done()
@@ -110,7 +109,7 @@ describe('groupFrom', () => {
         const settings = getSettingsForTesting({
           publicKey: factory.publicKey('image'),
         })
-        const groupPromise = groupFrom(GroupFromEnum.URL, [sourceUrl, sourceUrl], settings)
+        const groupPromise = groupFrom([sourceUrl, sourceUrl], settings)
 
         groupPromise.onReady = () => {
           done()
