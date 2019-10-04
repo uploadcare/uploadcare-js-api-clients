@@ -16,6 +16,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 `multipartComplete`, `multipart`, `fileFrom`, `groupFrom`) was exported 
 from `index.ts` to make better tree shaking. 
 
+### Removed
+
+* Removed `from` param from `fileFrom` and `groupFrom`. 
+* Removed `FileFromEnum` and `GroupFromEnum`.
+
 ## [1.0.0-alpha.5]
 
 ### Added
