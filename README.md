@@ -111,13 +111,9 @@ List of all available high level API methods:
 
 ```javascript
 interface UploadClientInterface {
-  setSettings(newSettings: SettingsInterface): void
+  updateSettings(newSettings: SettingsInterface): void
 
   getSettings(): SettingsInterface
-
-  addUpdateSettingsListener(listener: Function): void
-
-  removeUpdateSettingsListener(listener: Function): void
 
   fileFrom(data: FileData | Url | Uuid, settings?: SettingsInterface): FileUploadInterface
 
