@@ -1,13 +1,6 @@
 import {UploadcareFileInterface} from '../types'
 import {UploadInterface} from '../lifecycle/types'
 
-export enum FileFromEnum {
-  Object = 'object',
-  URL = 'url',
-  DOM = 'input',
-  Uploaded = 'uploaded',
-}
-
 /**
  * Base `thenable` interface for uploading `fileFrom` (`object`, `url`, `input`, `uploaded`).
  */
