@@ -3,7 +3,7 @@ import {UploadFrom} from './UploadFrom'
 import group from '../api/group'
 import CancelError from '../errors/CancelError'
 import fileFrom from '../fileFrom/fileFrom'
-import {FileFromEnum, FileUploadInterface} from '..'
+import {FileUploadInterface} from '..'
 import {GroupInfoInterface} from '../api/types'
 
 export class UploadFromObject extends UploadFrom {
@@ -29,7 +29,7 @@ export class UploadFromObject extends UploadFrom {
     const filesTotalCount = this.data.length
 
     return this.data.map((file: FileData, index: number) => {
-      const fileUpload = fileFrom(FileFromEnum.Object, file, this.settings)
+      const fileUpload = fileFrom(file, this.settings)
       const fileNumber = index + 1
 
       fileUpload.onCancel = this.handleCancelling

@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 [Unreleased]: https://github.com/uploadcare/uploadcare-upload-client/compare/v1.0.0-alpha.5...HEAD
 
+### Removed
+
+* Removed `from` param from `fileFrom` and `groupFrom`. 
+* Removed `FileFromEnum` and `GroupFromEnum`.
+
 ## [1.0.0-alpha.5]
 
 ### Added
