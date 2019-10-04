@@ -20,6 +20,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 * Removed `from` param from `fileFrom` and `groupFrom`. 
 * Removed `FileFromEnum` and `GroupFromEnum`.
 
+### Changed
+
+* `README.md` was updated according to library API.
+
 ## [1.0.0-alpha.5]
 
 ### Added
