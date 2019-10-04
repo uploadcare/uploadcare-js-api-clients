@@ -44,7 +44,6 @@ Uploadcare project:
 
 ```javascript
 import UploadClient from '@uploadcare/upload-client'
-import {FileFromEnum} from '@uploadcare/upload-client'
 
 const client = new UploadClient({publicKey: 'YOUR_PUBLIC_KEY'})
 ```
@@ -53,7 +52,7 @@ Once the UploadClient instance is created, you can start using
 the wrapper to upload files from binary data:
 
 ```javascript
-const fileUpload = client.fileFrom(FileFromEnum.Object, fileData)
+const fileUpload = client.fileFrom(fileData)
 
 fileUpload
   .then(file => console.log(file.uuid))
@@ -63,7 +62,7 @@ Another option is uploading files from URL, via the `fileFrom` method:
 
 ```javascript
 const fileURL = 'https://example.com/file.jpg'
-const fileUpload = client.fileFrom(FileFromEnum.URL, fileURL)
+const fileUpload = client.fileFrom(fileURL)
 
 fileUpload
   .then(file => console.log(file.uuid))
@@ -74,7 +73,7 @@ via their UUIDs:
 
 ```javascript
 const fileUUID = 'edfdf045-34c0-4087-bbdd-e3834921f890'
-const fileUpload = client.fileFrom(FileFromEnum.Uploaded, fileUUID)
+const fileUpload = client.fileFrom(fileUUID)
 
 fileUpload
   .then(file => console.log(file.uuid))
@@ -120,9 +119,9 @@ interface UploadClientInterface {
 
   removeUpdateSettingsListener(listener: Function): void
 
-  fileFrom(from: FileFromEnum, data: FileData | Url | Uuid, settings?: SettingsInterface): FileUploadInterface
+  fileFrom(data: FileData | Url | Uuid, settings?: SettingsInterface): FileUploadInterface
 
-  groupFrom(from: GroupFromEnum, data: FileData[] | Url[] | Uuid[], settings?: SettingsInterface): GroupUploadInterface
+  groupFrom(data: FileData[] | Url[] | Uuid[], settings?: SettingsInterface): GroupUploadInterface
 }
 ```
 
