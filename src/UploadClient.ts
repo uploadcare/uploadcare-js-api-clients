@@ -11,13 +11,9 @@ import {UploadAPIInterface, Uuid} from './api/types'
 import {GroupUploadInterface} from './groupFrom/types'
 
 export interface UploadClientInterface {
-  setSettings(newSettings: SettingsInterface): void
+  updateSettings(newSettings: SettingsInterface): void
 
   getSettings(): SettingsInterface
-
-  addUpdateSettingsListener(listener: Function): void
-
-  removeUpdateSettingsListener(listener: Function): void
 
   fileFrom(data: FileData | Url | Uuid, settings?: SettingsInterface): FileUploadInterface
 
@@ -25,8 +21,7 @@ export interface UploadClientInterface {
 }
 
 class UploadClient implements UploadClientInterface {
-  protected settings: SettingsInterface
-  protected updateSettingsListeners: Function[]
+  private settings: SettingsInterface
   readonly api: UploadAPIInterface
 
   constructor(settings: SettingsInterface = {}) {
@@ -34,39 +29,20 @@ class UploadClient implements UploadClientInterface {
       ...defaultSettings,
       ...settings,
     }
-    this.updateSettingsListeners = []
     this.api = new UploadAPI(this)
   }
 
-  setSettings(newSettings: SettingsInterface = {}): void {
+  updateSettings(newSettings: SettingsInterface = {}): void {
     const prevSettings = {...this.settings}
 
     this.settings = {
       ...prevSettings,
       ...newSettings,
     }
-
-    this.updateSettingsListeners.forEach(listener => {
-      listener(prevSettings)
-    })
   }
 
   getSettings(): SettingsInterface {
     return this.settings
-  }
-
-  addUpdateSettingsListener(listener: Function): void {
-    this.updateSettingsListeners.push(listener)
-  }
-
-  removeUpdateSettingsListener(listener: Function): void {
-    for (let index = 0; index < this.updateSettingsListeners.length; index++) {
-      if (this.updateSettingsListeners[index] === listener) {
-        this.updateSettingsListeners.splice(index, 1)
-
-        break
-      }
-    }
   }
 
   fileFrom(data: FileData | Url | Uuid, settings: SettingsInterface = {}): FileUploadInterface {
