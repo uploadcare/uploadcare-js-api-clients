@@ -12,6 +12,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Changed
 
 * Method `setSettings` of `UploadClientInterface` was renamed to `updateSettings`.
+* Methods (`request`, `base`, `fromUrl`, `fromUrlStatus`, `group`, 
+`groupInfo`, `info`, `multipartStart`, `multipartUpload`, 
+`multipartComplete`, `multipart`, `fileFrom`, `groupFrom`) was exported 
+from `index.ts` to make better tree shaking. 
 
 ### Removed
 
