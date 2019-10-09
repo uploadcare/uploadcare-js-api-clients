@@ -1,6 +1,5 @@
 import * as factory from '../_fixtureFactory'
 import fileFrom from '../../src/fileFrom/fileFrom'
-import {FileFromEnum} from '../../src/fileFrom/types'
 import {getSettingsForTesting} from '../_helpers'
 
 describe('fileFrom', () => {
@@ -9,9 +8,9 @@ describe('fileFrom', () => {
 
     it('should resolves when file is ready on CDN', (done) => {
       const settings = getSettingsForTesting({
-        publicKey: factory.publicKey('demo'),
+        publicKey: factory.publicKey('image'),
       })
-      const filePromise = fileFrom(FileFromEnum.Object, fileToUpload.data, settings)
+      const filePromise = fileFrom(fileToUpload.data, settings)
 
       filePromise
         .then(file => {
@@ -22,10 +21,10 @@ describe('fileFrom', () => {
 
     it('should accept doNotStore setting', async() => {
       const settings = getSettingsForTesting({
-        publicKey: factory.publicKey('demo'),
+        publicKey: factory.publicKey('image'),
         doNotStore: true,
       })
-      const filePromise = fileFrom(FileFromEnum.Object, fileToUpload.data, settings)
+      const filePromise = fileFrom(fileToUpload.data, settings)
       const file = await filePromise
 
       expect(file.isStored).toBeFalsy()
@@ -33,9 +32,9 @@ describe('fileFrom', () => {
 
     it('should be able to cancel uploading', (done) => {
       const settings = getSettingsForTesting({
-        publicKey: factory.publicKey('demo'),
+        publicKey: factory.publicKey('image'),
       })
-      const filePromise = fileFrom(FileFromEnum.Object, fileToUpload.data, settings)
+      const filePromise = fileFrom(fileToUpload.data, settings)
 
       setTimeout(() => {
         filePromise.cancel()
@@ -48,11 +47,11 @@ describe('fileFrom', () => {
 
     it('should accept new file name setting', async() => {
       const settings = getSettingsForTesting({
-        publicKey: factory.publicKey('demo'),
+        publicKey: factory.publicKey('image'),
         doNotStore: true,
         fileName: 'newFileName.jpg',
       })
-      const filePromise = fileFrom(FileFromEnum.Object, fileToUpload.data, settings)
+      const filePromise = fileFrom(fileToUpload.data, settings)
       const file = await filePromise
 
       expect(file.name).toEqual('newFileName.jpg')
@@ -61,9 +60,9 @@ describe('fileFrom', () => {
     describe('should be able to handle', () => {
       it('cancel uploading', (done) => {
         const settings = getSettingsForTesting({
-          publicKey: factory.publicKey('demo'),
+          publicKey: factory.publicKey('image'),
         })
-        const filePromise = fileFrom(FileFromEnum.Object, fileToUpload.data, settings)
+        const filePromise = fileFrom(fileToUpload.data, settings)
 
         setTimeout(() => {
           filePromise.cancel()
@@ -85,9 +84,9 @@ describe('fileFrom', () => {
       it('progress', (done) => {
         let progressValue = 0
         const settings = getSettingsForTesting({
-          publicKey: factory.publicKey('demo'),
+          publicKey: factory.publicKey('image'),
         })
-        const filePromise = fileFrom(FileFromEnum.Object, fileToUpload.data, settings)
+        const filePromise = fileFrom(fileToUpload.data, settings)
 
         filePromise.onProgress = (progress): void => {
           const {value} = progress
@@ -106,9 +105,9 @@ describe('fileFrom', () => {
 
       it('uploaded', (done) => {
         const settings = getSettingsForTesting({
-          publicKey: factory.publicKey('demo'),
+          publicKey: factory.publicKey('image'),
         })
-        const filePromise = fileFrom(FileFromEnum.Object, fileToUpload.data, settings)
+        const filePromise = fileFrom(fileToUpload.data, settings)
 
         filePromise.onUploaded = (): void => {
           done()
@@ -120,9 +119,9 @@ describe('fileFrom', () => {
 
       it('ready', (done) => {
         const settings = getSettingsForTesting({
-          publicKey: factory.publicKey('demo'),
+          publicKey: factory.publicKey('image'),
         })
-        const filePromise = fileFrom(FileFromEnum.Object, fileToUpload.data, settings)
+        const filePromise = fileFrom(fileToUpload.data, settings)
 
         filePromise.onReady = (): void => {
           done()

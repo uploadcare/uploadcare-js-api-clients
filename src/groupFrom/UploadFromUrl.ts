@@ -3,16 +3,16 @@ import {UploadFrom} from './UploadFrom'
 import group from '../api/group'
 import CancelError from '../errors/CancelError'
 import fileFrom from '../fileFrom/fileFrom'
-import {FileFromEnum, Url} from '..'
+import {FileUploadInterface} from '..'
+import {Url} from '..'
 import {GroupInfoInterface} from '../api/types'
-import {UploadInterface} from '../lifecycle/types'
 
 export class UploadFromUrl extends UploadFrom {
   protected readonly promise: Promise<UploadcareGroupInterface>
 
   private readonly data: Url[]
   private readonly settings: SettingsInterface
-  private readonly uploads: UploadInterface<UploadcareFileInterface>[]
+  private readonly uploads: FileUploadInterface[]
   private readonly files: Promise<UploadcareFileInterface[]>
 
   constructor(data: Url[], settings: SettingsInterface) {
@@ -26,16 +26,16 @@ export class UploadFromUrl extends UploadFrom {
     this.promise = this.getGroupPromise()
   }
 
-  private getUploadsPromises = (): UploadInterface<UploadcareFileInterface>[] => {
+  private getUploadsPromises = (): FileUploadInterface[] => {
     const filesTotalCount = this.data.length
 
     return this.data.map((sourceUrl: Url, index: number) => {
-      const fileUpload = fileFrom(FileFromEnum.URL, sourceUrl, this.settings)
+      const fileUpload = fileFrom(sourceUrl, this.settings)
       const fileNumber = index + 1
 
       fileUpload.onCancel = this.handleCancelling
 
-      fileUpload.onUploaded = ((): void => {
+      fileUpload.onUploaded = (() => {
         this.handleUploading({
           total: filesTotalCount,
           loaded: fileNumber
@@ -64,17 +64,14 @@ export class UploadFromUrl extends UploadFrom {
       .catch(this.handleError)
   }
 
-  private handleInfoResponse = (groupInfo: GroupInfoInterface): Promise<UploadcareGroupInterface | Error> => {
+  private handleInfoResponse = (groupInfo: GroupInfoInterface) => {
     if (this.isCancelled) {
       return Promise.reject(new CancelError())
     }
 
-    return this.handleUploaded(groupInfo)
+    return this.handleUploaded(groupInfo, this.settings)
   }
 
-  /**
-   * Cancel uploading.
-   */
   cancel(): void {
     this.isCancelled = true
   }

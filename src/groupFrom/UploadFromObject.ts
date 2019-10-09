@@ -3,16 +3,15 @@ import {UploadFrom} from './UploadFrom'
 import group from '../api/group'
 import CancelError from '../errors/CancelError'
 import fileFrom from '../fileFrom/fileFrom'
+import {FileUploadInterface} from '..'
 import {GroupInfoInterface} from '../api/types'
-import {UploadInterface} from '../lifecycle/types'
-import {FileFromEnum} from '..'
 
 export class UploadFromObject extends UploadFrom {
   protected readonly promise: Promise<UploadcareGroupInterface>
 
   private readonly data: FileData[]
   private readonly settings: SettingsInterface
-  private readonly uploads: UploadInterface<UploadcareFileInterface>[]
+  private readonly uploads: FileUploadInterface[]
   private readonly files: Promise<UploadcareFileInterface[]>
 
   constructor(data: FileData[], settings: SettingsInterface) {
@@ -26,16 +25,16 @@ export class UploadFromObject extends UploadFrom {
     this.promise = this.getGroupPromise()
   }
 
-  private getUploadsPromises = (): UploadInterface<UploadcareFileInterface>[] => {
+  private getUploadsPromises = (): FileUploadInterface[] => {
     const filesTotalCount = this.data.length
 
     return this.data.map((file: FileData, index: number) => {
-      const fileUpload = fileFrom(FileFromEnum.Object, file, this.settings)
+      const fileUpload = fileFrom(file, this.settings)
       const fileNumber = index + 1
 
       fileUpload.onCancel = this.handleCancelling
 
-      fileUpload.onUploaded = ((): void => {
+      fileUpload.onUploaded = (() => {
         this.handleUploading({
           total: filesTotalCount,
           loaded: fileNumber
@@ -64,17 +63,14 @@ export class UploadFromObject extends UploadFrom {
       .catch(this.handleError)
   }
 
-  private handleInfoResponse = (groupInfo: GroupInfoInterface): Promise<UploadcareGroupInterface> => {
+  private handleInfoResponse = (groupInfo: GroupInfoInterface) => {
     if (this.isCancelled) {
       return Promise.reject(new CancelError())
     }
 
-    return this.handleUploaded(groupInfo)
+    return this.handleUploaded(groupInfo, this.settings)
   }
 
-  /**
-   * Cancel uploading.
-   */
   cancel(): void {
     this.isCancelled = true
   }

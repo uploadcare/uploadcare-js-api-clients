@@ -9,7 +9,7 @@ describe('API - multipartUpload', () => {
 
   it('should be able to upload multipart file', async(done) => {
     const settings = getSettingsForTesting({
-      publicKey: factory.publicKey('demo'),
+      publicKey: factory.publicKey('image'),
     })
     const multipartStartUpload = multipartStart(fileToUpload, settings)
     const {parts} = await multipartStartUpload
@@ -21,7 +21,7 @@ describe('API - multipartUpload', () => {
 
   it('should be able to cancel uploading', async(done) => {
     const settings = getSettingsForTesting({
-      publicKey: factory.publicKey('demo'),
+      publicKey: factory.publicKey('image'),
     })
     const multipartStartUpload = multipartStart(fileToUpload, settings)
     const {parts} = await multipartStartUpload
@@ -39,7 +39,7 @@ describe('API - multipartUpload', () => {
 
   it('should be able to handle cancel uploading', async (done) => {
     const settings = getSettingsForTesting({
-      publicKey: factory.publicKey('demo'),
+      publicKey: factory.publicKey('image'),
     })
     const multipartStartUpload = multipartStart(fileToUpload, settings)
     const {parts} = await multipartStartUpload
@@ -66,7 +66,7 @@ describe('API - multipartUpload', () => {
   it('should be able to handle progress', async(done) => {
     let progressValue = 0
     const settings = getSettingsForTesting({
-      publicKey: factory.publicKey('demo'),
+      publicKey: factory.publicKey('image'),
     })
     const multipartStartUpload = multipartStart(fileToUpload, settings)
     const {parts} = await multipartStartUpload
