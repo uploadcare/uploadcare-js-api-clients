@@ -2,36 +2,42 @@ import {Thenable} from '../thenable/Thenable'
 
 /* Types */
 import {UploadcareFileInterface, UploadingProgress} from '../types'
-import {CancelableInterface, FileUploadLifecycleInterface, UploadInterface} from '../lifecycle/types'
-import {HandlerInterface} from './types'
+import {FileUploadLifecycleInterface, UploadInterface} from '../lifecycle/types'
+import {FileHandlerInterface} from './types'
 
 export class FileUpload extends Thenable<UploadcareFileInterface> implements UploadInterface<UploadcareFileInterface> {
-  onProgress: ((progress: UploadingProgress) => void) | null = null
-  onUploaded: ((uuid: string) => void) | null = null
-  onReady: ((file: UploadcareFileInterface) => void) | null = null
-  onCancel: (() => void) | null = null
+  onProgress: ((progress: UploadingProgress) => void) | null
+  onUploaded: ((uuid: string) => void) | null
+  onReady: ((file: UploadcareFileInterface) => void) | null
+  onCancel: (() => void) | null
 
   protected readonly promise: Promise<UploadcareFileInterface>
 
-  private readonly cancelable: CancelableInterface
+  private readonly lifecycle: FileUploadLifecycleInterface
+  private readonly handler: FileHandlerInterface
 
-  constructor(lifecycle: FileUploadLifecycleInterface, handler: HandlerInterface<UploadcareFileInterface>, cancelable: CancelableInterface) {
+  constructor(lifecycle: FileUploadLifecycleInterface, handler: FileHandlerInterface) {
     super()
-    this.cancelable = cancelable
+
+    this.onProgress = null
+    this.onUploaded = null
+    this.onReady = null
+    this.onCancel = null
+
+    this.handler = handler
+    this.lifecycle = lifecycle
+
     const uploadLifecycle = lifecycle.getUploadLifecycle()
 
-    uploadLifecycle.onProgress = this.onProgress
-    uploadLifecycle.onUploaded = this.onUploaded
-    uploadLifecycle.onReady = this.onReady
-    uploadLifecycle.onCancel = this.onCancel
-
-    this.promise = handler.upload()
+    this.promise = handler.upload(lifecycle)
+      .then(uploadLifecycle.handleReady)
+      .catch(uploadLifecycle.handleError)
   }
 
   /**
    * Cancel uploading.
    */
   cancel(): void {
-    this.cancelable.cancel()
+    this.handler.cancel(this.lifecycle)
   }
 }

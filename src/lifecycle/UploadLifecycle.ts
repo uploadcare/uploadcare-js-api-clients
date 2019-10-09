@@ -35,7 +35,7 @@ export class UploadLifecycle<T> implements LifecycleInterface<T> {
       this.state = state
     } else {
       // TODO: Make a new Exception
-      throw new Error(`${this.state.progress.state} can't be changed to ${state.progress.state}`)
+      throw new Error(`${this.state.progress.state} state can't be changed to ${state.progress.state} state`)
     }
   }
 

@@ -22,7 +22,9 @@ class Multipart extends Thenable<FileInfoInterface> implements BaseThenableInter
 
     this.request = multipartStart(file, settings)
 
+    // @ts-ignore
     this.promise = this.request
+      // @ts-ignore
       .then(({uuid, parts}) => {
         const upload = multipartUpload(file, parts, settings)
 

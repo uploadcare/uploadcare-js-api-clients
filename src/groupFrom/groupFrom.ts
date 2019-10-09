@@ -4,10 +4,10 @@ import {UploadFromUploaded} from './UploadFromUploaded'
 import {isFileData, isUrl, isUuid} from '../fileFrom/fileFrom'
 
 /* Types */
-import {FileData, SettingsInterface} from '../types'
+import {FileData, SettingsInterface, UploadcareGroupInterface} from '../types'
 import {Url} from '../api/fromUrl'
 import {Uuid} from '../api/types'
-import {GroupUploadInterface} from './types'
+import {UploadInterface} from '../lifecycle/types'
 
 /**
  * FileData type guard.
@@ -57,12 +57,12 @@ export const isUrlArray = (data: FileData[] | Url[] | Uuid[]): data is Url[] => 
 /**
  * Uploads file from provided data.
  *
- * @param {FileData} data
+ * @param {FileData[] | Url[] | Uuid[]} data
  * @param {SettingsInterface} settings
- * @throws Error
- * @returns {FileUploadInterface}
+ * @throws TypeError
+ * @returns {UploadInterface<UploadcareFileInterface>}
  */
-export default function groupFrom(data: FileData[] | Url[] | Uuid[], settings: SettingsInterface = {}): GroupUploadInterface {
+export default function groupFrom(data: FileData[] | Url[] | Uuid[], settings: SettingsInterface = {}): UploadInterface<UploadcareGroupInterface> {
   if (isFileDataArray(data)) {
     return new UploadFromObject(data, settings)
   }

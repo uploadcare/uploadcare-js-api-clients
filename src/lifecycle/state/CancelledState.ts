@@ -8,5 +8,7 @@ export class CancelledState extends AbstractState implements LifecycleStateInter
     uploaded: null,
     value: 0,
   }
-  protected nextPossibleState: ProgressStateEnum[] = []
+  protected nextPossibleState: ProgressStateEnum[] = [
+    ProgressStateEnum.Canceled,
+  ]
 }

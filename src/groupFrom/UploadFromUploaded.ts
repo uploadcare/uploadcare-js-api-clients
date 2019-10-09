@@ -26,6 +26,7 @@ export class UploadFromUploaded extends UploadFrom {
   private getGroupPromise = (): Promise<UploadcareGroupInterface> => {
     this.handleUploading()
 
+    // @ts-ignore
     return group(this.data, this.settings)
       .then(this.handleInfoResponse)
       .then(this.handleReady)

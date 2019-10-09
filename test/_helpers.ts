@@ -1,4 +1,5 @@
-import dataUriToBuffer from 'data-uri-to-buffer'
+// @ts-ignore
+const dataUriToBuffer = require('data-uri-to-buffer')
 import dataUriToBlob from 'dataurl-to-blob'
 import {SettingsInterface} from '../src'
 

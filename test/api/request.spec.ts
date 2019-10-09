@@ -39,6 +39,7 @@ describe('API – request', () => {
       expect(typeof result.headers).toBe('object')
       expect(result.url).toBe(`${settings.baseURL}/info/`)
       expect(typeof result.data).toBe('object')
+      // @ts-ignore
       expect(result.data.uuid).toBe(factory.uuid('image'))
     })
 
@@ -52,6 +53,7 @@ describe('API – request', () => {
           file: file.data,
         },
       }
+      // @ts-ignore
       const result = await request(options)
 
       expect(typeof result.headers).toBe('object')
@@ -73,6 +75,7 @@ describe('API – request', () => {
         query: {pub_key: factory.publicKey('demo')},
       }
 
+      // @ts-ignore
       await expectAsync(request(options)).toBeResolved()
     }, 20000)
   })
@@ -148,6 +151,7 @@ describe('API – request', () => {
       const requestError = new RequestError(errorRequest, errorResponse)
       const error = new RequestWasThrottledError(requestError, options.retryThrottledMaxTimes)
 
+      // @ts-ignore
       await expectAsync(request(options)).toBeRejectedWith(error)
     }, 20000)
   })

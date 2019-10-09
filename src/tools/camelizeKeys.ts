@@ -15,10 +15,10 @@ export function camelize(text: string): string {
 /**
  * Transforms keys of an object to camelCased recursively.
  *
- * @param {object} source - Object to camelize.
- * @returns {object}
+ * @param {object|string} source - Object to camelize.
+ * @returns {object|string}
  */
-export default function camelizeKeys(source: object): object {
+export default function camelizeKeys(source: object | string): object | string {
   if (!source || typeof source !== 'object') {
     return source
   }

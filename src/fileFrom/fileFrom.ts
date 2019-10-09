@@ -1,13 +1,18 @@
-import {UploadFromObject} from './UploadFromObject'
-import {UploadFromUrl} from './UploadFromUrl'
-import {UploadFromUploaded} from './UploadFromUploaded'
+// import {UploadFromObject} from './UploadFromObject'
+// import {UploadFromUrl} from './UploadFromUrl'
+// import {UploadFromUploaded} from './UploadFromUploaded'
 import {isNode} from '../tools/isNode'
 
+import {UploadLifecycle} from '../lifecycle/UploadLifecycle'
+import {FromObjectFileHandler} from './FromObjectFileHandler'
+import {FileUpload} from './FileUpload'
+import {FileUploadLifecycle} from '../lifecycle/FileUploadLifecycle'
+
 /* Types */
-import {FileData, SettingsInterface} from '../types'
+import {FileData, SettingsInterface, UploadcareFileInterface} from '../types'
 import {Url} from '../api/fromUrl'
 import {Uuid} from '../api/types'
-import {FileUploadInterface} from './types'
+import {UploadInterface} from '../lifecycle/types'
 
 /**
  * FileData type guard.
@@ -52,23 +57,28 @@ export const isUrl = (data: FileData | Url | Uuid): data is Url => {
 /**
  * Uploads file from provided data.
  *
- * @param {FileData} data
+ * @param {FileData | Url | Uuid} data
  * @param {SettingsInterface} settings
- * @throws Error
- * @returns {FileUploadInterface}
+ * @throws TypeError
+ * @returns {UploadInterface<UploadcareFileInterface>}
  */
-export default function fileFrom(data: FileData | Url | Uuid, settings: SettingsInterface = {}): FileUploadInterface {
+export default function fileFrom(data: FileData | Url | Uuid, settings: SettingsInterface = {}): UploadInterface<UploadcareFileInterface> {
+  const lifecycle = new UploadLifecycle<UploadcareFileInterface>()
+  const fileUploadLifecycle = new FileUploadLifecycle(lifecycle)
+
   if (isFileData(data)) {
-    return new UploadFromObject(data, settings)
+    const fileHandler = new FromObjectFileHandler(data, settings)
+
+    return new FileUpload(fileUploadLifecycle, fileHandler)
   }
 
-  if (isUrl(data)) {
-    return new UploadFromUrl(data, settings)
-  }
-
-  if (isUuid(data)) {
-    return new UploadFromUploaded(data, settings)
-  }
+  // if (isUrl(data)) {
+  //   return new UploadFromUrl(data, settings)
+  // }
+  //
+  // if (isUuid(data)) {
+  //   return new UploadFromUploaded(data, settings)
+  // }
 
   throw new TypeError(`File uploading from "${data}" is not supported`)
 }

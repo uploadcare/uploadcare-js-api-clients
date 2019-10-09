@@ -12,15 +12,25 @@ import {FileInfoInterface} from './api/types'
  */
 export default function prettyFileInfo(info: FileInfoInterface, settings: SettingsInterface = {}): UploadcareFileInterface {
   const {
+    // @ts-ignore
     uuid,
+    // @ts-ignore
     filename,
+    // @ts-ignore
     originalFilename,
+    // @ts-ignore
     size,
+    // @ts-ignore
     isStored,
+    // @ts-ignore
     isImage,
+    // @ts-ignore
     fileId,
+    // @ts-ignore
     defaultEffects,
+    // @ts-ignore
     imageInfo,
+    // @ts-ignore
     s3Bucket,
   } = camelizeKeys(info)
 
