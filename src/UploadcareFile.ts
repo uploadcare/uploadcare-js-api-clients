@@ -16,7 +16,6 @@ export class UploadcareFile implements UploadcareFileInterface {
 
   constructor(file: UploadcareFileInterface) {
     this.uuid = file.uuid
-    this.uuid = file.uuid
     this.name = file.name
     this.size = file.size
     this.isStored = file.isStored
