@@ -12,7 +12,7 @@ export class PendingState extends AbstractState implements LifecycleStateInterfa
     ProgressStateEnum.Uploading,
     ProgressStateEnum.Uploaded,
     ProgressStateEnum.Ready,
-    ProgressStateEnum.Canceled,
+    ProgressStateEnum.Cancelled,
     ProgressStateEnum.Error,
   ]
 }

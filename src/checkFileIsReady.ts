@@ -5,10 +5,10 @@ import {FileInfoInterface, Uuid} from './api/types'
 import defaultSettings from './defaultSettings'
 
 type FileIsReadyParams = {
-  uuid: Uuid,
-  timeout?: number,
-  onProgress?: Function,
-  settings?: SettingsInterface
+  uuid: Uuid;
+  timeout?: number;
+  onProgress?: Function;
+  settings?: SettingsInterface;
 }
 
 const checkFileIsReady = ({uuid, timeout = defaultSettings.pollingTimeoutMilliseconds, onProgress, settings = {}}: FileIsReadyParams): PollPromiseInterface<FileInfoInterface> =>

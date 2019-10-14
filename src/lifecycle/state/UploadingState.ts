@@ -5,9 +5,10 @@ import {ProgressParamsInterface, ProgressStateEnum, UploadingProgress} from '../
 export class UploadingState extends AbstractState implements LifecycleStateInterface {
   readonly progress: UploadingProgress
   protected nextPossibleState: ProgressStateEnum[] = [
+    ProgressStateEnum.Uploading,
     ProgressStateEnum.Uploaded,
     ProgressStateEnum.Ready,
-    ProgressStateEnum.Canceled,
+    ProgressStateEnum.Cancelled,
     ProgressStateEnum.Error,
   ]
 

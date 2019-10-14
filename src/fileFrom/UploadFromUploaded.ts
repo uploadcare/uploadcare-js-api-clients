@@ -9,7 +9,7 @@ import {FileInfoInterface, Uuid} from '../api/types'
 export class UploadFromUploaded extends UploadFrom {
   protected readonly promise: Promise<UploadcareFileInterface>
 
-  private isCancelled: boolean = false
+  private isCancelled = false
   private readonly data: Uuid
   private readonly settings: SettingsInterface
 

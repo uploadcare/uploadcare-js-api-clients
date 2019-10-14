@@ -60,7 +60,7 @@ export const isUrlArray = (data: FileData[] | Url[] | Uuid[]): data is Url[] => 
  * @param {FileData} data
  * @param {SettingsInterface} settings
  * @throws Error
- * @returns {FileUploadInterface}
+ * @returns {UploadInterface<UploadcareGroupInterface>}
  */
 export default function groupFrom(data: FileData[] | Url[] | Uuid[], settings: SettingsInterface = {}): GroupUploadInterface {
   if (isFileDataArray(data)) {

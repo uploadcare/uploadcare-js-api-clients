@@ -6,15 +6,15 @@ import {Thenable} from '../thenable/Thenable'
 import {SettingsInterface, UploadcareFileInterface, UploadingProgress, ProgressStateEnum, ProgressParamsInterface} from '../types'
 import {FileInfoInterface, Uuid} from '../api/types'
 import {PollPromiseInterface} from '../tools/poll'
-import {FileUploadInterface} from './types'
 import defaultSettings from '../defaultSettings'
+import {UploadInterface} from '../lifecycle/types'
 
 /**
  * Base abstract `thenable` implementation of `FileUploadInterface`.
  * You need to use this as base class for all uploading methods of `fileFrom`.
  * All that you need to implement — `promise` property and `cancel` method.
  */
-export abstract class UploadFrom extends Thenable<UploadcareFileInterface> implements FileUploadInterface {
+export abstract class UploadFrom extends Thenable<UploadcareFileInterface> implements UploadInterface<UploadcareFileInterface> {
   onProgress: ((progress: UploadingProgress) => void) | null = null
   onUploaded: ((uuid: string) => void) | null = null
   onReady: ((file: UploadcareFileInterface) => void) | null = null
@@ -68,9 +68,9 @@ export abstract class UploadFrom extends Thenable<UploadcareFileInterface> imple
           value: 1,
         }
         break
-      case ProgressStateEnum.Canceled:
+      case ProgressStateEnum.Cancelled:
         this.progress = {
-          state: ProgressStateEnum.Canceled,
+          state: ProgressStateEnum.Cancelled,
           uploaded: null,
           value: 0,
         }
@@ -101,7 +101,7 @@ export abstract class UploadFrom extends Thenable<UploadcareFileInterface> imple
    * Handle cancelling of uploading file.
    */
   protected handleCancelling(): void {
-    this.setProgress(ProgressStateEnum.Canceled)
+    this.setProgress(ProgressStateEnum.Cancelled)
 
     if (typeof this.onCancel === 'function') {
       this.onCancel()

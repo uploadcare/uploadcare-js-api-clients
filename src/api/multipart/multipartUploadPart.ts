@@ -15,9 +15,9 @@ import {MultipartPart, MultipartUploadResponse} from './types'
 import {BaseThenableInterface} from '../../thenable/types'
 
 const updateProgress = ({data, loaded = false, onUploadProgress}: {
-  data: Buffer,
-  loaded: boolean,
-  onUploadProgress: (progressEvent: ProgressEvent) => void
+  data: Buffer;
+  loaded: boolean;
+  onUploadProgress: (progressEvent: ProgressEvent) => void;
 }): void => {
   const formData = new FormData()
   formData.append('data', data)

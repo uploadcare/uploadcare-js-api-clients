@@ -8,7 +8,7 @@ import {BaseThenableInterface} from '../thenable/types'
 import {BaseThenable} from '../thenable/BaseThenable'
 
 export type BaseResponse = {
-  file: Uuid
+  file: Uuid;
 }
 
 const getRequestBody = (file: FileData, settings: SettingsInterface) => ({

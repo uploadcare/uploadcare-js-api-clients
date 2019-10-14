@@ -10,8 +10,8 @@ import {ErrorState} from './state/ErrorState'
 import {PendingState} from './state/PendingState'
 
 export class UploadLifecycle<T> implements LifecycleInterface<T> {
-  protected state: LifecycleStateInterface
-  protected entity: T | null = null
+  private state: LifecycleStateInterface
+  private entity: T | null = null
 
   onProgress: ((progress: UploadingProgress) => void) | null = null
   onUploaded: ((uuid: string) => void) | null = null
@@ -20,14 +20,6 @@ export class UploadLifecycle<T> implements LifecycleInterface<T> {
 
   constructor() {
     this.state = new PendingState()
-    this.updateState = this.updateState.bind(this)
-    this.getProgress = this.getProgress.bind(this)
-    this.updateEntity = this.updateEntity.bind(this)
-    this.getEntity = this.getEntity.bind(this)
-    this.handleUploading = this.handleUploading.bind(this)
-    this.handleCancelling = this.handleCancelling.bind(this)
-    this.handleReady = this.handleReady.bind(this)
-    this.handleError = this.handleError.bind(this)
   }
 
   updateState(state: LifecycleStateInterface): void {
@@ -35,7 +27,7 @@ export class UploadLifecycle<T> implements LifecycleInterface<T> {
       this.state = state
     } else {
       // TODO: Make a new Exception
-      throw new Error(`${this.state.progress.state} can't be changed to ${state.progress.state}`)
+      throw new Error(`"${this.state.progress.state}" state can't be changed to "${state.progress.state}" state`)
     }
   }
 
@@ -87,7 +79,7 @@ export class UploadLifecycle<T> implements LifecycleInterface<T> {
     return Promise.resolve(this.getEntity())
   }
 
-  handleError(error: Error) {
+  handleError(error: Error): Promise<never> {
     if (error.name === 'CancelError') {
       this.handleCancelling()
     } else {

@@ -15,12 +15,12 @@ export enum TypeEnum {
 }
 
 type TokenResponse = {
-  type: TypeEnum.Token,
-  token: string,
+  type: TypeEnum.Token;
+  token: string;
 }
 
 type FileInfoResponse = {
-  type: TypeEnum.FileInfo,
+  type: TypeEnum.FileInfo;
 } & FileInfoInterface
 
 export type FromUrlResponse = FileInfoResponse | TokenResponse
@@ -31,7 +31,7 @@ export type FromUrlResponse = FileInfoResponse | TokenResponse
  * @param {FromUrlResponse} response
  */
 export const isTokenResponse = (response: FromUrlResponse): response is TokenResponse => {
-  return response.type !== undefined && response.type === TypeEnum.Token;
+  return response.type !== undefined && response.type === TypeEnum.Token
 }
 
 /**
@@ -40,7 +40,7 @@ export const isTokenResponse = (response: FromUrlResponse): response is TokenRes
  * @param {FromUrlResponse} response
  */
 export const isFileInfoResponse = (response: FromUrlResponse): response is FileInfoResponse => {
-  return response.type !== undefined && response.type === TypeEnum.FileInfo;
+  return response.type !== undefined && response.type === TypeEnum.FileInfo
 }
 
 const getRequestQuery = (sourceUrl: Url, settings: SettingsInterface) => ({

@@ -2,12 +2,18 @@ import {UploadFromObject} from './UploadFromObject'
 import {UploadFromUrl} from './UploadFromUrl'
 import {UploadFromUploaded} from './UploadFromUploaded'
 import {isNode} from '../tools/isNode'
+import {UploadLifecycle} from '../lifecycle/UploadLifecycle'
+import {FromObjectFileHandler} from './FromObjectFileHandler'
+import {FromUploadedFileHandler} from './FromUploadedFileHandler'
+import {FileUploadLifecycle} from '../lifecycle/FileUploadLifecycle'
+import {FileUpload} from './FileUpload'
 
 /* Types */
-import {FileData, SettingsInterface} from '../types'
+import {FileData, SettingsInterface, UploadcareFileInterface} from '../types'
 import {Url} from '../api/fromUrl'
 import {Uuid} from '../api/types'
-import {FileUploadInterface} from './types'
+import {LifecycleInterface, UploadInterface} from '../lifecycle/types'
+import {FromUrlFileHandler} from './FromUrlFileHandler'
 
 /**
  * FileData type guard.
@@ -49,25 +55,58 @@ export const isUrl = (data: FileData | Url | Uuid): data is Url => {
     regExp.test(data)
 }
 
+const createProxyHandler = (lifecycle: LifecycleInterface<UploadcareFileInterface>): ProxyHandler<UploadInterface<UploadcareFileInterface>> => {
+  return {
+    set: (target, propertyKey, newValue): boolean => {
+      if (propertyKey === 'onProgress'
+        || propertyKey === 'onUploaded'
+        || propertyKey === 'onReady'
+        || propertyKey === 'onCancel') {
+        // update object property
+        target[propertyKey] = newValue
+
+        // and update uploadLifecycle property
+        lifecycle[propertyKey] = newValue
+        return true
+      } else {
+        return false
+      }
+    }
+  }
+}
+
 /**
  * Uploads file from provided data.
  *
- * @param {FileData} data
+ * @param {FileData | Url | Uuid} data
  * @param {SettingsInterface} settings
- * @throws Error
- * @returns {FileUploadInterface}
+ * @throws TypeError
+ * @returns {UploadInterface<UploadcareFileInterface>}
  */
-export default function fileFrom(data: FileData | Url | Uuid, settings: SettingsInterface = {}): FileUploadInterface {
+export default function fileFrom(data: FileData | Url | Uuid, settings: SettingsInterface = {}): UploadInterface<UploadcareFileInterface> {
+  const lifecycle = new UploadLifecycle<UploadcareFileInterface>()
+  const fileUploadLifecycle = new FileUploadLifecycle(lifecycle)
+  const lifecycleProxyHandler = createProxyHandler(lifecycle)
+
   if (isFileData(data)) {
-    return new UploadFromObject(data, settings)
+    const fileHandler = new FromObjectFileHandler(data, settings)
+    const fileUpload = new FileUpload(fileUploadLifecycle, fileHandler)
+
+    return new Proxy(fileUpload, lifecycleProxyHandler)
   }
 
   if (isUrl(data)) {
-    return new UploadFromUrl(data, settings)
+    const fileHandler = new FromUrlFileHandler(data, settings)
+    const fileUpload = new FileUpload(fileUploadLifecycle, fileHandler)
+
+    return new Proxy(fileUpload, lifecycleProxyHandler)
   }
 
   if (isUuid(data)) {
-    return new UploadFromUploaded(data, settings)
+    const fileHandler = new FromUploadedFileHandler(data, settings)
+    const fileUpload = new FileUpload(fileUploadLifecycle, fileHandler)
+
+    return new Proxy(fileUpload, lifecycleProxyHandler)
   }
 
   throw new TypeError(`File uploading from "${data}" is not supported`)

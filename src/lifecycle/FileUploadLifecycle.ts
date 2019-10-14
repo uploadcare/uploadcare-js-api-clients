@@ -8,15 +8,15 @@ import {PollPromiseInterface} from '../tools/poll'
 import {FileInfoInterface} from '../api/types'
 
 export class FileUploadLifecycle implements FileUploadLifecycleInterface {
-  private readonly lifecycle: LifecycleInterface<UploadcareFileInterface>
+  readonly uploadLifecycle: LifecycleInterface<UploadcareFileInterface>
   private isFileReadyPolling: PollPromiseInterface<FileInfoInterface> | null = null
 
   constructor(lifecycle: LifecycleInterface<UploadcareFileInterface>) {
-    this.lifecycle = lifecycle
+    this.uploadLifecycle = lifecycle
   }
 
   handleUploadedFile(uuid: Uuid, settings: SettingsInterface): Promise<UploadcareFileInterface> {
-    this.lifecycle.updateEntity({
+    const file = {
       uuid,
       name: null,
       size: null,
@@ -27,12 +27,12 @@ export class FileUploadLifecycle implements FileUploadLifecycleInterface {
       originalUrl: null,
       originalFilename: null,
       originalImageInfo: null,
-    })
+    }
+    this.uploadLifecycle.updateEntity(file)
+    this.uploadLifecycle.updateState(new UploadedState())
 
-    this.lifecycle.updateState(new UploadedState())
-
-    if (typeof this.lifecycle.onUploaded === 'function') {
-      this.lifecycle.onUploaded(uuid)
+    if (typeof this.uploadLifecycle.onUploaded === 'function') {
+      this.uploadLifecycle.onUploaded(uuid)
     }
 
     this.isFileReadyPolling = checkFileIsReady({
@@ -40,16 +40,19 @@ export class FileUploadLifecycle implements FileUploadLifecycleInterface {
       settings,
     })
 
+    const uploadLifecycle = this.uploadLifecycle
+
     return this.isFileReadyPolling
       .then(info => {
-        this.lifecycle.updateEntity(prettyFileInfo(info, settings))
+        const file = prettyFileInfo(info, settings)
+        uploadLifecycle.updateEntity(file)
 
-        return Promise.resolve(this.lifecycle.getEntity())
+        return Promise.resolve(uploadLifecycle.getEntity())
       })
-      .catch(error => Promise.reject(error))
+      .catch(uploadLifecycle.handleError)
   }
 
-  getUploadLifecycle(): LifecycleInterface<UploadcareFileInterface> {
-    return this.lifecycle
+  getIsFileReadyPolling = (): PollPromiseInterface<FileInfoInterface> | null => {
+    return this.isFileReadyPolling
   }
 }

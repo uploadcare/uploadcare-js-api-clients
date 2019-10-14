@@ -9,12 +9,12 @@ const DEFAULT_INTERVAL = 500
 export interface PollPromiseInterface<T> extends Promise<T>, CancelableInterface {}
 
 type ExecutorFunction = {
-  (resolve: Function, reject: Function): void
+  (resolve: Function, reject: Function): void;
 }
 
 class PollPromise<T> extends Thenable<T> implements PollPromiseInterface<T> {
   protected promise: Promise<T>
-  protected canceled: boolean = false
+  protected canceled = false
 
   constructor(executor: ExecutorFunction) {
     super()
@@ -61,7 +61,7 @@ export default function poll<T>(checkConditionFunction: Function, timeout: numbe
       }
       // If the condition isn't met but the timeout hasn't elapsed, go again
       else if (nowTime < endTime) {
-        setTimeout(checkCondition, interval, resolve, reject);
+        setTimeout(checkCondition, interval, resolve, reject)
       }
       // Didn't match and too much time, reject!
       else {
@@ -71,7 +71,7 @@ export default function poll<T>(checkConditionFunction: Function, timeout: numbe
     } catch (error) {
       reject(error)
     }
-  };
+  }
 
   return new PollPromise(checkCondition)
 }

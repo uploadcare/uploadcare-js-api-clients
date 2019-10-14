@@ -18,7 +18,7 @@ export abstract class UploadFrom extends Thenable<UploadcareGroupInterface> impl
   abstract cancel(): void
 
   protected abstract readonly promise: Promise<UploadcareGroupInterface>
-  protected isCancelled: boolean = false
+  protected isCancelled = false
 
   private progress: UploadingProgress = {
     state: ProgressStateEnum.Pending,
@@ -63,9 +63,9 @@ export abstract class UploadFrom extends Thenable<UploadcareGroupInterface> impl
           value: 1,
         }
         break
-      case ProgressStateEnum.Canceled:
+      case ProgressStateEnum.Cancelled:
         this.progress = {
-          state: ProgressStateEnum.Canceled,
+          state: ProgressStateEnum.Cancelled,
           uploaded: null,
           value: 0,
         }
@@ -96,7 +96,7 @@ export abstract class UploadFrom extends Thenable<UploadcareGroupInterface> impl
    * Handle cancelling of uploading file.
    */
   protected handleCancelling(): void {
-    this.setProgress(ProgressStateEnum.Canceled)
+    this.setProgress(ProgressStateEnum.Cancelled)
 
     if (typeof this.onCancel === 'function') {
       this.onCancel()
