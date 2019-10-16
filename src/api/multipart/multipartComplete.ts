@@ -1,13 +1,13 @@
 import {prepareOptions} from '../request/prepareOptions'
 
 /* Types */
-import {RequestOptionsInterface} from '../request/types'
+import {Body, RequestOptionsInterface} from '../request/types'
 import {SettingsInterface} from '../../types'
 import {FileInfoInterface, Uuid} from '../types'
 import {CancelableThenableInterface} from '../../thenable/types'
 import {CancelableThenable} from '../../thenable/CancelableThenable'
 
-const getRequestBody = (uuid: Uuid, settings: SettingsInterface) => ({
+const getRequestBody = (uuid: Uuid, settings: SettingsInterface): Body => ({
   uuid,
   UPLOADCARE_PUB_KEY: settings.publicKey || '',
   source: settings.source || 'local',

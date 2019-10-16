@@ -1,13 +1,13 @@
 import {prepareOptions} from './request/prepareOptions'
 
 /* Types */
-import {RequestOptionsInterface} from './request/types'
+import {Query, RequestOptionsInterface} from './request/types'
 import {GroupInfoInterface, GroupId} from './types'
 import {SettingsInterface} from '../types'
 import {CancelableThenable} from '../thenable/CancelableThenable'
 import {CancelableThenableInterface} from '../thenable/types'
 
-const getRequestQuery = (id: GroupId, settings: SettingsInterface) => {
+const getRequestQuery = (id: GroupId, settings: SettingsInterface): Query => {
   const query = {
     pub_key: settings.publicKey || '',
     group_id: id,

@@ -1,9 +1,11 @@
+import checkFileIsReady from '../checkFileIsReady'
+import {UploadedState} from './state/UploadedState'
+import {UploadcareFile} from '../UploadcareFile'
+
+/* Types */
 import {FileUploadLifecycleInterface, LifecycleInterface} from './types'
 import {SettingsInterface, UploadcareFileInterface} from '../types'
 import {Uuid} from '..'
-import checkFileIsReady from '../checkFileIsReady'
-import prettyFileInfo from '../prettyFileInfo'
-import {UploadedState} from './state/UploadedState'
 import {PollPromiseInterface} from '../tools/poll'
 import {FileInfoInterface} from '../api/types'
 
@@ -16,18 +18,8 @@ export class FileUploadLifecycle implements FileUploadLifecycleInterface {
   }
 
   handleUploadedFile(uuid: Uuid, settings: SettingsInterface): Promise<UploadcareFileInterface> {
-    const file = {
-      uuid,
-      name: null,
-      size: null,
-      isStored: null,
-      isImage: null,
-      cdnUrl: null,
-      cdnUrlModifiers: null,
-      originalUrl: null,
-      originalFilename: null,
-      originalImageInfo: null,
-    }
+    const file = UploadcareFile.fromUuid(uuid)
+
     this.uploadLifecycle.updateEntity(file)
     this.uploadLifecycle.updateState(new UploadedState())
 
@@ -44,12 +36,12 @@ export class FileUploadLifecycle implements FileUploadLifecycleInterface {
 
     return this.isFileReadyPolling
       .then(info => {
-        const file = prettyFileInfo(info, settings)
+        const file = UploadcareFile.fromFileInfo(info, settings)
         uploadLifecycle.updateEntity(file)
 
-        return Promise.resolve(uploadLifecycle.getEntity())
+        return Promise.resolve(file)
       })
-      .catch(uploadLifecycle.handleError)
+      .catch(uploadLifecycle.handleError.bind(uploadLifecycle))
   }
 
   getIsFileReadyPolling = (): PollPromiseInterface<FileInfoInterface> | null => {

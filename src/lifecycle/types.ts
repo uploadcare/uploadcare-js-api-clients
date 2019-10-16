@@ -54,6 +54,11 @@ export interface LifecycleInterface<T> extends LifecycleHooksInterface<T> {
   handleError(error: Error): Promise<never>;
 }
 
+export interface HandlerInterface<T> {
+  upload(entityUploadLifecycle: FileUploadLifecycleInterface): Promise<T>;
+  cancel(entityUploadLifecycle: FileUploadLifecycleInterface): void;
+}
+
 export interface FileUploadLifecycleInterface {
   readonly uploadLifecycle: LifecycleInterface<UploadcareFileInterface>;
 
@@ -62,7 +67,7 @@ export interface FileUploadLifecycleInterface {
 }
 
 export interface GroupUploadLifecycleInterface {
-  readonly uploadLifecycle: LifecycleInterface<UploadcareFileInterface>;
+  readonly uploadLifecycle: LifecycleInterface<UploadcareGroupInterface>;
 
   handleUploadedGroup(groupInfo: GroupInfoInterface, settings: SettingsInterface): Promise<UploadcareGroupInterface>;
 }

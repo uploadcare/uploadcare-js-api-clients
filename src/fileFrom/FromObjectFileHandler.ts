@@ -8,6 +8,13 @@ import defaultSettings from '../defaultSettings'
 import multipart from '../multipart/multipart'
 import {FileUploadLifecycleInterface} from '../lifecycle/types'
 
+/**
+ * Check if FileData is multipart data.
+ *
+ * @param {FileData} data
+ * @param {number} multipartMinFileSize
+ * @return {boolean}
+ */
 const isMultipart = (data: FileData, multipartMinFileSize: number): boolean => {
   const fileSize = getFileSize(data)
 

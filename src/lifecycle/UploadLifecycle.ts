@@ -8,6 +8,8 @@ import {CancelledState} from './state/CancelledState'
 import {ReadyState} from './state/ReadyState'
 import {ErrorState} from './state/ErrorState'
 import {PendingState} from './state/PendingState'
+import StateChangeError from '../errors/StateChangeError'
+import EntityIsNotReadyError from '../errors/EntityIsNotReadyError'
 
 export class UploadLifecycle<T> implements LifecycleInterface<T> {
   private state: LifecycleStateInterface
@@ -26,8 +28,10 @@ export class UploadLifecycle<T> implements LifecycleInterface<T> {
     if (this.state.isCanBeChangedTo(state)) {
       this.state = state
     } else {
-      // TODO: Make a new Exception
-      throw new Error(`"${this.state.progress.state}" state can't be changed to "${state.progress.state}" state`)
+      const fromState = this.state.progress.state
+      const toState = state.progress.state
+
+      throw new StateChangeError(fromState, toState)
     }
   }
 
@@ -41,16 +45,14 @@ export class UploadLifecycle<T> implements LifecycleInterface<T> {
 
   getEntity(): T {
     if (this.entity === null) {
-      throw new Error('Entity is not ready yet.')
+      throw new EntityIsNotReadyError()
     }
 
     return this.entity
   }
 
   handleUploading(progress?: ProgressParamsInterface): void {
-    if (progress) {
-      this.updateState(new UploadingState(progress))
-    }
+    this.updateState(new UploadingState(progress))
 
     if (typeof this.onProgress === 'function') {
       this.onProgress(this.getProgress())

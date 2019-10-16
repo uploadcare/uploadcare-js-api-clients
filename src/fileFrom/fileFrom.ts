@@ -1,6 +1,3 @@
-import {UploadFromObject} from './UploadFromObject'
-import {UploadFromUrl} from './UploadFromUrl'
-import {UploadFromUploaded} from './UploadFromUploaded'
 import {isNode} from '../tools/isNode'
 import {UploadLifecycle} from '../lifecycle/UploadLifecycle'
 import {FromObjectFileHandler} from './FromObjectFileHandler'

@@ -43,4 +43,19 @@ export class UploadcareFile implements UploadcareFileInterface {
       originalImageInfo: pretty.originalImageInfo,
     })
   }
+
+  static fromUuid(uuid: Uuid): UploadcareFileInterface {
+    return new UploadcareFile({
+      uuid,
+      name: null,
+      size: null,
+      isStored: null,
+      isImage: null,
+      cdnUrl: null,
+      cdnUrlModifiers: null,
+      originalUrl: null,
+      originalFilename: null,
+      originalImageInfo: null,
+    })
+  }
 }

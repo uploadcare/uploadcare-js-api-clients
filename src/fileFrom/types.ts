@@ -1,5 +1,6 @@
-export interface HandlerInterface<T> {
-  upload(): Promise<T>;
+export interface UploadHandlerInterface<T, U> {
+  upload(entityUploadLifecycle: U): Promise<T>;
+  cancel(entityUploadLifecycle: U): void;
 }
 
 import {FileUploadLifecycleInterface} from '../lifecycle/types'
