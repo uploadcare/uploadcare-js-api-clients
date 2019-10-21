@@ -1,12 +1,37 @@
-import {UploadFromObject} from './UploadFromObject'
 import {UploadFromUrl} from './UploadFromUrl'
-import {UploadFromUploaded} from './UploadFromUploaded'
 
 /* Types */
-import {FileData, SettingsInterface} from '../types'
+import {FileData, SettingsInterface, UploadcareGroupInterface} from '../types'
 import {Url} from '../api/fromUrl'
 import {Uuid} from '../api/types'
 import {GroupUploadInterface, isFileDataArray, isUrlArray, isUuidArray} from './types'
+import {UploadLifecycle} from '../lifecycle/UploadLifecycle'
+import {UploadGroup} from '../lifecycle/UploadGroup'
+import {LifecycleInterface, UploadInterface} from '../lifecycle/types'
+import {GroupUploadLifecycle} from '../lifecycle/GroupUploadLifecycle'
+import {GroupFromObject} from './GroupFromObject'
+import {GroupFromUploaded} from './GroupFromUploaded'
+import {GroupFromUrl} from './GroupFromUrl'
+
+const createProxyHandler = (lifecycle: LifecycleInterface<UploadcareGroupInterface>): ProxyHandler<UploadInterface<UploadcareGroupInterface>> => {
+  return {
+    set: (target, propertyKey, newValue): boolean => {
+      if (propertyKey === 'onProgress'
+        || propertyKey === 'onUploaded'
+        || propertyKey === 'onReady'
+        || propertyKey === 'onCancel') {
+        // update object property
+        target[propertyKey] = newValue
+
+        // and update uploadLifecycle property
+        lifecycle[propertyKey] = newValue
+        return true
+      } else {
+        return false
+      }
+    }
+  }
+}
 
 /**
  * Uploads file from provided data.
@@ -17,16 +42,33 @@ import {GroupUploadInterface, isFileDataArray, isUrlArray, isUuidArray} from './
  * @returns {UploadInterface<UploadcareGroupInterface>}
  */
 export default function groupFrom(data: FileData[] | Url[] | Uuid[], settings: SettingsInterface = {}): GroupUploadInterface {
+  const lifecycle = new UploadLifecycle<UploadcareGroupInterface>()
+  const groupUploadLifecycle = new GroupUploadLifecycle(lifecycle)
+  const lifecycleProxyHandler = createProxyHandler(lifecycle)
+
   if (isFileDataArray(data)) {
-    return new UploadFromObject(data, settings)
+    const fileHandler = new GroupFromObject(data, settings)
+    const fileUpload = new UploadGroup(groupUploadLifecycle, fileHandler)
+
+    return new Proxy(fileUpload, lifecycleProxyHandler)
   }
 
   if (isUrlArray(data)) {
     return new UploadFromUrl(data, settings)
   }
 
+  if (isUrlArray(data)) {
+    const fileHandler = new GroupFromUrl(data, settings)
+    const fileUpload = new UploadGroup(groupUploadLifecycle, fileHandler)
+
+    return new Proxy(fileUpload, lifecycleProxyHandler)
+  }
+
   if (isUuidArray(data)) {
-    return new UploadFromUploaded(data, settings)
+    const fileHandler = new GroupFromUploaded(data, settings)
+    const fileUpload = new UploadGroup(groupUploadLifecycle, fileHandler)
+
+    return new Proxy(fileUpload, lifecycleProxyHandler)
   }
 
   throw new TypeError(`Group uploading from "${data}" is not supported`)

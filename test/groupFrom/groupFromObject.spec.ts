@@ -2,7 +2,7 @@ import * as factory from '../_fixtureFactory'
 import groupFrom from '../../src/groupFrom/groupFrom'
 import {getSettingsForTesting} from '../_helpers'
 
-describe('groupFrom', () => {
+fdescribe('groupFrom', () => {
   describe('Object[]', () => {
     const fileToUpload = factory.image('blackSquare')
 

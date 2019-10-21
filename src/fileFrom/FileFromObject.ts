@@ -1,7 +1,7 @@
 import base from '../api/base'
-import {getFileSize} from '../api/multipart/getFileSize'
 import defaultSettings from '../defaultSettings'
 import multipart from '../multipart/multipart'
+import {isMultipart} from '../multipart/isMultipart'
 
 /* Types */
 import {FileUploadLifecycleInterface} from '../lifecycle/types'
@@ -10,19 +10,6 @@ import {BaseThenableInterface} from '../thenable/types'
 import {BaseResponse} from '../api/base'
 import {FileInfoInterface} from '../api/types'
 import {FileData, SettingsInterface, UploadcareFileInterface} from '../types'
-
-/**
- * Check if FileData is multipart data.
- *
- * @param {FileData} data
- * @param {number} multipartMinFileSize
- * @return {boolean}
- */
-const isMultipart = (data: FileData, multipartMinFileSize: number): boolean => {
-  const fileSize = getFileSize(data)
-
-  return fileSize >= multipartMinFileSize
-}
 
 export class FileFromObject implements FileHandlerInterface {
   private readonly request: BaseThenableInterface<BaseResponse> | BaseThenableInterface<FileInfoInterface>

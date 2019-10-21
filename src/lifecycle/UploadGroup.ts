@@ -2,11 +2,10 @@ import {Thenable} from '../thenable/Thenable'
 
 /* Types */
 import {UploadcareGroupInterface, UploadingProgress} from '../types'
-import {GroupHandlerInterface} from './types'
 import {GroupUploadLifecycleInterface} from '../lifecycle/types'
-import {GroupUploadInterface} from './types'
+import {GroupHandlerInterface, GroupUploadInterface} from '../groupFrom/types'
 
-export class GroupUpload extends Thenable<UploadcareGroupInterface> implements GroupUploadInterface {
+export class UploadGroup extends Thenable<UploadcareGroupInterface> implements GroupUploadInterface {
   onProgress: ((progress: UploadingProgress) => void) | null = null
   onUploaded: ((uuid: string) => void) | null = null
   onReady: ((file: UploadcareGroupInterface) => void) | null = null

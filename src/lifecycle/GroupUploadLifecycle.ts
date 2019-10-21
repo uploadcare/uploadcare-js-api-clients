@@ -12,6 +12,7 @@ export class GroupUploadLifecycle implements GroupUploadLifecycleInterface {
 
   handleUploadedGroup(groupInfo: GroupInfoInterface, settings: SettingsInterface): Promise<UploadcareGroupInterface> {
     const uploadLifecycle = this.getUploadLifecycle()
+    const filesCount = groupInfo.files_count
     const totalSize = groupInfo.files.reduce((acc, file) => acc + file.size, 0)
     const isStored = !!groupInfo.datetime_stored
     const isImage = !!groupInfo.files.filter(file => file.is_image).length
@@ -19,7 +20,7 @@ export class GroupUploadLifecycle implements GroupUploadLifecycleInterface {
 
     uploadLifecycle.updateEntity({
       uuid,
-      filesCount: groupInfo.files_count,
+      filesCount,
       totalSize,
       isStored,
       isImage,

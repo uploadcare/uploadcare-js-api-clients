@@ -2,7 +2,7 @@ import * as factory from '../_fixtureFactory'
 import {getSettingsForTesting} from '../_helpers'
 import groupFrom from '../../src/groupFrom/groupFrom'
 
-describe('groupFrom', () => {
+fdescribe('groupFrom', () => {
   describe('Uploaded[]', () => {
     const uuid = factory.uuid('image')
 
