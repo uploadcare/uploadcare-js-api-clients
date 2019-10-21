@@ -1,8 +1,3 @@
-import {ProgressParamsInterface, UploadingProgress} from '../types'
-import {
-  LifecycleInterface,
-  LifecycleStateInterface
-} from './types'
 import {UploadingState} from './state/UploadingState'
 import {CancelledState} from './state/CancelledState'
 import {ReadyState} from './state/ReadyState'
@@ -10,6 +5,15 @@ import {ErrorState} from './state/ErrorState'
 import {PendingState} from './state/PendingState'
 import StateChangeError from '../errors/StateChangeError'
 import EntityIsNotReadyError from '../errors/EntityIsNotReadyError'
+import {UploadedState} from './state/UploadedState'
+
+/* Types */
+import {ProgressParamsInterface, UploadingProgress} from '../types'
+import {
+  LifecycleInterface,
+  LifecycleStateInterface
+} from './types'
+import {Uuid} from '..'
 
 export class UploadLifecycle<T> implements LifecycleInterface<T> {
   private state: LifecycleStateInterface
@@ -67,7 +71,21 @@ export class UploadLifecycle<T> implements LifecycleInterface<T> {
     }
   }
 
-  handleReady(): Promise<T> {
+  handleUploaded(uuid: Uuid): T {
+    this.updateState(new UploadedState())
+
+    if (typeof this.onProgress === 'function') {
+      this.onProgress(this.getProgress())
+    }
+
+    if (typeof this.onUploaded === 'function') {
+      this.onUploaded(uuid)
+    }
+
+    return this.getEntity()
+  }
+
+  handleReady(): T {
     this.updateState(new ReadyState())
 
     if (typeof this.onProgress === 'function') {
@@ -78,7 +96,7 @@ export class UploadLifecycle<T> implements LifecycleInterface<T> {
       this.onReady(this.getEntity())
     }
 
-    return Promise.resolve(this.getEntity())
+    return this.getEntity()
   }
 
   handleError(error: Error): Promise<never> {

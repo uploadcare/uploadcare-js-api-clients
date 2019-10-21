@@ -50,7 +50,8 @@ export interface LifecycleInterface<T> extends LifecycleHooksInterface<T> {
   getEntity(): T;
   handleUploading(progress?: ProgressParamsInterface): void;
   handleCancelling(): void;
-  handleReady(): Promise<T>;
+  handleUploaded(uuid: Uuid): T;
+  handleReady(): T;
   handleError(error: Error): Promise<never>;
 }
 

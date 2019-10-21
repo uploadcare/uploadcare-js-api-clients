@@ -19,28 +19,23 @@ export class FileUploadLifecycle implements FileUploadLifecycleInterface {
 
   handleUploadedFile(uuid: Uuid, settings: SettingsInterface): Promise<UploadcareFileInterface> {
     const file = UploadcareFile.fromUuid(uuid)
+    const uploadLifecycle = this.uploadLifecycle
 
-    this.uploadLifecycle.updateEntity(file)
-    this.uploadLifecycle.updateState(new UploadedState())
-
-    if (typeof this.uploadLifecycle.onUploaded === 'function') {
-      this.uploadLifecycle.onUploaded(uuid)
-    }
+    uploadLifecycle.updateEntity(file)
 
     this.isFileReadyPolling = checkFileIsReady({
       uuid,
       settings,
     })
 
-    const uploadLifecycle = this.uploadLifecycle
+    uploadLifecycle.handleUploaded(uuid)
 
     return this.isFileReadyPolling
       .then(info => {
         const file = UploadcareFile.fromFileInfo(info, settings)
         uploadLifecycle.updateEntity(file)
-
-        return Promise.resolve(file)
       })
+      .then(uploadLifecycle.handleReady.bind(uploadLifecycle))
       .catch(uploadLifecycle.handleError.bind(uploadLifecycle))
   }
 

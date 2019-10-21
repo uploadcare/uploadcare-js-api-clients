@@ -1,4 +1,4 @@
-import {FileInfoInterface, GroupId} from './api/types'
+import {FileInfoInterface, GeoLocationInterface, GroupId} from './api/types'
 
 export interface SettingsInterface {
   baseCDN?: string;
@@ -42,14 +42,34 @@ export interface OriginalImageInfoInterface {
   height: number;
   format: string;
   datetimeOriginal: null | string;
-  geoLocation: null | {
-    latitude: number;
-    longitude: number;
-  };
+  geoLocation: null | GeoLocationInterface;
   orientation: null | number;
   dpi: null | number[];
   colorMode: string;
   sequence?: boolean;
+}
+
+interface AudioInterface {
+  bitrate: number | null;
+  codec: string | null;
+  sampleRate: number | null;
+  channels: string | null;
+}
+
+interface VideoInterface {
+  height: number;
+  width: number;
+  frameRate: number;
+  bitrate: number;
+  codec: string;
+}
+
+export interface OriginalVideoInfoInterface {
+  duration: number;
+  format: string;
+  bitrate: number;
+  audio: AudioInterface | null;
+  video: VideoInterface;
 }
 
 /* TODO Add sourceInfo */
@@ -64,6 +84,7 @@ export interface UploadcareFileInterface {
   readonly originalUrl: null | string;
   readonly originalFilename: null | string;
   readonly originalImageInfo: null | OriginalImageInfoInterface;
+  readonly originalVideoInfo: null | OriginalVideoInfoInterface;
 }
 
 export interface UploadcareGroupInterface {

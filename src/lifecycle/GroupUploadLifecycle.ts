@@ -4,7 +4,7 @@ import {SettingsInterface, UploadcareGroupInterface} from '../types'
 import {UploadedState} from './state/UploadedState'
 
 export class GroupUploadLifecycle implements GroupUploadLifecycleInterface {
-  private readonly uploadLifecycle: LifecycleInterface<UploadcareGroupInterface>
+  readonly uploadLifecycle: LifecycleInterface<UploadcareGroupInterface>;
 
   constructor(lifecycle: LifecycleInterface<UploadcareGroupInterface>) {
     this.uploadLifecycle = lifecycle

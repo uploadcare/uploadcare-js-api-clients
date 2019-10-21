@@ -21,7 +21,7 @@ interface ProgressInterface {
 
 export interface ProgressStatusInterface extends StatusInterface, ProgressInterface {}
 
-interface GeoLocationInterface {
+export interface GeoLocationInterface {
   latitude: number;
   longitude: number;
 }
@@ -61,7 +61,7 @@ interface VideoInfoInterface {
   video: VideoInterface;
 }
 
-export interface FileInfoInterface extends ProgressInterface, ImageInfoInterface, VideoInfoInterface {
+export interface FileInfoInterface extends ProgressInterface {
   uuid: Uuid;
   file_id: Uuid;
   original_filename: string;
@@ -70,6 +70,8 @@ export interface FileInfoInterface extends ProgressInterface, ImageInfoInterface
   is_image: string;
   is_store: string;
   is_ready: string;
+  image_info: null | ImageInfoInterface;
+  video_info: null | VideoInfoInterface;
 }
 
 export interface GroupInfoInterface {

@@ -3,7 +3,7 @@ import {Thenable} from '../thenable/Thenable'
 /* Types */
 import {UploadcareGroupInterface, UploadingProgress} from '../types'
 import {GroupHandlerInterface} from './types'
-import {CancelableInterface, GroupUploadLifecycleInterface} from '../lifecycle/types'
+import {GroupUploadLifecycleInterface} from '../lifecycle/types'
 import {GroupUploadInterface} from './types'
 
 export class GroupUpload extends Thenable<UploadcareGroupInterface> implements GroupUploadInterface {
@@ -13,22 +13,22 @@ export class GroupUpload extends Thenable<UploadcareGroupInterface> implements G
   onCancel: (() => void) | null = null
 
   protected readonly promise: Promise<UploadcareGroupInterface>
-  private readonly cancelable: CancelableInterface
 
-  constructor(lifecycle: GroupUploadLifecycleInterface, handler: GroupHandlerInterface, cancelable: CancelableInterface) {
+  private readonly lifecycle: GroupUploadLifecycleInterface
+  private readonly handler: GroupHandlerInterface
+
+  constructor(lifecycle: GroupUploadLifecycleInterface, handler: GroupHandlerInterface) {
     super()
-    this.cancelable = cancelable
-    const uploadLifecycle = lifecycle.getUploadLifecycle()
 
-    uploadLifecycle.onProgress = this.onProgress
-    uploadLifecycle.onUploaded = this.onUploaded
-    uploadLifecycle.onReady = this.onReady
-    uploadLifecycle.onCancel = this.onCancel
-
-    this.promise = handler.upload()
+    this.handler = handler
+    this.lifecycle = lifecycle
+    this.promise = handler.upload(lifecycle)
   }
 
+  /**
+   * Cancel uploading.
+   */
   cancel(): void {
-    this.cancelable.cancel()
+    this.handler.cancel(this.lifecycle)
   }
 }

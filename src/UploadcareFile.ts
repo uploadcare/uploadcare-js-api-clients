@@ -1,4 +1,9 @@
-import {OriginalImageInfoInterface, SettingsInterface, UploadcareFileInterface} from './types'
+import {
+  OriginalImageInfoInterface,
+  OriginalVideoInfoInterface,
+  SettingsInterface,
+  UploadcareFileInterface
+} from './types'
 import prettyFileInfo from './prettyFileInfo'
 import {FileInfoInterface, Uuid} from './api/types'
 
@@ -13,6 +18,7 @@ export class UploadcareFile implements UploadcareFileInterface {
   readonly originalUrl: null | string = null
   readonly originalFilename: null | string = null
   readonly originalImageInfo: null | OriginalImageInfoInterface = null
+  readonly originalVideoInfo: null | OriginalVideoInfoInterface = null
 
   constructor(file: UploadcareFileInterface) {
     this.uuid = file.uuid
@@ -25,6 +31,7 @@ export class UploadcareFile implements UploadcareFileInterface {
     this.originalUrl = file.originalUrl
     this.originalFilename = file.originalFilename
     this.originalImageInfo = file.originalImageInfo
+    this.originalVideoInfo = file.originalVideoInfo
   }
 
   static fromFileInfo(fileInfo: FileInfoInterface, settings: SettingsInterface): UploadcareFileInterface {
@@ -41,6 +48,7 @@ export class UploadcareFile implements UploadcareFileInterface {
       originalUrl: pretty.originalUrl,
       originalFilename: pretty.originalFilename,
       originalImageInfo: pretty.originalImageInfo,
+      originalVideoInfo: pretty.originalVideoInfo,
     })
   }
 
@@ -56,6 +64,7 @@ export class UploadcareFile implements UploadcareFileInterface {
       originalUrl: null,
       originalFilename: null,
       originalImageInfo: null,
+      originalVideoInfo: null,
     })
   }
 }

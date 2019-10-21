@@ -2,7 +2,7 @@ import * as factory from '../_fixtureFactory'
 import fileFrom from '../../src/fileFrom/fileFrom'
 import {getSettingsForTesting} from '../_helpers'
 
-fdescribe('fileFrom', () => {
+describe('fileFrom', () => {
   describe('Uploaded', () => {
     const uuid = factory.uuid('image')
 
