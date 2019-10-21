@@ -9,28 +9,9 @@ import {FileData, SettingsInterface, UploadcareGroupInterface} from '../types'
 import {Url} from '../api/fromUrl'
 import {Uuid} from '../api/types'
 import {isFileDataArray, isUrlArray, isUuidArray} from './types'
-import {GroupUploadLifecycleInterface, LifecycleInterface, UploadInterface} from '../lifecycle/types'
+import {GroupUploadLifecycleInterface, UploadInterface} from '../lifecycle/types'
 import {Upload} from '../lifecycle/Upload'
-
-const createProxyHandler = (lifecycle: LifecycleInterface<UploadcareGroupInterface>): ProxyHandler<UploadInterface<UploadcareGroupInterface>> => {
-  return {
-    set: (target, propertyKey, newValue): boolean => {
-      if (propertyKey === 'onProgress'
-        || propertyKey === 'onUploaded'
-        || propertyKey === 'onReady'
-        || propertyKey === 'onCancel') {
-        // update object property
-        target[propertyKey] = newValue
-
-        // and update uploadLifecycle property
-        lifecycle[propertyKey] = newValue
-        return true
-      } else {
-        return false
-      }
-    }
-  }
-}
+import {createProxyHandler} from '../lifecycle/createProxyHandler'
 
 /**
  * Uploads file from provided data.
@@ -43,7 +24,7 @@ const createProxyHandler = (lifecycle: LifecycleInterface<UploadcareGroupInterfa
 export default function groupFrom(data: FileData[] | Url[] | Uuid[], settings: SettingsInterface = {}): UploadInterface<UploadcareGroupInterface> {
   const lifecycle = new UploadLifecycle<UploadcareGroupInterface>()
   const groupUploadLifecycle = new GroupUploadLifecycle(lifecycle)
-  const lifecycleProxyHandler = createProxyHandler(lifecycle)
+  const lifecycleProxyHandler = createProxyHandler<UploadcareGroupInterface>(lifecycle)
 
   if (isFileDataArray(data)) {
     const fileHandler = new GroupFromObject(data, settings)

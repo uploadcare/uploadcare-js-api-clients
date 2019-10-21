@@ -8,29 +8,10 @@ import {FileFromUrl} from './FileFromUrl'
 import {FileData, SettingsInterface, UploadcareFileInterface} from '../types'
 import {Url} from '../api/fromUrl'
 import {Uuid} from '../api/types'
-import {FileUploadLifecycleInterface, LifecycleInterface, UploadInterface} from '../lifecycle/types'
+import {FileUploadLifecycleInterface, UploadInterface} from '../lifecycle/types'
 import {isFileData, isUrl, isUuid} from './types'
 import {Upload} from '../lifecycle/Upload'
-
-const createProxyHandler = (lifecycle: LifecycleInterface<UploadcareFileInterface>): ProxyHandler<UploadInterface<UploadcareFileInterface>> => {
-  return {
-    set: (target, propertyKey, newValue): boolean => {
-      if (propertyKey === 'onProgress'
-        || propertyKey === 'onUploaded'
-        || propertyKey === 'onReady'
-        || propertyKey === 'onCancel') {
-        // update object property
-        target[propertyKey] = newValue
-
-        // and update uploadLifecycle property
-        lifecycle[propertyKey] = newValue
-        return true
-      } else {
-        return false
-      }
-    }
-  }
-}
+import {createProxyHandler} from '../lifecycle/createProxyHandler'
 
 /**
  * Uploads file from provided data.
@@ -43,7 +24,7 @@ const createProxyHandler = (lifecycle: LifecycleInterface<UploadcareFileInterfac
 export default function fileFrom(data: FileData | Url | Uuid, settings: SettingsInterface = {}): UploadInterface<UploadcareFileInterface> {
   const lifecycle = new UploadLifecycle<UploadcareFileInterface>()
   const fileUploadLifecycle = new FileUploadLifecycle(lifecycle)
-  const lifecycleProxyHandler = createProxyHandler(lifecycle)
+  const lifecycleProxyHandler = createProxyHandler<UploadcareFileInterface>(lifecycle)
 
   if (isFileData(data)) {
     const fileHandler = new FileFromObject(data, settings)
