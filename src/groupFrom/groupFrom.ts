@@ -1,17 +1,16 @@
-import {UploadFromUrl} from './UploadFromUrl'
+import {GroupUploadLifecycle} from '../lifecycle/GroupUploadLifecycle'
+import {UploadLifecycle} from '../lifecycle/UploadLifecycle'
+import {UploadGroup} from '../lifecycle/UploadGroup'
+import {GroupFromObject} from './GroupFromObject'
+import {GroupFromUploaded} from './GroupFromUploaded'
+import {GroupFromUrl} from './GroupFromUrl'
 
 /* Types */
 import {FileData, SettingsInterface, UploadcareGroupInterface} from '../types'
 import {Url} from '../api/fromUrl'
 import {Uuid} from '../api/types'
 import {GroupUploadInterface, isFileDataArray, isUrlArray, isUuidArray} from './types'
-import {UploadLifecycle} from '../lifecycle/UploadLifecycle'
-import {UploadGroup} from '../lifecycle/UploadGroup'
 import {LifecycleInterface, UploadInterface} from '../lifecycle/types'
-import {GroupUploadLifecycle} from '../lifecycle/GroupUploadLifecycle'
-import {GroupFromObject} from './GroupFromObject'
-import {GroupFromUploaded} from './GroupFromUploaded'
-import {GroupFromUrl} from './GroupFromUrl'
 
 const createProxyHandler = (lifecycle: LifecycleInterface<UploadcareGroupInterface>): ProxyHandler<UploadInterface<UploadcareGroupInterface>> => {
   return {
@@ -51,10 +50,6 @@ export default function groupFrom(data: FileData[] | Url[] | Uuid[], settings: S
     const fileUpload = new UploadGroup(groupUploadLifecycle, fileHandler)
 
     return new Proxy(fileUpload, lifecycleProxyHandler)
-  }
-
-  if (isUrlArray(data)) {
-    return new UploadFromUrl(data, settings)
   }
 
   if (isUrlArray(data)) {
