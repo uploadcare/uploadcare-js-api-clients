@@ -6,10 +6,9 @@ import CancelError from '../errors/CancelError'
 import TokenWasNotFoundError from '../errors/TokenWasNotFoundError'
 
 /* Types */
-import {FileHandlerInterface} from './types'
 import {Uuid} from '../api/types'
 import {ProgressStateEnum, SettingsInterface, UploadcareFileInterface} from '../types'
-import {FileUploadLifecycleInterface} from '../lifecycle/types'
+import {FileUploadLifecycleInterface, UploadHandlerInterface} from '../lifecycle/types'
 import {Url} from '..'
 import {PollPromiseInterface} from '../tools/poll'
 import {
@@ -20,7 +19,7 @@ import {
 } from '../api/fromUrlStatus'
 import {FromUrlResponse, isFileInfoResponse, isTokenResponse} from '../api/fromUrl'
 
-export class FileFromUrl implements FileHandlerInterface {
+export class FileFromUrl implements UploadHandlerInterface<UploadcareFileInterface, FileUploadLifecycleInterface> {
   private isFileUploadedFromUrlPolling: PollPromiseInterface<FromUrlStatusResponse> | null = null
   private isCancelled = false
   private unknownStatusWasTimes = 0

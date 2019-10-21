@@ -1,17 +1,6 @@
-import {FileUploadLifecycleInterface} from '../lifecycle/types'
-import {FileData, UploadcareFileInterface} from '../types'
+import {FileData} from '../types'
 import {Url, Uuid} from '..'
 import {isNode} from '../tools/isNode'
-
-export interface UploadHandlerInterface<T, U> {
-  upload(entityUploadLifecycle: U): Promise<T>;
-  cancel(entityUploadLifecycle: U): void;
-}
-
-export interface FileHandlerInterface {
-  upload(fileUploadLifecycle: FileUploadLifecycleInterface): Promise<UploadcareFileInterface>;
-  cancel(fileUploadLifecycle: FileUploadLifecycleInterface): void;
-}
 
 /**
  * FileData type guard.

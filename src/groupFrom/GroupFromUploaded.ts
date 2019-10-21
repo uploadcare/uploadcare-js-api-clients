@@ -2,13 +2,12 @@ import group from '../api/group'
 import CancelError from '../errors/CancelError'
 
 /* Types */
-import {GroupHandlerInterface} from './types'
-import {GroupUploadLifecycleInterface} from '../lifecycle/types'
+import {GroupUploadLifecycleInterface, UploadHandlerInterface} from '../lifecycle/types'
 import {SettingsInterface, UploadcareGroupInterface} from '../types'
 import {Uuid} from '..'
 import {GroupInfoInterface} from '../api/types'
 
-export class GroupFromUploaded implements GroupHandlerInterface {
+export class GroupFromUploaded implements UploadHandlerInterface<UploadcareGroupInterface, GroupUploadLifecycleInterface> {
   private isCancelled = false
 
   private readonly data: Uuid[]

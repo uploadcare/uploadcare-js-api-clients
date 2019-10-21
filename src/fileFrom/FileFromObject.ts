@@ -4,14 +4,13 @@ import multipart from '../multipart/multipart'
 import {isMultipart} from '../multipart/isMultipart'
 
 /* Types */
-import {FileUploadLifecycleInterface} from '../lifecycle/types'
-import {FileHandlerInterface} from './types'
+import {FileUploadLifecycleInterface, UploadHandlerInterface} from '../lifecycle/types'
 import {BaseThenableInterface} from '../thenable/types'
 import {BaseResponse} from '../api/base'
 import {FileInfoInterface} from '../api/types'
 import {FileData, SettingsInterface, UploadcareFileInterface} from '../types'
 
-export class FileFromObject implements FileHandlerInterface {
+export class FileFromObject implements UploadHandlerInterface<UploadcareFileInterface, FileUploadLifecycleInterface> {
   private readonly request: BaseThenableInterface<BaseResponse> | BaseThenableInterface<FileInfoInterface>
   private readonly settings: SettingsInterface
   private readonly isMultipart: boolean = false

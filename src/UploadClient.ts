@@ -4,21 +4,16 @@ import fileFrom from './fileFrom/fileFrom'
 import groupFrom from './groupFrom/groupFrom'
 
 /* Types */
-import {FileData, SettingsInterface, UploadcareFileInterface} from './types'
+import {
+  FileData,
+  SettingsInterface,
+  UploadcareFileInterface,
+  UploadcareGroupInterface,
+  UploadClientInterface
+} from './types'
 import {Url} from './api/fromUrl'
 import {UploadAPIInterface, Uuid} from './api/types'
-import {GroupUploadInterface} from './groupFrom/types'
 import {UploadInterface} from './lifecycle/types'
-
-export interface UploadClientInterface {
-  updateSettings(newSettings: SettingsInterface): void;
-
-  getSettings(): SettingsInterface;
-
-  fileFrom(data: FileData | Url | Uuid, settings?: SettingsInterface): UploadInterface<UploadcareFileInterface>;
-
-  groupFrom(data: FileData[] | Url[] | Uuid[], settings?: SettingsInterface): GroupUploadInterface;
-}
 
 class UploadClient implements UploadClientInterface {
   private settings: SettingsInterface
@@ -52,7 +47,7 @@ class UploadClient implements UploadClientInterface {
     })
   }
 
-  groupFrom(data: FileData[] | Url[] | Uuid[], settings: SettingsInterface = {}): GroupUploadInterface {
+  groupFrom(data: FileData[] | Url[] | Uuid[], settings: SettingsInterface = {}): UploadInterface<UploadcareGroupInterface> {
     return groupFrom(data, {
       ...this.settings,
       ...settings,

@@ -21,13 +21,12 @@ export class FileUploadLifecycle implements FileUploadLifecycleInterface {
     const uploadLifecycle = this.uploadLifecycle
 
     uploadLifecycle.updateEntity(file)
+    uploadLifecycle.handleUploaded(uuid)
 
     this.isFileReadyPolling = checkFileIsReady({
       uuid,
       settings,
     })
-
-    uploadLifecycle.handleUploaded(uuid)
 
     return this.isFileReadyPolling
       .then(info => {

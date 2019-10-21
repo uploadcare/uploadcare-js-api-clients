@@ -1,13 +1,12 @@
-import {GroupHandlerInterface} from './types'
 import {SettingsInterface, UploadcareFileInterface, UploadcareGroupInterface} from '../types'
 import {Url} from '..'
-import {GroupUploadLifecycleInterface, UploadInterface} from '../lifecycle/types'
+import {GroupUploadLifecycleInterface, UploadHandlerInterface, UploadInterface} from '../lifecycle/types'
 import fileFrom from '../fileFrom/fileFrom'
 import group from '../api/group'
 import {GroupInfoInterface} from '../api/types'
 import CancelError from '../errors/CancelError'
 
-export class GroupFromUrl implements GroupHandlerInterface {
+export class GroupFromUrl implements UploadHandlerInterface<UploadcareGroupInterface, GroupUploadLifecycleInterface> {
   private isCancelled = false
 
   private readonly data: Url[]

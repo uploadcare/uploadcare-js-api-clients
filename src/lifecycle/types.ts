@@ -55,9 +55,9 @@ export interface LifecycleInterface<T> extends LifecycleHooksInterface<T> {
   handleError(error: Error): Promise<never>;
 }
 
-export interface HandlerInterface<T> {
-  upload(entityUploadLifecycle: FileUploadLifecycleInterface): Promise<T>;
-  cancel(entityUploadLifecycle: FileUploadLifecycleInterface): void;
+export interface UploadHandlerInterface<T, U> {
+  upload(entityUploadLifecycle: U): Promise<T>;
+  cancel(entityUploadLifecycle: U): void;
 }
 
 export interface FileUploadLifecycleInterface {

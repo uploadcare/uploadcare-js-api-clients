@@ -1,6 +1,5 @@
 import {UploadLifecycle} from '../lifecycle/UploadLifecycle'
 import {FileUploadLifecycle} from '../lifecycle/FileUploadLifecycle'
-import {UploadFile} from '../lifecycle/UploadFile'
 import {FileFromObject} from './FileFromObject'
 import {FileFromUploaded} from './FileFromUploaded'
 import {FileFromUrl} from './FileFromUrl'
@@ -9,8 +8,9 @@ import {FileFromUrl} from './FileFromUrl'
 import {FileData, SettingsInterface, UploadcareFileInterface} from '../types'
 import {Url} from '../api/fromUrl'
 import {Uuid} from '../api/types'
-import {LifecycleInterface, UploadInterface} from '../lifecycle/types'
+import {FileUploadLifecycleInterface, LifecycleInterface, UploadInterface} from '../lifecycle/types'
 import {isFileData, isUrl, isUuid} from './types'
+import {Upload} from '../lifecycle/Upload'
 
 const createProxyHandler = (lifecycle: LifecycleInterface<UploadcareFileInterface>): ProxyHandler<UploadInterface<UploadcareFileInterface>> => {
   return {
@@ -47,21 +47,21 @@ export default function fileFrom(data: FileData | Url | Uuid, settings: Settings
 
   if (isFileData(data)) {
     const fileHandler = new FileFromObject(data, settings)
-    const fileUpload = new UploadFile(fileUploadLifecycle, fileHandler)
+    const fileUpload = new Upload<UploadcareFileInterface, FileUploadLifecycleInterface>(fileUploadLifecycle, fileHandler)
 
     return new Proxy(fileUpload, lifecycleProxyHandler)
   }
 
   if (isUrl(data)) {
     const fileHandler = new FileFromUrl(data, settings)
-    const fileUpload = new UploadFile(fileUploadLifecycle, fileHandler)
+    const fileUpload = new Upload<UploadcareFileInterface, FileUploadLifecycleInterface>(fileUploadLifecycle, fileHandler)
 
     return new Proxy(fileUpload, lifecycleProxyHandler)
   }
 
   if (isUuid(data)) {
     const fileHandler = new FileFromUploaded(data, settings)
-    const fileUpload = new UploadFile(fileUploadLifecycle, fileHandler)
+    const fileUpload = new Upload<UploadcareFileInterface, FileUploadLifecycleInterface>(fileUploadLifecycle, fileHandler)
 
     return new Proxy(fileUpload, lifecycleProxyHandler)
   }
