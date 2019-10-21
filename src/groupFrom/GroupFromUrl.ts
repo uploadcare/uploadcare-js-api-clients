@@ -1,5 +1,5 @@
 import {GroupHandlerInterface} from './types'
-import {FileData, SettingsInterface, UploadcareFileInterface, UploadcareGroupInterface} from '../types'
+import {SettingsInterface, UploadcareFileInterface, UploadcareGroupInterface} from '../types'
 import {Url} from '..'
 import {GroupUploadLifecycleInterface, UploadInterface} from '../lifecycle/types'
 import fileFrom from '../fileFrom/fileFrom'
