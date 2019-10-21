@@ -1,25 +1,26 @@
-import {FileHandlerInterface} from './types'
-import {BaseThenableInterface} from '../thenable/types'
-import base, {BaseResponse} from '../api/base'
-import {FileInfoInterface, Uuid} from '../api/types'
-import {FileData, ProgressStateEnum, SettingsInterface, UploadcareFileInterface} from '../types'
-import {getFileSize} from '../api/multipart/getFileSize'
 import defaultSettings from '../defaultSettings'
-import multipart from '../multipart/multipart'
+import fromUrl from '../api/fromUrl'
+import fromUrlStatus from '../api/fromUrlStatus'
+import checkFileIsUploadedFromUrl from '../checkFileIsUploadedFromUrl'
+import CancelError from '../errors/CancelError'
+import TokenWasNotFoundError from '../errors/TokenWasNotFoundError'
+
+/* Types */
+import {FileHandlerInterface} from './types'
+import {Uuid} from '../api/types'
+import {ProgressStateEnum, SettingsInterface, UploadcareFileInterface} from '../types'
 import {FileUploadLifecycleInterface} from '../lifecycle/types'
 import {Url} from '..'
 import {PollPromiseInterface} from '../tools/poll'
-import fromUrlStatus, {
+import {
   FromUrlStatusResponse,
   isErrorResponse, isProgressResponse, isSuccessResponse,
   isUnknownResponse,
   isWaitingResponse
 } from '../api/fromUrlStatus'
-import fromUrl, {FromUrlResponse, isFileInfoResponse, isTokenResponse} from '../api/fromUrl'
-import checkFileIsUploadedFromUrl from '../checkFileIsUploadedFromUrl'
-import CancelError from '../errors/CancelError'
+import {FromUrlResponse, isFileInfoResponse, isTokenResponse} from '../api/fromUrl'
 
-export class FromUrlFileHandler implements FileHandlerInterface {
+export class FileFromUrl implements FileHandlerInterface {
   private isFileUploadedFromUrlPolling: PollPromiseInterface<FromUrlStatusResponse> | null = null
   private isCancelled = false
   private unknownStatusWasTimes = 0
@@ -37,18 +38,15 @@ export class FromUrlFileHandler implements FileHandlerInterface {
 
     return fromUrl(this.data, this.settings)
       .then((response) => this.handleFromUrlResponse(response, lifecycle))
-      .then(uploadLifecycle.handleReady.bind(uploadLifecycle))
       .catch(uploadLifecycle.handleError.bind(uploadLifecycle))
   }
 
   private handleFromUrlResponse = (response: FromUrlResponse, lifecycle: FileUploadLifecycleInterface) => {
     if (isTokenResponse(response)) {
       const {token} = response
-      const uploadLifecycle = lifecycle.uploadLifecycle
 
       return fromUrlStatus(token, this.settings)
         .then(response => this.handleFromUrlStatusResponse(token, response, lifecycle) )
-        .catch(uploadLifecycle.handleError.bind(uploadLifecycle))
     } else if (isFileInfoResponse(response)) {
       const {uuid} = response
 
@@ -75,18 +73,16 @@ export class FromUrlFileHandler implements FileHandlerInterface {
       this.unknownStatusWasTimes++
 
       if (this.unknownStatusWasTimes === 3) {
-        return Promise.reject(`Token "${token}" was not found.`)
+        return Promise.reject(new TokenWasNotFoundError(token))
       } else {
         return this.isFileUploadedFromUrlPolling
           .then(status => this.handleFromUrlStatusResponse(token, status, lifecycle))
-          .catch(uploadLifecycle.handleError.bind(uploadLifecycle))
       }
     }
 
     if (isWaitingResponse(response)) {
       return this.isFileUploadedFromUrlPolling
         .then(status => this.handleFromUrlStatusResponse(token, status, lifecycle))
-        .catch(uploadLifecycle.handleError.bind(uploadLifecycle))
     }
 
     if (isErrorResponse(response)) {
@@ -105,7 +101,6 @@ export class FromUrlFileHandler implements FileHandlerInterface {
 
       return this.isFileUploadedFromUrlPolling
         .then(status => this.handleFromUrlStatusResponse(token, status, lifecycle))
-        .catch(uploadLifecycle.handleError.bind(uploadLifecycle))
     }
 
     if (isSuccessResponse(response)) {
@@ -116,8 +111,6 @@ export class FromUrlFileHandler implements FileHandlerInterface {
       }
 
       return lifecycle.handleUploadedFile(uuid, this.settings)
-        .then(uploadLifecycle.handleReady.bind(uploadLifecycle))
-        .catch(uploadLifecycle.handleError.bind(uploadLifecycle))
     }
   }
 

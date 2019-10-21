@@ -1,5 +1,4 @@
 import checkFileIsReady from '../checkFileIsReady'
-import {UploadedState} from './state/UploadedState'
 import {UploadcareFile} from '../UploadcareFile'
 
 /* Types */

@@ -1,12 +1,15 @@
-import {FileHandlerInterface} from './types'
-import {BaseThenableInterface} from '../thenable/types'
-import base, {BaseResponse} from '../api/base'
-import {FileInfoInterface} from '../api/types'
-import {FileData, SettingsInterface, UploadcareFileInterface} from '../types'
+import base from '../api/base'
 import {getFileSize} from '../api/multipart/getFileSize'
 import defaultSettings from '../defaultSettings'
 import multipart from '../multipart/multipart'
+
+/* Types */
 import {FileUploadLifecycleInterface} from '../lifecycle/types'
+import {FileHandlerInterface} from './types'
+import {BaseThenableInterface} from '../thenable/types'
+import {BaseResponse} from '../api/base'
+import {FileInfoInterface} from '../api/types'
+import {FileData, SettingsInterface, UploadcareFileInterface} from '../types'
 
 /**
  * Check if FileData is multipart data.
@@ -21,7 +24,7 @@ const isMultipart = (data: FileData, multipartMinFileSize: number): boolean => {
   return fileSize >= multipartMinFileSize
 }
 
-export class FromObjectFileHandler implements FileHandlerInterface {
+export class FileFromObject implements FileHandlerInterface {
   private readonly request: BaseThenableInterface<BaseResponse> | BaseThenableInterface<FileInfoInterface>
   private readonly settings: SettingsInterface
   private readonly isMultipart: boolean = false

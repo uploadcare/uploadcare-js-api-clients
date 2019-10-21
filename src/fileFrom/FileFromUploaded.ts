@@ -1,5 +1,6 @@
 import info from '../api/info'
 
+/* Types */
 import {FileHandlerInterface} from './types'
 import {SettingsInterface, UploadcareFileInterface, Uuid} from '..'
 import {FileUploadLifecycleInterface} from '../lifecycle/types'
@@ -8,7 +9,7 @@ import {CancelableThenableInterface} from '../thenable/types'
 import {FileInfoInterface} from '../api/types'
 import CancelError from '../errors/CancelError'
 
-export class FromUploadedFileHandler implements FileHandlerInterface {
+export class FileFromUploaded implements FileHandlerInterface {
   private readonly request: CancelableThenableInterface<FileInfoInterface>
   private readonly settings: SettingsInterface
   private isCancelled = false
