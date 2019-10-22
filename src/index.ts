@@ -18,11 +18,15 @@ import fileFrom from './fileFrom/fileFrom'
 import groupFrom from './groupFrom/groupFrom'
 
 /* Types */
-export {SettingsInterface, FileData, OriginalImageInfoInterface, UploadcareFileInterface} from './types'
+export {
+  SettingsInterface,
+  FileData,
+  OriginalImageInfoInterface,
+  UploadcareFileInterface,
+  UploadClientInterface
+} from './types'
 export {Url} from './api/fromUrl'
 export {Uuid, UploadAPIInterface} from './api/types'
-export {FileUploadInterface} from './fileFrom/types'
-export {UploadClientInterface} from './UploadClient'
 export {RequestOptionsInterface, RequestInterface} from './api/request/types'
 
 /* Low-Level API */

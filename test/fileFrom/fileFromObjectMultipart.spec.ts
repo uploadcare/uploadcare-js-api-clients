@@ -23,12 +23,13 @@ describe('fileFrom', () => {
       const settings = getSettingsForTesting({
         publicKey: factory.publicKey('image'),
         doNotStore: true,
+        pollingTimeoutMilliseconds: 20000
       })
       const filePromise = fileFrom(fileToUpload.data, settings)
       const file = await filePromise
 
       expect(file.isStored).toBeFalsy()
-    })
+    }, 20000)
 
     it('should be able to cancel uploading', (done) => {
       const settings = getSettingsForTesting({

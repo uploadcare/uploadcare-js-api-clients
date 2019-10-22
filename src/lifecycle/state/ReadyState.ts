@@ -9,7 +9,7 @@ export class ReadyState extends AbstractState implements LifecycleStateInterface
     value: 1,
   }
   protected nextPossibleState: ProgressStateEnum[] = [
-    ProgressStateEnum.Canceled,
+    ProgressStateEnum.Cancelled,
     ProgressStateEnum.Error,
   ]
 }

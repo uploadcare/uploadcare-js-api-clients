@@ -21,6 +21,7 @@ export default function prettyFileInfo(info: FileInfoInterface, settings: Settin
     fileId,
     defaultEffects,
     imageInfo,
+    videoInfo,
     s3Bucket,
   } = camelizeKeys(info)
 
@@ -31,8 +32,8 @@ export default function prettyFileInfo(info: FileInfoInterface, settings: Settin
   const urlBase = s3Bucket
     ? `https://${s3Bucket}.s3.amazonaws.com/${fileId}/${filename}`
     : `${extendedSettings.baseCDN}/${fileId}/`
-  const cdnUrlModifiers = defaultEffects ? '-/' + defaultEffects : null
-  const cdnUrl = fileId ? urlBase + (cdnUrlModifiers || '') : null
+  const cdnUrlModifiers = defaultEffects ? `-/${defaultEffects}` : null
+  const cdnUrl = fileId ? `${urlBase}${(cdnUrlModifiers || '')}` : null
   const originalUrl = fileId ? urlBase : null
 
   return {
@@ -46,5 +47,6 @@ export default function prettyFileInfo(info: FileInfoInterface, settings: Settin
     originalUrl,
     originalFilename,
     originalImageInfo: imageInfo,
+    originalVideoInfo: videoInfo,
   }
 }

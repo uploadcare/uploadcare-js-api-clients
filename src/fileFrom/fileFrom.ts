@@ -1,73 +1,50 @@
-import {UploadFromObject} from './UploadFromObject'
-import {UploadFromUrl} from './UploadFromUrl'
-import {UploadFromUploaded} from './UploadFromUploaded'
-import {isNode} from '../tools/isNode'
+import {UploadLifecycle} from '../lifecycle/UploadLifecycle'
+import {FileUploadLifecycle} from '../lifecycle/FileUploadLifecycle'
+import {FileFromObject} from './FileFromObject'
+import {FileFromUploaded} from './FileFromUploaded'
+import {FileFromUrl} from './FileFromUrl'
 
 /* Types */
-import {FileData, SettingsInterface} from '../types'
+import {FileData, SettingsInterface, UploadcareFileInterface} from '../types'
 import {Url} from '../api/fromUrl'
 import {Uuid} from '../api/types'
-import {FileUploadInterface} from './types'
-
-/**
- * FileData type guard.
- *
- * @param {FileData | Url | Uuid} data
- */
-export const isFileData = (data: FileData | Url | Uuid): data is FileData => {
-  return data !== undefined &&
-    (
-      (!isNode() && data instanceof Blob) ||
-      (!isNode() && data instanceof File) ||
-      (isNode() && data instanceof Buffer)
-    )
-}
-
-/**
- * Uuid type guard.
- *
- * @param {FileData | Url | Uuid} data
- */
-export const isUuid = (data: FileData | Url | Uuid): data is Uuid => {
-  const UUID_REGEX = '[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}'
-  const regExp = (new RegExp(UUID_REGEX))
-
-  return !isFileData(data) &&
-    regExp.test(data)
-}
-
-/**
- * Url type guard.
- *
- * @param {FileData | Url | Uuid} data
- */
-export const isUrl = (data: FileData | Url | Uuid): data is Url => {
-  const URL_REGEX = '^(?:\\w+:)?\\/\\/([^\\s\\.]+\\.\\S{2}|localhost[\\:?\\d]*)\\S*$'
-  const regExp = (new RegExp(URL_REGEX))
-
-  return !isFileData(data) &&
-    regExp.test(data)
-}
+import {FileUploadLifecycleInterface, UploadInterface} from '../lifecycle/types'
+import {isFileData, isUrl, isUuid} from './types'
+import {Upload} from '../lifecycle/Upload'
+import {createProxyHandler} from '../lifecycle/createProxyHandler'
 
 /**
  * Uploads file from provided data.
  *
- * @param {FileData} data
+ * @param {FileData | Url | Uuid} data
  * @param {SettingsInterface} settings
- * @throws Error
- * @returns {FileUploadInterface}
+ * @throws TypeError
+ * @returns {UploadInterface<UploadcareFileInterface>}
  */
-export default function fileFrom(data: FileData | Url | Uuid, settings: SettingsInterface = {}): FileUploadInterface {
+export default function fileFrom(data: FileData | Url | Uuid, settings: SettingsInterface = {}): UploadInterface<UploadcareFileInterface> {
+  const lifecycle = new UploadLifecycle<UploadcareFileInterface>()
+  const fileUploadLifecycle = new FileUploadLifecycle(lifecycle)
+  const lifecycleProxyHandler = createProxyHandler<UploadcareFileInterface>(lifecycle)
+
   if (isFileData(data)) {
-    return new UploadFromObject(data, settings)
+    const fileHandler = new FileFromObject(data, settings)
+    const fileUpload = new Upload<UploadcareFileInterface, FileUploadLifecycleInterface>(fileUploadLifecycle, fileHandler)
+
+    return new Proxy(fileUpload, lifecycleProxyHandler)
   }
 
   if (isUrl(data)) {
-    return new UploadFromUrl(data, settings)
+    const fileHandler = new FileFromUrl(data, settings)
+    const fileUpload = new Upload<UploadcareFileInterface, FileUploadLifecycleInterface>(fileUploadLifecycle, fileHandler)
+
+    return new Proxy(fileUpload, lifecycleProxyHandler)
   }
 
   if (isUuid(data)) {
-    return new UploadFromUploaded(data, settings)
+    const fileHandler = new FileFromUploaded(data, settings)
+    const fileUpload = new Upload<UploadcareFileInterface, FileUploadLifecycleInterface>(fileUploadLifecycle, fileHandler)
+
+    return new Proxy(fileUpload, lifecycleProxyHandler)
   }
 
   throw new TypeError(`File uploading from "${data}" is not supported`)

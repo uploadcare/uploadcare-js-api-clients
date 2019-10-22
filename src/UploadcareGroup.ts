@@ -1,9 +1,7 @@
-import {UploadcareGroupInterface} from './types'
+import {UploadcareFileInterface, UploadcareGroupInterface} from './types'
 import {FileInfoInterface, GroupId, GroupInfoInterface} from './api/types'
 
 export class UploadcareGroup implements UploadcareGroupInterface {
-  private readonly groupInfo: GroupInfoInterface
-
   readonly uuid: GroupId
   readonly filesCount: string
   readonly totalSize: number
@@ -14,17 +12,29 @@ export class UploadcareGroup implements UploadcareGroupInterface {
   readonly createdAt: string
   readonly storedAt: string | null = null
 
-  constructor(groupInfo: GroupInfoInterface) {
-    this.groupInfo = groupInfo
+  constructor(group: UploadcareGroupInterface) {
+    this.uuid = group.uuid
+    this.filesCount = group.filesCount
+    this.totalSize = group.totalSize
+    this.isStored = group.isStored
+    this.isImage = group.isImage
+    this.cdnUrl = group.cdnUrl
+    this.files = group.files
+    this.createdAt = group.createdAt
+    this.storedAt = group.storedAt
+  }
 
-    this.uuid = groupInfo.id
-    this.filesCount = groupInfo.files_count
-    this.totalSize = groupInfo.files.reduce((acc, file) => acc + file.size, 0)
-    this.isStored = !!groupInfo.datetime_stored
-    this.isImage = !!groupInfo.files.filter(file => file.is_image).length
-    this.cdnUrl = groupInfo.cdn_url
-    this.files = groupInfo.files
-    this.createdAt = groupInfo.datetime_created
-    this.storedAt = groupInfo.datetime_stored
+  static fromGroupInfo(groupInfo: GroupInfoInterface): UploadcareGroupInterface {
+    return new UploadcareGroup({
+      uuid: groupInfo.id,
+      filesCount: groupInfo.files_count,
+      totalSize: groupInfo.files.reduce((acc, file) => acc + file.size, 0),
+      isStored: !!groupInfo.datetime_stored,
+      isImage: !!groupInfo.files.filter(file => file.is_image).length,
+      cdnUrl: groupInfo.cdn_url,
+      files: groupInfo.files,
+      createdAt: groupInfo.datetime_created,
+      storedAt: groupInfo.datetime_stored,
+    })
   }
 }

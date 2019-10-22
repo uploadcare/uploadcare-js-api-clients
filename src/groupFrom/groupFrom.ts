@@ -1,58 +1,17 @@
-import {UploadFromObject} from './UploadFromObject'
-import {UploadFromUrl} from './UploadFromUrl'
-import {UploadFromUploaded} from './UploadFromUploaded'
-import {isFileData, isUrl, isUuid} from '../fileFrom/fileFrom'
+import {GroupUploadLifecycle} from '../lifecycle/GroupUploadLifecycle'
+import {UploadLifecycle} from '../lifecycle/UploadLifecycle'
+import {GroupFromObject} from './GroupFromObject'
+import {GroupFromUploaded} from './GroupFromUploaded'
+import {GroupFromUrl} from './GroupFromUrl'
 
 /* Types */
-import {FileData, SettingsInterface} from '../types'
+import {FileData, SettingsInterface, UploadcareGroupInterface} from '../types'
 import {Url} from '../api/fromUrl'
 import {Uuid} from '../api/types'
-import {GroupUploadInterface} from './types'
-
-/**
- * FileData type guard.
- *
- * @param {FileData | Url | Uuid} data
- */
-export const isFileDataArray = (data: FileData[] | Url[] | Uuid[]): data is FileData[] => {
-  for (const item of data) {
-    if (!isFileData(item)) {
-      return false
-    }
-  }
-
-  return true
-}
-
-/**
- * Uuid type guard.
- *
- * @param {FileData | Url | Uuid} data
- */
-export const isUuidArray = (data: FileData[] | Url[] | Uuid[]): data is Uuid[] => {
-  for (const item of data) {
-    if (!isUuid(item)) {
-      return false
-    }
-  }
-
-  return true
-}
-
-/**
- * Url type guard.
- *
- * @param {FileData | Url | Uuid} data
- */
-export const isUrlArray = (data: FileData[] | Url[] | Uuid[]): data is Url[] => {
-  for (const item of data) {
-    if (!isUrl(item)) {
-      return false
-    }
-  }
-
-  return true
-}
+import {isFileDataArray, isUrlArray, isUuidArray} from './types'
+import {GroupUploadLifecycleInterface, UploadInterface} from '../lifecycle/types'
+import {Upload} from '../lifecycle/Upload'
+import {createProxyHandler} from '../lifecycle/createProxyHandler'
 
 /**
  * Uploads file from provided data.
@@ -60,19 +19,32 @@ export const isUrlArray = (data: FileData[] | Url[] | Uuid[]): data is Url[] => 
  * @param {FileData} data
  * @param {SettingsInterface} settings
  * @throws Error
- * @returns {FileUploadInterface}
+ * @returns {UploadInterface<UploadcareGroupInterface>}
  */
-export default function groupFrom(data: FileData[] | Url[] | Uuid[], settings: SettingsInterface = {}): GroupUploadInterface {
+export default function groupFrom(data: FileData[] | Url[] | Uuid[], settings: SettingsInterface = {}): UploadInterface<UploadcareGroupInterface> {
+  const lifecycle = new UploadLifecycle<UploadcareGroupInterface>()
+  const groupUploadLifecycle = new GroupUploadLifecycle(lifecycle)
+  const lifecycleProxyHandler = createProxyHandler<UploadcareGroupInterface>(lifecycle)
+
   if (isFileDataArray(data)) {
-    return new UploadFromObject(data, settings)
+    const fileHandler = new GroupFromObject(data, settings)
+    const fileUpload = new Upload<UploadcareGroupInterface, GroupUploadLifecycleInterface>(groupUploadLifecycle, fileHandler)
+
+    return new Proxy(fileUpload, lifecycleProxyHandler)
   }
 
   if (isUrlArray(data)) {
-    return new UploadFromUrl(data, settings)
+    const fileHandler = new GroupFromUrl(data, settings)
+    const fileUpload = new Upload<UploadcareGroupInterface, GroupUploadLifecycleInterface>(groupUploadLifecycle, fileHandler)
+
+    return new Proxy(fileUpload, lifecycleProxyHandler)
   }
 
   if (isUuidArray(data)) {
-    return new UploadFromUploaded(data, settings)
+    const fileHandler = new GroupFromUploaded(data, settings)
+    const fileUpload = new Upload<UploadcareGroupInterface, GroupUploadLifecycleInterface>(groupUploadLifecycle, fileHandler)
+
+    return new Proxy(fileUpload, lifecycleProxyHandler)
   }
 
   throw new TypeError(`Group uploading from "${data}" is not supported`)
