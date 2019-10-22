@@ -1,13 +1,15 @@
+import fileFrom from '../fileFrom/fileFrom'
+import group from '../api/group'
+import CancelError from '../errors/CancelError'
+
+/* Types */
 import {FileData, SettingsInterface, UploadcareFileInterface, UploadcareGroupInterface} from '../types'
 import {
   GroupUploadLifecycleInterface,
   UploadHandlerInterface,
   UploadInterface
 } from '../lifecycle/types'
-import fileFrom from '../fileFrom/fileFrom'
-import group from '../api/group'
 import {GroupInfoInterface} from '../api/types'
-import CancelError from '../errors/CancelError'
 
 export class GroupFromObject implements UploadHandlerInterface<UploadcareGroupInterface, GroupUploadLifecycleInterface> {
   private isCancelled = false
