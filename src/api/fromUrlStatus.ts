@@ -32,7 +32,7 @@ type ErrorResponse = {
   error: string;
 }
 
-type SuccessResponse = {
+export type SuccessResponse = {
   status: StatusEnum.Success;
 } & FileInfoInterface
 

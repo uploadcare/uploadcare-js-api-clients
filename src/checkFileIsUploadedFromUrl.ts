@@ -1,27 +1,52 @@
 import {SettingsInterface} from './types'
 import poll, {PollPromiseInterface} from './tools/poll'
-import fromUrlStatus, {FromUrlStatusResponse, isSuccessResponse} from './api/fromUrlStatus'
+import fromUrlStatus, {
+  isErrorResponse,
+  isProgressResponse,
+  isSuccessResponse,
+  isUnknownResponse, SuccessResponse
+} from './api/fromUrlStatus'
 import {Uuid} from './api/types'
-import defaultSettings from './defaultSettings'
 
 type FileIsUploadedParams = {
   token: Uuid;
   timeout?: number;
+  onUnknown?: Function;
   onProgress?: Function;
+  onError?: Function;
   settings?: SettingsInterface;
 }
 
-const checkFileIsUploadedFromUrl = ({token, timeout = defaultSettings.pollingTimeoutMilliseconds, onProgress, settings = {}}: FileIsUploadedParams): PollPromiseInterface<FromUrlStatusResponse> =>
-  poll<FromUrlStatusResponse>(
+const checkFileIsUploadedFromUrl = (
+  {
+    token,
+    timeout,
+    onUnknown,
+    onProgress,
+    settings = {}
+  }: FileIsUploadedParams): PollPromiseInterface<SuccessResponse> =>
+  poll<SuccessResponse>(
     async () => {
       const response = await fromUrlStatus(token, settings)
 
-      if (isSuccessResponse(response)) {
-        return response
+      if (isUnknownResponse(response)) {
+        if (onUnknown && typeof onUnknown === 'function') {
+          onUnknown(response)
+        }
       }
 
-      if (onProgress && typeof onProgress === 'function') {
-        onProgress(response)
+      if (isProgressResponse(response)) {
+        if (onProgress && typeof onProgress === 'function') {
+          onProgress(response)
+        }
+      }
+
+      if (isErrorResponse(response)) {
+        throw new Error(response.error)
+      }
+
+      if (isSuccessResponse(response)) {
+        return response
       }
 
       return false

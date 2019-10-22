@@ -17,6 +17,7 @@ export interface SettingsInterface {
   jsonpCallback?: string;
   pollingTimeoutMilliseconds?: number;
   maxContentLength?: number;
+  retryUnknownFromUrlStatusMaxTimes?: number;
   retryThrottledRequestMaxTimes?: number;
   multipartChunkSize?: number;
   multipartMinFileSize?: number;
@@ -30,6 +31,7 @@ export interface DefaultSettingsInterface extends SettingsInterface {
   fileName: string;
   maxContentLength: number;
   retryThrottledRequestMaxTimes: number;
+  retryUnknownFromUrlStatusMaxTimes: number;
   multipartMinFileSize: number;
   multipartChunkSize: number;
   multipartMinLastPartSize: number;
