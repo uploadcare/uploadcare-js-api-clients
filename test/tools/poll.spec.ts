@@ -54,7 +54,7 @@ fdescribe('poll', () => {
 
     setTimeout(() => {
       polling.cancel()
-    }, 1)
+    }, 100)
 
     polling
       .promise
@@ -82,13 +82,13 @@ fdescribe('poll', () => {
         // clearInterval(id)
         // console.log("         - — poll successfull ends")
 
-        return done.fail('Promise should not to be resolved')
+        done.fail('Promise should not to be resolved')
       })
       .catch((error) => {
         // clearInterval(id)
         // console.log(`         x — poll finished with ${error.message}`)
 
-        return error.name === 'CancelError' ? done() : done.fail(error)
+        error.name === 'CancelError' ? done() : done.fail(error)
       })
 
     setTimeout(() => {
