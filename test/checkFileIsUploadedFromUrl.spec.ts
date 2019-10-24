@@ -17,7 +17,7 @@ describe('checkFileIsUploadedFromUrl', () => {
     const info = await checkFileIsUploadedFromUrl({
       token,
       settings,
-    })
+    }).promise
 
     expect(info.status).toBe(StatusEnum.Success)
   })
@@ -35,6 +35,7 @@ describe('checkFileIsUploadedFromUrl', () => {
     }, 1)
 
     polling
+      .promise
       .then(() => done.fail('Promise should not to be resolved'))
       .catch((error) => {
         if (error.name === 'CancelError') {

@@ -1,9 +1,9 @@
 export default class TimeoutError extends Error {
-  constructor(fn: string) {
+  constructor(fn: string, timeout: number) {
     super()
 
     this.name = 'TimeoutError'
-    this.message = `Timed out for function "${fn}"`
+    this.message = `Timed out for function "${fn}" after ${timeout}`
 
     if (Error.captureStackTrace) {
       Error.captureStackTrace(this, TimeoutError)

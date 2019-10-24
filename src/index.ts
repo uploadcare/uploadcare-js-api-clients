@@ -52,4 +52,6 @@ export {
   groupFrom,
 }
 
+export {default as poll} from './tools/poll'
+
 export default UploadClient

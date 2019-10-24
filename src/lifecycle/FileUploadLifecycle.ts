@@ -29,6 +29,7 @@ export class FileUploadLifecycle implements FileUploadLifecycleInterface {
     })
 
     return this.isFileReadyPolling
+      .promise
       .then(info => {
         const file = UploadcareFile.fromFileInfo(info, settings)
         uploadLifecycle.updateEntity(file)

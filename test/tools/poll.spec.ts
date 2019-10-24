@@ -5,7 +5,7 @@ import * as factory from '../_fixtureFactory'
 import CancelError from '../../src/errors/CancelError'
 import {FileInfoInterface} from '../../src/api/types'
 
-describe('poll', () => {
+fdescribe('poll', () => {
   const uuid = factory.uuid('image')
   const settings = getSettingsForTesting({
     publicKey: factory.publicKey('image'),
@@ -15,7 +15,7 @@ describe('poll', () => {
   }
 
   it('should be resolved', async() => {
-    const result = await poll<FileInfoInterface>(
+    const polling = poll<FileInfoInterface>(
       async () => {
         const response = await info(uuid, settings)
 
@@ -30,6 +30,7 @@ describe('poll', () => {
         return false
       },
     )
+    const result = await polling.promise
 
     expect(result.is_ready).toBeTruthy()
   })
@@ -56,7 +57,43 @@ describe('poll', () => {
     }, 1)
 
     polling
+      .promise
       .then(() => done.fail('Promise should not to be resolved'))
       .catch((error) => error.name === 'CancelError' ? done() : done.fail(error))
+  })
+
+  it('should be able to cancel any polling', (done) => {
+    const createPool = time => {
+      let _isReady = false;
+
+      setTimeout(() => (_isReady = true), time);
+
+      return () => _isReady;
+    };
+
+    const check = createPool(5000);
+    const inst = poll(check);
+
+    // const id = setInterval(() => console.log('         |'), 500)
+
+    inst
+      .promise
+      .then(() => {
+        // clearInterval(id)
+        // console.log("         - — poll successfull ends")
+
+        return done.fail('Promise should not to be resolved')
+      })
+      .catch((error) => {
+        // clearInterval(id)
+        // console.log(`         x — poll finished with ${error.message}`)
+
+        return error.name === 'CancelError' ? done() : done.fail(error)
+      })
+
+    setTimeout(() => {
+      // console.log('         ^ — cancel event')
+      inst.cancel()
+    }, 1900)
   })
 })

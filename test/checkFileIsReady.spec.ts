@@ -13,7 +13,7 @@ describe('checkFileIsReady', () => {
     const result = await checkFileIsReady({
       uuid,
       settings,
-    })
+    }).promise
 
     expect(result.is_ready).toBeTruthy()
   })
@@ -33,6 +33,7 @@ describe('checkFileIsReady', () => {
     }, 1)
 
     await polling
+      .promise
       .then(() => done.fail('Promise should not to be resolved'))
       .catch((error) => {
         if (error.name === 'CancelError') {

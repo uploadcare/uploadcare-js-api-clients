@@ -54,7 +54,7 @@ export class FileFromUrl implements UploadHandlerInterface<UploadcareFileInterfa
         onUnknown,
         onProgress,
         settings,
-      })
+      }).promise
       const {uuid} = await this.request
         .catch(uploadLifecycle.handleError.bind(uploadLifecycle))
 
