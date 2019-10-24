@@ -29,6 +29,7 @@ export class FileFromUrl implements UploadHandlerInterface<UploadcareFileInterfa
 
     this.request = fromUrl(this.data, settings)
     const response = await this.request
+      .catch(uploadLifecycle.handleError.bind(uploadLifecycle))
 
     if (isTokenResponse(response)) {
       const {token} = response
@@ -55,6 +56,7 @@ export class FileFromUrl implements UploadHandlerInterface<UploadcareFileInterfa
         settings,
       })
       const {uuid} = await this.request
+        .catch(uploadLifecycle.handleError.bind(uploadLifecycle))
 
       return lifecycle.handleUploadedFile(uuid, settings)
     } else if (isFileInfoResponse(response)) {

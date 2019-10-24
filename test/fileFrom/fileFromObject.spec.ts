@@ -2,7 +2,7 @@ import * as factory from '../_fixtureFactory'
 import fileFrom from '../../src/fileFrom/fileFrom'
 import {getSettingsForTesting} from '../_helpers'
 
-describe('fileFrom', () => {
+fdescribe('fileFrom', () => {
   describe('Object', () => {
     const fileToUpload = factory.image('blackSquare')
 
