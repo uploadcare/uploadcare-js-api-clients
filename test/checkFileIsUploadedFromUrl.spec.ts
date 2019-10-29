@@ -3,8 +3,9 @@ import checkFileIsUploadedFromUrl from '../src/checkFileIsUploadedFromUrl'
 import {StatusEnum} from '../src/api/fromUrlStatus'
 import {getSettingsForTesting} from './_helpers'
 import fromUrl from '../src/api/fromUrl'
+import CancelError from '../src/errors/CancelError'
 
-describe('checkFileIsUploadedFromUrl', () => {
+fdescribe('checkFileIsUploadedFromUrl', () => {
   const sourceUrl = factory.imageUrl('valid')
   const settings = getSettingsForTesting({
     publicKey: factory.publicKey('demo')
@@ -34,15 +35,17 @@ describe('checkFileIsUploadedFromUrl', () => {
       polling.cancel()
     }, 1)
 
-    polling
-      .promise
-      .then(() => done.fail('Promise should not to be resolved'))
-      .catch((error) => {
-        if (error.name === 'CancelError') {
-          done()
-        } else {
-          done.fail(error)
-        }
-      })
+    expectAsync(polling.promise).toBeRejectedWith(new CancelError())
+
+    // await polling
+    //   .promise
+    //   .then(() => done.fail('Promise should not to be resolved'))
+    //   .catch((error) => {
+    //     if (error.name === 'CancelError') {
+    //       done()
+    //     } else {
+    //       done.fail(error)
+    //     }
+    //   })
   })
 })

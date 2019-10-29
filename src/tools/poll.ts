@@ -7,30 +7,30 @@ type ExecutorFunction = {
 
 interface CancelableSignal {
   signal: Promise<never>;
-  cancel: () => void
+  cancel: () => void;
 }
 
 export interface PollPromiseInterface<T> {
   promise: Promise<T>;
-  cancel: () => void
+  cancel: () => void;
 }
 
 export const DEFAULT_TIMEOUT = 10000
 const DEFAULT_INTERVAL = 500
 
 function createCancellableSignal(): CancelableSignal {
-  const ret = {}
+  const cancelable = {}
 
   // @ts-ignore
-  ret.signal = new Promise((resolve, reject) => {
+  cancelable.signal = new Promise((resolve, reject) => {
     // @ts-ignore
-    ret.cancel = () => {
+    cancelable.cancel = (): void => {
       reject(new CancelError())
     }
   })
 
   // @ts-ignore
-  return ret
+  return cancelable
 }
 
 export default function poll<T>(
@@ -63,7 +63,7 @@ export default function poll<T>(
 
       signal.catch(error => {
         reject(error)
-      });
+      })
     } catch (error) {
       reject(error)
     }

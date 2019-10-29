@@ -54,12 +54,14 @@ fdescribe('poll', () => {
 
     setTimeout(() => {
       polling.cancel()
-    }, 100)
+    }, 1)
 
-    polling
-      .promise
-      .then(() => done.fail('Promise should not to be resolved'))
-      .catch((error) => error.name === 'CancelError' ? done() : done.fail(error))
+    expectAsync(polling.promise).toBeRejectedWith(new CancelError())
+
+    // polling
+    //   .promise
+    //   .then(() => done.fail('Promise should not to be resolved'))
+    //   .catch((error) => error.name === 'CancelError' ? done() : done.fail(error))
   })
 
   it('should be able to cancel any polling', (done) => {
@@ -89,6 +91,41 @@ fdescribe('poll', () => {
         // console.log(`         x — poll finished with ${error.message}`)
 
         error.name === 'CancelError' ? done() : done.fail(error)
+      })
+
+    setTimeout(() => {
+      // console.log('         ^ — cancel event')
+      inst.cancel()
+    }, 1900)
+  })
+
+  it('should be rejected after timeout', async (done) => {
+    const createPool = time => {
+      let _isReady = false;
+
+      setTimeout(() => (_isReady = true), time);
+
+      return () => _isReady;
+    };
+
+    const check = createPool(5000);
+    const inst = poll(check, 1000);
+
+    // const id = setInterval(() => console.log('         |'), 500)
+
+    inst
+      .promise
+      .then(() => {
+        // clearInterval(id)
+        // console.log("         - — poll successfull ends")
+
+        done.fail('Promise should not to be resolved')
+      })
+      .catch((error) => {
+        // clearInterval(id)
+        // console.log(`         x — poll finished with ${error.message}`)
+
+        error.name === 'TimeoutError' ? done() : done.fail(error)
       })
 
     setTimeout(() => {
