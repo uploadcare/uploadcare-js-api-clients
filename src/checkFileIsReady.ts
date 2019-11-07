@@ -12,10 +12,9 @@ type FileIsReadyParams = {
 }
 
 const checkFileIsReady = ({uuid, timeout = defaultSettings.pollingTimeoutMilliseconds, onProgress, settings = {}}: FileIsReadyParams): PollPromiseInterface<FileInfoInterface> =>
-  poll<FileInfoInterface>(
-    async () => {
-      const response = await info(uuid, settings)
-
+  poll<FileInfoInterface>({
+    task: info(uuid, settings),
+    condition: (response) => {
       if (response.is_ready) {
         return response
       }
@@ -26,7 +25,8 @@ const checkFileIsReady = ({uuid, timeout = defaultSettings.pollingTimeoutMillise
 
       return false
     },
+    taskName: 'checkFileIsReady',
     timeout,
-  )
+  })
 
 export default checkFileIsReady

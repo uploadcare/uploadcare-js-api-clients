@@ -6,6 +6,7 @@ import {FileInfoInterface, Uuid} from './types'
 import {SettingsInterface} from '../types'
 import {CancelableThenable} from '../thenable/CancelableThenable'
 import {CancelableThenableInterface} from '../thenable/types'
+import {delay} from './request/delay'
 
 const getRequestQuery = (uuid: Uuid, settings: SettingsInterface): Query => {
   const query = {

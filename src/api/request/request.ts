@@ -149,7 +149,7 @@ class Request extends Thenable<RequestResponse> implements RequestInterface {
     }
   }
 
-  private handleRequestError = (error: AxiosError) => {
+  private handleRequestError = (error: AxiosError): void => {
     const {path: url} = this.options
 
     if (axios.isCancel(error)) {

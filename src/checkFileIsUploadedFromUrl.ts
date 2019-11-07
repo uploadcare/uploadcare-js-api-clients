@@ -7,6 +7,7 @@ import fromUrlStatus, {
   isUnknownResponse, SuccessResponse
 } from './api/fromUrlStatus'
 import {Uuid} from './api/types'
+import {CancelableThenableInterface} from './thenable/types'
 
 type FileIsUploadedParams = {
   token: Uuid;
@@ -25,10 +26,9 @@ const checkFileIsUploadedFromUrl = (
     onProgress,
     settings = {}
   }: FileIsUploadedParams): PollPromiseInterface<SuccessResponse> =>
-  poll<SuccessResponse>(
-    async () => {
-      const response = await fromUrlStatus(token, settings)
-
+  poll<SuccessResponse>({
+    task: fromUrlStatus(token, settings) as CancelableThenableInterface<SuccessResponse>,
+    condition: (response) => {
       if (isUnknownResponse(response)) {
         if (onUnknown && typeof onUnknown === 'function') {
           onUnknown(response)
@@ -51,7 +51,8 @@ const checkFileIsUploadedFromUrl = (
 
       return false
     },
+    taskName: 'checkFileIsUploadedFromUrl',
     timeout,
-  )
+  })
 
 export default checkFileIsUploadedFromUrl

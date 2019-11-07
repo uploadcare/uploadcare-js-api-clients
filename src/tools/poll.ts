@@ -1,9 +1,6 @@
 import CancelError from '../errors/CancelError'
 import TimeoutError from '../errors/TimeoutError'
-
-type ExecutorFunction = {
-  (resolve: Function, reject: Function): void;
-}
+import {CancelableThenableInterface} from '../thenable/types'
 
 interface CancelableSignal {
   signal: Promise<never>;
@@ -18,11 +15,15 @@ export interface PollPromiseInterface<T> {
 export const DEFAULT_TIMEOUT = 10000
 const DEFAULT_INTERVAL = 500
 
-function createCancellableSignal(): CancelableSignal {
+const createCancellableTimedSignal = (taskName, timeoutMs): CancelableSignal => {
   const cancelable = {}
 
   // @ts-ignore
   cancelable.signal = new Promise((resolve, reject) => {
+    setTimeout(() => {
+      reject(new TimeoutError(taskName, timeoutMs))
+    }, timeoutMs)
+
     // @ts-ignore
     cancelable.cancel = (): void => {
       reject(new CancelError())
@@ -33,44 +34,47 @@ function createCancellableSignal(): CancelableSignal {
   return cancelable
 }
 
-export default function poll<T>(
-  checkConditionFunction: Function,
-  timeout: number = DEFAULT_TIMEOUT,
-  interval: number = DEFAULT_INTERVAL
-): PollPromiseInterface<T> {
-  const startTime = Number(new Date())
-  const endTime = startTime + timeout
-  const {signal, cancel} = createCancellableSignal()
+export default function poll<T>({
+  task,
+  taskName,
+  condition,
+  interval = DEFAULT_INTERVAL,
+  timeout = DEFAULT_TIMEOUT
+}: {
+  task: CancelableThenableInterface<T>;
+  taskName: string;
+  condition: (response: T) => T | boolean;
+  interval?: number;
+  timeout?: number;
+}): PollPromiseInterface<T> {
+  const { signal, cancel } = createCancellableTimedSignal(taskName, timeout)
 
-  const checkCondition: ExecutorFunction = async (resolve, reject) => {
-    // If the condition is met, we're done!
-    try {
-      const result = await checkConditionFunction()
-      const nowTime = Number(new Date())
+  const promise = new Promise((resolve, reject) => {
+    // eslint-disable-next-line @typescript-eslint/no-misused-promises
+    const intervalId = setInterval(async () => {
+      try {
+        const response = await task
 
-      if (result) {
-        resolve(result)
+        if (condition(response)) {
+          resolve(response)
+          clearInterval(intervalId)
+        }
+      } catch (thrown) {
+        reject(thrown)
+        clearInterval(intervalId)
       }
-      // If the condition isn't met but the timeout hasn't elapsed, go again
-      else if (nowTime < endTime) {
-        setTimeout(checkCondition, interval, resolve, reject)
-      }
-      // Didn't match and too much time, reject!
-      else {
-        // TODO: Pass function name as param
-        reject(new TimeoutError('', timeout))
-      }
+    }, interval)
 
-      signal.catch(error => {
-        reject(error)
-      })
-    } catch (error) {
+    signal.catch(error => {
       reject(error)
-    }
-  }
+      clearInterval(intervalId)
+      task.cancel()
+    })
+  })
 
   return {
-    promise: new Promise(checkCondition),
-    cancel,
+    // @ts-ignore
+    promise,
+    cancel
   }
 }
