@@ -15,15 +15,11 @@ export interface PollPromiseInterface<T> {
 export const DEFAULT_TIMEOUT = 10000
 const DEFAULT_INTERVAL = 500
 
-const createCancellableTimedSignal = (taskName, timeoutMs): CancelableSignal => {
+const createCancellableTimedSignal = (): CancelableSignal => {
   const cancelable = {}
 
   // @ts-ignore
   cancelable.signal = new Promise((resolve, reject) => {
-    setTimeout(() => {
-      reject(new TimeoutError(taskName, timeoutMs))
-    }, timeoutMs)
-
     // @ts-ignore
     cancelable.cancel = (): void => {
       reject(new CancelError())
@@ -47,21 +43,31 @@ export default function poll<T>({
   interval?: number;
   timeout?: number;
 }): PollPromiseInterface<T> {
-  const { signal, cancel } = createCancellableTimedSignal(taskName, timeout)
+  const { signal, cancel } = createCancellableTimedSignal()
 
   const promise = new Promise((resolve, reject) => {
+    const startTime = Number(new Date())
+    const endTime = startTime + timeout
+
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
     let intervalId = setTimeout(async function tick() {
       try {
         const response = await task
+        const nowTime = Number(new Date())
 
         if (condition(response)) {
           resolve(response)
           clearInterval(intervalId)
         }
-
-        // eslint-disable-next-line @typescript-eslint/no-misused-promises
-        intervalId = setTimeout(tick, interval) // (*)
+        // If the condition isn't met but the timeout hasn't elapsed, go again
+        else if (nowTime < endTime) {
+          // eslint-disable-next-line @typescript-eslint/no-misused-promises
+          intervalId = setTimeout(tick, interval) // (*)
+        }
+        // Didn't match and too much time, reject!
+        else {
+          reject(new TimeoutError(taskName, timeout))
+        }
       } catch (thrown) {
         reject(thrown)
         clearInterval(intervalId)
@@ -70,8 +76,8 @@ export default function poll<T>({
 
     signal.catch(error => {
       reject(error)
-      clearInterval(intervalId)
       task.cancel()
+      clearInterval(intervalId)
     })
   })
 

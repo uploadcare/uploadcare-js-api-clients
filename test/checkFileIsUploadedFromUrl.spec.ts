@@ -3,9 +3,8 @@ import checkFileIsUploadedFromUrl from '../src/checkFileIsUploadedFromUrl'
 import {StatusEnum} from '../src/api/fromUrlStatus'
 import {getSettingsForTesting} from './_helpers'
 import fromUrl from '../src/api/fromUrl'
-import CancelError from '../src/errors/CancelError'
 
-fdescribe('checkFileIsUploadedFromUrl', () => {
+describe('checkFileIsUploadedFromUrl', () => {
   const sourceUrl = factory.imageUrl('valid')
   const settings = getSettingsForTesting({
     publicKey: factory.publicKey('demo')
@@ -22,7 +21,6 @@ fdescribe('checkFileIsUploadedFromUrl', () => {
 
     expect(info.status).toBe(StatusEnum.Success)
   })
-
   it('should be cancelable', async(done) => {
     const data = await fromUrl(sourceUrl, settings)
     // @ts-ignore
@@ -32,35 +30,15 @@ fdescribe('checkFileIsUploadedFromUrl', () => {
       settings,
     })
 
-    polling
-      .promise
-      .catch((error) => {
-        if (error.name === 'CancelError') {
-          done()
-        } else {
-          done.fail(error)
-        }
-      })
-
     setTimeout(() => {
       polling.cancel()
     }, 1)
-  })
-
-  it('should be rejected after timeout', async(done) => {
-    const data = await fromUrl(sourceUrl, settings)
-    // @ts-ignore
-    const {token} = data
-    const polling = checkFileIsUploadedFromUrl({
-      token,
-      settings,
-      timeout: 1
-    })
 
     polling
       .promise
+      .then(() => done.fail('Promise should not to be resolved'))
       .catch((error) => {
-        if (error.name === 'TimeoutError') {
+        if (error.name === 'CancelError') {
           done()
         } else {
           done.fail(error)
