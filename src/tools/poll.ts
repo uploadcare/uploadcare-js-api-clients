@@ -51,7 +51,7 @@ export default function poll<T>({
 
   const promise = new Promise((resolve, reject) => {
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
-    const intervalId = setInterval(async () => {
+    let intervalId = setTimeout(async function tick() {
       try {
         const response = await task
 
@@ -59,6 +59,9 @@ export default function poll<T>({
           resolve(response)
           clearInterval(intervalId)
         }
+
+        // eslint-disable-next-line @typescript-eslint/no-misused-promises
+        intervalId = setTimeout(tick, interval) // (*)
       } catch (thrown) {
         reject(thrown)
         clearInterval(intervalId)
