@@ -79,7 +79,7 @@ describe('API - from url', () => {
       .catch((error) => error.name === 'CancelError' ? done() : done.fail(error))
   })
 
-  fit('should be able to handle cancel uploading', async () => {
+  it('should be able to handle cancel uploading', async () => {
     const sourceUrl = factory.imageUrl('valid')
     const settings = getSettingsForTesting({
       publicKey: factory.publicKey('demo')
