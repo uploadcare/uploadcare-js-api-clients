@@ -1,9 +1,10 @@
-import fromUrl, {TypeEnum} from '../../src/api/fromUrl'
+import fromUrl, { TypeEnum } from '../../src/api/fromUrl'
 import * as factory from '../_fixtureFactory'
-import {getSettingsForTesting} from '../_helpers'
+import { getSettingsForTesting } from '../_helpers'
+import CancelError from '../../src/errors/CancelError'
 
 describe('API - from url', () => {
-  it('should return token for file', async() => {
+  it('should return token for file', async () => {
     const sourceUrl = factory.imageUrl('valid')
     const settings = getSettingsForTesting({
       publicKey: factory.publicKey('demo')
@@ -62,7 +63,7 @@ describe('API - from url', () => {
       })
   })
 
-  it('should be able to cancel uploading', async(done) => {
+  it('should be able to cancel uploading', async (done) => {
     const sourceUrl = factory.imageUrl('valid')
     const settings = getSettingsForTesting({
       publicKey: factory.publicKey('demo')
@@ -78,27 +79,21 @@ describe('API - from url', () => {
       .catch((error) => error.name === 'CancelError' ? done() : done.fail(error))
   })
 
-  it('should be able to handle cancel uploading', async (done) => {
+  fit('should be able to handle cancel uploading', async () => {
     const sourceUrl = factory.imageUrl('valid')
     const settings = getSettingsForTesting({
       publicKey: factory.publicKey('demo')
     })
     const upload = fromUrl(sourceUrl, settings)
 
-    setTimeout(() => {
-      upload.cancel()
-    }, 1)
+    const onCancel = jasmine.createSpy('onCancel');
 
-    upload.onCancel = () => {
-      done()
-    }
+    upload.onCancel = onCancel
+    upload.cancel()
 
-    upload
-      .then(() => done.fail('Promise should not to be resolved'))
-      .catch((error) => {
-        if (error.name !== 'CancelError') {
-          done.fail(error)
-        }
-      })
+    // TODO: update jasmine 3.5.0 typings
+    await (expectAsync(upload) as any).toBeRejectedWithError(CancelError)
+
+    expect(onCancel).toHaveBeenCalled()
   })
 })
