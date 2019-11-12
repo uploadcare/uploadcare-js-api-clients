@@ -67,6 +67,7 @@ export default function poll<T>({
         // Didn't match and too much time, reject!
         else {
           reject(new TimeoutError(taskName, timeout))
+          clearInterval(intervalId)
         }
       } catch (thrown) {
         reject(thrown)

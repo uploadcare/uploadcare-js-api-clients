@@ -1,4 +1,4 @@
-import {UploadcareFileInterface, UploadcareGroupInterface} from './types'
+import {UploadcareGroupInterface} from './types'
 import {FileInfoInterface, GroupId, GroupInfoInterface} from './api/types'
 
 export class UploadcareGroup implements UploadcareGroupInterface {
