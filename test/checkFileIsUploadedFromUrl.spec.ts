@@ -21,28 +21,40 @@ describe('checkFileIsUploadedFromUrl', () => {
 
     expect(info.status).toBe(StatusEnum.Success)
   })
-  it('should be cancelable', async(done) => {
+  it('should be cancelable', async () => {
     const data = await fromUrl(sourceUrl, settings)
     // @ts-ignore
     const {token} = data
+
     const polling = checkFileIsUploadedFromUrl({
       token,
       settings,
     })
 
-    setTimeout(() => {
-      polling.cancel()
-    }, 1)
+    try {
+      await polling.promise
 
-    polling
-      .promise
-      .then(() => done.fail('Promise should not to be resolved'))
-      .catch((error) => {
-        if (error.name === 'CancelError') {
-          done()
-        } else {
-          done.fail(error)
-        }
+      setTimeout(() => {
+        polling.cancel()
+      }, 1)
+    } catch (error) {
+      expect(error.name === 'CancelError').toBeTruthy()
+    }
+  })
+  it('should be rejected after timeout', async () => {
+    const data = await fromUrl(sourceUrl, settings)
+    // @ts-ignore
+    const {token} = data
+
+    try {
+      const polling = checkFileIsUploadedFromUrl({
+        token,
+        settings,
       })
+
+      await polling.promise
+    } catch (error) {
+      expect(error.name === 'TimeoutError').toBeTruthy()
+    }
   })
 })

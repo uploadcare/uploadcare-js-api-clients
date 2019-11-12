@@ -2,8 +2,9 @@ import checkFileIsReady from '../src/checkFileIsReady'
 import * as factory from './_fixtureFactory'
 import {getSettingsForTesting} from './_helpers'
 import info from '../src/api/info'
+import CancelError from '../src/errors/CancelError'
 
-fdescribe('checkFileIsReady', () => {
+describe('checkFileIsReady', () => {
   it('should be resolved if file is ready', async () => {
     const settings = getSettingsForTesting({
       publicKey: factory.publicKey('image')
