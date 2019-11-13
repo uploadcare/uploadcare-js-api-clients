@@ -4,7 +4,7 @@ import {getSettingsForTesting} from '../../_helpers'
 import CancelError from '../../../src/errors/CancelError'
 import UploadcareError from '../../../src/errors/UploadcareError'
 
-fdescribe('API - multipartStart', () => {
+describe('API - multipartStart', () => {
   const fileToUpload = factory.file(11).data
   const settings = getSettingsForTesting({
     publicKey: factory.publicKey('image'),

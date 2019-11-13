@@ -2,83 +2,68 @@ import base from '../../src/api/base'
 import * as factory from '../_fixtureFactory'
 import {getUserAgent} from '../../src/defaultSettings'
 import {getSettingsForTesting} from '../_helpers'
+import CancelError from '../../src/errors/CancelError'
 
 describe('API - base', () => {
   const fileToUpload = factory.image('blackSquare')
+  const settings = getSettingsForTesting({
+    publicKey: factory.publicKey('demo')
+  })
 
   it('should be able to upload data', async() => {
-    const settings = getSettingsForTesting({
-      publicKey: factory.publicKey('demo')
-    })
     const directUpload = base(fileToUpload.data, settings)
     const {file} = await directUpload
 
     expect(typeof file).toBe('string')
   })
 
-  it('should accept integration setting', (done) => {
-    const settings = getSettingsForTesting({
-      publicKey: 'test',
-      integration: 'Test',
-    })
+  // it('should accept integration setting', async () => {
+  //   const settings = getSettingsForTesting({
+  //     publicKey: 'test',
+  //     integration: 'Test',
+  //   })
+  //   const directUpload = base(fileToUpload.data, settings)
+  //
+  //   directUpload
+  //     .then(() => done.fail('Promise should not to be resolved'))
+  //     .catch((error) => {
+  //       if (
+  //         error.request &&
+  //         error.request.headers &&
+  //         error.request.headers.hasOwnProperty('X-UC-User-Agent') &&
+  //         error.request.headers['X-UC-User-Agent'] === getUserAgent(settings)
+  //       ) {
+  //         done()
+  //       }
+  //       else {
+  //         done.fail(error)
+  //       }
+  //     })
+  //
+  //   await (expectAsync(directUpload) as any).toBeRejected()
+  // })
+
+  it('should be able to cancel uploading', async () => {
     const directUpload = base(fileToUpload.data, settings)
 
-    directUpload
-      .then(() => done.fail('Promise should not to be resolved'))
-      .catch((error) => {
-        if (
-          error.request &&
-          error.request.headers &&
-          error.request.headers.hasOwnProperty('X-UC-User-Agent') &&
-          error.request.headers['X-UC-User-Agent'] === getUserAgent(settings)
-        ) {
-          done()
-        }
-        else {
-          done.fail(error)
-        }
-      })
+    directUpload.cancel()
+
+    await (expectAsync(directUpload) as any).toBeRejectedWithError(CancelError)
   })
 
-  it('should be able to cancel uploading', (done) => {
-    const settings = getSettingsForTesting({
-      publicKey: factory.publicKey('demo')
-    })
+  it('should be able to handle cancel uploading', async () => {
     const directUpload = base(fileToUpload.data, settings)
+    const onCancel = jasmine.createSpy('onCancel')
 
-    setTimeout(() => {
-      directUpload.cancel()
-    }, 1)
+    directUpload.onCancel = onCancel
+    directUpload.cancel()
 
-    directUpload
-      .then(() => done.fail('Promise should not to be resolved'))
-      .catch((error) => error.name === 'CancelError' ? done() : done.fail(error))
+    await (expectAsync(directUpload) as any).toBeRejectedWithError(CancelError)
+
+    expect(onCancel).toHaveBeenCalled()
   })
 
-  it('should be able to handle cancel uploading', (done) => {
-    const settings = getSettingsForTesting({
-      publicKey: factory.publicKey('demo')
-    })
-    const directUpload = base(fileToUpload.data, settings)
-
-    setTimeout(() => {
-      directUpload.cancel()
-    }, 1)
-
-    directUpload.onCancel = () => {
-      done()
-    }
-
-    directUpload
-      .then(() => done.fail('Promise should not to be resolved'))
-      .catch((error) => {
-        if (error.name !== 'CancelError') {
-          done.fail(error)
-        }
-      })
-  })
-
-  it('should be able to handle progress', (done) => {
+  it('should be able to handle progress', async () => {
     let progressValue = 0
     const settings = getSettingsForTesting({
       publicKey: factory.publicKey('demo')
@@ -89,8 +74,8 @@ describe('API - base', () => {
       progressValue = Math.round((progressEvent.loaded * 100) / progressEvent.total)
     }
 
-    directUpload
-      .then(() => progressValue > 0 ? done() : done.fail())
-      .catch(error => done.fail(error))
+    await directUpload
+
+    expect(progressValue).toBeGreaterThan(0)
   })
 })

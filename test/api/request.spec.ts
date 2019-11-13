@@ -4,6 +4,8 @@ import * as factory from '../_fixtureFactory'
 import {getSettingsForTesting, sleep} from '../_helpers'
 import RequestWasThrottledError from '../../src/errors/RequestWasThrottledError'
 import RequestError from '../../src/errors/RequestError'
+import UploadcareError from '../../src/errors/UploadcareError'
+import CancelError from '../../src/errors/CancelError'
 
 describe('buildFormData', () => {
   it('should return FormData with nice input object', () => {
@@ -25,7 +27,7 @@ describe('API – request', () => {
   const settings = getSettingsForTesting()
 
   describe('should be resolved', () => {
-    it('on valid GET request', async() => {
+    it('on valid GET request', async () => {
       const options = {
         baseURL: settings.baseURL,
         path: '/info/',
@@ -42,7 +44,7 @@ describe('API – request', () => {
       expect(result.data.uuid).toBe(factory.uuid('image'))
     })
 
-    it('on valid POST request', async() => {
+    it('on valid POST request', async () => {
       const file = factory.image('blackSquare')
       const options = {
         method: 'POST',
@@ -60,7 +62,7 @@ describe('API – request', () => {
       expect(typeof result.data.file).toBe('string')
     })
 
-    it('if request was throttled and max retries 1', async() => {
+    it('if request was throttled and max retries 1', async () => {
       // Run this case only in dev mode
       if (process.env.NODE_ENV === 'production') {
         return Promise.resolve()
@@ -72,8 +74,9 @@ describe('API – request', () => {
         path: '/throttle/',
         query: {pub_key: factory.publicKey('demo')},
       }
+      const throttle = request(options)
 
-      await expectAsync(request(options)).toBeResolved()
+      await expectAsync(throttle).toBeResolved()
     }, 20000)
   })
 
@@ -81,16 +84,15 @@ describe('API – request', () => {
     /* Wait to bypass the requests limits */
     beforeEach(() => sleep(1000))
 
-    it('if Uploadcare returns error', async(done) => {
+    it('if Uploadcare returns error', async () => {
       const options = {
         baseURL: settings.baseURL,
         path: '/info/',
         query: {pub_key: factory.publicKey('image')},
       }
+      const upload = request(options)
 
-      await request(options)
-        .then(() => done.fail('Promise should not to be resolved'))
-        .catch((error) => error.name === 'UploadcareError' ? done() : done.fail(error))
+      await (expectAsync(upload) as any).toBeRejectedWithError(UploadcareError)
     })
 
     // it('on connection error', async() => {
@@ -110,7 +112,7 @@ describe('API – request', () => {
     //   axios.interceptors.response.eject(interceptor)
     // })
 
-    it('if promise canceled', (done) => {
+    it('if promise canceled', async () => {
       const options = {
         baseURL: settings.baseURL,
         path: '/info/',
@@ -119,20 +121,14 @@ describe('API – request', () => {
           file_id: factory.uuid('image'),
         },
       }
-      const requestWithOptions = request(options)
+      const upload = request(options)
 
-      requestWithOptions
-        .then(() => done.fail('Promise should not to be resolved'))
-        .catch(error => {
-          (error.name === 'CancelError')
-            ? done()
-            : done.fail(error)
-        })
+      upload.cancel()
 
-      requestWithOptions.cancel()
+      await (expectAsync(upload) as any).toBeRejectedWithError(CancelError)
     })
 
-    it('if request was throttled and max retries 0', async() => {
+    it('if request was throttled and max retries 0', async () => {
       // Run this case only in dev mode
       if (process.env.NODE_ENV === 'production') {
         return Promise.resolve()
