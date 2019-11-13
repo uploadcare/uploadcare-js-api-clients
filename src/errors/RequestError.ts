@@ -12,6 +12,8 @@ export default class RequestError extends Error {
     this.request = request
     this.response = response
 
+    Object.setPrototypeOf(this, RequestError.prototype)
+
     if (Error.captureStackTrace) {
       Error.captureStackTrace(this, RequestError)
     }
