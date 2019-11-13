@@ -3,13 +3,16 @@ import * as factory from '../../_fixtureFactory'
 import {getSettingsForTesting} from '../../_helpers'
 import multipartStart from '../../../src/api/multipart/multipartStart'
 import multipartUpload from '../../../src/api/multipart/multipartUpload'
+import UploadcareError from '../../../src/errors/UploadcareError'
+import CancelError from '../../../src/errors/CancelError'
 
 describe('API - multipartComplete', () => {
-  it('should be able to complete upload data', async() => {
-    const fileToUpload = factory.file(11).data
-    const settings = getSettingsForTesting({
-      publicKey: factory.publicKey('image'),
-    })
+  const fileToUpload = factory.file(11).data
+  const settings = getSettingsForTesting({
+    publicKey: factory.publicKey('image'),
+  })
+
+  it('should be able to complete upload data', async () => {
     const multipartStartUpload = multipartStart(fileToUpload, settings)
     const {uuid: completedUuid, parts} = await multipartStartUpload
 
@@ -21,11 +24,7 @@ describe('API - multipartComplete', () => {
     expect(uuid).toBeTruthy()
   })
 
-  it('should be able to cancel uploading', async(done) => {
-    const fileToUpload = factory.file(11).data
-    const settings = getSettingsForTesting({
-      publicKey: factory.publicKey('image'),
-    })
+  it('should be able to cancel uploading', async () => {
     const multipartStartUpload = multipartStart(fileToUpload, settings)
     const {uuid: completedUuid, parts} = await multipartStartUpload
 
@@ -33,20 +32,12 @@ describe('API - multipartComplete', () => {
 
     const upload = multipartComplete(completedUuid, settings)
 
-    setTimeout(() => {
-      upload.cancel()
-    }, 1)
+    upload.cancel()
 
-    upload
-      .then(() => done.fail('Promise should not to be resolved'))
-      .catch((error) => error.name === 'CancelError' ? done() : done.fail(error))
+    await (expectAsync(upload) as any).toBeRejectedWithError(CancelError)
   })
 
-  it('should be able to handle cancel uploading', async (done) => {
-    const fileToUpload = factory.file(11).data
-    const settings = getSettingsForTesting({
-      publicKey: factory.publicKey('image'),
-    })
+  it('should be able to handle cancel uploading', async () => {
     const multipartStartUpload = multipartStart(fileToUpload, settings)
     const {uuid: completedUuid, parts} = await multipartStartUpload
 
@@ -54,34 +45,19 @@ describe('API - multipartComplete', () => {
 
     const upload = multipartComplete(completedUuid, settings)
 
-    setTimeout(() => {
-      upload.cancel()
-    }, 1)
+    const onCancel = jasmine.createSpy('onCancel')
 
-    upload.onCancel = () => {
-      done()
-    }
+    upload.onCancel = onCancel
+    upload.cancel()
 
-    upload
-      .then(() => done.fail('Promise should not to be resolved'))
-      .catch((error) => {
-        if (error.name !== 'CancelError') {
-          done.fail(error)
-        }
-      })
+    await (expectAsync(upload) as any).toBeRejectedWithError(CancelError)
+
+    expect(onCancel).toHaveBeenCalled()
   })
 
-  it('should be rejected with bad options', (done) => {
-    const settings = getSettingsForTesting({
-      publicKey: factory.publicKey('image'),
-    })
+  it('should be rejected with bad options', async () => {
+    const upload = multipartComplete('', settings)
 
-    multipartComplete('', settings)
-      .then(() => done.fail('Promise should not to be resolved'))
-      .catch(error => {
-        (error.name === 'UploadcareError')
-          ? done()
-          : done.fail(error)
-      })
+    await (expectAsync(upload) as any).toBeRejectedWithError(UploadcareError)
   })
 })

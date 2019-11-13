@@ -1,13 +1,16 @@
 import multipartStart from '../../../src/api/multipart/multipartStart'
 import * as factory from '../../_fixtureFactory'
 import {getSettingsForTesting} from '../../_helpers'
+import CancelError from '../../../src/errors/CancelError'
+import UploadcareError from '../../../src/errors/UploadcareError'
 
-describe('API - multipartStart', () => {
-  it('should be able to start upload data', async() => {
-    const fileToUpload = factory.file(11).data
-    const settings = getSettingsForTesting({
-      publicKey: factory.publicKey('image'),
-    })
+fdescribe('API - multipartStart', () => {
+  const fileToUpload = factory.file(11).data
+  const settings = getSettingsForTesting({
+    publicKey: factory.publicKey('image'),
+  })
+
+  it('should be able to start upload data', async () => {
     const multipartStartUpload = multipartStart(fileToUpload, settings)
     const {uuid, parts} = await multipartStartUpload
 
@@ -15,58 +18,30 @@ describe('API - multipartStart', () => {
     expect(parts).toBeTruthy()
   })
 
-  it('should be able to cancel uploading', async(done) => {
-    const fileToUpload = factory.file(11).data
-    const settings = getSettingsForTesting({
-      publicKey: factory.publicKey('image'),
-    })
+  it('should be able to cancel uploading', async () => {
     const upload = multipartStart(fileToUpload, settings)
 
-    setTimeout(() => {
-      upload.cancel()
-    }, 1)
+    upload.cancel()
 
-    upload
-      .then(() => done.fail('Promise should not to be resolved'))
-      .catch((error) => error.name === 'CancelError' ? done() : done.fail(error))
+    await (expectAsync(upload) as any).toBeRejectedWithError(CancelError)
   })
 
-  it('should be able to handle cancel uploading', async (done) => {
-    const fileToUpload = factory.file(11).data
-    const settings = getSettingsForTesting({
-      publicKey: factory.publicKey('image'),
-    })
+  it('should be able to handle cancel uploading', async () => {
     const upload = multipartStart(fileToUpload, settings)
+    const onCancel = jasmine.createSpy('onCancel')
 
-    setTimeout(() => {
-      upload.cancel()
-    }, 1)
+    upload.onCancel = onCancel
+    upload.cancel()
 
-    upload.onCancel = () => {
-      done()
-    }
+    await (expectAsync(upload) as any).toBeRejectedWithError(CancelError)
 
-    upload
-      .then(() => done.fail('Promise should not to be resolved'))
-      .catch((error) => {
-        if (error.name !== 'CancelError') {
-          done.fail(error)
-        }
-      })
+    expect(onCancel).toHaveBeenCalled()
   })
 
-  it('should be rejected with bad options', (done) => {
+  it('should be rejected with bad options', async () => {
     const fileToUpload = factory.file(9).data
-    const settings = getSettingsForTesting({
-      publicKey: factory.publicKey('image'),
-    })
+    const upload = multipartStart(fileToUpload, settings)
 
-    multipartStart(fileToUpload, settings)
-      .then(() => done.fail('Promise should not to be resolved'))
-      .catch(error => {
-        (error.name === 'UploadcareError')
-          ? done()
-          : done.fail(error)
-      })
+    await (expectAsync(upload) as any).toBeRejectedWithError(UploadcareError)
   })
 })
