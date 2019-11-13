@@ -76,6 +76,6 @@ describe('API - base', () => {
 
     await directUpload
 
-    expect(progressValue).toBeGreaterThan(0)
+    expect(progressValue).toBe(100)
   })
 })
