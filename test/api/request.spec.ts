@@ -82,7 +82,7 @@ describe('API – request', () => {
 
   describe('should be rejected', () => {
     /* Wait to bypass the requests limits */
-    beforeEach(() => sleep(1000))
+    // beforeEach(() => sleep(1000))
 
     it('if Uploadcare returns error', async () => {
       const options = {

@@ -13,7 +13,6 @@ describe('checkFileIsReady', () => {
 
   it('should be resolved if file is ready', async () => {
     const {uuid} = await info(fileToUpload, settings)
-
     const result = await checkFileIsReady({
       uuid,
       settings,
@@ -27,10 +26,10 @@ describe('checkFileIsReady', () => {
       uuid,
       settings,
     })
-
+    const promise = polling.promise
     polling.cancel()
 
-    await (expectAsync(polling.promise) as any).toBeRejectedWithError(CancelError)
+    await (expectAsync(promise) as any).toBeRejectedWithError(CancelError)
   })
   it('should be rejected after timeout', async () => {
     const {uuid} = await info(fileToUpload, settings)
@@ -39,7 +38,8 @@ describe('checkFileIsReady', () => {
       settings,
       timeout: 1,
     })
+    const promise = polling.promise
 
-    await (expectAsync(polling.promise) as any).toBeRejectedWithError(TimeoutError)
+    await (expectAsync(promise) as any).toBeRejectedWithError(TimeoutError)
   })
 })
