@@ -1,7 +1,7 @@
 import UploadClient from '../src/UploadClient'
 import * as factory from './_fixtureFactory'
 
-xdescribe('UploadClient', () => {
+describe('UploadClient', () => {
   describe('should request to the right base url', () => {
     const requestOptions = {
       path: '/info/',

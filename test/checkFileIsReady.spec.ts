@@ -5,7 +5,7 @@ import info from '../src/api/info'
 import CancelError from '../src/errors/CancelError'
 import TimeoutError from '../src/errors/TimeoutError'
 
-describe('checkFileIsReady', () => {
+xdescribe('checkFileIsReady', () => {
   const fileToUpload = factory.uuid('image')
   const settings = getSettingsForTesting({
     publicKey: factory.publicKey('image')
