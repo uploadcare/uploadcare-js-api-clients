@@ -5,11 +5,11 @@ import CancelError from '../../src/errors/CancelError'
 
 describe('fileFrom Object (multipart)', () => {
   const fileToUpload = factory.file(11).data
+  const settings = getSettingsForTesting({
+    publicKey: factory.publicKey('image'),
+  })
 
   it('should resolves when file is ready on CDN', async () => {
-    const settings = getSettingsForTesting({
-      publicKey: factory.publicKey('demo'),
-    })
     const file = await fileFrom(fileToUpload, settings)
 
     expect(file.cdnUrl).toBeTruthy()
@@ -17,7 +17,7 @@ describe('fileFrom Object (multipart)', () => {
 
   it('should accept doNotStore setting', async () => {
     const settings = getSettingsForTesting({
-      publicKey: factory.publicKey('demo'),
+      publicKey: factory.publicKey('image'),
       doNotStore: true,
     })
     const file = await fileFrom(fileToUpload, settings)
@@ -26,9 +26,6 @@ describe('fileFrom Object (multipart)', () => {
   })
 
   it('should be able to cancel uploading', async () => {
-    const settings = getSettingsForTesting({
-      publicKey: factory.publicKey('demo'),
-    })
     const upload = fileFrom(fileToUpload, settings)
 
     upload.cancel()
@@ -38,7 +35,7 @@ describe('fileFrom Object (multipart)', () => {
 
   it('should accept new file name setting', async () => {
     const settings = getSettingsForTesting({
-      publicKey: factory.publicKey('demo'),
+      publicKey: factory.publicKey('image'),
       doNotStore: true,
       fileName: 'newFileName.jpg',
     })
@@ -48,9 +45,6 @@ describe('fileFrom Object (multipart)', () => {
   })
 
   it('should be able to upload big files (multipart)', async () => {
-    const settings = getSettingsForTesting({
-      publicKey: factory.publicKey('image'),
-    })
     const bigFileToUpload = factory.file(11).data
     const file = await fileFrom(bigFileToUpload, settings)
 
@@ -59,9 +53,6 @@ describe('fileFrom Object (multipart)', () => {
 
   describe('should be able to handle', () => {
     it('cancel uploading', async () => {
-      const settings = getSettingsForTesting({
-        publicKey: factory.publicKey('demo'),
-      })
       const upload = fileFrom(fileToUpload, settings)
 
       const onCancel = jasmine.createSpy('onCancel')
@@ -76,9 +67,6 @@ describe('fileFrom Object (multipart)', () => {
 
     it('progress', async () => {
       let progressValue = 0
-      const settings = getSettingsForTesting({
-        publicKey: factory.publicKey('demo'),
-      })
       const upload = fileFrom(fileToUpload, settings)
 
       upload.onProgress = (progress) => {
@@ -93,9 +81,6 @@ describe('fileFrom Object (multipart)', () => {
     })
 
     it('uploaded', async () => {
-      const settings = getSettingsForTesting({
-        publicKey: factory.publicKey('demo'),
-      })
       const upload = fileFrom(fileToUpload, settings)
       const onUploaded = jasmine.createSpy('onUploaded')
 
@@ -107,9 +92,6 @@ describe('fileFrom Object (multipart)', () => {
     })
 
     it('ready', async () => {
-      const settings = getSettingsForTesting({
-        publicKey: factory.publicKey('demo'),
-      })
       const upload = fileFrom(fileToUpload, settings)
       const onReady = jasmine.createSpy('onReady')
 

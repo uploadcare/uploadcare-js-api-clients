@@ -5,11 +5,11 @@ import CancelError from '../../src/errors/CancelError'
 
 describe('fileFrom Uploaded', () => {
   const uuid = factory.uuid('image')
+  const settings = getSettingsForTesting({
+    publicKey: factory.publicKey('image'),
+  })
 
   it('should resolves when file is ready on CDN', async () => {
-    const settings = getSettingsForTesting({
-      publicKey: factory.publicKey('demo'),
-    })
     const file = await fileFrom(uuid, settings)
 
     expect(file.cdnUrl).toBeTruthy()
@@ -17,7 +17,7 @@ describe('fileFrom Uploaded', () => {
 
   it('should accept doNotStore setting', async () => {
     const settings = getSettingsForTesting({
-      publicKey: factory.publicKey('demo'),
+      publicKey: factory.publicKey('image'),
       doNotStore: true,
     })
     const file = await fileFrom(uuid, settings)
@@ -26,9 +26,6 @@ describe('fileFrom Uploaded', () => {
   })
 
   it('should be able to cancel uploading', async () => {
-    const settings = getSettingsForTesting({
-      publicKey: factory.publicKey('demo'),
-    })
     const upload = fileFrom(uuid, settings)
 
     upload.cancel()
@@ -38,7 +35,7 @@ describe('fileFrom Uploaded', () => {
 
   it('should accept new file name setting', async () => {
     const settings = getSettingsForTesting({
-      publicKey: factory.publicKey('demo'),
+      publicKey: factory.publicKey('image'),
       doNotStore: true,
       fileName: 'newFileName.jpg',
     })
@@ -49,9 +46,6 @@ describe('fileFrom Uploaded', () => {
 
   describe('should be able to handle', () => {
     it('cancel uploading', async () => {
-      const settings = getSettingsForTesting({
-        publicKey: factory.publicKey('demo'),
-      })
       const upload = fileFrom(uuid, settings)
 
       const onCancel = jasmine.createSpy('onCancel')
@@ -66,9 +60,6 @@ describe('fileFrom Uploaded', () => {
 
     it('progress', async () => {
       let progressValue = 0
-      const settings = getSettingsForTesting({
-        publicKey: factory.publicKey('demo'),
-      })
       const upload = fileFrom(uuid, settings)
 
       upload.onProgress = (progress) => {
@@ -83,9 +74,6 @@ describe('fileFrom Uploaded', () => {
     })
 
     it('uploaded', async () => {
-      const settings = getSettingsForTesting({
-        publicKey: factory.publicKey('demo'),
-      })
       const upload = fileFrom(uuid, settings)
       const onUploaded = jasmine.createSpy('onUploaded')
 
@@ -97,9 +85,6 @@ describe('fileFrom Uploaded', () => {
     })
 
     it('ready', async () => {
-      const settings = getSettingsForTesting({
-        publicKey: factory.publicKey('demo'),
-      })
       const upload = fileFrom(uuid, settings)
       const onReady = jasmine.createSpy('onReady')
 
