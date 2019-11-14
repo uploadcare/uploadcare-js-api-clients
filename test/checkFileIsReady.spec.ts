@@ -6,11 +6,13 @@ import CancelError from '../src/errors/CancelError'
 import TimeoutError from '../src/errors/TimeoutError'
 
 describe('checkFileIsReady', () => {
+  const fileToUpload = factory.uuid('image')
+  const settings = getSettingsForTesting({
+    publicKey: factory.publicKey('image')
+  })
+
   it('should be resolved if file is ready', async () => {
-    const settings = getSettingsForTesting({
-      publicKey: factory.publicKey('image')
-    })
-    const {uuid} = await info(factory.uuid('image'), settings)
+    const {uuid} = await info(fileToUpload, settings)
 
     const result = await checkFileIsReady({
       uuid,
@@ -20,11 +22,7 @@ describe('checkFileIsReady', () => {
     expect(result.is_ready).toBeTruthy()
   })
   it('should be cancelable', async () => {
-    const settings = getSettingsForTesting({
-      publicKey: factory.publicKey('image')
-    })
-    const {uuid} = await info(factory.uuid('image'), settings)
-
+    const {uuid} = await info(fileToUpload, settings)
     const polling = checkFileIsReady({
       uuid,
       settings,
@@ -35,10 +33,7 @@ describe('checkFileIsReady', () => {
     await (expectAsync(polling.promise) as any).toBeRejectedWithError(CancelError)
   })
   it('should be rejected after timeout', async () => {
-    const settings = getSettingsForTesting({
-      publicKey: factory.publicKey('image')
-    })
-    const {uuid} = await info(factory.uuid('image'), settings)
+    const {uuid} = await info(fileToUpload, settings)
     const polling = checkFileIsReady({
       uuid,
       settings,
