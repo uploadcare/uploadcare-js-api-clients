@@ -63,7 +63,6 @@ describe('fileFrom Object', () => {
         publicKey: factory.publicKey('demo'),
       })
       const upload = fileFrom(fileToUpload, settings)
-
       const onCancel = jasmine.createSpy('onCancel')
 
       upload.onCancel = onCancel
