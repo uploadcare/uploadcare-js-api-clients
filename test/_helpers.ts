@@ -18,13 +18,13 @@ export const getSettingsForTesting = (settings = {}, environment: Environment | 
     development: {
       baseCDN: 'http://localhost:3000',
       baseURL: 'http://localhost:3000',
-      multipartMinFileSize: 11 * 1024 * 1024,
+      multipartMinFileSize: 10 * 1024 * 1024,
       ...settings,
     },
     production: {
       baseCDN: 'https://ucarecdn.com',
       baseURL: 'https://upload.uploadcare.com',
-      multipartMinFileSize: 11 * 1024 * 1024,
+      multipartMinFileSize: 10 * 1024 * 1024,
       ...settings,
     }
   }
