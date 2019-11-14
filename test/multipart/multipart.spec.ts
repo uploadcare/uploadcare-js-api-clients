@@ -1,72 +1,50 @@
 import * as factory from '../_fixtureFactory'
 import {getSettingsForTesting} from '../_helpers'
 import multipart from '../../src/multipart/multipart'
+import CancelError from '../../src/errors/CancelError'
 
 describe('API - multipart', () => {
-  it('should be able to upload multipart file', async() => {
-    const fileToUpload = factory.file(11).data
-    const settings = getSettingsForTesting({
-      publicKey: factory.publicKey('image'),
-    })
+  const fileToUpload = factory.file(11).data
+  const settings = getSettingsForTesting({
+    publicKey: factory.publicKey('image'),
+  })
+
+  it('should be able to upload multipart file', async () => {
     const {uuid} = await multipart(fileToUpload, settings)
 
     expect(uuid).toBeTruthy()
   })
 
-  it('should be able to cancel uploading', async(done) => {
-    const fileToUpload = factory.file(11).data
-    const settings = getSettingsForTesting({
-      publicKey: factory.publicKey('image'),
-    })
+  it('should be able to cancel uploading', async () => {
     const upload = multipart(fileToUpload, settings)
 
-    setTimeout(() => {
-      upload.cancel()
-    }, 1)
+    upload.cancel()
 
-    upload
-      .then(() => done.fail('Promise should not to be resolved'))
-      .catch((error) => error.name === 'CancelError' ? done() : done.fail(error))
+    await (expectAsync(upload) as any).toBeRejectedWithError(CancelError)
   })
 
-  it('should be able to handle cancel uploading', async (done) => {
-    const fileToUpload = factory.file(11).data
-    const settings = getSettingsForTesting({
-      publicKey: factory.publicKey('image'),
-    })
+  it('should be able to handle cancel uploading', async () => {
     const upload = multipart(fileToUpload, settings)
+    const onCancel = jasmine.createSpy('onCancel')
 
-    setTimeout(() => {
-      upload.cancel()
-    }, 1)
+    upload.onCancel = onCancel
+    upload.cancel()
 
-    upload.onCancel = () => {
-      done()
-    }
+    await (expectAsync(upload) as any).toBeRejectedWithError(CancelError)
 
-    upload
-      .then(() => done.fail('Promise should not to be resolved'))
-      .catch((error) => {
-        if (error.name !== 'CancelError') {
-          done.fail(error)
-        }
-      })
+    expect(onCancel).toHaveBeenCalled()
   })
 
-  it('should be able to handle progress', async(done) => {
+  it('should be able to handle progress', async () => {
     let progressValue = 0
-    const fileToUpload = factory.file(11).data
-    const settings = getSettingsForTesting({
-      publicKey: factory.publicKey('image'),
-    })
     const upload = multipart(fileToUpload, settings)
 
     upload.onProgress = (progressEvent) => {
       progressValue = Math.round(progressEvent.loaded / progressEvent.total)
     }
 
-    upload
-      .then(() => progressValue > 0 && progressValue <= 1 ? done() : done.fail())
-      .catch(error => done.fail(error))
+    await upload
+
+    expect(progressValue).toBe(1)
   })
 })
