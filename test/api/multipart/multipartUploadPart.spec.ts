@@ -6,9 +6,10 @@ import defaultSettings from '../../../src/defaultSettings'
 import CancelError from '../../../src/errors/CancelError'
 
 describe('API - multipartUploadPart', () => {
-  const fileToUpload = factory.file(11).data
+  jasmine.DEFAULT_TIMEOUT_INTERVAL = 20000
+  const fileToUpload = factory.file(12).data
   const settings = getSettingsForTesting({
-    publicKey: factory.publicKey('image')
+    publicKey: factory.publicKey('image'),
   })
 
   it('should be able to upload part', async () => {

@@ -7,7 +7,8 @@ import UploadcareError from '../../../src/errors/UploadcareError'
 import CancelError from '../../../src/errors/CancelError'
 
 describe('API - multipartComplete', () => {
-  const fileToUpload = factory.file(11).data
+  jasmine.DEFAULT_TIMEOUT_INTERVAL = 20000
+  const fileToUpload = factory.file(12).data
   const settings = getSettingsForTesting({
     publicKey: factory.publicKey('image'),
   })
