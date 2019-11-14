@@ -3,6 +3,8 @@ import checkFileIsUploadedFromUrl from '../src/checkFileIsUploadedFromUrl'
 import {StatusEnum} from '../src/api/fromUrlStatus'
 import {getSettingsForTesting} from './_helpers'
 import fromUrl from '../src/api/fromUrl'
+import CancelError from '../src/errors/CancelError'
+import TimeoutError from '../src/errors/TimeoutError'
 
 describe('checkFileIsUploadedFromUrl', () => {
   const sourceUrl = factory.imageUrl('valid')
@@ -10,7 +12,7 @@ describe('checkFileIsUploadedFromUrl', () => {
     publicKey: factory.publicKey('demo')
   })
 
-  it('should be resolved if file is uploaded', async() => {
+  it('should be resolved if file is uploaded', async () => {
     const data = await fromUrl(sourceUrl, settings)
     // @ts-ignore
     const {token} = data
@@ -21,6 +23,7 @@ describe('checkFileIsUploadedFromUrl', () => {
 
     expect(info.status).toBe(StatusEnum.Success)
   })
+
   it('should be cancelable', async () => {
     const data = await fromUrl(sourceUrl, settings)
     // @ts-ignore
@@ -31,30 +34,21 @@ describe('checkFileIsUploadedFromUrl', () => {
       settings,
     })
 
-    try {
-      await polling.promise
+    polling.cancel()
 
-      setTimeout(() => {
-        polling.cancel()
-      }, 1)
-    } catch (error) {
-      expect(error.name === 'CancelError').toBeTruthy()
-    }
+    await (expectAsync(polling.promise) as any).toBeRejectedWithError(CancelError)
   })
+
   it('should be rejected after timeout', async () => {
     const data = await fromUrl(sourceUrl, settings)
     // @ts-ignore
     const {token} = data
+    const polling = checkFileIsUploadedFromUrl({
+      token,
+      settings,
+      timeout: 1,
+    })
 
-    try {
-      const polling = checkFileIsUploadedFromUrl({
-        token,
-        settings,
-      })
-
-      await polling.promise
-    } catch (error) {
-      expect(error.name === 'TimeoutError').toBeTruthy()
-    }
+    await (expectAsync(polling.promise) as any).toBeRejectedWithError(TimeoutError)
   })
 })

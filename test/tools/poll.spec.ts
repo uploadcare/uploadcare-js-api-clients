@@ -5,6 +5,7 @@ import * as factory from '../_fixtureFactory'
 import CancelError from '../../src/errors/CancelError'
 import {FileInfoInterface} from '../../src/api/types'
 import checkFileIsReady from '../../src/checkFileIsReady'
+import TimeoutError from '../../src/errors/TimeoutError'
 
 describe('poll', () => {
   const uuid = factory.uuid('image')
@@ -52,38 +53,28 @@ describe('poll', () => {
       taskName: 'checkFileIsReady',
     })
 
-    try {
-      await polling.promise
+    polling.cancel()
 
-      setTimeout(() => {
-        polling.cancel()
-      }, 1)
-    } catch (error) {
-      expect(error.name === 'CancelError').toBeTruthy()
-    }
+    await (expectAsync(polling.promise) as any).toBeRejectedWithError(CancelError)
   })
   it('should be rejected after timeout', async () => {
-    try {
-      const polling = poll<FileInfoInterface>({
-        task: info(uuid, settings),
-        condition: (response) => {
-          if (response.is_ready) {
-            return response
-          }
+    const polling = poll<FileInfoInterface>({
+      task: info(uuid, settings),
+      condition: (response) => {
+        if (response.is_ready) {
+          return response
+        }
 
-          if (typeof onProgress === 'function') {
-            onProgress(response)
-          }
+        if (typeof onProgress === 'function') {
+          onProgress(response)
+        }
 
-          return false
-        },
-        taskName: 'checkFileIsReady',
-        timeout: 1,
-      })
+        return false
+      },
+      taskName: 'checkFileIsReady',
+      timeout: 1,
+    })
 
-      await polling.promise
-    } catch (error) {
-      expect(error.name === 'TimeoutError').toBeTruthy()
-    }
+    await (expectAsync(polling.promise) as any).toBeRejectedWithError(TimeoutError)
   })
 })
