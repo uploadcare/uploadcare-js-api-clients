@@ -7,7 +7,7 @@ import {FileInfoInterface} from '../../src/api/types'
 import checkFileIsReady from '../../src/checkFileIsReady'
 import TimeoutError from '../../src/errors/TimeoutError'
 
-xdescribe('poll', () => {
+fdescribe('poll', () => {
   const uuid = factory.uuid('image')
   const settings = getSettingsForTesting({
     publicKey: factory.publicKey('image'),

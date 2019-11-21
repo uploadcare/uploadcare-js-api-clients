@@ -3,7 +3,7 @@ export default class TimeoutError extends Error {
     super()
 
     this.name = 'TimeoutError'
-    this.message = `Timed out for function "${fn}" after ${timeout}`
+    this.message = `Timed out for function "${fn}" after ${timeout} ms`
 
     Object.setPrototypeOf(this, TimeoutError.prototype)
 

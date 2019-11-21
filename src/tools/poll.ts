@@ -52,23 +52,21 @@ export default function poll<T>({
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
     let intervalId = setTimeout(async function tick() {
       try {
-        const response = await task
         const nowTime = Number(new Date())
+        if (nowTime > endTime) {
+          reject(new TimeoutError(taskName, timeout))
+          clearInterval(intervalId)
+          return
+        }
+
+        const response = await task
 
         if (condition(response)) {
           resolve(response)
           clearInterval(intervalId)
         }
-        // If the condition isn't met but the timeout hasn't elapsed, go again
-        else if (nowTime < endTime) {
-          // eslint-disable-next-line @typescript-eslint/no-misused-promises
-          intervalId = setTimeout(tick, interval) // (*)
-        }
-        // Didn't match and too much time, reject!
-        else {
-          reject(new TimeoutError(taskName, timeout))
-          clearInterval(intervalId)
-        }
+        // eslint-disable-next-line @typescript-eslint/no-misused-promises,require-atomic-updates
+        intervalId = setTimeout(tick, interval) // (*)
       } catch (thrown) {
         reject(thrown)
         clearInterval(intervalId)
