@@ -31,6 +31,10 @@ const uuids: {[key: string]: {publicKey: string, uuid: string}} = {
     publicKey: '',
     uuid: '',
   },
+  multipart: {
+    publicKey: 'pub_test__no_storing',
+    uuid: '',
+  }
 }
 
 export type FixtureFile = {

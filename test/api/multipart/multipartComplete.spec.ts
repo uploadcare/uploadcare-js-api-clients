@@ -6,11 +6,10 @@ import multipartUpload from '../../../src/api/multipart/multipartUpload'
 import UploadcareError from '../../../src/errors/UploadcareError'
 import CancelError from '../../../src/errors/CancelError'
 
-describe('API - multipartComplete', () => {
-  jasmine.DEFAULT_TIMEOUT_INTERVAL = 20000
+fdescribe('API - multipartComplete', () => {
   const fileToUpload = factory.file(12).data
   const settings = getSettingsForTesting({
-    publicKey: factory.publicKey('image'),
+    publicKey: factory.publicKey('multipart'),
   })
 
   it('should be able to complete upload data', async () => {
@@ -23,7 +22,7 @@ describe('API - multipartComplete', () => {
     const {uuid} = await upload
 
     expect(uuid).toBeTruthy()
-  })
+  }, 100000)
 
   it('should be able to cancel uploading', async () => {
     const multipartStartUpload = multipartStart(fileToUpload, settings)

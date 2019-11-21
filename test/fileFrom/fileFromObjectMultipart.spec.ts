@@ -7,7 +7,7 @@ describe('fileFrom Object (multipart)', () => {
   jasmine.DEFAULT_TIMEOUT_INTERVAL = 20000
   const fileToUpload = factory.file(12).data
   const settings = getSettingsForTesting({
-    publicKey: factory.publicKey('image'),
+    publicKey: factory.publicKey('multipart'),
   })
 
   it('should resolves when file is ready on CDN', async () => {

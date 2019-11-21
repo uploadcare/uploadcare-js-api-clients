@@ -4,11 +4,10 @@ import {getSettingsForTesting} from '../../_helpers'
 import multipartStart from '../../../src/api/multipart/multipartStart'
 import CancelError from '../../../src/errors/CancelError'
 
-describe('API - multipartUpload', () => {
-  jasmine.DEFAULT_TIMEOUT_INTERVAL = 20000
+fdescribe('API - multipartUpload', () => {
   const fileToUpload = factory.file(12).data
   const settings = getSettingsForTesting({
-    publicKey: factory.publicKey('image'),
+    publicKey: factory.publicKey('multipart'),
   })
 
   it('should be able to upload multipart file', async () => {
@@ -16,7 +15,7 @@ describe('API - multipartUpload', () => {
     const upload = multipartUpload(fileToUpload, parts, settings)
 
     await (expectAsync(upload) as any).toBeResolved()
-  })
+  }, 100000)
 
   it('should be able to cancel uploading', async () => {
     const {parts} = await multipartStart(fileToUpload, settings)
@@ -52,5 +51,5 @@ describe('API - multipartUpload', () => {
     await upload
 
     expect(progressValue).toBeGreaterThan(0)
-  })
+  }, 100000)
 })

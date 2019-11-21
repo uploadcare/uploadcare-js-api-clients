@@ -4,11 +4,11 @@ import {getSettingsForTesting} from '../../_helpers'
 import CancelError from '../../../src/errors/CancelError'
 import UploadcareError from '../../../src/errors/UploadcareError'
 
-describe('API - multipartStart', () => {
+fdescribe('API - multipartStart', () => {
   jasmine.DEFAULT_TIMEOUT_INTERVAL = 20000
   const fileToUpload = factory.file(12).data
   const settings = getSettingsForTesting({
-    publicKey: factory.publicKey('image'),
+    publicKey: factory.publicKey('multipart'),
   })
 
   it('should be able to start upload data', async () => {

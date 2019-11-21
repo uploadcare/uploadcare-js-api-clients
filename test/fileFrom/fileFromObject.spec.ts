@@ -45,13 +45,6 @@ describe('fileFrom Object', () => {
     expect(file.name).toEqual('newFileName.jpg')
   })
 
-  it('should be able to upload big files (multipart)', async () => {
-    const bigFileToUpload = factory.file(11).data
-    const file = await fileFrom(bigFileToUpload, settings)
-
-    expect(file.cdnUrl).toBeTruthy()
-  })
-
   describe('should be able to handle', () => {
     it('cancel uploading', async () => {
       const upload = fileFrom(fileToUpload, settings)
