@@ -4,7 +4,6 @@ import {getSettingsForTesting} from '../_helpers'
 import CancelError from '../../src/errors/CancelError'
 
 describe('fileFrom Object (multipart)', () => {
-  jasmine.DEFAULT_TIMEOUT_INTERVAL = 20000
   const fileToUpload = factory.file(12).data
   const settings = getSettingsForTesting({
     publicKey: factory.publicKey('multipart'),
@@ -14,7 +13,7 @@ describe('fileFrom Object (multipart)', () => {
     const file = await fileFrom(fileToUpload, settings)
 
     expect(file.cdnUrl).toBeTruthy()
-  })
+  }, 100000)
 
   it('should accept doNotStore setting', async () => {
     const settings = getSettingsForTesting({
@@ -24,7 +23,7 @@ describe('fileFrom Object (multipart)', () => {
     const file = await fileFrom(fileToUpload, settings)
 
     expect(file.isStored).toBeFalsy()
-  })
+  }, 100000)
 
   it('should be able to cancel uploading', async () => {
     const upload = fileFrom(fileToUpload, settings)
@@ -43,14 +42,7 @@ describe('fileFrom Object (multipart)', () => {
     const file = await fileFrom(fileToUpload, settings)
 
     expect(file.name).toEqual('newFileName.jpg')
-  })
-
-  it('should be able to upload big files (multipart)', async () => {
-    const bigFileToUpload = factory.file(11).data
-    const file = await fileFrom(bigFileToUpload, settings)
-
-    expect(file.cdnUrl).toBeTruthy()
-  })
+  }, 100000)
 
   describe('should be able to handle', () => {
     it('cancel uploading', async () => {
@@ -79,7 +71,7 @@ describe('fileFrom Object (multipart)', () => {
       await upload
 
       expect(progressValue).toBe(1)
-    })
+    }, 100000)
 
     it('uploaded', async () => {
       const upload = fileFrom(fileToUpload, settings)
@@ -90,7 +82,7 @@ describe('fileFrom Object (multipart)', () => {
       await (expectAsync(upload) as any).toBeResolved()
 
       expect(onUploaded).toHaveBeenCalled()
-    })
+    }, 100000)
 
     it('ready', async () => {
       const upload = fileFrom(fileToUpload, settings)
@@ -101,6 +93,6 @@ describe('fileFrom Object (multipart)', () => {
       await (expectAsync(upload) as any).toBeResolved()
 
       expect(onReady).toHaveBeenCalled()
-    })
+    }, 100000)
   })
 })
