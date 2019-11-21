@@ -4,7 +4,7 @@ import {getSettingsForTesting} from '../../_helpers'
 import multipartStart from '../../../src/api/multipart/multipartStart'
 import CancelError from '../../../src/errors/CancelError'
 
-fdescribe('API - multipartUpload', () => {
+describe('API - multipartUpload', () => {
   const fileToUpload = factory.file(12).data
   const settings = getSettingsForTesting({
     publicKey: factory.publicKey('multipart'),
