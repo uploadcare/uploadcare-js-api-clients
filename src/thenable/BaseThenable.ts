@@ -23,7 +23,10 @@ export class BaseThenable<T> extends Thenable<T> implements BaseThenableInterfac
       },
     })
     this.promise = this.request
-      .then(response => Promise.resolve(response.data))
+      .then(response => {
+        console.log('Uploaded')
+        return Promise.resolve(response.data)
+      })
       .catch(error => {
         if (error.name === 'CancelError' && typeof this.onCancel === 'function') {
           this.onCancel()

@@ -15,7 +15,7 @@ export interface PollPromiseInterface<T> {
 export const DEFAULT_TIMEOUT = 10000
 const DEFAULT_INTERVAL = 500
 
-const createCancellableTimedSignal = (): CancelableSignal => {
+const createCancellableTimedSignal = (taskName: string, ms: number): CancelableSignal => {
   const cancelable = {}
 
   // @ts-ignore
@@ -24,6 +24,11 @@ const createCancellableTimedSignal = (): CancelableSignal => {
     cancelable.cancel = (): void => {
       reject(new CancelError())
     }
+
+    // const timeoutId = setTimeout(() => {
+    //   reject(new TimeoutError(taskName, ms))
+    //   clearTimeout(timeoutId)
+    // }, ms)
   })
 
   // @ts-ignore
@@ -35,53 +40,61 @@ export default function poll<T>({
   taskName,
   condition,
   interval = DEFAULT_INTERVAL,
-  timeout = DEFAULT_TIMEOUT
+  timeout = DEFAULT_TIMEOUT,
+  onCancel
 }: {
   task: CancelableThenableInterface<T>;
   taskName: string;
   condition: (response: T) => T | boolean;
   interval?: number;
   timeout?: number;
+  onCancel?: () => void;
 }): PollPromiseInterface<T> {
-  const { signal, cancel } = createCancellableTimedSignal()
+  const { signal, cancel } = createCancellableTimedSignal(taskName, timeout)
 
-  const promise = new Promise((resolve, reject) => {
+  const promise = new Promise<T>((resolve, reject) => {
     const startTime = Number(new Date())
     const endTime = startTime + timeout
 
-    // eslint-disable-next-line @typescript-eslint/no-misused-promises
-    let intervalId = setTimeout(async function tick() {
-      try {
-        const nowTime = Number(new Date())
-        if (nowTime > endTime) {
-          reject(new TimeoutError(taskName, timeout))
-          clearInterval(intervalId)
-          return
-        }
+    let timeoutId = setTimeout(function tick() {
+      const nowTime = Number(new Date())
 
-        const response = await task
+      if (nowTime > endTime) {
+        onCancel && onCancel()
+        reject(new TimeoutError(taskName, timeout))
+        clearTimeout(timeoutId)
 
-        if (condition(response)) {
-          resolve(response)
-          clearInterval(intervalId)
-        }
-        // eslint-disable-next-line @typescript-eslint/no-misused-promises,require-atomic-updates
-        intervalId = setTimeout(tick, interval) // (*)
-      } catch (thrown) {
-        reject(thrown)
-        clearInterval(intervalId)
+        return
       }
+
+      task
+        .then(response => {
+          if (condition(response)) {
+            resolve(response)
+            clearTimeout(timeoutId)
+
+            return
+          }
+
+          timeoutId = setTimeout(tick, interval)
+        })
+        .catch(thrown => {
+          reject(thrown)
+          clearTimeout(timeoutId)
+
+          return
+        })
     }, interval)
 
     signal.catch(error => {
-      reject(error)
+      onCancel && onCancel()
       task.cancel()
-      clearInterval(intervalId)
+      reject(error)
+      clearTimeout(timeoutId)
     })
   })
 
   return {
-    // @ts-ignore
     promise,
     cancel
   }
