@@ -149,11 +149,11 @@ class Request extends Thenable<RequestResponse> implements RequestInterface {
     }
   }
 
-  private handleRequestError = async(error: AxiosError): Promise<Error> => {
+  private handleRequestError = (error: AxiosError): Error => {
     const {path: url} = this.options
 
     if (axios.isCancel(error)) {
-      return new CancelError()
+      throw new CancelError()
     }
 
     if (error.response) {
@@ -166,10 +166,10 @@ class Request extends Thenable<RequestResponse> implements RequestInterface {
         statusText: error.response.statusText,
       }
 
-      return new RequestError(errorRequestInfo, errorResponseInfo)
+      throw new RequestError(errorRequestInfo, errorResponseInfo)
     }
 
-    return error
+    throw error
   }
 
   private handleError = (error: Error) => {

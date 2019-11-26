@@ -53,11 +53,13 @@ export default function poll<T>({
   const { signal, cancel } = createCancellableTimedSignal(taskName, timeout)
 
   const promise = new Promise<T>((resolve, reject) => {
-    const startTime = Number(new Date())
+    const startTime = Date.now()
     const endTime = startTime + timeout
 
-    let timeoutId = setTimeout(function tick() {
-      const nowTime = Number(new Date())
+    let timeoutId
+
+    const tick = () => {
+      const nowTime = Date.now()
 
       if (nowTime > endTime) {
         onCancel && onCancel()
@@ -66,25 +68,27 @@ export default function poll<T>({
 
         return
       }
+    }
 
-      task
-        .then(response => {
-          if (condition(response)) {
-            resolve(response)
-            clearTimeout(timeoutId)
+    timeoutId = setTimeout(tick, interval)
 
-            return
-          }
-
-          timeoutId = setTimeout(tick, interval)
-        })
-        .catch(thrown => {
-          reject(thrown)
+    task
+      .then(response => {
+        if (condition(response)) {
+          resolve(response)
           clearTimeout(timeoutId)
 
           return
-        })
-    }, interval)
+        }
+
+        timeoutId = setTimeout(tick, interval)
+      })
+      .catch(thrown => {
+        reject(thrown)
+        clearTimeout(timeoutId)
+
+        return
+      })
 
     signal.catch(error => {
       onCancel && onCancel()
