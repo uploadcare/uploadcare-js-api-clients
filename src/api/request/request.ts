@@ -76,8 +76,8 @@ class Request extends Thenable<RequestResponse> implements RequestInterface {
     }
 
     return instance(options as AxiosRequestConfig)
-      .then(this.handleResponse)
       .catch(this.handleRequestError)
+      .then(this.handleResponse)
       .catch(this.handleError)
   }
 
@@ -155,11 +155,11 @@ class Request extends Thenable<RequestResponse> implements RequestInterface {
     if (axios.isCancel(error)) {
       throw new CancelError()
     }
-
+    console.log(error)
     if (error.response) {
       const errorRequestInfo = {
-        headers: error.config.headers,
-        url: error.config.url || url,
+        headers: error.request.headers,
+        url: error.request.url || url,
       }
       const errorResponseInfo = {
         status: error.response.status,
