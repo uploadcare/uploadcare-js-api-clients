@@ -72,7 +72,7 @@ fdescribe('poll', () => {
         return false
       },
       taskName: 'checkFileIsReady',
-      timeout: 1,
+      timeout: -1000,
     })
 
     await (expectAsync(polling.promise) as any).toBeRejectedWithError(TimeoutError)

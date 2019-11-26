@@ -46,7 +46,7 @@ fdescribe('checkFileIsUploadedFromUrl', () => {
     const polling = checkFileIsUploadedFromUrl({
       token,
       settings,
-      timeout: 1,
+      timeout: -1000,
     })
     const promise = polling.promise
 

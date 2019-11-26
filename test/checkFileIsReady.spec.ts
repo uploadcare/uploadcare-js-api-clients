@@ -36,7 +36,7 @@ fdescribe('checkFileIsReady', () => {
     const polling = checkFileIsReady({
       uuid,
       settings,
-      timeout: 1,
+      timeout: -1000,
     })
     const promise = polling.promise
 
