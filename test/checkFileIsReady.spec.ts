@@ -5,7 +5,7 @@ import info from '../src/api/info'
 import CancelError from '../src/errors/CancelError'
 import TimeoutError from '../src/errors/TimeoutError'
 
-fdescribe('checkFileIsReady', () => {
+describe('checkFileIsReady', () => {
   jasmine.DEFAULT_TIMEOUT_INTERVAL = 60000
 
   const fileToUpload = factory.uuid('image')

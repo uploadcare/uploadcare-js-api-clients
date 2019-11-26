@@ -6,7 +6,7 @@ import fromUrl from '../src/api/fromUrl'
 import CancelError from '../src/errors/CancelError'
 import TimeoutError from '../src/errors/TimeoutError'
 
-fdescribe('checkFileIsUploadedFromUrl', () => {
+describe('checkFileIsUploadedFromUrl', () => {
   const sourceUrl = factory.imageUrl('valid')
   const settings = getSettingsForTesting({
     publicKey: factory.publicKey('demo')
