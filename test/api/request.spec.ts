@@ -77,7 +77,7 @@ describe('API – request', () => {
       const throttle = request(options)
 
       await expectAsync(throttle).toBeResolved()
-    }, 20000)
+    })
   })
 
   describe('should be rejected', () => {
@@ -162,6 +162,6 @@ describe('API – request', () => {
       const error = new RequestWasThrottledError(requestError, options.retryThrottledMaxTimes)
 
       await expectAsync(request(options)).toBeRejectedWith(error)
-    }, 20000)
+    })
   })
 })

@@ -4,7 +4,6 @@ import {getSettingsForTesting} from '../_helpers'
 import CancelError from '../../src/errors/CancelError'
 
 describe('fileFrom Object', () => {
-  jasmine.DEFAULT_TIMEOUT_INTERVAL = 20000
   const fileToUpload = factory.image('blackSquare').data
   const settings = getSettingsForTesting({
     publicKey: factory.publicKey('image'),
