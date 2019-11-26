@@ -70,6 +70,8 @@ export default function poll<T>({
       }
     }
 
+    tick()
+
     timeoutId = setTimeout(tick, interval)
 
     task
