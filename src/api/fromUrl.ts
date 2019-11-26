@@ -1,4 +1,5 @@
 import {prepareOptions} from './request/prepareOptions'
+import {parseDoNotStore} from '../tools/parseDoNotStore'
 
 /* Types */
 import {Query, RequestOptionsInterface} from './request/types'
@@ -46,7 +47,7 @@ export const isFileInfoResponse = (response: FromUrlResponse): response is FileI
 const getRequestQuery = (sourceUrl: Url, settings: SettingsInterface): Query => ({
   pub_key: settings.publicKey || '',
   source_url: sourceUrl,
-  store: settings.doNotStore ? '' : 'auto',
+  store: parseDoNotStore(settings.doNotStore),
   filename: settings.fileName || '',
   check_URL_duplicates: settings.checkForUrlDuplicates ? 1 : 0,
   save_URL_duplicates: settings.saveUrlForRecurrentUploads ? 1 : 0,

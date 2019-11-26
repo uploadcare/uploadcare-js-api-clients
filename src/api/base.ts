@@ -1,4 +1,5 @@
 import {prepareOptions} from './request/prepareOptions'
+import {parseDoNotStore} from '../tools/parseDoNotStore'
 
 /* Types */
 import {Body, RequestOptionsInterface} from './request/types'
@@ -15,7 +16,7 @@ const getRequestBody = (file: FileData, settings: SettingsInterface): Body => ({
   UPLOADCARE_PUB_KEY: settings.publicKey || '',
   signature: settings.secureSignature || '',
   expire: settings.secureExpire || '',
-  UPLOADCARE_STORE: settings.doNotStore ? '' : 'auto',
+  UPLOADCARE_STORE: parseDoNotStore(settings.doNotStore),
   source: settings.source || 'local',
   file: file,
 })

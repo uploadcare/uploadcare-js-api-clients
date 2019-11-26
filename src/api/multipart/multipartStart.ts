@@ -1,6 +1,7 @@
 import {prepareOptions} from '../request/prepareOptions'
 import {getFileSize} from './getFileSize'
 import defaultSettings from '../../defaultSettings'
+import {parseDoNotStore} from '../../tools/parseDoNotStore'
 
 /* Types */
 import {Body, RequestOptionsInterface} from '../request/types'
@@ -17,7 +18,7 @@ const getRequestBody = (file: FileData, settings: SettingsInterface): Body => {
     size,
     partSize: settings.multipartChunkSize || defaultSettings.multipartChunkSize,
     content_type: 'application/octet-stream',
-    UPLOADCARE_STORE: settings.doNotStore ? '' : 'auto',
+    UPLOADCARE_STORE: parseDoNotStore(settings.doNotStore),
     UPLOADCARE_PUB_KEY: settings.publicKey || '',
     signature: settings.secureSignature || '',
     expire: settings.secureExpire || '',
