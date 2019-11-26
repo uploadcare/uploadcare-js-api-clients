@@ -6,6 +6,8 @@ import CancelError from '../src/errors/CancelError'
 import TimeoutError from '../src/errors/TimeoutError'
 
 fdescribe('checkFileIsReady', () => {
+  jasmine.DEFAULT_TIMEOUT_INTERVAL = 60000
+
   const fileToUpload = factory.uuid('image')
   const settings = getSettingsForTesting({
     publicKey: factory.publicKey('image')
