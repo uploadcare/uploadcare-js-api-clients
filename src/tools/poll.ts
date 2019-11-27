@@ -1,4 +1,4 @@
-import TimeoutError from '../errors/TimeoutError'
+import TimeoutError from "../errors/TimeoutError";
 import CancelError from "../errors/CancelError";
 
 export const DEFAULT_TIMEOUT = 10000;
@@ -9,13 +9,19 @@ let CancelablePromise = (promise, cancel) => ({
   cancel
 });
 
-let polling = (task, interval: number = DEFAULT_INTERVAL, timeout: number = DEFAULT_TIMEOUT) => {
+let polling = (
+  task,
+  {
+    interval = DEFAULT_INTERVAL,
+    timeout = DEFAULT_TIMEOUT
+  }: { interval?: number; timeout?: number } = {}
+) => {
   let timeoutId;
   let currentTask;
   let cancel;
 
-  let startTime = Date.now()
-  let endTime = startTime + timeout
+  let startTime = Date.now();
+  let endTime = startTime + timeout;
 
   let promise = new Promise((resolve, reject) => {
     cancel = () => {
@@ -29,15 +35,15 @@ let polling = (task, interval: number = DEFAULT_INTERVAL, timeout: number = DEFA
 
       currentTask
         .then(result => {
-          let nowTime = Date.now()
+          let nowTime = Date.now();
 
           if (result) {
             resolve(result);
-          } if (nowTime > endTime) {
-            // TODO: Pass function name as param
-            reject(new TimeoutError('poll timeout'))
           }
-          else {
+          if (nowTime > endTime) {
+            // TODO: Pass function name as param
+            reject(new TimeoutError("poll timeout"));
+          } else {
             timeoutId = setTimeout(() => {
               tick();
             }, interval);
