@@ -15,7 +15,7 @@ describe('API - multipartUpload', () => {
     const upload = multipartUpload(fileToUpload, parts, settings)
 
     await (expectAsync(upload) as any).toBeResolved()
-  }, 100000)
+  }, 250000)
 
   it('should be able to cancel uploading', async () => {
     const {parts} = await multipartStart(fileToUpload, settings)
@@ -51,5 +51,5 @@ describe('API - multipartUpload', () => {
     await upload
 
     expect(progressValue).toBeGreaterThan(0)
-  }, 100000)
+  }, 250000)
 })

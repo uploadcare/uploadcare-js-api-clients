@@ -13,7 +13,7 @@ describe('fileFrom Object (multipart)', () => {
     const file = await fileFrom(fileToUpload, settings)
 
     expect(file.cdnUrl).toBeTruthy()
-  }, 100000)
+  }, 250000)
 
   it('should accept doNotStore setting', async () => {
     const settings = getSettingsForTesting({
@@ -23,7 +23,7 @@ describe('fileFrom Object (multipart)', () => {
     const file = await fileFrom(fileToUpload, settings)
 
     expect(file.isStored).toBeFalsy()
-  }, 100000)
+  }, 250000)
 
   it('should be able to cancel uploading', async () => {
     const upload = fileFrom(fileToUpload, settings)
@@ -42,7 +42,7 @@ describe('fileFrom Object (multipart)', () => {
     const file = await fileFrom(fileToUpload, settings)
 
     expect(file.name).toEqual('newFileName.jpg')
-  }, 100000)
+  }, 250000)
 
   describe('should be able to handle', () => {
     it('cancel uploading', async () => {
@@ -71,7 +71,7 @@ describe('fileFrom Object (multipart)', () => {
       await upload
 
       expect(progressValue).toBe(1)
-    }, 100000)
+    }, 250000)
 
     it('uploaded', async () => {
       const upload = fileFrom(fileToUpload, settings)
@@ -82,7 +82,7 @@ describe('fileFrom Object (multipart)', () => {
       await (expectAsync(upload) as any).toBeResolved()
 
       expect(onUploaded).toHaveBeenCalled()
-    }, 100000)
+    }, 250000)
 
     it('ready', async () => {
       const upload = fileFrom(fileToUpload, settings)
@@ -93,6 +93,6 @@ describe('fileFrom Object (multipart)', () => {
       await (expectAsync(upload) as any).toBeResolved()
 
       expect(onReady).toHaveBeenCalled()
-    }, 100000)
+    }, 250000)
   })
 })

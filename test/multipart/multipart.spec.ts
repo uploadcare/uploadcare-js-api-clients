@@ -13,7 +13,7 @@ describe('API - multipart', () => {
     const {uuid} = await multipart(fileToUpload, settings)
 
     expect(uuid).toBeTruthy()
-  }, 100000)
+  }, 250000)
 
   it('should be able to cancel uploading', async () => {
     const upload = multipart(fileToUpload, settings)
@@ -46,5 +46,5 @@ describe('API - multipart', () => {
     await upload
 
     expect(progressValue).toBe(1)
-  }, 100000)
+  }, 250000)
 })
