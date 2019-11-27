@@ -15,6 +15,7 @@ describe('checkFileIsReady', () => {
       settings,
     })
 
+    // @ts-ignore
     expect(result.is_ready).toBeTruthy()
   })
   it('should be cancelable', async (done) => {

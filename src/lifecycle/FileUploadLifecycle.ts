@@ -5,12 +5,11 @@ import {UploadcareFile} from '../UploadcareFile'
 import {FileUploadLifecycleInterface, LifecycleInterface} from './types'
 import {SettingsInterface, UploadcareFileInterface} from '../types'
 import {Uuid} from '..'
-import {PollPromiseInterface} from '../tools/poll'
-import {FileInfoInterface} from '../api/types'
+// import {FileInfoInterface} from '../api/types'
 
 export class FileUploadLifecycle implements FileUploadLifecycleInterface {
   readonly uploadLifecycle: LifecycleInterface<UploadcareFileInterface>
-  private isFileReadyPolling: PollPromiseInterface<FileInfoInterface> | null = null
+  private isFileReadyPolling: any | null = null
 
   constructor(lifecycle: LifecycleInterface<UploadcareFileInterface>) {
     this.uploadLifecycle = lifecycle
@@ -37,7 +36,7 @@ export class FileUploadLifecycle implements FileUploadLifecycleInterface {
       .catch(uploadLifecycle.handleError.bind(uploadLifecycle))
   }
 
-  getIsFileReadyPolling = (): PollPromiseInterface<FileInfoInterface> | null => {
+  getIsFileReadyPolling = (): any | null => {
     return this.isFileReadyPolling
   }
 }

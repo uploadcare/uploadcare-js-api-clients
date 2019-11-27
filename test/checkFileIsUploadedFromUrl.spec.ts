@@ -19,6 +19,7 @@ describe('checkFileIsUploadedFromUrl', () => {
       settings,
     })
 
+    // @ts-ignore
     expect(info.status).toBe(StatusEnum.Success)
   })
   it('should be cancelable', async(done) => {

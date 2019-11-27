@@ -10,7 +10,6 @@ import {Uuid} from '../api/types'
 import {ProgressStateEnum, SettingsInterface, UploadcareFileInterface} from '../types'
 import {FileUploadLifecycleInterface, UploadHandlerInterface} from '../lifecycle/types'
 import {Url} from '..'
-import {PollPromiseInterface} from '../tools/poll'
 import {
   FromUrlStatusResponse,
   isErrorResponse, isProgressResponse, isSuccessResponse,
@@ -20,7 +19,7 @@ import {
 import {FromUrlResponse, isFileInfoResponse, isTokenResponse} from '../api/fromUrl'
 
 export class FileFromUrl implements UploadHandlerInterface<UploadcareFileInterface, FileUploadLifecycleInterface> {
-  private isFileUploadedFromUrlPolling: PollPromiseInterface<FromUrlStatusResponse> | null = null
+  private isFileUploadedFromUrlPolling: any | null = null
   private isCancelled = false
   private unknownStatusWasTimes = 0
   private readonly data: Url

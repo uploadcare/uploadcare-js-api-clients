@@ -1,7 +1,7 @@
 import {ProgressParamsInterface, SettingsInterface, UploadcareFileInterface, UploadcareGroupInterface, UploadingProgress} from '../types'
 import {Uuid} from '..'
 import {FileInfoInterface, GroupInfoInterface} from '../api/types'
-import {PollPromiseInterface} from '../tools/poll'
+// import {PollPromiseInterface} from '../tools/poll'
 
 export interface CancelableInterface {
   cancel(): void;
@@ -63,7 +63,7 @@ export interface UploadHandlerInterface<T, U> {
 export interface FileUploadLifecycleInterface {
   readonly uploadLifecycle: LifecycleInterface<UploadcareFileInterface>;
 
-  getIsFileReadyPolling(): PollPromiseInterface<FileInfoInterface> | null;
+  getIsFileReadyPolling(): any | null;
   handleUploadedFile(uuid: Uuid, settings: SettingsInterface): Promise<UploadcareFileInterface>;
 }
 
