@@ -4,34 +4,34 @@ export const DEFAULT_TIMEOUT = 10000;
 const DEFAULT_INTERVAL = 500;
 
 let polling = (task, time: number) => {
-  let id;
+  let timeoutId;
   let currentTask;
   let cancel;
 
   let promise = new Promise((resolve, reject) => {
     cancel = () => {
-      id && clearTimeout(id);
+      timeoutId && clearTimeout(timeoutId);
       currentTask && currentTask.cancel();
       reject(new CancelError());
     };
 
     let tick = () => {
-      id = setTimeout(() => {
-        currentTask = task();
+      currentTask = task();
 
-        currentTask
-          .then(result => {
-            if (result) {
-              resolve(result);
-            } else {
+      currentTask
+        .then(result => {
+          if (result) {
+            resolve(result);
+          } else {
+            timeoutId = setTimeout(() => {
               tick();
-            }
-          })
-          .catch(reject);
-      }, time);
+            }, time);
+          }
+        })
+        .catch(reject);
     };
 
-    tick();
+    setTimeout(() => tick());
   });
 
   // @ts-ignore
