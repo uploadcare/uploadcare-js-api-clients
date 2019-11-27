@@ -2,56 +2,63 @@ import poll from '../../src/tools/poll'
 import info from '../../src/api/info'
 import {getSettingsForTesting} from '../_helpers'
 import * as factory from '../_fixtureFactory'
-import CancelError from '../../src/errors/CancelError'
-import {FileInfoInterface} from '../../src/api/types'
 
 describe('poll', () => {
   const uuid = factory.uuid('image')
   const settings = getSettingsForTesting({
     publicKey: factory.publicKey('image'),
   })
-  const onProgress = (response) => {
-    return response
-  }
 
   it('should be resolved', async() => {
-    const result = await poll<FileInfoInterface>(
-      async () => {
-        const response = await info(uuid, settings)
+    const result = await poll(
+      () => {
+        const request = info(uuid, settings)
+        let cancel = () => request.cancel()
 
-        if (response.is_ready) {
-          return response
-        }
+        let promise = request.then(response => {
+          if (response.is_ready) {
+            return response
+          }
 
-        if (typeof onProgress === 'function') {
-          onProgress(response)
-        }
+          return false
+        })
 
-        return false
+        // @ts-ignore
+        promise.cancel = cancel
+
+        return promise
       },
+      300
     )
 
+    // @ts-ignore
     expect(result.is_ready).toBeTruthy()
   })
 
   it('should be able to cancel polling', (done) => {
-    const polling = poll<FileInfoInterface>(
+    const polling = poll(
       async() => {
-        const response = await info(uuid, settings)
+        const request = info(uuid, settings)
+        let cancel = () => request.cancel()
 
-        if (response.is_ready) {
-          return response
-        }
+        let promise = request.then(response => {
+          if (response.is_ready) {
+            return response
+          }
 
-        if (typeof onProgress === 'function') {
-          onProgress(response)
-        }
+          return false
+        })
 
-        return false
+        // @ts-ignore
+        promise.cancel = cancel
+
+        return promise
       },
+      300
     )
 
     setTimeout(() => {
+      // @ts-ignore
       polling.cancel()
     }, 1)
 
