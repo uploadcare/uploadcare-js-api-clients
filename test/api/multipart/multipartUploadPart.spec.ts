@@ -19,7 +19,6 @@ describe('API - multipartUploadPart', () => {
 
     upload.onProgress = (progressEvent) => {
       const progressValue = Math.round((progressEvent.loaded * 100) / progressEvent.total)
-      console.log(progressValue)
     }
 
     const {code} = await upload

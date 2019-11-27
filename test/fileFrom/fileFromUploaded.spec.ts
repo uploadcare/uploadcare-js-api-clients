@@ -15,17 +15,6 @@ describe('fileFrom Uploaded', () => {
     expect(file.cdnUrl).toBeTruthy()
   })
 
-  // TODO: cant store already stored file. need to do smth with it
-  xit('should accept doNotStore setting', async () => {
-    const settings = getSettingsForTesting({
-      publicKey: factory.publicKey('image'),
-      doNotStore: true,
-    })
-    const file = await fileFrom(uuid, settings)
-
-    expect(file.isStored).toBeFalsy()
-  })
-
   it('should be able to cancel uploading', async () => {
     const upload = fileFrom(uuid, settings)
 
