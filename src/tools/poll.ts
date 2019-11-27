@@ -3,6 +3,11 @@ import CancelError from "../errors/CancelError";
 export const DEFAULT_TIMEOUT = 10000;
 const DEFAULT_INTERVAL = 500;
 
+let CancelablePromise = (promise, cancel) => ({
+  then: promise.then.bind(promise),
+  cancel
+});
+
 let polling = (task, time: number) => {
   let timeoutId;
   let currentTask;
@@ -34,10 +39,7 @@ let polling = (task, time: number) => {
     setTimeout(() => tick());
   });
 
-  // @ts-ignore
-  promise.cancel = cancel;
-
-  return promise;
+  return CancelablePromise(promise, cancel);
 };
 
-export default polling;
+export { CancelablePromise, polling as poll };
