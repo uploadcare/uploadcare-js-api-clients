@@ -68,8 +68,8 @@ describe("poll", () => {
 
     await expectAsync(polling).toBeRejectedWith(new CancelError());
 
-    expect(job.spy.condition).toHaveBeenCalledTimes(0);
-    expect(job.spy.cancel).toHaveBeenCalledTimes(0);
+    expect(job.spy.condition).toHaveBeenCalledTimes(1);
+    expect(job.spy.cancel).toHaveBeenCalledTimes(1);
   });
 
   it("should be able to cancel polling async after first request", async () => {
@@ -83,7 +83,7 @@ describe("poll", () => {
 
     await expectAsync(polling).toBeRejectedWith(new CancelError());
 
-    expect(job.spy.condition).toHaveBeenCalledTimes(1);
+    expect(job.spy.condition).toHaveBeenCalledTimes(2);
     expect(job.spy.cancel).toHaveBeenCalledTimes(1);
   });
 });
