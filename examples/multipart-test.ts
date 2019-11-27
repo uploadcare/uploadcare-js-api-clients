@@ -10,15 +10,22 @@ const settings = {
 
 ;(async () => {
   try {
+    let counter = 0
+    const step = 10000
+    const intervalID = setInterval(() => {
+      counter += step
+      console.log('Time after start: ', counter)
+    }, step)
     const {parts} = await multipartStart(fileToUpload, settings)
     const upload = multipartUpload(fileToUpload, parts, settings)
 
     upload.onProgress = (progressEvent) => {
       const progressValue = Math.round((progressEvent.loaded * 100) / progressEvent.total)
-      console.log(progressValue)
+      console.log('Progress: ', progressValue)
     }
 
     await upload
+    clearInterval(intervalID)
   } catch (err) {
     console.log(err)
   }

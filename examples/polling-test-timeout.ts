@@ -37,8 +37,6 @@ import info from '../src/api/info'
       timeout: 100
     })
 
-    // polling.cancel()
-
     const result = await polling.promise
     console.log(result)
   } catch (error) {
