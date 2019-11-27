@@ -155,7 +155,7 @@ class Request extends Thenable<RequestResponse> implements RequestInterface {
     if (axios.isCancel(error)) {
       throw new CancelError()
     }
-    console.log(error)
+
     if (error.response) {
       const errorRequestInfo = {
         headers: error.request.headers,

@@ -24,7 +24,6 @@ export class BaseThenable<T> extends Thenable<T> implements BaseThenableInterfac
     })
     this.promise = this.request
       .then(response => {
-        console.log('Uploaded')
         return Promise.resolve(response.data)
       })
       .catch(error => {
