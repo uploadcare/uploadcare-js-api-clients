@@ -1,6 +1,6 @@
 {
   "spec_dir": "test",
-  "spec_files": ["tools/poll.spec.ts"],
+  "spec_files": ["**/*.spec.ts"],
   "stopSpecOnExecutionFailure": false,
   "random": false,
   "reporters": [
