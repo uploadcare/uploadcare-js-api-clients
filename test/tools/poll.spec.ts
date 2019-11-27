@@ -1,69 +1,89 @@
-import poll from '../../src/tools/poll'
-import info from '../../src/api/info'
-import {getSettingsForTesting} from '../_helpers'
-import * as factory from '../_fixtureFactory'
+import poll from "../../src/tools/poll";
+import CancelError from '../../src/errors/CancelError'
 
-describe('poll', () => {
-  const uuid = factory.uuid('image')
-  const settings = getSettingsForTesting({
-    publicKey: factory.publicKey('image'),
-  })
+let CancelablePromise = (promise, cancel) => ({
+  then: promise.then.bind(promise),
+  cancel
+});
 
-  it('should be resolved', async() => {
-    const result = await poll(
-      () => {
-        const request = info(uuid, settings)
-        let cancel = () => request.cancel()
+let loongJob = (attemps, fails = false) => {
+  let runs = 1;
+  let condition = jasmine.createSpy("condition");
+  let cancel = jasmine.createSpy("cancelCondition");
 
-        let promise = request.then(response => {
-          if (response.is_ready) {
-            return response
-          }
+  let isFinish = () =>
+    CancelablePromise(
+      new Promise((resolve, reject) => {
+        condition();
+        if (runs === attemps) {
+          resolve(true);
+        } else {
+          runs += 1;
+          resolve(false);
+        }
+      }),
+      cancel
+    );
 
-          return false
-        })
+  return {
+    isFinish,
+    spy: {
+      condition,
+      cancel
+    }
+  };
+};
 
-        // @ts-ignore
-        promise.cancel = cancel
+describe("poll", () => {
+  it("should be resolved", async () => {
+    let job = loongJob(3);
+    let result = await poll(job.isFinish, 300);
 
-        return promise
-      },
-      300
-    )
+    expect(result).toBeTruthy();
+    expect(job.spy.condition).toHaveBeenCalledTimes(3);
+    expect(job.spy.cancel).not.toHaveBeenCalled();
+  });
+
+  it("should be able to cancel polling sync", async () => {
+    let job = loongJob(3);
+    let polling = poll(job.isFinish, 300);
 
     // @ts-ignore
-    expect(result.is_ready).toBeTruthy()
-  })
+    polling.cancel();
 
-  it('should be able to cancel polling', (done) => {
-    const polling = poll(
-      async() => {
-        const request = info(uuid, settings)
-        let cancel = () => request.cancel()
+    await expectAsync(polling).toBeRejectedWith(new CancelError())
 
-        let promise = request.then(response => {
-          if (response.is_ready) {
-            return response
-          }
+    expect(job.spy.condition).not.toHaveBeenCalled();
+    expect(job.spy.cancel).not.toHaveBeenCalled();
+  });
 
-          return false
-        })
-
-        // @ts-ignore
-        promise.cancel = cancel
-
-        return promise
-      },
-      300
-    )
+  it("should be able to cancel polling async", async () => {
+    let job = loongJob(3);
+    let polling = poll(job.isFinish, 300);
 
     setTimeout(() => {
       // @ts-ignore
-      polling.cancel()
-    }, 1)
+      polling.cancel();
+    }, 10);
 
-    polling
-      .then(() => done.fail('Promise should not to be resolved'))
-      .catch((error) => error.name === 'CancelError' ? done() : done.fail(error))
-  })
-})
+    await expectAsync(polling).toBeRejectedWith(new CancelError());
+
+    expect(job.spy.condition).toHaveBeenCalledTimes(0);
+    expect(job.spy.cancel).toHaveBeenCalledTimes(0);
+  });
+
+  it("should be able to cancel polling async after first request", async () => {
+    let job = loongJob(3);
+    let polling = poll(job.isFinish, 300);
+
+    setTimeout(() => {
+      // @ts-ignore
+      polling.cancel();
+    }, 350);
+
+    await expectAsync(polling).toBeRejectedWith(new CancelError());
+
+    expect(job.spy.condition).toHaveBeenCalledTimes(1);
+    expect(job.spy.cancel).toHaveBeenCalledTimes(1);
+  });
+});
