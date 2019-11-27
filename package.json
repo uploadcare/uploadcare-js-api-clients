@@ -9,7 +9,7 @@
     "clean": "rimraf dist",
     "lint": "eslint . --ext=ts",
     "mock:start": "cd ./mock-server && npm run start",
-    "test": "npm-run-all test:node test:browser",
+    "test": "npm-run-all test:node",
     "test:node": "jasmine-ts --project test/tsconfig.json --config=test/jasmine.config.json",
     "test:browser": "karma start karma.config.js --single-run --nocache",
     "test:browser:debug": "karma start karma.config.js --browsers=Chrome --single-run=false --watch --debug --nocache",
