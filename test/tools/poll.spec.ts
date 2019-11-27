@@ -1,7 +1,8 @@
 import { CancelablePromise, poll } from "../../src/tools/poll";
 import CancelError from '../../src/errors/CancelError'
+import TimeoutError from '../../src/errors/TimeoutError'
 
-let longJob = (attemps, fails = false) => {
+let longJob = (attemps, fails = null) => {
   let runs = 1;
   let condition = jasmine.createSpy("condition");
   let cancel = jasmine.createSpy("cancelCondition");
@@ -11,7 +12,7 @@ let longJob = (attemps, fails = false) => {
       new Promise((resolve, reject) => {
         condition();
         if (runs === attemps) {
-          resolve(true);
+          fails ? reject(fails) : resolve(true);
         } else {
           runs += 1;
           resolve(false);
@@ -80,5 +81,21 @@ describe("poll", () => {
 
     expect(job.spy.condition).toHaveBeenCalledTimes(2);
     expect(job.spy.cancel).toHaveBeenCalledTimes(1);
+  });
+
+  it("should fails with timeout error", async () => {
+    let job = longJob(3);
+    let polling = poll(job.isFinish, 200, 100);
+
+    await expectAsync(Promise.resolve(polling)).toBeRejectedWith(new TimeoutError('poll timeout'));
+  });
+
+  it("should handle errors", async () => {
+    let error = new Error('test error')
+    // @ts-ignore
+    let job = longJob(5, error);
+    let polling = poll(job.isFinish, 100);
+
+    await expectAsync(Promise.resolve(polling)).toBeRejectedWith(error);
   });
 });
