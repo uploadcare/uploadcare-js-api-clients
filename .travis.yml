@@ -11,16 +11,7 @@ env:
 install:
   - NODE_ENV=dev npm install
 
-stages:
-  - Lint
-  - Node
-  - Browser
-
 jobs:
   include:
-    - stage: Lint
-      script: npm run lint
-    - stage: Node
-      script: npm run test:node
     - stage: Browser
       script: npm run test:browser
