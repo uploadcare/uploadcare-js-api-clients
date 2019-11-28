@@ -10,7 +10,7 @@ export class UploadedState extends AbstractState implements LifecycleStateInterf
   }
   protected nextPossibleState: ProgressStateEnum[] = [
     ProgressStateEnum.Ready,
-    ProgressStateEnum.Canceled,
+    ProgressStateEnum.Cancelled,
     ProgressStateEnum.Error,
   ]
 }

@@ -1,6 +1,5 @@
 import * as factory from '../_fixtureFactory'
 import fileFrom from '../../src/fileFrom/fileFrom'
-import {FileFromEnum} from '../../src/fileFrom/types'
 import {getSettingsForTesting} from '../_helpers'
 
 describe('fileFrom', () => {
@@ -11,7 +10,7 @@ describe('fileFrom', () => {
       const settings = getSettingsForTesting({
         publicKey: factory.publicKey('demo'),
       })
-      const file = await fileFrom(FileFromEnum.URL, sourceUrl, settings)
+      const file = await fileFrom(sourceUrl, settings)
 
       expect(file.cdnUrl).toBeTruthy()
     })
@@ -21,7 +20,7 @@ describe('fileFrom', () => {
         publicKey: factory.publicKey('demo'),
         doNotStore: true,
       })
-      const file = await fileFrom(FileFromEnum.URL, sourceUrl, settings)
+      const file = await fileFrom(sourceUrl, settings)
 
       expect(file.isStored).toBeFalsy()
     })
@@ -30,7 +29,7 @@ describe('fileFrom', () => {
       const settings = getSettingsForTesting({
         publicKey: factory.publicKey('demo'),
       })
-      const filePromise = fileFrom(FileFromEnum.URL, sourceUrl, settings)
+      const filePromise = fileFrom(sourceUrl, settings)
 
       setTimeout(() => {
         filePromise.cancel()
@@ -47,7 +46,7 @@ describe('fileFrom', () => {
         doNotStore: true,
         fileName: 'newFileName.jpg',
       })
-      const file = await fileFrom(FileFromEnum.URL, sourceUrl, settings)
+      const file = await fileFrom(sourceUrl, settings)
 
       expect(file.name).toEqual('newFileName.jpg')
     })
@@ -57,7 +56,7 @@ describe('fileFrom', () => {
         const settings = getSettingsForTesting({
           publicKey: factory.publicKey('demo'),
         })
-        const filePromise = fileFrom(FileFromEnum.URL, sourceUrl, settings)
+        const filePromise = fileFrom(sourceUrl, settings)
 
         setTimeout(() => {
           filePromise.cancel()
@@ -81,7 +80,7 @@ describe('fileFrom', () => {
         const settings = getSettingsForTesting({
           publicKey: factory.publicKey('demo'),
         })
-        const filePromise = fileFrom(FileFromEnum.URL, sourceUrl, settings)
+        const filePromise = fileFrom(sourceUrl, settings)
 
         filePromise.onProgress = (progress) => {
           const {value} = progress
@@ -98,7 +97,7 @@ describe('fileFrom', () => {
         const settings = getSettingsForTesting({
           publicKey: factory.publicKey('demo'),
         })
-        const filePromise = fileFrom(FileFromEnum.URL, sourceUrl, settings)
+        const filePromise = fileFrom(sourceUrl, settings)
 
         filePromise.onUploaded = () => {
           done()
@@ -112,7 +111,7 @@ describe('fileFrom', () => {
         const settings = getSettingsForTesting({
           publicKey: factory.publicKey('demo'),
         })
-        const filePromise = fileFrom(FileFromEnum.URL, sourceUrl, settings)
+        const filePromise = fileFrom(sourceUrl, settings)
 
         filePromise.onReady = () => {
           done()

@@ -1,17 +1,48 @@
-import {UploadcareGroupInterface} from '../types'
-import {UploadInterface} from '../lifecycle/types'
-import {HandlerInterface} from '../fileFrom/types'
+import {FileData} from '../types'
+import {Url, Uuid} from '..'
+import {isFileData, isUrl, isUuid} from '../fileFrom/types'
 
-export enum GroupFromEnum {
-  Object = 'object',
-  URL = 'url',
-  DOM = 'input',
-  Uploaded = 'uploaded',
+/**
+ * FileData type guard.
+ *
+ * @param {FileData | Url | Uuid} data
+ */
+export const isFileDataArray = (data: FileData[] | Url[] | Uuid[]): data is FileData[] => {
+  for (const item of data) {
+    if (!isFileData(item)) {
+      return false
+    }
+  }
+
+  return true
 }
 
 /**
- * Base `thenable` interface for uploading `groupFrom` (`object`, `url`, `input`, `uploaded`).
+ * Uuid type guard.
+ *
+ * @param {FileData | Url | Uuid} data
  */
-export interface GroupUploadInterface extends UploadInterface<UploadcareGroupInterface> {}
+export const isUuidArray = (data: FileData[] | Url[] | Uuid[]): data is Uuid[] => {
+  for (const item of data) {
+    if (!isUuid(item)) {
+      return false
+    }
+  }
 
-export interface GroupHandlerInterface extends HandlerInterface<UploadcareGroupInterface> {}
+  return true
+}
+
+/**
+ * Url type guard.
+ *
+ * @param {FileData | Url | Uuid} data
+ */
+export const isUrlArray = (data: FileData[] | Url[] | Uuid[]): data is Url[] => {
+  for (const item of data) {
+    if (!isUrl(item)) {
+      return false
+    }
+  }
+
+  return true
+}

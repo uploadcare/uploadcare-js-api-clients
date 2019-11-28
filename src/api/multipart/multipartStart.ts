@@ -3,13 +3,13 @@ import {getFileSize} from './getFileSize'
 import defaultSettings from '../../defaultSettings'
 
 /* Types */
-import {RequestOptionsInterface} from '../request/types'
+import {Body, RequestOptionsInterface} from '../request/types'
 import {FileData, SettingsInterface} from '../../types'
 import {MultipartStartResponse} from './types'
 import {CancelableThenableInterface} from '../../thenable/types'
 import {CancelableThenable} from '../../thenable/CancelableThenable'
 
-const getRequestBody = (file: FileData, settings: SettingsInterface) => {
+const getRequestBody = (file: FileData, settings: SettingsInterface): Body => {
   const size: number = getFileSize(file)
 
   return {

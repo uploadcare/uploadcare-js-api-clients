@@ -1,42 +1,25 @@
 import {GroupUploadLifecycleInterface, LifecycleInterface} from './types'
 import {GroupInfoInterface} from '../api/types'
-import {SettingsInterface, UploadcareGroupInterface} from '../types'
-import {UploadedState} from './state/UploadedState'
+import {UploadcareGroupInterface} from '../types'
+import {UploadcareGroup} from '../UploadcareGroup'
 
 export class GroupUploadLifecycle implements GroupUploadLifecycleInterface {
-  private readonly lifecycle: LifecycleInterface<UploadcareGroupInterface>
+  readonly uploadLifecycle: LifecycleInterface<UploadcareGroupInterface>;
 
   constructor(lifecycle: LifecycleInterface<UploadcareGroupInterface>) {
-    this.lifecycle = lifecycle
+    this.uploadLifecycle = lifecycle
   }
 
-  handleUploadedGroup(groupInfo: GroupInfoInterface, settings: SettingsInterface): Promise<UploadcareGroupInterface> {
-    const totalSize = groupInfo.files.reduce((acc, file) => acc + file.size, 0)
-    const isStored = !!groupInfo.datetime_stored
-    const isImage = !!groupInfo.files.filter(file => file.is_image).length
+  handleUploadedGroup(groupInfo: GroupInfoInterface): Promise<UploadcareGroupInterface> {
+    const uploadLifecycle = this.getUploadLifecycle()
 
-    this.lifecycle.updateEntity({
-      uuid: groupInfo.id,
-      filesCount: groupInfo.files_count,
-      totalSize,
-      isStored,
-      isImage,
-      cdnUrl: groupInfo.cdn_url,
-      files: groupInfo.files,
-      createdAt: groupInfo.datetime_created,
-      storedAt: groupInfo.datetime_stored,
-    })
+    uploadLifecycle.updateEntity(UploadcareGroup.fromGroupInfo(groupInfo))
+    uploadLifecycle.handleUploaded(groupInfo.id)
 
-    this.lifecycle.updateState(new UploadedState())
-
-    if (typeof this.lifecycle.onUploaded === 'function') {
-      this.lifecycle.onUploaded(groupInfo.id)
-    }
-
-    return Promise.resolve(this.lifecycle.getEntity())
+    return Promise.resolve(uploadLifecycle.getEntity())
   }
 
   getUploadLifecycle(): LifecycleInterface<UploadcareGroupInterface> {
-    return this.lifecycle
+    return this.uploadLifecycle
   }
 }

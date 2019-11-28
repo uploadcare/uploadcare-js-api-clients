@@ -17,7 +17,7 @@ import {Body} from './types'
 export function buildFormData(body: Body): FormData | Body {
   const formData = new FormData()
 
-  for (let key of Object.keys(body)) {
+  for (const key of Object.keys(body)) {
     let value = body[key]
 
     if (typeof value === 'boolean') {

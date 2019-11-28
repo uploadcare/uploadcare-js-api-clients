@@ -25,7 +25,7 @@ class UploadAPI implements UploadAPIInterface {
     this.client = client
   }
 
-  private getResultSettings = (settings) => {
+  private getExtendedSettings = (settings): SettingsInterface => {
     return {
       ...this.client.getSettings(),
       ...settings,
@@ -39,39 +39,39 @@ class UploadAPI implements UploadAPIInterface {
   }
 
   base(data: FileData, settings: SettingsInterface = {}): BaseThenableInterface<BaseResponse> {
-    return base(data, this.getResultSettings(settings))
+    return base(data, this.getExtendedSettings(settings))
   }
 
   info(uuid: Uuid, settings: SettingsInterface = {}): CancelableThenableInterface<FileInfoInterface> {
-    return info(uuid, this.getResultSettings(settings))
+    return info(uuid, this.getExtendedSettings(settings))
   }
 
   fromUrl(sourceUrl: Url, settings: SettingsInterface = {}): CancelableThenableInterface<FromUrlResponse> {
-    return fromUrl(sourceUrl, this.getResultSettings(settings))
+    return fromUrl(sourceUrl, this.getExtendedSettings(settings))
   }
 
   fromUrlStatus(token: Token, settings: SettingsInterface = {}): CancelableThenableInterface<FromUrlStatusResponse> {
-    return fromUrlStatus(token, this.getResultSettings(settings))
+    return fromUrlStatus(token, this.getExtendedSettings(settings))
   }
 
   group(uuids: Uuid[], settings: SettingsInterface): CancelableThenableInterface<GroupInfoInterface> {
-    return group(uuids, this.getResultSettings(settings))
+    return group(uuids, this.getExtendedSettings(settings))
   }
 
   groupInfo(id: GroupId, settings: SettingsInterface): CancelableThenableInterface<GroupInfoInterface> {
-    return groupInfo(id, this.getResultSettings(settings))
+    return groupInfo(id, this.getExtendedSettings(settings))
   }
 
   multipartStart(file: FileData, settings: SettingsInterface): CancelableThenableInterface<MultipartStartResponse> {
-    return multipartStart(file, this.getResultSettings(settings))
+    return multipartStart(file, this.getExtendedSettings(settings))
   }
 
   multipartUpload(file: FileData, parts: MultipartPart[], settings: SettingsInterface): BaseThenableInterface<any> {
-    return multipartUpload(file, parts, this.getResultSettings(settings))
+    return multipartUpload(file, parts, this.getExtendedSettings(settings))
   }
 
   multipartComplete(uuid: Uuid, settings: SettingsInterface): CancelableThenableInterface<FileInfoInterface> {
-    return multipartComplete(uuid, this.getResultSettings(settings))
+    return multipartComplete(uuid, this.getExtendedSettings(settings))
   }
 }
 

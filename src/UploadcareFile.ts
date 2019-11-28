@@ -1,11 +1,14 @@
-import {OriginalImageInfoInterface, SettingsInterface, UploadcareFileInterface} from './types'
+import {
+  OriginalImageInfoInterface,
+  OriginalVideoInfoInterface,
+  SettingsInterface,
+  UploadcareFileInterface
+} from './types'
 import prettyFileInfo from './prettyFileInfo'
-import {FileInfoInterface} from './api/types'
+import {FileInfoInterface, Uuid} from './api/types'
 
 export class UploadcareFile implements UploadcareFileInterface {
-  private readonly fileInfo: FileInfoInterface
-
-  readonly uuid: string
+  readonly uuid: Uuid
   readonly name: null | string = null
   readonly size: null | number = null
   readonly isStored: null | boolean = null
@@ -15,20 +18,53 @@ export class UploadcareFile implements UploadcareFileInterface {
   readonly originalUrl: null | string = null
   readonly originalFilename: null | string = null
   readonly originalImageInfo: null | OriginalImageInfoInterface = null
+  readonly originalVideoInfo: null | OriginalVideoInfoInterface = null
 
-  constructor(fileInfo: FileInfoInterface, settings: SettingsInterface) {
-    this.fileInfo = fileInfo
+  constructor(file: UploadcareFileInterface) {
+    this.uuid = file.uuid
+    this.name = file.name
+    this.size = file.size
+    this.isStored = file.isStored
+    this.isImage = file.isImage
+    this.cdnUrl = file.cdnUrl
+    this.cdnUrlModifiers = file.cdnUrlModifiers
+    this.originalUrl = file.originalUrl
+    this.originalFilename = file.originalFilename
+    this.originalImageInfo = file.originalImageInfo
+    this.originalVideoInfo = file.originalVideoInfo
+  }
+
+  static fromFileInfo(fileInfo: FileInfoInterface, settings: SettingsInterface): UploadcareFileInterface {
     const pretty = prettyFileInfo(fileInfo, settings)
 
-    this.uuid = pretty.uuid
-    this.name = pretty.name
-    this.size = pretty.size
-    this.isStored = pretty.isStored
-    this.isImage = pretty.isImage
-    this.cdnUrl = pretty.cdnUrl
-    this.cdnUrlModifiers = pretty.cdnUrlModifiers
-    this.originalUrl = pretty.originalUrl
-    this.originalFilename = pretty.originalFilename
-    this.originalImageInfo = pretty.originalImageInfo
+    return new UploadcareFile({
+      uuid: pretty.uuid,
+      name: pretty.name,
+      size: pretty.size,
+      isStored: pretty.isStored,
+      isImage: pretty.isImage,
+      cdnUrl: pretty.cdnUrl,
+      cdnUrlModifiers: pretty.cdnUrlModifiers,
+      originalUrl: pretty.originalUrl,
+      originalFilename: pretty.originalFilename,
+      originalImageInfo: pretty.originalImageInfo,
+      originalVideoInfo: pretty.originalVideoInfo,
+    })
+  }
+
+  static fromUuid(uuid: Uuid): UploadcareFileInterface {
+    return new UploadcareFile({
+      uuid,
+      name: null,
+      size: null,
+      isStored: null,
+      isImage: null,
+      cdnUrl: null,
+      cdnUrlModifiers: null,
+      originalUrl: null,
+      originalFilename: null,
+      originalImageInfo: null,
+      originalVideoInfo: null,
+    })
   }
 }

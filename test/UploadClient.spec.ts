@@ -32,10 +32,10 @@ describe('UploadClient', () => {
         expect(error.request.url).toBe('https://upload.staging0.uploadcare.com/info/')
       })
     })
-    it('with setSettings method', async() => {
+    it('with updateSettings method', async() => {
       const client = new UploadClient()
 
-      client.setSettings({baseURL: 'https://upload.staging0.uploadcare.com'})
+      client.updateSettings({baseURL: 'https://upload.staging0.uploadcare.com'})
 
       const req = client.api.request(requestOptions)
 

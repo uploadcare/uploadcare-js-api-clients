@@ -9,6 +9,25 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 [Unreleased]: https://github.com/uploadcare/uploadcare-upload-client/compare/v1.0.0-alpha.5...HEAD
 
+### Changed
+
+* Method `setSettings` of `UploadClientInterface` was renamed to `updateSettings`.
+* Methods (`request`, `base`, `fromUrl`, `fromUrlStatus`, `group`, 
+`groupInfo`, `info`, `multipartStart`, `multipartUpload`, 
+`multipartComplete`, `multipart`, `fileFrom`, `groupFrom`) was exported 
+from `index.ts` to make better tree shaking. 
+
+### Removed
+
+* `addUpdateSettingsListener` and `removeUpdateSettingsListener` from 
+`UploadClientInterface`.
+* Removed `from` param from `fileFrom` and `groupFrom`. 
+* Removed `FileFromEnum` and `GroupFromEnum`.
+
+### Changed
+
+* `README.md` was updated according to library API.
+
 ## [1.0.0-alpha.5]
 
 ### Added

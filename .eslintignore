@@ -1,4 +1,5 @@
 dist
 coverage
 mock-server/node_modules
-scripts
+karma.config.js
+rollup.config.js
