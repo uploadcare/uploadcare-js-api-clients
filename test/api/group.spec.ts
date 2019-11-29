@@ -1,87 +1,59 @@
 import * as factory from '../_fixtureFactory'
 import {getSettingsForTesting} from '../_helpers'
 import group from '../../src/api/group'
+import UploadcareError from '../../src/errors/UploadcareError'
+import CancelError from '../../src/errors/CancelError'
 
 describe('API - group', () => {
-  it('should upload group of files', async() => {
-    const files = factory.groupOfFiles('valid')
-    const settings = getSettingsForTesting({publicKey: factory.publicKey('image')})
+  const files = factory.groupOfFiles('valid')
+  const settings = getSettingsForTesting({publicKey: factory.publicKey('image')})
+
+  it('should upload group of files', async () => {
     const data = await group(files, settings)
 
     expect(data).toBeTruthy()
     expect(data.id).toBeTruthy()
     expect(data.files).toBeTruthy()
   })
-  it('should fail with [HTTP 400] no files[N] parameters found.', (done) => {
+
+  it('should fail with [HTTP 400] no files[N] parameters found.', async () => {
     const files = []
-    const settings = getSettingsForTesting({publicKey: factory.publicKey('image')})
+    const upload = group(files, settings)
 
-    group(files, settings)
-      .then(() => done.fail('Promise should not to be resolved'))
-      .catch(error => {
-        (error.name === 'UploadcareError')
-          ? done()
-          : done.fail(error)
-      })
+    await (expectAsync(upload) as any).toBeRejectedWithError(UploadcareError)
   })
-  it('should fail with [HTTP 400] this is not valid file url: http://invalid/url.', (done) => {
+
+  it('should fail with [HTTP 400] this is not valid file url: http://invalid/url.', async () => {
     const files = factory.groupOfFiles('invalid')
-    const settings = getSettingsForTesting({publicKey: factory.publicKey('image')})
+    const upload = group(files, settings)
 
-    group(files, settings)
-      .then(() => done.fail('Promise should not to be resolved'))
-      .catch(error => {
-        (error.name === 'UploadcareError')
-          ? done()
-          : done.fail(error)
-      })
+    await (expectAsync(upload) as any).toBeRejectedWithError(UploadcareError)
   })
-  it('should fail with [HTTP 400] some files not found.', (done) => {
-    const files = factory.groupOfFiles('valid')
+
+  it('should fail with [HTTP 400] some files not found.', async () => {
     const settings = getSettingsForTesting({publicKey: factory.publicKey('demo')})
-
-    group(files, settings)
-      .then(() => done.fail('Promise should not to be resolved'))
-      .catch(error => {
-        (error.name === 'UploadcareError')
-          ? done()
-          : done.fail(error)
-      })
-  })
-
-  it('should be able to cancel uploading', async(done) => {
-    const files = factory.groupOfFiles('valid')
-    const settings = getSettingsForTesting({publicKey: factory.publicKey('image')})
     const upload = group(files, settings)
 
-    setTimeout(() => {
-      upload.cancel()
-    }, 1)
-
-    upload
-      .then(() => done.fail('Promise should not to be resolved'))
-      .catch((error) => error.name === 'CancelError' ? done() : done.fail(error))
+    await (expectAsync(upload) as any).toBeRejectedWithError(UploadcareError)
   })
 
-  it('should be able to handle cancel uploading', async (done) => {
-    const files = factory.groupOfFiles('valid')
-    const settings = getSettingsForTesting({publicKey: factory.publicKey('image')})
+  it('should be able to cancel uploading', async () => {
     const upload = group(files, settings)
 
-    setTimeout(() => {
-      upload.cancel()
-    }, 1)
+    upload.cancel()
 
-    upload.onCancel = () => {
-      done()
-    }
+    await (expectAsync(upload) as any).toBeRejectedWithError(CancelError)
+  })
 
-    upload
-      .then(() => done.fail('Promise should not to be resolved'))
-      .catch((error) => {
-        if (error.name !== 'CancelError') {
-          done.fail(error)
-        }
-      })
+  it('should be able to handle cancel uploading', async () => {
+    const upload = group(files, settings)
+    const onCancel = jasmine.createSpy('onCancel')
+
+    upload.onCancel = onCancel
+    upload.cancel()
+
+    await (expectAsync(upload) as any).toBeRejectedWithError(CancelError)
+
+    expect(onCancel).toHaveBeenCalled()
   })
 })

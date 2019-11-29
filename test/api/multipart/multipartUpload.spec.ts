@@ -2,83 +2,54 @@ import * as factory from '../../_fixtureFactory'
 import multipartUpload from '../../../src/api/multipart/multipartUpload'
 import {getSettingsForTesting} from '../../_helpers'
 import multipartStart from '../../../src/api/multipart/multipartStart'
+import CancelError from '../../../src/errors/CancelError'
 
 describe('API - multipartUpload', () => {
-  jasmine.DEFAULT_TIMEOUT_INTERVAL = 10000
-  const fileToUpload = factory.file(11).data
-
-  it('should be able to upload multipart file', async(done) => {
-    const settings = getSettingsForTesting({
-      publicKey: factory.publicKey('image'),
-    })
-    const multipartStartUpload = multipartStart(fileToUpload, settings)
-    const {parts} = await multipartStartUpload
-
-    multipartUpload(fileToUpload, parts, settings)
-      .then(done)
-      .catch(done.fail)
+  const fileToUpload = factory.file(12).data
+  const settings = getSettingsForTesting({
+    publicKey: factory.publicKey('multipart'),
   })
 
-  it('should be able to cancel uploading', async(done) => {
-    const settings = getSettingsForTesting({
-      publicKey: factory.publicKey('image'),
-    })
-    const multipartStartUpload = multipartStart(fileToUpload, settings)
-    const {parts} = await multipartStartUpload
-
+  it('should be able to upload multipart file', async () => {
+    const {parts} = await multipartStart(fileToUpload, settings)
     const upload = multipartUpload(fileToUpload, parts, settings)
 
-    setTimeout(() => {
-      upload.cancel()
-    }, 1)
+    await (expectAsync(upload) as any).toBeResolved()
+  }, 250000)
 
-    upload
-      .then(() => done.fail('Promise should not to be resolved'))
-      .catch((error) => error.name === 'CancelError' ? done() : done.fail(error))
-  })
-
-  it('should be able to handle cancel uploading', async (done) => {
-    const settings = getSettingsForTesting({
-      publicKey: factory.publicKey('image'),
-    })
-    const multipartStartUpload = multipartStart(fileToUpload, settings)
-    const {parts} = await multipartStartUpload
-
+  it('should be able to cancel uploading', async () => {
+    const {parts} = await multipartStart(fileToUpload, settings)
     const upload = multipartUpload(fileToUpload, parts, settings)
 
-    setTimeout(() => {
-      upload.cancel()
-    }, 1)
+    upload.cancel()
 
-    upload.onCancel = () => {
-      done()
-    }
-
-    upload
-      .then(() => done.fail('Promise should not to be resolved'))
-      .catch((error) => {
-        if (error.name !== 'CancelError') {
-          done.fail(error)
-        }
-      })
+    await (expectAsync(upload) as any).toBeRejectedWithError(CancelError)
   })
 
-  it('should be able to handle progress', async(done) => {
+  it('should be able to handle cancel uploading', async () => {
+    const {parts} = await multipartStart(fileToUpload, settings)
+    const upload = multipartUpload(fileToUpload, parts, settings)
+    const onCancel = jasmine.createSpy('onCancel')
+
+    upload.onCancel = onCancel
+    upload.cancel()
+
+    await (expectAsync(upload) as any).toBeRejectedWithError(CancelError)
+
+    expect(onCancel).toHaveBeenCalled()
+  })
+
+  it('should be able to handle progress', async () => {
     let progressValue = 0
-    const settings = getSettingsForTesting({
-      publicKey: factory.publicKey('image'),
-    })
-    const multipartStartUpload = multipartStart(fileToUpload, settings)
-    const {parts} = await multipartStartUpload
-
+    const {parts} = await multipartStart(fileToUpload, settings)
     const upload = multipartUpload(fileToUpload, parts, settings)
 
     upload.onProgress = (progressEvent) => {
       progressValue = Math.round((progressEvent.loaded * 100) / progressEvent.total)
     }
 
-    upload
-      .then(() => progressValue > 0 ? done() : done.fail())
-      .catch(error => done.fail(error))
-  })
+    await upload
+
+    expect(progressValue).toBeGreaterThan(0)
+  }, 250000)
 })

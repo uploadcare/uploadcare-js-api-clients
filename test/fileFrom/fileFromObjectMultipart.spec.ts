@@ -1,136 +1,98 @@
 import * as factory from '../_fixtureFactory'
 import fileFrom from '../../src/fileFrom/fileFrom'
 import {getSettingsForTesting} from '../_helpers'
+import CancelError from '../../src/errors/CancelError'
 
-describe('fileFrom', () => {
-  describe('Object (multipart)', () => {
-    const fileToUpload = factory.file(11)
+describe('fileFrom Object (multipart)', () => {
+  const fileToUpload = factory.file(12).data
+  const settings = getSettingsForTesting({
+    publicKey: factory.publicKey('multipart'),
+  })
 
-    it('should resolves when file is ready on CDN', (done) => {
-      const settings = getSettingsForTesting({
-        publicKey: factory.publicKey('image'),
-      })
-      const filePromise = fileFrom(fileToUpload.data, settings)
+  it('should resolves when file is ready on CDN', async () => {
+    const file = await fileFrom(fileToUpload, settings)
 
-      filePromise
-        .then(file => {
-          expect(file.cdnUrl).toBeTruthy()
-          done()
-        })
+    expect(file.cdnUrl).toBeTruthy()
+  }, 250000)
+
+  it('should accept doNotStore setting', async () => {
+    const settings = getSettingsForTesting({
+      publicKey: factory.publicKey('image'),
+      doNotStore: true,
+    })
+    const file = await fileFrom(fileToUpload, settings)
+
+    expect(file.isStored).toBeFalsy()
+  }, 250000)
+
+  it('should be able to cancel uploading', async () => {
+    const upload = fileFrom(fileToUpload, settings)
+
+    upload.cancel()
+
+    await (expectAsync(upload) as any).toBeRejectedWithError(CancelError)
+  })
+
+  it('should accept new file name setting', async () => {
+    const settings = getSettingsForTesting({
+      publicKey: factory.publicKey('image'),
+      doNotStore: true,
+      fileName: 'newFileName.jpg',
+    })
+    const file = await fileFrom(fileToUpload, settings)
+
+    expect(file.name).toEqual('newFileName.jpg')
+  }, 250000)
+
+  describe('should be able to handle', () => {
+    it('cancel uploading', async () => {
+      const upload = fileFrom(fileToUpload, settings)
+
+      const onCancel = jasmine.createSpy('onCancel')
+
+      upload.onCancel = onCancel
+      upload.cancel()
+
+      await (expectAsync(upload) as any).toBeRejectedWithError(CancelError)
+
+      expect(onCancel).toHaveBeenCalled()
     })
 
-    it('should accept doNotStore setting', async() => {
-      const settings = getSettingsForTesting({
-        publicKey: factory.publicKey('image'),
-        doNotStore: true,
-        pollingTimeoutMilliseconds: 20000
-      })
-      const filePromise = fileFrom(fileToUpload.data, settings)
-      const file = await filePromise
+    it('progress', async () => {
+      let progressValue = 0
+      const upload = fileFrom(fileToUpload, settings)
 
-      expect(file.isStored).toBeFalsy()
-    }, 20000)
+      upload.onProgress = (progress) => {
+        const {value} = progress
 
-    it('should be able to cancel uploading', (done) => {
-      const settings = getSettingsForTesting({
-        publicKey: factory.publicKey('image'),
-      })
-      const filePromise = fileFrom(fileToUpload.data, settings)
+        progressValue = value
+      }
 
-      setTimeout(() => {
-        filePromise.cancel()
-      }, 1)
+      await upload
 
-      filePromise
-        .then(() => done.fail('Promise should not to be resolved'))
-        .catch((error) => error.name === 'CancelError' ? done() : done.fail(error))
-    })
+      expect(progressValue).toBe(1)
+    }, 250000)
 
-    it('should accept new file name setting', async() => {
-      const settings = getSettingsForTesting({
-        publicKey: factory.publicKey('image'),
-        doNotStore: true,
-        fileName: 'newFileName.jpg',
-      })
-      const filePromise = fileFrom(fileToUpload.data, settings)
-      const file = await filePromise
+    it('uploaded', async () => {
+      const upload = fileFrom(fileToUpload, settings)
+      const onUploaded = jasmine.createSpy('onUploaded')
 
-      expect(file.name).toEqual('newFileName.jpg')
-    })
+      upload.onUploaded = onUploaded
 
-    describe('should be able to handle', () => {
-      it('cancel uploading', (done) => {
-        const settings = getSettingsForTesting({
-          publicKey: factory.publicKey('image'),
-        })
-        const filePromise = fileFrom(fileToUpload.data, settings)
+      await (expectAsync(upload) as any).toBeResolved()
 
-        setTimeout(() => {
-          filePromise.cancel()
-        }, 1)
+      expect(onUploaded).toHaveBeenCalled()
+    }, 250000)
 
-        filePromise.onCancel = () => {
-          done()
-        }
+    it('ready', async () => {
+      const upload = fileFrom(fileToUpload, settings)
+      const onReady = jasmine.createSpy('onReady')
 
-        filePromise
-          .then(() => done.fail('Promise should not to be resolved'))
-          .catch((error) => {
-            if (error.name !== 'CancelError') {
-              done.fail(error)
-            }
-          })
-      })
+      upload.onReady = onReady
 
-      it('progress', (done) => {
-        let progressValue = 0
-        const settings = getSettingsForTesting({
-          publicKey: factory.publicKey('image'),
-        })
-        const filePromise = fileFrom(fileToUpload.data, settings)
+      await (expectAsync(upload) as any).toBeResolved()
 
-        filePromise.onProgress = (progress) => {
-          const {value} = progress
-
-          progressValue = value
-        }
-
-        filePromise
-          .then(() =>
-            progressValue > 0
-              ? done()
-              : done.fail()
-          )
-          .catch(error => done.fail(error))
-      })
-
-      it('uploaded', (done) => {
-        const settings = getSettingsForTesting({
-          publicKey: factory.publicKey('image'),
-        })
-        const filePromise = fileFrom(fileToUpload.data, settings)
-
-        filePromise.onUploaded = () => {
-          done()
-        }
-
-        filePromise
-          .catch(error => done.fail(error))
-      })
-
-      it('ready', (done) => {
-        const settings = getSettingsForTesting({
-          publicKey: factory.publicKey('image'),
-        })
-        const filePromise = fileFrom(fileToUpload.data, settings)
-
-        filePromise.onReady = () => {
-          done()
-        }
-
-        filePromise
-          .catch(error => done.fail(error))
-      })
-    })
+      expect(onReady).toHaveBeenCalled()
+    }, 250000)
   })
 })

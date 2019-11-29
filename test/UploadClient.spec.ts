@@ -11,7 +11,7 @@ describe('UploadClient', () => {
       },
     }
 
-    it('with default settings', async() => {
+    it('with default settings', async () => {
       const client = new UploadClient()
 
       const req = client.api.request(requestOptions)
@@ -21,7 +21,8 @@ describe('UploadClient', () => {
         expect(url).toBe('https://upload.uploadcare.com/info/')
       })
     })
-    it('with constructor settings', async() => {
+
+    it('with constructor settings', async () => {
       const client = new UploadClient({baseURL: 'https://upload.staging0.uploadcare.com'})
 
       const req = client.api.request(requestOptions)
@@ -32,7 +33,8 @@ describe('UploadClient', () => {
         expect(error.request.url).toBe('https://upload.staging0.uploadcare.com/info/')
       })
     })
-    it('with updateSettings method', async() => {
+
+    it('with updateSettings method', async () => {
       const client = new UploadClient()
 
       client.updateSettings({baseURL: 'https://upload.staging0.uploadcare.com'})
@@ -45,7 +47,8 @@ describe('UploadClient', () => {
         expect(error.request.url).toBe('https://upload.staging0.uploadcare.com/info/')
       })
     })
-    it('with settings as options', async() => {
+
+    it('with settings as options', async () => {
       const client = new UploadClient()
 
       const req = client.api.request({
