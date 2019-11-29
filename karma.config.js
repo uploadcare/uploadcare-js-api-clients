@@ -14,7 +14,7 @@ module.exports = function(config) {
         watched: false,
       },
       {
-        pattern: 'test/**/*.ts',
+        pattern: 'test/**/*.test.ts',
         watched: false,
       },
     ],
@@ -27,7 +27,7 @@ module.exports = function(config) {
 
     preprocessors: {
       'src/**/*.ts': ['karma-typescript'],
-      'test/**/*.ts': ['karma-typescript'],
+      'test/**/*.test.ts': ['karma-typescript'],
     },
 
     karmaTypescriptConfig: {
