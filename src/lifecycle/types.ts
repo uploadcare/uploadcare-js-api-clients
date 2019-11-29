@@ -13,11 +13,11 @@ export type UploadedHook = (uuid: string) => void
 export type ReadyHook<T> = (entity: T) => void
 
 export interface ProgressHookInterface<T> {
-  onProgress: ProgressHook<T> | null;
+  onProgress?: ProgressHook<T> | null;
 }
 
 export interface CancelHookInterface {
-  onCancel: CancelHook | null;
+  onCancel?: CancelHook | null;
 }
 
 export interface BaseHooksInterface extends
@@ -27,8 +27,8 @@ export interface BaseHooksInterface extends
 
 export interface UploadHooksInterface<T> extends
   ProgressHookInterface<UploadingProgress> {
-  onUploaded: UploadedHook | null;
-  onReady: ReadyHook<T> | null;
+  onUploaded?: UploadedHook | null;
+  onReady?: ReadyHook<T> | null;
 }
 
 export interface LifecycleHooksInterface<T> extends

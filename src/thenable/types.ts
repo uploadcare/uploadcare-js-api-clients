@@ -1,4 +1,4 @@
-import {BaseHooksInterface, CancelableInterface, CancelHookInterface} from '../lifecycle/types'
+import {CancelableInterface, CancelHookInterface} from '../lifecycle/types'
 
 export interface CancelableThenableInterface<T> extends
   CancelHookInterface,
@@ -7,7 +7,6 @@ export interface CancelableThenableInterface<T> extends
 }
 
 export interface BaseThenableInterface<T> extends
-  BaseHooksInterface,
   Promise<T>,
   CancelableInterface {
 }
