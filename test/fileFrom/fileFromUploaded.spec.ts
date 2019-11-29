@@ -1,115 +1,88 @@
 import * as factory from '../_fixtureFactory'
 import fileFrom from '../../src/fileFrom/fileFrom'
 import {getSettingsForTesting} from '../_helpers'
+import CancelError from '../../src/errors/CancelError'
 
-describe('fileFrom', () => {
-  describe('Uploaded', () => {
-    const uuid = factory.uuid('image')
+describe('fileFrom Uploaded', () => {
+  const uuid = factory.uuid('image')
+  const settings = getSettingsForTesting({
+    publicKey: factory.publicKey('image'),
+  })
 
-    it('should resolves when file is ready on CDN', async() => {
-      const settings = getSettingsForTesting({
-        publicKey: factory.publicKey('image'),
-      })
-      const file = await fileFrom(uuid, settings)
+  it('should resolves when file is ready on CDN', async () => {
+    const file = await fileFrom(uuid, settings)
 
-      expect(file.cdnUrl).toBeTruthy()
+    expect(file.cdnUrl).toBeTruthy()
+  })
+
+  it('should be able to cancel uploading', async () => {
+    const upload = fileFrom(uuid, settings)
+
+    upload.cancel()
+
+    await (expectAsync(upload) as any).toBeRejectedWithError(CancelError)
+  })
+
+  it('should accept new file name setting', async () => {
+    const settings = getSettingsForTesting({
+      publicKey: factory.publicKey('image'),
+      doNotStore: true,
+      fileName: 'newFileName.jpg',
+    })
+    const file = await fileFrom(uuid, settings)
+
+    expect(file.name).toEqual('newFileName.jpg')
+  })
+
+  describe('should be able to handle', () => {
+    it('cancel uploading', async () => {
+      const upload = fileFrom(uuid, settings)
+
+      const onCancel = jasmine.createSpy('onCancel')
+
+      upload.onCancel = onCancel
+      upload.cancel()
+
+      await (expectAsync(upload) as any).toBeRejectedWithError(CancelError)
+
+      expect(onCancel).toHaveBeenCalled()
     })
 
-    it('should be able to cancel uploading', (done) => {
-      const settings = getSettingsForTesting({
-        publicKey: factory.publicKey('image'),
-      })
-      const filePromise = fileFrom(uuid, settings)
+    it('progress', async () => {
+      let progressValue = 0
+      const upload = fileFrom(uuid, settings)
 
-      setTimeout(() => {
-        filePromise.cancel()
-      }, 1)
+      upload.onProgress = (progress) => {
+        const {value} = progress
 
-      filePromise
-        .then(() => done.fail('Promise should not to be resolved'))
-        .catch(error => error.name === 'CancelError' ? done() : done.fail(error))
+        progressValue = value
+      }
+
+      await upload
+
+      expect(progressValue).toBe(1)
     })
 
-    it('should accept new file name setting', async() => {
-      const settings = getSettingsForTesting({
-        publicKey: factory.publicKey('image'),
-        doNotStore: true,
-        fileName: 'newFileName.jpg',
-      })
-      const file = await fileFrom(uuid, settings)
+    it('uploaded', async () => {
+      const upload = fileFrom(uuid, settings)
+      const onUploaded = jasmine.createSpy('onUploaded')
 
-      expect(file.name).toEqual('newFileName.jpg')
+      upload.onUploaded = onUploaded
+
+      await (expectAsync(upload) as any).toBeResolved()
+
+      expect(onUploaded).toHaveBeenCalled()
     })
 
-    describe('should be able to handle', () => {
-      it('cancel uploading', (done) => {
-        const settings = getSettingsForTesting({
-          publicKey: factory.publicKey('image'),
-        })
-        const filePromise = fileFrom(uuid, settings)
+    it('ready', async () => {
+      const upload = fileFrom(uuid, settings)
+      const onReady = jasmine.createSpy('onReady')
 
-        setTimeout(() => {
-          filePromise.cancel()
-        }, 1)
+      upload.onReady = onReady
 
-        filePromise.onCancel = () => {
-          done()
-        }
+      await (expectAsync(upload) as any).toBeResolved()
 
-        filePromise
-          .then(() => done.fail('Promise should not to be resolved'))
-          .catch((error) => {
-            if (error.name !== 'CancelError') {
-              done.fail(error)
-            }
-          })
-      })
-
-      it('progress', (done) => {
-        let progressValue = 0
-        const settings = getSettingsForTesting({
-          publicKey: factory.publicKey('image'),
-        })
-        const filePromise = fileFrom(uuid, settings)
-
-        filePromise.onProgress = (progress) => {
-          const {value} = progress
-
-          progressValue = value
-        }
-
-        filePromise
-          .then(() => progressValue > 0 && progressValue <= 1 ? done() : done.fail())
-          .catch(error => done.fail(error))
-      })
-
-      it('uploaded', (done) => {
-        const settings = getSettingsForTesting({
-          publicKey: factory.publicKey('image'),
-        })
-        const filePromise = fileFrom(uuid, settings)
-
-        filePromise.onUploaded = () => {
-          done()
-        }
-
-        filePromise
-          .catch(error => done.fail(error))
-      })
-
-      it('ready', (done) => {
-        const settings = getSettingsForTesting({
-          publicKey: factory.publicKey('image'),
-        })
-        const filePromise = fileFrom(uuid, settings)
-
-        filePromise.onReady = () => {
-          done()
-        }
-
-        filePromise
-          .catch(error => done.fail(error))
-      })
+      expect(onReady).toHaveBeenCalled()
     })
   })
 })

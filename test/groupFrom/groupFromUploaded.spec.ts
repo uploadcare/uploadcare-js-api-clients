@@ -1,123 +1,88 @@
 import * as factory from '../_fixtureFactory'
 import {getSettingsForTesting} from '../_helpers'
 import groupFrom from '../../src/groupFrom/groupFrom'
+import CancelError from '../../src/errors/CancelError'
 
-describe('groupFrom', () => {
-  describe('Uploaded[]', () => {
-    const uuid = factory.uuid('image')
+describe('groupFrom Uploaded[]', () => {
+  const uuid = factory.uuid('image')
+  const files = [uuid]
+  const settings = getSettingsForTesting({
+    publicKey: factory.publicKey('image'),
+  })
 
-    it('should resolves when file is ready on CDN', (done) => {
-      const settings = getSettingsForTesting({
-        publicKey: factory.publicKey('image'),
-      })
-      const groupPromise = groupFrom([uuid], settings)
+  it('should resolves when file is ready on CDN', async () => {
+    const {cdnUrl} = await groupFrom(files, settings)
 
-      groupPromise
-        .then(group => {
-          expect(group.cdnUrl).toBeTruthy()
-          done()
-        })
+    expect(cdnUrl).toBeTruthy()
+  })
+
+  it('should accept doNotStore setting', async () => {
+    const settings = getSettingsForTesting({
+      publicKey: factory.publicKey('image'),
+      doNotStore: true,
+    })
+    const upload = groupFrom(files, settings)
+    const group = await upload
+
+    expect(group.isStored).toBeFalsy()
+  })
+
+  it('should be able to cancel uploading', async () => {
+    const upload = groupFrom(files, settings)
+
+    upload.cancel()
+
+    await (expectAsync(upload) as any).toBeRejectedWithError(CancelError)
+  })
+
+  describe('should be able to handle', () => {
+    it('cancel uploading', async () => {
+      const upload = groupFrom(files, settings)
+      const onCancel = jasmine.createSpy('onCancel')
+
+      upload.onCancel = onCancel
+      upload.cancel()
+
+      await (expectAsync(upload) as any).toBeRejectedWithError(CancelError)
+
+      expect(onCancel).toHaveBeenCalled()
     })
 
-    it('should accept doNotStore setting', async() => {
-      const settings = getSettingsForTesting({
-        publicKey: factory.publicKey('image'),
-        doNotStore: true,
-      })
-      const groupPromise = groupFrom([uuid], settings)
-      const group = await groupPromise
+    it('progress', async () => {
+      let progressValue = 0
+      const upload = groupFrom(files, settings)
 
-      expect(group.isStored).toBeFalsy()
+      upload.onProgress = (progress) => {
+        const {value} = progress
+
+        progressValue = value
+      }
+
+      await upload
+
+      expect(progressValue).toBe(1)
     })
 
-    it('should be able to cancel uploading', (done) => {
-      const settings = getSettingsForTesting({
-        publicKey: factory.publicKey('image'),
-      })
-      const groupPromise = groupFrom([uuid], settings)
+    it('uploaded', async () => {
+      const upload = groupFrom(files, settings)
+      const onUploaded = jasmine.createSpy('onUploaded')
 
-      setTimeout(() => {
-        groupPromise.cancel()
-      }, 1)
+      upload.onUploaded = onUploaded
 
-      groupPromise
-        .then(() => done.fail('Promise should not to be resolved'))
-        .catch((error) => error.name === 'CancelError' ? done() : done.fail(error))
+      await (expectAsync(upload) as any).toBeResolved()
+
+      expect(onUploaded).toHaveBeenCalled()
     })
 
-    describe('should be able to handle', () => {
-      it('cancel uploading', (done) => {
-        const settings = getSettingsForTesting({
-          publicKey: factory.publicKey('image'),
-        })
-        const groupPromise = groupFrom([uuid], settings)
+    it('ready', async () => {
+      const upload = groupFrom(files, settings)
+      const onReady = jasmine.createSpy('onReady')
 
-        setTimeout(() => {
-          groupPromise.cancel()
-        }, 1)
+      upload.onReady = onReady
 
-        groupPromise.onCancel = () => {
-          done()
-        }
+      await (expectAsync(upload) as any).toBeResolved()
 
-        groupPromise
-          .then(() => done.fail('Promise should not to be resolved'))
-          .catch((error) => {
-            if (error.name !== 'CancelError') {
-              done.fail(error)
-            }
-          })
-      })
-
-      it('progress', (done) => {
-        let progressValue = 0
-        const settings = getSettingsForTesting({
-          publicKey: factory.publicKey('image'),
-        })
-        const groupPromise = groupFrom([uuid], settings)
-
-        groupPromise.onProgress = (progress) => {
-          const {value} = progress
-
-          progressValue = value
-        }
-
-        groupPromise
-          .then(() =>
-            progressValue > 0 && progressValue <= 1
-              ? done()
-              : done.fail()
-          )
-          .catch(error => done.fail(error))
-      })
-
-      it('uploaded', (done) => {
-        const settings = getSettingsForTesting({
-          publicKey: factory.publicKey('image'),
-        })
-        const groupPromise = groupFrom([uuid], settings)
-
-        groupPromise.onUploaded = () => {
-          done()
-        }
-
-        groupPromise
-          .catch(error => done.fail(error))
-      })
-
-      it('ready', (done) => {
-        const settings = getSettingsForTesting({
-          publicKey: factory.publicKey('image'),
-        })
-        const groupPromise = groupFrom([uuid], settings)
-
-        groupPromise.onReady = () => {
-          done()
-        }
-
-        groupPromise
-          .catch(error => done.fail(error))
-      })
+      expect(onReady).toHaveBeenCalled()
     })
   })
 })

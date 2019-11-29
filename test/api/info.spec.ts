@@ -1,68 +1,47 @@
 import info from '../../src/api/info'
 import * as factory from '../_fixtureFactory'
 import {getSettingsForTesting} from '../_helpers'
-import group from '../../src/api/group'
-import groupInfo from '../../src/api/groupInfo'
+import UploadcareError from '../../src/errors/UploadcareError'
+import CancelError from '../../src/errors/CancelError'
 
 describe('API - info', () => {
-  it('should return file info', async() => {
-    const settings = getSettingsForTesting({
-      publicKey: factory.publicKey('image')
-    })
-    const data = await info(factory.uuid('image'), settings)
+  const settings = getSettingsForTesting({
+    publicKey: factory.publicKey('image')
+  })
+  const uuid = factory.uuid('image')
+
+  it('should return file info', async () => {
+    const data = await info(uuid, settings)
 
     expect(data.uuid).toBeTruthy()
   })
 
-  it('should be rejected with bad options', (done) => {
+  it('should be rejected with bad options', async () => {
     const settings = getSettingsForTesting({
       publicKey: factory.publicKey('empty'),
     })
+    const upload = info(uuid, settings)
 
-    info(factory.uuid('image'), settings)
-      .then(() => done.fail('Promise should not to be resolved'))
-      .catch(error => {
-        (error.name === 'UploadcareError')
-          ? done()
-          : done.fail(error)
-      })
+    await (expectAsync(upload) as any).toBeRejectedWithError(UploadcareError)
   })
 
-  it('should be able to cancel uploading', async(done) => {
-    const settings = getSettingsForTesting({
-      publicKey: factory.publicKey('image')
-    })
-    const upload = info(factory.uuid('image'), settings)
+  it('should be able to cancel uploading', async () => {
+    const upload = info(uuid, settings)
 
-    setTimeout(() => {
-      upload.cancel()
-    }, 1)
+    upload.cancel()
 
-    upload
-      .then(() => done.fail('Promise should not to be resolved'))
-      .catch((error) => error.name === 'CancelError' ? done() : done.fail(error))
+    await (expectAsync(upload) as any).toBeRejectedWithError(CancelError)
   })
 
-  it('should be able to handle cancel uploading', async (done) => {
-    const settings = getSettingsForTesting({
-      publicKey: factory.publicKey('image')
-    })
-    const upload = info(factory.uuid('image'), settings)
+  it('should be able to handle cancel uploading', async () => {
+    const upload = info(uuid, settings)
+    const onCancel = jasmine.createSpy('onCancel')
 
-    setTimeout(() => {
-      upload.cancel()
-    }, 1)
+    upload.onCancel = onCancel
+    upload.cancel()
 
-    upload.onCancel = () => {
-      done()
-    }
+    await (expectAsync(upload) as any).toBeRejectedWithError(CancelError)
 
-    upload
-      .then(() => done.fail('Promise should not to be resolved'))
-      .catch((error) => {
-        if (error.name !== 'CancelError') {
-          done.fail(error)
-        }
-      })
+    expect(onCancel).toHaveBeenCalled()
   })
 })
