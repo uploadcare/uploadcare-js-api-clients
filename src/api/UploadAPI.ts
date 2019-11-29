@@ -17,6 +17,7 @@ import multipartComplete from './multipart/multipartComplete'
 import multipartStart from './multipart/multipartStart'
 import multipartUpload from './multipart/multipartUpload'
 import {BaseThenableInterface, CancelableThenableInterface} from '../thenable/types'
+import {BaseHooksInterface} from '../lifecycle/types'
 
 class UploadAPI implements UploadAPIInterface {
   readonly client: UploadClient
@@ -38,8 +39,8 @@ class UploadAPI implements UploadAPIInterface {
     return request(preparedOptions)
   }
 
-  base(data: FileData, settings: SettingsInterface = {}): BaseThenableInterface<BaseResponse> {
-    return base(data, this.getExtendedSettings(settings))
+  base(data: FileData, settings: SettingsInterface = {}, hooks?: BaseHooksInterface): BaseThenableInterface<BaseResponse> {
+    return base(data, this.getExtendedSettings(settings), hooks)
   }
 
   info(uuid: Uuid, settings: SettingsInterface = {}): CancelableThenableInterface<FileInfoInterface> {

@@ -8,6 +8,7 @@ import {
 } from './multipart/types'
 import {BaseThenableInterface, CancelableThenableInterface} from '../thenable/types'
 import {BaseResponse} from './base'
+import {BaseHooksInterface} from '../lifecycle/types'
 
 interface StatusInterface {
   status: string;
@@ -93,7 +94,7 @@ export type GroupId = string
 export interface UploadAPIInterface {
   request(options: RequestOptionsInterface): Promise<RequestResponse>;
 
-  base(data: FileData, settings?: SettingsInterface): BaseThenableInterface<BaseResponse>;
+  base(data: FileData, settings?: SettingsInterface, hooks?: BaseHooksInterface): BaseThenableInterface<BaseResponse>
 
   info(uuid: Uuid, settings?: SettingsInterface): CancelableThenableInterface<FileInfoInterface>;
 
