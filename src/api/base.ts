@@ -1,11 +1,12 @@
 import {prepareOptions} from './request/prepareOptions'
+import {BaseThenable} from '../thenable/BaseThenable'
 
 /* Types */
 import {Body, RequestOptionsInterface} from './request/types'
 import {SettingsInterface, FileData} from '../types'
 import {Uuid} from './types'
 import {BaseThenableInterface} from '../thenable/types'
-import {BaseThenable} from '../thenable/BaseThenable'
+import {BaseHooksInterface} from '../lifecycle/types'
 
 export type BaseResponse = {
   file: Uuid;
@@ -34,10 +35,11 @@ const getRequestOptions = (file: FileData, settings: SettingsInterface): Request
  *
  * @param {FileData} file
  * @param {SettingsInterface} settings
+ * @param {BaseHooksInterface} hooks
  * @return {BaseThenableInterface<BaseResponse>}
  */
-export default function base(file: FileData, settings: SettingsInterface = {}): BaseThenableInterface<BaseResponse> {
+export default function base(file: FileData, settings: SettingsInterface = {}, hooks?: BaseHooksInterface): BaseThenableInterface<BaseResponse> {
   const options = getRequestOptions(file, settings)
 
-  return new BaseThenable<BaseResponse>(options)
+  return new BaseThenable<BaseResponse>(options, hooks)
 }

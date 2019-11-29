@@ -52,10 +52,9 @@ describe('API - base', () => {
   })
 
   it('should be able to handle cancel uploading', async () => {
-    const directUpload = base(fileToUpload.data, settings)
     const onCancel = jasmine.createSpy('onCancel')
+    const directUpload = base(fileToUpload.data, settings, {onCancel})
 
-    directUpload.onCancel = onCancel
     directUpload.cancel()
 
     await (expectAsync(directUpload) as any).toBeRejectedWithError(CancelError)
@@ -68,11 +67,10 @@ describe('API - base', () => {
     const settings = getSettingsForTesting({
       publicKey: factory.publicKey('demo')
     })
-    const directUpload = base(fileToUpload.data, settings)
-
-    directUpload.onProgress = (progressEvent) => {
+    const onProgress = (progressEvent) => {
       progressValue = Math.round((progressEvent.loaded * 100) / progressEvent.total)
     }
+    const directUpload = base(fileToUpload.data, settings, {onProgress})
 
     await directUpload
 
