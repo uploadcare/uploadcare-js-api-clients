@@ -13,6 +13,8 @@ export default class UploadcareError extends Error {
     this.request = requestError.request
     this.response = requestError.response
 
+    Object.setPrototypeOf(this, UploadcareError.prototype)
+
     if (Error.captureStackTrace) {
       Error.captureStackTrace(this, UploadcareError)
     }
