@@ -129,7 +129,6 @@ describe("poll", () => {
 
   it("should handle errors", async () => {
     let error = new Error("test error");
-    // @ts-ignore
     let job = longJob(3, error);
 
     await expectAsync(
