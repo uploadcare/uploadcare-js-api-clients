@@ -34,13 +34,13 @@ export class FileFromObject implements UploadHandlerInterface<UploadcareFileInte
 
     uploadLifecycle.handleUploading()
 
-    fileUpload.onProgress = (progressEvent): void =>
-      uploadLifecycle.handleUploading({
-        total: progressEvent.total,
-        loaded: progressEvent.loaded,
-      })
-
-    fileUpload.onCancel = uploadLifecycle.handleCancelling.bind(uploadLifecycle)
+    // fileUpload.onProgress = (progressEvent): void =>
+    //   uploadLifecycle.handleUploading({
+    //     total: progressEvent.total,
+    //     loaded: progressEvent.loaded,
+    //   })
+    //
+    // fileUpload.onCancel = uploadLifecycle.handleCancelling.bind(uploadLifecycle)
 
     if (this.isMultipart) {
       const upload = fileUpload as BaseThenableInterface<FileInfoInterface>
