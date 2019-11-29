@@ -13,6 +13,7 @@ import {addMaxConcurrencyInterceptorsToAxiosInstance} from '../request/intercept
 import {FileData, SettingsInterface} from '../../types'
 import {MultipartPart, MultipartUploadResponse} from './types'
 import {BaseThenableInterface} from '../../thenable/types'
+import {BaseHooksInterface} from '../../lifecycle/types'
 
 const updateProgress = ({data, loaded = false, onUploadProgress}: {
   data: Buffer;
@@ -53,13 +54,10 @@ const nodeUploadProgressResponseInterceptor = (response: AxiosResponse): AxiosRe
 }
 
 class MultipartUploadPart extends Thenable<MultipartUploadResponse> implements BaseThenableInterface<MultipartUploadResponse> {
-  onProgress: ((progressEvent: ProgressEvent) => void) | null = null
-  onCancel: (() => void) | null = null
-
   protected readonly promise: Promise<MultipartUploadResponse>
   private readonly cancelController: CancelTokenSource
 
-  constructor(partUrl: MultipartPart, file: FileData, settings: SettingsInterface) {
+  constructor(partUrl: MultipartPart, file: FileData, settings: SettingsInterface, hooks?: BaseHooksInterface) {
     super()
 
     this.cancelController = axios.CancelToken.source()
@@ -71,8 +69,8 @@ class MultipartUploadPart extends Thenable<MultipartUploadResponse> implements B
       cancelToken: this.cancelController.token,
       maxContentLength: settings.maxContentLength || defaultSettings.maxContentLength,
       onUploadProgress: (progressEvent: ProgressEvent) => {
-        if (typeof this.onProgress === 'function') {
-          this.onProgress(progressEvent)
+        if (hooks && typeof hooks.onProgress === 'function') {
+          hooks.onProgress(progressEvent)
         }
       },
     }
@@ -120,8 +118,8 @@ class MultipartUploadPart extends Thenable<MultipartUploadResponse> implements B
       })
       .then(response => Promise.resolve({code: response.status}))
       .catch(error => {
-        if (error.name === 'CancelError' && typeof this.onCancel === 'function') {
-          this.onCancel()
+        if (error.name === 'CancelError' && hooks && typeof hooks.onCancel === 'function') {
+          hooks.onCancel()
         }
 
         return Promise.reject(error)
@@ -139,8 +137,9 @@ class MultipartUploadPart extends Thenable<MultipartUploadResponse> implements B
  * @param {MultipartPart} partUrl
  * @param {FileData} file
  * @param {SettingsInterface} settings
+ * @param {BaseHooksInterface} hooks
  * @return {BaseThenableInterface<MultipartUploadResponse>}
  */
-export default function multipartUploadPart(partUrl: MultipartPart, file: FileData, settings: SettingsInterface = {}): BaseThenableInterface<MultipartUploadResponse> {
-  return new MultipartUploadPart(partUrl, file, settings)
+export default function multipartUploadPart(partUrl: MultipartPart, file: FileData, settings: SettingsInterface = {}, hooks?: BaseHooksInterface): BaseThenableInterface<MultipartUploadResponse> {
+  return new MultipartUploadPart(partUrl, file, settings, hooks)
 }

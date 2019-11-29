@@ -36,10 +36,9 @@ describe('API - multipartUploadPart', () => {
     const {parts} = await multipartStart(fileToUpload, settings)
     const [firstPart] = parts
     const fileSliceToUpload = fileToUpload.slice(0, defaultSettings.multipartChunkSize)
-    const upload = multipartUploadPart(firstPart, fileSliceToUpload)
     const onCancel = jasmine.createSpy('onCancel')
+    const upload = multipartUploadPart(firstPart, fileSliceToUpload, settings, {onCancel})
 
-    upload.onCancel = onCancel
     upload.cancel()
 
     await (expectAsync(upload) as any).toBeRejectedWithError(CancelError)
@@ -52,12 +51,10 @@ describe('API - multipartUploadPart', () => {
     const {parts} = await multipartStart(fileToUpload, settings)
     const [firstPart] = parts
     const fileSliceToUpload = fileToUpload.slice(0, defaultSettings.multipartChunkSize)
-
-    const upload = multipartUploadPart(firstPart, fileSliceToUpload)
-
-    upload.onProgress = (progressEvent) => {
+    const onProgress = (progressEvent) => {
       progressValue = Math.round((progressEvent.loaded * 100) / progressEvent.total)
     }
+    const upload = multipartUploadPart(firstPart, fileSliceToUpload, settings, {onProgress})
 
     await upload
 

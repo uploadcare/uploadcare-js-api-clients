@@ -6,6 +6,7 @@ import {SettingsInterface} from '../../types'
 import {FileInfoInterface, Uuid} from '../types'
 import {CancelableThenableInterface} from '../../thenable/types'
 import {CancelableThenable} from '../../thenable/CancelableThenable'
+import {CancelHookInterface} from '../../lifecycle/types'
 
 const getRequestBody = (uuid: Uuid, settings: SettingsInterface): Body => ({
   uuid,
@@ -26,10 +27,11 @@ const getRequestOptions = (uuid: Uuid, settings: SettingsInterface): RequestOpti
  *
  * @param {Uuid} uuid
  * @param {SettingsInterface} settings
+ * @param {CancelHookInterface} hooks
  * @return {CancelableThenableInterface<FileInfoInterface>}
  */
-export default function multipartComplete(uuid: Uuid, settings: SettingsInterface = {}): CancelableThenableInterface<FileInfoInterface> {
+export default function multipartComplete(uuid: Uuid, settings: SettingsInterface = {}, hooks?: CancelHookInterface): CancelableThenableInterface<FileInfoInterface> {
   const options = getRequestOptions(uuid, settings)
 
-  return new CancelableThenable<FileInfoInterface>(options)
+  return new CancelableThenable<FileInfoInterface>(options, hooks)
 }
