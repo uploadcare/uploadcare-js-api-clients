@@ -44,8 +44,6 @@ let longJob = (attemps: number, fails: Error | null = null) => {
   };
 };
 
-
-
 describe("poll", () => {
   it("should be resolved", async () => {
     let job = longJob(3);
@@ -80,13 +78,13 @@ describe("poll", () => {
       poll(job.isFinish, { interval: 20, cancelController: ctrl })
     ).toBeRejectedWith(new CancelError());
 
-    expect(job.spy.condition).not.toHaveBeenCalled();
-    expect(job.spy.cancel).not.toHaveBeenCalled();
+    let conditionCallsCount = job.spy.condition.calls.count()
+    let cancelCallsCount = job.spy.cancel.calls.count()
 
-    await delay(30);
+    await delay(50);
 
-    expect(job.spy.condition).not.toHaveBeenCalled();
-    expect(job.spy.cancel).not.toHaveBeenCalled();
+    expect(job.spy.condition).toHaveBeenCalledTimes(conditionCallsCount);
+    expect(job.spy.cancel).toHaveBeenCalledTimes(cancelCallsCount);
   });
 
   it("should be able to cancel polling async after first request", async () => {
@@ -106,25 +104,25 @@ describe("poll", () => {
   });
 
   it("should fails with timeout error", async () => {
-    let job = longJob(3);
+    let job = longJob(30);
 
     await expectAsync(
-      poll(job.isFinish, { interval: 20, timeout: 20 })
+      poll(job.isFinish, { interval: 40, timeout: 20 })
     ).toBeRejectedWith(new TimeoutError("Poll Timeout"));
   });
 
   it("should not run any logic after timeout error", async () => {
-    let job = longJob(3);
+    let job = longJob(30);
 
     await expectAsync(
-      poll(job.isFinish, { interval: 20, timeout: 20 })
+      poll(job.isFinish, { interval: 40, timeout: 20 })
     ).toBeRejectedWith(new TimeoutError("Poll Timeout"));
 
-    expect(job.spy.condition).toHaveBeenCalledTimes(2);
+    let conditionCallsCount = job.spy.condition.calls.count()
 
-    await delay(30);
+    await delay(50);
 
-    expect(job.spy.condition).toHaveBeenCalledTimes(2);
+    expect(job.spy.condition).toHaveBeenCalledTimes(conditionCallsCount);
   });
 
   it("should handle errors", async () => {

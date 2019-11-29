@@ -2,18 +2,18 @@ import CancelError from '../../src/errors/CancelError'
 import TimeoutError from '../../src/errors/TimeoutError'
 import CancelController from '../CancelController'
 
-type TestEnd = (cancel: CancelController) => Promise<boolean> | boolean
+type TestEnd = (cancel: CancelController | undefined) => Promise<boolean> | boolean
 
 const DEFAULT_TIMEOUT = 10000
 const DEFAULT_INTERVAL = 500
 
-const pooolling = (
+const poller = (
   test: TestEnd,
   {
     timeout = DEFAULT_TIMEOUT,
     interval = DEFAULT_INTERVAL,
     cancelController
-  }: { timeout?: number; interval?: number; cancelController?: any } = {}
+  }: { timeout?: number; interval?: number; cancelController?: CancelController } = {}
 ) =>
   new Promise((resolve, reject) => {
     let timeoutId: number
@@ -38,16 +38,14 @@ const pooolling = (
           reject(new TimeoutError('Poll Timeout'))
         } else {
           // @ts-ignore
-          timeoutId = setTimeout(() => {
-            tick()
-          }, interval)
+          timeoutId = setTimeout(tick, interval)
         }
       } catch (error) {
         reject(error)
       }
     }
 
-    timeoutId = setTimeout(() => tick())
+    timeoutId = setTimeout(tick)
   })
 
-export default pooolling
+export default poller
