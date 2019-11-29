@@ -1,4 +1,4 @@
-import poll from '../../src/tools/poller'
+import {poll, CheckFunction} from '../../src/tools/poller'
 import CancelController from '../../src/CancelController'
 import { delay } from "../../src/api/request/delay";
 import CancelError from "../../src/errors/CancelError";
@@ -9,7 +9,7 @@ let longJob = (attemps: number, fails: Error | null = null) => {
   let condition = jasmine.createSpy("condition");
   let cancel = jasmine.createSpy("cancelCondition");
 
-  let isFinish = cancelCrtl => {
+  let isFinish: CheckFunction = cancelCrtl => {
     condition();
 
     if (cancelCrtl) {
@@ -28,15 +28,17 @@ let longJob = (attemps: number, fails: Error | null = null) => {
     }
   }
 
+  let asyncIsFinish: CheckFunction = cancel => new Promise<boolean>((resolve, reject) => {
+    try {
+      resolve(isFinish(cancel))
+    } catch (error) {
+      reject(error)
+    }
+  })
+
   return {
     isFinish,
-    asyncIsFinish: cancel => new Promise<boolean>((resolve, reject) => {
-      try {
-        resolve(isFinish(cancel))
-      } catch (error) {
-        reject(error)
-      }
-    }),
+    asyncIsFinish,
     spy: {
       condition,
       cancel

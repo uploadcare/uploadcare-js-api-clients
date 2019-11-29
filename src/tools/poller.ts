@@ -2,13 +2,13 @@ import CancelError from '../../src/errors/CancelError'
 import TimeoutError from '../../src/errors/TimeoutError'
 import CancelController from '../CancelController'
 
-type TestEnd = (cancel: CancelController | undefined) => Promise<boolean> | boolean
+type CheckFunction = (cancel: CancelController | undefined) => Promise<boolean> | boolean
 
 const DEFAULT_TIMEOUT = 10000
 const DEFAULT_INTERVAL = 500
 
 const poller = (
-  test: TestEnd,
+  check: CheckFunction,
   {
     timeout = DEFAULT_TIMEOUT,
     interval = DEFAULT_INTERVAL,
@@ -29,7 +29,7 @@ const poller = (
 
     const tick = async () => {
       try {
-        const result = await test(cancelController)
+        const result = await check(cancelController)
         const nowTime = Date.now()
 
         if (result) {
@@ -48,4 +48,4 @@ const poller = (
     timeoutId = setTimeout(tick)
   })
 
-export default poller
+export {poller as poll, CheckFunction}
