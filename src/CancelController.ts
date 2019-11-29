@@ -1,10 +1,11 @@
-import axios, {CancelTokenSource} from 'axios'
+import {CancelTokenSource} from 'axios'
+const {CancelToken} = require('axios')
 
 class CancelController {
   private axiosCancel: CancelTokenSource
 
   constructor() {
-    this.axiosCancel = axios.CancelToken.source()
+    this.axiosCancel = CancelToken.source()
   }
 
   cancel() {
@@ -13,6 +14,10 @@ class CancelController {
 
   onCancel(fn: Function) {
     this.axiosCancel.token.promise.then(() => fn())
+  }
+
+  axiosToken() {
+    return this.axiosCancel
   }
 }
 

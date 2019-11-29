@@ -23,7 +23,7 @@ describe('CancelController', () => {
     expect(spy).toHaveBeenCalledTimes(1)
   })
 
-  it('should ', async () => {
+  it('should execute more than one callback', async () => {
     let ctrl = new CancelController()
     let firstOnCancel = jasmine.createSpy('cancel')
     let secondOnCancel = jasmine.createSpy('cancel')
@@ -39,5 +39,14 @@ describe('CancelController', () => {
 
     expect(spy1).toHaveBeenCalledTimes(1)
     expect(spy2).toHaveBeenCalledTimes(1)
+  })
+
+  it('should have method that return axios token', () => {
+    let ctrl = new CancelController()
+    let cancelToken = ctrl.axiosToken()
+
+    expect(typeof cancelToken).toBe('object')
+    expect(typeof cancelToken.cancel).toBe('function')
+    expect(typeof cancelToken.token).toBe('object')
   })
 })
