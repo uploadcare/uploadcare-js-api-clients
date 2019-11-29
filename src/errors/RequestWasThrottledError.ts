@@ -13,6 +13,8 @@ export default class RequestWasThrottledError extends Error {
     this.request = requestError.request
     this.response = requestError.response
 
+    Object.setPrototypeOf(this, RequestWasThrottledError.prototype)
+
     if (Error.captureStackTrace) {
       Error.captureStackTrace(this, RequestWasThrottledError)
     }
