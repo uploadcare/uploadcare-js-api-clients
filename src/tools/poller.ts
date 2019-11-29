@@ -1,50 +1,53 @@
-import CancelError from "../../src/errors/CancelError";
-import TimeoutError from "../../src/errors/TimeoutError";
-import CancelController from "../CancelController";
+import CancelError from '../../src/errors/CancelError'
+import TimeoutError from '../../src/errors/TimeoutError'
+import CancelController from '../CancelController'
 
 type TestEnd = (cancel: CancelController) => Promise<boolean> | boolean
 
-let pooolling = (
+const DEFAULT_TIMEOUT = 10000
+const DEFAULT_INTERVAL = 500
+
+const pooolling = (
   test: TestEnd,
   {
-    timeout = 1000,
-    interval = 100,
+    timeout = DEFAULT_TIMEOUT,
+    interval = DEFAULT_INTERVAL,
     cancelController
   }: { timeout?: number; interval?: number; cancelController?: any } = {}
 ) =>
   new Promise((resolve, reject) => {
-    let timeoutId: number;
-    let startTime = Date.now();
-    let endTime = startTime + timeout;
+    let timeoutId: number
+    const startTime = Date.now()
+    const endTime = startTime + timeout
 
     if (cancelController) {
       cancelController.onCancel(() => {
-        timeoutId && clearTimeout(timeoutId);
-        reject(new CancelError());
-      });
+        timeoutId && clearTimeout(timeoutId)
+        reject(new CancelError())
+      })
     }
 
-    let tick = async () => {
+    const tick = async () => {
       try {
-        let result = await test(cancelController);
-        let nowTime = Date.now();
+        const result = await test(cancelController)
+        const nowTime = Date.now()
 
         if (result) {
-          resolve(result);
+          resolve(result)
         } else if (nowTime > endTime) {
-          reject(new TimeoutError("Poll Timeout"));
+          reject(new TimeoutError('Poll Timeout'))
         } else {
           // @ts-ignore
           timeoutId = setTimeout(() => {
-            tick();
-          }, interval);
+            tick()
+          }, interval)
         }
       } catch (error) {
-        reject(error);
+        reject(error)
       }
-    };
+    }
 
-    timeoutId = setTimeout(() => tick());
-  });
+    timeoutId = setTimeout(() => tick())
+  })
 
 export default pooolling

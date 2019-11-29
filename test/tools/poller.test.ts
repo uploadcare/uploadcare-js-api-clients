@@ -99,7 +99,7 @@ describe("poll", () => {
 
     setTimeout(() => {
       ctrl.cancel();
-    }, 20);
+    }, 16);
 
     await expectAsync(
       poll(job.isFinish, { interval: 10, cancelController: ctrl })
@@ -113,16 +113,16 @@ describe("poll", () => {
     let job = longJob(3);
 
     await expectAsync(
-      poll(job.isFinish, { interval: 10, timeout: 1 })
-    ).toBeRejectedWith(new TimeoutError("poll timeout"));
+      poll(job.isFinish, { interval: 10, timeout: 10 })
+    ).toBeRejectedWith(new TimeoutError("Poll Timeout"));
   });
 
   it("should not run any logic after timeout error", async () => {
     let job = longJob(3);
 
     await expectAsync(
-      poll(job.isFinish, { interval: 10, timeout: 1 })
-    ).toBeRejectedWith(new TimeoutError("poll timeout"));
+      poll(job.isFinish, { interval: 10, timeout: 10 })
+    ).toBeRejectedWith(new TimeoutError("Poll Timeout"));
 
     expect(job.spy.condition).toHaveBeenCalledTimes(2);
 
