@@ -8,7 +8,7 @@ import {
 } from './multipart/types'
 import {BaseThenableInterface, CancelableThenableInterface} from '../thenable/types'
 import {BaseResponse} from './base'
-import {BaseHooksInterface} from '../lifecycle/types'
+import {BaseHooksInterface, CancelHookInterface} from '../lifecycle/types'
 
 interface StatusInterface {
   status: string;
@@ -94,21 +94,21 @@ export type GroupId = string
 export interface UploadAPIInterface {
   request(options: RequestOptionsInterface): Promise<RequestResponse>;
 
-  base(data: FileData, settings?: SettingsInterface, hooks?: BaseHooksInterface): BaseThenableInterface<BaseResponse>
+  base(data: FileData, settings?: SettingsInterface, hooks?: BaseHooksInterface): BaseThenableInterface<BaseResponse>;
 
-  info(uuid: Uuid, settings?: SettingsInterface): CancelableThenableInterface<FileInfoInterface>;
+  info(uuid: Uuid, settings?: SettingsInterface, hooks?: CancelHookInterface): CancelableThenableInterface<FileInfoInterface>;
 
-  fromUrl(sourceUrl: Url, settings?: SettingsInterface): CancelableThenableInterface<FromUrlResponse>;
+  fromUrl(sourceUrl: Url, settings?: SettingsInterface, hooks?: CancelHookInterface): CancelableThenableInterface<FromUrlResponse>;
 
-  fromUrlStatus(token: Token, settings?: SettingsInterface): CancelableThenableInterface<FromUrlStatusResponse>;
+  fromUrlStatus(token: Token, settings?: SettingsInterface, hooks?: CancelHookInterface): CancelableThenableInterface<FromUrlStatusResponse>;
 
-  group(files: Uuid[], settings: SettingsInterface): CancelableThenableInterface<GroupInfoInterface>;
+  group(files: Uuid[], settings: SettingsInterface, hooks?: CancelHookInterface): CancelableThenableInterface<GroupInfoInterface>;
 
-  groupInfo(id: GroupId, settings: SettingsInterface): CancelableThenableInterface<GroupInfoInterface>;
+  groupInfo(id: GroupId, settings: SettingsInterface, hooks?: CancelHookInterface): CancelableThenableInterface<GroupInfoInterface>;
 
-  multipartStart(file: FileData, settings: SettingsInterface): CancelableThenableInterface<MultipartStartResponse>;
+  multipartStart(file: FileData, settings: SettingsInterface, hooks?: CancelHookInterface): CancelableThenableInterface<MultipartStartResponse>;
 
-  multipartUpload(file: FileData, parts: MultipartPart[], settings: SettingsInterface): BaseThenableInterface<any>;
+  multipartUpload(file: FileData, parts: MultipartPart[], settings: SettingsInterface, hooks?: CancelHookInterface): BaseThenableInterface<any>;
 
-  multipartComplete(uuid: Uuid, settings: SettingsInterface): CancelableThenableInterface<FileInfoInterface>;
+  multipartComplete(uuid: Uuid, settings: SettingsInterface, hooks?: CancelHookInterface): CancelableThenableInterface<FileInfoInterface>;
 }

@@ -17,7 +17,7 @@ import multipartComplete from './multipart/multipartComplete'
 import multipartStart from './multipart/multipartStart'
 import multipartUpload from './multipart/multipartUpload'
 import {BaseThenableInterface, CancelableThenableInterface} from '../thenable/types'
-import {BaseHooksInterface} from '../lifecycle/types'
+import {BaseHooksInterface, CancelHookInterface} from '../lifecycle/types'
 
 class UploadAPI implements UploadAPIInterface {
   readonly client: UploadClient
@@ -43,36 +43,36 @@ class UploadAPI implements UploadAPIInterface {
     return base(data, this.getExtendedSettings(settings), hooks)
   }
 
-  info(uuid: Uuid, settings: SettingsInterface = {}): CancelableThenableInterface<FileInfoInterface> {
-    return info(uuid, this.getExtendedSettings(settings))
+  info(uuid: Uuid, settings: SettingsInterface = {}, hooks?: CancelHookInterface): CancelableThenableInterface<FileInfoInterface> {
+    return info(uuid, this.getExtendedSettings(settings), hooks)
   }
 
-  fromUrl(sourceUrl: Url, settings: SettingsInterface = {}): CancelableThenableInterface<FromUrlResponse> {
-    return fromUrl(sourceUrl, this.getExtendedSettings(settings))
+  fromUrl(sourceUrl: Url, settings: SettingsInterface = {}, hooks?: CancelHookInterface): CancelableThenableInterface<FromUrlResponse> {
+    return fromUrl(sourceUrl, this.getExtendedSettings(settings), hooks)
   }
 
-  fromUrlStatus(token: Token, settings: SettingsInterface = {}): CancelableThenableInterface<FromUrlStatusResponse> {
-    return fromUrlStatus(token, this.getExtendedSettings(settings))
+  fromUrlStatus(token: Token, settings: SettingsInterface = {}, hooks?: CancelHookInterface): CancelableThenableInterface<FromUrlStatusResponse> {
+    return fromUrlStatus(token, this.getExtendedSettings(settings), hooks)
   }
 
-  group(uuids: Uuid[], settings: SettingsInterface): CancelableThenableInterface<GroupInfoInterface> {
-    return group(uuids, this.getExtendedSettings(settings))
+  group(uuids: Uuid[], settings: SettingsInterface = {}, hooks?: CancelHookInterface): CancelableThenableInterface<GroupInfoInterface> {
+    return group(uuids, this.getExtendedSettings(settings), hooks)
   }
 
-  groupInfo(id: GroupId, settings: SettingsInterface): CancelableThenableInterface<GroupInfoInterface> {
-    return groupInfo(id, this.getExtendedSettings(settings))
+  groupInfo(id: GroupId, settings: SettingsInterface = {}, hooks?: CancelHookInterface): CancelableThenableInterface<GroupInfoInterface> {
+    return groupInfo(id, this.getExtendedSettings(settings), hooks)
   }
 
-  multipartStart(file: FileData, settings: SettingsInterface): CancelableThenableInterface<MultipartStartResponse> {
-    return multipartStart(file, this.getExtendedSettings(settings))
+  multipartStart(file: FileData, settings: SettingsInterface = {}, hooks?: CancelHookInterface): CancelableThenableInterface<MultipartStartResponse> {
+    return multipartStart(file, this.getExtendedSettings(settings), hooks)
   }
 
-  multipartUpload(file: FileData, parts: MultipartPart[], settings: SettingsInterface): BaseThenableInterface<any> {
-    return multipartUpload(file, parts, this.getExtendedSettings(settings))
+  multipartUpload(file: FileData, parts: MultipartPart[], settings: SettingsInterface = {}, hooks?: CancelHookInterface): BaseThenableInterface<any> {
+    return multipartUpload(file, parts, this.getExtendedSettings(settings), hooks)
   }
 
-  multipartComplete(uuid: Uuid, settings: SettingsInterface): CancelableThenableInterface<FileInfoInterface> {
-    return multipartComplete(uuid, this.getExtendedSettings(settings))
+  multipartComplete(uuid: Uuid, settings: SettingsInterface = {}, hooks?: CancelHookInterface): CancelableThenableInterface<FileInfoInterface> {
+    return multipartComplete(uuid, this.getExtendedSettings(settings), hooks)
   }
 }
 
