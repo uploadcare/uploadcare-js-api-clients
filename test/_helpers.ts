@@ -12,7 +12,7 @@ export enum Environment {
 }
 
 export const getSettingsForTesting = (settings = {}, environment: Environment | null = null) => {
-  const selectedEnvironment = environment || process.env.NODE_ENV || Environment.Development
+  const selectedEnvironment = 'production'
 
   const allEnvironments = {
     development: {

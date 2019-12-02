@@ -1,7 +1,6 @@
 /* Vendors */
-import axios, {AxiosError, AxiosRequestConfig, CancelTokenSource} from 'axios'
+import axios, {AxiosError, AxiosRequestConfig, CancelTokenSource, AxiosInstance} from 'axios'
 
-import {Thenable} from '../../thenable/Thenable'
 import {isNode} from '../../tools/isNode'
 import {buildFormData} from './buildFormData'
 import {delay} from './delay'
@@ -14,7 +13,7 @@ import UploadcareError from '../../errors/UploadcareError'
 import RequestWasThrottledError from '../../errors/RequestWasThrottledError'
 
 /* Types */
-import {RequestInterface, RequestOptionsInterface, RequestResponse} from './types'
+import {RequestOptionsInterface, RequestResponse} from './types'
 
 const REQUEST_WAS_THROTTLED_CODE = 429
 
@@ -42,32 +41,28 @@ const nodeUploadProgress = (config: AxiosRequestConfig): AxiosRequestConfig => {
   return config
 }
 
-class Request extends Thenable<RequestResponse> implements RequestInterface {
-  protected readonly promise: Promise<RequestResponse>
-  private readonly options: RequestOptionsInterface
-  private readonly cancelController: CancelTokenSource
+class Request {
+  private readonly options: AxiosRequestConfig
+  private readonly cancelController: CancelTokenSource | undefined
+  private instance: AxiosInstance
   private throttledTimes = 0
   private readonly retryThrottledMaxTimes: number
 
   constructor(options: RequestOptionsInterface) {
-    super()
-
-    this.options = options
     if (typeof options.retryThrottledMaxTimes !== 'undefined' && options.retryThrottledMaxTimes >= 0) {
       this.retryThrottledMaxTimes = options.retryThrottledMaxTimes
     } else {
       this.retryThrottledMaxTimes = defaultSettings.retryThrottledRequestMaxTimes
     }
-    this.cancelController = axios.CancelToken.source()
-    this.promise = this.getRequestPromise()
-  }
 
-  private getRequestPromise() {
-    const options = this.getRequestOptions()
+    this.options = this.getRequestOptions(options)
+
     const instance = axios.create()
-    const maxConcurrentRequestsCount = this.options.maxConcurrentRequests || defaultSettings.maxConcurrentRequests
+    const maxConcurrentRequestsCount = options.maxConcurrentRequests
 
-    addMaxConcurrencyInterceptorsToAxiosInstance({instance, maxConcurrentRequestsCount})
+    if (maxConcurrentRequestsCount) {
+      addMaxConcurrencyInterceptorsToAxiosInstance({instance, maxConcurrentRequestsCount})
+    }
 
     if (isNode()) {
       instance.interceptors.request.use(nodeUploadProgress,
@@ -75,48 +70,50 @@ class Request extends Thenable<RequestResponse> implements RequestInterface {
       )
     }
 
-    return instance(options as AxiosRequestConfig)
+    this.instance = instance
+  }
+
+  request(): Promise<RequestResponse> {
+    return this.instance(this.options)
       .catch(this.handleRequestError)
       .then(this.handleResponse)
       .catch(this.handleError)
   }
 
-  private getRequestOptions() {
-    const {path: url, onUploadProgress} = this.options
-    const method = this.getRequestMethod()
-    const baseURL = this.getRequestBaseURL()
-    const data = this.getRequestData()
-    const params = this.getRequestParams()
-    const headers = this.getRequestHeaders(data)
-    const cancelToken = this.cancelController.token
+  private getRequestOptions(options: RequestOptionsInterface) {
+    const method = this.getRequestMethod(options)
+    const baseURL = this.getRequestBaseURL(options)
+    const params = this.getRequestParams(options)
+    const data = this.getRequestData(options)
+    const headers = this.getRequestHeaders(options, data)
 
     return {
       method,
       baseURL,
-      url,
+      url: options.path,
       params,
       data,
       maxContentLength: defaultSettings.maxContentLength,
       headers,
-      cancelToken,
-      onUploadProgress,
-    }
+      // cancelToken,
+      onUploadProgress: options.onUploadProgress
+    } as AxiosRequestConfig
   }
 
-  private getRequestMethod(): string {
-    const {method} = this.options
+  private getRequestMethod(options: RequestOptionsInterface): string {
+    const {method} = options
 
     return method || 'GET'
   }
 
-  private getRequestBaseURL() {
-    const {baseURL} = this.options
+  private getRequestBaseURL(options: RequestOptionsInterface) {
+    const {baseURL} = options
 
     return baseURL || defaultSettings.baseURL
   }
 
-  private getRequestParams() {
-    const {query} = this.options
+  private getRequestParams(options: RequestOptionsInterface) {
+    const {query} = options
 
     return {
       jsonerrors: 1,
@@ -124,8 +121,8 @@ class Request extends Thenable<RequestResponse> implements RequestInterface {
     }
   }
 
-  private getRequestData() {
-    const {body} = this.options
+  private getRequestData(options: RequestOptionsInterface) {
+    const {body} = options
 
     if (body) {
       const newBody = body.source ? {
@@ -139,8 +136,8 @@ class Request extends Thenable<RequestResponse> implements RequestInterface {
     return null
   }
 
-  private getRequestHeaders(data) {
-    const {headers} = this.options
+  private getRequestHeaders(options, data) {
+    const {headers = {}} = options
 
     return {
       'X-UC-User-Agent': getUserAgent(),
@@ -150,7 +147,7 @@ class Request extends Thenable<RequestResponse> implements RequestInterface {
   }
 
   private handleRequestError = (error: AxiosError) => {
-    const {path: url} = this.options
+    const {url} = this.options
 
     if (axios.isCancel(error)) {
       throw new CancelError()
@@ -159,7 +156,7 @@ class Request extends Thenable<RequestResponse> implements RequestInterface {
     if (error.response) {
       const errorRequestInfo = {
         headers: error.config.headers,
-        url: error.config.url || url,
+        url: error.config.url || url || 'no url',
       }
       const errorResponseInfo = {
         status: error.response.status,
@@ -179,15 +176,14 @@ class Request extends Thenable<RequestResponse> implements RequestInterface {
       const timeout = this.getTimeoutFromThrottledRequest(error as RequestWasThrottledError)
         || DEFAULT_RETRY_AFTER_TIMEOUT
 
-      return delay(timeout).then(() => this.getRequestPromise())
+      return delay(timeout).then(() => this.request())
     }
 
     return Promise.reject(error)
   }
 
   private handleResponse = response => {
-    const {path} = this.options
-    const url = response.config.url || path
+    const url = response.config.url || this.options.url
 
     if (response.data.error) {
       const {status_code: code, content} = response.data.error
@@ -228,8 +224,6 @@ class Request extends Thenable<RequestResponse> implements RequestInterface {
 
     return headers['x-throttle-wait-seconds'] * 1000 || null
   }
-
-  cancel = (): void => this.cancelController.cancel()
 }
 
 /**
@@ -246,8 +240,10 @@ class Request extends Thenable<RequestResponse> implements RequestInterface {
  * @param {number} [options.retryThrottledMaxTimes] – How much times retry throttled request (1 by default)
  * @returns {RequestInterface}
  */
-const request = (options: RequestOptionsInterface): RequestInterface => {
-  return new Request(options)
+const request = (options: RequestOptionsInterface): Promise<RequestResponse> => {
+  const inst = new Request(options)
+
+  return inst.request()
 }
 
 export default request

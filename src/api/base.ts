@@ -13,9 +13,9 @@ export type BaseResponse = {
 
 const getRequestBody = (file: FileData, settings: SettingsInterface): Body => ({
   UPLOADCARE_PUB_KEY: settings.publicKey || '',
+  UPLOADCARE_STORE: settings.doNotStore ? '' : 'auto',
   signature: settings.secureSignature || '',
   expire: settings.secureExpire || '',
-  UPLOADCARE_STORE: settings.doNotStore ? '' : 'auto',
   source: settings.source || 'local',
   file: file,
 })

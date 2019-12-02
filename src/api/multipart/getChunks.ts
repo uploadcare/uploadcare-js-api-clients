@@ -8,10 +8,10 @@ import {ChunkType} from './types'
  * @param {number} chunkSize
  * @returns {ChunkType[]}
  */
-export const getChunks = (fileSize: number, chunkSize): ChunkType[] => {
+export const getChunks = (fileSize: number, chunkSize: number): ChunkType[] => {
   const chunksCount = Math.ceil(fileSize / chunkSize)
 
-  return Array.apply(null, Array(chunksCount)).map((value, index: number) => {
+  return Array.apply(null, Array(chunksCount)).map((_, index: number) => {
     const start = chunkSize * index
     const end = Math.min(start + chunkSize, fileSize)
 

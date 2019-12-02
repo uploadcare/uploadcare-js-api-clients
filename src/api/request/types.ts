@@ -1,5 +1,4 @@
 import {FileData} from '../../types'
-import {CancelableInterface} from '../../lifecycle/types'
 
 export type Query = {
   [key: string]: string | string[] | boolean | number | void;
@@ -35,5 +34,3 @@ export type RequestResponse = {
   url: string;
   data: any;
 }
-
-export interface RequestInterface extends Promise<RequestResponse>, CancelableInterface {}

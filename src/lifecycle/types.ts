@@ -3,10 +3,6 @@ import {Uuid} from '..'
 import {FileInfoInterface, GroupInfoInterface} from '../api/types'
 import {PollPromiseInterface} from '../tools/poll'
 
-export interface CancelableInterface {
-  cancel(): void;
-}
-
 export interface ProgressHookInterface<T> {
   onProgress: ((progress: T) => void) | null;
 }
@@ -33,9 +29,7 @@ export interface LifecycleHooksInterface<T> extends
 
 export interface UploadInterface<T> extends
   LifecycleHooksInterface<T>,
-  Promise<T>,
-  CancelableInterface {
-}
+  Promise<T> {}
 
 export interface LifecycleStateInterface {
   readonly progress: UploadingProgress;
