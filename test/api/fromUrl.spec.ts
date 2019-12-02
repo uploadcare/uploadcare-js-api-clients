@@ -52,10 +52,9 @@ describe('API - from url', () => {
   })
 
   it('should be able to handle cancel uploading', async () => {
-    const upload = fromUrl(sourceUrl, settings)
     const onCancel = jasmine.createSpy('onCancel')
+    const upload = fromUrl(sourceUrl, settings, {onCancel})
 
-    upload.onCancel = onCancel
     upload.cancel()
 
     await (expectAsync(upload) as any).toBeRejectedWithError(CancelError)
