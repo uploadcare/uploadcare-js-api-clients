@@ -7,10 +7,7 @@ import {RequestInterface, RequestOptionsInterface} from '../api/request/types'
 import {CancelHookInterface} from '../lifecycle/types'
 
 export class CancelableThenable<T> extends Thenable<T> implements CancelableThenableInterface<T> {
-  onCancel: (() => void) | null = null
-
   protected readonly promise: Promise<T>
-
   private readonly request: RequestInterface
 
   constructor(options: RequestOptionsInterface, hooks?: CancelHookInterface) {
