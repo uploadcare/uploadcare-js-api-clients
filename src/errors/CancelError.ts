@@ -5,6 +5,8 @@ export default class CancelError extends Error {
     this.name = 'CancelError'
     this.message = 'Request canceled'
 
+    Object.setPrototypeOf(this, CancelError.prototype)
+
     if (Error.captureStackTrace) {
       Error.captureStackTrace(this, CancelError)
     }

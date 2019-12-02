@@ -7,6 +7,8 @@ export default class TokenWasNotFoundError extends Error {
     this.name = 'TokenWasNotFoundError'
     this.message = `Token "${token}" was not found.`
 
+    Object.setPrototypeOf(this, TokenWasNotFoundError.prototype)
+
     if (Error.captureStackTrace) {
       Error.captureStackTrace(this, TokenWasNotFoundError)
     }
