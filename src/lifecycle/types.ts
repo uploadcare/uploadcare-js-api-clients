@@ -37,7 +37,6 @@ export interface LifecycleHooksInterface<T> extends
 }
 
 export interface UploadInterface<T> extends
-  LifecycleHooksInterface<T>,
   Promise<T>,
   CancelableInterface {
 }
@@ -48,7 +47,7 @@ export interface LifecycleStateInterface {
   isCanBeChangedTo(state: LifecycleStateInterface): boolean;
 }
 
-export interface LifecycleInterface<T> extends LifecycleHooksInterface<T> {
+export interface LifecycleInterface<T> {
   updateState(state: LifecycleStateInterface): void;
   getProgress(): UploadingProgress;
   updateEntity(entity: T): void;

@@ -4,7 +4,7 @@ import multipart from '../multipart/multipart'
 import {isMultipart} from '../multipart/isMultipart'
 
 /* Types */
-import {FileUploadLifecycleInterface, UploadHandlerInterface} from '../lifecycle/types'
+import {FileUploadLifecycleInterface, LifecycleInterface, UploadHandlerInterface} from '../lifecycle/types'
 import {BaseThenableInterface} from '../thenable/types'
 import {BaseResponse} from '../api/base'
 import {FileInfoInterface} from '../api/types'
@@ -15,16 +15,23 @@ export class FileFromObject implements UploadHandlerInterface<UploadcareFileInte
   private readonly settings: SettingsInterface
   private readonly isMultipart: boolean = false
 
-  constructor(data: FileData, settings: SettingsInterface) {
+  constructor(data: FileData, settings: SettingsInterface, uploadLifecycle: LifecycleInterface<UploadcareFileInterface>) {
     this.settings = settings
 
     const multipartMinFileSize = settings.multipartMinFileSize || defaultSettings.multipartMinFileSize
     this.isMultipart = isMultipart(data, multipartMinFileSize)
 
+    const onProgress = (progressEvent): void =>
+      uploadLifecycle.handleUploading({
+        total: progressEvent.total,
+        loaded: progressEvent.loaded,
+      })
+    const onCancel = uploadLifecycle.handleCancelling.bind(uploadLifecycle)
+
     if (this.isMultipart) {
-      this.request = multipart(data, this.settings)
+      this.request = multipart(data, this.settings, {onProgress, onCancel})
     } else {
-      this.request = base(data, this.settings)
+      this.request = base(data, this.settings, {onProgress, onCancel})
     }
   }
 
@@ -33,14 +40,6 @@ export class FileFromObject implements UploadHandlerInterface<UploadcareFileInte
     const uploadLifecycle = fileUploadLifecycle.uploadLifecycle
 
     uploadLifecycle.handleUploading()
-
-    // fileUpload.onProgress = (progressEvent): void =>
-    //   uploadLifecycle.handleUploading({
-    //     total: progressEvent.total,
-    //     loaded: progressEvent.loaded,
-    //   })
-    //
-    // fileUpload.onCancel = uploadLifecycle.handleCancelling.bind(uploadLifecycle)
 
     if (this.isMultipart) {
       const upload = fileUpload as BaseThenableInterface<FileInfoInterface>
