@@ -6,6 +6,7 @@ import {SettingsInterface} from '../types'
 import {FileInfoInterface, ProgressStatusInterface, Token} from './types'
 import {CancelableThenable} from '../thenable/CancelableThenable'
 import {CancelableThenableInterface} from '../thenable/types'
+import {CancelHookInterface} from '../lifecycle/types'
 
 export enum StatusEnum {
   Unknown = 'unknown',
@@ -100,11 +101,16 @@ const getRequestOptions = (token: Token, settings: SettingsInterface): RequestOp
  *
  * @param {Token} token – Source file URL, which should be a public HTTP or HTTPS link.
  * @param {SettingsInterface} settings
+ * @param {CancelHookInterface} hooks
  * @throws {UploadcareError}
  * @return {CancelableThenableInterface<FromUrlStatusResponse>}
  */
-export default function fromUrlStatus(token: Token, settings: SettingsInterface = {}): CancelableThenableInterface<FromUrlStatusResponse> {
+export default function fromUrlStatus(
+  token: Token,
+  settings: SettingsInterface = {},
+  hooks?: CancelHookInterface,
+): CancelableThenableInterface<FromUrlStatusResponse> {
   const options = getRequestOptions(token, settings)
 
-  return new CancelableThenable(options)
+  return new CancelableThenable(options, hooks)
 }
