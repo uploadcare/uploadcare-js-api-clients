@@ -6,6 +6,7 @@ import {GroupInfoInterface, Uuid} from './types'
 import {SettingsInterface} from '../types'
 import {CancelableThenable} from '../thenable/CancelableThenable'
 import {CancelableThenableInterface} from '../thenable/types'
+import {CancelHookInterface} from '../lifecycle/types'
 
 const getRequestQuery = (uuids: Uuid[], settings: SettingsInterface): Query => {
   const query = {
@@ -39,10 +40,15 @@ const getRequestOptions = (uuids: Uuid[], settings: SettingsInterface): RequestO
  *
  * @param {Uuid[]} uuids – A set of files you want to join in a group.
  * @param {SettingsInterface} settings
+ * @param {CancelHookInterface} hooks
  * @return {CancelableThenableInterface<GroupInfoInterface>}
  */
-export default function group(uuids: Uuid[], settings: SettingsInterface = {}): CancelableThenableInterface<GroupInfoInterface> {
+export default function group(
+  uuids: Uuid[],
+  settings: SettingsInterface = {},
+  hooks?: CancelHookInterface,
+): CancelableThenableInterface<GroupInfoInterface> {
   const options = getRequestOptions(uuids, settings)
 
-  return new CancelableThenable(options)
+  return new CancelableThenable(options, hooks)
 }
