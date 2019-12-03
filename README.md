@@ -37,9 +37,9 @@ npm install @uploadcare/upload-client --save
 
 ### High-Level API
 
-To access the High-Level API, you need to create an instance 
-of `UploadClient` providing the necessary settings. 
-Specifying `YOUR_PUBLIC_KEY` is mandatory: it points to the specific 
+To access the High-Level API, you need to create an instance
+of `UploadClient` providing the necessary settings.
+Specifying `YOUR_PUBLIC_KEY` is mandatory: it points to the specific
 Uploadcare project:
 
 ```javascript
@@ -48,7 +48,7 @@ import UploadClient from '@uploadcare/upload-client'
 const client = new UploadClient({publicKey: 'YOUR_PUBLIC_KEY'})
 ```
 
-Once the UploadClient instance is created, you can start using 
+Once the UploadClient instance is created, you can start using
 the wrapper to upload files from binary data:
 
 ```javascript
@@ -68,7 +68,7 @@ fileUpload
   .then(file => console.log(file.uuid))
 ```
 
-You can also use the `fileFrom` method to get previously uploaded files 
+You can also use the `fileFrom` method to get previously uploaded files
 via their UUIDs:
 
 ```javascript
@@ -141,7 +141,7 @@ directUpload.onProgress = (progressEvent) => console.log(progressEvent.loaded / 
 directUpload.cancel()
 
 // and set callback to track cancel event:
-directUpload.onCancel = () => console.log('File upload was canceled.') 
+directUpload.onCancel = () => console.log('File upload was canceled.')
 ```
 
 List of all available API methods:
@@ -180,7 +180,7 @@ import UploadClient from '@uploadcare/upload-client'
 const client = new UploadClient({publicKey: 'YOUR_PUBLIC_KEY'})
 
 client.api.request({
-  path: 'info', 
+  path: 'info',
   query: {
     pub_key: `YOUR_PUBLIC_KEY`,
     file_id: `6db2621d-3ca4-4edc-9c67-832b641fae85`,
@@ -193,41 +193,41 @@ client.api.request({
 
 #### `publicKey: string`
 
-The main use of a `publicKey` is to identify a target project for your uploads. 
+The main use of a `publicKey` is to identify a target project for your uploads.
 It is required when using Upload API.
 
 #### `baseCDN: string`
 
-Defines your schema and CDN domain. Can be changed to one of 
-the predefined values (`https://ucarecdn.com/`) or your custom CNAME. 
+Defines your schema and CDN domain. Can be changed to one of
+the predefined values (`https://ucarecdn.com/`) or your custom CNAME.
 
 Defaults to `https://ucarecdn.com/`.
 
 #### `baseURL: string`
 
-API base URL. 
+API base URL.
 
 Defaults to `https://upload.uploadcare.com`
 
 #### `fileName: string`
 
-You can specify an original filename. 
+You can specify an original filename.
 
 Defaults to `original`.
 
 #### `doNotStore: boolean`
 
-Forces files uploaded with a `UploadClient` not to be stored. 
-For instance, you might want to turn this on when automatic file storing 
-is enabled in your project, but you do not want to store files uploaded 
+Forces files uploaded with a `UploadClient` not to be stored.
+For instance, you might want to turn this on when automatic file storing
+is enabled in your project, but you do not want to store files uploaded
 with a particular instance.
 
 #### `secureSignature: string`
 
-In case you enable signed uploads for your project, you’d need to provide 
-the client with `secureSignature` and `secureExpire` params. 
+In case you enable signed uploads for your project, you’d need to provide
+the client with `secureSignature` and `secureExpire` params.
 
-The `secureSignature` is an MD5 hex-encoded hash from a concatenation 
+The `secureSignature` is an MD5 hex-encoded hash from a concatenation
 of `API secret key` and `secureExpire`.
 
 #### `secureExpire: string`
@@ -246,9 +246,9 @@ Runs the duplicate check and provides the immediate-download behavior.
 
 #### `saveUrlForRecurrentUploads: boolean`
 
-Provides the save/update URL behavior. The parameter can be used 
-if you believe a `sourceUrl` will be used more than once. 
-Using the parameter also updates an existing reference with a new 
+Provides the save/update URL behavior. The parameter can be used
+if you believe a `sourceUrl` will be used more than once.
+Using the parameter also updates an existing reference with a new
 `sourceUrl` content.
 
 #### `source: string`
@@ -257,19 +257,19 @@ Defines the upload source to use, can be set to local, url, etc.
 
 #### `jsonpCallback: string`
 
-Sets the name of your JSONP callback function to create files group from 
+Sets the name of your JSONP callback function to create files group from
 a set of files by using their UUIDs.
 
 #### `pollingTimeoutMilliseconds: number`
 
-Internally, Upload Client implements polling to ensure that a file 
+Internally, Upload Client implements polling to ensure that a file
 s available on CDN or has finished uploading from URL.
 
 Defaults to `10000` milliseconds (10 seconds).
 
 #### `maxContentLength: number`
 
-`maxContentLength` defines the maximum allowed size (in bytes) of 
+`maxContentLength` defines the maximum allowed size (in bytes) of
 the HTTP response content.
 
 Defaults to `52428800` bytes (50 MB).
@@ -283,16 +283,16 @@ Defaults to `1`.
 #### `multipartChunkSize: number`
 
 This option is only applicable when handling local files.
-Sets the multipart chunk size. 
+Sets the multipart chunk size.
 
 Defaults to `5242880` bytes (5 MB).
 
 #### `multipartMinFileSize: number`
 
-This option is only applicable when handling local files. 
-Sets the multipart uploading file size threshold: larger files 
+This option is only applicable when handling local files.
+Sets the multipart uploading file size threshold: larger files
 will be uploaded in the Multipart mode rather than via Direct Upload.
-The value is limited to the range from `10485760` (10 MB) to `104857600` (100 MB). 
+The value is limited to the range from `10485760` (10 MB) to `104857600` (100 MB).
 
 Defaults to `26214400` (25 MB).
 
@@ -309,10 +309,15 @@ Allows specifying the number of concurrent requests.
 
 Defaults to `4`.
 
-## Testing 
+## Testing
 
-By default, the testing environment is local and requires starting 
-a mock server to run tests.
+```
+npm run test
+```
+
+By default, the testing environment is production, but you can run
+test with local environment. It requires starting a mock server to
+run tests.
 
 To start a mock server you need to run next command:
 
@@ -323,13 +328,7 @@ npm run mock:start
 and after that you can run:
 
 ```
-npm run test
-```
-
-If you want to run tests on production servers you need to set `NODE_ENV` as `production`:
-
-```
-NODE_ENV=production npm run test
+NODE_ENV=development npm run test
 ```
 
 ## Security issues
