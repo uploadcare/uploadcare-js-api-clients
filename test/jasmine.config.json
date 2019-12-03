@@ -1,6 +1,6 @@
 {
   "spec_dir": "test",
-  "spec_files": ["**/*.test.ts"],
+  "spec_files": ["**/*.test.ts", "**/*.test.node.ts"],
   "stopSpecOnExecutionFailure": false,
   "random": false,
   "helpers": [
