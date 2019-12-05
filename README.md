@@ -81,27 +81,46 @@ fileUpload
 
 You can track uploading progress:
 ```javascript
-fileUpload.onProgress = (progress => {
+const fileUUID = 'edfdf045-34c0-4087-bbdd-e3834921f890'
+const onProgress = (progress) => {
   console.log(progress.state)
   console.log(progress.uploaded.loaded / progress.uploaded.total)
   console.log(progress.value)
-})
+}
+const fileUpload = client.fileFrom(fileUUID, {}, {onProgress})
+
+fileUpload
+  .then(file => console.log(file.uuid))
 ```
 
 Or set callback function that will be called when file was uploaded:
 ```javascript
-fileUpload.onUploaded = (uuid => console.log(`File "${uuid}" was uploaded.`))
+const fileUUID = 'edfdf045-34c0-4087-bbdd-e3834921f890'
+const onUploaded = (uuid) => console.log(`File "${uuid}" was uploaded.`)
+const fileUpload = client.fileFrom(fileUUID, {}, {onUploaded})
+
+fileUpload
+  .then(file => console.log(file.uuid))
 ```
 
 Or when file is ready on CDN:
 ```javascript
-fileUpload.onReady = (file => console.log(`File "${file.uuid}" is ready on CDN.`))
+const fileUUID = 'edfdf045-34c0-4087-bbdd-e3834921f890'
+const onReady = (file) => console.log(`File "${file.uuid}" is ready on CDN.`)
+const fileUpload = client.fileFrom(fileUUID, {}, {onReady})
+
+fileUpload
+  .then(file => console.log(file.uuid))
 ```
 
 You can cancel file uploading and track this event:
 ```javascript
-// Set callback
-fileUpload.onCancel = (() => console.log(`File uploading was canceled.`))
+const fileUUID = 'edfdf045-34c0-4087-bbdd-e3834921f890'
+const onCancel = () => console.log(`File uploading was canceled.`)
+const fileUpload = client.fileFrom(fileUUID, {}, {onCancel})
+
+fileUpload
+  .then(file => console.log(file.uuid))
 
 // Cancel uploading
 fileUpload.cancel()
@@ -109,15 +128,23 @@ fileUpload.cancel()
 
 List of all available high level API methods:
 
-```javascript
+```typescript
 interface UploadClientInterface {
-  updateSettings(newSettings: SettingsInterface): void
+  updateSettings(newSettings: SettingsInterface): void;
 
-  getSettings(): SettingsInterface
+  getSettings(): SettingsInterface;
 
-  fileFrom(data: FileData | Url | Uuid, settings?: SettingsInterface): FileUploadInterface
+  fileFrom(
+    data: FileData | Url | Uuid,
+    settings?: SettingsInterface,
+    hooks?: LifecycleHooksInterface<UploadcareFileInterface>,
+  ): UploadInterface<UploadcareFileInterface>;
 
-  groupFrom(data: FileData[] | Url[] | Uuid[], settings?: SettingsInterface): GroupUploadInterface
+  groupFrom(
+    data: FileData[] | Url[] | Uuid[],
+    settings?: SettingsInterface,
+    hooks?: LifecycleHooksInterface<UploadcareGroupInterface>,
+  ): UploadInterface<UploadcareGroupInterface>;
 }
 ```
 
@@ -129,44 +156,80 @@ Also, you can use wrappers around low level to call the API endpoints:
 import UploadClient from '@uploadcare/upload-client'
 
 const client = new UploadClient({publicKey: 'YOUR_PUBLIC_KEY'})
-const api = client.api
-const directUpload = api.base(fileData) // fileData must be `Blob` or `File` or `Buffer`
+
+const onProgress = (progressEvent) => console.log(progressEvent.loaded / progressEvent.total)
+// and set callback to track cancel event:
+const onCancel = () => console.log('File upload was canceled.')
+
+const directUpload = client.api.base(fileData, {}, {onProgress, onCancel}) // fileData must be `Blob` or `File` or `Buffer`
 
 directUpload
   .then(data => console.log(data.file))
 
-directUpload.onProgress = (progressEvent) => console.log(progressEvent.loaded / progressEvent.total)
-
 // Also you can cancel upload:
 directUpload.cancel()
-
-// and set callback to track cancel event:
-directUpload.onCancel = () => console.log('File upload was canceled.')
 ```
 
 List of all available API methods:
 
 ```typescript
 interface UploadAPIInterface {
-  request(options: RequestOptionsInterface): Promise<RequestResponse>
+  request(options: RequestOptionsInterface): Promise<RequestResponse>;
 
-  base(data: FileData, settings?: SettingsInterface): BaseThenableInterface<BaseResponse>
+  base(
+    data: FileData,
+    settings?: SettingsInterface,
+    hooks?: BaseHooksInterface,
+  ): BaseThenableInterface<BaseResponse>;
 
-  info(uuid: Uuid, settings?: SettingsInterface): CancelableThenableInterface<FileInfoInterface>
+  info(
+    uuid: Uuid,
+    settings?: SettingsInterface,
+    hooks?: CancelHookInterface,
+  ): CancelableThenableInterface<FileInfoInterface>;
 
-  fromUrl(sourceUrl: Url, settings?: SettingsInterface): CancelableThenableInterface<FromUrlResponse>
+  fromUrl(
+    sourceUrl: Url,
+    settings?: SettingsInterface,
+    hooks?: CancelHookInterface,
+  ): CancelableThenableInterface<FromUrlResponse>;
 
-  fromUrlStatus(token: Token, settings?: SettingsInterface): CancelableThenableInterface<FromUrlStatusResponse>
+  fromUrlStatus(
+    token: Token,
+    settings?: SettingsInterface,
+    hooks?: CancelHookInterface,
+  ): CancelableThenableInterface<FromUrlStatusResponse>;
 
-  group(files: Uuid[], settings: SettingsInterface): CancelableThenableInterface<GroupInfoInterface>
+  group(
+    files: Uuid[],
+    settings?: SettingsInterface,
+    hooks?: CancelHookInterface,
+  ): CancelableThenableInterface<GroupInfoInterface>;
 
-  groupInfo(id: GroupId, settings: SettingsInterface): CancelableThenableInterface<GroupInfoInterface>
+  groupInfo(
+    id: GroupId,
+    settings?: SettingsInterface,
+    hooks?: CancelHookInterface
+  ): CancelableThenableInterface<GroupInfoInterface>;
 
-  multipartStart(file: FileData, settings: SettingsInterface): CancelableThenableInterface<MultipartStartResponse>
+  multipartStart(
+    file: FileData,
+    settings: SettingsInterface,
+    hooks?: CancelHookInterface,
+  ): CancelableThenableInterface<MultipartStartResponse>;
 
-  multipartUpload(file: FileData, parts: MultipartPart[], settings: SettingsInterface): BaseThenableInterface<any>
+  multipartUpload(
+    file: FileData,
+    parts: MultipartPart[],
+    settings: SettingsInterface,
+    hooks?: CancelHookInterface,
+  ): BaseThenableInterface<any>;
 
-  multipartComplete(uuid: Uuid, settings: SettingsInterface): CancelableThenableInterface<FileInfoInterface>
+  multipartComplete(
+    uuid: Uuid,
+    settings: SettingsInterface,
+    hooks?: CancelHookInterface,
+  ): CancelableThenableInterface<FileInfoInterface>;
 }
 ```
 

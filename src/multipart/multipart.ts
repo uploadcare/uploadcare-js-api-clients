@@ -8,6 +8,7 @@ import {FileData, SettingsInterface} from '../types'
 import {Uuid} from '..'
 import {BaseThenableInterface, CancelableThenableInterface} from '../thenable/types'
 import {FileInfoInterface} from '../api/types'
+import {BaseHooksInterface} from '../lifecycle/types'
 
 class Multipart extends Thenable<FileInfoInterface> implements BaseThenableInterface<FileInfoInterface> {
   onCancel: (() => void) | null = null
@@ -16,25 +17,23 @@ class Multipart extends Thenable<FileInfoInterface> implements BaseThenableInter
   protected readonly promise: Promise<FileInfoInterface>
   private request: BaseThenableInterface<any> | CancelableThenableInterface<any>
 
-  constructor(file: FileData, settings: SettingsInterface) {
+  constructor(file: FileData, settings: SettingsInterface, hooks?: BaseHooksInterface) {
     super()
 
     this.request = multipartStart(file, settings)
 
     this.promise = this.request
       .then(({uuid, parts}) => {
-        this.request = multipartUpload(file, parts, settings)
-
-        // @ts-ignore
-        this.request.onProgress = (progressEvent: ProgressEvent) => {
-          if (typeof this.onProgress === 'function') {
-            this.onProgress({
+        const onProgress = (progressEvent: ProgressEvent): void => {
+          if (hooks && typeof hooks.onProgress === 'function') {
+            hooks.onProgress({
               ...progressEvent,
               loaded: progressEvent.loaded,
               total: progressEvent.total,
             })
           }
         }
+        this.request = multipartUpload(file, parts, settings, {onProgress})
 
         return this.request
           .then(() => Promise.resolve(uuid))
@@ -45,8 +44,8 @@ class Multipart extends Thenable<FileInfoInterface> implements BaseThenableInter
         return this.request
       })
       .catch(error => {
-        if (error.name === 'CancelError' && typeof this.onCancel === 'function') {
-          this.onCancel()
+        if (error.name === 'CancelError' && hooks && typeof hooks.onCancel === 'function') {
+          hooks.onCancel()
         }
 
         return Promise.reject(error)
@@ -63,8 +62,9 @@ class Multipart extends Thenable<FileInfoInterface> implements BaseThenableInter
  *
  * @param {FileData} file
  * @param {SettingsInterface} settings
+ * @param {BaseHooksInterface} hooks
  * @return {BaseThenableInterface<FileInfoInterface>}
  */
-export default function multipart(file: FileData, settings: SettingsInterface = {}): BaseThenableInterface<FileInfoInterface> {
-  return new Multipart(file, settings)
+export default function multipart(file: FileData, settings: SettingsInterface = {}, hooks?: BaseHooksInterface): BaseThenableInterface<FileInfoInterface> {
+  return new Multipart(file, settings, hooks)
 }

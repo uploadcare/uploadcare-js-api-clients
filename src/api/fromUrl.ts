@@ -6,6 +6,7 @@ import {SettingsInterface} from '../types'
 import {FileInfoInterface} from './types'
 import {CancelableThenable} from '../thenable/CancelableThenable'
 import {CancelableThenableInterface} from '../thenable/types'
+import {CancelHookInterface} from '../lifecycle/types'
 
 export type Url = string
 
@@ -68,12 +69,15 @@ const getRequestOptions = (sourceUrl: Url, settings: SettingsInterface): Request
  *
  * @param {Url} sourceUrl – Source file URL, which should be a public HTTP or HTTPS link.
  * @param {SettingsInterface} settings
+ * @param {CancelHookInterface} hooks
  * @return {CancelableThenableInterface<FromUrlResponse>}
  */
 export default function fromUrl(
-  sourceUrl: Url, settings: SettingsInterface = {}
+  sourceUrl: Url,
+  settings: SettingsInterface = {},
+  hooks?: CancelHookInterface,
 ): CancelableThenableInterface<FromUrlResponse> {
   const options = getRequestOptions(sourceUrl, settings)
 
-  return new CancelableThenable(options)
+  return new CancelableThenable(options, hooks)
 }

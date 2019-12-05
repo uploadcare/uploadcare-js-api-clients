@@ -7,12 +7,17 @@ export interface CancelableInterface {
   cancel(): void;
 }
 
+export type ProgressHook<T> = (progress: T) => void
+export type CancelHook = () => void
+export type UploadedHook = (uuid: string) => void
+export type ReadyHook<T> = (entity: T) => void
+
 export interface ProgressHookInterface<T> {
-  onProgress: ((progress: T) => void) | null;
+  onProgress?: ProgressHook<T> | null;
 }
 
 export interface CancelHookInterface {
-  onCancel: (() => void) | null;
+  onCancel?: CancelHook | null;
 }
 
 export interface BaseHooksInterface extends
@@ -22,8 +27,8 @@ export interface BaseHooksInterface extends
 
 export interface UploadHooksInterface<T> extends
   ProgressHookInterface<UploadingProgress> {
-  onUploaded: ((uuid: string) => void) | null;
-  onReady: ((entity: T) => void) | null;
+  onUploaded?: UploadedHook | null;
+  onReady?: ReadyHook<T> | null;
 }
 
 export interface LifecycleHooksInterface<T> extends
@@ -32,7 +37,6 @@ export interface LifecycleHooksInterface<T> extends
 }
 
 export interface UploadInterface<T> extends
-  LifecycleHooksInterface<T>,
   Promise<T>,
   CancelableInterface {
 }
@@ -43,7 +47,7 @@ export interface LifecycleStateInterface {
   isCanBeChangedTo(state: LifecycleStateInterface): boolean;
 }
 
-export interface LifecycleInterface<T> extends LifecycleHooksInterface<T> {
+export interface LifecycleInterface<T> {
   updateState(state: LifecycleStateInterface): void;
   getProgress(): UploadingProgress;
   updateEntity(entity: T): void;

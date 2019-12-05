@@ -8,6 +8,7 @@ import {FileData, SettingsInterface} from '../../types'
 import {MultipartStartResponse} from './types'
 import {CancelableThenableInterface} from '../../thenable/types'
 import {CancelableThenable} from '../../thenable/CancelableThenable'
+import {CancelHookInterface} from '../../lifecycle/types'
 
 const getRequestBody = (file: FileData, settings: SettingsInterface): Body => {
   const size: number = getFileSize(file)
@@ -38,10 +39,11 @@ const getRequestOptions = (file: FileData, settings: SettingsInterface): Request
  *
  * @param {FileData} file
  * @param {SettingsInterface} settings
+ * @param {CancelHookInterface} hooks
  * @return {CancelableThenableInterface<MultipartStartResponse>}
  */
-export default function multipartStart(file: FileData, settings: SettingsInterface = {}): CancelableThenableInterface<MultipartStartResponse> {
+export default function multipartStart(file: FileData, settings: SettingsInterface = {}, hooks?: CancelHookInterface): CancelableThenableInterface<MultipartStartResponse> {
   const options = getRequestOptions(file, settings)
 
-  return new CancelableThenable<MultipartStartResponse>(options)
+  return new CancelableThenable<MultipartStartResponse>(options, hooks)
 }

@@ -43,10 +43,9 @@ describe('API - multipartComplete', () => {
 
     await multipartUpload(fileToUpload, parts, settings)
 
-    const upload = multipartComplete(completedUuid, settings)
     const onCancel = jasmine.createSpy('onCancel')
+    const upload = multipartComplete(completedUuid, settings, {onCancel})
 
-    upload.onCancel = onCancel
     upload.cancel()
 
     await (expectAsync(upload) as any).toBeRejectedWithError(CancelError)

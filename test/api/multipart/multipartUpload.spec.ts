@@ -28,10 +28,9 @@ describe('API - multipartUpload', () => {
 
   it('should be able to handle cancel uploading', async () => {
     const {parts} = await multipartStart(fileToUpload, settings)
-    const upload = multipartUpload(fileToUpload, parts, settings)
     const onCancel = jasmine.createSpy('onCancel')
+    const upload = multipartUpload(fileToUpload, parts, settings, {onCancel})
 
-    upload.onCancel = onCancel
     upload.cancel()
 
     await (expectAsync(upload) as any).toBeRejectedWithError(CancelError)
@@ -42,11 +41,10 @@ describe('API - multipartUpload', () => {
   it('should be able to handle progress', async () => {
     let progressValue = 0
     const {parts} = await multipartStart(fileToUpload, settings)
-    const upload = multipartUpload(fileToUpload, parts, settings)
-
-    upload.onProgress = (progressEvent) => {
+    const onProgress = (progressEvent) => {
       progressValue = Math.round((progressEvent.loaded * 100) / progressEvent.total)
     }
+    const upload = multipartUpload(fileToUpload, parts, settings, {onProgress})
 
     await upload
 

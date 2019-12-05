@@ -10,8 +10,9 @@ import {UploadedState} from './state/UploadedState'
 /* Types */
 import {ProgressParamsInterface, UploadingProgress} from '../types'
 import {
+  LifecycleHooksInterface,
   LifecycleInterface,
-  LifecycleStateInterface
+  LifecycleStateInterface,
 } from './types'
 import {Uuid} from '..'
 
@@ -19,13 +20,18 @@ export class UploadLifecycle<T> implements LifecycleInterface<T> {
   private state: LifecycleStateInterface
   private entity: T | null = null
 
-  onProgress: ((progress: UploadingProgress) => void) | null = null
-  onUploaded: ((uuid: string) => void) | null = null
-  onReady: ((entity: T) => void) | null = null
-  onCancel: (() => void) | null = null
+  private readonly onProgress: ((progress: UploadingProgress) => void) | null
+  private readonly onUploaded: ((uuid: string) => void) | null
+  private readonly onReady: ((entity: T) => void) | null
+  private readonly onCancel: (() => void) | null
 
-  constructor() {
+  constructor(hooks?: LifecycleHooksInterface<T>) {
     this.state = new PendingState()
+
+    this.onProgress = (hooks && hooks.onProgress) || null
+    this.onUploaded = (hooks && hooks.onUploaded) || null
+    this.onReady = (hooks && hooks.onReady) || null
+    this.onCancel = (hooks && hooks.onCancel) || null
   }
 
   updateState(state: LifecycleStateInterface): void {

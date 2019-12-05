@@ -37,10 +37,9 @@ describe('groupFrom Url[]', () => {
 
   describe('should be able to handle', () => {
     it('cancel uploading', async () => {
-      const upload = groupFrom(files, settings)
       const onCancel = jasmine.createSpy('onCancel')
+      const upload = groupFrom(files, settings, {onCancel})
 
-      upload.onCancel = onCancel
       upload.cancel()
 
       await (expectAsync(upload) as any).toBeRejectedWithError(CancelError)
@@ -50,13 +49,12 @@ describe('groupFrom Url[]', () => {
 
     it('progress', async () => {
       let progressValue = 0
-      const upload = groupFrom(files, settings)
-
-      upload.onProgress = (progress) => {
+      const onProgress = (progress) => {
         const {value} = progress
 
         progressValue = value
       }
+      const upload = groupFrom(files, settings, {onProgress})
 
       await upload
 
@@ -64,10 +62,8 @@ describe('groupFrom Url[]', () => {
     })
 
     it('uploaded', async () => {
-      const upload = groupFrom(files, settings)
       const onUploaded = jasmine.createSpy('onUploaded')
-
-      upload.onUploaded = onUploaded
+      const upload = groupFrom(files, settings, {onUploaded})
 
       await (expectAsync(upload) as any).toBeResolved()
 
@@ -75,10 +71,8 @@ describe('groupFrom Url[]', () => {
     })
 
     it('ready', async () => {
-      const upload = groupFrom(files, settings)
       const onReady = jasmine.createSpy('onReady')
-
-      upload.onReady = onReady
+      const upload = groupFrom(files, settings, {onReady})
 
       await (expectAsync(upload) as any).toBeResolved()
 
