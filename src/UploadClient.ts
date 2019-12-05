@@ -13,7 +13,7 @@ import {
 } from './types'
 import {Url} from './api/fromUrl'
 import {UploadAPIInterface, Uuid} from './api/types'
-import {UploadInterface} from './lifecycle/types'
+import {LifecycleHooksInterface, UploadInterface} from './lifecycle/types'
 
 class UploadClient implements UploadClientInterface {
   private settings: SettingsInterface
@@ -40,18 +40,26 @@ class UploadClient implements UploadClientInterface {
     return this.settings
   }
 
-  fileFrom(data: FileData | Url | Uuid, settings: SettingsInterface = {}): UploadInterface<UploadcareFileInterface> {
+  fileFrom(
+    data: FileData | Url | Uuid,
+    settings?: SettingsInterface,
+    hooks?: LifecycleHooksInterface<UploadcareFileInterface>
+  ): UploadInterface<UploadcareFileInterface> {
     return fileFrom(data, {
       ...this.settings,
       ...settings,
-    })
+    }, hooks)
   }
 
-  groupFrom(data: FileData[] | Url[] | Uuid[], settings: SettingsInterface = {}): UploadInterface<UploadcareGroupInterface> {
+  groupFrom(
+    data: FileData[] | Url[] | Uuid[],
+    settings?: SettingsInterface,
+    hooks?: LifecycleHooksInterface<UploadcareGroupInterface>
+  ): UploadInterface<UploadcareGroupInterface> {
     return groupFrom(data, {
       ...this.settings,
       ...settings,
-    })
+    }, hooks)
   }
 }
 

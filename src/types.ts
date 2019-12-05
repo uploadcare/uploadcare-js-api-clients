@@ -135,6 +135,6 @@ export interface UploadClientInterface {
   groupFrom(
     data: FileData[] | Url[] | Uuid[],
     settings?: SettingsInterface,
-    hooks?: LifecycleHooksInterface<UploadcareFileInterface>
+    hooks?: LifecycleHooksInterface<UploadcareGroupInterface>
   ): UploadInterface<UploadcareGroupInterface>;
 }
