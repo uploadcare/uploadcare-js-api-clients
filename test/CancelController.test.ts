@@ -49,4 +49,20 @@ describe('CancelController', () => {
     expect(typeof cancelToken.cancel).toBe('function')
     expect(typeof cancelToken.token).toBe('object')
   })
+
+  it('should run callback on already cancelled controller', async () => {
+    let spy = jasmine.createSpy('cancel')
+    let ctrl = new CancelController()
+
+    ctrl.cancel()
+    // this hack for wait execution of CancelController
+    await Promise.resolve()
+
+    ctrl.onCancel(spy)
+
+    // this hack for wait execution of CancelController
+    await Promise.resolve()
+
+    expect(spy).toHaveBeenCalled()
+  })
 })
