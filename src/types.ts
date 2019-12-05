@@ -129,12 +129,12 @@ export interface UploadClientInterface {
   fileFrom(
     data: FileData | Url | Uuid,
     settings?: SettingsInterface,
-    hooks?: LifecycleHooksInterface<UploadcareFileInterface>
+    hooks?: LifecycleHooksInterface<UploadcareFileInterface>,
   ): UploadInterface<UploadcareFileInterface>;
 
   groupFrom(
     data: FileData[] | Url[] | Uuid[],
     settings?: SettingsInterface,
-    hooks?: LifecycleHooksInterface<UploadcareGroupInterface>
+    hooks?: LifecycleHooksInterface<UploadcareGroupInterface>,
   ): UploadInterface<UploadcareGroupInterface>;
 }
