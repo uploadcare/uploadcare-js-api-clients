@@ -14,7 +14,7 @@ export type RequestOptions = {
   data?: any;
   headers?: any;
   cancel?: CancelController;
-  progress?: (event: any) => void;
+  onProgress?: (event: any) => void;
 };
 
 const request = ({
@@ -23,7 +23,7 @@ const request = ({
   data,
   headers = {},
   cancel,
-  progress
+  onProgress
 }: RequestOptions): Promise<{ data: string; headers: any; status?: number }> =>
   Promise.resolve(data.toString() === "[object FormData]")
     .then(isFormData => (isFormData ? getLength(data) : undefined))
@@ -82,8 +82,8 @@ const request = ({
           });
 
           if (data instanceof Readable || isFormData) {
-            if (progress) {
-              data.pipe(new ProgressEmitter(progress)).pipe(req);
+            if (onProgress) {
+              data.pipe(new ProgressEmitter(onProgress)).pipe(req);
             } else {
               data.pipe(req);
             }
@@ -99,6 +99,7 @@ const request = ({
 class ProgressEmitter extends Transform {
   private _onprogress: (evn: any) => void;
   private _position: number;
+
   constructor(onprogress) {
     super();
 

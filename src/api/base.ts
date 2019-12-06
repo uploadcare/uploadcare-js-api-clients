@@ -21,7 +21,7 @@ export type Options = {
   store?: boolean;
 
   cancel?: CancelController;
-  progress?: (event: any) => void;
+  onProgress?: (event: any) => void;
 
   source?: string;
   integration?: string;
@@ -35,13 +35,13 @@ export default function base(
   file: Blob | File | NodeJS.ReadableStream | Buffer,
   {
     publicKey,
-    fileName = "file",
+    fileName = "original",
     baseURL = "https://upload.uploadcare.com",
     secureSignature,
     secureExpire,
     store,
     cancel,
-    progress,
+    onProgress,
     source = "local",
     integration
   }: Options
@@ -65,6 +65,6 @@ export default function base(
       file
     }),
     cancel,
-    progress
+    onProgress
   }).then(({ data }) => JSON.parse(data));
 }
