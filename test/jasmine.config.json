@@ -12,9 +12,6 @@
       "options": {
         "displayStacktrace": "all"
       }
-    },
-    {
-      "name": "jasmine-ts-console-reporter"
     }
   ]
 }
