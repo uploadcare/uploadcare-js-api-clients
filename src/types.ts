@@ -1,6 +1,6 @@
 import {FileInfoInterface, GeoLocationInterface, GroupId, Uuid} from './api/types'
 import {Url} from './api/fromUrl'
-import {UploadInterface} from './lifecycle/types'
+import {LifecycleHooksInterface, UploadInterface} from './lifecycle/types'
 
 export interface SettingsInterface {
   baseCDN?: string;
@@ -126,7 +126,15 @@ export interface UploadClientInterface {
 
   getSettings(): SettingsInterface;
 
-  fileFrom(data: FileData | Url | Uuid, settings?: SettingsInterface): UploadInterface<UploadcareFileInterface>;
+  fileFrom(
+    data: FileData | Url | Uuid,
+    settings?: SettingsInterface,
+    hooks?: LifecycleHooksInterface<UploadcareFileInterface>,
+  ): UploadInterface<UploadcareFileInterface>;
 
-  groupFrom(data: FileData[] | Url[] | Uuid[], settings?: SettingsInterface): UploadInterface<UploadcareGroupInterface>;
+  groupFrom(
+    data: FileData[] | Url[] | Uuid[],
+    settings?: SettingsInterface,
+    hooks?: LifecycleHooksInterface<UploadcareGroupInterface>,
+  ): UploadInterface<UploadcareGroupInterface>;
 }

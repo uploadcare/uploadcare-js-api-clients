@@ -28,20 +28,17 @@ export class GroupFromObject implements UploadHandlerInterface<UploadcareGroupIn
 
     const filesTotalCount = this.data.length
     const uploadFile = (file: FileData, index: number): UploadInterface<UploadcareFileInterface> => {
-      const fileUpload = fileFrom(file, this.settings)
       const fileNumber = index + 1
-
-      fileUpload.onCancel = uploadLifecycle.handleCancelling.bind(uploadLifecycle)
-
-      fileUpload.onProgress = ((): void => {
+      const onCancel = uploadLifecycle.handleCancelling.bind(uploadLifecycle)
+      const onProgress = ((): void => {
         uploadLifecycle.handleUploading({
           total: filesTotalCount,
           loaded: fileNumber
         })
       })
-
-      return fileUpload
+      return fileFrom(file, this.settings, {onProgress, onCancel})
     }
+
     const files = this.data.map(uploadFile)
 
     return Promise.all(files)

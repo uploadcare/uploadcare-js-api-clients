@@ -36,11 +36,9 @@ describe('fileFrom Uploaded', () => {
 
   describe('should be able to handle', () => {
     it('cancel uploading', async () => {
-      const upload = fileFrom(uuid, settings)
-
       const onCancel = jasmine.createSpy('onCancel')
+      const upload = fileFrom(uuid, settings, {onCancel})
 
-      upload.onCancel = onCancel
       upload.cancel()
 
       await (expectAsync(upload) as any).toBeRejectedWithError(CancelError)
@@ -50,13 +48,12 @@ describe('fileFrom Uploaded', () => {
 
     it('progress', async () => {
       let progressValue = 0
-      const upload = fileFrom(uuid, settings)
-
-      upload.onProgress = (progress) => {
+      const onProgress = (progress) => {
         const {value} = progress
 
         progressValue = value
       }
+      const upload = fileFrom(uuid, settings, {onProgress})
 
       await upload
 
@@ -64,10 +61,8 @@ describe('fileFrom Uploaded', () => {
     })
 
     it('uploaded', async () => {
-      const upload = fileFrom(uuid, settings)
       const onUploaded = jasmine.createSpy('onUploaded')
-
-      upload.onUploaded = onUploaded
+      const upload = fileFrom(uuid, settings, {onUploaded})
 
       await (expectAsync(upload) as any).toBeResolved()
 
@@ -75,10 +70,8 @@ describe('fileFrom Uploaded', () => {
     })
 
     it('ready', async () => {
-      const upload = fileFrom(uuid, settings)
       const onReady = jasmine.createSpy('onReady')
-
-      upload.onReady = onReady
+      const upload = fileFrom(uuid, settings, {onReady})
 
       await (expectAsync(upload) as any).toBeResolved()
 

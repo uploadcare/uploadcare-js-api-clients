@@ -8,6 +8,7 @@ import defaultSettings from '../../defaultSettings'
 import {FileData, SettingsInterface} from '../../types'
 import {ChunkType, MultipartPart} from './types'
 import {BaseThenableInterface} from '../../thenable/types'
+import {BaseHooksInterface} from '../../lifecycle/types'
 
 function throttle(callback, limit = 1) {
   let wait = false                  // Initially, we're not waiting
@@ -24,14 +25,11 @@ function throttle(callback, limit = 1) {
 }
 
 class MultipartUpload extends Thenable<any> implements BaseThenableInterface<any> {
-  onProgress: ((progressEvent: ProgressEvent) => void) | null = null
-  onCancel: (() => void) | null = null
-
   protected readonly promise: Promise<any>
   private readonly requests: BaseThenableInterface<any>[]
   private readonly loaded: number[]
 
-  constructor(file: FileData, parts: MultipartPart[], settings: SettingsInterface = {}) {
+  constructor(file: FileData, parts: MultipartPart[], settings: SettingsInterface = {}, hooks?: BaseHooksInterface) {
     super()
 
     const fileSize = getFileSize(file)
@@ -42,10 +40,10 @@ class MultipartUpload extends Thenable<any> implements BaseThenableInterface<any
     this.loaded = Array.from(new Array(chunksCount)).fill(0)
 
     const updateProgress = throttle((progressEvent: ProgressEvent) => {
-      if (typeof this.onProgress === 'function') {
+      if (hooks && typeof hooks.onProgress === 'function') {
         const loaded = this.loaded.reduce((sum, chunk) => chunk + sum, 0)
 
-        this.onProgress({
+        hooks.onProgress({
           ...progressEvent,
           loaded,
           total: fileSize,
@@ -57,21 +55,18 @@ class MultipartUpload extends Thenable<any> implements BaseThenableInterface<any
       const [start, end] = chunk
       const fileChunk = file.slice(start, end)
       const partUrl = parts[index]
-      const uploadPartPromise = multipartUploadPart(partUrl, fileChunk)
-
-      uploadPartPromise.onProgress = (progressEvent: ProgressEvent) => {
-        if (typeof this.onProgress === 'function') {
+      const onProgress = (progressEvent: ProgressEvent): void => {
+        if (hooks && typeof hooks.onProgress === 'function') {
           this.loaded[index] = progressEvent.loaded
           updateProgress(progressEvent)
         }
       }
-
-      return uploadPartPromise
+      return multipartUploadPart(partUrl, fileChunk, {}, {onProgress})
     })
     this.promise = Promise.all(this.requests)
       .catch(error => {
-        if (error.name === 'CancelError' && typeof this.onCancel === 'function') {
-          this.onCancel()
+        if (error.name === 'CancelError' && hooks && typeof hooks.onCancel === 'function') {
+          hooks.onCancel()
         }
 
         return Promise.reject(error)
@@ -89,9 +84,10 @@ class MultipartUpload extends Thenable<any> implements BaseThenableInterface<any
  * @param {FileData} file
  * @param {MultipartPart[]} parts
  * @param {SettingsInterface} settings
+ * @param {BaseHooksInterface} hooks
  * @return {BaseThenableInterface<any>}
  */
-export default function multipartUpload(file: FileData, parts: MultipartPart[], settings: SettingsInterface = {}): BaseThenableInterface<any> {
-  return new MultipartUpload(file, parts, settings)
+export default function multipartUpload(file: FileData, parts: MultipartPart[], settings: SettingsInterface = {}, hooks?: BaseHooksInterface): BaseThenableInterface<any> {
+  return new MultipartUpload(file, parts, settings, hooks)
 }
 

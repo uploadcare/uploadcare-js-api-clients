@@ -158,8 +158,8 @@ class Request extends Thenable<RequestResponse> implements RequestInterface {
 
     if (error.response) {
       const errorRequestInfo = {
-        headers: error.config.headers,
-        url: error.config.url || url,
+        headers: error.request.headers,
+        url: error.request.url || url,
       }
       const errorResponseInfo = {
         status: error.response.status,

@@ -35,10 +35,9 @@ describe('API - group info', () => {
 
   it('should be able to handle cancel uploading', async () => {
     const {id} = await group(files, settings)
-    const upload = groupInfo(id, settings)
     const onCancel = jasmine.createSpy('onCancel')
+    const upload = groupInfo(id, settings, {onCancel})
 
-    upload.onCancel = onCancel
     upload.cancel()
 
     await (expectAsync(upload) as any).toBeRejectedWithError(CancelError)

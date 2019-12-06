@@ -27,10 +27,9 @@ describe('API - multipartStart', () => {
   })
 
   it('should be able to handle cancel uploading', async () => {
-    const upload = multipartStart(fileToUpload, settings)
     const onCancel = jasmine.createSpy('onCancel')
+    const upload = multipartStart(fileToUpload, settings, {onCancel})
 
-    upload.onCancel = onCancel
     upload.cancel()
 
     await (expectAsync(upload) as any).toBeRejectedWithError(CancelError)
