@@ -6,10 +6,20 @@ import getUrl from "./request/getUrl";
 
 import CancelController from "../CancelController";
 import { getUserAgent } from "../defaultSettings";
+import camelizeKeys from "../tools/camelizeKeys";
 
-export type Response = {
+type SuccessResponse = {
   file: Uuid;
 };
+
+type FailedResponse = {
+  error: {
+    content: string;
+    statusCode: number;
+  };
+};
+
+type Response = SuccessResponse | FailedResponse;
 
 export type Options = {
   publicKey: string;
@@ -32,10 +42,10 @@ export type Options = {
  * Can be canceled and has progress.
  */
 export default function base(
-  file: Blob | File | NodeJS.ReadableStream | Buffer,
+  file: Blob | File | NodeJS.ReadableStream | Buffer | null,
   {
     publicKey,
-    fileName = "original",
+    fileName,
     baseURL = "https://upload.uploadcare.com",
     secureSignature,
     secureExpire,
@@ -45,7 +55,7 @@ export default function base(
     source = "local",
     integration
   }: Options
-): Promise<Response> {
+): Promise<SuccessResponse> {
   return request({
     method: "POST",
     url: getUrl(baseURL, "/base/", {
@@ -54,17 +64,28 @@ export default function base(
     headers: {
       "X-UC-User-Agent": getUserAgent({ publicKey, integration })
     },
-    data: getFormData({
-      UPLOADCARE_PUB_KEY: publicKey,
-      UPLOADCARE_STORE:
-        typeof store === "undefined" ? "auto" : store ? "1" : "0",
-      signature: secureSignature,
-      expire: secureExpire,
-      source: source,
-      fileName: fileName || (file as File).name,
-      file
-    }),
+    data: getFormData([
+      ["file", file, fileName || (file as File).name || "original"],
+      ["UPLOADCARE_PUB_KEY", publicKey],
+      [
+        "UPLOADCARE_STORE",
+        typeof store === "undefined" ? "auto" : store ? "1" : "0"
+      ],
+      ["signature", secureSignature],
+      ["expire", secureExpire],
+      ["source", source]
+    ]),
     cancel,
     onProgress
-  }).then(({ data }) => JSON.parse(data));
+  })
+    .then(({ data }) => camelizeKeys<Response>(JSON.parse(data)))
+    .then(response => {
+      if ("error" in response) {
+        throw Error(
+          response.error.content + "\nStatus: " + response.error.statusCode
+        );
+      } else {
+        return response;
+      }
+    });
 }
