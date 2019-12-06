@@ -8,27 +8,28 @@ import * as FormData from "form-data";
  * @param {Body} body
  * @returns {FormData} FormData instance
  */
-function getFormData(body: {
-  [key: string]: any;
-  fileName?: any;
-  file?: any;
-}): FormData {
+
+type FileTyple = [
+  "file",
+  Blob | File | NodeJS.ReadableStream | Buffer | null,
+  string
+];
+type BaseType = string | number | void
+type FormDataTyple = [string, BaseType | BaseType[]];
+
+function getFormData(body: (FormDataTyple | FileTyple)[]): FormData {
   const formData = new FormData();
 
-  for (const key of Object.keys(body)) {
-    let value = body[key];
-
+  for (const [key, value, name] of body) {
     if (Array.isArray(value)) {
       // refactor this
       value.forEach(val => formData.append(key + "[]", val));
-    } else if (key === "file") {
-      formData.append("file", value, body.fileName);
     } else if (value != null) {
-      formData.append(key, value);
+      formData.append(key, value, name);
     }
   }
 
   return formData;
 }
 
-export default getFormData
+export default getFormData;
