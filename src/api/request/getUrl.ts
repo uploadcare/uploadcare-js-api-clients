@@ -1,27 +1,30 @@
-type BaseTypes = string | number | void;
+type BaseTypes = string | number;
 
 type Query = {
   [key: string]: BaseTypes | BaseTypes[];
 };
 
-const arrayToQuery = (key: string, values: BaseTypes[]) =>
-  values.reduce<{ [key: string]: BaseTypes }>((acc, value) => {
-    acc[`${key}[]`] = value;
-
-    return acc;
-  }, {});
-
 const createQuery = (query: Query): string =>
   Object.entries(query)
-    .map(([key, value]) =>
-      Array.isArray(value)
-        ? createQuery(arrayToQuery(key, value))
-        : `${key}=${value}`
+    .reduce<string[]>(
+      (params, [key, value]) =>
+        params.concat(
+          Array.isArray(value)
+            ? value.map(value => `${key}[]=${encodeURIComponent(value)}`)
+            : `${key}=${encodeURIComponent(value)}`
+        ),
+      []
     )
     .join("&");
 
-const getUrl = (base: string, path: string, query: Query) =>
-  `${base}${path}?${createQuery(query)}`;
+const getUrl = (base: string, path: string, query?: Query) =>
+  [
+    base,
+    path,
+    query && Object.keys(query).length > 0 ? "?" : "",
+    query && createQuery(query)
+  ]
+    .filter(Boolean)
+    .join("");
 
-
-export default getUrl
+export default getUrl;
