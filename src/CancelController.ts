@@ -1,23 +1,22 @@
-import {CancelTokenSource} from 'axios'
-const {CancelToken} = require('axios')
+export interface CancelControllerInterface {
+  cancel(): void;
+  onCancel(fn: Function): void;
+}
 
-class CancelController {
-  private axiosCancel: CancelTokenSource
+class CancelController implements CancelControllerInterface {
+  private promise: Promise<void>
+  private resolve: (value?: void | PromiseLike<void> | undefined) => void = () => {}
 
   constructor() {
-    this.axiosCancel = CancelToken.source()
+    this.promise = new Promise<void>(resolve => this.resolve = resolve)
   }
 
-  cancel() {
-    this.axiosCancel.cancel()
+  cancel(): void {
+    this.resolve()
   }
 
-  onCancel(fn: Function) {
-    this.axiosCancel.token.promise.then(() => fn())
-  }
-
-  axiosToken() {
-    return this.axiosCancel
+  onCancel(fn: Function): void {
+    this.promise.then(() => fn())
   }
 }
 

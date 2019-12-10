@@ -41,15 +41,6 @@ describe('CancelController', () => {
     expect(spy2).toHaveBeenCalledTimes(1)
   })
 
-  it('should have method that return axios token', () => {
-    let ctrl = new CancelController()
-    let cancelToken = ctrl.axiosToken()
-
-    expect(typeof cancelToken).toBe('object')
-    expect(typeof cancelToken.cancel).toBe('function')
-    expect(typeof cancelToken.token).toBe('object')
-  })
-
   it('should run callback on already cancelled controller', async () => {
     let spy = jasmine.createSpy('cancel')
     let ctrl = new CancelController()
