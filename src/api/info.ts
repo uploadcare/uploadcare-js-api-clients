@@ -1,50 +1,66 @@
-import {prepareOptions} from './request/prepareOptions'
+import { Uuid, FileInfo } from "./base-types";
+import request from "./request/request.node";
+import getUrl from "./request/getUrl";
 
-/* Types */
-import {Query, RequestOptionsInterface} from './request/types'
-import {FileInfoInterface, Uuid} from './types'
-import {SettingsInterface} from '../types'
-import {CancelableThenable} from '../thenable/CancelableThenable'
-import {CancelableThenableInterface} from '../thenable/types'
-import {CancelHookInterface} from '../lifecycle/types'
+import CancelController from "../CancelController";
+import { getUserAgent } from "../defaultSettings";
+import camelizeKeys from "../tools/camelizeKeys";
 
-const getRequestQuery = (uuid: Uuid, settings: SettingsInterface): Query => {
-  const query = {
-    pub_key: settings.publicKey || '',
-    file_id: uuid,
-  }
+type FailedResponse = {
+  error: {
+    content: string;
+    statusCode: number;
+  };
+};
 
-  if (settings.source) {
-    return {
-      ...query,
-      source: settings.source,
-    }
-  }
+type Response = FileInfo | FailedResponse;
 
-  return query
-}
+type Options = {
+  publicKey: string;
 
-const getRequestOptions = (uuid: Uuid, settings: SettingsInterface): RequestOptionsInterface => {
-  return prepareOptions({
-    path: '/info/',
-    query: getRequestQuery(uuid, settings),
-  }, settings)
-}
+  baseUrl?: string;
+
+  cancel?: CancelController;
+
+  source?: string;
+  integration?: string;
+  // cancel?: CancelController;
+};
 
 /**
  * Returns a JSON dictionary holding file info.
- *
- * @param {Uuid} uuid – UUID of a target file to request its info.
- * @param {SettingsInterface} settings
- * @param {CancelHookInterface} hooks
- * @return {CancelableThenableInterface<FileInfoInterface>}
  */
 export default function info(
   uuid: Uuid,
-  settings: SettingsInterface = {},
-  hooks?: CancelHookInterface,
-): CancelableThenableInterface<FileInfoInterface> {
-  const options = getRequestOptions(uuid, settings)
+  {
+    publicKey,
+    baseUrl = "https://upload.uploadcare.com",
+    cancel,
+    source,
+    integration
+  }: Options
+): Promise<FileInfo> {
+  return request({
+    method: "GET",
+    headers: {
+      "X-UC-User-Agent": getUserAgent({ publicKey, integration })
+    },
+    url: getUrl(baseUrl, "/info/", {
+      jsonerrors: 1,
+      pub_key: publicKey,
+      file_id: uuid,
+      source
+    }),
+    cancel,
+  })
+    .then(response => camelizeKeys<Response>(JSON.parse(response.data)))
+    .then(response => {
+      if ("error" in response) {
+        throw new Error(
+          `[${response.error.statusCode}] ${response.error.content}`
+        );
+      }
 
-  return new CancelableThenable(options, hooks)
+      return response;
+    });
 }

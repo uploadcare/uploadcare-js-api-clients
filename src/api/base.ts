@@ -1,4 +1,4 @@
-import { Uuid } from "./types";
+import { Uuid } from "./base-types";
 
 import getFormData from "./request/buildFormData.node";
 import request from "./request/request.node";
@@ -42,7 +42,7 @@ export type Options = {
  * Can be canceled and has progress.
  */
 export default function base(
-  file: Blob | File | NodeJS.ReadableStream | Buffer | null,
+  file: Blob | File | NodeJS.ReadableStream | Buffer,
   {
     publicKey,
     fileName,
@@ -69,7 +69,7 @@ export default function base(
       ["UPLOADCARE_PUB_KEY", publicKey],
       [
         "UPLOADCARE_STORE",
-        typeof store === "undefined" ? "auto" : store ? "1" : "0"
+        typeof store === "undefined" ? "auto" : store ? 1 : 0
       ],
       ["signature", secureSignature],
       ["expire", secureExpire],
@@ -81,8 +81,8 @@ export default function base(
     .then(({ data }) => camelizeKeys<Response>(JSON.parse(data)))
     .then(response => {
       if ("error" in response) {
-        throw Error(
-          response.error.content + "\nStatus: " + response.error.statusCode
+        throw new Error(
+          `[${response.error.statusCode}] ${response.error.content}`
         );
       } else {
         return response;

@@ -1,83 +1,117 @@
-import {prepareOptions} from './request/prepareOptions'
+import { FileInfo } from "./base-types";
+import request from "./request/request.node";
+import getUrl from "./request/getUrl";
 
-/* Types */
-import {Query, RequestOptionsInterface} from './request/types'
-import {SettingsInterface} from '../types'
-import {FileInfoInterface} from './types'
-import {CancelableThenable} from '../thenable/CancelableThenable'
-import {CancelableThenableInterface} from '../thenable/types'
-import {CancelHookInterface} from '../lifecycle/types'
+import CancelController from "../CancelController";
+import { getUserAgent } from "../defaultSettings";
+import camelizeKeys from "../tools/camelizeKeys";
 
-export type Url = string
+type Url = string;
 
-export enum TypeEnum {
-  Token = 'token',
-  FileInfo = 'file_info'
+enum TypeEnum {
+  Token = "token",
+  FileInfo = "file_info"
 }
 
 type TokenResponse = {
   type: TypeEnum.Token;
   token: string;
-}
+};
 
 type FileInfoResponse = {
   type: TypeEnum.FileInfo;
-} & FileInfoInterface
+} & FileInfo;
 
-export type FromUrlResponse = FileInfoResponse | TokenResponse
+type SuccessResponse = FileInfoResponse | TokenResponse;
+
+type FailResponce = {
+  error: {
+    content: string;
+    statusCode: number;
+  };
+};
+
+type Response = FailResponce | SuccessResponse;
 
 /**
  * TokenResponse Type Guard.
- *
- * @param {FromUrlResponse} response
  */
-export const isTokenResponse = (response: FromUrlResponse): response is TokenResponse => {
-  return response.type !== undefined && response.type === TypeEnum.Token
-}
+export const isTokenResponse = (
+  response: SuccessResponse
+): response is TokenResponse => {
+  return response.type !== undefined && response.type === TypeEnum.Token;
+};
 
 /**
- * InfoResponse Type Guard.
- *
- * @param {FromUrlResponse} response
+ * FileInfoResponse Type Guard.
  */
-export const isFileInfoResponse = (response: FromUrlResponse): response is FileInfoResponse => {
-  return response.type !== undefined && response.type === TypeEnum.FileInfo
-}
+export const isFileInfoResponse = (
+  response: SuccessResponse
+): response is FileInfoResponse => {
+  return response.type !== undefined && response.type === TypeEnum.FileInfo;
+};
 
-const getRequestQuery = (sourceUrl: Url, settings: SettingsInterface): Query => ({
-  pub_key: settings.publicKey || '',
-  source_url: sourceUrl,
-  store: settings.doNotStore ? '' : 'auto',
-  filename: settings.fileName || '',
-  check_URL_duplicates: settings.checkForUrlDuplicates ? 1 : 0,
-  save_URL_duplicates: settings.saveUrlForRecurrentUploads ? 1 : 0,
-  signature: settings.secureSignature || '',
-  expire: settings.secureExpire || '',
-  source: settings.source || 'url',
-})
+type Options = {
+  publicKey: string;
 
-const getRequestOptions = (sourceUrl: Url, settings: SettingsInterface): RequestOptionsInterface => {
-  return prepareOptions({
-    method: 'POST',
-    path: '/from_url/',
-    query: getRequestQuery(sourceUrl, settings),
-  }, settings)
-}
+  baseURL?: string;
+  store?: boolean;
+  fileName?: string;
+  checkForUrlDuplicates?: boolean;
+  saveUrlForRecurrentUploads?: boolean;
+  secureSignature?: string;
+  secureExpire?: string;
+
+  cancel?: CancelController;
+
+  source?: string;
+  integration?: string;
+};
 
 /**
  * Uploading files from URL.
- *
- * @param {Url} sourceUrl – Source file URL, which should be a public HTTP or HTTPS link.
- * @param {SettingsInterface} settings
- * @param {CancelHookInterface} hooks
- * @return {CancelableThenableInterface<FromUrlResponse>}
  */
 export default function fromUrl(
   sourceUrl: Url,
-  settings: SettingsInterface = {},
-  hooks?: CancelHookInterface,
-): CancelableThenableInterface<FromUrlResponse> {
-  const options = getRequestOptions(sourceUrl, settings)
-
-  return new CancelableThenable(options, hooks)
+  {
+    publicKey,
+    baseURL = "https://upload.uploadcare.com",
+    store,
+    fileName,
+    checkForUrlDuplicates,
+    saveUrlForRecurrentUploads,
+    secureSignature,
+    secureExpire,
+    source = "url",
+    cancel,
+    integration
+  }: Options
+): Promise<SuccessResponse> {
+  return request({
+    method: "POST",
+    headers: {
+      "X-UC-User-Agent": getUserAgent({ publicKey, integration })
+    },
+    url: getUrl(baseURL, "/from_url/", {
+      jsonerrors: 1,
+      pub_key: publicKey,
+      source_url: sourceUrl,
+      store: typeof store === "undefined" ? "auto" : store ? 1 : undefined,
+      filename: fileName,
+      check_URL_duplicates: checkForUrlDuplicates ? 1 : undefined,
+      save_URL_duplicates: saveUrlForRecurrentUploads ? 1 : undefined,
+      signature: secureSignature,
+      expire: secureExpire,
+      source: source
+    }),
+    cancel
+  })
+    .then(response => camelizeKeys<Response>(JSON.parse(response.data)))
+    .then(response => {
+      if ("error" in response) {
+        throw new Error(`[${response.error.statusCode}] ${response.error.content}`);
+      } else {
+        return response;
+      }
+    });
 }

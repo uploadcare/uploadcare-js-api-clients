@@ -1,54 +1,73 @@
-import {prepareOptions} from './request/prepareOptions'
+import { Uuid, GroupInfo } from "./base-types";
+import request from "./request/request.node";
+import getUrl from "./request/getUrl";
 
-/* Types */
-import {Query, RequestOptionsInterface} from './request/types'
-import {GroupInfoInterface, Uuid} from './types'
-import {SettingsInterface} from '../types'
-import {CancelableThenable} from '../thenable/CancelableThenable'
-import {CancelableThenableInterface} from '../thenable/types'
-import {CancelHookInterface} from '../lifecycle/types'
+import CancelController from "../CancelController";
+import { getUserAgent } from "../defaultSettings";
+import camelizeKeys from "../tools/camelizeKeys";
 
-const getRequestQuery = (uuids: Uuid[], settings: SettingsInterface): Query => {
-  const query = {
-    pub_key: settings.publicKey || '',
-    files: uuids,
-    callback: settings.jsonpCallback || undefined,
-    signature: settings.secureSignature || undefined,
-    expire: settings.secureExpire || undefined,
-  }
+type Options = {
+  publicKey: string;
 
-  if (settings.source) {
-    return {
-      ...query,
-      source: settings.source,
-    }
-  }
+  baseURL?: string;
+  jsonpCallback?: string;
+  secureSignature?: string;
+  secureExpire?: string;
 
-  return  {...query}
-}
+  cancel?: CancelController;
 
-const getRequestOptions = (uuids: Uuid[], settings: SettingsInterface): RequestOptionsInterface => {
-  return prepareOptions({
-    method: 'POST',
-    path: '/group/',
-    query: getRequestQuery(uuids, settings),
-  }, settings)
-}
+  source?: string; // ??
+  integration?: string;
+};
+
+type FailedResponse = {
+  error: {
+    content: string;
+    statusCode: number;
+  };
+};
+
+type Response = GroupInfo | FailedResponse;
+
 
 /**
  * Create files group.
- *
- * @param {Uuid[]} uuids – A set of files you want to join in a group.
- * @param {SettingsInterface} settings
- * @param {CancelHookInterface} hooks
- * @return {CancelableThenableInterface<GroupInfoInterface>}
  */
 export default function group(
   uuids: Uuid[],
-  settings: SettingsInterface = {},
-  hooks?: CancelHookInterface,
-): CancelableThenableInterface<GroupInfoInterface> {
-  const options = getRequestOptions(uuids, settings)
+  {
+    publicKey,
+    baseURL = "https://upload.uploadcare.com",
+    jsonpCallback,
+    secureSignature,
+    secureExpire,
+    cancel,
+    source,
+    integration
+  }: Options
+): Promise<GroupInfo> {
+  return request({
+    method: "POST",
+    headers: {
+      "X-UC-User-Agent": getUserAgent({ publicKey, integration })
+    },
+    url: getUrl(baseURL, "/group/", {
+      jsonerrors: 1,
+      pub_key: publicKey,
+      files: uuids,
+      callback: jsonpCallback,
+      signature: secureSignature,
+      expire: secureExpire,
+      source
+    }),
+    cancel,
+  })
+    .then(response => camelizeKeys<Response>(JSON.parse(response.data)))
+    .then(response => {
+      if ("error" in response) {
+        throw new Error(`[${response.error.statusCode}] ${response.error.content}`);
+      }
 
-  return new CancelableThenable(options, hooks)
+      return response;
+    });
 }

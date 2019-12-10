@@ -1,50 +1,64 @@
-import {prepareOptions} from './request/prepareOptions'
+import { GroupId, GroupInfo } from "./base-types";
+import request from "./request/request.node";
+import getUrl from "./request/getUrl";
 
-/* Types */
-import {Query, RequestOptionsInterface} from './request/types'
-import {GroupInfoInterface, GroupId} from './types'
-import {SettingsInterface} from '../types'
-import {CancelableThenable} from '../thenable/CancelableThenable'
-import {CancelableThenableInterface} from '../thenable/types'
-import {CancelHookInterface} from '../lifecycle/types'
+import CancelController from "../CancelController";
+import { getUserAgent } from "../defaultSettings";
+import camelizeKeys from "../tools/camelizeKeys";
 
-const getRequestQuery = (id: GroupId, settings: SettingsInterface): Query => {
-  const query = {
-    pub_key: settings.publicKey || '',
-    group_id: id,
-  }
+type Options = {
+  publicKey: string;
+  baseURL?: string;
 
-  if (settings.source) {
-    return {
-      ...query,
-      source: settings.source,
-    }
-  }
+  cancel?: CancelController;
 
-  return query
-}
+  source?: string;
+  integration?: string;
+};
 
-const getRequestOptions = (id: GroupId, settings: SettingsInterface): RequestOptionsInterface => {
-  return prepareOptions({
-    path: '/group/info/',
-    query: getRequestQuery(id, settings),
-  }, settings)
-}
+type FailedResponse = {
+  error: {
+    content: string;
+    statusCode: number;
+  };
+};
+
+type Response = GroupInfo | FailedResponse;
 
 /**
  * Get info about group.
- *
- * @param {GroupId} id – Group ID. Group IDs look like UUID~N.
- * @param {SettingsInterface} settings
- * @param hooks
- * @return {CancelableThenableInterface<GroupInfoInterface>}
  */
 export default function groupInfo(
   id: GroupId,
-  settings: SettingsInterface = {},
-  hooks?: CancelHookInterface,
-): CancelableThenableInterface<GroupInfoInterface> {
-  const options = getRequestOptions(id, settings)
+  {
+    publicKey,
+    baseURL = "https://upload.uploadcare.com",
+    cancel,
+    source,
+    integration
+  }: Options
+): Promise<GroupInfo> {
+  return request({
+    method: "GET",
+    headers: {
+      "X-UC-User-Agent": getUserAgent({ publicKey, integration })
+    },
+    url: getUrl(baseURL, "/group/info/", {
+      jsonerrors: 1,
+      pub_key: publicKey,
+      group_id: id,
+      source
+    }),
+    cancel
+  })
+    .then(response => camelizeKeys<Response>(JSON.parse(response.data)))
+    .then(response => {
+      if ("error" in response) {
+        throw new Error(
+          `[${response.error.statusCode}] ${response.error.content}`
+        );
+      }
 
-  return new CancelableThenable(options, hooks)
+      return response;
+    });
 }
