@@ -10,7 +10,7 @@ import CancelController from "../../CancelController";
 export type RequestOptions = {
   method?: string;
   url: string;
-  query?: any;
+  query?: string;
   data?: any;
   headers?: any;
   cancel?: CancelController;
@@ -25,7 +25,7 @@ const request = ({
   cancel,
   onProgress
 }: RequestOptions): Promise<{ data: string; headers: any; status?: number }> =>
-  Promise.resolve(data.toString() === "[object FormData]")
+  Promise.resolve(data && data.toString() === "[object FormData]")
     .then(isFormData => (isFormData ? getLength(data) : undefined))
     .then(
       length =>

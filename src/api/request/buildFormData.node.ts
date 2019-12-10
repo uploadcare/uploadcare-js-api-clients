@@ -11,7 +11,7 @@ import * as FormData from "form-data";
 
 type FileTyple = [
   "file",
-  Blob | File | NodeJS.ReadableStream | Buffer | null,
+  Blob | File | NodeJS.ReadableStream | Buffer,
   string
 ];
 type BaseType = string | number | void
