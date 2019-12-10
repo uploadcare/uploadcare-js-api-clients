@@ -39,6 +39,10 @@ export type VideoInfo = {
 }
 
 export type FileInfo = {
+  size: number;
+  done: number;
+  total: number;
+
   uuid: Uuid;
   fileId: Uuid;
   originalFilename: string;

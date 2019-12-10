@@ -8,7 +8,7 @@ import camelizeKeys from "../tools/camelizeKeys";
 
 type Url = string;
 
-enum TypeEnum {
+export enum TypeEnum {
   Token = "token",
   FileInfo = "file_info"
 }
