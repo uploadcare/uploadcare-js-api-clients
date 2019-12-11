@@ -5,7 +5,7 @@ type Query = {
   [key: string]: BaseTypes | BaseTypes[]
 }
 
-const serializePair = (key: string, value: BaseTypes) =>
+const serializePair = (key: string, value: BaseTypes): string | null =>
   typeof value !== 'undefined' ? `${key}=${encodeURIComponent(value)}` : null
 
 const createQuery = (query: Query): string =>
@@ -22,7 +22,7 @@ const createQuery = (query: Query): string =>
     .filter(x => !!x)
     .join('&')
 
-const getUrl = (base: string, path: string, query?: Query) =>
+const getUrl = (base: string, path: string, query?: Query): string =>
   [
     base,
     path,
