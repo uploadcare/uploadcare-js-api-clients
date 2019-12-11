@@ -7,6 +7,7 @@ import getUrl from "./request/getUrl";
 import CancelController from "../CancelController";
 import defaultSettings, { getUserAgent } from "../defaultSettings";
 import camelizeKeys from "../tools/camelizeKeys";
+import {createError} from '../errors/createError'
 
 type SuccessResponse = {
   file: Uuid;
@@ -81,9 +82,11 @@ export default function base(
     .then(({ data }) => camelizeKeys<Response>(JSON.parse(data)))
     .then(response => {
       if ("error" in response) {
-        throw new Error(
-          `[${response.error.statusCode}] ${response.error.content}`
-        );
+        throw createError(
+          'UploadcareError',
+          `[${response.error.statusCode}] ${response.error.content}`,
+          response.error.statusCode,
+        )
       } else {
         return response;
       }
