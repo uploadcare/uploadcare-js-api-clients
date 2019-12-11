@@ -24,13 +24,13 @@ class PollPromise<T> extends Thenable<T> implements PollPromiseInterface<T> {
           return Promise.resolve(response)
         }
 
-        throw new CancelError()
+        throw CancelError()
       }, error => {
         if (!this.canceled) {
           return Promise.reject(error)
         }
 
-        throw new CancelError()
+        throw CancelError()
       })
   }
 

@@ -64,7 +64,7 @@ describe("poll", () => {
 
     await expectAsync(
       poll({ check: job.isFinish, interval: 20, cancelController: ctrl })
-    ).toBeRejectedWith(new CancelError());
+    ).toBeRejectedWith(CancelError());
 
     expect(job.spy.condition).not.toHaveBeenCalled();
     expect(job.spy.cancel).not.toHaveBeenCalled();
@@ -78,7 +78,7 @@ describe("poll", () => {
 
     await expectAsync(
       poll({ check: job.isFinish, interval: 20, cancelController: ctrl })
-    ).toBeRejectedWith(new CancelError());
+    ).toBeRejectedWith(CancelError());
 
     let conditionCallsCount = job.spy.condition.calls.count()
     let cancelCallsCount = job.spy.cancel.calls.count()
@@ -99,7 +99,7 @@ describe("poll", () => {
 
     await expectAsync(
       poll({ check: job.isFinish, interval: 20, cancelController: ctrl })
-    ).toBeRejectedWith(new CancelError());
+    ).toBeRejectedWith(CancelError());
 
     expect(job.spy.condition).toHaveBeenCalledTimes(2);
     expect(job.spy.cancel).toHaveBeenCalledTimes(2);

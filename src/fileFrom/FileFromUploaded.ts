@@ -23,7 +23,7 @@ export class FileFromUploaded implements UploadHandlerInterface<UploadcareFileIn
 
   upload(fileUploadLifecycle: FileUploadLifecycleInterface): Promise<UploadcareFileInterface> {
     if (this.isCancelled) {
-      return Promise.reject(new CancelError())
+      return Promise.reject(CancelError())
     }
 
     const uploadLifecycle = fileUploadLifecycle.uploadLifecycle

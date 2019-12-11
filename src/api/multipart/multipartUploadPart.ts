@@ -98,7 +98,7 @@ class MultipartUploadPart extends Thenable<MultipartUploadResponse> implements B
         const {url} = options
 
         if (axios.isCancel(error)) {
-          throw new CancelError()
+          throw CancelError()
         }
 
         if (error.response) {

@@ -28,7 +28,7 @@ const poller = ({
     if (cancelController) {
       cancelController.onCancel(() => {
         timeoutId && clearTimeout(timeoutId)
-        reject(new CancelError())
+        reject(CancelError())
       })
     }
 

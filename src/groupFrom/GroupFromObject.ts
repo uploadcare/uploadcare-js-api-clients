@@ -49,7 +49,7 @@ export class GroupFromObject implements UploadHandlerInterface<UploadcareGroupIn
       })
       .then((groupInfo: GroupInfoInterface) => {
         if (this.isCancelled) {
-          return Promise.reject(new CancelError())
+          return Promise.reject(CancelError())
         }
 
         return groupUploadLifecycle.handleUploadedGroup(groupInfo, this.settings)

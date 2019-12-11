@@ -90,7 +90,7 @@ export class FileFromUrl implements UploadHandlerInterface<UploadcareFileInterfa
 
     if (isProgressResponse(response)) {
       if (this.isCancelled) {
-        return Promise.reject(new CancelError())
+        return Promise.reject(CancelError())
       }
 
       uploadLifecycle.handleUploading({
@@ -106,7 +106,7 @@ export class FileFromUrl implements UploadHandlerInterface<UploadcareFileInterfa
       const {uuid} = response
 
       if (this.isCancelled) {
-        return Promise.reject(new CancelError())
+        return Promise.reject(CancelError())
       }
 
       return lifecycle.handleUploadedFile(uuid, this.settings)

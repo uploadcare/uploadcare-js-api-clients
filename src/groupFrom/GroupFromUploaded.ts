@@ -28,7 +28,7 @@ export class GroupFromUploaded implements UploadHandlerInterface<UploadcareGroup
     return group(this.data, this.settings)
       .then((groupInfo: GroupInfoInterface) => {
         if (this.isCancelled) {
-          return Promise.reject(new CancelError())
+          return Promise.reject(CancelError())
         }
 
         return groupUploadLifecycle.handleUploadedGroup(groupInfo, this.settings)
