@@ -11,7 +11,7 @@ export enum Status {
   Waiting = 'waiting',
   Progress = 'progress',
   Error = 'error',
-  Success = 'success',
+  Success = 'success'
 }
 
 type UnknownResponse = {
@@ -58,7 +58,7 @@ type Response = StatusResponse | FailedResponse
  * UnknownResponse Type Guard.
  */
 export const isUnknownResponse = (
-  response: StatusResponse,
+  response: StatusResponse
 ): response is UnknownResponse => {
   return response.status !== undefined && response.status === Status.Unknown
 }
@@ -67,7 +67,7 @@ export const isUnknownResponse = (
  * WaitingResponse Type Guard.
  */
 export const isWaitingResponse = (
-  response: StatusResponse,
+  response: StatusResponse
 ): response is WaitingResponse => {
   return response.status !== undefined && response.status === Status.Waiting
 }
@@ -76,7 +76,7 @@ export const isWaitingResponse = (
  * UnknownResponse Type Guard.
  */
 export const isProgressResponse = (
-  response: StatusResponse,
+  response: StatusResponse
 ): response is ProgressResponse => {
   return response.status !== undefined && response.status === Status.Progress
 }
@@ -84,7 +84,9 @@ export const isProgressResponse = (
 /**
  * UnknownResponse Type Guard.
  */
-export const isErrorResponse = (response: Response): response is ErrorResponse => {
+export const isErrorResponse = (
+  response: Response
+): response is ErrorResponse => {
   return 'status' in response && response.status === Status.Error
 }
 
@@ -92,7 +94,7 @@ export const isErrorResponse = (response: Response): response is ErrorResponse =
  * SuccessResponse Type Guard.
  */
 export const isSuccessResponse = (
-  response: StatusResponse,
+  response: StatusResponse
 ): response is SuccessResponse => {
   return response.status !== undefined && response.status === Status.Success
 }
@@ -112,7 +114,12 @@ export type Options = {
  */
 export default function fromUrlStatus(
   token: Token,
-  { publicKey, baseUrl = defaultSettings.baseURL, cancel, integration }: Options = {},
+  {
+    publicKey,
+    baseUrl = defaultSettings.baseURL,
+    cancel,
+    integration
+  }: Options = {}
 ): Promise<StatusResponse> {
   return request({
     method: 'GET',
@@ -121,14 +128,16 @@ export default function fromUrlStatus(
       : undefined,
     url: getUrl(baseUrl, '/from_url/status/', {
       jsonerrors: 1,
-      token,
+      token
     }),
-    cancel,
+    cancel
   })
     .then(response => camelizeKeys<Response>(JSON.parse(response.data)))
     .then(response => {
       if ('error' in response && !isErrorResponse(response)) {
-        throw new Error(`[${response.error.statusCode}] ${response.error.content}`)
+        throw new Error(
+          `[${response.error.statusCode}] ${response.error.content}`
+        )
       }
 
       return response

@@ -1,5 +1,5 @@
-import {UploadcareFileInterface, UploadcareGroupInterface} from './types'
-import {FileInfoInterface, GroupId, GroupInfoInterface} from './api/types'
+import { UploadcareFileInterface, UploadcareGroupInterface } from './types'
+import { FileInfoInterface, GroupId, GroupInfoInterface } from './api/types'
 
 export class UploadcareGroup implements UploadcareGroupInterface {
   readonly uuid: GroupId
@@ -24,7 +24,9 @@ export class UploadcareGroup implements UploadcareGroupInterface {
     this.storedAt = group.storedAt
   }
 
-  static fromGroupInfo(groupInfo: GroupInfoInterface): UploadcareGroupInterface {
+  static fromGroupInfo(
+    groupInfo: GroupInfoInterface
+  ): UploadcareGroupInterface {
     return new UploadcareGroup({
       uuid: groupInfo.id,
       filesCount: groupInfo.files_count,
@@ -34,7 +36,7 @@ export class UploadcareGroup implements UploadcareGroupInterface {
       cdnUrl: groupInfo.cdn_url,
       files: groupInfo.files,
       createdAt: groupInfo.datetime_created,
-      storedAt: groupInfo.datetime_stored,
+      storedAt: groupInfo.datetime_stored
     })
   }
 }

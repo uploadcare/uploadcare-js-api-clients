@@ -11,7 +11,8 @@ export function camelize(text: string): string {
     .split(SEPARATOR)
     .map(
       (word, index) =>
-        word.charAt(0)[index > 0 ? 'toUpperCase' : 'toLowerCase']() + word.slice(1),
+        word.charAt(0)[index > 0 ? 'toUpperCase' : 'toLowerCase']() +
+        word.slice(1)
     )
     .join('')
 }

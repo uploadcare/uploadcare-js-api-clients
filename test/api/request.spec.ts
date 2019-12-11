@@ -1,7 +1,7 @@
 import request from '../../src/api/request/request'
-import {buildFormData} from '../../src/api/request/buildFormData'
+import { buildFormData } from '../../src/api/request/buildFormData'
 import * as factory from '../_fixtureFactory'
-import {getSettingsForTesting, sleep} from '../_helpers'
+import { getSettingsForTesting, sleep } from '../_helpers'
 import RequestWasThrottledError from '../../src/errors/RequestWasThrottledError'
 import RequestError from '../../src/errors/RequestError'
 import UploadcareError from '../../src/errors/UploadcareError'
@@ -17,8 +17,8 @@ describe('API – request', () => {
         path: '/info/',
         query: {
           pub_key: factory.publicKey('image'),
-          file_id: factory.uuid('image'),
-        },
+          file_id: factory.uuid('image')
+        }
       }
       const result = await request(options)
 
@@ -35,8 +35,8 @@ describe('API – request', () => {
         path: '/base/',
         body: {
           UPLOADCARE_PUB_KEY: factory.publicKey('demo'),
-          file: file.data,
-        },
+          file: file.data
+        }
       }
       const result = await request(options)
 
@@ -56,7 +56,7 @@ describe('API – request', () => {
         method: 'POST',
         baseURL: settings.baseURL,
         path: '/throttle/',
-        query: {pub_key: factory.publicKey('demo')},
+        query: { pub_key: factory.publicKey('demo') }
       }
       const throttle = request(options)
 
@@ -69,7 +69,7 @@ describe('API – request', () => {
       const options = {
         baseURL: settings.baseURL,
         path: '/info/',
-        query: {pub_key: factory.publicKey('image')},
+        query: { pub_key: factory.publicKey('image') }
       }
       const upload = request(options)
 
@@ -99,8 +99,8 @@ describe('API – request', () => {
         path: '/info/',
         query: {
           pub_key: factory.publicKey('image'),
-          file_id: factory.uuid('image'),
-        },
+          file_id: factory.uuid('image')
+        }
       }
       const upload = request(options)
 
@@ -119,28 +119,32 @@ describe('API – request', () => {
         method: 'POST',
         baseURL: settings.baseURL,
         path: '/throttle/',
-        query: {pub_key: factory.publicKey('demo')},
-        retryThrottledMaxTimes: 0,
+        query: { pub_key: factory.publicKey('demo') },
+        retryThrottledMaxTimes: 0
       }
 
       const errorRequest = {
         headers: {
-          "accept": "application/json, text/plain, */*",
-          "content-type": "application/x-www-form-urlencoded",
-          "x-uc-user-agent": "UploadcareUploadClient/1.0.0-alpha.4 (JavaScript)",
-          "user-agent": "axios/0.19.0",
-          "host": "localhost:3000",
-          "connection": "close",
-          "content-length": "0"
+          accept: 'application/json, text/plain, */*',
+          'content-type': 'application/x-www-form-urlencoded',
+          'x-uc-user-agent':
+            'UploadcareUploadClient/1.0.0-alpha.4 (JavaScript)',
+          'user-agent': 'axios/0.19.0',
+          host: 'localhost:3000',
+          connection: 'close',
+          'content-length': '0'
         },
-        url: 'http://localhost:3000/throttle',
+        url: 'http://localhost:3000/throttle'
       }
       const errorResponse = {
         status: 429,
-        statusText: 'Request was throttled.',
+        statusText: 'Request was throttled.'
       }
       const requestError = new RequestError(errorRequest, errorResponse)
-      const error = new RequestWasThrottledError(requestError, options.retryThrottledMaxTimes)
+      const error = new RequestWasThrottledError(
+        requestError,
+        options.retryThrottledMaxTimes
+      )
 
       await expectAsync(request(options)).toBeRejectedWith(error)
     })

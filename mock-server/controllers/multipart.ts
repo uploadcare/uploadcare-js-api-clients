@@ -7,7 +7,7 @@ import error from '../utils/error'
  * '/multipart/start/'
  * @param {object} ctx
  */
-const start = (ctx) => {
+const start = ctx => {
   if (ctx.request.body && !ctx.request.body.filename) {
     return error(ctx, {
       statusText: 'The "filename" parameter is missing.'
@@ -20,9 +20,14 @@ const start = (ctx) => {
     })
   }
 
-  if (ctx.request.body && ctx.request.body.size && ctx.request.body.size < 10485760) {
+  if (
+    ctx.request.body &&
+    ctx.request.body.size &&
+    ctx.request.body.size < 10485760
+  ) {
     return error(ctx, {
-      statusText: 'File size should not be less than 10485760 bytes. Please use direct uploads instead.'
+      statusText:
+        'File size should not be less than 10485760 bytes. Please use direct uploads instead.'
     })
   }
 
@@ -32,33 +37,29 @@ const start = (ctx) => {
     })
   }
 
-  return ctx.body = find(multipartJson, 'start')
+  return (ctx.body = find(multipartJson, 'start'))
 }
 
 /**
  * '/multipart/upload/'
  * @param {object} ctx
  */
-const upload = (ctx) => {
-  return ctx.status = 200
+const upload = ctx => {
+  return (ctx.status = 200)
 }
 
 /**
  * '/multipart/complete/'
  * @param {object} ctx
  */
-const complete = (ctx) => {
+const complete = ctx => {
   if (ctx.request.body && !ctx.request.body.uuid) {
     return error(ctx, {
       statusText: 'The "uuid" parameter is missing.'
     })
   }
 
-  return ctx.body = find(infoJson, 'info')
+  return (ctx.body = find(infoJson, 'info'))
 }
 
-export {
-  start,
-  upload,
-  complete,
-}
+export { start, upload, complete }

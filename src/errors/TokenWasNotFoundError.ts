@@ -1,4 +1,4 @@
-import {Uuid} from '..'
+import { Uuid } from '..'
 
 export default class TokenWasNotFoundError extends Error {
   constructor(token: Uuid) {
@@ -11,9 +11,8 @@ export default class TokenWasNotFoundError extends Error {
 
     if (Error.captureStackTrace) {
       Error.captureStackTrace(this, TokenWasNotFoundError)
-    }
-    else {
-      this.stack = (new Error()).stack
+    } else {
+      this.stack = new Error().stack
     }
   }
 }

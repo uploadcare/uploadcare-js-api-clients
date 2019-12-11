@@ -1,12 +1,13 @@
-import {Thenable} from './Thenable'
+import { Thenable } from './Thenable'
 import request from '../api/request/request'
 
 /* Types */
-import {CancelableThenableInterface} from './types'
-import {RequestInterface, RequestOptionsInterface} from '../api/request/types'
-import {CancelHookInterface} from '../lifecycle/types'
+import { CancelableThenableInterface } from './types'
+import { RequestInterface, RequestOptionsInterface } from '../api/request/types'
+import { CancelHookInterface } from '../lifecycle/types'
 
-export class CancelableThenable<T> extends Thenable<T> implements CancelableThenableInterface<T> {
+export class CancelableThenable<T> extends Thenable<T>
+  implements CancelableThenableInterface<T> {
   protected readonly promise: Promise<T>
   private readonly request: RequestInterface
 
@@ -17,7 +18,11 @@ export class CancelableThenable<T> extends Thenable<T> implements CancelableThen
     this.promise = this.request
       .then(response => Promise.resolve(response.data))
       .catch(error => {
-        if (error.name === 'CancelError' && hooks && typeof hooks.onCancel === 'function') {
+        if (
+          error.name === 'CancelError' &&
+          hooks &&
+          typeof hooks.onCancel === 'function'
+        ) {
           hooks.onCancel()
         }
 

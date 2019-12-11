@@ -1,14 +1,14 @@
-import {Uuid} from '../types'
+import { Uuid } from '../types'
 
 export type MultipartPart = string
 
 export type MultipartStartResponse = {
-  parts: MultipartPart[];
-  uuid: Uuid;
+  parts: MultipartPart[]
+  uuid: Uuid
 }
 
 export type MultipartUploadResponse = {
-  code: number;
+  code: number
 }
 
 export type ChunkType = [number, number]

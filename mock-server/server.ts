@@ -13,10 +13,10 @@ import logger from './middleware/logger'
 import auth from './middleware/auth'
 
 // Config
-import {PORT} from './config'
+import { PORT } from './config'
 
 // Routes
-import {ROUTES, RouteType} from './routes'
+import { ROUTES, RouteType } from './routes'
 
 const app = new Koa()
 const router = new Router()
@@ -25,11 +25,13 @@ const router = new Router()
 app.use(cors())
 app.use(addTrailingSlashes())
 app.use(logger)
-app.use(koaBody({
-  multipart: true,
-  formLimit: 50 * 1024 * 1024,
-  textLimit: 50 * 1024 * 1024,
-}))
+app.use(
+  koaBody({
+    multipart: true,
+    formLimit: 50 * 1024 * 1024,
+    textLimit: 50 * 1024 * 1024
+  })
+)
 app.use(auth)
 
 // Routes
@@ -48,11 +50,16 @@ app.on('error', (err, ctx) => {
   console.error(`💔 ${chalk.red('Server error')}:`)
   console.error(err)
   console.error(ctx)
-});
+})
 
 // Listen server
 app.listen(PORT, () => {
-  console.log(`🚀 ${chalk.bold('Server started at')} ${chalk.green(chalk.bold(`http://localhost:${PORT}`))}`, '\n')
+  console.log(
+    `🚀 ${chalk.bold('Server started at')} ${chalk.green(
+      chalk.bold(`http://localhost:${PORT}`)
+    )}`,
+    '\n'
+  )
   console.log('Available routes:', '\n')
 
   // Print all available routes
@@ -64,7 +71,11 @@ app.listen(PORT, () => {
     const description = routePath.description || path
     const isFake = routePath.isFake || false
 
-    console.log(`  ${chalk.bold(method)}: '${isFake ? chalk.gray(description) : chalk.green(description)}'`)
+    console.log(
+      `  ${chalk.bold(method)}: '${
+        isFake ? chalk.gray(description) : chalk.green(description)
+      }'`
+    )
   })
   console.log()
 })

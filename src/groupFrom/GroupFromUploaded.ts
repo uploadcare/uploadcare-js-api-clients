@@ -2,12 +2,20 @@ import group from '../api/group'
 import CancelError from '../errors/CancelError'
 
 /* Types */
-import {GroupUploadLifecycleInterface, UploadHandlerInterface} from '../lifecycle/types'
-import {SettingsInterface, UploadcareGroupInterface} from '../types'
-import {Uuid} from '..'
-import {GroupInfoInterface} from '../api/types'
+import {
+  GroupUploadLifecycleInterface,
+  UploadHandlerInterface
+} from '../lifecycle/types'
+import { SettingsInterface, UploadcareGroupInterface } from '../types'
+import { Uuid } from '..'
+import { GroupInfoInterface } from '../api/types'
 
-export class GroupFromUploaded implements UploadHandlerInterface<UploadcareGroupInterface, GroupUploadLifecycleInterface> {
+export class GroupFromUploaded
+  implements
+    UploadHandlerInterface<
+      UploadcareGroupInterface,
+      GroupUploadLifecycleInterface
+    > {
   private isCancelled = false
 
   private readonly data: Uuid[]
@@ -17,11 +25,13 @@ export class GroupFromUploaded implements UploadHandlerInterface<UploadcareGroup
     this.data = data
     this.settings = {
       ...settings,
-      source: 'uploaded',
+      source: 'uploaded'
     }
   }
 
-  upload(groupUploadLifecycle: GroupUploadLifecycleInterface): Promise<UploadcareGroupInterface> {
+  upload(
+    groupUploadLifecycle: GroupUploadLifecycleInterface
+  ): Promise<UploadcareGroupInterface> {
     const uploadLifecycle = groupUploadLifecycle.uploadLifecycle
     uploadLifecycle.handleUploading()
 
@@ -31,7 +41,10 @@ export class GroupFromUploaded implements UploadHandlerInterface<UploadcareGroup
           return Promise.reject(new CancelError())
         }
 
-        return groupUploadLifecycle.handleUploadedGroup(groupInfo, this.settings)
+        return groupUploadLifecycle.handleUploadedGroup(
+          groupInfo,
+          this.settings
+        )
       })
       .then(uploadLifecycle.handleReady.bind(uploadLifecycle))
       .catch(uploadLifecycle.handleError.bind(uploadLifecycle))

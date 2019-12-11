@@ -25,12 +25,12 @@ export {
   UploadcareFileInterface,
   UploadClientInterface
 } from './types'
-export {Url} from './api/fromUrl'
-export {Uuid, UploadAPIInterface} from './api/types'
-export {RequestOptionsInterface, RequestInterface} from './api/request/types'
+export { Url } from './api/fromUrl'
+export { Uuid, UploadAPIInterface } from './api/types'
+export { RequestOptionsInterface, RequestInterface } from './api/request/types'
 
 /* Low-Level API */
-export {request}
+export { request }
 
 /* Middle-Level API */
 export {
@@ -42,14 +42,10 @@ export {
   info,
   multipartStart,
   multipartUpload,
-  multipartComplete,
+  multipartComplete
 }
 
 /* High-Level API */
-export {
-  multipart,
-  fileFrom,
-  groupFrom,
-}
+export { multipart, fileFrom, groupFrom }
 
 export default UploadClient

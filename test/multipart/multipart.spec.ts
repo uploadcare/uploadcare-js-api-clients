@@ -1,16 +1,16 @@
 import * as factory from '../_fixtureFactory'
-import {getSettingsForTesting} from '../_helpers'
+import { getSettingsForTesting } from '../_helpers'
 import multipart from '../../src/multipart/multipart'
 import CancelError from '../../src/errors/CancelError'
 
 describe('API - multipart', () => {
   const fileToUpload = factory.file(11).data
   const settings = getSettingsForTesting({
-    publicKey: factory.publicKey('multipart'),
+    publicKey: factory.publicKey('multipart')
   })
 
   it('should be able to upload multipart file', async () => {
-    const {uuid} = await multipart(fileToUpload, settings)
+    const { uuid } = await multipart(fileToUpload, settings)
 
     expect(uuid).toBeTruthy()
   }, 250000)
@@ -25,7 +25,7 @@ describe('API - multipart', () => {
 
   it('should be able to handle cancel uploading', async () => {
     const onCancel = jasmine.createSpy('onCancel')
-    const upload = multipart(fileToUpload, settings, {onCancel})
+    const upload = multipart(fileToUpload, settings, { onCancel })
 
     upload.cancel()
 
@@ -36,10 +36,10 @@ describe('API - multipart', () => {
 
   it('should be able to handle progress', async () => {
     let progressValue = 0
-    const onProgress = (progressEvent) => {
+    const onProgress = progressEvent => {
       progressValue = Math.round(progressEvent.loaded / progressEvent.total)
     }
-    const upload = multipart(fileToUpload, settings, {onProgress})
+    const upload = multipart(fileToUpload, settings, { onProgress })
 
     await upload
 

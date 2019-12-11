@@ -2,7 +2,9 @@ import CancelError from '../../src/errors/CancelError'
 import TimeoutError from '../../src/errors/TimeoutError'
 import CancelController from '../CancelController'
 
-type CheckFunction = (cancel: CancelController | undefined) => Promise<boolean> | boolean
+type CheckFunction = (
+  cancel: CancelController | undefined
+) => Promise<boolean> | boolean
 
 const DEFAULT_TIMEOUT = 10000
 const DEFAULT_INTERVAL = 500
@@ -11,7 +13,7 @@ const poller = ({
   check,
   timeout = DEFAULT_TIMEOUT,
   interval = DEFAULT_INTERVAL,
-  cancelController,
+  cancelController
 }: {
   check: CheckFunction
   timeout?: number

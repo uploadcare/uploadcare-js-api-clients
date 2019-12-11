@@ -1,15 +1,17 @@
-import {Thenable} from '../thenable/Thenable'
+import { Thenable } from '../thenable/Thenable'
 import TimeoutError from '../errors/TimeoutError'
 import CancelError from '../errors/CancelError'
-import {CancelableInterface} from '../lifecycle/types'
+import { CancelableInterface } from '../lifecycle/types'
 
 export const DEFAULT_TIMEOUT = 10000
 const DEFAULT_INTERVAL = 500
 
-export interface PollPromiseInterface<T> extends Promise<T>, CancelableInterface {}
+export interface PollPromiseInterface<T>
+  extends Promise<T>,
+    CancelableInterface {}
 
 type ExecutorFunction = {
-  (resolve: Function, reject: Function): void;
+  (resolve: Function, reject: Function): void
 }
 
 class PollPromise<T> extends Thenable<T> implements PollPromiseInterface<T> {
@@ -18,20 +20,22 @@ class PollPromise<T> extends Thenable<T> implements PollPromiseInterface<T> {
 
   constructor(executor: ExecutorFunction) {
     super()
-    this.promise = new Promise<T>(executor)
-      .then(response => {
+    this.promise = new Promise<T>(executor).then(
+      response => {
         if (!this.canceled) {
           return Promise.resolve(response)
         }
 
         throw new CancelError()
-      }, error => {
+      },
+      error => {
         if (!this.canceled) {
           return Promise.reject(error)
         }
 
         throw new CancelError()
-      })
+      }
+    )
   }
 
   cancel() {
@@ -46,7 +50,11 @@ class PollPromise<T> extends Thenable<T> implements PollPromiseInterface<T> {
  * @param {number} interval
  * @return {PollPromiseInterface}
  */
-export default function poll<T>(checkConditionFunction: Function, timeout: number = DEFAULT_TIMEOUT, interval: number = DEFAULT_INTERVAL): PollPromiseInterface<T> {
+export default function poll<T>(
+  checkConditionFunction: Function,
+  timeout: number = DEFAULT_TIMEOUT,
+  interval: number = DEFAULT_INTERVAL
+): PollPromiseInterface<T> {
   const startTime = Number(new Date())
   const endTime = startTime + timeout
 

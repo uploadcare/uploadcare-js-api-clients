@@ -3,12 +3,25 @@ import group from '../api/group'
 import CancelError from '../errors/CancelError'
 
 /* Types */
-import {SettingsInterface, UploadcareFileInterface, UploadcareGroupInterface} from '../types'
-import {Url} from '..'
-import {GroupUploadLifecycleInterface, UploadHandlerInterface, UploadInterface} from '../lifecycle/types'
-import {GroupInfoInterface} from '../api/types'
+import {
+  SettingsInterface,
+  UploadcareFileInterface,
+  UploadcareGroupInterface
+} from '../types'
+import { Url } from '..'
+import {
+  GroupUploadLifecycleInterface,
+  UploadHandlerInterface,
+  UploadInterface
+} from '../lifecycle/types'
+import { GroupInfoInterface } from '../api/types'
 
-export class GroupFromUrl implements UploadHandlerInterface<UploadcareGroupInterface, GroupUploadLifecycleInterface> {
+export class GroupFromUrl
+  implements
+    UploadHandlerInterface<
+      UploadcareGroupInterface,
+      GroupUploadLifecycleInterface
+    > {
   private isCancelled = false
 
   private readonly data: Url[]
@@ -19,22 +32,27 @@ export class GroupFromUrl implements UploadHandlerInterface<UploadcareGroupInter
     this.settings = settings
   }
 
-  upload(groupUploadLifecycle: GroupUploadLifecycleInterface): Promise<UploadcareGroupInterface> {
+  upload(
+    groupUploadLifecycle: GroupUploadLifecycleInterface
+  ): Promise<UploadcareGroupInterface> {
     const uploadLifecycle = groupUploadLifecycle.uploadLifecycle
     uploadLifecycle.handleUploading()
 
     const filesTotalCount = this.data.length
-    const uploadFile = (file: Url, index: number): UploadInterface<UploadcareFileInterface> => {
+    const uploadFile = (
+      file: Url,
+      index: number
+    ): UploadInterface<UploadcareFileInterface> => {
       const fileNumber = index + 1
       const onCancel = uploadLifecycle.handleCancelling.bind(uploadLifecycle)
-      const onProgress = ((): void => {
+      const onProgress = (): void => {
         uploadLifecycle.handleUploading({
           total: filesTotalCount,
           loaded: fileNumber
         })
-      })
+      }
 
-      return fileFrom(file, this.settings, {onProgress, onCancel})
+      return fileFrom(file, this.settings, { onProgress, onCancel })
     }
     const files = this.data.map(uploadFile)
 
@@ -49,7 +67,10 @@ export class GroupFromUrl implements UploadHandlerInterface<UploadcareGroupInter
           return Promise.reject(new CancelError())
         }
 
-        return groupUploadLifecycle.handleUploadedGroup(groupInfo, this.settings)
+        return groupUploadLifecycle.handleUploadedGroup(
+          groupInfo,
+          this.settings
+        )
       })
       .then(uploadLifecycle.handleReady.bind(uploadLifecycle))
       .catch(uploadLifecycle.handleError.bind(uploadLifecycle))

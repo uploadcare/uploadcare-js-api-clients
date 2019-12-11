@@ -1,12 +1,12 @@
 import * as factory from '../_fixtureFactory'
 import fileFrom from '../../src/fileFrom/fileFrom'
-import {getSettingsForTesting} from '../_helpers'
+import { getSettingsForTesting } from '../_helpers'
 import CancelError from '../../src/errors/CancelError'
 
 describe('fileFrom Object (multipart)', () => {
   const fileToUpload = factory.file(12).data
   const settings = getSettingsForTesting({
-    publicKey: factory.publicKey('multipart'),
+    publicKey: factory.publicKey('multipart')
   })
 
   it('should resolves when file is ready on CDN', async () => {
@@ -18,7 +18,7 @@ describe('fileFrom Object (multipart)', () => {
   it('should accept doNotStore setting', async () => {
     const settings = getSettingsForTesting({
       publicKey: factory.publicKey('image'),
-      doNotStore: true,
+      doNotStore: true
     })
     const file = await fileFrom(fileToUpload, settings)
 
@@ -37,7 +37,7 @@ describe('fileFrom Object (multipart)', () => {
     const settings = getSettingsForTesting({
       publicKey: factory.publicKey('image'),
       doNotStore: true,
-      fileName: 'newFileName.jpg',
+      fileName: 'newFileName.jpg'
     })
     const file = await fileFrom(fileToUpload, settings)
 
@@ -47,7 +47,7 @@ describe('fileFrom Object (multipart)', () => {
   describe('should be able to handle', () => {
     it('cancel uploading', async () => {
       const onCancel = jasmine.createSpy('onCancel')
-      const upload = fileFrom(fileToUpload, settings, {onCancel})
+      const upload = fileFrom(fileToUpload, settings, { onCancel })
 
       upload.cancel()
 
@@ -58,12 +58,12 @@ describe('fileFrom Object (multipart)', () => {
 
     it('progress', async () => {
       let progressValue = 0
-      const onProgress = (progress) => {
-        const {value} = progress
+      const onProgress = progress => {
+        const { value } = progress
 
         progressValue = value
       }
-      const upload = fileFrom(fileToUpload, settings, {onProgress})
+      const upload = fileFrom(fileToUpload, settings, { onProgress })
 
       await upload
 
@@ -72,7 +72,7 @@ describe('fileFrom Object (multipart)', () => {
 
     it('uploaded', async () => {
       const onUploaded = jasmine.createSpy('onUploaded')
-      const upload = fileFrom(fileToUpload, settings, {onUploaded})
+      const upload = fileFrom(fileToUpload, settings, { onUploaded })
 
       await (expectAsync(upload) as any).toBeResolved()
 
@@ -81,7 +81,7 @@ describe('fileFrom Object (multipart)', () => {
 
     it('ready', async () => {
       const onReady = jasmine.createSpy('onReady')
-      const upload = fileFrom(fileToUpload, settings, {onReady})
+      const upload = fileFrom(fileToUpload, settings, { onReady })
 
       await (expectAsync(upload) as any).toBeResolved()
 

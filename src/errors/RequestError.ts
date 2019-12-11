@@ -1,10 +1,13 @@
-import {ErrorRequestInfoInterface, ErrorResponseInfoInterface} from './types'
+import { ErrorRequestInfoInterface, ErrorResponseInfoInterface } from './types'
 
 export default class RequestError extends Error {
   readonly request: ErrorRequestInfoInterface
   readonly response: ErrorResponseInfoInterface
 
-  constructor(request: ErrorRequestInfoInterface, response: ErrorResponseInfoInterface) {
+  constructor(
+    request: ErrorRequestInfoInterface,
+    response: ErrorResponseInfoInterface
+  ) {
     super()
 
     this.name = 'RequestError'
@@ -16,9 +19,8 @@ export default class RequestError extends Error {
 
     if (Error.captureStackTrace) {
       Error.captureStackTrace(this, RequestError)
-    }
-    else {
-      this.stack = (new Error()).stack
+    } else {
+      this.stack = new Error().stack
     }
   }
 }

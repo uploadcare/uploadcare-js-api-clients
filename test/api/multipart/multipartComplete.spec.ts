@@ -1,6 +1,6 @@
 import multipartComplete from '../../../src/api/multipart/multipartComplete'
 import * as factory from '../../_fixtureFactory'
-import {getSettingsForTesting} from '../../_helpers'
+import { getSettingsForTesting } from '../../_helpers'
 import multipartStart from '../../../src/api/multipart/multipartStart'
 import multipartUpload from '../../../src/api/multipart/multipartUpload'
 import UploadcareError from '../../../src/errors/UploadcareError'
@@ -9,24 +9,24 @@ import CancelError from '../../../src/errors/CancelError'
 describe('API - multipartComplete', () => {
   const fileToUpload = factory.file(12).data
   const settings = getSettingsForTesting({
-    publicKey: factory.publicKey('multipart'),
+    publicKey: factory.publicKey('multipart')
   })
 
   it('should be able to complete upload data', async () => {
     const multipartStartUpload = multipartStart(fileToUpload, settings)
-    const {uuid: completedUuid, parts} = await multipartStartUpload
+    const { uuid: completedUuid, parts } = await multipartStartUpload
 
     await multipartUpload(fileToUpload, parts, settings)
 
     const upload = multipartComplete(completedUuid, settings)
-    const {uuid} = await upload
+    const { uuid } = await upload
 
     expect(uuid).toBeTruthy()
   }, 250000)
 
   it('should be able to cancel uploading', async () => {
     const multipartStartUpload = multipartStart(fileToUpload, settings)
-    const {uuid: completedUuid, parts} = await multipartStartUpload
+    const { uuid: completedUuid, parts } = await multipartStartUpload
 
     await multipartUpload(fileToUpload, parts, settings)
 
@@ -39,12 +39,12 @@ describe('API - multipartComplete', () => {
 
   it('should be able to handle cancel uploading', async () => {
     const multipartStartUpload = multipartStart(fileToUpload, settings)
-    const {uuid: completedUuid, parts} = await multipartStartUpload
+    const { uuid: completedUuid, parts } = await multipartStartUpload
 
     await multipartUpload(fileToUpload, parts, settings)
 
     const onCancel = jasmine.createSpy('onCancel')
-    const upload = multipartComplete(completedUuid, settings, {onCancel})
+    const upload = multipartComplete(completedUuid, settings, { onCancel })
 
     upload.cancel()
 

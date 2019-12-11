@@ -9,9 +9,8 @@ export default class CancelError extends Error {
 
     if (Error.captureStackTrace) {
       Error.captureStackTrace(this, CancelError)
-    }
-    else {
-      this.stack = (new Error()).stack
+    } else {
+      this.stack = new Error().stack
     }
   }
 }

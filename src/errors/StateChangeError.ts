@@ -1,4 +1,4 @@
-import {ProgressStateEnum} from '../types'
+import { ProgressStateEnum } from '../types'
 
 export default class StateChangeError extends Error {
   constructor(fromState: ProgressStateEnum, toState: ProgressStateEnum) {
@@ -11,9 +11,8 @@ export default class StateChangeError extends Error {
 
     if (Error.captureStackTrace) {
       Error.captureStackTrace(this, StateChangeError)
-    }
-    else {
-      this.stack = (new Error()).stack
+    } else {
+      this.stack = new Error().stack
     }
   }
 }

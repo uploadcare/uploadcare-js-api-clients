@@ -1,16 +1,17 @@
-import {AbstractState} from './AbstractState'
-import {LifecycleStateInterface} from '../types'
-import {ProgressStateEnum, UploadingProgress} from '../../types'
+import { AbstractState } from './AbstractState'
+import { LifecycleStateInterface } from '../types'
+import { ProgressStateEnum, UploadingProgress } from '../../types'
 
-export class UploadedState extends AbstractState implements LifecycleStateInterface {
+export class UploadedState extends AbstractState
+  implements LifecycleStateInterface {
   readonly progress: UploadingProgress = {
     state: ProgressStateEnum.Uploaded,
     uploaded: null,
-    value: 0.99,
+    value: 0.99
   }
   protected nextPossibleState: ProgressStateEnum[] = [
     ProgressStateEnum.Ready,
     ProgressStateEnum.Cancelled,
-    ProgressStateEnum.Error,
+    ProgressStateEnum.Error
   ]
 }

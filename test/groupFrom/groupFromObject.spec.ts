@@ -1,17 +1,17 @@
 import * as factory from '../_fixtureFactory'
 import groupFrom from '../../src/groupFrom/groupFrom'
-import {getSettingsForTesting} from '../_helpers'
+import { getSettingsForTesting } from '../_helpers'
 import CancelError from '../../src/errors/CancelError'
 
 describe('groupFrom Object[]', () => {
   const fileToUpload = factory.image('blackSquare').data
   const files = [fileToUpload]
   const settings = getSettingsForTesting({
-    publicKey: factory.publicKey('image'),
+    publicKey: factory.publicKey('image')
   })
 
   it('should resolves when file is ready on CDN', async () => {
-    const {cdnUrl} = await groupFrom(files, settings)
+    const { cdnUrl } = await groupFrom(files, settings)
 
     expect(cdnUrl).toBeTruthy()
   })
@@ -19,7 +19,7 @@ describe('groupFrom Object[]', () => {
   it('should accept doNotStore setting', async () => {
     const settings = getSettingsForTesting({
       publicKey: factory.publicKey('image'),
-      doNotStore: true,
+      doNotStore: true
     })
     const upload = groupFrom(files, settings)
     const group = await upload
@@ -49,8 +49,8 @@ describe('groupFrom Object[]', () => {
 
     it('progress', async () => {
       let progressValue = 0
-      const onProgress = (progress) => {
-        const {value} = progress
+      const onProgress = progress => {
+        const { value } = progress
 
         progressValue = value
       }
@@ -63,7 +63,7 @@ describe('groupFrom Object[]', () => {
 
     it('uploaded', async () => {
       const onUploaded = jasmine.createSpy('onUploaded')
-      const upload = groupFrom(files, settings, {onUploaded})
+      const upload = groupFrom(files, settings, { onUploaded })
 
       await (expectAsync(upload) as any).toBeResolved()
 
@@ -72,7 +72,7 @@ describe('groupFrom Object[]', () => {
 
     it('ready', async () => {
       const onReady = jasmine.createSpy('onReady')
-      const upload = groupFrom(files, settings, {onReady})
+      const upload = groupFrom(files, settings, { onReady })
 
       await (expectAsync(upload) as any).toBeResolved()
 

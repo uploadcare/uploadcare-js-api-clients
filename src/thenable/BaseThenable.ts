@@ -1,12 +1,13 @@
-import {Thenable} from './Thenable'
+import { Thenable } from './Thenable'
 import request from '../api/request/request'
 
 /* Types */
-import {BaseThenableInterface} from './types'
-import {RequestInterface, RequestOptionsInterface} from '../api/request/types'
-import {BaseHooksInterface} from '../lifecycle/types'
+import { BaseThenableInterface } from './types'
+import { RequestInterface, RequestOptionsInterface } from '../api/request/types'
+import { BaseHooksInterface } from '../lifecycle/types'
 
-export class BaseThenable<T> extends Thenable<T> implements BaseThenableInterface<T> {
+export class BaseThenable<T> extends Thenable<T>
+  implements BaseThenableInterface<T> {
   protected readonly promise: Promise<T>
   private readonly request: RequestInterface
 
@@ -19,12 +20,16 @@ export class BaseThenable<T> extends Thenable<T> implements BaseThenableInterfac
         if (hooks && typeof hooks.onProgress === 'function') {
           hooks.onProgress(progressEvent)
         }
-      },
+      }
     })
     this.promise = this.request
       .then(response => Promise.resolve(response.data))
       .catch(error => {
-        if (hooks && error.name === 'CancelError' && typeof hooks.onCancel === 'function') {
+        if (
+          hooks &&
+          error.name === 'CancelError' &&
+          typeof hooks.onCancel === 'function'
+        ) {
           hooks.onCancel()
         }
 

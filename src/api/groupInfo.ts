@@ -30,25 +30,33 @@ type Response = GroupInfo | FailedResponse
  */
 export default function groupInfo(
   id: GroupId,
-  { publicKey, baseURL = defaultSettings.baseURL, cancel, source, integration }: Options,
+  {
+    publicKey,
+    baseURL = defaultSettings.baseURL,
+    cancel,
+    source,
+    integration
+  }: Options
 ): Promise<GroupInfo> {
   return request({
     method: 'GET',
     headers: {
-      'X-UC-User-Agent': getUserAgent({ publicKey, integration }),
+      'X-UC-User-Agent': getUserAgent({ publicKey, integration })
     },
     url: getUrl(baseURL, '/group/info/', {
       jsonerrors: 1,
       pub_key: publicKey,
       group_id: id,
-      source,
+      source
     }),
-    cancel,
+    cancel
   })
     .then(response => camelizeKeys<Response>(JSON.parse(response.data)))
     .then(response => {
       if ('error' in response) {
-        throw new Error(`[${response.error.statusCode}] ${response.error.content}`)
+        throw new Error(
+          `[${response.error.statusCode}] ${response.error.content}`
+        )
       }
 
       return response

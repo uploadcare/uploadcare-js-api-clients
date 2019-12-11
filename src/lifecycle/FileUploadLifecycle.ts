@@ -1,22 +1,27 @@
 import checkFileIsReady from '../checkFileIsReady'
-import {UploadcareFile} from '../UploadcareFile'
+import { UploadcareFile } from '../UploadcareFile'
 
 /* Types */
-import {FileUploadLifecycleInterface, LifecycleInterface} from './types'
-import {SettingsInterface, UploadcareFileInterface} from '../types'
-import {Uuid} from '..'
-import {PollPromiseInterface} from '../tools/poll'
-import {FileInfoInterface} from '../api/types'
+import { FileUploadLifecycleInterface, LifecycleInterface } from './types'
+import { SettingsInterface, UploadcareFileInterface } from '../types'
+import { Uuid } from '..'
+import { PollPromiseInterface } from '../tools/poll'
+import { FileInfoInterface } from '../api/types'
 
 export class FileUploadLifecycle implements FileUploadLifecycleInterface {
   readonly uploadLifecycle: LifecycleInterface<UploadcareFileInterface>
-  private isFileReadyPolling: PollPromiseInterface<FileInfoInterface> | null = null
+  private isFileReadyPolling: PollPromiseInterface<
+    FileInfoInterface
+  > | null = null
 
   constructor(lifecycle: LifecycleInterface<UploadcareFileInterface>) {
     this.uploadLifecycle = lifecycle
   }
 
-  handleUploadedFile(uuid: Uuid, settings: SettingsInterface): Promise<UploadcareFileInterface> {
+  handleUploadedFile(
+    uuid: Uuid,
+    settings: SettingsInterface
+  ): Promise<UploadcareFileInterface> {
     const file = UploadcareFile.fromUuid(uuid)
     const uploadLifecycle = this.uploadLifecycle
 
@@ -25,7 +30,7 @@ export class FileUploadLifecycle implements FileUploadLifecycleInterface {
 
     this.isFileReadyPolling = checkFileIsReady({
       uuid,
-      settings,
+      settings
     })
 
     return this.isFileReadyPolling
@@ -38,7 +43,9 @@ export class FileUploadLifecycle implements FileUploadLifecycleInterface {
       .catch(uploadLifecycle.handleError.bind(uploadLifecycle))
   }
 
-  getIsFileReadyPolling = (): PollPromiseInterface<FileInfoInterface> | null => {
+  getIsFileReadyPolling = (): PollPromiseInterface<
+    FileInfoInterface
+  > | null => {
     return this.isFileReadyPolling
   }
 }

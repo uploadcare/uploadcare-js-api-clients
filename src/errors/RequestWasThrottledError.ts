@@ -1,4 +1,4 @@
-import {ErrorRequestInfoInterface, ErrorResponseInfoInterface} from './types'
+import { ErrorRequestInfoInterface, ErrorResponseInfoInterface } from './types'
 import RequestError from './RequestError'
 
 export default class RequestWasThrottledError extends Error {
@@ -17,9 +17,8 @@ export default class RequestWasThrottledError extends Error {
 
     if (Error.captureStackTrace) {
       Error.captureStackTrace(this, RequestWasThrottledError)
-    }
-    else {
-      this.stack = (new Error()).stack
+    } else {
+      this.stack = new Error().stack
     }
   }
 }

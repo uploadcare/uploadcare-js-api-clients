@@ -9,9 +9,8 @@ export default class TimeoutError extends Error {
 
     if (Error.captureStackTrace) {
       Error.captureStackTrace(this, TimeoutError)
-    }
-    else {
-      this.stack = (new Error()).stack
+    } else {
+      this.stack = new Error().stack
     }
   }
 }

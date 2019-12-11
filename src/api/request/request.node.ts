@@ -41,7 +41,7 @@ class ProgressEmitter extends Transform {
     this._position += chunk.length
     this._onprogress({
       lengthComputable: true,
-      loaded: this._position,
+      loaded: this._position
     })
     callback(null, chunk)
   }
@@ -61,7 +61,7 @@ const request = ({
   data,
   headers = {},
   cancel,
-  onProgress,
+  onProgress
 }: RequestOptions): Promise<BaseResponse> =>
   Promise.resolve(data && data.toString() === '[object FormData]')
     .then(isFormData => (isFormData ? getLength(data) : undefined))
@@ -82,7 +82,9 @@ const request = ({
           }
 
           const req =
-            options.protocol !== 'https:' ? http.request(options) : https.request(options)
+            options.protocol !== 'https:'
+              ? http.request(options)
+              : https.request(options)
 
           if (cancel) {
             cancel.onCancel(() => {
@@ -106,8 +108,8 @@ const request = ({
               resolve({
                 data: Buffer.concat(resChunks).toString('utf8'),
                 status: res.statusCode,
-                headers: res.headers,
-              }),
+                headers: res.headers
+              })
             )
           })
 
@@ -126,7 +128,7 @@ const request = ({
           } else {
             req.end(data)
           }
-        }),
+        })
     )
 
 export default request

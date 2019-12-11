@@ -1,20 +1,20 @@
-import {UploadingState} from './state/UploadingState'
-import {CancelledState} from './state/CancelledState'
-import {ReadyState} from './state/ReadyState'
-import {ErrorState} from './state/ErrorState'
-import {PendingState} from './state/PendingState'
+import { UploadingState } from './state/UploadingState'
+import { CancelledState } from './state/CancelledState'
+import { ReadyState } from './state/ReadyState'
+import { ErrorState } from './state/ErrorState'
+import { PendingState } from './state/PendingState'
 import StateChangeError from '../errors/StateChangeError'
 import EntityIsNotReadyError from '../errors/EntityIsNotReadyError'
-import {UploadedState} from './state/UploadedState'
+import { UploadedState } from './state/UploadedState'
 
 /* Types */
-import {ProgressParamsInterface, UploadingProgress} from '../types'
+import { ProgressParamsInterface, UploadingProgress } from '../types'
 import {
   LifecycleHooksInterface,
   LifecycleInterface,
-  LifecycleStateInterface,
+  LifecycleStateInterface
 } from './types'
-import {Uuid} from '..'
+import { Uuid } from '..'
 
 export class UploadLifecycle<T> implements LifecycleInterface<T> {
   private state: LifecycleStateInterface

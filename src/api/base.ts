@@ -53,32 +53,41 @@ export default function base(
     cancel,
     onProgress,
     source = 'local',
-    integration,
-  }: Options,
+    integration
+  }: Options
 ): Promise<SuccessResponse> {
   return request({
     method: 'POST',
     url: getUrl(baseURL, '/base/', {
-      jsonerrors: 1,
+      jsonerrors: 1
     }),
     headers: {
-      'X-UC-User-Agent': getUserAgent({ publicKey, integration }),
+      'X-UC-User-Agent': getUserAgent({ publicKey, integration })
     },
     data: getFormData([
-      ['file', file, fileName || (file as File).name || defaultSettings.fileName],
+      [
+        'file',
+        file,
+        fileName || (file as File).name || defaultSettings.fileName
+      ],
       ['UPLOADCARE_PUB_KEY', publicKey],
-      ['UPLOADCARE_STORE', typeof store === 'undefined' ? 'auto' : store ? 1 : 0],
+      [
+        'UPLOADCARE_STORE',
+        typeof store === 'undefined' ? 'auto' : store ? 1 : 0
+      ],
       ['signature', secureSignature],
       ['expire', secureExpire],
-      ['source', source],
+      ['source', source]
     ]),
     cancel,
-    onProgress,
+    onProgress
   })
     .then(({ data }) => camelizeKeys<Response>(JSON.parse(data)))
     .then(response => {
       if ('error' in response) {
-        throw new Error(`[${response.error.statusCode}] ${response.error.content}`)
+        throw new Error(
+          `[${response.error.statusCode}] ${response.error.content}`
+        )
       } else {
         return response
       }

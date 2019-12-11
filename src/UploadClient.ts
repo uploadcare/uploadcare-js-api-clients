@@ -11,9 +11,9 @@ import {
   UploadcareGroupInterface,
   UploadClientInterface
 } from './types'
-import {Url} from './api/fromUrl'
-import {UploadAPIInterface, Uuid} from './api/types'
-import {LifecycleHooksInterface, UploadInterface} from './lifecycle/types'
+import { Url } from './api/fromUrl'
+import { UploadAPIInterface, Uuid } from './api/types'
+import { LifecycleHooksInterface, UploadInterface } from './lifecycle/types'
 
 class UploadClient implements UploadClientInterface {
   private settings: SettingsInterface
@@ -22,17 +22,17 @@ class UploadClient implements UploadClientInterface {
   constructor(settings: SettingsInterface = {}) {
     this.settings = {
       ...defaultSettings,
-      ...settings,
+      ...settings
     }
     this.api = new UploadAPI(this)
   }
 
   updateSettings(newSettings: SettingsInterface = {}): void {
-    const prevSettings = {...this.settings}
+    const prevSettings = { ...this.settings }
 
     this.settings = {
       ...prevSettings,
-      ...newSettings,
+      ...newSettings
     }
   }
 
@@ -45,10 +45,14 @@ class UploadClient implements UploadClientInterface {
     settings?: SettingsInterface,
     hooks?: LifecycleHooksInterface<UploadcareFileInterface>
   ): UploadInterface<UploadcareFileInterface> {
-    return fileFrom(data, {
-      ...this.settings,
-      ...settings,
-    }, hooks)
+    return fileFrom(
+      data,
+      {
+        ...this.settings,
+        ...settings
+      },
+      hooks
+    )
   }
 
   groupFrom(
@@ -56,10 +60,14 @@ class UploadClient implements UploadClientInterface {
     settings?: SettingsInterface,
     hooks?: LifecycleHooksInterface<UploadcareGroupInterface>
   ): UploadInterface<UploadcareGroupInterface> {
-    return groupFrom(data, {
-      ...this.settings,
-      ...settings,
-    }, hooks)
+    return groupFrom(
+      data,
+      {
+        ...this.settings,
+        ...settings
+      },
+      hooks
+    )
   }
 }
 

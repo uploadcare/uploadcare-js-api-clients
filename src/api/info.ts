@@ -31,25 +31,33 @@ type Options = {
  */
 export default function info(
   uuid: Uuid,
-  { publicKey, baseUrl = defaultSettings.baseURL, cancel, source, integration }: Options,
+  {
+    publicKey,
+    baseUrl = defaultSettings.baseURL,
+    cancel,
+    source,
+    integration
+  }: Options
 ): Promise<FileInfo> {
   return request({
     method: 'GET',
     headers: {
-      'X-UC-User-Agent': getUserAgent({ publicKey, integration }),
+      'X-UC-User-Agent': getUserAgent({ publicKey, integration })
     },
     url: getUrl(baseUrl, '/info/', {
       jsonerrors: 1,
       pub_key: publicKey,
       file_id: uuid,
-      source,
+      source
     }),
-    cancel,
+    cancel
   })
     .then(response => camelizeKeys<Response>(JSON.parse(response.data)))
     .then(response => {
       if ('error' in response) {
-        throw new Error(`[${response.error.statusCode}] ${response.error.content}`)
+        throw new Error(
+          `[${response.error.statusCode}] ${response.error.content}`
+        )
       }
 
       return response

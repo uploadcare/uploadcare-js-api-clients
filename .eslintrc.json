@@ -13,23 +13,5 @@
     "ecmaVersion": 2018,
     "sourceType": "module",
     "project": "./tsconfig.json"
-  },
-  "rules": {
-    "semi": ["error", "never"],
-    "quotes": ["error", "single"],
-    "@typescript-eslint/indent": ["error", 2],
-    "@typescript-eslint/camelcase": ["error", { "allow": [
-      "pub_key",
-      "source_url",
-      "check_URL_duplicates",
-      "save_URL_duplicates",
-      "group_id",
-      "file_id",
-      "content_type",
-      "foo_bar",
-      "foo_bar_baz",
-      "Foo_bar_baz_4",
-      "one_more_thing"
-    ] }]
   }
 }

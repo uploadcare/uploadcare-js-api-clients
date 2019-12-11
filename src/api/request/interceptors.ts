@@ -1,17 +1,17 @@
-import {AxiosInstance} from 'axios'
+import { AxiosInstance } from 'axios'
 
 export const addMaxConcurrencyInterceptorsToAxiosInstance = ({
   instance,
   maxConcurrentRequestsCount,
-  intervalToCheckPendingRequestsMs = 10,
+  intervalToCheckPendingRequestsMs = 10
 }: {
-  instance: AxiosInstance;
-  maxConcurrentRequestsCount: number;
-  intervalToCheckPendingRequestsMs?: number;
+  instance: AxiosInstance
+  maxConcurrentRequestsCount: number
+  intervalToCheckPendingRequestsMs?: number
 }): void => {
   let pendingRequestsCount = 0
 
-  instance.interceptors.request.use((config) => {
+  instance.interceptors.request.use(config => {
     return new Promise((resolve, reject) => {
       const interval = setInterval(() => {
         if (pendingRequestsCount < maxConcurrentRequestsCount) {
@@ -23,11 +23,14 @@ export const addMaxConcurrencyInterceptorsToAxiosInstance = ({
     })
   })
 
-  instance.interceptors.response.use((response) => {
-    pendingRequestsCount = Math.max(0, pendingRequestsCount - 1)
-    return Promise.resolve(response)
-  }, (error) => {
-    pendingRequestsCount = Math.max(0, pendingRequestsCount - 1)
-    return Promise.reject(error)
-  })
+  instance.interceptors.response.use(
+    response => {
+      pendingRequestsCount = Math.max(0, pendingRequestsCount - 1)
+      return Promise.resolve(response)
+    },
+    error => {
+      pendingRequestsCount = Math.max(0, pendingRequestsCount - 1)
+      return Promise.reject(error)
+    }
+  )
 }

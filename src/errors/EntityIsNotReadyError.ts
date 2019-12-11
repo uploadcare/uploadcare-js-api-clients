@@ -9,9 +9,8 @@ export default class EntityIsNotReadyError extends Error {
 
     if (Error.captureStackTrace) {
       Error.captureStackTrace(this, EntityIsNotReadyError)
-    }
-    else {
-      this.stack = (new Error()).stack
+    } else {
+      this.stack = new Error().stack
     }
   }
 }

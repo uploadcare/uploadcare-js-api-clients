@@ -42,13 +42,13 @@ export default function group(
     secureExpire,
     cancel,
     source,
-    integration,
-  }: Options,
+    integration
+  }: Options
 ): Promise<GroupInfo> {
   return request({
     method: 'POST',
     headers: {
-      'X-UC-User-Agent': getUserAgent({ publicKey, integration }),
+      'X-UC-User-Agent': getUserAgent({ publicKey, integration })
     },
     url: getUrl(baseURL, '/group/', {
       jsonerrors: 1,
@@ -57,14 +57,16 @@ export default function group(
       callback: jsonpCallback,
       signature: secureSignature,
       expire: secureExpire,
-      source,
+      source
     }),
-    cancel,
+    cancel
   })
     .then(response => camelizeKeys<Response>(JSON.parse(response.data)))
     .then(response => {
       if ('error' in response) {
-        throw new Error(`[${response.error.statusCode}] ${response.error.content}`)
+        throw new Error(
+          `[${response.error.statusCode}] ${response.error.content}`
+        )
       }
 
       return response
