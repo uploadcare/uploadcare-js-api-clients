@@ -17,6 +17,12 @@ export type RequestOptions = {
   onProgress?: (event: any) => void;
 };
 
+type BaseResponse = {
+  data: string;
+  headers: any;
+  status?: number
+}
+
 const request = ({
   method,
   url,
@@ -24,7 +30,7 @@ const request = ({
   headers = {},
   cancel,
   onProgress
-}: RequestOptions): Promise<{ data: string; headers: any; status?: number }> =>
+}: RequestOptions): Promise<BaseResponse> =>
   Promise.resolve(data && data.toString() === "[object FormData]")
     .then(isFormData => (isFormData ? getLength(data) : undefined))
     .then(
