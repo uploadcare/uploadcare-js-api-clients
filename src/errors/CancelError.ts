@@ -1,17 +1,5 @@
-export default class CancelError extends Error {
-  constructor() {
-    super()
+import {createError} from './createError'
+import {UploadcareError} from './types'
 
-    this.name = 'CancelError'
-    this.message = 'Request canceled'
-
-    Object.setPrototypeOf(this, CancelError.prototype)
-
-    if (Error.captureStackTrace) {
-      Error.captureStackTrace(this, CancelError)
-    }
-    else {
-      this.stack = (new Error()).stack
-    }
-  }
-}
+export const CancelError = (message = 'Request canceled'): UploadcareError =>
+  createError('CancelError', message)
