@@ -7,8 +7,12 @@ const SEPARATOR = /\W|_/g
  * @returns {string}
  */
 export function camelize(text: string): string {
-  return (text.split(SEPARATOR))
-    .map((word, index) => word.charAt(0)[index > 0 ? 'toUpperCase' : 'toLowerCase']() + word.slice(1))
+  return text
+    .split(SEPARATOR)
+    .map(
+      (word, index) =>
+        word.charAt(0)[index > 0 ? 'toUpperCase' : 'toLowerCase']() + word.slice(1),
+    )
     .join('')
 }
 
@@ -23,10 +27,10 @@ export default function camelizeKeys<T>(source: any): T {
     return source
   }
 
-  return Object.keys(source)
-    .reduce<T>((accumulator, key) => {
-      accumulator[camelize(key)] = typeof source[key] === 'object' ? camelizeKeys(source[key]) : source[key]
+  return Object.keys(source).reduce<T>((accumulator, key) => {
+    accumulator[camelize(key)] =
+      typeof source[key] === 'object' ? camelizeKeys(source[key]) : source[key]
 
-      return accumulator
-    }, {} as T)
+    return accumulator
+  }, {} as T)
 }
