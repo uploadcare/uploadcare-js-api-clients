@@ -6,6 +6,7 @@ import { parse } from "url";
 import { Readable, Transform } from "stream";
 
 import CancelController from "../../CancelController";
+import CancelError from '../../errors/CancelError'
 
 export type RequestOptions = {
   method?: string;
@@ -59,7 +60,7 @@ const request = ({
               aborted = true;
               req.abort();
 
-              reject(new Error("cancel"));
+              reject(CancelError());
             });
           }
 
