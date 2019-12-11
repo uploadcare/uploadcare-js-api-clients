@@ -1,9 +1,4 @@
-export interface CancelControllerInterface {
-  cancel(): void;
-  onCancel(fn: Function): void;
-}
-
-class CancelController implements CancelControllerInterface {
+class CancelController {
   private promise: Promise<void>
   private resolve: () => void = () => {}
 
