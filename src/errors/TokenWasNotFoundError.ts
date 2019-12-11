@@ -1,19 +1,18 @@
-import {Uuid} from '..'
+import { Uuid } from "..";
 
 export default class TokenWasNotFoundError extends Error {
   constructor(token: Uuid) {
-    super()
+    super();
 
-    this.name = 'TokenWasNotFoundError'
-    this.message = `Token "${token}" was not found.`
+    this.name = "TokenWasNotFoundError";
+    this.message = `Token "${token}" was not found.`;
 
-    Object.setPrototypeOf(this, TokenWasNotFoundError.prototype)
+    Object.setPrototypeOf(this, TokenWasNotFoundError.prototype);
 
     if (Error.captureStackTrace) {
-      Error.captureStackTrace(this, TokenWasNotFoundError)
-    }
-    else {
-      this.stack = (new Error()).stack
+      Error.captureStackTrace(this, TokenWasNotFoundError);
+    } else {
+      this.stack = new Error().stack;
     }
   }
 }

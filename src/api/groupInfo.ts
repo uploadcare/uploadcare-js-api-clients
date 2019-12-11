@@ -1,56 +1,64 @@
-import { GroupId, GroupInfo } from './base-types'
-import request from './request/request.node'
-import getUrl from './request/getUrl'
+import { GroupId, GroupInfo } from "./base-types";
+import request from "./request/request.node";
+import getUrl from "./request/getUrl";
 
-import CancelController from '../CancelController'
-import defaultSettings, { getUserAgent } from '../defaultSettings'
-import camelizeKeys from '../tools/camelizeKeys'
+import CancelController from "../CancelController";
+import defaultSettings, { getUserAgent } from "../defaultSettings";
+import camelizeKeys from "../tools/camelizeKeys";
 
 type Options = {
-  publicKey: string
-  baseURL?: string
+  publicKey: string;
+  baseURL?: string;
 
-  cancel?: CancelController
+  cancel?: CancelController;
 
-  source?: string
-  integration?: string
-}
+  source?: string;
+  integration?: string;
+};
 
 type FailedResponse = {
   error: {
-    content: string
-    statusCode: number
-  }
-}
+    content: string;
+    statusCode: number;
+  };
+};
 
-type Response = GroupInfo | FailedResponse
+type Response = GroupInfo | FailedResponse;
 
 /**
  * Get info about group.
  */
 export default function groupInfo(
   id: GroupId,
-  { publicKey, baseURL = defaultSettings.baseURL, cancel, source, integration }: Options,
+  {
+    publicKey,
+    baseURL = defaultSettings.baseURL,
+    cancel,
+    source,
+    integration
+  }: Options
 ): Promise<GroupInfo> {
   return request({
-    method: 'GET',
+    method: "GET",
     headers: {
-      'X-UC-User-Agent': getUserAgent({ publicKey, integration }),
+      "X-UC-User-Agent": getUserAgent({ publicKey, integration })
     },
-    url: getUrl(baseURL, '/group/info/', {
+    url: getUrl(baseURL, "/group/info/", {
       jsonerrors: 1,
       pub_key: publicKey,
       group_id: id,
-      source,
+      source
     }),
-    cancel,
+    cancel
   })
     .then(response => camelizeKeys<Response>(JSON.parse(response.data)))
     .then(response => {
-      if ('error' in response) {
-        throw new Error(`[${response.error.statusCode}] ${response.error.content}`)
+      if ("error" in response) {
+        throw new Error(
+          `[${response.error.statusCode}] ${response.error.content}`
+        );
       }
 
-      return response
-    })
+      return response;
+    });
 }

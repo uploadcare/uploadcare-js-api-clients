@@ -1,6 +1,11 @@
-import {FileInfoInterface, GeoLocationInterface, GroupId, Uuid} from './api/types'
-import {Url} from './api/fromUrl'
-import {LifecycleHooksInterface, UploadInterface} from './lifecycle/types'
+import {
+  FileInfoInterface,
+  GeoLocationInterface,
+  GroupId,
+  Uuid
+} from "./api/types";
+import { Url } from "./api/fromUrl";
+import { LifecycleHooksInterface, UploadInterface } from "./lifecycle/types";
 
 export interface SettingsInterface {
   baseCDN?: string;
@@ -37,7 +42,7 @@ export interface DefaultSettingsInterface extends SettingsInterface {
   pollingTimeoutMilliseconds: number;
 }
 
-export type FileData = Blob | File | Buffer
+export type FileData = Blob | File | Buffer;
 
 export interface OriginalImageInfoInterface {
   width: number;
@@ -102,12 +107,12 @@ export interface UploadcareGroupInterface {
 }
 
 export enum ProgressStateEnum {
-  Pending = 'pending',
-  Uploading = 'uploading',
-  Uploaded = 'uploaded',
-  Ready = 'ready',
-  Cancelled = 'cancelled',
-  Error = 'error',
+  Pending = "pending",
+  Uploading = "uploading",
+  Uploaded = "uploaded",
+  Ready = "ready",
+  Cancelled = "cancelled",
+  Error = "error"
 }
 
 export interface ProgressParamsInterface {
@@ -119,7 +124,7 @@ export type UploadingProgress = {
   state: ProgressStateEnum;
   uploaded: null | ProgressParamsInterface;
   value: number;
-}
+};
 
 export interface UploadClientInterface {
   updateSettings(newSettings: SettingsInterface): void;
@@ -129,12 +134,12 @@ export interface UploadClientInterface {
   fileFrom(
     data: FileData | Url | Uuid,
     settings?: SettingsInterface,
-    hooks?: LifecycleHooksInterface<UploadcareFileInterface>,
+    hooks?: LifecycleHooksInterface<UploadcareFileInterface>
   ): UploadInterface<UploadcareFileInterface>;
 
   groupFrom(
     data: FileData[] | Url[] | Uuid[],
     settings?: SettingsInterface,
-    hooks?: LifecycleHooksInterface<UploadcareGroupInterface>,
+    hooks?: LifecycleHooksInterface<UploadcareGroupInterface>
   ): UploadInterface<UploadcareGroupInterface>;
 }

@@ -1,5 +1,5 @@
 /* Types */
-import {ChunkType} from './types'
+import { ChunkType } from "./types";
 
 /**
  * Split file size to chunks.
@@ -9,12 +9,12 @@ import {ChunkType} from './types'
  * @returns {ChunkType[]}
  */
 export const getChunks = (fileSize: number, chunkSize): ChunkType[] => {
-  const chunksCount = Math.ceil(fileSize / chunkSize)
+  const chunksCount = Math.ceil(fileSize / chunkSize);
 
   return Array.apply(null, Array(chunksCount)).map((value, index: number) => {
-    const start = chunkSize * index
-    const end = Math.min(start + chunkSize, fileSize)
+    const start = chunkSize * index;
+    const end = Math.min(start + chunkSize, fileSize);
 
-    return [start, end]
-  })
-}
+    return [start, end];
+  });
+};

@@ -1,3 +1,3 @@
-import UploadAPI from './UploadAPI'
+import UploadAPI from "./UploadAPI";
 
-export default UploadAPI
+export default UploadAPI;

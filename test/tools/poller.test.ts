@@ -1,5 +1,5 @@
-import {poll, CheckFunction} from '../../src/tools/poller'
-import CancelController from '../../src/CancelController'
+import { poll, CheckFunction } from "../../src/tools/poller";
+import CancelController from "../../src/CancelController";
 import { delay } from "../../src/api/request/delay";
 import CancelError from "../../src/errors/CancelError";
 import TimeoutError from "../../src/errors/TimeoutError";
@@ -18,7 +18,7 @@ let longJob = (attemps: number, fails: Error | null = null) => {
 
     if (runs === attemps) {
       if (fails) {
-        throw fails
+        throw fails;
       }
 
       return true;
@@ -26,15 +26,16 @@ let longJob = (attemps: number, fails: Error | null = null) => {
       runs += 1;
       return false;
     }
-  }
+  };
 
-  let asyncIsFinish: CheckFunction = cancel => new Promise<boolean>((resolve, reject) => {
-    try {
-      resolve(isFinish(cancel))
-    } catch (error) {
-      reject(error)
-    }
-  })
+  let asyncIsFinish: CheckFunction = cancel =>
+    new Promise<boolean>((resolve, reject) => {
+      try {
+        resolve(isFinish(cancel));
+      } catch (error) {
+        reject(error);
+      }
+    });
 
   return {
     isFinish,
@@ -80,8 +81,8 @@ describe("poll", () => {
       poll({ check: job.isFinish, interval: 20, cancelController: ctrl })
     ).toBeRejectedWith(new CancelError());
 
-    let conditionCallsCount = job.spy.condition.calls.count()
-    let cancelCallsCount = job.spy.cancel.calls.count()
+    let conditionCallsCount = job.spy.condition.calls.count();
+    let cancelCallsCount = job.spy.cancel.calls.count();
 
     await delay(50);
 
@@ -120,7 +121,7 @@ describe("poll", () => {
       poll({ check: job.isFinish, interval: 40, timeout: 20 })
     ).toBeRejectedWith(new TimeoutError("Poll Timeout"));
 
-    let conditionCallsCount = job.spy.condition.calls.count()
+    let conditionCallsCount = job.spy.condition.calls.count();
 
     await delay(50);
 
@@ -138,9 +139,9 @@ describe("poll", () => {
 
   it("should work with async test function", async () => {
     let job = longJob(3);
-    let result = await poll({ check: job.asyncIsFinish, interval: 20 })
+    let result = await poll({ check: job.asyncIsFinish, interval: 20 });
 
-    expect(result).toBeTruthy()
+    expect(result).toBeTruthy();
     expect(job.spy.condition).toHaveBeenCalledTimes(3);
   });
 });

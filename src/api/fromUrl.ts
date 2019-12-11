@@ -1,70 +1,72 @@
-import { FileInfo } from './base-types'
-import request from './request/request.node'
-import getUrl from './request/getUrl'
+import { FileInfo } from "./base-types";
+import request from "./request/request.node";
+import getUrl from "./request/getUrl";
 
-import CancelController from '../CancelController'
-import defaultSettings, { getUserAgent } from '../defaultSettings'
-import camelizeKeys from '../tools/camelizeKeys'
+import CancelController from "../CancelController";
+import defaultSettings, { getUserAgent } from "../defaultSettings";
+import camelizeKeys from "../tools/camelizeKeys";
 
-type Url = string
+type Url = string;
 
 export enum TypeEnum {
-  Token = 'token',
-  FileInfo = 'file_info',
+  Token = "token",
+  FileInfo = "file_info"
 }
 
 type TokenResponse = {
-  type: TypeEnum.Token
-  token: string
-}
+  type: TypeEnum.Token;
+  token: string;
+};
 
 type FileInfoResponse = {
-  type: TypeEnum.FileInfo
-} & FileInfo
+  type: TypeEnum.FileInfo;
+} & FileInfo;
 
-type SuccessResponse = FileInfoResponse | TokenResponse
+type SuccessResponse = FileInfoResponse | TokenResponse;
 
 type FailedResponse = {
   error: {
-    content: string
-    statusCode: number
-  }
-}
+    content: string;
+    statusCode: number;
+  };
+};
 
-type Response = FailedResponse | SuccessResponse
+type Response = FailedResponse | SuccessResponse;
 
 /**
  * TokenResponse Type Guard.
  */
-export const isTokenResponse = (response: SuccessResponse): response is TokenResponse => {
-  return response.type !== undefined && response.type === TypeEnum.Token
-}
+export const isTokenResponse = (
+  response: SuccessResponse
+): response is TokenResponse => {
+  return response.type !== undefined && response.type === TypeEnum.Token;
+};
 
 /**
  * FileInfoResponse Type Guard.
  */
 export const isFileInfoResponse = (
-  response: SuccessResponse,
+  response: SuccessResponse
 ): response is FileInfoResponse => {
-  return response.type !== undefined && response.type === TypeEnum.FileInfo
-}
+  return response.type !== undefined && response.type === TypeEnum.FileInfo;
+};
 
 type Options = {
-  publicKey: string
+  publicKey: string;
 
-  baseURL?: string
-  store?: boolean
-  fileName?: string
-  checkForUrlDuplicates?: boolean
-  saveUrlForRecurrentUploads?: boolean
-  secureSignature?: string
-  secureExpire?: string
+  baseURL?: string;
+  store?: boolean;
+  fileName?: string;
+  checkForUrlDuplicates?: boolean;
+  saveUrlForRecurrentUploads?: boolean;
+  secureSignature?: string;
+  secureExpire?: string;
 
-  cancel?: CancelController
+  cancel?: CancelController;
 
-  source?: string
-  integration?: string
-}
+  source?: string;
+  integration?: string;
+};
 
 /**
  * Uploading files from URL.
@@ -80,36 +82,38 @@ export default function fromUrl(
     saveUrlForRecurrentUploads,
     secureSignature,
     secureExpire,
-    source = 'url',
+    source = "url",
     cancel,
-    integration,
-  }: Options,
+    integration
+  }: Options
 ): Promise<SuccessResponse> {
   return request({
-    method: 'POST',
+    method: "POST",
     headers: {
-      'X-UC-User-Agent': getUserAgent({ publicKey, integration }),
+      "X-UC-User-Agent": getUserAgent({ publicKey, integration })
     },
-    url: getUrl(baseURL, '/from_url/', {
+    url: getUrl(baseURL, "/from_url/", {
       jsonerrors: 1,
       pub_key: publicKey,
       source_url: sourceUrl,
-      store: typeof store === 'undefined' ? 'auto' : store ? 1 : undefined,
+      store: typeof store === "undefined" ? "auto" : store ? 1 : undefined,
       filename: fileName,
       check_URL_duplicates: checkForUrlDuplicates ? 1 : undefined,
       save_URL_duplicates: saveUrlForRecurrentUploads ? 1 : undefined,
       signature: secureSignature,
       expire: secureExpire,
-      source: source,
+      source: source
     }),
-    cancel,
+    cancel
   })
     .then(response => camelizeKeys<Response>(JSON.parse(response.data)))
     .then(response => {
-      if ('error' in response) {
-        throw new Error(`[${response.error.statusCode}] ${response.error.content}`)
+      if ("error" in response) {
+        throw new Error(
+          `[${response.error.statusCode}] ${response.error.content}`
+        );
       } else {
-        return response
+        return response;
       }
-    })
+    });
 }

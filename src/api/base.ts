@@ -1,41 +1,41 @@
-import { Uuid } from './base-types'
+import { Uuid } from "./base-types";
 
-import getFormData from './request/buildFormData.node'
-import request from './request/request.node'
-import getUrl from './request/getUrl'
+import getFormData from "./request/buildFormData.node";
+import request from "./request/request.node";
+import getUrl from "./request/getUrl";
 
-import CancelController from '../CancelController'
-import defaultSettings, { getUserAgent } from '../defaultSettings'
-import camelizeKeys from '../tools/camelizeKeys'
+import CancelController from "../CancelController";
+import defaultSettings, { getUserAgent } from "../defaultSettings";
+import camelizeKeys from "../tools/camelizeKeys";
 
 type SuccessResponse = {
-  file: Uuid
-}
+  file: Uuid;
+};
 
 type FailedResponse = {
   error: {
-    content: string
-    statusCode: number
-  }
-}
+    content: string;
+    statusCode: number;
+  };
+};
 
-type Response = SuccessResponse | FailedResponse
+type Response = SuccessResponse | FailedResponse;
 
 export type Options = {
-  publicKey: string
+  publicKey: string;
 
-  fileName?: string
-  baseURL?: string
-  secureSignature?: string
-  secureExpire?: string
-  store?: boolean
+  fileName?: string;
+  baseURL?: string;
+  secureSignature?: string;
+  secureExpire?: string;
+  store?: boolean;
 
-  cancel?: CancelController
-  onProgress?: (event: any) => void
+  cancel?: CancelController;
+  onProgress?: (event: any) => void;
 
-  source?: string
-  integration?: string
-}
+  source?: string;
+  integration?: string;
+};
 
 /**
  * Performs file uploading request to Uploadcare Upload API.
@@ -52,35 +52,44 @@ export default function base(
     store,
     cancel,
     onProgress,
-    source = 'local',
-    integration,
-  }: Options,
+    source = "local",
+    integration
+  }: Options
 ): Promise<SuccessResponse> {
   return request({
-    method: 'POST',
-    url: getUrl(baseURL, '/base/', {
-      jsonerrors: 1,
+    method: "POST",
+    url: getUrl(baseURL, "/base/", {
+      jsonerrors: 1
     }),
     headers: {
-      'X-UC-User-Agent': getUserAgent({ publicKey, integration }),
+      "X-UC-User-Agent": getUserAgent({ publicKey, integration })
     },
     data: getFormData([
-      ['file', file, fileName || (file as File).name || defaultSettings.fileName],
-      ['UPLOADCARE_PUB_KEY', publicKey],
-      ['UPLOADCARE_STORE', typeof store === 'undefined' ? 'auto' : store ? 1 : 0],
-      ['signature', secureSignature],
-      ['expire', secureExpire],
-      ['source', source],
+      [
+        "file",
+        file,
+        fileName || (file as File).name || defaultSettings.fileName
+      ],
+      ["UPLOADCARE_PUB_KEY", publicKey],
+      [
+        "UPLOADCARE_STORE",
+        typeof store === "undefined" ? "auto" : store ? 1 : 0
+      ],
+      ["signature", secureSignature],
+      ["expire", secureExpire],
+      ["source", source]
     ]),
     cancel,
-    onProgress,
+    onProgress
   })
     .then(({ data }) => camelizeKeys<Response>(JSON.parse(data)))
     .then(response => {
-      if ('error' in response) {
-        throw new Error(`[${response.error.statusCode}] ${response.error.content}`)
+      if ("error" in response) {
+        throw new Error(
+          `[${response.error.statusCode}] ${response.error.content}`
+        );
       } else {
-        return response
+        return response;
       }
-    })
+    });
 }

@@ -1,82 +1,82 @@
-import * as factory from '../_fixtureFactory'
-import groupFrom from '../../src/groupFrom/groupFrom'
-import {getSettingsForTesting} from '../_helpers'
-import CancelError from '../../src/errors/CancelError'
+import * as factory from "../_fixtureFactory";
+import groupFrom from "../../src/groupFrom/groupFrom";
+import { getSettingsForTesting } from "../_helpers";
+import CancelError from "../../src/errors/CancelError";
 
-describe('groupFrom Object[]', () => {
-  const fileToUpload = factory.image('blackSquare').data
-  const files = [fileToUpload]
+describe("groupFrom Object[]", () => {
+  const fileToUpload = factory.image("blackSquare").data;
+  const files = [fileToUpload];
   const settings = getSettingsForTesting({
-    publicKey: factory.publicKey('image'),
-  })
+    publicKey: factory.publicKey("image")
+  });
 
-  it('should resolves when file is ready on CDN', async () => {
-    const {cdnUrl} = await groupFrom(files, settings)
+  it("should resolves when file is ready on CDN", async () => {
+    const { cdnUrl } = await groupFrom(files, settings);
 
-    expect(cdnUrl).toBeTruthy()
-  })
+    expect(cdnUrl).toBeTruthy();
+  });
 
-  it('should accept doNotStore setting', async () => {
+  it("should accept doNotStore setting", async () => {
     const settings = getSettingsForTesting({
-      publicKey: factory.publicKey('image'),
-      doNotStore: true,
-    })
-    const upload = groupFrom(files, settings)
-    const group = await upload
+      publicKey: factory.publicKey("image"),
+      doNotStore: true
+    });
+    const upload = groupFrom(files, settings);
+    const group = await upload;
 
-    expect(group.isStored).toBeFalsy()
-  })
+    expect(group.isStored).toBeFalsy();
+  });
 
-  it('should be able to cancel uploading', async () => {
-    const upload = groupFrom(files, settings)
+  it("should be able to cancel uploading", async () => {
+    const upload = groupFrom(files, settings);
 
-    upload.cancel()
+    upload.cancel();
 
-    await (expectAsync(upload) as any).toBeRejectedWithError(CancelError)
-  })
+    await (expectAsync(upload) as any).toBeRejectedWithError(CancelError);
+  });
 
-  describe('should be able to handle', () => {
-    it('cancel uploading', async () => {
-      const onCancel = jasmine.createSpy('onCancel')
-      const upload = groupFrom(files, settings)
+  describe("should be able to handle", () => {
+    it("cancel uploading", async () => {
+      const onCancel = jasmine.createSpy("onCancel");
+      const upload = groupFrom(files, settings);
 
-      upload.cancel()
+      upload.cancel();
 
-      await (expectAsync(upload) as any).toBeRejectedWithError(CancelError)
+      await (expectAsync(upload) as any).toBeRejectedWithError(CancelError);
 
-      expect(onCancel).toHaveBeenCalled()
-    })
+      expect(onCancel).toHaveBeenCalled();
+    });
 
-    it('progress', async () => {
-      let progressValue = 0
-      const onProgress = (progress) => {
-        const {value} = progress
+    it("progress", async () => {
+      let progressValue = 0;
+      const onProgress = progress => {
+        const { value } = progress;
 
-        progressValue = value
-      }
-      const upload = groupFrom(files, settings)
+        progressValue = value;
+      };
+      const upload = groupFrom(files, settings);
 
-      await upload
+      await upload;
 
-      expect(progressValue).toBe(1)
-    })
+      expect(progressValue).toBe(1);
+    });
 
-    it('uploaded', async () => {
-      const onUploaded = jasmine.createSpy('onUploaded')
-      const upload = groupFrom(files, settings, {onUploaded})
+    it("uploaded", async () => {
+      const onUploaded = jasmine.createSpy("onUploaded");
+      const upload = groupFrom(files, settings, { onUploaded });
 
-      await (expectAsync(upload) as any).toBeResolved()
+      await (expectAsync(upload) as any).toBeResolved();
 
-      expect(onUploaded).toHaveBeenCalled()
-    })
+      expect(onUploaded).toHaveBeenCalled();
+    });
 
-    it('ready', async () => {
-      const onReady = jasmine.createSpy('onReady')
-      const upload = groupFrom(files, settings, {onReady})
+    it("ready", async () => {
+      const onReady = jasmine.createSpy("onReady");
+      const upload = groupFrom(files, settings, { onReady });
 
-      await (expectAsync(upload) as any).toBeResolved()
+      await (expectAsync(upload) as any).toBeResolved();
 
-      expect(onReady).toHaveBeenCalled()
-    })
-  })
-})
+      expect(onReady).toHaveBeenCalled();
+    });
+  });
+});
