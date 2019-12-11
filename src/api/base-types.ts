@@ -3,39 +3,37 @@ export type GeoLocation = {
   longitude: number;
 }
 
-export interface ImageInfo {
+export type ImageInfo = {
   height: number;
   width: number;
   geoLocation: GeoLocation | null;
   datetimeOriginal: string;
   format: string;
   colorMode: string;
-  dpi?: number[]; // wrong type
+  dpi: number[] | null; // wrong type
   orientation: number | null;
   sequence: boolean | null;
 }
 
-export interface AudioInterface {
+export type AudioInfo = {
   bitrate: number | null;
   codec: string | null;
   sampleRate: number | null;
   channels: string | null;
 }
 
-export interface VideoInterface {
-  height: number;
-  width: number;
-  frameRate: number;
-  bitrate: number;
-  codec: string;
-}
-
 export type VideoInfo = {
   duration: number;
   format: string;
   bitrate: number;
-  audio?: AudioInterface;
-  video: VideoInterface;
+  audio: AudioInfo | null;
+  video: {
+    height: number;
+    width: number;
+    frameRate: number;
+    bitrate: number;
+    codec: string;
+  };
 }
 
 export type FileInfo = {
@@ -49,38 +47,11 @@ export type FileInfo = {
   filename: string;
   mimeType: string;
   isImage: string;
-  isStore: string;
+  isStored: string;
   isReady: string;
   imageInfo: ImageInfo | null;
   videoInfo: VideoInfo | null;
 }
-
-// {
-//   status: 'success',
-//   uuid: '103509fe-43ee-4dfc-8b03-8c54173f4af0',
-//   isImage: true,
-//   filename: 'imagefromunsplash',
-//   videoInfo: null,
-//   isStored: false,
-//   done: 2224724,
-//   fileId: '103509fe-43ee-4dfc-8b03-8c54173f4af0',
-//   originalFilename: 'image-from-unsplash',
-//   imageInfo: {
-//     colorMode: 'RGB',
-//     orientation: null,
-//     format: 'JPEG',
-//     sequence: false,
-//     height: 4101,
-//     width: 2734,
-//     geoLocation: null,
-//     datetimeOriginal: null,
-//     dpi: { '0': 72, '1': 72 }
-//   },
-//   isReady: true,
-//   total: 2224724,
-//   mimeType: 'image/jpeg',
-//   size: 2224724
-// }
 
 export type GroupInfo = {
   datetimeCreated: string;
