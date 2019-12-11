@@ -3,7 +3,7 @@ class CancelController {
   private resolve: () => void = () => {}
 
   constructor() {
-    this.promise = new Promise<void>(resolve => this.resolve = resolve)
+    this.promise = new Promise<void>(resolve => (this.resolve = resolve))
   }
 
   cancel(): void {
@@ -16,4 +16,3 @@ class CancelController {
 }
 
 export default CancelController
-
