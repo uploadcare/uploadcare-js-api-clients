@@ -45,14 +45,14 @@ export type StatusResponse =
   | ErrorResponse
   | SuccessResponse;
 
-type FiledResponse = {
+type FailedResponse = {
   error: {
     content: string;
     statusCode: number
   };
 };
 
-type Response = StatusResponse | FiledResponse
+type Response = StatusResponse | FailedResponse
 
 /**
  * UnknownResponse Type Guard.

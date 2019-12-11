@@ -24,14 +24,14 @@ type FileInfoResponse = {
 
 type SuccessResponse = FileInfoResponse | TokenResponse;
 
-type FailResponce = {
+type FailedResponse = {
   error: {
     content: string;
     statusCode: number;
   };
 };
 
-type Response = FailResponce | SuccessResponse;
+type Response = FailedResponse | SuccessResponse;
 
 /**
  * TokenResponse Type Guard.
