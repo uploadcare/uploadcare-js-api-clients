@@ -3,7 +3,7 @@ import request from "./request/request.node";
 import getUrl from "./request/getUrl";
 
 import CancelController from "../CancelController";
-import { getUserAgent } from "../defaultSettings";
+import defaultSettings, { getUserAgent } from "../defaultSettings";
 import camelizeKeys from "../tools/camelizeKeys";
 
 type Url = string;
@@ -75,7 +75,7 @@ export default function fromUrl(
   sourceUrl: Url,
   {
     publicKey,
-    baseURL = "https://upload.uploadcare.com",
+    baseURL = defaultSettings.baseURL,
     store,
     fileName,
     checkForUrlDuplicates,

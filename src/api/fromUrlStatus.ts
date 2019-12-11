@@ -2,7 +2,7 @@ import { FileInfo, Token } from "./base-types";
 import request from "./request/request.node";
 import getUrl from "./request/getUrl";
 
-import { getUserAgent } from "../defaultSettings";
+import defaultSettings, { getUserAgent } from "../defaultSettings";
 import CancelController from "../CancelController";
 import camelizeKeys from "../tools/camelizeKeys";
 
@@ -100,6 +100,8 @@ export const isSuccessResponse = (
 };
 
 export type Options = {
+  publicKey?: string;
+
   baseUrl?: string;
 
   cancel?: CancelController;
@@ -112,14 +114,13 @@ export type Options = {
  */
 export default function fromUrlStatus(
   token: Token,
-  { baseUrl = "https://upload.uploadcare.com", cancel, integration }: Options = {}
+  { publicKey, baseUrl = defaultSettings.baseURL, cancel, integration }: Options = {}
 ): Promise<StatusResponse> {
   return request({
     method: "GET",
-    // TODO ??
-    // headers: {
-    //   "X-UC-User-Agent": getUserAgent({ publicKey, integration })
-    // },
+    headers: publicKey ? {
+      "X-UC-User-Agent": getUserAgent({ publicKey, integration })
+    } : undefined,
     url: getUrl(baseUrl, "/from_url/status/", {
       jsonerrors: 1,
       token

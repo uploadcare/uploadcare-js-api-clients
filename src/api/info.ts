@@ -3,7 +3,7 @@ import request from "./request/request.node";
 import getUrl from "./request/getUrl";
 
 import CancelController from "../CancelController";
-import { getUserAgent } from "../defaultSettings";
+import defaultSettings, { getUserAgent } from "../defaultSettings";
 import camelizeKeys from "../tools/camelizeKeys";
 
 type FailedResponse = {
@@ -34,7 +34,7 @@ export default function info(
   uuid: Uuid,
   {
     publicKey,
-    baseUrl = "https://upload.uploadcare.com",
+    baseUrl = defaultSettings.baseURL,
     cancel,
     source,
     integration

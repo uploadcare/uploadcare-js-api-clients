@@ -5,7 +5,7 @@ import request from "./request/request.node";
 import getUrl from "./request/getUrl";
 
 import CancelController from "../CancelController";
-import { getUserAgent } from "../defaultSettings";
+import defaultSettings, { getUserAgent } from "../defaultSettings";
 import camelizeKeys from "../tools/camelizeKeys";
 
 type SuccessResponse = {
@@ -46,7 +46,7 @@ export default function base(
   {
     publicKey,
     fileName,
-    baseURL = "https://upload.uploadcare.com",
+    baseURL = defaultSettings.baseURL,
     secureSignature,
     secureExpire,
     store,
@@ -65,7 +65,7 @@ export default function base(
       "X-UC-User-Agent": getUserAgent({ publicKey, integration })
     },
     data: getFormData([
-      ["file", file, fileName || (file as File).name || "original"],
+      ["file", file, fileName || (file as File).name || defaultSettings.fileName],
       ["UPLOADCARE_PUB_KEY", publicKey],
       [
         "UPLOADCARE_STORE",

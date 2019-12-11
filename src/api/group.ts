@@ -3,7 +3,7 @@ import request from "./request/request.node";
 import getUrl from "./request/getUrl";
 
 import CancelController from "../CancelController";
-import { getUserAgent } from "../defaultSettings";
+import defaultSettings, { getUserAgent } from "../defaultSettings";
 import camelizeKeys from "../tools/camelizeKeys";
 
 type Options = {
@@ -37,7 +37,7 @@ export default function group(
   uuids: Uuid[],
   {
     publicKey,
-    baseURL = "https://upload.uploadcare.com",
+    baseURL = defaultSettings.baseURL,
     jsonpCallback,
     secureSignature,
     secureExpire,
