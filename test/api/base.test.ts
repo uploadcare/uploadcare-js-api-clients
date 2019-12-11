@@ -2,6 +2,7 @@ import base from "../../src/api/base";
 import * as factory from "../_fixtureFactory";
 import { getSettingsForTesting } from "../_helpers";
 import CancelController from "../../src/CancelController";
+import CancelError from '../../src/errors/CancelError'
 
 describe("API - base", () => {
   const fileToUpload = factory.image("blackSquare");
@@ -27,7 +28,7 @@ describe("API - base", () => {
 
     timeoutId = setTimeout(timeout, 10);
 
-    await expectAsync(directUpload).toBeRejectedWithError("cancel");
+    await expectAsync(directUpload).toBeRejectedWithError(CancelError());
 
     expect(timeout).not.toHaveBeenCalled();
     clearTimeout(timeoutId);

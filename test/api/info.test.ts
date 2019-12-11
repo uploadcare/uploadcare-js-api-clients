@@ -2,6 +2,7 @@ import info from "../../src/api/info";
 import * as factory from "../_fixtureFactory";
 import { getSettingsForTesting } from "../_helpers";
 import CancelController from "../../src/CancelController";
+import CancelError from '../../src/errors/CancelError'
 
 describe("API - info", () => {
   const settings = getSettingsForTesting({
@@ -36,6 +37,6 @@ describe("API - info", () => {
       controller.cancel();
     }, 10);
 
-    await expectAsync(info(uuid, settings)).toBeRejectedWithError("cancel");
+    await expectAsync(info(uuid, settings)).toBeRejectedWithError(CancelError());
   });
 });

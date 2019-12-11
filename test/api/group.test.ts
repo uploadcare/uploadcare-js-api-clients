@@ -2,6 +2,7 @@ import * as factory from "../_fixtureFactory";
 import { getSettingsForTesting } from "../_helpers";
 import group from "../../src/api/group";
 import CancelController from "../../src/CancelController";
+import CancelError from '../../src/errors/CancelError'
 
 describe("API - group", () => {
   const files = factory.groupOfFiles("valid");
@@ -47,6 +48,6 @@ describe("API - group", () => {
       controller.cancel();
     }, 10);
 
-    await expectAsync(group(files, settings)).toBeRejectedWithError("cancel");
+    await expectAsync(group(files, settings)).toBeRejectedWithError(CancelError());
   });
 });
