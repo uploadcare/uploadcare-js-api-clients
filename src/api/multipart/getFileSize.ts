@@ -1,7 +1,7 @@
-import { isNode } from "../../tools/isNode"
+import { isNode } from '../../tools/isNode'
 
 /* Types */
-import { FileData } from "../../types"
+import { FileData } from '../../types'
 
 /**
  * Get file size.

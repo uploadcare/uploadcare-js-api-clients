@@ -1,26 +1,26 @@
-import buildFormData from "../../src/api/request/buildFormData.node"
-import * as factory from "../_fixtureFactory"
+import buildFormData from '../../src/api/request/buildFormData.node'
+import * as factory from '../_fixtureFactory'
 
-describe("buildFormData", () => {
-  it("should return FormData with nice input object", () => {
+describe('buildFormData', () => {
+  it('should return FormData with nice input object', () => {
     const data = buildFormData([
-      ["file", factory.image("blackSquare").data, "file.jpeg"],
-      ["UPLOADCARE_PUB_KEY", factory.publicKey("demo")]
+      ['file', factory.image('blackSquare').data, 'file.jpeg'],
+      ['UPLOADCARE_PUB_KEY', factory.publicKey('demo')]
     ])
 
     expect(data).toBeDefined()
-    expect(typeof data).toBe("object")
-    expect(typeof data.append).toBe("function")
+    expect(typeof data).toBe('object')
+    expect(typeof data.append).toBe('function')
   })
 
-  it("should support arrays", () => {
+  it('should support arrays', () => {
     const data = buildFormData([
-      ["test", ["test", "1", 2]],
-      ["test", "test"]
+      ['test', ['test', '1', 2]],
+      ['test', 'test']
     ])
 
     expect(data).toBeDefined()
-    expect(typeof data).toBe("object")
-    expect(typeof data.append).toBe("function")
+    expect(typeof data).toBe('object')
+    expect(typeof data.append).toBe('function')
   })
 })

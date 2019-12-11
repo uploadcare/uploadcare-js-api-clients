@@ -1,5 +1,5 @@
-import { version } from "../package.json"
-import { DefaultSettingsInterface, SettingsInterface } from "./types"
+import { version } from '../package.json'
+import { DefaultSettingsInterface, SettingsInterface } from './types'
 
 /*
   SettingsInterface for future support:
@@ -8,9 +8,9 @@ import { DefaultSettingsInterface, SettingsInterface } from "./types"
   pusherKey: '79ae88bd931ea68464d9',
  */
 const defaultSettings: DefaultSettingsInterface = {
-  baseCDN: "https://ucarecdn.com",
-  baseURL: "https://upload.uploadcare.com",
-  fileName: "original",
+  baseCDN: 'https://ucarecdn.com',
+  baseURL: 'https://upload.uploadcare.com',
+  fileName: 'original',
   maxContentLength: 50 * 1024 * 1024, // 50 MB
   retryThrottledRequestMaxTimes: 1,
   multipartMinFileSize: 25 * 1024 * 1024, // 25 MB
@@ -29,8 +29,8 @@ export default defaultSettings
  * @returns {string}
  */
 export function getUserAgent(settings: SettingsInterface = {}): string {
-  const publicKey = settings.publicKey ? "/" + settings.publicKey : ""
-  const integration = settings.integration ? "; " + settings.integration : ""
+  const publicKey = settings.publicKey ? '/' + settings.publicKey : ''
+  const integration = settings.integration ? '; ' + settings.integration : ''
 
   return `UploadcareUploadClient/${version}${publicKey} (JavaScript${integration})`
 }

@@ -3,9 +3,9 @@ import {
   GeoLocationInterface,
   GroupId,
   Uuid
-} from "./api/types"
-import { Url } from "./api/fromUrl"
-import { LifecycleHooksInterface, UploadInterface } from "./lifecycle/types"
+} from './api/types'
+import { Url } from './api/fromUrl'
+import { LifecycleHooksInterface, UploadInterface } from './lifecycle/types'
 
 export interface SettingsInterface {
   baseCDN?: string
@@ -107,12 +107,12 @@ export interface UploadcareGroupInterface {
 }
 
 export enum ProgressStateEnum {
-  Pending = "pending",
-  Uploading = "uploading",
-  Uploaded = "uploaded",
-  Ready = "ready",
-  Cancelled = "cancelled",
-  Error = "error"
+  Pending = 'pending',
+  Uploading = 'uploading',
+  Uploaded = 'uploaded',
+  Ready = 'ready',
+  Cancelled = 'cancelled',
+  Error = 'error'
 }
 
 export interface ProgressParamsInterface {

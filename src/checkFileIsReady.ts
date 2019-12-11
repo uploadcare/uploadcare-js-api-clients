@@ -1,8 +1,8 @@
-import info from "./api/info"
-import { SettingsInterface } from "./types"
-import poll, { PollPromiseInterface } from "./tools/poll"
-import { FileInfoInterface, Uuid } from "./api/types"
-import defaultSettings from "./defaultSettings"
+import info from './api/info'
+import { SettingsInterface } from './types'
+import poll, { PollPromiseInterface } from './tools/poll'
+import { FileInfoInterface, Uuid } from './api/types'
+import defaultSettings from './defaultSettings'
 
 type FileIsReadyParams = {
   uuid: Uuid
@@ -24,7 +24,7 @@ const checkFileIsReady = ({
       return response
     }
 
-    if (typeof onProgress === "function") {
+    if (typeof onProgress === 'function') {
       onProgress(response)
     }
 

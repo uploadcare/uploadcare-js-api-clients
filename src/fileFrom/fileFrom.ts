@@ -1,20 +1,20 @@
-import { UploadLifecycle } from "../lifecycle/UploadLifecycle"
-import { FileUploadLifecycle } from "../lifecycle/FileUploadLifecycle"
-import { FileFromObject } from "./FileFromObject"
-import { FileFromUploaded } from "./FileFromUploaded"
-import { FileFromUrl } from "./FileFromUrl"
+import { UploadLifecycle } from '../lifecycle/UploadLifecycle'
+import { FileUploadLifecycle } from '../lifecycle/FileUploadLifecycle'
+import { FileFromObject } from './FileFromObject'
+import { FileFromUploaded } from './FileFromUploaded'
+import { FileFromUrl } from './FileFromUrl'
 
 /* Types */
-import { FileData, SettingsInterface, UploadcareFileInterface } from "../types"
-import { Url } from "../api/fromUrl"
-import { Uuid } from "../api/types"
+import { FileData, SettingsInterface, UploadcareFileInterface } from '../types'
+import { Url } from '../api/fromUrl'
+import { Uuid } from '../api/types'
 import {
   FileUploadLifecycleInterface,
   LifecycleHooksInterface,
   UploadInterface
-} from "../lifecycle/types"
-import { isFileData, isUrl, isUuid } from "./types"
-import { Upload } from "../lifecycle/Upload"
+} from '../lifecycle/types'
+import { isFileData, isUrl, isUuid } from './types'
+import { Upload } from '../lifecycle/Upload'
 
 /**
  * Uploads file from provided data.

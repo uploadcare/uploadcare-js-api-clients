@@ -1,7 +1,7 @@
-import { Thenable } from "../thenable/Thenable"
+import { Thenable } from '../thenable/Thenable'
 
 /* Types */
-import { UploadHandlerInterface, UploadInterface } from "../lifecycle/types"
+import { UploadHandlerInterface, UploadInterface } from '../lifecycle/types'
 
 export class Upload<T, U> extends Thenable<T> implements UploadInterface<T> {
   protected readonly promise: Promise<T>

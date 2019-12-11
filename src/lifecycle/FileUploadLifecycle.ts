@@ -1,12 +1,12 @@
-import checkFileIsReady from "../checkFileIsReady"
-import { UploadcareFile } from "../UploadcareFile"
+import checkFileIsReady from '../checkFileIsReady'
+import { UploadcareFile } from '../UploadcareFile'
 
 /* Types */
-import { FileUploadLifecycleInterface, LifecycleInterface } from "./types"
-import { SettingsInterface, UploadcareFileInterface } from "../types"
-import { Uuid } from ".."
-import { PollPromiseInterface } from "../tools/poll"
-import { FileInfoInterface } from "../api/types"
+import { FileUploadLifecycleInterface, LifecycleInterface } from './types'
+import { SettingsInterface, UploadcareFileInterface } from '../types'
+import { Uuid } from '..'
+import { PollPromiseInterface } from '../tools/poll'
+import { FileInfoInterface } from '../api/types'
 
 export class FileUploadLifecycle implements FileUploadLifecycleInterface {
   readonly uploadLifecycle: LifecycleInterface<UploadcareFileInterface>

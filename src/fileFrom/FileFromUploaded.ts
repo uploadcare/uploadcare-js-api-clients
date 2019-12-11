@@ -1,15 +1,15 @@
-import info from "../api/info"
+import info from '../api/info'
 
 /* Types */
-import { SettingsInterface, UploadcareFileInterface, Uuid } from ".."
+import { SettingsInterface, UploadcareFileInterface, Uuid } from '..'
 import {
   FileUploadLifecycleInterface,
   UploadHandlerInterface
-} from "../lifecycle/types"
-import { ProgressStateEnum } from "../types"
-import { CancelableThenableInterface } from "../thenable/types"
-import { FileInfoInterface } from "../api/types"
-import CancelError from "../errors/CancelError"
+} from '../lifecycle/types'
+import { ProgressStateEnum } from '../types'
+import { CancelableThenableInterface } from '../thenable/types'
+import { FileInfoInterface } from '../api/types'
+import CancelError from '../errors/CancelError'
 
 export class FileFromUploaded
   implements
@@ -24,7 +24,7 @@ export class FileFromUploaded
   constructor(uuid: Uuid, settings: SettingsInterface) {
     this.settings = {
       ...settings,
-      source: "uploaded"
+      source: 'uploaded'
     }
     this.request = info(uuid, this.settings)
   }

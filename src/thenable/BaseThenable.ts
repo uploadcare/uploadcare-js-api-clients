@@ -1,10 +1,10 @@
-import { Thenable } from "./Thenable"
-import request from "../api/request/request"
+import { Thenable } from './Thenable'
+import request from '../api/request/request'
 
 /* Types */
-import { BaseThenableInterface } from "./types"
-import { RequestInterface, RequestOptionsInterface } from "../api/request/types"
-import { BaseHooksInterface } from "../lifecycle/types"
+import { BaseThenableInterface } from './types'
+import { RequestInterface, RequestOptionsInterface } from '../api/request/types'
+import { BaseHooksInterface } from '../lifecycle/types'
 
 export class BaseThenable<T> extends Thenable<T>
   implements BaseThenableInterface<T> {
@@ -17,7 +17,7 @@ export class BaseThenable<T> extends Thenable<T>
     this.request = request({
       ...options,
       onUploadProgress: (progressEvent: ProgressEvent) => {
-        if (hooks && typeof hooks.onProgress === "function") {
+        if (hooks && typeof hooks.onProgress === 'function') {
           hooks.onProgress(progressEvent)
         }
       }
@@ -27,8 +27,8 @@ export class BaseThenable<T> extends Thenable<T>
       .catch(error => {
         if (
           hooks &&
-          error.name === "CancelError" &&
-          typeof hooks.onCancel === "function"
+          error.name === 'CancelError' &&
+          typeof hooks.onCancel === 'function'
         ) {
           hooks.onCancel()
         }

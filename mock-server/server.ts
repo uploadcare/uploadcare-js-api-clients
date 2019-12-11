@@ -1,22 +1,22 @@
 // @ts-ignore
-import Koa from "koa"
-import Router from "@koa/router"
-import chalk from "chalk"
+import Koa from 'koa'
+import Router from '@koa/router'
+import chalk from 'chalk'
 
 // Middleware
-import cors from "@koa/cors"
-import addTrailingSlashes from "koa-add-trailing-slashes"
+import cors from '@koa/cors'
+import addTrailingSlashes from 'koa-add-trailing-slashes'
 // @ts-ignore
-import koaBody from "koa-body"
+import koaBody from 'koa-body'
 
-import logger from "./middleware/logger"
-import auth from "./middleware/auth"
+import logger from './middleware/logger'
+import auth from './middleware/auth'
 
 // Config
-import { PORT } from "./config"
+import { PORT } from './config'
 
 // Routes
-import { ROUTES, RouteType } from "./routes"
+import { ROUTES, RouteType } from './routes'
 
 const app = new Koa()
 const router = new Router()
@@ -46,8 +46,8 @@ ROUTES.forEach((route: RouteType) => {
 })
 
 // Handle errors
-app.on("error", (err, ctx) => {
-  console.error(`💔 ${chalk.red("Server error")}:`)
+app.on('error', (err, ctx) => {
+  console.error(`💔 ${chalk.red('Server error')}:`)
   console.error(err)
   console.error(ctx)
 })
@@ -55,12 +55,12 @@ app.on("error", (err, ctx) => {
 // Listen server
 app.listen(PORT, () => {
   console.log(
-    `🚀 ${chalk.bold("Server started at")} ${chalk.green(
+    `🚀 ${chalk.bold('Server started at')} ${chalk.green(
       chalk.bold(`http://localhost:${PORT}`)
     )}`,
-    "\n"
+    '\n'
   )
-  console.log("Available routes:", "\n")
+  console.log('Available routes:', '\n')
 
   // Print all available routes
   ROUTES.forEach((route: RouteType) => {

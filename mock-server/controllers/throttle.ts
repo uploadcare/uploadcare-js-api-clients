@@ -1,4 +1,4 @@
-import error from "../utils/error"
+import error from '../utils/error'
 
 let times = 0
 
@@ -16,7 +16,7 @@ const index = ctx => {
   } else {
     return error(ctx, {
       status: 429,
-      statusText: "Request was throttled."
+      statusText: 'Request was throttled.'
     })
   }
 }

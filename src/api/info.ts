@@ -1,10 +1,10 @@
-import { Uuid, FileInfo } from "./base-types"
-import request from "./request/request.node"
-import getUrl from "./request/getUrl"
+import { Uuid, FileInfo } from './base-types'
+import request from './request/request.node'
+import getUrl from './request/getUrl'
 
-import CancelController from "../CancelController"
-import defaultSettings, { getUserAgent } from "../defaultSettings"
-import camelizeKeys from "../tools/camelizeKeys"
+import CancelController from '../CancelController'
+import defaultSettings, { getUserAgent } from '../defaultSettings'
+import camelizeKeys from '../tools/camelizeKeys'
 
 type FailedResponse = {
   error: {
@@ -40,11 +40,11 @@ export default function info(
   }: Options
 ): Promise<FileInfo> {
   return request({
-    method: "GET",
+    method: 'GET',
     headers: {
-      "X-UC-User-Agent": getUserAgent({ publicKey, integration })
+      'X-UC-User-Agent': getUserAgent({ publicKey, integration })
     },
-    url: getUrl(baseUrl, "/info/", {
+    url: getUrl(baseUrl, '/info/', {
       jsonerrors: 1,
       pub_key: publicKey,
       file_id: uuid,
@@ -54,7 +54,7 @@ export default function info(
   })
     .then(response => camelizeKeys<Response>(JSON.parse(response.data)))
     .then(response => {
-      if ("error" in response) {
+      if ('error' in response) {
         throw new Error(
           `[${response.error.statusCode}] ${response.error.content}`
         )

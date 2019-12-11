@@ -1,16 +1,16 @@
-import * as factory from "../_fixtureFactory"
-import { getSettingsForTesting } from "../_helpers"
-import group from "../../src/api/group"
-import groupInfo from "../../src/api/groupInfo"
-import CancelController from "../../src/CancelController"
+import * as factory from '../_fixtureFactory'
+import { getSettingsForTesting } from '../_helpers'
+import group from '../../src/api/group'
+import groupInfo from '../../src/api/groupInfo'
+import CancelController from '../../src/CancelController'
 
-describe("API - group info", () => {
-  const files = factory.groupOfFiles("valid")
+describe('API - group info', () => {
+  const files = factory.groupOfFiles('valid')
   const settings = getSettingsForTesting({
-    publicKey: factory.publicKey("image")
+    publicKey: factory.publicKey('image')
   })
 
-  it("should return info about uploaded group of files", async () => {
+  it('should return info about uploaded group of files', async () => {
     const { id } = await group(files, settings)
     const data = await groupInfo(id, settings)
 
@@ -18,18 +18,18 @@ describe("API - group info", () => {
     expect(data.id).toBeTruthy()
     expect(data.files).toBeTruthy()
   })
-  it("should fail with [HTTP 404] group_id is invalid.", async () => {
-    const groupId = factory.groupId("invalid")
+  it('should fail with [HTTP 404] group_id is invalid.', async () => {
+    const groupId = factory.groupId('invalid')
     const upload = groupInfo(groupId, settings)
 
     await expectAsync(upload).toBeRejectedWithError(Error)
   })
 
-  it("should be able to cancel uploading", async () => {
+  it('should be able to cancel uploading', async () => {
     let controller = new CancelController()
 
     const settingsWithCancel = getSettingsForTesting({
-      publicKey: factory.publicKey("image"),
+      publicKey: factory.publicKey('image'),
       cancel: controller
     })
 
@@ -40,7 +40,7 @@ describe("API - group info", () => {
     }, 10)
 
     await expectAsync(groupInfo(id, settingsWithCancel)).toBeRejectedWithError(
-      "cancel"
+      'cancel'
     )
   })
 })

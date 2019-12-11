@@ -3,9 +3,9 @@ import {
   OriginalVideoInfoInterface,
   SettingsInterface,
   UploadcareFileInterface
-} from "./types"
-import prettyFileInfo from "./prettyFileInfo"
-import { FileInfoInterface, Uuid } from "./api/types"
+} from './types'
+import prettyFileInfo from './prettyFileInfo'
+import { FileInfoInterface, Uuid } from './api/types'
 
 export class UploadcareFile implements UploadcareFileInterface {
   readonly uuid: Uuid

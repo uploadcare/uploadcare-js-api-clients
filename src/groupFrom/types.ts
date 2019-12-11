@@ -1,6 +1,6 @@
-import { FileData } from "../types"
-import { Url, Uuid } from ".."
-import { isFileData, isUrl, isUuid } from "../fileFrom/types"
+import { FileData } from '../types'
+import { Url, Uuid } from '..'
+import { isFileData, isUrl, isUuid } from '../fileFrom/types'
 
 /**
  * FileData type guard.

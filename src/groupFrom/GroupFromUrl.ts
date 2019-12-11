@@ -1,20 +1,20 @@
-import fileFrom from "../fileFrom/fileFrom"
-import group from "../api/group"
-import CancelError from "../errors/CancelError"
+import fileFrom from '../fileFrom/fileFrom'
+import group from '../api/group'
+import CancelError from '../errors/CancelError'
 
 /* Types */
 import {
   SettingsInterface,
   UploadcareFileInterface,
   UploadcareGroupInterface
-} from "../types"
-import { Url } from ".."
+} from '../types'
+import { Url } from '..'
 import {
   GroupUploadLifecycleInterface,
   UploadHandlerInterface,
   UploadInterface
-} from "../lifecycle/types"
-import { GroupInfoInterface } from "../api/types"
+} from '../lifecycle/types'
+import { GroupInfoInterface } from '../api/types'
 
 export class GroupFromUrl
   implements

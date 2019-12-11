@@ -1,4 +1,4 @@
-import { ErrorRequestInfoInterface, ErrorResponseInfoInterface } from "./types"
+import { ErrorRequestInfoInterface, ErrorResponseInfoInterface } from './types'
 
 export default class RequestError extends Error {
   readonly request: ErrorRequestInfoInterface
@@ -10,7 +10,7 @@ export default class RequestError extends Error {
   ) {
     super()
 
-    this.name = "RequestError"
+    this.name = 'RequestError'
     this.message = `[${response.status}] ${response.statusText}`
     this.request = request
     this.response = response

@@ -1,18 +1,18 @@
-import * as factory from "./_fixtureFactory"
-import checkFileIsUploadedFromUrl from "../src/checkFileIsUploadedFromUrl"
-import { StatusEnum } from "../src/api/fromUrlStatus"
-import { getSettingsForTesting } from "./_helpers"
-import fromUrl from "../src/api/fromUrl"
-import CancelError from "../src/errors/CancelError"
-import TimeoutError from "../src/errors/TimeoutError"
+import * as factory from './_fixtureFactory'
+import checkFileIsUploadedFromUrl from '../src/checkFileIsUploadedFromUrl'
+import { StatusEnum } from '../src/api/fromUrlStatus'
+import { getSettingsForTesting } from './_helpers'
+import fromUrl from '../src/api/fromUrl'
+import CancelError from '../src/errors/CancelError'
+import TimeoutError from '../src/errors/TimeoutError'
 
-describe("checkFileIsUploadedFromUrl", () => {
-  const sourceUrl = factory.imageUrl("valid")
+describe('checkFileIsUploadedFromUrl', () => {
+  const sourceUrl = factory.imageUrl('valid')
   const settings = getSettingsForTesting({
-    publicKey: factory.publicKey("demo")
+    publicKey: factory.publicKey('demo')
   })
 
-  it("should be resolved if file is uploaded", async () => {
+  it('should be resolved if file is uploaded', async () => {
     const data = await fromUrl(sourceUrl, settings)
     // @ts-ignore
     const { token } = data
@@ -24,7 +24,7 @@ describe("checkFileIsUploadedFromUrl", () => {
     expect(info.status).toBe(StatusEnum.Success)
   })
 
-  it("should be cancelable", async () => {
+  it('should be cancelable', async () => {
     const data = await fromUrl(sourceUrl, settings)
     // @ts-ignore
     const { token } = data
@@ -39,7 +39,7 @@ describe("checkFileIsUploadedFromUrl", () => {
     await (expectAsync(promise) as any).toBeRejectedWithError(CancelError)
   })
 
-  it("should be rejected after timeout", async () => {
+  it('should be rejected after timeout', async () => {
     const data = await fromUrl(sourceUrl, settings)
     // @ts-ignore
     const { token } = data

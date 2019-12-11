@@ -1,5 +1,5 @@
-import { LifecycleStateInterface } from "../types"
-import { ProgressStateEnum, UploadingProgress } from "../../types"
+import { LifecycleStateInterface } from '../types'
+import { ProgressStateEnum, UploadingProgress } from '../../types'
 
 export abstract class AbstractState implements LifecycleStateInterface {
   abstract readonly progress: UploadingProgress

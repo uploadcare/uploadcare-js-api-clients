@@ -1,7 +1,7 @@
-import { Thenable } from "../thenable/Thenable"
-import TimeoutError from "../errors/TimeoutError"
-import CancelError from "../errors/CancelError"
-import { CancelableInterface } from "../lifecycle/types"
+import { Thenable } from '../thenable/Thenable'
+import TimeoutError from '../errors/TimeoutError'
+import CancelError from '../errors/CancelError'
+import { CancelableInterface } from '../lifecycle/types'
 
 export const DEFAULT_TIMEOUT = 10000
 const DEFAULT_INTERVAL = 500
@@ -74,7 +74,7 @@ export default function poll<T>(
       // Didn't match and too much time, reject!
       else {
         // TODO: Pass function name as param
-        reject(new TimeoutError(""))
+        reject(new TimeoutError(''))
       }
     } catch (error) {
       reject(error)

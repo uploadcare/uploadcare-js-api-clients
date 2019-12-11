@@ -1,11 +1,11 @@
-import { SettingsInterface } from "./types"
-import poll, { PollPromiseInterface } from "./tools/poll"
+import { SettingsInterface } from './types'
+import poll, { PollPromiseInterface } from './tools/poll'
 import fromUrlStatus, {
   FromUrlStatusResponse,
   isSuccessResponse
-} from "./api/fromUrlStatus"
-import { Uuid } from "./api/types"
-import defaultSettings from "./defaultSettings"
+} from './api/fromUrlStatus'
+import { Uuid } from './api/types'
+import defaultSettings from './defaultSettings'
 
 type FileIsUploadedParams = {
   token: Uuid
@@ -27,7 +27,7 @@ const checkFileIsUploadedFromUrl = ({
       return response
     }
 
-    if (onProgress && typeof onProgress === "function") {
+    if (onProgress && typeof onProgress === 'function') {
       onProgress(response)
     }
 

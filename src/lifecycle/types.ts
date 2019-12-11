@@ -4,10 +4,10 @@ import {
   UploadcareFileInterface,
   UploadcareGroupInterface,
   UploadingProgress
-} from "../types"
-import { Uuid } from ".."
-import { FileInfoInterface, GroupInfoInterface } from "../api/types"
-import { PollPromiseInterface } from "../tools/poll"
+} from '../types'
+import { Uuid } from '..'
+import { FileInfoInterface, GroupInfoInterface } from '../api/types'
+import { PollPromiseInterface } from '../tools/poll'
 
 export interface CancelableInterface {
   cancel(): void

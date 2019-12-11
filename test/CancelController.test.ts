@@ -1,16 +1,16 @@
-import CancelController from "../src/CancelController"
+import CancelController from '../src/CancelController'
 
-describe("CancelController", () => {
-  it("should work", done => {
+describe('CancelController', () => {
+  it('should work', done => {
     let ctrl = new CancelController()
 
     ctrl.onCancel(done)
     ctrl.cancel()
   })
 
-  it("should run onCancel callback ones", async () => {
+  it('should run onCancel callback ones', async () => {
     let ctrl = new CancelController()
-    let onCancel = jasmine.createSpy("cancel")
+    let onCancel = jasmine.createSpy('cancel')
 
     ctrl.onCancel(onCancel)
     ctrl.cancel()
@@ -23,10 +23,10 @@ describe("CancelController", () => {
     expect(spy).toHaveBeenCalledTimes(1)
   })
 
-  it("should execute more than one callback", async () => {
+  it('should execute more than one callback', async () => {
     let ctrl = new CancelController()
-    let firstOnCancel = jasmine.createSpy("cancel")
-    let secondOnCancel = jasmine.createSpy("cancel")
+    let firstOnCancel = jasmine.createSpy('cancel')
+    let secondOnCancel = jasmine.createSpy('cancel')
 
     ctrl.onCancel(firstOnCancel)
     ctrl.onCancel(secondOnCancel)
@@ -41,8 +41,8 @@ describe("CancelController", () => {
     expect(spy2).toHaveBeenCalledTimes(1)
   })
 
-  it("should run callback on already cancelled controller", async () => {
-    let spy = jasmine.createSpy("cancel")
+  it('should run callback on already cancelled controller', async () => {
+    let spy = jasmine.createSpy('cancel')
     let ctrl = new CancelController()
 
     ctrl.cancel()

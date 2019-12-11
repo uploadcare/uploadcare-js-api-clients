@@ -1,11 +1,11 @@
-import * as FormData from "form-data"
+import * as FormData from 'form-data'
 
-import * as http from "http"
-import * as https from "https"
-import { parse } from "url"
-import { Readable, Transform } from "stream"
+import * as http from 'http'
+import * as https from 'https'
+import { parse } from 'url'
+import { Readable, Transform } from 'stream'
 
-import CancelController from "../../CancelController"
+import CancelController from '../../CancelController'
 
 export type RequestOptions = {
   method?: string
@@ -63,7 +63,7 @@ const request = ({
   cancel,
   onProgress
 }: RequestOptions): Promise<BaseResponse> =>
-  Promise.resolve(data && data.toString() === "[object FormData]")
+  Promise.resolve(data && data.toString() === '[object FormData]')
     .then(isFormData => (isFormData ? getLength(data) : undefined))
     .then(
       length =>
@@ -78,11 +78,11 @@ const request = ({
             : headers
 
           if (isFormData) {
-            options.headers!["Content-Length"] = length
+            options.headers!['Content-Length'] = length
           }
 
           const req =
-            options.protocol !== "https:"
+            options.protocol !== 'https:'
               ? http.request(options)
               : https.request(options)
 
@@ -91,29 +91,29 @@ const request = ({
               aborted = true
               req.abort()
 
-              reject(new Error("cancel"))
+              reject(new Error('cancel'))
             })
           }
 
-          req.on("response", res => {
+          req.on('response', res => {
             if (aborted) return
 
             const resChunks: any = []
 
-            res.on("data", data => {
+            res.on('data', data => {
               resChunks.push(data)
             })
 
-            res.on("end", () =>
+            res.on('end', () =>
               resolve({
-                data: Buffer.concat(resChunks).toString("utf8"),
+                data: Buffer.concat(resChunks).toString('utf8'),
                 status: res.statusCode,
                 headers: res.headers
               })
             )
           })
 
-          req.on("error", err => {
+          req.on('error', err => {
             if (aborted) return
 
             reject(err)

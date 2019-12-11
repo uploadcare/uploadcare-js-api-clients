@@ -1,14 +1,14 @@
-import { prepareOptions } from "../request/prepareOptions"
-import { getFileSize } from "./getFileSize"
-import defaultSettings from "../../defaultSettings"
+import { prepareOptions } from '../request/prepareOptions'
+import { getFileSize } from './getFileSize'
+import defaultSettings from '../../defaultSettings'
 
 /* Types */
-import { Body, RequestOptionsInterface } from "../request/types"
-import { FileData, SettingsInterface } from "../../types"
-import { MultipartStartResponse } from "./types"
-import { CancelableThenableInterface } from "../../thenable/types"
-import { CancelableThenable } from "../../thenable/CancelableThenable"
-import { CancelHookInterface } from "../../lifecycle/types"
+import { Body, RequestOptionsInterface } from '../request/types'
+import { FileData, SettingsInterface } from '../../types'
+import { MultipartStartResponse } from './types'
+import { CancelableThenableInterface } from '../../thenable/types'
+import { CancelableThenable } from '../../thenable/CancelableThenable'
+import { CancelHookInterface } from '../../lifecycle/types'
 
 const getRequestBody = (file: FileData, settings: SettingsInterface): Body => {
   const size: number = getFileSize(file)
@@ -17,12 +17,12 @@ const getRequestBody = (file: FileData, settings: SettingsInterface): Body => {
     filename: settings.fileName || defaultSettings.fileName,
     size,
     partSize: settings.multipartChunkSize || defaultSettings.multipartChunkSize,
-    content_type: "application/octet-stream",
-    UPLOADCARE_STORE: settings.doNotStore ? "" : "auto",
-    UPLOADCARE_PUB_KEY: settings.publicKey || "",
-    signature: settings.secureSignature || "",
-    expire: settings.secureExpire || "",
-    source: "local"
+    content_type: 'application/octet-stream',
+    UPLOADCARE_STORE: settings.doNotStore ? '' : 'auto',
+    UPLOADCARE_PUB_KEY: settings.publicKey || '',
+    signature: settings.secureSignature || '',
+    expire: settings.secureExpire || '',
+    source: 'local'
   }
 }
 
@@ -32,8 +32,8 @@ const getRequestOptions = (
 ): RequestOptionsInterface => {
   return prepareOptions(
     {
-      method: "POST",
-      path: "/multipart/start/",
+      method: 'POST',
+      path: '/multipart/start/',
       body: getRequestBody(file, settings)
     },
     settings

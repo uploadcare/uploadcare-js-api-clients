@@ -1,10 +1,10 @@
-import { Uuid } from ".."
+import { Uuid } from '..'
 
 export default class TokenWasNotFoundError extends Error {
   constructor(token: Uuid) {
     super()
 
-    this.name = "TokenWasNotFoundError"
+    this.name = 'TokenWasNotFoundError'
     this.message = `Token "${token}" was not found.`
 
     Object.setPrototypeOf(this, TokenWasNotFoundError.prototype)

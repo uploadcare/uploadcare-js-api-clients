@@ -1,6 +1,6 @@
-import { FileData } from "../types"
-import { Url, Uuid } from ".."
-import { isNode } from "../tools/isNode"
+import { FileData } from '../types'
+import { Url, Uuid } from '..'
+import { isNode } from '../tools/isNode'
 
 /**
  * FileData type guard.
@@ -23,7 +23,7 @@ export const isFileData = (data: FileData | Url | Uuid): data is FileData => {
  */
 export const isUuid = (data: FileData | Url | Uuid): data is Uuid => {
   const UUID_REGEX =
-    "[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}"
+    '[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}'
   const regExp = new RegExp(UUID_REGEX)
 
   return !isFileData(data) && regExp.test(data)
@@ -36,7 +36,7 @@ export const isUuid = (data: FileData | Url | Uuid): data is Uuid => {
  */
 export const isUrl = (data: FileData | Url | Uuid): data is Url => {
   const URL_REGEX =
-    "^(?:\\w+:)?\\/\\/([^\\s\\.]+\\.\\S{2}|localhost[\\:?\\d]*)\\S*$"
+    '^(?:\\w+:)?\\/\\/([^\\s\\.]+\\.\\S{2}|localhost[\\:?\\d]*)\\S*$'
   const regExp = new RegExp(URL_REGEX)
 
   return !isFileData(data) && regExp.test(data)

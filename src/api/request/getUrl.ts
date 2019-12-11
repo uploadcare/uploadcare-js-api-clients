@@ -6,7 +6,7 @@ type Query = {
 }
 
 const serializePair = (key: string, value: BaseTypes): string | null =>
-  typeof value !== "undefined" ? `${key}=${encodeURIComponent(value)}` : null
+  typeof value !== 'undefined' ? `${key}=${encodeURIComponent(value)}` : null
 
 const createQuery = (query: Query): string =>
   Object.entries(query)
@@ -20,16 +20,16 @@ const createQuery = (query: Query): string =>
       []
     )
     .filter(x => !!x)
-    .join("&")
+    .join('&')
 
 const getUrl = (base: string, path: string, query?: Query): string =>
   [
     base,
     path,
-    query && Object.keys(query).length > 0 ? "?" : "",
+    query && Object.keys(query).length > 0 ? '?' : '',
     query && createQuery(query)
   ]
     .filter(Boolean)
-    .join("")
+    .join('')
 
 export default getUrl

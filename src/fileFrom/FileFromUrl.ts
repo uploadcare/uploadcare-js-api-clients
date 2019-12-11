@@ -1,23 +1,23 @@
-import defaultSettings from "../defaultSettings"
-import fromUrl from "../api/fromUrl"
-import fromUrlStatus from "../api/fromUrlStatus"
-import checkFileIsUploadedFromUrl from "../checkFileIsUploadedFromUrl"
-import CancelError from "../errors/CancelError"
-import TokenWasNotFoundError from "../errors/TokenWasNotFoundError"
+import defaultSettings from '../defaultSettings'
+import fromUrl from '../api/fromUrl'
+import fromUrlStatus from '../api/fromUrlStatus'
+import checkFileIsUploadedFromUrl from '../checkFileIsUploadedFromUrl'
+import CancelError from '../errors/CancelError'
+import TokenWasNotFoundError from '../errors/TokenWasNotFoundError'
 
 /* Types */
-import { Uuid } from "../api/types"
+import { Uuid } from '../api/types'
 import {
   ProgressStateEnum,
   SettingsInterface,
   UploadcareFileInterface
-} from "../types"
+} from '../types'
 import {
   FileUploadLifecycleInterface,
   UploadHandlerInterface
-} from "../lifecycle/types"
-import { Url } from ".."
-import { PollPromiseInterface } from "../tools/poll"
+} from '../lifecycle/types'
+import { Url } from '..'
+import { PollPromiseInterface } from '../tools/poll'
 import {
   FromUrlStatusResponse,
   isErrorResponse,
@@ -25,12 +25,12 @@ import {
   isSuccessResponse,
   isUnknownResponse,
   isWaitingResponse
-} from "../api/fromUrlStatus"
+} from '../api/fromUrlStatus'
 import {
   FromUrlResponse,
   isFileInfoResponse,
   isTokenResponse
-} from "../api/fromUrl"
+} from '../api/fromUrl'
 
 export class FileFromUrl
   implements

@@ -1,23 +1,23 @@
-import * as factory from "../_fixtureFactory"
-import fileFrom from "../../src/fileFrom/fileFrom"
-import { getSettingsForTesting } from "../_helpers"
-import CancelError from "../../src/errors/CancelError"
+import * as factory from '../_fixtureFactory'
+import fileFrom from '../../src/fileFrom/fileFrom'
+import { getSettingsForTesting } from '../_helpers'
+import CancelError from '../../src/errors/CancelError'
 
-describe("fileFrom Object (multipart)", () => {
+describe('fileFrom Object (multipart)', () => {
   const fileToUpload = factory.file(12).data
   const settings = getSettingsForTesting({
-    publicKey: factory.publicKey("multipart")
+    publicKey: factory.publicKey('multipart')
   })
 
-  it("should resolves when file is ready on CDN", async () => {
+  it('should resolves when file is ready on CDN', async () => {
     const file = await fileFrom(fileToUpload, settings)
 
     expect(file.cdnUrl).toBeTruthy()
   }, 250000)
 
-  it("should accept doNotStore setting", async () => {
+  it('should accept doNotStore setting', async () => {
     const settings = getSettingsForTesting({
-      publicKey: factory.publicKey("image"),
+      publicKey: factory.publicKey('image'),
       doNotStore: true
     })
     const file = await fileFrom(fileToUpload, settings)
@@ -25,7 +25,7 @@ describe("fileFrom Object (multipart)", () => {
     expect(file.isStored).toBeFalsy()
   }, 250000)
 
-  it("should be able to cancel uploading", async () => {
+  it('should be able to cancel uploading', async () => {
     const upload = fileFrom(fileToUpload, settings)
 
     upload.cancel()
@@ -33,20 +33,20 @@ describe("fileFrom Object (multipart)", () => {
     await (expectAsync(upload) as any).toBeRejectedWithError(CancelError)
   })
 
-  it("should accept new file name setting", async () => {
+  it('should accept new file name setting', async () => {
     const settings = getSettingsForTesting({
-      publicKey: factory.publicKey("image"),
+      publicKey: factory.publicKey('image'),
       doNotStore: true,
-      fileName: "newFileName.jpg"
+      fileName: 'newFileName.jpg'
     })
     const file = await fileFrom(fileToUpload, settings)
 
-    expect(file.name).toEqual("newFileName.jpg")
+    expect(file.name).toEqual('newFileName.jpg')
   }, 250000)
 
-  describe("should be able to handle", () => {
-    it("cancel uploading", async () => {
-      const onCancel = jasmine.createSpy("onCancel")
+  describe('should be able to handle', () => {
+    it('cancel uploading', async () => {
+      const onCancel = jasmine.createSpy('onCancel')
       const upload = fileFrom(fileToUpload, settings, { onCancel })
 
       upload.cancel()
@@ -56,7 +56,7 @@ describe("fileFrom Object (multipart)", () => {
       expect(onCancel).toHaveBeenCalled()
     })
 
-    it("progress", async () => {
+    it('progress', async () => {
       let progressValue = 0
       const onProgress = progress => {
         const { value } = progress
@@ -70,8 +70,8 @@ describe("fileFrom Object (multipart)", () => {
       expect(progressValue).toBe(1)
     }, 250000)
 
-    it("uploaded", async () => {
-      const onUploaded = jasmine.createSpy("onUploaded")
+    it('uploaded', async () => {
+      const onUploaded = jasmine.createSpy('onUploaded')
       const upload = fileFrom(fileToUpload, settings, { onUploaded })
 
       await (expectAsync(upload) as any).toBeResolved()
@@ -79,8 +79,8 @@ describe("fileFrom Object (multipart)", () => {
       expect(onUploaded).toHaveBeenCalled()
     }, 250000)
 
-    it("ready", async () => {
-      const onReady = jasmine.createSpy("onReady")
+    it('ready', async () => {
+      const onReady = jasmine.createSpy('onReady')
       const upload = fileFrom(fileToUpload, settings, { onReady })
 
       await (expectAsync(upload) as any).toBeResolved()

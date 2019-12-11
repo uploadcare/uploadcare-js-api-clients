@@ -1,17 +1,17 @@
-import { FileInfo, Token } from "./base-types"
-import request from "./request/request.node"
-import getUrl from "./request/getUrl"
+import { FileInfo, Token } from './base-types'
+import request from './request/request.node'
+import getUrl from './request/getUrl'
 
-import defaultSettings, { getUserAgent } from "../defaultSettings"
-import CancelController from "../CancelController"
-import camelizeKeys from "../tools/camelizeKeys"
+import defaultSettings, { getUserAgent } from '../defaultSettings'
+import CancelController from '../CancelController'
+import camelizeKeys from '../tools/camelizeKeys'
 
 export enum Status {
-  Unknown = "unknown",
-  Waiting = "waiting",
-  Progress = "progress",
-  Error = "error",
-  Success = "success"
+  Unknown = 'unknown',
+  Waiting = 'waiting',
+  Progress = 'progress',
+  Error = 'error',
+  Success = 'success'
 }
 
 type UnknownResponse = {
@@ -87,7 +87,7 @@ export const isProgressResponse = (
 export const isErrorResponse = (
   response: Response
 ): response is ErrorResponse => {
-  return "status" in response && response.status === Status.Error
+  return 'status' in response && response.status === Status.Error
 }
 
 /**
@@ -122,11 +122,11 @@ export default function fromUrlStatus(
   }: Options = {}
 ): Promise<StatusResponse> {
   return request({
-    method: "GET",
+    method: 'GET',
     headers: publicKey
-      ? { "X-UC-User-Agent": getUserAgent({ publicKey, integration }) }
+      ? { 'X-UC-User-Agent': getUserAgent({ publicKey, integration }) }
       : undefined,
-    url: getUrl(baseUrl, "/from_url/status/", {
+    url: getUrl(baseUrl, '/from_url/status/', {
       jsonerrors: 1,
       token
     }),
@@ -134,7 +134,7 @@ export default function fromUrlStatus(
   })
     .then(response => camelizeKeys<Response>(JSON.parse(response.data)))
     .then(response => {
-      if ("error" in response && !isErrorResponse(response)) {
+      if ('error' in response && !isErrorResponse(response)) {
         throw new Error(
           `[${response.error.statusCode}] ${response.error.content}`
         )

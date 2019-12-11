@@ -1,20 +1,20 @@
-import { UploadingState } from "./state/UploadingState"
-import { CancelledState } from "./state/CancelledState"
-import { ReadyState } from "./state/ReadyState"
-import { ErrorState } from "./state/ErrorState"
-import { PendingState } from "./state/PendingState"
-import StateChangeError from "../errors/StateChangeError"
-import EntityIsNotReadyError from "../errors/EntityIsNotReadyError"
-import { UploadedState } from "./state/UploadedState"
+import { UploadingState } from './state/UploadingState'
+import { CancelledState } from './state/CancelledState'
+import { ReadyState } from './state/ReadyState'
+import { ErrorState } from './state/ErrorState'
+import { PendingState } from './state/PendingState'
+import StateChangeError from '../errors/StateChangeError'
+import EntityIsNotReadyError from '../errors/EntityIsNotReadyError'
+import { UploadedState } from './state/UploadedState'
 
 /* Types */
-import { ProgressParamsInterface, UploadingProgress } from "../types"
+import { ProgressParamsInterface, UploadingProgress } from '../types'
 import {
   LifecycleHooksInterface,
   LifecycleInterface,
   LifecycleStateInterface
-} from "./types"
-import { Uuid } from ".."
+} from './types'
+import { Uuid } from '..'
 
 export class UploadLifecycle<T> implements LifecycleInterface<T> {
   private state: LifecycleStateInterface
@@ -64,7 +64,7 @@ export class UploadLifecycle<T> implements LifecycleInterface<T> {
   handleUploading(progress?: ProgressParamsInterface): void {
     this.updateState(new UploadingState(progress))
 
-    if (typeof this.onProgress === "function") {
+    if (typeof this.onProgress === 'function') {
       this.onProgress(this.getProgress())
     }
   }
@@ -72,7 +72,7 @@ export class UploadLifecycle<T> implements LifecycleInterface<T> {
   handleCancelling(): void {
     this.updateState(new CancelledState())
 
-    if (typeof this.onCancel === "function") {
+    if (typeof this.onCancel === 'function') {
       this.onCancel()
     }
   }
@@ -80,11 +80,11 @@ export class UploadLifecycle<T> implements LifecycleInterface<T> {
   handleUploaded(uuid: Uuid): T {
     this.updateState(new UploadedState())
 
-    if (typeof this.onProgress === "function") {
+    if (typeof this.onProgress === 'function') {
       this.onProgress(this.getProgress())
     }
 
-    if (typeof this.onUploaded === "function") {
+    if (typeof this.onUploaded === 'function') {
       this.onUploaded(uuid)
     }
 
@@ -94,11 +94,11 @@ export class UploadLifecycle<T> implements LifecycleInterface<T> {
   handleReady(): T {
     this.updateState(new ReadyState())
 
-    if (typeof this.onProgress === "function") {
+    if (typeof this.onProgress === 'function') {
       this.onProgress(this.getProgress())
     }
 
-    if (typeof this.onReady === "function") {
+    if (typeof this.onReady === 'function') {
       this.onReady(this.getEntity())
     }
 
@@ -106,7 +106,7 @@ export class UploadLifecycle<T> implements LifecycleInterface<T> {
   }
 
   handleError(error: Error): Promise<never> {
-    if (error.name === "CancelError") {
+    if (error.name === 'CancelError') {
       this.handleCancelling()
     } else {
       this.updateState(new ErrorState())

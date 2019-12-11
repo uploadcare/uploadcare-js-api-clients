@@ -1,7 +1,7 @@
-import info from "./info"
-import UploadClient from "../UploadClient"
-import fromUrlStatus, { FromUrlStatusResponse } from "./fromUrlStatus"
-import base, { BaseResponse } from "./base"
+import info from './info'
+import UploadClient from '../UploadClient'
+import fromUrlStatus, { FromUrlStatusResponse } from './fromUrlStatus'
+import base, { BaseResponse } from './base'
 import {
   FileInfoInterface,
   GroupId,
@@ -9,23 +9,23 @@ import {
   Token,
   UploadAPIInterface,
   Uuid
-} from "./types"
-import { RequestOptionsInterface, RequestResponse } from "./request/types"
-import fromUrl, { FromUrlResponse, Url } from "./fromUrl"
-import groupInfo from "./groupInfo"
-import { FileData, SettingsInterface } from "../types"
-import { prepareOptions } from "./request/prepareOptions"
-import group from "./group"
-import request from "./request/request"
-import { MultipartPart, MultipartStartResponse } from "./multipart/types"
-import multipartComplete from "./multipart/multipartComplete"
-import multipartStart from "./multipart/multipartStart"
-import multipartUpload from "./multipart/multipartUpload"
+} from './types'
+import { RequestOptionsInterface, RequestResponse } from './request/types'
+import fromUrl, { FromUrlResponse, Url } from './fromUrl'
+import groupInfo from './groupInfo'
+import { FileData, SettingsInterface } from '../types'
+import { prepareOptions } from './request/prepareOptions'
+import group from './group'
+import request from './request/request'
+import { MultipartPart, MultipartStartResponse } from './multipart/types'
+import multipartComplete from './multipart/multipartComplete'
+import multipartStart from './multipart/multipartStart'
+import multipartUpload from './multipart/multipartUpload'
 import {
   BaseThenableInterface,
   CancelableThenableInterface
-} from "../thenable/types"
-import { BaseHooksInterface, CancelHookInterface } from "../lifecycle/types"
+} from '../thenable/types'
+import { BaseHooksInterface, CancelHookInterface } from '../lifecycle/types'
 
 class UploadAPI implements UploadAPIInterface {
   readonly client: UploadClient

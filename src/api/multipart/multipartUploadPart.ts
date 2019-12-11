@@ -1,23 +1,23 @@
 /* Vendors */
-import * as FormData from "form-data"
+import * as FormData from 'form-data'
 import axios, {
   AxiosRequestConfig,
   AxiosResponse,
   CancelTokenSource
-} from "axios"
+} from 'axios'
 
-import { Thenable } from "../../thenable/Thenable"
-import defaultSettings from "../../defaultSettings"
-import { isNode } from "../../tools/isNode"
-import CancelError from "../../errors/CancelError"
-import RequestError from "../../errors/RequestError"
-import { addMaxConcurrencyInterceptorsToAxiosInstance } from "../request/interceptors"
+import { Thenable } from '../../thenable/Thenable'
+import defaultSettings from '../../defaultSettings'
+import { isNode } from '../../tools/isNode'
+import CancelError from '../../errors/CancelError'
+import RequestError from '../../errors/RequestError'
+import { addMaxConcurrencyInterceptorsToAxiosInstance } from '../request/interceptors'
 
 /* Types */
-import { FileData, SettingsInterface } from "../../types"
-import { MultipartPart, MultipartUploadResponse } from "./types"
-import { BaseThenableInterface } from "../../thenable/types"
-import { BaseHooksInterface } from "../../lifecycle/types"
+import { FileData, SettingsInterface } from '../../types'
+import { MultipartPart, MultipartUploadResponse } from './types'
+import { BaseThenableInterface } from '../../thenable/types'
+import { BaseHooksInterface } from '../../lifecycle/types'
 
 const updateProgress = ({
   data,
@@ -29,7 +29,7 @@ const updateProgress = ({
   onUploadProgress: (progressEvent: ProgressEvent) => void
 }): void => {
   const formData = new FormData()
-  formData.append("data", data)
+  formData.append('data', data)
 
   const total = formData.getLengthSync()
 
@@ -83,12 +83,12 @@ class MultipartUploadPart extends Thenable<MultipartUploadResponse>
     const options = {
       data: file,
       url: partUrl,
-      method: "PUT",
+      method: 'PUT',
       cancelToken: this.cancelController.token,
       maxContentLength:
         settings.maxContentLength || defaultSettings.maxContentLength,
       onUploadProgress: (progressEvent: ProgressEvent) => {
-        if (hooks && typeof hooks.onProgress === "function") {
+        if (hooks && typeof hooks.onProgress === 'function') {
           hooks.onProgress(progressEvent)
         }
       }
@@ -144,9 +144,9 @@ class MultipartUploadPart extends Thenable<MultipartUploadResponse>
       .then(response => Promise.resolve({ code: response.status }))
       .catch(error => {
         if (
-          error.name === "CancelError" &&
+          error.name === 'CancelError' &&
           hooks &&
-          typeof hooks.onCancel === "function"
+          typeof hooks.onCancel === 'function'
         ) {
           hooks.onCancel()
         }

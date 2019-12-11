@@ -1,10 +1,10 @@
-import { Uuid, GroupInfo } from "./base-types"
-import request from "./request/request.node"
-import getUrl from "./request/getUrl"
+import { Uuid, GroupInfo } from './base-types'
+import request from './request/request.node'
+import getUrl from './request/getUrl'
 
-import CancelController from "../CancelController"
-import defaultSettings, { getUserAgent } from "../defaultSettings"
-import camelizeKeys from "../tools/camelizeKeys"
+import CancelController from '../CancelController'
+import defaultSettings, { getUserAgent } from '../defaultSettings'
+import camelizeKeys from '../tools/camelizeKeys'
 
 type Options = {
   publicKey: string
@@ -46,11 +46,11 @@ export default function group(
   }: Options
 ): Promise<GroupInfo> {
   return request({
-    method: "POST",
+    method: 'POST',
     headers: {
-      "X-UC-User-Agent": getUserAgent({ publicKey, integration })
+      'X-UC-User-Agent': getUserAgent({ publicKey, integration })
     },
-    url: getUrl(baseURL, "/group/", {
+    url: getUrl(baseURL, '/group/', {
       jsonerrors: 1,
       pub_key: publicKey,
       files: uuids,
@@ -63,7 +63,7 @@ export default function group(
   })
     .then(response => camelizeKeys<Response>(JSON.parse(response.data)))
     .then(response => {
-      if ("error" in response) {
+      if ('error' in response) {
         throw new Error(
           `[${response.error.statusCode}] ${response.error.content}`
         )

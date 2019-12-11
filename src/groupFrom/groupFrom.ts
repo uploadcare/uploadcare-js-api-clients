@@ -1,20 +1,20 @@
-import { GroupUploadLifecycle } from "../lifecycle/GroupUploadLifecycle"
-import { UploadLifecycle } from "../lifecycle/UploadLifecycle"
-import { GroupFromObject } from "./GroupFromObject"
-import { GroupFromUploaded } from "./GroupFromUploaded"
-import { GroupFromUrl } from "./GroupFromUrl"
+import { GroupUploadLifecycle } from '../lifecycle/GroupUploadLifecycle'
+import { UploadLifecycle } from '../lifecycle/UploadLifecycle'
+import { GroupFromObject } from './GroupFromObject'
+import { GroupFromUploaded } from './GroupFromUploaded'
+import { GroupFromUrl } from './GroupFromUrl'
 
 /* Types */
-import { FileData, SettingsInterface, UploadcareGroupInterface } from "../types"
-import { Url } from "../api/fromUrl"
-import { Uuid } from "../api/types"
-import { isFileDataArray, isUrlArray, isUuidArray } from "./types"
+import { FileData, SettingsInterface, UploadcareGroupInterface } from '../types'
+import { Url } from '../api/fromUrl'
+import { Uuid } from '../api/types'
+import { isFileDataArray, isUrlArray, isUuidArray } from './types'
 import {
   GroupUploadLifecycleInterface,
   LifecycleHooksInterface,
   UploadInterface
-} from "../lifecycle/types"
-import { Upload } from "../lifecycle/Upload"
+} from '../lifecycle/types'
+import { Upload } from '../lifecycle/Upload'
 
 /**
  * Uploads file from provided data.

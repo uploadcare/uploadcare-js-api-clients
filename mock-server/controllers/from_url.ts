@@ -1,9 +1,9 @@
-import * as jsonIndex from "../data/from_url/index.json"
-import * as jsonStatus from "../data/from_url/status.json"
-import find from "../utils/find"
-import error from "../utils/error"
+import * as jsonIndex from '../data/from_url/index.json'
+import * as jsonStatus from '../data/from_url/status.json'
+import find from '../utils/find'
+import error from '../utils/error'
 
-import { PORT } from "../config"
+import { PORT } from '../config'
 
 /**
  * '/from_url/?pub_key=XXXXXXXXXXXXXXXXXXXX'
@@ -11,9 +11,9 @@ import { PORT } from "../config"
  */
 const index = ctx => {
   const isPrivateIP = (url: string): boolean =>
-    url.includes("192.168.") ||
-    (url.includes("localhost") && !url.includes(`http://localhost:${PORT}/`))
-  const doesNotExist = (url: string): boolean => url === "https://1.com/1.jpg"
+    url.includes('192.168.') ||
+    (url.includes('localhost') && !url.includes(`http://localhost:${PORT}/`))
+  const doesNotExist = (url: string): boolean => url === 'https://1.com/1.jpg'
 
   const sourceUrl = ctx.query && ctx.query.source_url
   const checkForUrlDuplicates = !!parseInt(
@@ -26,7 +26,7 @@ const index = ctx => {
   // Check params
   if (!sourceUrl) {
     error(ctx, {
-      statusText: "source_url is required."
+      statusText: 'source_url is required.'
     })
 
     return
@@ -34,7 +34,7 @@ const index = ctx => {
 
   if (doesNotExist(sourceUrl)) {
     error(ctx, {
-      statusText: "Host does not exist."
+      statusText: 'Host does not exist.'
     })
 
     return
@@ -42,16 +42,16 @@ const index = ctx => {
 
   if (isPrivateIP(sourceUrl)) {
     error(ctx, {
-      statusText: "Only public IPs are allowed."
+      statusText: 'Only public IPs are allowed.'
     })
 
     return
   }
 
   if (checkForUrlDuplicates === true && saveUrlForRecurrentUploads === true) {
-    ctx.body = find(jsonIndex, "info")
+    ctx.body = find(jsonIndex, 'info')
   } else {
-    ctx.body = find(jsonIndex, "token")
+    ctx.body = find(jsonIndex, 'token')
   }
 }
 
@@ -64,14 +64,14 @@ const status = ctx => {
   const publicKey = ctx.query && ctx.query.publicKey
 
   if (token) {
-    if (publicKey !== "demopublickey") {
-      ctx.body = find(jsonStatus, "info")
+    if (publicKey !== 'demopublickey') {
+      ctx.body = find(jsonStatus, 'info')
     } else {
-      ctx.body = find(jsonStatus, "progress")
+      ctx.body = find(jsonStatus, 'progress')
     }
   } else {
     error(ctx, {
-      statusText: "token is required."
+      statusText: 'token is required.'
     })
   }
 }

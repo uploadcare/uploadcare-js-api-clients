@@ -1,4 +1,4 @@
-import chalk from "chalk"
+import chalk from 'chalk'
 
 /**
  * Pretty print for JSON.
@@ -23,7 +23,7 @@ const isEmptyObject = (object: object): boolean =>
 const logger = async (ctx, next) => {
   await next()
 
-  const request = `${chalk.gray("-->")} ${chalk.bold(
+  const request = `${chalk.gray('-->')} ${chalk.bold(
     ctx.request.method
   )} ${chalk.gray(ctx.request.url)}`
   const requestHeaders = ctx.request.headers
@@ -38,13 +38,13 @@ const logger = async (ctx, next) => {
     ? `${chalk.green(statusMessage)}`
     : `${chalk.red(statusMessage)}`
 
-  const response = `${chalk.gray("<--")} ${chalk.bold(coloredStatusMessage)}`
+  const response = `${chalk.gray('<--')} ${chalk.bold(coloredStatusMessage)}`
   const responseBody = ctx.response.body
 
   console.log(request)
 
   if (!isEmptyObject(requestHeaders)) {
-    console.log("Request Headers:")
+    console.log('Request Headers:')
     console.log(pretty(requestHeaders))
   }
 
@@ -52,17 +52,17 @@ const logger = async (ctx, next) => {
     if (ctx.request.url.match(/\/multipart\/upload/)) {
       console.log(
         `Request Body: ${chalk.gray(
-          "hidden (because a lot of binary data will be printed)"
+          'hidden (because a lot of binary data will be printed)'
         )}`
       )
     } else {
-      console.log("Request Body:")
+      console.log('Request Body:')
       console.log(pretty(requestBody))
     }
   }
 
   if (!isEmptyObject(requestQuery)) {
-    console.log("Request Query:")
+    console.log('Request Query:')
     console.log(pretty(requestQuery))
   }
 
@@ -70,7 +70,7 @@ const logger = async (ctx, next) => {
   console.log(response)
 
   if (responseBody) {
-    console.log("Response Body:")
+    console.log('Response Body:')
     console.log(pretty(responseBody))
   }
 

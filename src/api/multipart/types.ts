@@ -1,4 +1,4 @@
-import { Uuid } from "../types"
+import { Uuid } from '../types'
 
 export type MultipartPart = string
 

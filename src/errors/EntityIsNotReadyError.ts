@@ -2,8 +2,8 @@ export default class EntityIsNotReadyError extends Error {
   constructor() {
     super()
 
-    this.name = "EntityIsNotReadyError"
-    this.message = "Entity is not ready yet"
+    this.name = 'EntityIsNotReadyError'
+    this.message = 'Entity is not ready yet'
 
     Object.setPrototypeOf(this, EntityIsNotReadyError.prototype)
 

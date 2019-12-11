@@ -1,3 +1,1 @@
-module.exports =  {
-  semi: false,
-};
+module.exports = 'prettier-config-standard'

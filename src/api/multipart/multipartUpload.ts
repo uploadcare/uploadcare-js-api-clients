@@ -1,14 +1,14 @@
-import { Thenable } from "../../thenable/Thenable"
-import multipartUploadPart from "./multipartUploadPart"
-import { getFileSize } from "./getFileSize"
-import { getChunks } from "./getChunks"
-import defaultSettings from "../../defaultSettings"
+import { Thenable } from '../../thenable/Thenable'
+import multipartUploadPart from './multipartUploadPart'
+import { getFileSize } from './getFileSize'
+import { getChunks } from './getChunks'
+import defaultSettings from '../../defaultSettings'
 
 /* Types */
-import { FileData, SettingsInterface } from "../../types"
-import { ChunkType, MultipartPart } from "./types"
-import { BaseThenableInterface } from "../../thenable/types"
-import { BaseHooksInterface } from "../../lifecycle/types"
+import { FileData, SettingsInterface } from '../../types'
+import { ChunkType, MultipartPart } from './types'
+import { BaseThenableInterface } from '../../thenable/types'
+import { BaseHooksInterface } from '../../lifecycle/types'
 
 function throttle(callback, limit = 1) {
   let wait = false // Initially, we're not waiting
@@ -50,7 +50,7 @@ class MultipartUpload extends Thenable<any>
     this.loaded = Array.from(new Array(chunksCount)).fill(0)
 
     const updateProgress = throttle((progressEvent: ProgressEvent) => {
-      if (hooks && typeof hooks.onProgress === "function") {
+      if (hooks && typeof hooks.onProgress === 'function') {
         const loaded = this.loaded.reduce((sum, chunk) => chunk + sum, 0)
 
         hooks.onProgress({
@@ -66,7 +66,7 @@ class MultipartUpload extends Thenable<any>
       const fileChunk = file.slice(start, end)
       const partUrl = parts[index]
       const onProgress = (progressEvent: ProgressEvent): void => {
-        if (hooks && typeof hooks.onProgress === "function") {
+        if (hooks && typeof hooks.onProgress === 'function') {
           this.loaded[index] = progressEvent.loaded
           updateProgress(progressEvent)
         }
@@ -75,9 +75,9 @@ class MultipartUpload extends Thenable<any>
     })
     this.promise = Promise.all(this.requests).catch(error => {
       if (
-        error.name === "CancelError" &&
+        error.name === 'CancelError' &&
         hooks &&
-        typeof hooks.onCancel === "function"
+        typeof hooks.onCancel === 'function'
       ) {
         hooks.onCancel()
       }

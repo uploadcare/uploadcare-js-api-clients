@@ -1,5 +1,5 @@
 /* Types */
-import { ChunkType } from "./types"
+import { ChunkType } from './types'
 
 /**
  * Split file size to chunks.

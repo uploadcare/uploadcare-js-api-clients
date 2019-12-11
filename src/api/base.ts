@@ -1,12 +1,12 @@
-import { Uuid } from "./base-types"
+import { Uuid } from './base-types'
 
-import getFormData from "./request/buildFormData.node"
-import request from "./request/request.node"
-import getUrl from "./request/getUrl"
+import getFormData from './request/buildFormData.node'
+import request from './request/request.node'
+import getUrl from './request/getUrl'
 
-import CancelController from "../CancelController"
-import defaultSettings, { getUserAgent } from "../defaultSettings"
-import camelizeKeys from "../tools/camelizeKeys"
+import CancelController from '../CancelController'
+import defaultSettings, { getUserAgent } from '../defaultSettings'
+import camelizeKeys from '../tools/camelizeKeys'
 
 type SuccessResponse = {
   file: Uuid
@@ -52,39 +52,39 @@ export default function base(
     store,
     cancel,
     onProgress,
-    source = "local",
+    source = 'local',
     integration
   }: Options
 ): Promise<SuccessResponse> {
   return request({
-    method: "POST",
-    url: getUrl(baseURL, "/base/", {
+    method: 'POST',
+    url: getUrl(baseURL, '/base/', {
       jsonerrors: 1
     }),
     headers: {
-      "X-UC-User-Agent": getUserAgent({ publicKey, integration })
+      'X-UC-User-Agent': getUserAgent({ publicKey, integration })
     },
     data: getFormData([
       [
-        "file",
+        'file',
         file,
         fileName || (file as File).name || defaultSettings.fileName
       ],
-      ["UPLOADCARE_PUB_KEY", publicKey],
+      ['UPLOADCARE_PUB_KEY', publicKey],
       [
-        "UPLOADCARE_STORE",
-        typeof store === "undefined" ? "auto" : store ? 1 : 0
+        'UPLOADCARE_STORE',
+        typeof store === 'undefined' ? 'auto' : store ? 1 : 0
       ],
-      ["signature", secureSignature],
-      ["expire", secureExpire],
-      ["source", source]
+      ['signature', secureSignature],
+      ['expire', secureExpire],
+      ['source', source]
     ]),
     cancel,
     onProgress
   })
     .then(({ data }) => camelizeKeys<Response>(JSON.parse(data)))
     .then(response => {
-      if ("error" in response) {
+      if ('error' in response) {
         throw new Error(
           `[${response.error.statusCode}] ${response.error.content}`
         )

@@ -1,7 +1,7 @@
-import * as multipartJson from "../data/multipart.json"
-import * as infoJson from "../data/info.json"
-import find from "../utils/find"
-import error from "../utils/error"
+import * as multipartJson from '../data/multipart.json'
+import * as infoJson from '../data/info.json'
+import find from '../utils/find'
+import error from '../utils/error'
 
 /**
  * '/multipart/start/'
@@ -27,7 +27,7 @@ const start = ctx => {
   ) {
     return error(ctx, {
       statusText:
-        "File size should not be less than 10485760 bytes. Please use direct uploads instead."
+        'File size should not be less than 10485760 bytes. Please use direct uploads instead.'
     })
   }
 
@@ -37,7 +37,7 @@ const start = ctx => {
     })
   }
 
-  return (ctx.body = find(multipartJson, "start"))
+  return (ctx.body = find(multipartJson, 'start'))
 }
 
 /**
@@ -59,7 +59,7 @@ const complete = ctx => {
     })
   }
 
-  return (ctx.body = find(infoJson, "info"))
+  return (ctx.body = find(infoJson, 'info'))
 }
 
 export { start, upload, complete }

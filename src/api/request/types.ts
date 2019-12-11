@@ -1,5 +1,5 @@
-import { FileData } from "../../types"
-import { CancelableInterface } from "../../lifecycle/types"
+import { FileData } from '../../types'
+import { CancelableInterface } from '../../lifecycle/types'
 
 export type Query = {
   [key: string]: string | string[] | boolean | number | void

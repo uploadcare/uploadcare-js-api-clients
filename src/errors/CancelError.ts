@@ -2,8 +2,8 @@ export default class CancelError extends Error {
   constructor() {
     super()
 
-    this.name = "CancelError"
-    this.message = "Request canceled"
+    this.name = 'CancelError'
+    this.message = 'Request canceled'
 
     Object.setPrototypeOf(this, CancelError.prototype)
 

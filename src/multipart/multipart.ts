@@ -1,17 +1,17 @@
-import multipartStart from "../api/multipart/multipartStart"
-import multipartUpload from "../api/multipart/multipartUpload"
-import multipartComplete from "../api/multipart/multipartComplete"
-import { Thenable } from "../thenable/Thenable"
+import multipartStart from '../api/multipart/multipartStart'
+import multipartUpload from '../api/multipart/multipartUpload'
+import multipartComplete from '../api/multipart/multipartComplete'
+import { Thenable } from '../thenable/Thenable'
 
 /* Types */
-import { FileData, SettingsInterface } from "../types"
-import { Uuid } from ".."
+import { FileData, SettingsInterface } from '../types'
+import { Uuid } from '..'
 import {
   BaseThenableInterface,
   CancelableThenableInterface
-} from "../thenable/types"
-import { FileInfoInterface } from "../api/types"
-import { BaseHooksInterface } from "../lifecycle/types"
+} from '../thenable/types'
+import { FileInfoInterface } from '../api/types'
+import { BaseHooksInterface } from '../lifecycle/types'
 
 class Multipart extends Thenable<FileInfoInterface>
   implements BaseThenableInterface<FileInfoInterface> {
@@ -33,7 +33,7 @@ class Multipart extends Thenable<FileInfoInterface>
     this.promise = this.request
       .then(({ uuid, parts }) => {
         const onProgress = (progressEvent: ProgressEvent): void => {
-          if (hooks && typeof hooks.onProgress === "function") {
+          if (hooks && typeof hooks.onProgress === 'function') {
             hooks.onProgress({
               ...progressEvent,
               loaded: progressEvent.loaded,
@@ -52,9 +52,9 @@ class Multipart extends Thenable<FileInfoInterface>
       })
       .catch(error => {
         if (
-          error.name === "CancelError" &&
+          error.name === 'CancelError' &&
           hooks &&
-          typeof hooks.onCancel === "function"
+          typeof hooks.onCancel === 'function'
         ) {
           hooks.onCancel()
         }

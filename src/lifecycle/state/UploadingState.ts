@@ -1,10 +1,10 @@
-import { AbstractState } from "./AbstractState"
-import { LifecycleStateInterface } from "../types"
+import { AbstractState } from './AbstractState'
+import { LifecycleStateInterface } from '../types'
 import {
   ProgressParamsInterface,
   ProgressStateEnum,
   UploadingProgress
-} from "../../types"
+} from '../../types'
 
 export class UploadingState extends AbstractState
   implements LifecycleStateInterface {

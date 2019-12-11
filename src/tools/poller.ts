@@ -1,6 +1,6 @@
-import CancelError from "../../src/errors/CancelError"
-import TimeoutError from "../../src/errors/TimeoutError"
-import CancelController from "../CancelController"
+import CancelError from '../../src/errors/CancelError'
+import TimeoutError from '../../src/errors/TimeoutError'
+import CancelController from '../CancelController'
 
 type CheckFunction = (
   cancel: CancelController | undefined
@@ -40,7 +40,7 @@ const poller = ({
         if (result) {
           resolve(result)
         } else if (nowTime > endTime) {
-          reject(new TimeoutError("Poll Timeout"))
+          reject(new TimeoutError('Poll Timeout'))
         } else {
           // @ts-ignore
           timeoutId = setTimeout(tick, interval)

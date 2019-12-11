@@ -1,7 +1,7 @@
-import defaultSettings from "./defaultSettings"
-import UploadAPI from "./api/index"
-import fileFrom from "./fileFrom/fileFrom"
-import groupFrom from "./groupFrom/groupFrom"
+import defaultSettings from './defaultSettings'
+import UploadAPI from './api/index'
+import fileFrom from './fileFrom/fileFrom'
+import groupFrom from './groupFrom/groupFrom'
 
 /* Types */
 import {
@@ -10,10 +10,10 @@ import {
   UploadcareFileInterface,
   UploadcareGroupInterface,
   UploadClientInterface
-} from "./types"
-import { Url } from "./api/fromUrl"
-import { UploadAPIInterface, Uuid } from "./api/types"
-import { LifecycleHooksInterface, UploadInterface } from "./lifecycle/types"
+} from './types'
+import { Url } from './api/fromUrl'
+import { UploadAPIInterface, Uuid } from './api/types'
+import { LifecycleHooksInterface, UploadInterface } from './lifecycle/types'
 
 class UploadClient implements UploadClientInterface {
   private settings: SettingsInterface

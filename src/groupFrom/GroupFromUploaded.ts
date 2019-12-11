@@ -1,14 +1,14 @@
-import group from "../api/group"
-import CancelError from "../errors/CancelError"
+import group from '../api/group'
+import CancelError from '../errors/CancelError'
 
 /* Types */
 import {
   GroupUploadLifecycleInterface,
   UploadHandlerInterface
-} from "../lifecycle/types"
-import { SettingsInterface, UploadcareGroupInterface } from "../types"
-import { Uuid } from ".."
-import { GroupInfoInterface } from "../api/types"
+} from '../lifecycle/types'
+import { SettingsInterface, UploadcareGroupInterface } from '../types'
+import { Uuid } from '..'
+import { GroupInfoInterface } from '../api/types'
 
 export class GroupFromUploaded
   implements
@@ -25,7 +25,7 @@ export class GroupFromUploaded
     this.data = data
     this.settings = {
       ...settings,
-      source: "uploaded"
+      source: 'uploaded'
     }
   }
 

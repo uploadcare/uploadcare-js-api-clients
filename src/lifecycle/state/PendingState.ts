@@ -1,6 +1,6 @@
-import { AbstractState } from "./AbstractState"
-import { LifecycleStateInterface } from "../types"
-import { ProgressStateEnum, UploadingProgress } from "../../types"
+import { AbstractState } from './AbstractState'
+import { LifecycleStateInterface } from '../types'
+import { ProgressStateEnum, UploadingProgress } from '../../types'
 
 export class PendingState extends AbstractState
   implements LifecycleStateInterface {

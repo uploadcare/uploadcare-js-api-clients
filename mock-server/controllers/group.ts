@@ -1,9 +1,9 @@
-import * as json from "../data/group.json"
-import find from "../utils/find"
-import error from "../utils/error"
+import * as json from '../data/group.json'
+import find from '../utils/find'
+import error from '../utils/error'
 
 const UUID_REGEX =
-  "[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}"
+  '[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}'
 const GROUP_ID_REGEX = `${UUID_REGEX}~[1-9][0-9]*$`
 
 /**
@@ -29,7 +29,7 @@ const isValidGroupId = (groupId: string): boolean =>
 const getFileUuid = (file: string): string => {
   // If file contains CDN operations
   if (new RegExp(/\//).test(file)) {
-    const array = file.split("/")
+    const array = file.split('/')
 
     return array[0]
   }
@@ -53,12 +53,12 @@ const isValidFile = (file: string): boolean => {
  * @param {object} ctx
  */
 const index = ctx => {
-  let files = ctx.query && ctx.query["files[]"]
+  let files = ctx.query && ctx.query['files[]']
   const publicKey = ctx.query && ctx.query.pub_key
 
   if (!files || files.length === 0) {
     return error(ctx, {
-      statusText: "no files[N] parameters found."
+      statusText: 'no files[N] parameters found.'
     })
   }
 
@@ -75,13 +75,13 @@ const index = ctx => {
     }
   }
 
-  if (publicKey === "demopublickey" && files.length > 0) {
+  if (publicKey === 'demopublickey' && files.length > 0) {
     return error(ctx, {
-      statusText: "some files not found."
+      statusText: 'some files not found.'
     })
   }
 
-  ctx.body = find(json, "info")
+  ctx.body = find(json, 'info')
 }
 
 /**
@@ -93,18 +93,18 @@ const info = ctx => {
 
   if (!groupId) {
     return error(ctx, {
-      statusText: "group_id is required."
+      statusText: 'group_id is required.'
     })
   }
 
   if (!isValidGroupId(groupId)) {
     return error(ctx, {
       status: 404,
-      statusText: "group_id is invalid."
+      statusText: 'group_id is invalid.'
     })
   }
 
-  ctx.body = find(json, "info")
+  ctx.body = find(json, 'info')
 }
 
 export { index, info }

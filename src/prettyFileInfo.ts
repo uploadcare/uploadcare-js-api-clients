@@ -1,7 +1,7 @@
-import defaultSettings from "./defaultSettings"
-import camelizeKeys from "./tools/camelizeKeys"
-import { SettingsInterface, UploadcareFileInterface } from "./types"
-import { FileInfoInterface } from "./api/types"
+import defaultSettings from './defaultSettings'
+import camelizeKeys from './tools/camelizeKeys'
+import { SettingsInterface, UploadcareFileInterface } from './types'
+import { FileInfoInterface } from './api/types'
 
 /**
  * Transforms file info getting from Upload API to pretty info.
@@ -36,7 +36,7 @@ export default function prettyFileInfo(
     ? `https://${s3Bucket}.s3.amazonaws.com/${fileId}/${filename}`
     : `${extendedSettings.baseCDN}/${fileId}/`
   const cdnUrlModifiers = defaultEffects ? `-/${defaultEffects}` : null
-  const cdnUrl = fileId ? `${urlBase}${cdnUrlModifiers || ""}` : null
+  const cdnUrl = fileId ? `${urlBase}${cdnUrlModifiers || ''}` : null
   const originalUrl = fileId ? urlBase : null
 
   return {

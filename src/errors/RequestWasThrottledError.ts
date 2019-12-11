@@ -1,5 +1,5 @@
-import { ErrorRequestInfoInterface, ErrorResponseInfoInterface } from "./types"
-import RequestError from "./RequestError"
+import { ErrorRequestInfoInterface, ErrorResponseInfoInterface } from './types'
+import RequestError from './RequestError'
 
 export default class RequestWasThrottledError extends Error {
   readonly request: ErrorRequestInfoInterface
@@ -8,7 +8,7 @@ export default class RequestWasThrottledError extends Error {
   constructor(requestError: RequestError, retryThrottledMaxTimes: number) {
     super()
 
-    this.name = "RequestWasThrottledError"
+    this.name = 'RequestWasThrottledError'
     this.message = `Request was throttled more than ${retryThrottledMaxTimes}`
     this.request = requestError.request
     this.response = requestError.response

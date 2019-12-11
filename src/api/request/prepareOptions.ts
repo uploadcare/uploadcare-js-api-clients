@@ -1,8 +1,8 @@
-import { getUserAgent } from "../../defaultSettings"
+import { getUserAgent } from '../../defaultSettings'
 
 /* Types */
-import { RequestOptionsInterface } from "./types"
-import { SettingsInterface } from "../../types"
+import { RequestOptionsInterface } from './types'
+import { SettingsInterface } from '../../types'
 
 /**
  * Updates options with Uploadcare SettingsInterface.
@@ -24,7 +24,7 @@ export function prepareOptions(
   if (settings.integration) {
     newOptions.headers = {
       ...newOptions.headers,
-      "X-UC-User-Agent": getUserAgent(settings)
+      'X-UC-User-Agent': getUserAgent(settings)
     }
   }
 

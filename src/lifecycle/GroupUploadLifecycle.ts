@@ -1,7 +1,7 @@
-import { GroupUploadLifecycleInterface, LifecycleInterface } from "./types"
-import { GroupInfoInterface } from "../api/types"
-import { UploadcareGroupInterface } from "../types"
-import { UploadcareGroup } from "../UploadcareGroup"
+import { GroupUploadLifecycleInterface, LifecycleInterface } from './types'
+import { GroupInfoInterface } from '../api/types'
+import { UploadcareGroupInterface } from '../types'
+import { UploadcareGroup } from '../UploadcareGroup'
 
 export class GroupUploadLifecycle implements GroupUploadLifecycleInterface {
   readonly uploadLifecycle: LifecycleInterface<UploadcareGroupInterface>

@@ -1,18 +1,18 @@
-import base from "../api/base"
-import defaultSettings from "../defaultSettings"
-import multipart from "../multipart/multipart"
-import { isMultipart } from "../multipart/isMultipart"
+import base from '../api/base'
+import defaultSettings from '../defaultSettings'
+import multipart from '../multipart/multipart'
+import { isMultipart } from '../multipart/isMultipart'
 
 /* Types */
 import {
   FileUploadLifecycleInterface,
   LifecycleInterface,
   UploadHandlerInterface
-} from "../lifecycle/types"
-import { BaseThenableInterface } from "../thenable/types"
-import { BaseResponse } from "../api/base"
-import { FileInfoInterface } from "../api/types"
-import { FileData, SettingsInterface, UploadcareFileInterface } from "../types"
+} from '../lifecycle/types'
+import { BaseThenableInterface } from '../thenable/types'
+import { BaseResponse } from '../api/base'
+import { FileInfoInterface } from '../api/types'
+import { FileData, SettingsInterface, UploadcareFileInterface } from '../types'
 
 export class FileFromObject
   implements
