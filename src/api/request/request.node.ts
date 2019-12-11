@@ -7,19 +7,23 @@ import { Readable, Transform } from 'stream'
 
 import CancelController from '../../CancelController'
 
+type Headers = {
+  [key: string]: string | string[] | undefined
+}
+
 export type RequestOptions = {
   method?: string
   url: string
   query?: string
-  data?: any
-  headers?: any
+  data?: FormData
+  headers?: Headers
   cancel?: CancelController
   onProgress?: (event: any) => void
 }
 
 type BaseResponse = {
   data: string
-  headers: any
+  headers: Headers
   status?: number
 }
 
@@ -37,7 +41,7 @@ class ProgressEmitter extends Transform {
     this._position = 0
   }
 
-  _transform(chunk, encoding, callback) {
+  _transform(chunk, encoding, callback): void {
     this._position += chunk.length
     this._onprogress({
       lengthComputable: true,
@@ -47,7 +51,7 @@ class ProgressEmitter extends Transform {
   }
 }
 
-const getLength = (formData: FormData) =>
+const getLength = (formData: FormData): Promise<number> =>
   new Promise<number>((resolve, reject) => {
     formData.getLength((error, length) => {
       if (error) reject(error)
@@ -63,8 +67,14 @@ const request = ({
   cancel,
   onProgress,
 }: RequestOptions): Promise<BaseResponse> =>
-  Promise.resolve(data && data.toString() === '[object FormData]')
-    .then(isFormData => (isFormData ? getLength(data) : undefined))
+  Promise.resolve()
+    .then(() => {
+      if (data && data.toString() === '[object FormData]') {
+        return getLength(data)
+      } else {
+        return undefined
+      }
+    })
     .then(
       length =>
         new Promise((resolve, reject) => {
@@ -78,7 +88,7 @@ const request = ({
             : headers
 
           if (isFormData) {
-            options.headers!['Content-Length'] = length
+            options.headers['Content-Length'] = length
           }
 
           const req =
@@ -96,7 +106,7 @@ const request = ({
           req.on('response', res => {
             if (aborted) return
 
-            const resChunks: any = []
+            const resChunks: any[] = []
 
             res.on('data', data => {
               resChunks.push(data)
@@ -117,7 +127,7 @@ const request = ({
             reject(err)
           })
 
-          if (data instanceof Readable || isFormData) {
+          if (data && (data instanceof Readable || isFormData)) {
             if (onProgress) {
               data.pipe(new ProgressEmitter(onProgress)).pipe(req)
             } else {
