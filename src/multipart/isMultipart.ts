@@ -1,5 +1,5 @@
-import { FileData } from "../types";
-import { getFileSize } from "../api/multipart/getFileSize";
+import { FileData } from "../types"
+import { getFileSize } from "../api/multipart/getFileSize"
 
 /**
  * Check if FileData is multipart data.
@@ -12,7 +12,7 @@ export const isMultipart = (
   data: FileData,
   multipartMinFileSize: number
 ): boolean => {
-  const fileSize = getFileSize(data);
+  const fileSize = getFileSize(data)
 
-  return fileSize >= multipartMinFileSize;
-};
+  return fileSize >= multipartMinFileSize
+}

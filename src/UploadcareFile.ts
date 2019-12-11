@@ -3,42 +3,42 @@ import {
   OriginalVideoInfoInterface,
   SettingsInterface,
   UploadcareFileInterface
-} from "./types";
-import prettyFileInfo from "./prettyFileInfo";
-import { FileInfoInterface, Uuid } from "./api/types";
+} from "./types"
+import prettyFileInfo from "./prettyFileInfo"
+import { FileInfoInterface, Uuid } from "./api/types"
 
 export class UploadcareFile implements UploadcareFileInterface {
-  readonly uuid: Uuid;
-  readonly name: null | string = null;
-  readonly size: null | number = null;
-  readonly isStored: null | boolean = null;
-  readonly isImage: null | boolean = null;
-  readonly cdnUrl: null | string = null;
-  readonly cdnUrlModifiers: null | string = null;
-  readonly originalUrl: null | string = null;
-  readonly originalFilename: null | string = null;
-  readonly originalImageInfo: null | OriginalImageInfoInterface = null;
-  readonly originalVideoInfo: null | OriginalVideoInfoInterface = null;
+  readonly uuid: Uuid
+  readonly name: null | string = null
+  readonly size: null | number = null
+  readonly isStored: null | boolean = null
+  readonly isImage: null | boolean = null
+  readonly cdnUrl: null | string = null
+  readonly cdnUrlModifiers: null | string = null
+  readonly originalUrl: null | string = null
+  readonly originalFilename: null | string = null
+  readonly originalImageInfo: null | OriginalImageInfoInterface = null
+  readonly originalVideoInfo: null | OriginalVideoInfoInterface = null
 
   constructor(file: UploadcareFileInterface) {
-    this.uuid = file.uuid;
-    this.name = file.name;
-    this.size = file.size;
-    this.isStored = file.isStored;
-    this.isImage = file.isImage;
-    this.cdnUrl = file.cdnUrl;
-    this.cdnUrlModifiers = file.cdnUrlModifiers;
-    this.originalUrl = file.originalUrl;
-    this.originalFilename = file.originalFilename;
-    this.originalImageInfo = file.originalImageInfo;
-    this.originalVideoInfo = file.originalVideoInfo;
+    this.uuid = file.uuid
+    this.name = file.name
+    this.size = file.size
+    this.isStored = file.isStored
+    this.isImage = file.isImage
+    this.cdnUrl = file.cdnUrl
+    this.cdnUrlModifiers = file.cdnUrlModifiers
+    this.originalUrl = file.originalUrl
+    this.originalFilename = file.originalFilename
+    this.originalImageInfo = file.originalImageInfo
+    this.originalVideoInfo = file.originalVideoInfo
   }
 
   static fromFileInfo(
     fileInfo: FileInfoInterface,
     settings: SettingsInterface
   ): UploadcareFileInterface {
-    const pretty = prettyFileInfo(fileInfo, settings);
+    const pretty = prettyFileInfo(fileInfo, settings)
 
     return new UploadcareFile({
       uuid: pretty.uuid,
@@ -52,7 +52,7 @@ export class UploadcareFile implements UploadcareFileInterface {
       originalFilename: pretty.originalFilename,
       originalImageInfo: pretty.originalImageInfo,
       originalVideoInfo: pretty.originalVideoInfo
-    });
+    })
   }
 
   static fromUuid(uuid: Uuid): UploadcareFileInterface {
@@ -68,6 +68,6 @@ export class UploadcareFile implements UploadcareFileInterface {
       originalFilename: null,
       originalImageInfo: null,
       originalVideoInfo: null
-    });
+    })
   }
 }

@@ -1,52 +1,52 @@
-import * as factory from "../_fixtureFactory";
-import { getSettingsForTesting } from "../_helpers";
-import group from "../../src/api/group";
-import CancelController from "../../src/CancelController";
+import * as factory from "../_fixtureFactory"
+import { getSettingsForTesting } from "../_helpers"
+import group from "../../src/api/group"
+import CancelController from "../../src/CancelController"
 
 describe("API - group", () => {
-  const files = factory.groupOfFiles("valid");
+  const files = factory.groupOfFiles("valid")
   const settings = getSettingsForTesting({
     publicKey: factory.publicKey("image")
-  });
+  })
 
   it("should upload group of files", async () => {
-    const data = await group(files, settings);
+    const data = await group(files, settings)
 
-    expect(data).toBeTruthy();
-    expect(data.id).toBeTruthy();
-    expect(data.files).toBeTruthy();
-  });
+    expect(data).toBeTruthy()
+    expect(data.id).toBeTruthy()
+    expect(data.files).toBeTruthy()
+  })
 
   it("should fail with [HTTP 400] no files[N] parameters found.", async () => {
-    await expectAsync(group([], settings)).toBeRejectedWithError(Error);
-  });
+    await expectAsync(group([], settings)).toBeRejectedWithError(Error)
+  })
 
   it("should fail with [HTTP 400] this is not valid file url: http://invalid/url.", async () => {
-    const files = factory.groupOfFiles("invalid");
+    const files = factory.groupOfFiles("invalid")
 
-    await expectAsync(group(files, settings)).toBeRejectedWithError(Error);
-  });
+    await expectAsync(group(files, settings)).toBeRejectedWithError(Error)
+  })
 
   it("should fail with [HTTP 400] some files not found.", async () => {
     const settings = getSettingsForTesting({
       publicKey: factory.publicKey("demo")
-    });
+    })
 
-    await expectAsync(group(files, settings)).toBeRejectedWithError(Error);
-  });
+    await expectAsync(group(files, settings)).toBeRejectedWithError(Error)
+  })
 
   it("should be able to cancel uploading", async () => {
-    let controller = new CancelController();
+    let controller = new CancelController()
 
     const settings = getSettingsForTesting({
       publicKey: factory.publicKey("image"),
       cancel: controller
-    });
+    })
 
     setTimeout(() => {
-      controller.cancel();
-    }, 10);
+      controller.cancel()
+    }, 10)
 
-    await expectAsync(group(files, settings)).toBeRejectedWithError("cancel");
-  });
-});
+    await expectAsync(group(files, settings)).toBeRejectedWithError("cancel")
+  })
+})

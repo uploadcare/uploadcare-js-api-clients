@@ -1,26 +1,26 @@
-import { ErrorRequestInfoInterface, ErrorResponseInfoInterface } from "./types";
+import { ErrorRequestInfoInterface, ErrorResponseInfoInterface } from "./types"
 
 export default class RequestError extends Error {
-  readonly request: ErrorRequestInfoInterface;
-  readonly response: ErrorResponseInfoInterface;
+  readonly request: ErrorRequestInfoInterface
+  readonly response: ErrorResponseInfoInterface
 
   constructor(
     request: ErrorRequestInfoInterface,
     response: ErrorResponseInfoInterface
   ) {
-    super();
+    super()
 
-    this.name = "RequestError";
-    this.message = `[${response.status}] ${response.statusText}`;
-    this.request = request;
-    this.response = response;
+    this.name = "RequestError"
+    this.message = `[${response.status}] ${response.statusText}`
+    this.request = request
+    this.response = response
 
-    Object.setPrototypeOf(this, RequestError.prototype);
+    Object.setPrototypeOf(this, RequestError.prototype)
 
     if (Error.captureStackTrace) {
-      Error.captureStackTrace(this, RequestError);
+      Error.captureStackTrace(this, RequestError)
     } else {
-      this.stack = new Error().stack;
+      this.stack = new Error().stack
     }
   }
 }

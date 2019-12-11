@@ -1,30 +1,30 @@
-import { Uuid, FileInfo } from "./base-types";
-import request from "./request/request.node";
-import getUrl from "./request/getUrl";
+import { Uuid, FileInfo } from "./base-types"
+import request from "./request/request.node"
+import getUrl from "./request/getUrl"
 
-import CancelController from "../CancelController";
-import defaultSettings, { getUserAgent } from "../defaultSettings";
-import camelizeKeys from "../tools/camelizeKeys";
+import CancelController from "../CancelController"
+import defaultSettings, { getUserAgent } from "../defaultSettings"
+import camelizeKeys from "../tools/camelizeKeys"
 
 type FailedResponse = {
   error: {
-    content: string;
-    statusCode: number;
-  };
-};
+    content: string
+    statusCode: number
+  }
+}
 
-type Response = FileInfo | FailedResponse;
+type Response = FileInfo | FailedResponse
 
 type Options = {
-  publicKey: string;
+  publicKey: string
 
-  baseUrl?: string;
+  baseUrl?: string
 
-  cancel?: CancelController;
+  cancel?: CancelController
 
-  source?: string;
-  integration?: string;
-};
+  source?: string
+  integration?: string
+}
 
 /**
  * Returns a JSON dictionary holding file info.
@@ -57,9 +57,9 @@ export default function info(
       if ("error" in response) {
         throw new Error(
           `[${response.error.statusCode}] ${response.error.content}`
-        );
+        )
       }
 
-      return response;
-    });
+      return response
+    })
 }

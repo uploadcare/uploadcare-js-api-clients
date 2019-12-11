@@ -1,12 +1,12 @@
-import { FileInfo } from "./base-types";
-import request from "./request/request.node";
-import getUrl from "./request/getUrl";
+import { FileInfo } from "./base-types"
+import request from "./request/request.node"
+import getUrl from "./request/getUrl"
 
-import CancelController from "../CancelController";
-import defaultSettings, { getUserAgent } from "../defaultSettings";
-import camelizeKeys from "../tools/camelizeKeys";
+import CancelController from "../CancelController"
+import defaultSettings, { getUserAgent } from "../defaultSettings"
+import camelizeKeys from "../tools/camelizeKeys"
 
-type Url = string;
+type Url = string
 
 export enum TypeEnum {
   Token = "token",
@@ -14,24 +14,24 @@ export enum TypeEnum {
 }
 
 type TokenResponse = {
-  type: TypeEnum.Token;
-  token: string;
-};
+  type: TypeEnum.Token
+  token: string
+}
 
 type FileInfoResponse = {
-  type: TypeEnum.FileInfo;
-} & FileInfo;
+  type: TypeEnum.FileInfo
+} & FileInfo
 
-type SuccessResponse = FileInfoResponse | TokenResponse;
+type SuccessResponse = FileInfoResponse | TokenResponse
 
 type FailedResponse = {
   error: {
-    content: string;
-    statusCode: number;
-  };
-};
+    content: string
+    statusCode: number
+  }
+}
 
-type Response = FailedResponse | SuccessResponse;
+type Response = FailedResponse | SuccessResponse
 
 /**
  * TokenResponse Type Guard.
@@ -39,8 +39,8 @@ type Response = FailedResponse | SuccessResponse;
 export const isTokenResponse = (
   response: SuccessResponse
 ): response is TokenResponse => {
-  return response.type !== undefined && response.type === TypeEnum.Token;
-};
+  return response.type !== undefined && response.type === TypeEnum.Token
+}
 
 /**
  * FileInfoResponse Type Guard.
@@ -48,25 +48,25 @@ export const isTokenResponse = (
 export const isFileInfoResponse = (
   response: SuccessResponse
 ): response is FileInfoResponse => {
-  return response.type !== undefined && response.type === TypeEnum.FileInfo;
-};
+  return response.type !== undefined && response.type === TypeEnum.FileInfo
+}
 
 type Options = {
-  publicKey: string;
+  publicKey: string
 
-  baseURL?: string;
-  store?: boolean;
-  fileName?: string;
-  checkForUrlDuplicates?: boolean;
-  saveUrlForRecurrentUploads?: boolean;
-  secureSignature?: string;
-  secureExpire?: string;
+  baseURL?: string
+  store?: boolean
+  fileName?: string
+  checkForUrlDuplicates?: boolean
+  saveUrlForRecurrentUploads?: boolean
+  secureSignature?: string
+  secureExpire?: string
 
-  cancel?: CancelController;
+  cancel?: CancelController
 
-  source?: string;
-  integration?: string;
-};
+  source?: string
+  integration?: string
+}
 
 /**
  * Uploading files from URL.
@@ -111,9 +111,9 @@ export default function fromUrl(
       if ("error" in response) {
         throw new Error(
           `[${response.error.statusCode}] ${response.error.content}`
-        );
+        )
       } else {
-        return response;
+        return response
       }
-    });
+    })
 }

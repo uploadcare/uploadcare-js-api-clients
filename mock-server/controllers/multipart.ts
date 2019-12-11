@@ -1,7 +1,7 @@
-import * as multipartJson from "../data/multipart.json";
-import * as infoJson from "../data/info.json";
-import find from "../utils/find";
-import error from "../utils/error";
+import * as multipartJson from "../data/multipart.json"
+import * as infoJson from "../data/info.json"
+import find from "../utils/find"
+import error from "../utils/error"
 
 /**
  * '/multipart/start/'
@@ -11,13 +11,13 @@ const start = ctx => {
   if (ctx.request.body && !ctx.request.body.filename) {
     return error(ctx, {
       statusText: 'The "filename" parameter is missing.'
-    });
+    })
   }
 
   if (ctx.request.body && !ctx.request.body.size) {
     return error(ctx, {
       statusText: 'The provided "size" should be an integer.'
-    });
+    })
   }
 
   if (
@@ -28,25 +28,25 @@ const start = ctx => {
     return error(ctx, {
       statusText:
         "File size should not be less than 10485760 bytes. Please use direct uploads instead."
-    });
+    })
   }
 
   if (ctx.request.body && !ctx.request.body.content_type) {
     return error(ctx, {
       statusText: 'The "content_type" parameter is missing.'
-    });
+    })
   }
 
-  return (ctx.body = find(multipartJson, "start"));
-};
+  return (ctx.body = find(multipartJson, "start"))
+}
 
 /**
  * '/multipart/upload/'
  * @param {object} ctx
  */
 const upload = ctx => {
-  return (ctx.status = 200);
-};
+  return (ctx.status = 200)
+}
 
 /**
  * '/multipart/complete/'
@@ -56,10 +56,10 @@ const complete = ctx => {
   if (ctx.request.body && !ctx.request.body.uuid) {
     return error(ctx, {
       statusText: 'The "uuid" parameter is missing.'
-    });
+    })
   }
 
-  return (ctx.body = find(infoJson, "info"));
-};
+  return (ctx.body = find(infoJson, "info"))
+}
 
-export { start, upload, complete };
+export { start, upload, complete }

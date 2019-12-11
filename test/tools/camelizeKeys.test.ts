@@ -1,25 +1,25 @@
-import camelizeKeys, { camelize } from "../../src/tools/camelizeKeys";
+import camelizeKeys, { camelize } from "../../src/tools/camelizeKeys"
 
 describe("camelize", () => {
   it("should works", () => {
-    expect(camelize("foo_bar")).toBe("fooBar");
-    expect(camelize("foo-bar")).toBe("fooBar");
-    expect(camelize("foo.bar")).toBe("fooBar");
-    expect(camelize("Foo_bar")).toBe("fooBar");
-    expect(camelize("foo_bar_baz")).toBe("fooBarBaz");
-  });
-});
+    expect(camelize("foo_bar")).toBe("fooBar")
+    expect(camelize("foo-bar")).toBe("fooBar")
+    expect(camelize("foo.bar")).toBe("fooBar")
+    expect(camelize("Foo_bar")).toBe("fooBar")
+    expect(camelize("foo_bar_baz")).toBe("fooBarBaz")
+  })
+})
 
 type Camelize = {
-  fooBar: string;
-  fooBarBaz: string;
-  foo: string;
-  fooBarBaz4: object;
-};
+  fooBar: string
+  fooBarBaz: string
+  foo: string
+  fooBarBaz4: object
+}
 
 describe("camelizeKeys", () => {
   it("should works", () => {
-    expect(camelizeKeys<string>("foo_bar")).toBe("foo_bar");
+    expect(camelizeKeys<string>("foo_bar")).toBe("foo_bar")
     expect(
       camelizeKeys<Camelize>({
         foo_bar: "test1",
@@ -32,6 +32,6 @@ describe("camelizeKeys", () => {
       fooBarBaz: "test2",
       foo: "test3",
       fooBarBaz4: { oneMoreThing: "test4" }
-    });
-  });
-});
+    })
+  })
+})

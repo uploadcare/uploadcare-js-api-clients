@@ -1,7 +1,7 @@
-import info from "./info";
-import UploadClient from "../UploadClient";
-import fromUrlStatus, { FromUrlStatusResponse } from "./fromUrlStatus";
-import base, { BaseResponse } from "./base";
+import info from "./info"
+import UploadClient from "../UploadClient"
+import fromUrlStatus, { FromUrlStatusResponse } from "./fromUrlStatus"
+import base, { BaseResponse } from "./base"
 import {
   FileInfoInterface,
   GroupId,
@@ -9,42 +9,42 @@ import {
   Token,
   UploadAPIInterface,
   Uuid
-} from "./types";
-import { RequestOptionsInterface, RequestResponse } from "./request/types";
-import fromUrl, { FromUrlResponse, Url } from "./fromUrl";
-import groupInfo from "./groupInfo";
-import { FileData, SettingsInterface } from "../types";
-import { prepareOptions } from "./request/prepareOptions";
-import group from "./group";
-import request from "./request/request";
-import { MultipartPart, MultipartStartResponse } from "./multipart/types";
-import multipartComplete from "./multipart/multipartComplete";
-import multipartStart from "./multipart/multipartStart";
-import multipartUpload from "./multipart/multipartUpload";
+} from "./types"
+import { RequestOptionsInterface, RequestResponse } from "./request/types"
+import fromUrl, { FromUrlResponse, Url } from "./fromUrl"
+import groupInfo from "./groupInfo"
+import { FileData, SettingsInterface } from "../types"
+import { prepareOptions } from "./request/prepareOptions"
+import group from "./group"
+import request from "./request/request"
+import { MultipartPart, MultipartStartResponse } from "./multipart/types"
+import multipartComplete from "./multipart/multipartComplete"
+import multipartStart from "./multipart/multipartStart"
+import multipartUpload from "./multipart/multipartUpload"
 import {
   BaseThenableInterface,
   CancelableThenableInterface
-} from "../thenable/types";
-import { BaseHooksInterface, CancelHookInterface } from "../lifecycle/types";
+} from "../thenable/types"
+import { BaseHooksInterface, CancelHookInterface } from "../lifecycle/types"
 
 class UploadAPI implements UploadAPIInterface {
-  readonly client: UploadClient;
+  readonly client: UploadClient
 
   constructor(client: UploadClient) {
-    this.client = client;
+    this.client = client
   }
 
   private getExtendedSettings = (settings): SettingsInterface => {
     return {
       ...this.client.getSettings(),
       ...settings
-    };
-  };
+    }
+  }
 
   request(options: RequestOptionsInterface): Promise<RequestResponse> {
-    const preparedOptions = prepareOptions(options, this.client.getSettings());
+    const preparedOptions = prepareOptions(options, this.client.getSettings())
 
-    return request(preparedOptions);
+    return request(preparedOptions)
   }
 
   base(
@@ -52,7 +52,7 @@ class UploadAPI implements UploadAPIInterface {
     settings: SettingsInterface = {},
     hooks?: BaseHooksInterface
   ): BaseThenableInterface<BaseResponse> {
-    return base(data, this.getExtendedSettings(settings), hooks);
+    return base(data, this.getExtendedSettings(settings), hooks)
   }
 
   info(
@@ -60,7 +60,7 @@ class UploadAPI implements UploadAPIInterface {
     settings: SettingsInterface = {},
     hooks?: CancelHookInterface
   ): CancelableThenableInterface<FileInfoInterface> {
-    return info(uuid, this.getExtendedSettings(settings), hooks);
+    return info(uuid, this.getExtendedSettings(settings), hooks)
   }
 
   fromUrl(
@@ -68,7 +68,7 @@ class UploadAPI implements UploadAPIInterface {
     settings: SettingsInterface = {},
     hooks?: CancelHookInterface
   ): CancelableThenableInterface<FromUrlResponse> {
-    return fromUrl(sourceUrl, this.getExtendedSettings(settings), hooks);
+    return fromUrl(sourceUrl, this.getExtendedSettings(settings), hooks)
   }
 
   fromUrlStatus(
@@ -76,7 +76,7 @@ class UploadAPI implements UploadAPIInterface {
     settings: SettingsInterface = {},
     hooks?: CancelHookInterface
   ): CancelableThenableInterface<FromUrlStatusResponse> {
-    return fromUrlStatus(token, this.getExtendedSettings(settings), hooks);
+    return fromUrlStatus(token, this.getExtendedSettings(settings), hooks)
   }
 
   group(
@@ -84,7 +84,7 @@ class UploadAPI implements UploadAPIInterface {
     settings: SettingsInterface = {},
     hooks?: CancelHookInterface
   ): CancelableThenableInterface<GroupInfoInterface> {
-    return group(uuids, this.getExtendedSettings(settings), hooks);
+    return group(uuids, this.getExtendedSettings(settings), hooks)
   }
 
   groupInfo(
@@ -92,7 +92,7 @@ class UploadAPI implements UploadAPIInterface {
     settings: SettingsInterface = {},
     hooks?: CancelHookInterface
   ): CancelableThenableInterface<GroupInfoInterface> {
-    return groupInfo(id, this.getExtendedSettings(settings), hooks);
+    return groupInfo(id, this.getExtendedSettings(settings), hooks)
   }
 
   multipartStart(
@@ -100,7 +100,7 @@ class UploadAPI implements UploadAPIInterface {
     settings: SettingsInterface = {},
     hooks?: CancelHookInterface
   ): CancelableThenableInterface<MultipartStartResponse> {
-    return multipartStart(file, this.getExtendedSettings(settings), hooks);
+    return multipartStart(file, this.getExtendedSettings(settings), hooks)
   }
 
   multipartUpload(
@@ -114,7 +114,7 @@ class UploadAPI implements UploadAPIInterface {
       parts,
       this.getExtendedSettings(settings),
       hooks
-    );
+    )
   }
 
   multipartComplete(
@@ -122,8 +122,8 @@ class UploadAPI implements UploadAPIInterface {
     settings: SettingsInterface = {},
     hooks?: CancelHookInterface
   ): CancelableThenableInterface<FileInfoInterface> {
-    return multipartComplete(uuid, this.getExtendedSettings(settings), hooks);
+    return multipartComplete(uuid, this.getExtendedSettings(settings), hooks)
   }
 }
 
-export default UploadAPI;
+export default UploadAPI

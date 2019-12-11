@@ -1,74 +1,74 @@
 /* Vendors */
-import * as FormData from "form-data";
+import * as FormData from "form-data"
 import axios, {
   AxiosRequestConfig,
   AxiosResponse,
   CancelTokenSource
-} from "axios";
+} from "axios"
 
-import { Thenable } from "../../thenable/Thenable";
-import defaultSettings from "../../defaultSettings";
-import { isNode } from "../../tools/isNode";
-import CancelError from "../../errors/CancelError";
-import RequestError from "../../errors/RequestError";
-import { addMaxConcurrencyInterceptorsToAxiosInstance } from "../request/interceptors";
+import { Thenable } from "../../thenable/Thenable"
+import defaultSettings from "../../defaultSettings"
+import { isNode } from "../../tools/isNode"
+import CancelError from "../../errors/CancelError"
+import RequestError from "../../errors/RequestError"
+import { addMaxConcurrencyInterceptorsToAxiosInstance } from "../request/interceptors"
 
 /* Types */
-import { FileData, SettingsInterface } from "../../types";
-import { MultipartPart, MultipartUploadResponse } from "./types";
-import { BaseThenableInterface } from "../../thenable/types";
-import { BaseHooksInterface } from "../../lifecycle/types";
+import { FileData, SettingsInterface } from "../../types"
+import { MultipartPart, MultipartUploadResponse } from "./types"
+import { BaseThenableInterface } from "../../thenable/types"
+import { BaseHooksInterface } from "../../lifecycle/types"
 
 const updateProgress = ({
   data,
   loaded = false,
   onUploadProgress
 }: {
-  data: Buffer;
-  loaded: boolean;
-  onUploadProgress: (progressEvent: ProgressEvent) => void;
+  data: Buffer
+  loaded: boolean
+  onUploadProgress: (progressEvent: ProgressEvent) => void
 }): void => {
-  const formData = new FormData();
-  formData.append("data", data);
+  const formData = new FormData()
+  formData.append("data", data)
 
-  const total = formData.getLengthSync();
+  const total = formData.getLengthSync()
 
   onUploadProgress({
     total,
     loaded: loaded ? total : 0
-  } as ProgressEvent);
-};
+  } as ProgressEvent)
+}
 
 const nodeUploadProgressRequestInterceptor = (
   config: AxiosRequestConfig
 ): AxiosRequestConfig => {
-  const { data, onUploadProgress } = config;
+  const { data, onUploadProgress } = config
   if (!onUploadProgress) {
-    return config;
+    return config
   }
 
-  updateProgress({ data, loaded: false, onUploadProgress });
+  updateProgress({ data, loaded: false, onUploadProgress })
 
-  return config;
-};
+  return config
+}
 
 const nodeUploadProgressResponseInterceptor = (
   response: AxiosResponse
 ): AxiosResponse => {
-  const { data, onUploadProgress } = response.config;
+  const { data, onUploadProgress } = response.config
   if (!onUploadProgress) {
-    return response;
+    return response
   }
 
-  updateProgress({ data, loaded: true, onUploadProgress });
+  updateProgress({ data, loaded: true, onUploadProgress })
 
-  return response;
-};
+  return response
+}
 
 class MultipartUploadPart extends Thenable<MultipartUploadResponse>
   implements BaseThenableInterface<MultipartUploadResponse> {
-  protected readonly promise: Promise<MultipartUploadResponse>;
-  private readonly cancelController: CancelTokenSource;
+  protected readonly promise: Promise<MultipartUploadResponse>
+  private readonly cancelController: CancelTokenSource
 
   constructor(
     partUrl: MultipartPart,
@@ -76,9 +76,9 @@ class MultipartUploadPart extends Thenable<MultipartUploadResponse>
     settings: SettingsInterface,
     hooks?: BaseHooksInterface
   ) {
-    super();
+    super()
 
-    this.cancelController = axios.CancelToken.source();
+    this.cancelController = axios.CancelToken.source()
 
     const options = {
       data: file,
@@ -89,57 +89,57 @@ class MultipartUploadPart extends Thenable<MultipartUploadResponse>
         settings.maxContentLength || defaultSettings.maxContentLength,
       onUploadProgress: (progressEvent: ProgressEvent) => {
         if (hooks && typeof hooks.onProgress === "function") {
-          hooks.onProgress(progressEvent);
+          hooks.onProgress(progressEvent)
         }
       }
-    };
+    }
 
-    const instance = axios.create();
+    const instance = axios.create()
     const maxConcurrentRequestsCount =
-      settings.maxConcurrentRequests || defaultSettings.maxConcurrentRequests;
+      settings.maxConcurrentRequests || defaultSettings.maxConcurrentRequests
 
     addMaxConcurrencyInterceptorsToAxiosInstance({
       instance,
       maxConcurrentRequestsCount
-    });
+    })
 
     if (isNode()) {
       instance.interceptors.request.use(
         nodeUploadProgressRequestInterceptor,
         error => {
-          return Promise.reject(error);
+          return Promise.reject(error)
         }
-      );
+      )
       instance.interceptors.response.use(
         nodeUploadProgressResponseInterceptor,
         error => {
-          return Promise.reject(error);
+          return Promise.reject(error)
         }
-      );
+      )
     }
 
     this.promise = instance(options as AxiosRequestConfig)
       .catch(error => {
-        const { url } = options;
+        const { url } = options
 
         if (axios.isCancel(error)) {
-          throw new CancelError();
+          throw new CancelError()
         }
 
         if (error.response) {
           const errorRequestInfo = {
             headers: error.config.headers,
             url: error.config.url || url
-          };
+          }
           const errorResponseInfo = {
             status: error.response.status,
             statusText: error.response.statusText
-          };
+          }
 
-          throw new RequestError(errorRequestInfo, errorResponseInfo);
+          throw new RequestError(errorRequestInfo, errorResponseInfo)
         }
 
-        throw error;
+        throw error
       })
       .then(response => Promise.resolve({ code: response.status }))
       .catch(error => {
@@ -148,15 +148,15 @@ class MultipartUploadPart extends Thenable<MultipartUploadResponse>
           hooks &&
           typeof hooks.onCancel === "function"
         ) {
-          hooks.onCancel();
+          hooks.onCancel()
         }
 
-        return Promise.reject(error);
-      });
+        return Promise.reject(error)
+      })
   }
 
   cancel(): void {
-    return this.cancelController.cancel();
+    return this.cancelController.cancel()
   }
 }
 
@@ -175,5 +175,5 @@ export default function multipartUploadPart(
   settings: SettingsInterface = {},
   hooks?: BaseHooksInterface
 ): BaseThenableInterface<MultipartUploadResponse> {
-  return new MultipartUploadPart(partUrl, file, settings, hooks);
+  return new MultipartUploadPart(partUrl, file, settings, hooks)
 }

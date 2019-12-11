@@ -1,17 +1,17 @@
-import { prepareOptions } from "../request/prepareOptions";
-import { getFileSize } from "./getFileSize";
-import defaultSettings from "../../defaultSettings";
+import { prepareOptions } from "../request/prepareOptions"
+import { getFileSize } from "./getFileSize"
+import defaultSettings from "../../defaultSettings"
 
 /* Types */
-import { Body, RequestOptionsInterface } from "../request/types";
-import { FileData, SettingsInterface } from "../../types";
-import { MultipartStartResponse } from "./types";
-import { CancelableThenableInterface } from "../../thenable/types";
-import { CancelableThenable } from "../../thenable/CancelableThenable";
-import { CancelHookInterface } from "../../lifecycle/types";
+import { Body, RequestOptionsInterface } from "../request/types"
+import { FileData, SettingsInterface } from "../../types"
+import { MultipartStartResponse } from "./types"
+import { CancelableThenableInterface } from "../../thenable/types"
+import { CancelableThenable } from "../../thenable/CancelableThenable"
+import { CancelHookInterface } from "../../lifecycle/types"
 
 const getRequestBody = (file: FileData, settings: SettingsInterface): Body => {
-  const size: number = getFileSize(file);
+  const size: number = getFileSize(file)
 
   return {
     filename: settings.fileName || defaultSettings.fileName,
@@ -23,8 +23,8 @@ const getRequestBody = (file: FileData, settings: SettingsInterface): Body => {
     signature: settings.secureSignature || "",
     expire: settings.secureExpire || "",
     source: "local"
-  };
-};
+  }
+}
 
 const getRequestOptions = (
   file: FileData,
@@ -37,8 +37,8 @@ const getRequestOptions = (
       body: getRequestBody(file, settings)
     },
     settings
-  );
-};
+  )
+}
 
 /**
  * Start multipart uploading.
@@ -53,7 +53,7 @@ export default function multipartStart(
   settings: SettingsInterface = {},
   hooks?: CancelHookInterface
 ): CancelableThenableInterface<MultipartStartResponse> {
-  const options = getRequestOptions(file, settings);
+  const options = getRequestOptions(file, settings)
 
-  return new CancelableThenable<MultipartStartResponse>(options, hooks);
+  return new CancelableThenable<MultipartStartResponse>(options, hooks)
 }

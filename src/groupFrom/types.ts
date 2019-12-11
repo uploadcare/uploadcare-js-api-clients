@@ -1,6 +1,6 @@
-import { FileData } from "../types";
-import { Url, Uuid } from "..";
-import { isFileData, isUrl, isUuid } from "../fileFrom/types";
+import { FileData } from "../types"
+import { Url, Uuid } from ".."
+import { isFileData, isUrl, isUuid } from "../fileFrom/types"
 
 /**
  * FileData type guard.
@@ -12,12 +12,12 @@ export const isFileDataArray = (
 ): data is FileData[] => {
   for (const item of data) {
     if (!isFileData(item)) {
-      return false;
+      return false
     }
   }
 
-  return true;
-};
+  return true
+}
 
 /**
  * Uuid type guard.
@@ -29,12 +29,12 @@ export const isUuidArray = (
 ): data is Uuid[] => {
   for (const item of data) {
     if (!isUuid(item)) {
-      return false;
+      return false
     }
   }
 
-  return true;
-};
+  return true
+}
 
 /**
  * Url type guard.
@@ -46,9 +46,9 @@ export const isUrlArray = (
 ): data is Url[] => {
   for (const item of data) {
     if (!isUrl(item)) {
-      return false;
+      return false
     }
   }
 
-  return true;
-};
+  return true
+}

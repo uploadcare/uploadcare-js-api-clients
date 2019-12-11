@@ -3,9 +3,9 @@
  * You need only implement `promise` property.
  */
 export abstract class Thenable<T> implements Promise<T> {
-  readonly [Symbol.toStringTag]: string;
+  readonly [Symbol.toStringTag]: string
 
-  protected abstract readonly promise: Promise<T>;
+  protected abstract readonly promise: Promise<T>
 
   then<TFulfilled = T, TRejected = never>(
     onFulfilled?:
@@ -17,7 +17,7 @@ export abstract class Thenable<T> implements Promise<T> {
       | undefined
       | null
   ): Promise<TFulfilled | TRejected> {
-    return this.promise.then(onFulfilled, onRejected);
+    return this.promise.then(onFulfilled, onRejected)
   }
 
   catch<TRejected = never>(
@@ -26,10 +26,10 @@ export abstract class Thenable<T> implements Promise<T> {
       | undefined
       | null
   ): Promise<T | TRejected> {
-    return this.promise.catch(onRejected);
+    return this.promise.catch(onRejected)
   }
 
   finally(onFinally?: (() => void) | null | undefined): Promise<T> {
-    return this.promise.finally(onFinally);
+    return this.promise.finally(onFinally)
   }
 }

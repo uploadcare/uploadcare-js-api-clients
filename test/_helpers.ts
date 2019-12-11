@@ -1,11 +1,11 @@
-const dataUriToBuffer = require("data-uri-to-buffer");
-import dataUriToBlob from "dataurl-to-blob";
+const dataUriToBuffer = require("data-uri-to-buffer")
+import dataUriToBlob from "dataurl-to-blob"
 
-export const dataURItoBuffer: (uri: string) => Buffer = dataUriToBuffer;
-export const dataURItoBlob: (uri: string) => Blob = dataUriToBlob;
+export const dataURItoBuffer: (uri: string) => Buffer = dataUriToBuffer
+export const dataURItoBlob: (uri: string) => Blob = dataUriToBlob
 
 export const sleep = (ms: number): Promise<void> =>
-  new Promise(resolve => setTimeout(resolve, ms));
+  new Promise(resolve => setTimeout(resolve, ms))
 
 export enum Environment {
   Development = "development",
@@ -17,7 +17,7 @@ export const getSettingsForTesting = (
   environment: Environment | null = null
 ) => {
   const selectedEnvironment =
-    environment || process.env.NODE_ENV || Environment.Production;
+    environment || process.env.NODE_ENV || Environment.Production
 
   const allEnvironments = {
     development: {
@@ -32,7 +32,7 @@ export const getSettingsForTesting = (
       multipartMinFileSize: 10 * 1024 * 1024,
       ...settings
     }
-  };
+  }
 
-  return allEnvironments[selectedEnvironment];
-};
+  return allEnvironments[selectedEnvironment]
+}

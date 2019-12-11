@@ -1,12 +1,12 @@
 /* eslint-disable @typescript-eslint/indent */
-type BaseTypes = string | number | void;
+type BaseTypes = string | number | void
 
 type Query = {
-  [key: string]: BaseTypes | BaseTypes[];
-};
+  [key: string]: BaseTypes | BaseTypes[]
+}
 
 const serializePair = (key: string, value: BaseTypes): string | null =>
-  typeof value !== "undefined" ? `${key}=${encodeURIComponent(value)}` : null;
+  typeof value !== "undefined" ? `${key}=${encodeURIComponent(value)}` : null
 
 const createQuery = (query: Query): string =>
   Object.entries(query)
@@ -20,7 +20,7 @@ const createQuery = (query: Query): string =>
       []
     )
     .filter(x => !!x)
-    .join("&");
+    .join("&")
 
 const getUrl = (base: string, path: string, query?: Query): string =>
   [
@@ -30,6 +30,6 @@ const getUrl = (base: string, path: string, query?: Query): string =>
     query && createQuery(query)
   ]
     .filter(Boolean)
-    .join("");
+    .join("")
 
-export default getUrl;
+export default getUrl

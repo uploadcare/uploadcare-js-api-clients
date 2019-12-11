@@ -1,36 +1,34 @@
-import multipartStart from "../api/multipart/multipartStart";
-import multipartUpload from "../api/multipart/multipartUpload";
-import multipartComplete from "../api/multipart/multipartComplete";
-import { Thenable } from "../thenable/Thenable";
+import multipartStart from "../api/multipart/multipartStart"
+import multipartUpload from "../api/multipart/multipartUpload"
+import multipartComplete from "../api/multipart/multipartComplete"
+import { Thenable } from "../thenable/Thenable"
 
 /* Types */
-import { FileData, SettingsInterface } from "../types";
-import { Uuid } from "..";
+import { FileData, SettingsInterface } from "../types"
+import { Uuid } from ".."
 import {
   BaseThenableInterface,
   CancelableThenableInterface
-} from "../thenable/types";
-import { FileInfoInterface } from "../api/types";
-import { BaseHooksInterface } from "../lifecycle/types";
+} from "../thenable/types"
+import { FileInfoInterface } from "../api/types"
+import { BaseHooksInterface } from "../lifecycle/types"
 
 class Multipart extends Thenable<FileInfoInterface>
   implements BaseThenableInterface<FileInfoInterface> {
-  onCancel: (() => void) | null = null;
-  onProgress: ((progressEvent: ProgressEvent) => void) | null = null;
+  onCancel: (() => void) | null = null
+  onProgress: ((progressEvent: ProgressEvent) => void) | null = null
 
-  protected readonly promise: Promise<FileInfoInterface>;
-  private request:
-    | BaseThenableInterface<any>
-    | CancelableThenableInterface<any>;
+  protected readonly promise: Promise<FileInfoInterface>
+  private request: BaseThenableInterface<any> | CancelableThenableInterface<any>
 
   constructor(
     file: FileData,
     settings: SettingsInterface,
     hooks?: BaseHooksInterface
   ) {
-    super();
+    super()
 
-    this.request = multipartStart(file, settings);
+    this.request = multipartStart(file, settings)
 
     this.promise = this.request
       .then(({ uuid, parts }) => {
@@ -40,17 +38,17 @@ class Multipart extends Thenable<FileInfoInterface>
               ...progressEvent,
               loaded: progressEvent.loaded,
               total: progressEvent.total
-            });
+            })
           }
-        };
-        this.request = multipartUpload(file, parts, settings, { onProgress });
+        }
+        this.request = multipartUpload(file, parts, settings, { onProgress })
 
-        return this.request.then(() => Promise.resolve(uuid));
+        return this.request.then(() => Promise.resolve(uuid))
       })
       .then((uuid: Uuid) => {
-        this.request = multipartComplete(uuid, settings);
+        this.request = multipartComplete(uuid, settings)
 
-        return this.request;
+        return this.request
       })
       .catch(error => {
         if (
@@ -58,15 +56,15 @@ class Multipart extends Thenable<FileInfoInterface>
           hooks &&
           typeof hooks.onCancel === "function"
         ) {
-          hooks.onCancel();
+          hooks.onCancel()
         }
 
-        return Promise.reject(error);
-      });
+        return Promise.reject(error)
+      })
   }
 
   cancel(): void {
-    this.request.cancel();
+    this.request.cancel()
   }
 }
 
@@ -83,5 +81,5 @@ export default function multipart(
   settings: SettingsInterface = {},
   hooks?: BaseHooksInterface
 ): BaseThenableInterface<FileInfoInterface> {
-  return new Multipart(file, settings, hooks);
+  return new Multipart(file, settings, hooks)
 }

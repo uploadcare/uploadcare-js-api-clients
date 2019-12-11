@@ -1,24 +1,24 @@
-import { ErrorRequestInfoInterface, ErrorResponseInfoInterface } from "./types";
-import RequestError from "./RequestError";
+import { ErrorRequestInfoInterface, ErrorResponseInfoInterface } from "./types"
+import RequestError from "./RequestError"
 
 export default class UploadcareError extends Error {
-  readonly request: ErrorRequestInfoInterface;
-  readonly response: ErrorResponseInfoInterface;
+  readonly request: ErrorRequestInfoInterface
+  readonly response: ErrorResponseInfoInterface
 
   constructor(requestError: RequestError) {
-    super();
+    super()
 
-    this.name = "UploadcareError";
-    this.message = `[${requestError.response.status}] ${requestError.response.statusText}`;
-    this.request = requestError.request;
-    this.response = requestError.response;
+    this.name = "UploadcareError"
+    this.message = `[${requestError.response.status}] ${requestError.response.statusText}`
+    this.request = requestError.request
+    this.response = requestError.response
 
-    Object.setPrototypeOf(this, UploadcareError.prototype);
+    Object.setPrototypeOf(this, UploadcareError.prototype)
 
     if (Error.captureStackTrace) {
-      Error.captureStackTrace(this, UploadcareError);
+      Error.captureStackTrace(this, UploadcareError)
     } else {
-      this.stack = new Error().stack;
+      this.stack = new Error().stack
     }
   }
 }

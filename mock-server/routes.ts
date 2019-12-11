@@ -1,19 +1,19 @@
-import * as base from "./controllers/base";
-import * as fromUrl from "./controllers/from_url";
-import * as info from "./controllers/info";
-import * as group from "./controllers/group";
-import * as throttle from "./controllers/throttle";
-import * as multipart from "./controllers/multipart";
+import * as base from "./controllers/base"
+import * as fromUrl from "./controllers/from_url"
+import * as info from "./controllers/info"
+import * as group from "./controllers/group"
+import * as throttle from "./controllers/throttle"
+import * as multipart from "./controllers/multipart"
 
 export type RouteType = {
   [path: string]: {
-    method: string;
-    fn: (ctx: object) => void;
-    isProtected: boolean;
-    isFake?: boolean;
-    description?: string;
-  };
-};
+    method: string
+    fn: (ctx: object) => void
+    isProtected: boolean
+    isFake?: boolean
+    description?: string
+  }
+}
 
 export const ROUTES: RouteType[] = [
   {
@@ -104,4 +104,4 @@ export const ROUTES: RouteType[] = [
       isProtected: true
     }
   }
-];
+]

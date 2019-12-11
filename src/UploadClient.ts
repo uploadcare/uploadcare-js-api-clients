@@ -1,7 +1,7 @@
-import defaultSettings from "./defaultSettings";
-import UploadAPI from "./api/index";
-import fileFrom from "./fileFrom/fileFrom";
-import groupFrom from "./groupFrom/groupFrom";
+import defaultSettings from "./defaultSettings"
+import UploadAPI from "./api/index"
+import fileFrom from "./fileFrom/fileFrom"
+import groupFrom from "./groupFrom/groupFrom"
 
 /* Types */
 import {
@@ -10,34 +10,34 @@ import {
   UploadcareFileInterface,
   UploadcareGroupInterface,
   UploadClientInterface
-} from "./types";
-import { Url } from "./api/fromUrl";
-import { UploadAPIInterface, Uuid } from "./api/types";
-import { LifecycleHooksInterface, UploadInterface } from "./lifecycle/types";
+} from "./types"
+import { Url } from "./api/fromUrl"
+import { UploadAPIInterface, Uuid } from "./api/types"
+import { LifecycleHooksInterface, UploadInterface } from "./lifecycle/types"
 
 class UploadClient implements UploadClientInterface {
-  private settings: SettingsInterface;
-  readonly api: UploadAPIInterface;
+  private settings: SettingsInterface
+  readonly api: UploadAPIInterface
 
   constructor(settings: SettingsInterface = {}) {
     this.settings = {
       ...defaultSettings,
       ...settings
-    };
-    this.api = new UploadAPI(this);
+    }
+    this.api = new UploadAPI(this)
   }
 
   updateSettings(newSettings: SettingsInterface = {}): void {
-    const prevSettings = { ...this.settings };
+    const prevSettings = { ...this.settings }
 
     this.settings = {
       ...prevSettings,
       ...newSettings
-    };
+    }
   }
 
   getSettings(): SettingsInterface {
-    return this.settings;
+    return this.settings
   }
 
   fileFrom(
@@ -52,7 +52,7 @@ class UploadClient implements UploadClientInterface {
         ...settings
       },
       hooks
-    );
+    )
   }
 
   groupFrom(
@@ -67,8 +67,8 @@ class UploadClient implements UploadClientInterface {
         ...settings
       },
       hooks
-    );
+    )
   }
 }
 
-export default UploadClient;
+export default UploadClient
