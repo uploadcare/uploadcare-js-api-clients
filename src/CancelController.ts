@@ -5,7 +5,7 @@ export interface CancelControllerInterface {
 
 class CancelController implements CancelControllerInterface {
   private promise: Promise<void>
-  private resolve: (value?: void | PromiseLike<void> | undefined) => void = () => {}
+  private resolve: () => void = () => {}
 
   constructor() {
     this.promise = new Promise<void>(resolve => this.resolve = resolve)
