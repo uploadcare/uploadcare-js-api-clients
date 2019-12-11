@@ -1,79 +1,44 @@
-import base from '../../src/api/base'
-import * as factory from '../_fixtureFactory'
-import {getUserAgent} from '../../src/defaultSettings'
-import {getSettingsForTesting} from '../_helpers'
-import CancelError from '../../src/errors/CancelError'
+import base from "../../src/api/base";
+import * as factory from "../_fixtureFactory";
+import { getSettingsForTesting } from "../_helpers";
+import CancelController from "../../src/CancelController";
 
-describe('API - base', () => {
-  const fileToUpload = factory.image('blackSquare')
-  const settings = getSettingsForTesting({
-    publicKey: factory.publicKey('demo')
-  })
+describe("API - base", () => {
+  const fileToUpload = factory.image("blackSquare");
 
-  it('should be able to upload data', async () => {
-    const directUpload = base(fileToUpload.data, settings)
-    const {file} = await directUpload
+  it("should be able to upload data", async () => {
+    const publicKey = factory.publicKey("demo");
+    const { file } = await base(fileToUpload.data, { publicKey });
 
-    expect(typeof file).toBe('string')
-  })
+    expect(typeof file).toBe("string");
+  });
 
-  // it('should accept integration setting', async () => {
-  //   const settings = getSettingsForTesting({
-  //     publicKey: 'test',
-  //     integration: 'Test',
-  //   })
-  //   const directUpload = base(fileToUpload.data, settings)
-  //
-  //   directUpload
-  //     .then(() => done.fail('Promise should not to be resolved'))
-  //     .catch((error) => {
-  //       if (
-  //         error.request &&
-  //         error.request.headers &&
-  //         error.request.headers.hasOwnProperty('X-UC-User-Agent') &&
-  //         error.request.headers['X-UC-User-Agent'] === getUserAgent(settings)
-  //       ) {
-  //         done()
-  //       }
-  //       else {
-  //         done.fail(error)
-  //       }
-  //     })
-  //
-  //   await (expectAsync(directUpload) as any).toBeRejected()
-  // })
+  it("should be able to cancel uploading", async () => {
+    let timeoutId;
+    let timeout = jasmine.createSpy("timeout");
+    const publicKey = factory.publicKey("demo");
+    const controller = new CancelController();
+    const directUpload = base(fileToUpload.data, {
+      publicKey,
+      cancel: controller
+    });
 
-  it('should be able to cancel uploading', async () => {
-    const directUpload = base(fileToUpload.data, settings)
+    controller.cancel();
 
-    directUpload.cancel()
+    timeoutId = setTimeout(timeout, 10);
 
-    await (expectAsync(directUpload) as any).toBeRejectedWithError(CancelError)
-  })
+    await expectAsync(directUpload).toBeRejectedWithError("cancel");
 
-  it('should be able to handle cancel uploading', async () => {
-    const onCancel = jasmine.createSpy('onCancel')
-    const directUpload = base(fileToUpload.data, settings, {onCancel})
+    expect(timeout).not.toHaveBeenCalled();
+    clearTimeout(timeoutId);
+  });
 
-    directUpload.cancel()
+  it("should be able to handle progress", async () => {
+    const publicKey = factory.publicKey("demo");
+    const onProgress = jasmine.createSpy("onProgress");
 
-    await (expectAsync(directUpload) as any).toBeRejectedWithError(CancelError)
+    await base(fileToUpload.data, { publicKey, onProgress });
 
-    expect(onCancel).toHaveBeenCalled()
-  })
-
-  it('should be able to handle progress', async () => {
-    let progressValue = 0
-    const settings = getSettingsForTesting({
-      publicKey: factory.publicKey('demo')
-    })
-    const onProgress = (progressEvent) => {
-      progressValue = Math.round((progressEvent.loaded * 100) / progressEvent.total)
-    }
-    const directUpload = base(fileToUpload.data, settings, {onProgress})
-
-    await directUpload
-
-    expect(progressValue).toBe(100)
-  })
-})
+    expect(onProgress).toHaveBeenCalled();
+  });
+});

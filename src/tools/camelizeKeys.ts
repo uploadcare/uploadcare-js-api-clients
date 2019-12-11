@@ -18,15 +18,15 @@ export function camelize(text: string): string {
  * @param {Object} source
  * @returns {Object}
  */
-export default function camelizeKeys(source: any): any {
+export default function camelizeKeys<T>(source: any): T {
   if (!source || typeof source !== 'object') {
     return source
   }
 
   return Object.keys(source)
-    .reduce((accumulator, key) => {
+    .reduce<T>((accumulator, key) => {
       accumulator[camelize(key)] = typeof source[key] === 'object' ? camelizeKeys(source[key]) : source[key]
 
       return accumulator
-    }, {})
+    }, {} as T)
 }

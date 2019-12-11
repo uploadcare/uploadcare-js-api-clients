@@ -3,7 +3,7 @@ import axios, {AxiosError, AxiosRequestConfig, CancelTokenSource} from 'axios'
 
 import {Thenable} from '../../thenable/Thenable'
 import {isNode} from '../../tools/isNode'
-import {buildFormData} from './buildFormData'
+import buildFormData from './buildFormData.node'
 import {delay} from './delay'
 import defaultSettings, {getUserAgent} from '../../defaultSettings'
 import {addMaxConcurrencyInterceptorsToAxiosInstance} from './interceptors'

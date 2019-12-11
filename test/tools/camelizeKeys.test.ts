@@ -10,10 +10,17 @@ describe('camelize', () => {
   })
 })
 
+type Camelize = {
+  fooBar: string;
+  fooBarBaz: string;
+  foo: string;
+  fooBarBaz4: object;
+}
+
 describe('camelizeKeys', () => {
   it('should works', () => {
-    expect(camelizeKeys('foo_bar')).toBe('foo_bar')
-    expect(camelizeKeys({
+    expect(camelizeKeys<string>('foo_bar')).toBe('foo_bar')
+    expect(camelizeKeys<Camelize>({
       foo_bar: 'test1',
       foo_bar_baz: 'test2',
       foo: 'test3',
