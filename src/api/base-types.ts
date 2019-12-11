@@ -10,7 +10,10 @@ export type ImageInfo = {
   datetimeOriginal: string
   format: string
   colorMode: string
-  dpi: number[] | null // wrong type
+  dpi: {
+    '0': number
+    '1': number
+  } | null
   orientation: number | null
   sequence: boolean | null
 }
