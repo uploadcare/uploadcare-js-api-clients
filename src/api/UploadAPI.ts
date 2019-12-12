@@ -14,6 +14,20 @@ import { FileInfo, GroupId, GroupInfo, Token, Url, Uuid } from './types'
 import { InfoOptions } from './info'
 import { FromUrlOptions, FromUrlResponse } from './fromUrl'
 import { FromUrlStatusOptions, FromUrlStatusResponse } from './fromUrlStatus'
+import { SettingsInterface } from '../types'
+
+/**
+ * Populate options with settings.
+ * @param {<T>} options
+ * @param {SettingsInterface} settings
+ */
+const populateOptionsWithSettings = <T>(
+  options: T,
+  settings: SettingsInterface
+): T => ({
+  ...settings,
+  ...options
+})
 
 class UploadAPI {
   private client: UploadClient
@@ -29,47 +43,28 @@ class UploadAPI {
   base(file: FileData, options: BaseOptions): Promise<BaseResponse> {
     const settings = this.client.getSettings()
 
-    return base(file, {
-      ...options,
-      fileName: options.fileName || settings.fileName,
-      baseURL: options.baseURL || settings.baseURL,
-      secureSignature: options.secureSignature || settings.secureSignature,
-      secureExpire: options.secureExpire || settings.secureExpire,
-      store: options.store || settings.store,
-      source: options.source || settings.source,
-      integration: options.integration || settings.integration
-    })
+    return base(
+      file,
+      populateOptionsWithSettings<BaseOptions>(options, settings)
+    )
   }
 
   info(uuid: Uuid, options: InfoOptions): Promise<FileInfo> {
     const settings = this.client.getSettings()
 
-    return info(uuid, {
-      ...options,
-      baseURL: options.baseURL || settings.baseURL,
-      source: options.source || settings.source,
-      integration: options.integration || settings.integration
-    })
+    return info(
+      uuid,
+      populateOptionsWithSettings<InfoOptions>(options, settings)
+    )
   }
 
   fromUrl(sourceUrl: Url, options: FromUrlOptions): Promise<FromUrlResponse> {
     const settings = this.client.getSettings()
 
-    return fromUrl(sourceUrl, {
-      ...options,
-      baseURL: options.baseURL || settings.baseURL,
-      store: options.store || settings.store,
-      fileName: options.fileName || settings.fileName,
-      checkForUrlDuplicates:
-        options.checkForUrlDuplicates || settings.checkForUrlDuplicates,
-      saveUrlForRecurrentUploads:
-        options.saveUrlForRecurrentUploads ||
-        settings.saveUrlForRecurrentUploads,
-      secureSignature: options.secureSignature || settings.secureSignature,
-      secureExpire: options.secureExpire || settings.secureExpire,
-      source: options.source || settings.source,
-      integration: options.integration || settings.integration
-    })
+    return fromUrl(
+      sourceUrl,
+      populateOptionsWithSettings<FromUrlOptions>(options, settings)
+    )
   }
 
   fromUrlStatus(
@@ -77,37 +72,34 @@ class UploadAPI {
     options: FromUrlStatusOptions
   ): Promise<FromUrlStatusResponse> {
     const settings = this.client.getSettings()
+    const {
+      publicKey,
+      baseURL,
+      cancel,
+      integration
+    } = populateOptionsWithSettings<FromUrlStatusOptions>(options, settings)
 
     return fromUrlStatus(token, {
-      ...options,
-      baseURL: options.baseURL || settings.baseURL,
-      integration: options.integration || settings.integration
+      publicKey,
+      baseURL,
+      cancel,
+      integration
     })
   }
 
   group(uuids: Uuid[], options: GroupOptions): Promise<GroupInfo> {
     const settings = this.client.getSettings()
 
-    return group(uuids, {
-      ...options,
-      baseURL: options.baseURL || settings.baseURL,
-      jsonpCallback: options.jsonpCallback || settings.jsonpCallback,
-      secureSignature: options.secureSignature || settings.secureSignature,
-      secureExpire: options.secureExpire || settings.secureExpire,
-      source: options.source || settings.source,
-      integration: options.integration || settings.integration
-    })
+    return group(
+      uuids,
+      populateOptionsWithSettings<GroupOptions>(options, settings)
+    )
   }
 
   groupInfo(id: GroupId, options): Promise<GroupInfo> {
     const settings = this.client.getSettings()
 
-    return groupInfo(id, {
-      ...options,
-      baseURL: options.baseURL || settings.baseURL,
-      source: options.source || settings.source,
-      integration: options.integration || settings.integration
-    })
+    return groupInfo(id, populateOptionsWithSettings(options, settings))
   }
 
   // multipartStart(
