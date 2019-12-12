@@ -1,4 +1,4 @@
-import { FileInfo, Token } from './base-types'
+import { FileInfo, Token } from './types'
 import request from './request/request.node'
 import getUrl from './request/getUrl'
 
@@ -38,7 +38,7 @@ type SuccessResponse = {
   status: Status.Success
 } & FileInfo
 
-export type StatusResponse =
+export type FromUrlStatusResponse =
   | UnknownResponse
   | WaitingResponse
   | ProgressResponse
@@ -52,13 +52,13 @@ type FailedResponse = {
   }
 }
 
-type Response = StatusResponse | FailedResponse
+type Response = FromUrlStatusResponse | FailedResponse
 
 /**
  * UnknownResponse Type Guard.
  */
 export const isUnknownResponse = (
-  response: StatusResponse
+  response: FromUrlStatusResponse
 ): response is UnknownResponse => {
   return response.status !== undefined && response.status === Status.Unknown
 }
@@ -67,7 +67,7 @@ export const isUnknownResponse = (
  * WaitingResponse Type Guard.
  */
 export const isWaitingResponse = (
-  response: StatusResponse
+  response: FromUrlStatusResponse
 ): response is WaitingResponse => {
   return response.status !== undefined && response.status === Status.Waiting
 }
@@ -76,7 +76,7 @@ export const isWaitingResponse = (
  * UnknownResponse Type Guard.
  */
 export const isProgressResponse = (
-  response: StatusResponse
+  response: FromUrlStatusResponse
 ): response is ProgressResponse => {
   return response.status !== undefined && response.status === Status.Progress
 }
@@ -94,15 +94,15 @@ export const isErrorResponse = (
  * SuccessResponse Type Guard.
  */
 export const isSuccessResponse = (
-  response: StatusResponse
+  response: FromUrlStatusResponse
 ): response is SuccessResponse => {
   return response.status !== undefined && response.status === Status.Success
 }
 
-export type Options = {
+export type FromUrlStatusOptions = {
   publicKey?: string
 
-  baseUrl?: string
+  baseURL?: string
 
   cancel?: CancelController
 
@@ -116,17 +116,17 @@ export default function fromUrlStatus(
   token: Token,
   {
     publicKey,
-    baseUrl = defaultSettings.baseURL,
+    baseURL = defaultSettings.baseURL,
     cancel,
     integration
-  }: Options = {}
-): Promise<StatusResponse> {
+  }: FromUrlStatusOptions = {}
+): Promise<FromUrlStatusResponse> {
   return request({
     method: 'GET',
     headers: publicKey
       ? { 'X-UC-User-Agent': getUserAgent({ publicKey, integration }) }
       : undefined,
-    url: getUrl(baseUrl, '/from_url/status/', {
+    url: getUrl(baseURL, '/from_url/status/', {
       jsonerrors: 1,
       token
     }),
