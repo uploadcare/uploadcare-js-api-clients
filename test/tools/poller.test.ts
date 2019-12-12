@@ -1,15 +1,14 @@
 import { poll, CheckFunction } from '../../src/tools/poller'
 import CancelController from '../../src/CancelController'
 import { delay } from '../../src/api/request/delay'
-import CancelError from '../../src/errors/CancelError'
-import TimeoutError from '../../src/errors/TimeoutError'
+import { UploadClientError } from '../../src/errors/errors'
 
 let longJob = (attemps: number, fails: Error | null = null) => {
   let runs = 1
   let condition = jasmine.createSpy('condition')
   let cancel = jasmine.createSpy('cancelCondition')
 
-  let isFinish: CheckFunction = cancelCrtl => {
+  let isFinish: CheckFunction<boolean> = cancelCrtl => {
     condition()
 
     if (cancelCrtl) {
@@ -28,7 +27,7 @@ let longJob = (attemps: number, fails: Error | null = null) => {
     }
   }
 
-  let asyncIsFinish: CheckFunction = cancel =>
+  let asyncIsFinish: CheckFunction<boolean> = cancel =>
     new Promise<boolean>((resolve, reject) => {
       try {
         resolve(isFinish(cancel))
@@ -65,7 +64,7 @@ describe('poll', () => {
 
     await expectAsync(
       poll({ check: job.isFinish, interval: 20, cancelController: ctrl })
-    ).toBeRejectedWith(new CancelError())
+    ).toBeRejectedWithError(UploadClientError, 'Poll canceled')
 
     expect(job.spy.condition).not.toHaveBeenCalled()
     expect(job.spy.cancel).not.toHaveBeenCalled()
@@ -79,7 +78,7 @@ describe('poll', () => {
 
     await expectAsync(
       poll({ check: job.isFinish, interval: 20, cancelController: ctrl })
-    ).toBeRejectedWith(new CancelError())
+    ).toBeRejectedWithError(UploadClientError, 'Poll canceled')
 
     let conditionCallsCount = job.spy.condition.calls.count()
     let cancelCallsCount = job.spy.cancel.calls.count()
@@ -100,7 +99,7 @@ describe('poll', () => {
 
     await expectAsync(
       poll({ check: job.isFinish, interval: 20, cancelController: ctrl })
-    ).toBeRejectedWith(new CancelError())
+    ).toBeRejectedWithError(UploadClientError, 'Poll canceled')
 
     expect(job.spy.condition).toHaveBeenCalledTimes(2)
     expect(job.spy.cancel).toHaveBeenCalledTimes(2)
@@ -111,7 +110,7 @@ describe('poll', () => {
 
     await expectAsync(
       poll({ check: job.isFinish, interval: 40, timeout: 20 })
-    ).toBeRejectedWith(new TimeoutError('Poll Timeout'))
+    ).toBeRejectedWithError(UploadClientError, 'Poll Timeout')
   })
 
   it('should not run any logic after timeout error', async () => {
@@ -119,7 +118,7 @@ describe('poll', () => {
 
     await expectAsync(
       poll({ check: job.isFinish, interval: 40, timeout: 20 })
-    ).toBeRejectedWith(new TimeoutError('Poll Timeout'))
+    ).toBeRejectedWithError(UploadClientError, 'Poll Timeout')
 
     let conditionCallsCount = job.spy.condition.calls.count()
 
