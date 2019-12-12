@@ -1,4 +1,4 @@
-import { FileInfo } from './base-types'
+import { FileInfo } from './types'
 import request from './request/request.node'
 import getUrl from './request/getUrl'
 
@@ -33,6 +33,8 @@ type FailedResponse = {
 
 type Response = FailedResponse | SuccessResponse
 
+export type FromUrlResponse = SuccessResponse
+
 /**
  * TokenResponse Type Guard.
  */
@@ -51,7 +53,7 @@ export const isFileInfoResponse = (
   return response.type !== undefined && response.type === TypeEnum.FileInfo
 }
 
-type Options = {
+export type FromUrlOptions = {
   publicKey: string
 
   baseURL?: string
@@ -85,7 +87,7 @@ export default function fromUrl(
     source = 'url',
     cancel,
     integration
-  }: Options
+  }: FromUrlOptions
 ): Promise<SuccessResponse> {
   return request({
     method: 'POST',
