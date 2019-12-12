@@ -1,129 +1,144 @@
-import info from './info'
 import UploadClient from '../UploadClient'
-import fromUrlStatus, { FromUrlStatusResponse } from './fromUrlStatus'
-import base, { BaseResponse } from './base'
-import {
-  FileInfoInterface,
-  GroupId,
-  GroupInfoInterface,
-  Token,
-  UploadAPIInterface,
-  Uuid
-} from './types'
-import { RequestOptionsInterface, RequestResponse } from './request/types'
-import fromUrl, { FromUrlResponse, Url } from './fromUrl'
+import request from './request/request.node'
+import base from './base'
+import info from './info'
+import fromUrl from './fromUrl'
+import fromUrlStatus from './fromUrlStatus'
+import group, { GroupOptions } from './group'
 import groupInfo from './groupInfo'
-import { FileData, SettingsInterface } from '../types'
-import { prepareOptions } from './request/prepareOptions'
-import group from './group'
-import request from './request/request'
-import { MultipartPart, MultipartStartResponse } from './multipart/types'
-import multipartComplete from './multipart/multipartComplete'
-import multipartStart from './multipart/multipartStart'
-import multipartUpload from './multipart/multipartUpload'
-import {
-  BaseThenableInterface,
-  CancelableThenableInterface
-} from '../thenable/types'
-import { BaseHooksInterface, CancelHookInterface } from '../lifecycle/types'
 
-class UploadAPI implements UploadAPIInterface {
-  readonly client: UploadClient
+/* Types */
+import { BaseOptions, FileData, BaseResponse } from './base'
+import { RequestOptions, RequestResponse } from './request/request.node'
+import { FileInfo, GroupId, GroupInfo, Token, Url, Uuid } from './types'
+import { InfoOptions } from './info'
+import { FromUrlOptions, FromUrlResponse } from './fromUrl'
+import { FromUrlStatusOptions, FromUrlStatusResponse } from './fromUrlStatus'
+
+class UploadAPI {
+  private client: UploadClient
 
   constructor(client: UploadClient) {
     this.client = client
   }
 
-  private getExtendedSettings = (settings): SettingsInterface => {
-    return {
-      ...this.client.getSettings(),
-      ...settings
-    }
+  request(options: RequestOptions): Promise<RequestResponse> {
+    return request(options)
   }
 
-  request(options: RequestOptionsInterface): Promise<RequestResponse> {
-    const preparedOptions = prepareOptions(options, this.client.getSettings())
+  base(file: FileData, options: BaseOptions): Promise<BaseResponse> {
+    const settings = this.client.getSettings()
 
-    return request(preparedOptions)
+    return base(file, {
+      ...options,
+      fileName: options.fileName || settings.fileName,
+      baseURL: options.baseURL || settings.baseURL,
+      secureSignature: options.secureSignature || settings.secureSignature,
+      secureExpire: options.secureExpire || settings.secureExpire,
+      store: options.store || settings.store,
+      source: options.source || settings.source,
+      integration: options.integration || settings.integration
+    })
   }
 
-  base(
-    data: FileData,
-    settings: SettingsInterface = {},
-    hooks?: BaseHooksInterface
-  ): BaseThenableInterface<BaseResponse> {
-    return base(data, this.getExtendedSettings(settings), hooks)
+  info(uuid: Uuid, options: InfoOptions): Promise<FileInfo> {
+    const settings = this.client.getSettings()
+
+    return info(uuid, {
+      ...options,
+      baseURL: options.baseURL || settings.baseURL,
+      source: options.source || settings.source,
+      integration: options.integration || settings.integration
+    })
   }
 
-  info(
-    uuid: Uuid,
-    settings: SettingsInterface = {},
-    hooks?: CancelHookInterface
-  ): CancelableThenableInterface<FileInfoInterface> {
-    return info(uuid, this.getExtendedSettings(settings), hooks)
-  }
+  fromUrl(sourceUrl: Url, options: FromUrlOptions): Promise<FromUrlResponse> {
+    const settings = this.client.getSettings()
 
-  fromUrl(
-    sourceUrl: Url,
-    settings: SettingsInterface = {},
-    hooks?: CancelHookInterface
-  ): CancelableThenableInterface<FromUrlResponse> {
-    return fromUrl(sourceUrl, this.getExtendedSettings(settings), hooks)
+    return fromUrl(sourceUrl, {
+      ...options,
+      baseURL: options.baseURL || settings.baseURL,
+      store: options.store || settings.store,
+      fileName: options.fileName || settings.fileName,
+      checkForUrlDuplicates:
+        options.checkForUrlDuplicates || settings.checkForUrlDuplicates,
+      saveUrlForRecurrentUploads:
+        options.saveUrlForRecurrentUploads ||
+        settings.saveUrlForRecurrentUploads,
+      secureSignature: options.secureSignature || settings.secureSignature,
+      secureExpire: options.secureExpire || settings.secureExpire,
+      source: options.source || settings.source,
+      integration: options.integration || settings.integration
+    })
   }
 
   fromUrlStatus(
     token: Token,
-    settings: SettingsInterface = {},
-    hooks?: CancelHookInterface
-  ): CancelableThenableInterface<FromUrlStatusResponse> {
-    return fromUrlStatus(token, this.getExtendedSettings(settings), hooks)
+    options: FromUrlStatusOptions
+  ): Promise<FromUrlStatusResponse> {
+    const settings = this.client.getSettings()
+
+    return fromUrlStatus(token, {
+      ...options,
+      baseURL: options.baseURL || settings.baseURL,
+      integration: options.integration || settings.integration
+    })
   }
 
-  group(
-    uuids: Uuid[],
-    settings: SettingsInterface = {},
-    hooks?: CancelHookInterface
-  ): CancelableThenableInterface<GroupInfoInterface> {
-    return group(uuids, this.getExtendedSettings(settings), hooks)
+  group(uuids: Uuid[], options: GroupOptions): Promise<GroupInfo> {
+    const settings = this.client.getSettings()
+
+    return group(uuids, {
+      ...options,
+      baseURL: options.baseURL || settings.baseURL,
+      jsonpCallback: options.jsonpCallback || settings.jsonpCallback,
+      secureSignature: options.secureSignature || settings.secureSignature,
+      secureExpire: options.secureExpire || settings.secureExpire,
+      source: options.source || settings.source,
+      integration: options.integration || settings.integration
+    })
   }
 
-  groupInfo(
-    id: GroupId,
-    settings: SettingsInterface = {},
-    hooks?: CancelHookInterface
-  ): CancelableThenableInterface<GroupInfoInterface> {
-    return groupInfo(id, this.getExtendedSettings(settings), hooks)
+  groupInfo(id: GroupId, options): Promise<GroupInfo> {
+    const settings = this.client.getSettings()
+
+    return groupInfo(id, {
+      ...options,
+      baseURL: options.baseURL || settings.baseURL,
+      source: options.source || settings.source,
+      integration: options.integration || settings.integration
+    })
   }
 
-  multipartStart(
-    file: FileData,
-    settings: SettingsInterface = {},
-    hooks?: CancelHookInterface
-  ): CancelableThenableInterface<MultipartStartResponse> {
-    return multipartStart(file, this.getExtendedSettings(settings), hooks)
-  }
-
-  multipartUpload(
-    file: FileData,
-    parts: MultipartPart[],
-    settings: SettingsInterface = {},
-    hooks?: CancelHookInterface
-  ): BaseThenableInterface<any> {
-    return multipartUpload(
-      file,
-      parts,
-      this.getExtendedSettings(settings),
-      hooks
-    )
-  }
-
-  multipartComplete(
-    uuid: Uuid,
-    settings: SettingsInterface = {},
-    hooks?: CancelHookInterface
-  ): CancelableThenableInterface<FileInfoInterface> {
-    return multipartComplete(uuid, this.getExtendedSettings(settings), hooks)
-  }
+  // multipartStart(
+  //   file: FileData,
+  //   settings: Settings = {},
+  //   hooks?: CancelHookInterface
+  // ): CancelableThenableInterface<MultipartStartResponse> {
+  //   return multipartStart(file, this.getExtendedSettings(settings), hooks)
+  // }
+  //
+  // multipartUpload(
+  //   file: FileData,
+  //   parts: MultipartPart[],
+  //   settings: Settings = {},
+  //   hooks?: CancelHookInterface
+  // ): BaseThenableInterface<any> {
+  //   return multipartUpload(
+  //     file,
+  //     parts,
+  //     this.getExtendedSettings(settings),
+  //     hooks
+  //   )
+  // }
+  //
+  // multipartComplete(
+  //   uuid: Uuid,
+  //   settings: Settings = {},
+  //   hooks?: CancelHookInterface
+  // ): CancelableThenableInterface<FileInfo> {
+  //   return multipartComplete(uuid, this.getExtendedSettings(settings), hooks)
+  // }
 }
 
 export default UploadAPI
