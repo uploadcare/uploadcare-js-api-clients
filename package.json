@@ -38,7 +38,7 @@
   "devDependencies": {
     "@types/axios": "^0.14.0",
     "@types/form-data": "^2.5.0",
-    "@types/jasmine": "^3.4.0",
+    "@types/jasmine": "^3.5.0",
     "@types/promise": "^7.1.30",
     "@typescript-eslint/eslint-plugin": "^2.2.0",
     "@typescript-eslint/parser": "^2.2.0",
