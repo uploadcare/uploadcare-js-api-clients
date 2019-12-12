@@ -1,4 +1,4 @@
-import { Uuid, GroupInfo } from './base-types'
+import { Uuid, GroupInfo } from './types'
 import request from './request/request.node'
 import getUrl from './request/getUrl'
 
@@ -6,7 +6,7 @@ import CancelController from '../CancelController'
 import defaultSettings, { getUserAgent } from '../defaultSettings'
 import camelizeKeys from '../tools/camelizeKeys'
 
-type Options = {
+export type GroupOptions = {
   publicKey: string
 
   baseURL?: string
@@ -43,7 +43,7 @@ export default function group(
     cancel,
     source,
     integration
-  }: Options
+  }: GroupOptions
 ): Promise<GroupInfo> {
   return request({
     method: 'POST',
