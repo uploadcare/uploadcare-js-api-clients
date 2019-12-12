@@ -5,6 +5,8 @@ import getUrl from './request/getUrl'
 import defaultSettings, { getUserAgent } from '../defaultSettings'
 import CancelController from '../CancelController'
 import camelizeKeys from '../tools/camelizeKeys'
+import { UploadClientError } from '../errors/errors'
+import retryIfThrottled from '../tools/retryIfThrottled'
 
 export enum Status {
   Unknown = 'unknown',
@@ -107,6 +109,8 @@ export type Options = {
   cancel?: CancelController
 
   integration?: string
+
+  retryThrottledRequestMaxTimes?: number
 }
 
 /**
@@ -118,28 +122,36 @@ export default function fromUrlStatus(
     publicKey,
     baseUrl = defaultSettings.baseURL,
     cancel,
-    integration
+    integration,
+    retryThrottledRequestMaxTimes = defaultSettings.retryThrottledRequestMaxTimes
   }: Options = {}
 ): Promise<StatusResponse> {
-  return request({
-    method: 'GET',
-    headers: publicKey
-      ? { 'X-UC-User-Agent': getUserAgent({ publicKey, integration }) }
-      : undefined,
-    url: getUrl(baseUrl, '/from_url/status/', {
-      jsonerrors: 1,
-      token
-    }),
-    cancel
-  })
-    .then(response => camelizeKeys<Response>(JSON.parse(response.data)))
-    .then(response => {
-      if ('error' in response && !isErrorResponse(response)) {
-        throw new Error(
-          `[${response.error.statusCode}] ${response.error.content}`
-        )
-      }
+  return retryIfThrottled(
+    () =>
+      request({
+        method: 'GET',
+        headers: publicKey
+          ? { 'X-UC-User-Agent': getUserAgent({ publicKey, integration }) }
+          : undefined,
+        url: getUrl(baseUrl, '/from_url/status/', {
+          jsonerrors: 1,
+          token
+        }),
+        cancel
+      }).then(({ data, headers, request }) => {
+        const response = camelizeKeys<Response>(JSON.parse(data))
 
-      return response
-    })
+        if ('error' in response && !isErrorResponse(response)) {
+          throw new UploadClientError(
+            `[${response.error.statusCode}] ${response.error.content}`,
+            request,
+            response.error,
+            headers
+          )
+        } else {
+          return response
+        }
+      }),
+    retryThrottledRequestMaxTimes
+  )
 }

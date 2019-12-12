@@ -5,6 +5,8 @@ import getUrl from './request/getUrl'
 import CancelController from '../CancelController'
 import defaultSettings, { getUserAgent } from '../defaultSettings'
 import camelizeKeys from '../tools/camelizeKeys'
+import { UploadClientError } from '../errors/errors'
+import retryIfThrottled from '../tools/retryIfThrottled'
 
 type Url = string
 
@@ -66,11 +68,16 @@ type Options = {
 
   source?: string
   integration?: string
+
+  retryThrottledRequestMaxTimes?: number
 }
 
 /**
  * Uploading files from URL.
  */
+
+/* eslint @typescript-eslint/camelcase: [2, {allow: ["pub_key", "source_url", "check_URL_duplicates", "save_URL_duplicates"]}] */
+
 export default function fromUrl(
   sourceUrl: Url,
   {
@@ -84,36 +91,44 @@ export default function fromUrl(
     secureExpire,
     source = 'url',
     cancel,
-    integration
+    integration,
+    retryThrottledRequestMaxTimes = defaultSettings.retryThrottledRequestMaxTimes
   }: Options
 ): Promise<SuccessResponse> {
-  return request({
-    method: 'POST',
-    headers: {
-      'X-UC-User-Agent': getUserAgent({ publicKey, integration })
-    },
-    url: getUrl(baseURL, '/from_url/', {
-      jsonerrors: 1,
-      pub_key: publicKey,
-      source_url: sourceUrl,
-      store: typeof store === 'undefined' ? 'auto' : store ? 1 : undefined,
-      filename: fileName,
-      check_URL_duplicates: checkForUrlDuplicates ? 1 : undefined,
-      save_URL_duplicates: saveUrlForRecurrentUploads ? 1 : undefined,
-      signature: secureSignature,
-      expire: secureExpire,
-      source: source
-    }),
-    cancel
-  })
-    .then(response => camelizeKeys<Response>(JSON.parse(response.data)))
-    .then(response => {
-      if ('error' in response) {
-        throw new Error(
-          `[${response.error.statusCode}] ${response.error.content}`
-        )
-      } else {
-        return response
-      }
-    })
+  return retryIfThrottled(
+    () =>
+      request({
+        method: 'POST',
+        headers: {
+          'X-UC-User-Agent': getUserAgent({ publicKey, integration })
+        },
+        url: getUrl(baseURL, '/from_url/', {
+          jsonerrors: 1,
+          pub_key: publicKey,
+          source_url: sourceUrl,
+          store: typeof store === 'undefined' ? 'auto' : store ? 1 : undefined,
+          filename: fileName,
+          check_URL_duplicates: checkForUrlDuplicates ? 1 : undefined,
+          save_URL_duplicates: saveUrlForRecurrentUploads ? 1 : undefined,
+          signature: secureSignature,
+          expire: secureExpire,
+          source: source
+        }),
+        cancel
+      }).then(({ data, headers, request }) => {
+        const response = camelizeKeys<Response>(JSON.parse(data))
+
+        if ('error' in response) {
+          throw new UploadClientError(
+            `[${response.error.statusCode}] ${response.error.content}`,
+            request,
+            response.error,
+            headers
+          )
+        } else {
+          return response
+        }
+      }),
+    retryThrottledRequestMaxTimes
+  )
 }

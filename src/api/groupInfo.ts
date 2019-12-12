@@ -5,6 +5,8 @@ import getUrl from './request/getUrl'
 import CancelController from '../CancelController'
 import defaultSettings, { getUserAgent } from '../defaultSettings'
 import camelizeKeys from '../tools/camelizeKeys'
+import { UploadClientError } from '../errors/errors'
+import retryIfThrottled from '../tools/retryIfThrottled'
 
 type Options = {
   publicKey: string
@@ -14,6 +16,8 @@ type Options = {
 
   source?: string
   integration?: string
+
+  retryThrottledRequestMaxTimes?: number
 }
 
 type FailedResponse = {
@@ -28,6 +32,9 @@ type Response = GroupInfo | FailedResponse
 /**
  * Get info about group.
  */
+
+/* eslint @typescript-eslint/camelcase: [2, {allow: ["pub_key", "group_id"]}] */
+
 export default function groupInfo(
   id: GroupId,
   {
@@ -35,30 +42,38 @@ export default function groupInfo(
     baseURL = defaultSettings.baseURL,
     cancel,
     source,
-    integration
+    integration,
+    retryThrottledRequestMaxTimes = defaultSettings.retryThrottledRequestMaxTimes
   }: Options
 ): Promise<GroupInfo> {
-  return request({
-    method: 'GET',
-    headers: {
-      'X-UC-User-Agent': getUserAgent({ publicKey, integration })
-    },
-    url: getUrl(baseURL, '/group/info/', {
-      jsonerrors: 1,
-      pub_key: publicKey,
-      group_id: id,
-      source
-    }),
-    cancel
-  })
-    .then(response => camelizeKeys<Response>(JSON.parse(response.data)))
-    .then(response => {
-      if ('error' in response) {
-        throw new Error(
-          `[${response.error.statusCode}] ${response.error.content}`
-        )
-      }
+  return retryIfThrottled(
+    () =>
+      request({
+        method: 'GET',
+        headers: {
+          'X-UC-User-Agent': getUserAgent({ publicKey, integration })
+        },
+        url: getUrl(baseURL, '/group/info/', {
+          jsonerrors: 1,
+          pub_key: publicKey,
+          group_id: id,
+          source
+        }),
+        cancel
+      }).then(({ data, headers, request }) => {
+        const response = camelizeKeys<Response>(JSON.parse(data))
 
-      return response
-    })
+        if ('error' in response) {
+          throw new UploadClientError(
+            `[${response.error.statusCode}] ${response.error.content}`,
+            request,
+            response.error,
+            headers
+          )
+        } else {
+          return response
+        }
+      }),
+    retryThrottledRequestMaxTimes
+  )
 }

@@ -1,6 +1,5 @@
 import base from '../../src/api/base'
 import * as factory from '../_fixtureFactory'
-import { getSettingsForTesting } from '../_helpers'
 import CancelController from '../../src/CancelController'
 
 describe('API - base', () => {
@@ -27,7 +26,7 @@ describe('API - base', () => {
 
     timeoutId = setTimeout(timeout, 10)
 
-    await expectAsync(directUpload).toBeRejectedWithError('cancel')
+    await expectAsync(directUpload).toBeRejectedWithError('Request canceled')
 
     expect(timeout).not.toHaveBeenCalled()
     clearTimeout(timeoutId)
