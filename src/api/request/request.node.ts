@@ -21,10 +21,17 @@ export type RequestOptions = {
   onProgress?: (event: any) => void
 }
 
-type BaseResponse = {
+export type RequestResponse = {
   data: string
   headers: Headers
   status?: number
+}
+
+export type FailedResponse = {
+  error: {
+    content: string
+    statusCode: number
+  }
 }
 
 // ProgressEmitter is a simple PassThrough-style transform stream which keeps
@@ -66,7 +73,7 @@ const request = ({
   headers = {},
   cancel,
   onProgress
-}: RequestOptions): Promise<BaseResponse> =>
+}: RequestOptions): Promise<RequestResponse> =>
   Promise.resolve()
     .then(() => {
       if (data && data.toString() === '[object FormData]') {
