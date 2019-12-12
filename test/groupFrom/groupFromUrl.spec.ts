@@ -16,7 +16,7 @@ describe('groupFrom Url[]', () => {
     expect(cdnUrl).toBeTruthy()
   })
 
-  it('should accept doNotStore setting', async () => {
+  it('should accept store setting', async () => {
     const settings = getSettingsForTesting({
       publicKey: factory.publicKey('image'),
       doNotStore: true
