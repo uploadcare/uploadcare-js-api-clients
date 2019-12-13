@@ -1,5 +1,5 @@
 import * as FormData from 'form-data'
-import { Headers } from '../api/request/requestTypes'
+import { Headers } from '../api/request/types'
 
 type ErrorRequestInfo = {
   method?: string

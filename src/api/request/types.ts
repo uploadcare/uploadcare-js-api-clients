@@ -1,36 +1,30 @@
-import { FileData } from '../../types'
-import { CancelableInterface } from '../../lifecycle/types'
-
-export type Query = {
-  [key: string]: string | string[] | boolean | number | void
-}
-
-export type Body = {
-  [key: string]: string[] | string | boolean | number | FileData | void
-}
+import * as FormData from 'form-data'
+import CancelController from '../../CancelController'
 
 export type Headers = {
-  [key: string]: string
+  [key: string]: string | string[] | undefined
 }
 
-export interface RequestOptionsInterface {
+export type RequestOptions = {
   method?: string
-  path: string
-  query?: Query
-  body?: Body
+  url: string
+  query?: string
+  data?: FormData
   headers?: Headers
-  baseURL?: string
-  onUploadProgress?: (progressEvent: ProgressEvent) => void
-  retryThrottledMaxTimes?: number
-  maxConcurrentRequests?: number
+  cancel?: CancelController
+  onProgress?: (event: any) => void
 }
 
 export type RequestResponse = {
-  headers?: object
-  url: string
-  data: any
+  request: RequestOptions
+  data: string
+  headers: Headers
+  status?: number
 }
 
-export interface RequestInterface
-  extends Promise<RequestResponse>,
-    CancelableInterface {}
+export type FailedResponse = {
+  error: {
+    content: string
+    statusCode: number
+  }
+}
