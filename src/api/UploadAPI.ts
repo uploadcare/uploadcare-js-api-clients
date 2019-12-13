@@ -1,5 +1,4 @@
 import UploadClient from '../UploadClient'
-import request from './request/request.node'
 import base from './base'
 import info from './info'
 import fromUrl from './fromUrl'
@@ -9,7 +8,6 @@ import groupInfo from './groupInfo'
 
 /* Types */
 import { BaseOptions, FileData, BaseResponse } from './base'
-import { RequestOptions, RequestResponse } from './request/request.node'
 import { FileInfo, GroupId, GroupInfo, Token, Url, Uuid } from './types'
 import { InfoOptions } from './info'
 import { FromUrlOptions, FromUrlResponse } from './fromUrl'
