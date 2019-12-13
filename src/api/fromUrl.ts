@@ -1,4 +1,6 @@
-import { FileInfo } from './base-types'
+import { FileInfo } from './types'
+import { FailedResponse } from './request/types'
+
 import request from './request/request.node'
 import getUrl from './request/getUrl'
 
@@ -26,14 +28,9 @@ type FileInfoResponse = {
 
 type SuccessResponse = FileInfoResponse | TokenResponse
 
-type FailedResponse = {
-  error: {
-    content: string
-    statusCode: number
-  }
-}
-
 type Response = FailedResponse | SuccessResponse
+
+export type FromUrlResponse = SuccessResponse
 
 /**
  * TokenResponse Type Guard.
@@ -53,7 +50,7 @@ export const isFileInfoResponse = (
   return response.type !== undefined && response.type === TypeEnum.FileInfo
 }
 
-type Options = {
+export type FromUrlOptions = {
   publicKey: string
 
   baseURL?: string
@@ -93,7 +90,7 @@ export default function fromUrl(
     cancel,
     integration,
     retryThrottledRequestMaxTimes = defaultSettings.retryThrottledRequestMaxTimes
-  }: Options
+  }: FromUrlOptions
 ): Promise<SuccessResponse> {
   return retryIfThrottled(
     () =>

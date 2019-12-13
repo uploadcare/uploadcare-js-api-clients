@@ -1,29 +1,23 @@
-import { Uuid } from './base-types'
-
 import getFormData from './request/buildFormData.node'
 import request from './request/request.node'
 import getUrl from './request/getUrl'
-
 import CancelController from '../CancelController'
 import defaultSettings, { getUserAgent } from '../defaultSettings'
 import camelizeKeys from '../tools/camelizeKeys'
 import { UploadClientError } from '../errors/errors'
 import retryIfThrottled from '../tools/retryIfThrottled'
 
-type SuccessResponse = {
+/* Types */
+import { Uuid } from './types'
+import { FailedResponse } from './request/types'
+
+export type BaseResponse = {
   file: Uuid
 }
 
-type FailedResponse = {
-  error: {
-    content: string
-    statusCode: number
-  }
-}
+type Response = BaseResponse | FailedResponse
 
-type Response = SuccessResponse | FailedResponse
-
-export type Options = {
+export type BaseOptions = {
   publicKey: string
 
   fileName?: string
@@ -41,12 +35,14 @@ export type Options = {
   retryThrottledRequestMaxTimes?: number
 }
 
+export type FileData = Blob | File | NodeJS.ReadableStream | Buffer
+
 /**
  * Performs file uploading request to Uploadcare Upload API.
  * Can be canceled and has progress.
  */
 export default function base(
-  file: Blob | File | NodeJS.ReadableStream | Buffer,
+  file: FileData,
   {
     publicKey,
     fileName,
@@ -59,8 +55,8 @@ export default function base(
     source = 'local',
     integration,
     retryThrottledRequestMaxTimes = defaultSettings.retryThrottledRequestMaxTimes
-  }: Options
-): Promise<SuccessResponse> {
+  }: BaseOptions
+): Promise<BaseResponse> {
   return retryIfThrottled(
     () =>
       request({

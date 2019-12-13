@@ -12,7 +12,7 @@ export interface SettingsInterface {
   baseURL?: string
   publicKey?: string | null
   fileName?: string
-  doNotStore?: boolean
+  store?: boolean
   secureSignature?: string
   secureExpire?: string
   integration?: string

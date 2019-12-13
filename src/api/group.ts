@@ -1,4 +1,6 @@
-import { Uuid, GroupInfo } from './base-types'
+import { Uuid, GroupInfo } from './types'
+import { FailedResponse } from './request/types'
+
 import request from './request/request.node'
 import getUrl from './request/getUrl'
 
@@ -8,7 +10,7 @@ import camelizeKeys from '../tools/camelizeKeys'
 import { UploadClientError } from '../errors/errors'
 import retryIfThrottled from '../tools/retryIfThrottled'
 
-type Options = {
+export type GroupOptions = {
   publicKey: string
 
   baseURL?: string
@@ -22,13 +24,6 @@ type Options = {
   integration?: string
 
   retryThrottledRequestMaxTimes?: number
-}
-
-type FailedResponse = {
-  error: {
-    content: string
-    statusCode: number
-  }
 }
 
 type Response = GroupInfo | FailedResponse
@@ -51,7 +46,7 @@ export default function group(
     source,
     integration,
     retryThrottledRequestMaxTimes = defaultSettings.retryThrottledRequestMaxTimes
-  }: Options
+  }: GroupOptions
 ): Promise<GroupInfo> {
   return retryIfThrottled(
     () =>

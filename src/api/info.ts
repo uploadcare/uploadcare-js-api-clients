@@ -1,26 +1,21 @@
-import { Uuid, FileInfo } from './base-types'
 import request from './request/request.node'
 import getUrl from './request/getUrl'
-
 import CancelController from '../CancelController'
 import defaultSettings, { getUserAgent } from '../defaultSettings'
 import camelizeKeys from '../tools/camelizeKeys'
 import { UploadClientError } from '../errors/errors'
 import retryIfThrottled from '../tools/retryIfThrottled'
 
-type FailedResponse = {
-  error: {
-    content: string
-    statusCode: number
-  }
-}
+/* Types */
+import { Uuid, FileInfo } from './types'
+import { FailedResponse } from './request/types'
 
 type Response = FileInfo | FailedResponse
 
-type Options = {
+export type InfoOptions = {
   publicKey: string
 
-  baseUrl?: string
+  baseURL?: string
 
   cancel?: CancelController
 
@@ -40,12 +35,12 @@ export default function info(
   uuid: Uuid,
   {
     publicKey,
-    baseUrl = defaultSettings.baseURL,
+    baseURL = defaultSettings.baseURL,
     cancel,
     source,
     integration,
     retryThrottledRequestMaxTimes = defaultSettings.retryThrottledRequestMaxTimes
-  }: Options
+  }: InfoOptions
 ): Promise<FileInfo> {
   return retryIfThrottled(
     () =>
@@ -54,7 +49,7 @@ export default function info(
         headers: {
           'X-UC-User-Agent': getUserAgent({ publicKey, integration })
         },
-        url: getUrl(baseUrl, '/info/', {
+        url: getUrl(baseURL, '/info/', {
           jsonerrors: 1,
           pub_key: publicKey,
           file_id: uuid,

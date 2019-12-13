@@ -5,8 +5,8 @@ import * as https from 'https'
 import { parse } from 'url'
 import { Readable, Transform } from 'stream'
 
-import { RequestOptions, BaseResponse } from './requestTypes'
 import { cancelError } from '../../errors/errors'
+import { RequestOptions, RequestResponse } from './types'
 
 // ProgressEmitter is a simple PassThrough-style transform stream which keeps
 // track of the number of bytes which have been piped through it and will
@@ -40,7 +40,7 @@ const getLength = (formData: FormData): Promise<number> =>
     })
   })
 
-const request = (params: RequestOptions): Promise<BaseResponse> => {
+const request = (params: RequestOptions): Promise<RequestResponse> => {
   const { method, url, data, headers = {}, cancel, onProgress } = params
 
   return Promise.resolve()
