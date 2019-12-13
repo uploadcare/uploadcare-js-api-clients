@@ -4,10 +4,12 @@ import getUrl from './request/getUrl'
 import CancelController from '../CancelController'
 import defaultSettings, { getUserAgent } from '../defaultSettings'
 import camelizeKeys from '../tools/camelizeKeys'
+import { UploadClientError } from '../errors/errors'
+import retryIfThrottled from '../tools/retryIfThrottled'
 
 /* Types */
 import { Uuid } from './types'
-import { FailedResponse } from './request/request.node'
+import { FailedResponse } from './request/types'
 
 export type BaseResponse = {
   file: Uuid
@@ -29,6 +31,8 @@ export type BaseOptions = {
 
   source?: string
   integration?: string
+
+  retryThrottledRequestMaxTimes?: number
 }
 
 export type FileData = Blob | File | NodeJS.ReadableStream | Buffer
@@ -49,43 +53,51 @@ export default function base(
     cancel,
     onProgress,
     source = 'local',
-    integration
+    integration,
+    retryThrottledRequestMaxTimes = defaultSettings.retryThrottledRequestMaxTimes
   }: BaseOptions
 ): Promise<BaseResponse> {
-  return request({
-    method: 'POST',
-    url: getUrl(baseURL, '/base/', {
-      jsonerrors: 1
-    }),
-    headers: {
-      'X-UC-User-Agent': getUserAgent({ publicKey, integration })
-    },
-    data: getFormData([
-      [
-        'file',
-        file,
-        fileName || (file as File).name || defaultSettings.fileName
-      ],
-      ['UPLOADCARE_PUB_KEY', publicKey],
-      [
-        'UPLOADCARE_STORE',
-        typeof store === 'undefined' ? 'auto' : store ? 1 : 0
-      ],
-      ['signature', secureSignature],
-      ['expire', secureExpire],
-      ['source', source]
-    ]),
-    cancel,
-    onProgress
-  })
-    .then(({ data }) => camelizeKeys<Response>(JSON.parse(data)))
-    .then(response => {
-      if ('error' in response) {
-        throw new Error(
-          `[${response.error.statusCode}] ${response.error.content}`
-        )
-      } else {
-        return response
-      }
-    })
+  return retryIfThrottled(
+    () =>
+      request({
+        method: 'POST',
+        url: getUrl(baseURL, '/base/', {
+          jsonerrors: 1
+        }),
+        headers: {
+          'X-UC-User-Agent': getUserAgent({ publicKey, integration })
+        },
+        data: getFormData([
+          [
+            'file',
+            file,
+            fileName || (file as File).name || defaultSettings.fileName
+          ],
+          ['UPLOADCARE_PUB_KEY', publicKey],
+          [
+            'UPLOADCARE_STORE',
+            typeof store === 'undefined' ? 'auto' : store ? 1 : 0
+          ],
+          ['signature', secureSignature],
+          ['expire', secureExpire],
+          ['source', source]
+        ]),
+        cancel,
+        onProgress
+      }).then(({ data, headers, request }) => {
+        const response = camelizeKeys<Response>(JSON.parse(data))
+
+        if ('error' in response) {
+          throw new UploadClientError(
+            `[${response.error.statusCode}] ${response.error.content}`,
+            request,
+            response.error,
+            headers
+          )
+        } else {
+          return response
+        }
+      }),
+    retryThrottledRequestMaxTimes
+  )
 }

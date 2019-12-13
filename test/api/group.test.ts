@@ -18,13 +18,15 @@ describe('API - group', () => {
   })
 
   it('should fail with [HTTP 400] no files[N] parameters found.', async () => {
-    await expectAsync(group([], settings)).toBeRejectedWithError(Error)
+    await expectAsync(group([], settings)).toBeRejectedWithError('[400] no files[N] parameters found.')
   })
 
   it('should fail with [HTTP 400] this is not valid file url: http://invalid/url.', async () => {
     const files = factory.groupOfFiles('invalid')
 
-    await expectAsync(group(files, settings)).toBeRejectedWithError(Error)
+    await expectAsync(group(files, settings)).toBeRejectedWithError(
+      `[400] this is not valid file url: ${files[0]}.`
+    )
   })
 
   it('should fail with [HTTP 400] some files not found.', async () => {
@@ -32,7 +34,7 @@ describe('API - group', () => {
       publicKey: factory.publicKey('demo')
     })
 
-    await expectAsync(group(files, settings)).toBeRejectedWithError(Error)
+    await expectAsync(group(files, settings)).toBeRejectedWithError('[400] some files not found.')
   })
 
   it('should be able to cancel uploading', async () => {
@@ -47,6 +49,6 @@ describe('API - group', () => {
       controller.cancel()
     }, 10)
 
-    await expectAsync(group(files, settings)).toBeRejectedWithError('cancel')
+    await expectAsync(group(files, settings)).toBeRejectedWithError('Request canceled')
   })
 })

@@ -1,56 +1,58 @@
-import CancelError from '../../src/errors/CancelError'
-import TimeoutError from '../../src/errors/TimeoutError'
+import { cancelError, UploadClientError } from '../../src/errors/errors'
+
 import CancelController from '../CancelController'
 
-type CheckFunction = (
+type CheckFunction<T> = (
   cancel: CancelController | undefined
-) => Promise<boolean> | boolean
+) => Promise<boolean | T> | boolean | T
 
 const DEFAULT_TIMEOUT = 10000
 const DEFAULT_INTERVAL = 500
 
-const poller = ({
+const poller = <T>({
   check,
   timeout = DEFAULT_TIMEOUT,
   interval = DEFAULT_INTERVAL,
   cancelController
 }: {
-  check: CheckFunction
+  check: CheckFunction<T>
   timeout?: number
   interval?: number
   cancelController?: CancelController
-}) =>
+}): Promise<boolean | T> =>
   new Promise((resolve, reject) => {
-    let timeoutId: number
+    let timeoutId: NodeJS.Timeout
     const startTime = Date.now()
     const endTime = startTime + timeout
 
     if (cancelController) {
       cancelController.onCancel(() => {
         timeoutId && clearTimeout(timeoutId)
-        reject(new CancelError())
+        reject(cancelError('Poll canceled'))
       })
     }
 
-    const tick = async () => {
+    const tick = (): void => {
       try {
-        const result = await check(cancelController)
-        const nowTime = Date.now()
+        Promise.resolve(check(cancelController))
+          .then(result => {
+            const nowTime = Date.now()
 
-        if (result) {
-          resolve(result)
-        } else if (nowTime > endTime) {
-          reject(new TimeoutError('Poll Timeout'))
-        } else {
-          // @ts-ignore
-          timeoutId = setTimeout(tick, interval)
-        }
+            if (result) {
+              resolve(result)
+            } else if (nowTime > endTime) {
+              reject(new UploadClientError('Poll Timeout'))
+            } else {
+              timeoutId = setTimeout(tick, interval)
+            }
+          })
+          .catch(error => reject(error))
       } catch (error) {
         reject(error)
       }
     }
 
-    timeoutId = setTimeout(tick)
+    timeoutId = setTimeout(tick, 0)
   })
 
 export { poller as poll, CheckFunction }

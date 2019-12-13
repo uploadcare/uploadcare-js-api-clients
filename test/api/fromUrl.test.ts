@@ -3,6 +3,7 @@ import * as factory from '../_fixtureFactory'
 import { getSettingsForTesting } from '../_helpers'
 import CancelController from '../../src/CancelController'
 
+
 describe('API - from url', () => {
   const sourceUrl = factory.imageUrl('valid')
   const settings = getSettingsForTesting({
@@ -24,19 +25,19 @@ describe('API - from url', () => {
       publicKey: factory.publicKey('invalid')
     })
 
-    await expectAsync(fromUrl(sourceUrl, settings)).toBeRejectedWithError(Error)
+    await expectAsync(fromUrl(sourceUrl, settings)).toBeRejectedWithError('[403] pub_key is invalid.')
   })
 
   it('should be rejected with image that does not exists', async () => {
     const sourceUrl = factory.imageUrl('doesNotExist')
 
-    await expectAsync(fromUrl(sourceUrl, settings)).toBeRejectedWithError(Error)
+    await expectAsync(fromUrl(sourceUrl, settings)).toBeRejectedWithError('[400] Host does not exist.')
   })
 
   it('should be rejected with image from private IP', async () => {
     const sourceUrl = factory.imageUrl('privateIP')
 
-    await expectAsync(fromUrl(sourceUrl, settings)).toBeRejectedWithError(Error)
+    await expectAsync(fromUrl(sourceUrl, settings)).toBeRejectedWithError('[400] Only public IPs are allowed.')
   })
 
   it('should be able to cancel uploading', async () => {
@@ -52,7 +53,7 @@ describe('API - from url', () => {
     })
 
     await expectAsync(fromUrl(sourceUrl, settings)).toBeRejectedWithError(
-      'cancel'
+      'Request canceled'
     )
   })
 })

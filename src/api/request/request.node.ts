@@ -5,34 +5,8 @@ import * as https from 'https'
 import { parse } from 'url'
 import { Readable, Transform } from 'stream'
 
-import CancelController from '../../CancelController'
-
-type Headers = {
-  [key: string]: string | string[] | undefined
-}
-
-export type RequestOptions = {
-  method?: string
-  url: string
-  query?: string
-  data?: FormData
-  headers?: Headers
-  cancel?: CancelController
-  onProgress?: (event: any) => void
-}
-
-export type RequestResponse = {
-  data: string
-  headers: Headers
-  status?: number
-}
-
-export type FailedResponse = {
-  error: {
-    content: string
-    statusCode: number
-  }
-}
+import { cancelError } from '../../errors/errors'
+import { RequestOptions, RequestResponse } from './types'
 
 // ProgressEmitter is a simple PassThrough-style transform stream which keeps
 // track of the number of bytes which have been piped through it and will
@@ -66,15 +40,10 @@ const getLength = (formData: FormData): Promise<number> =>
     })
   })
 
-const request = ({
-  method,
-  url,
-  data,
-  headers = {},
-  cancel,
-  onProgress
-}: RequestOptions): Promise<RequestResponse> =>
-  Promise.resolve()
+const request = (params: RequestOptions): Promise<RequestResponse> => {
+  const { method, url, data, headers = {}, cancel, onProgress } = params
+
+  return Promise.resolve()
     .then(() => {
       if (data && data.toString() === '[object FormData]') {
         return getLength(data)
@@ -108,7 +77,7 @@ const request = ({
               aborted = true
               req.abort()
 
-              reject(new Error('cancel'))
+              reject(cancelError())
             })
           }
 
@@ -125,7 +94,8 @@ const request = ({
               resolve({
                 data: Buffer.concat(resChunks).toString('utf8'),
                 status: res.statusCode,
-                headers: res.headers
+                headers: res.headers,
+                request: params
               })
             )
           })
@@ -147,5 +117,6 @@ const request = ({
           }
         })
     )
+}
 
 export default request
