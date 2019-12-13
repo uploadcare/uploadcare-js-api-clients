@@ -1,10 +1,11 @@
-import { Uuid, FileInfo } from './base-types'
 import request from './request/request.node'
 import getUrl from './request/getUrl'
-
 import CancelController from '../CancelController'
 import defaultSettings, { getUserAgent } from '../defaultSettings'
 import camelizeKeys from '../tools/camelizeKeys'
+
+/* Types */
+import { Uuid, FileInfo } from './types'
 
 type FailedResponse = {
   error: {
@@ -15,10 +16,10 @@ type FailedResponse = {
 
 type Response = FileInfo | FailedResponse
 
-type Options = {
+export type InfoOptions = {
   publicKey: string
 
-  baseUrl?: string
+  baseURL?: string
 
   cancel?: CancelController
 
@@ -33,18 +34,18 @@ export default function info(
   uuid: Uuid,
   {
     publicKey,
-    baseUrl = defaultSettings.baseURL,
+    baseURL = defaultSettings.baseURL,
     cancel,
     source,
     integration
-  }: Options
+  }: InfoOptions
 ): Promise<FileInfo> {
   return request({
     method: 'GET',
     headers: {
       'X-UC-User-Agent': getUserAgent({ publicKey, integration })
     },
-    url: getUrl(baseUrl, '/info/', {
+    url: getUrl(baseURL, '/info/', {
       jsonerrors: 1,
       pub_key: publicKey,
       file_id: uuid,

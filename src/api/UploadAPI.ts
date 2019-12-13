@@ -1,129 +1,130 @@
-import info from './info'
 import UploadClient from '../UploadClient'
-import fromUrlStatus, { FromUrlStatusResponse } from './fromUrlStatus'
-import base, { BaseResponse } from './base'
-import {
-  FileInfoInterface,
-  GroupId,
-  GroupInfoInterface,
-  Token,
-  UploadAPIInterface,
-  Uuid
-} from './types'
-import { RequestOptionsInterface, RequestResponse } from './request/types'
-import fromUrl, { FromUrlResponse, Url } from './fromUrl'
+import base from './base'
+import info from './info'
+import fromUrl from './fromUrl'
+import fromUrlStatus from './fromUrlStatus'
+import group, { GroupOptions } from './group'
 import groupInfo from './groupInfo'
-import { FileData, SettingsInterface } from '../types'
-import { prepareOptions } from './request/prepareOptions'
-import group from './group'
-import request from './request/request'
-import { MultipartPart, MultipartStartResponse } from './multipart/types'
-import multipartComplete from './multipart/multipartComplete'
-import multipartStart from './multipart/multipartStart'
-import multipartUpload from './multipart/multipartUpload'
-import {
-  BaseThenableInterface,
-  CancelableThenableInterface
-} from '../thenable/types'
-import { BaseHooksInterface, CancelHookInterface } from '../lifecycle/types'
 
-class UploadAPI implements UploadAPIInterface {
-  readonly client: UploadClient
+/* Types */
+import { BaseOptions, FileData, BaseResponse } from './base'
+import { FileInfo, GroupId, GroupInfo, Token, Url, Uuid } from './types'
+import { InfoOptions } from './info'
+import { FromUrlOptions, FromUrlResponse } from './fromUrl'
+import { FromUrlStatusOptions, FromUrlStatusResponse } from './fromUrlStatus'
+import { SettingsInterface } from '../types'
+
+/**
+ * Populate options with settings.
+ * @param {<T>} options
+ * @param {SettingsInterface} settings
+ */
+const populateOptionsWithSettings = <T>(
+  options: T,
+  settings: SettingsInterface
+): T => ({
+  ...settings,
+  ...options
+})
+
+class UploadAPI {
+  private client: UploadClient
 
   constructor(client: UploadClient) {
     this.client = client
   }
 
-  private getExtendedSettings = (settings): SettingsInterface => {
-    return {
-      ...this.client.getSettings(),
-      ...settings
-    }
+  base(file: FileData, options: BaseOptions): Promise<BaseResponse> {
+    const settings = this.client.getSettings()
+
+    return base(
+      file,
+      populateOptionsWithSettings<BaseOptions>(options, settings)
+    )
   }
 
-  request(options: RequestOptionsInterface): Promise<RequestResponse> {
-    const preparedOptions = prepareOptions(options, this.client.getSettings())
+  info(uuid: Uuid, options: InfoOptions): Promise<FileInfo> {
+    const settings = this.client.getSettings()
 
-    return request(preparedOptions)
+    return info(
+      uuid,
+      populateOptionsWithSettings<InfoOptions>(options, settings)
+    )
   }
 
-  base(
-    data: FileData,
-    settings: SettingsInterface = {},
-    hooks?: BaseHooksInterface
-  ): BaseThenableInterface<BaseResponse> {
-    return base(data, this.getExtendedSettings(settings), hooks)
-  }
+  fromUrl(sourceUrl: Url, options: FromUrlOptions): Promise<FromUrlResponse> {
+    const settings = this.client.getSettings()
 
-  info(
-    uuid: Uuid,
-    settings: SettingsInterface = {},
-    hooks?: CancelHookInterface
-  ): CancelableThenableInterface<FileInfoInterface> {
-    return info(uuid, this.getExtendedSettings(settings), hooks)
-  }
-
-  fromUrl(
-    sourceUrl: Url,
-    settings: SettingsInterface = {},
-    hooks?: CancelHookInterface
-  ): CancelableThenableInterface<FromUrlResponse> {
-    return fromUrl(sourceUrl, this.getExtendedSettings(settings), hooks)
+    return fromUrl(
+      sourceUrl,
+      populateOptionsWithSettings<FromUrlOptions>(options, settings)
+    )
   }
 
   fromUrlStatus(
     token: Token,
-    settings: SettingsInterface = {},
-    hooks?: CancelHookInterface
-  ): CancelableThenableInterface<FromUrlStatusResponse> {
-    return fromUrlStatus(token, this.getExtendedSettings(settings), hooks)
+    options: FromUrlStatusOptions
+  ): Promise<FromUrlStatusResponse> {
+    const settings = this.client.getSettings()
+    const {
+      publicKey,
+      baseURL,
+      cancel,
+      integration
+    } = populateOptionsWithSettings<FromUrlStatusOptions>(options, settings)
+
+    return fromUrlStatus(token, {
+      publicKey,
+      baseURL,
+      cancel,
+      integration
+    })
   }
 
-  group(
-    uuids: Uuid[],
-    settings: SettingsInterface = {},
-    hooks?: CancelHookInterface
-  ): CancelableThenableInterface<GroupInfoInterface> {
-    return group(uuids, this.getExtendedSettings(settings), hooks)
-  }
+  group(uuids: Uuid[], options: GroupOptions): Promise<GroupInfo> {
+    const settings = this.client.getSettings()
 
-  groupInfo(
-    id: GroupId,
-    settings: SettingsInterface = {},
-    hooks?: CancelHookInterface
-  ): CancelableThenableInterface<GroupInfoInterface> {
-    return groupInfo(id, this.getExtendedSettings(settings), hooks)
-  }
-
-  multipartStart(
-    file: FileData,
-    settings: SettingsInterface = {},
-    hooks?: CancelHookInterface
-  ): CancelableThenableInterface<MultipartStartResponse> {
-    return multipartStart(file, this.getExtendedSettings(settings), hooks)
-  }
-
-  multipartUpload(
-    file: FileData,
-    parts: MultipartPart[],
-    settings: SettingsInterface = {},
-    hooks?: CancelHookInterface
-  ): BaseThenableInterface<any> {
-    return multipartUpload(
-      file,
-      parts,
-      this.getExtendedSettings(settings),
-      hooks
+    return group(
+      uuids,
+      populateOptionsWithSettings<GroupOptions>(options, settings)
     )
   }
 
-  multipartComplete(
-    uuid: Uuid,
-    settings: SettingsInterface = {},
-    hooks?: CancelHookInterface
-  ): CancelableThenableInterface<FileInfoInterface> {
-    return multipartComplete(uuid, this.getExtendedSettings(settings), hooks)
+  groupInfo(id: GroupId, options): Promise<GroupInfo> {
+    const settings = this.client.getSettings()
+
+    return groupInfo(id, populateOptionsWithSettings(options, settings))
   }
+
+  // multipartStart(
+  //   file: FileData,
+  //   settings: Settings = {},
+  //   hooks?: CancelHookInterface
+  // ): CancelableThenableInterface<MultipartStartResponse> {
+  //   return multipartStart(file, this.getExtendedSettings(settings), hooks)
+  // }
+  //
+  // multipartUpload(
+  //   file: FileData,
+  //   parts: MultipartPart[],
+  //   settings: Settings = {},
+  //   hooks?: CancelHookInterface
+  // ): BaseThenableInterface<any> {
+  //   return multipartUpload(
+  //     file,
+  //     parts,
+  //     this.getExtendedSettings(settings),
+  //     hooks
+  //   )
+  // }
+  //
+  // multipartComplete(
+  //   uuid: Uuid,
+  //   settings: Settings = {},
+  //   hooks?: CancelHookInterface
+  // ): CancelableThenableInterface<FileInfo> {
+  //   return multipartComplete(uuid, this.getExtendedSettings(settings), hooks)
+  // }
 }
 
 export default UploadAPI

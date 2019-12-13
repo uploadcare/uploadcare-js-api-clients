@@ -15,7 +15,7 @@ describe('fileFrom Object (multipart)', () => {
     expect(file.cdnUrl).toBeTruthy()
   }, 250000)
 
-  it('should accept doNotStore setting', async () => {
+  it('should accept store setting', async () => {
     const settings = getSettingsForTesting({
       publicKey: factory.publicKey('image'),
       doNotStore: true

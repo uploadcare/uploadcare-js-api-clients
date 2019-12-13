@@ -71,3 +71,5 @@ export type Token = string
 export type Uuid = string
 
 export type GroupId = string
+
+export type Url = string

@@ -18,7 +18,12 @@ const getRequestBody = (file: FileData, settings: SettingsInterface): Body => {
     size,
     partSize: settings.multipartChunkSize || defaultSettings.multipartChunkSize,
     content_type: 'application/octet-stream',
-    UPLOADCARE_STORE: settings.doNotStore ? '' : 'auto',
+    UPLOADCARE_STORE:
+      typeof settings.store === 'undefined'
+        ? 'auto'
+        : settings.store
+        ? 1
+        : undefined,
     UPLOADCARE_PUB_KEY: settings.publicKey || '',
     signature: settings.secureSignature || '',
     expire: settings.secureExpire || '',

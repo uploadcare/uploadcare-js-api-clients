@@ -1,4 +1,4 @@
-import { GroupId, GroupInfo } from './base-types'
+import { GroupId, GroupInfo } from './types'
 import request from './request/request.node'
 import getUrl from './request/getUrl'
 
@@ -6,7 +6,7 @@ import CancelController from '../CancelController'
 import defaultSettings, { getUserAgent } from '../defaultSettings'
 import camelizeKeys from '../tools/camelizeKeys'
 
-type Options = {
+export type GroupInfoOptions = {
   publicKey: string
   baseURL?: string
 
@@ -36,7 +36,7 @@ export default function groupInfo(
     cancel,
     source,
     integration
-  }: Options
+  }: GroupInfoOptions
 ): Promise<GroupInfo> {
   return request({
     method: 'GET',
