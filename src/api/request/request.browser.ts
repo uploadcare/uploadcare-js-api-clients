@@ -55,7 +55,7 @@ const request = ({
     }
 
     if (onProgress && typeof onProgress === 'function') {
-      xhr.onprogress = (event: ProgressEvent): void => {
+      xhr.upload.onprogress = (event: ProgressEvent): void => {
         const value = Math.round(event.loaded / event.total)
         onProgress(value)
       }
