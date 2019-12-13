@@ -65,6 +65,7 @@ const request = ({
 
         // Create a map of header names to values
         const responseHeaders = {}
+
         headersArray.forEach(function(line) {
           const parts = line.split(': ')
           const header = parts.shift()
@@ -74,11 +75,15 @@ const request = ({
             responseHeaders[header] = value
           }
         })
+
+        const responseData = xhr.response
+        const responseStatus = xhr.status
+
         resolve({
           request,
-          data: xhr.response,
+          data: responseData,
           headers: responseHeaders,
-          status: xhr.status
+          status: responseStatus
         })
       }
     }
