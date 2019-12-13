@@ -9,11 +9,11 @@ import * as FormData from 'form-data'
  * @returns {FormData} FormData instance
  */
 
-type FileTyple = ['file', Blob | File | NodeJS.ReadableStream | Buffer, string]
+type FileTuple = ['file', Blob | File | NodeJS.ReadableStream | Buffer, string]
 type BaseType = string | number | void
-type FormDataTyple = [string, BaseType | BaseType[]]
+type FormDataTuple = [string, BaseType | BaseType[]]
 
-function getFormData(body: (FormDataTyple | FileTyple)[]): FormData {
+function getFormData(body: (FormDataTuple | FileTuple)[]): FormData {
   const formData = new FormData()
 
   for (const [key, value, name] of body) {
