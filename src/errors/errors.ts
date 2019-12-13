@@ -1,11 +1,11 @@
-import * as FormData from 'form-data'
+import * as NodeFormData from 'form-data'
 import { Headers } from '../api/request/types'
 
 type ErrorRequestInfo = {
   method?: string
   url: string
   query?: string
-  data?: FormData // Wrong type
+  data?: NodeFormData | FormData
   headers?: Headers
 }
 
