@@ -36,10 +36,6 @@ class UploadAPI {
     this.client = client
   }
 
-  request(options: RequestOptions): Promise<RequestResponse> {
-    return request(options)
-  }
-
   base(file: FileData, options: BaseOptions): Promise<BaseResponse> {
     const settings = this.client.getSettings()
 
