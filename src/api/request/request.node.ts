@@ -46,7 +46,7 @@ const request = (params: RequestOptions): Promise<RequestResponse> => {
   return Promise.resolve()
     .then(() => {
       if (data && data.toString() === '[object FormData]') {
-        return getLength(data)
+        return getLength(data as FormData)
       } else {
         return undefined
       }
@@ -108,9 +108,11 @@ const request = (params: RequestOptions): Promise<RequestResponse> => {
 
           if (data && (data instanceof Readable || isFormData)) {
             if (onProgress) {
-              data.pipe(new ProgressEmitter(onProgress)).pipe(req)
+              ;(data as FormData)
+                .pipe(new ProgressEmitter(onProgress))
+                .pipe(req)
             } else {
-              data.pipe(req)
+              ;(data as FormData).pipe(req)
             }
           } else {
             req.end(data)
