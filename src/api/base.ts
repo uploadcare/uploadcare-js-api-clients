@@ -27,7 +27,7 @@ export type BaseOptions = {
   store?: boolean
 
   cancel?: CancelController
-  onProgress?: (event: any) => void
+  onProgress?: (value: number) => void
 
   source?: string
   integration?: string
