@@ -4,7 +4,7 @@ import CancelController from '../CancelController'
 
 type CheckFunction<T> = (
   cancel: CancelController | undefined
-) => Promise<boolean | T> | boolean | T
+) => Promise<false | T> | false | T
 
 const DEFAULT_TIMEOUT = 10000
 const DEFAULT_INTERVAL = 500
@@ -19,7 +19,7 @@ const poller = <T>({
   timeout?: number
   interval?: number
   cancelController?: CancelController
-}): Promise<boolean | T> =>
+}): Promise<T> =>
   new Promise((resolve, reject) => {
     let timeoutId: NodeJS.Timeout
     const startTime = Date.now()
