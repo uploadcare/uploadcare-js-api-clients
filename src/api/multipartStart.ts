@@ -12,7 +12,6 @@ import CancelController from '../CancelController'
 
 export type MultipartStartOptions = {
   publicKey: string
-  size: number
   contentType: string
   fileName?: string
   baseURL?: string
@@ -26,7 +25,7 @@ export type MultipartStartOptions = {
   retryThrottledRequestMaxTimes?: number
 }
 
-type MultipartPart = string
+export type MultipartPart = string
 
 export type MultipartStartResponse = {
   parts: MultipartPart[]
@@ -39,11 +38,10 @@ type Response = MultipartStartResponse | FailedResponse
  * Start multipart uploading.
  */
 export default function multipartStart(
-  file: Blob | File | Buffer,
+  size: number,
   {
     publicKey,
-    contentType = 'application/octet-stream',
-    size,
+    contentType,
     fileName = defaultSettings.fileName,
     multipartChunkSize = defaultSettings.multipartChunkSize,
     baseURL = '',

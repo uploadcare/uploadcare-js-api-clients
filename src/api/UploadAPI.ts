@@ -7,6 +7,7 @@ import group from './group'
 import groupInfo from './groupInfo'
 import multipartStart from './multipartStart'
 import multipartComplete from './multipartComplete'
+import multipartUpload from './multipartUpload'
 
 /* Types */
 import { BaseOptions, FileData, BaseResponse } from './base'
@@ -16,8 +17,16 @@ import { FromUrlOptions, FromUrlResponse } from './fromUrl'
 import { FromUrlStatusOptions, FromUrlStatusResponse } from './fromUrlStatus'
 import { GroupOptions } from './group'
 import { GroupInfoOptions } from './groupInfo'
-import { MultipartStartOptions, MultipartStartResponse } from './multipartStart'
+import {
+  MultipartStartOptions,
+  MultipartStartResponse,
+  MultipartPart
+} from './multipartStart'
 import { MultipartCompleteOptions } from './multipartComplete'
+import {
+  MultipartUploadOptions,
+  MultipartUploadResponse
+} from './multipartUpload'
 import { SettingsInterface } from '../types'
 
 /**
@@ -80,27 +89,27 @@ class UploadAPI {
   }
 
   multipartStart(
-    file: Blob | File | Buffer,
+    size: number,
     options: MultipartStartOptions
   ): Promise<MultipartStartResponse> {
     const settings = this.client.getSettings()
 
-    return multipartStart(file, populateOptionsWithSettings(options, settings))
+    return multipartStart(size, populateOptionsWithSettings(options, settings))
   }
 
-  // multipartUpload(
-  //   file: FileData,
-  //   parts: MultipartPart[],
-  //   settings: Settings = {},
-  //   hooks?: CancelHookInterface
-  // ): BaseThenableInterface<any> {
-  //   return multipartUpload(
-  //     file,
-  //     parts,
-  //     this.getExtendedSettings(settings),
-  //     hooks
-  //   )
-  // }
+  multipartUpload(
+    part: Buffer,
+    url: MultipartPart,
+    options: MultipartUploadOptions
+  ): Promise<MultipartUploadResponse> {
+    const settings = this.client.getSettings()
+
+    return multipartUpload(
+      part,
+      url,
+      populateOptionsWithSettings(options, settings)
+    )
+  }
 
   multipartComplete(
     uuid: Uuid,

@@ -1,5 +1,5 @@
 import { FailedResponse } from './request/types'
-import { Uuid } from './types'
+import { MultipartPart } from './multipartStart'
 
 import request from './request/request.node'
 import defaultSettings, { getUserAgent } from '../defaultSettings'
@@ -8,7 +8,7 @@ import retryIfThrottled from '../tools/retryIfThrottled'
 import { UploadClientError } from '../errors/errors'
 import CancelController from '../CancelController'
 
-export type MultipartCompleteOptions = {
+export type MultipartUploadOptions = {
   publicKey?: string
   cancel?: CancelController
   onProgress?: (value: number) => void
@@ -25,22 +25,22 @@ type Response = FailedResponse | MultipartUploadResponse
 /**
  * Complete multipart uploading.
  */
-export default function multipartComplete(
-  partUrl: Uuid,
+export default function multipartUpload(
   part: Buffer,
+  url: MultipartPart,
   {
     publicKey,
     cancel,
     onProgress,
     integration,
     retryThrottledRequestMaxTimes = defaultSettings.retryThrottledRequestMaxTimes
-  }: MultipartCompleteOptions
+  }: MultipartUploadOptions
 ): Promise<MultipartUploadResponse> {
   return retryIfThrottled(
     () =>
       request({
         method: 'PUT',
-        url: partUrl,
+        url,
         headers: {
           'X-UC-User-Agent': publicKey
             ? getUserAgent({ publicKey, integration })
