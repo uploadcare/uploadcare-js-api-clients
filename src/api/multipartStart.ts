@@ -1,89 +1,79 @@
-import getFormData from './request/buildFormData.node'
+import { FailedResponse } from './request/types'
+import { Uuid } from './types'
+
 import request from './request/request.node'
+import getFormData from './request/buildFormData.node'
 import getUrl from './request/getUrl'
-import CancelController from '../CancelController'
 import defaultSettings, { getUserAgent } from '../defaultSettings'
 import camelizeKeys from '../tools/camelizeKeys'
-import { UploadClientError } from '../errors/errors'
 import retryIfThrottled from '../tools/retryIfThrottled'
+import { UploadClientError } from '../errors/errors'
+import CancelController from '../CancelController'
 
-/* Types */
-import { Uuid } from './types'
-import { FailedResponse } from './request/types'
-
-export type BaseResponse = {
-  file: Uuid
-}
-
-type Response = BaseResponse | FailedResponse
-
-export type BaseOptions = {
+export type MultipartStartOptions = {
   publicKey: string
-
+  contentType: string
   fileName?: string
   baseURL?: string
   secureSignature?: string
   secureExpire?: string
   store?: boolean
-
+  multipartChunkSize?: number
   cancel?: CancelController
-  onProgress?: (value: number) => void
-
   source?: string
   integration?: string
-
   retryThrottledRequestMaxTimes?: number
 }
 
-export type FileData = Blob | File | NodeJS.ReadableStream | Buffer
+export type MultipartPart = string
+
+export type MultipartStartResponse = {
+  parts: MultipartPart[]
+  uuid: Uuid
+}
+
+type Response = MultipartStartResponse | FailedResponse
 
 /**
- * Performs file uploading request to Uploadcare Upload API.
- * Can be canceled and has progress.
+ * Start multipart uploading.
  */
-export default function base(
-  file: FileData,
+export default function multipartStart(
+  size: number,
   {
     publicKey,
-    fileName,
-    baseURL = defaultSettings.baseURL,
+    contentType,
+    fileName = defaultSettings.fileName,
+    multipartChunkSize = defaultSettings.multipartChunkSize,
+    baseURL = '',
     secureSignature,
     secureExpire,
     store,
     cancel,
-    onProgress,
     source = 'local',
     integration,
     retryThrottledRequestMaxTimes = defaultSettings.retryThrottledRequestMaxTimes
-  }: BaseOptions
-): Promise<BaseResponse> {
+  }: MultipartStartOptions
+): Promise<MultipartStartResponse> {
   return retryIfThrottled(
     () =>
       request({
         method: 'POST',
-        url: getUrl(baseURL, '/base/', {
-          jsonerrors: 1
-        }),
+        url: getUrl(baseURL, '/multipart/start/', { jsonerrors: 1 }),
         headers: {
           'X-UC-User-Agent': getUserAgent({ publicKey, integration })
         },
         data: getFormData([
-          [
-            'file',
-            file,
-            fileName || (file as File).name || defaultSettings.fileName
-          ],
+          ['filename', fileName],
+          ['size', size],
+          ['content_type', contentType],
+          ['part_size', multipartChunkSize],
+          ['UPLOADCARE_STORE', store ? '' : 'auto'],
           ['UPLOADCARE_PUB_KEY', publicKey],
-          [
-            'UPLOADCARE_STORE',
-            typeof store === 'undefined' ? 'auto' : store ? 1 : 0
-          ],
           ['signature', secureSignature],
           ['expire', secureExpire],
           ['source', source]
         ]),
-        cancel,
-        onProgress
+        cancel
       }).then(({ data, headers, request }) => {
         const response = camelizeKeys<Response>(JSON.parse(data))
 
@@ -95,6 +85,11 @@ export default function base(
             headers
           )
         } else {
+          // convert to array
+          response.parts = Object.keys(response.parts).map(
+            key => response.parts[key]
+          )
+
           return response
         }
       }),

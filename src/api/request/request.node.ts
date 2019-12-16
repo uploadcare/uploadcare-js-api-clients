@@ -40,12 +40,31 @@ const getLength = (formData: FormData): Promise<number> =>
     })
   })
 
+function isFormData(formData?: FormData | Buffer | Blob): formData is FormData {
+  if (formData && formData.toString() === '[object FormData]') {
+    return true
+  }
+
+  return false
+}
+
+function isReadable(
+  data?: Readable | FormData | Buffer | Blob,
+  isFormData?: boolean
+): data is Readable {
+  if (data && (data instanceof Readable || isFormData)) {
+    return true
+  }
+
+  return false
+}
+
 const request = (params: RequestOptions): Promise<RequestResponse> => {
   const { method, url, data, headers = {}, cancel, onProgress } = params
 
   return Promise.resolve()
     .then(() => {
-      if (data && data.toString() === '[object FormData]') {
+      if (isFormData(data)) {
         return getLength(data)
       } else {
         return undefined
@@ -63,8 +82,9 @@ const request = (params: RequestOptions): Promise<RequestResponse> => {
             ? Object.assign((data as FormData).getHeaders(), headers)
             : headers
 
-          if (isFormData) {
-            options.headers['Content-Length'] = length
+          if (isFormData || (data && (data as Buffer).length)) {
+            options.headers['Content-Length'] =
+              length || (data as Buffer).length
           }
 
           const req =
@@ -106,7 +126,7 @@ const request = (params: RequestOptions): Promise<RequestResponse> => {
             reject(err)
           })
 
-          if (data && (data instanceof Readable || isFormData)) {
+          if (isReadable(data, isFormData)) {
             if (onProgress) {
               data.pipe(new ProgressEmitter(onProgress)).pipe(req)
             } else {
