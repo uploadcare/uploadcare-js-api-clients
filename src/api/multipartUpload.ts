@@ -7,7 +7,7 @@ import CancelController from '../CancelController'
 export type MultipartUploadOptions = {
   publicKey?: string
   cancel?: CancelController
-  onProgress?: (value: number) => void
+  onProgress?: ({ value: number }) => void
   integration?: string
   retryThrottledRequestMaxTimes?: number
 }
