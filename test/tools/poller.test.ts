@@ -63,7 +63,7 @@ describe('poll', () => {
     ctrl.cancel()
 
     await expectAsync(
-      poll({ check: job.isFinish, interval: 20, cancelController: ctrl })
+      poll({ check: job.isFinish, interval: 20, cancel: ctrl })
     ).toBeRejectedWithError(UploadClientError, 'Poll canceled')
 
     expect(job.spy.condition).not.toHaveBeenCalled()
@@ -77,7 +77,7 @@ describe('poll', () => {
     ctrl.cancel()
 
     await expectAsync(
-      poll({ check: job.isFinish, interval: 20, cancelController: ctrl })
+      poll({ check: job.isFinish, interval: 20, cancel: ctrl })
     ).toBeRejectedWithError(UploadClientError, 'Poll canceled')
 
     let conditionCallsCount = job.spy.condition.calls.count()
@@ -98,7 +98,7 @@ describe('poll', () => {
     }, 30)
 
     await expectAsync(
-      poll({ check: job.isFinish, interval: 20, cancelController: ctrl })
+      poll({ check: job.isFinish, interval: 20, cancel: ctrl })
     ).toBeRejectedWithError(UploadClientError, 'Poll canceled')
 
     expect(job.spy.condition).toHaveBeenCalledTimes(2)
