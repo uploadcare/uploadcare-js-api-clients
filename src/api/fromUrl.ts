@@ -26,17 +26,17 @@ type FileInfoResponse = {
   type: TypeEnum.FileInfo
 } & FileInfo
 
-type SuccessResponse = FileInfoResponse | TokenResponse
+type FromUrlSuccessResponse = FileInfoResponse | TokenResponse
 
-type Response = FailedResponse | SuccessResponse
+type Response = FailedResponse | FromUrlSuccessResponse
 
-export type FromUrlResponse = SuccessResponse
+export type FromUrlResponse = FromUrlSuccessResponse
 
 /**
  * TokenResponse Type Guard.
  */
 export const isTokenResponse = (
-  response: SuccessResponse
+  response: FromUrlSuccessResponse
 ): response is TokenResponse => {
   return response.type !== undefined && response.type === TypeEnum.Token
 }
@@ -45,7 +45,7 @@ export const isTokenResponse = (
  * FileInfoResponse Type Guard.
  */
 export const isFileInfoResponse = (
-  response: SuccessResponse
+  response: FromUrlSuccessResponse
 ): response is FileInfoResponse => {
   return response.type !== undefined && response.type === TypeEnum.FileInfo
 }
@@ -91,7 +91,7 @@ export default function fromUrl(
     integration,
     retryThrottledRequestMaxTimes = defaultSettings.retryThrottledRequestMaxTimes
   }: FromUrlOptions
-): Promise<SuccessResponse> {
+): Promise<FromUrlSuccessResponse> {
   return retryIfThrottled(
     () =>
       request({
