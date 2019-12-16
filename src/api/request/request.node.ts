@@ -48,7 +48,7 @@ function isFormData(formData?: FormData | Buffer | Blob): formData is FormData {
   return false
 }
 
-function isReadeble(
+function isReadable(
   data?: Readable | FormData | Buffer | Blob,
   isFormData?: boolean
 ): data is Readable {
@@ -126,7 +126,7 @@ const request = (params: RequestOptions): Promise<RequestResponse> => {
             reject(err)
           })
 
-          if (isReadeble(data, isFormData)) {
+          if (isReadable(data, isFormData)) {
             if (onProgress) {
               data.pipe(new ProgressEmitter(onProgress)).pipe(req)
             } else {
