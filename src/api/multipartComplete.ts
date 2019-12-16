@@ -39,7 +39,7 @@ export default function multipartComplete(
     () =>
       request({
         method: 'POST',
-        url: getUrl(baseURL, '/multipart/complete/'),
+        url: getUrl(baseURL, '/multipart/complete/', { jsonerrors: 1 }),
         headers: {
           'X-UC-User-Agent': getUserAgent({ publicKey, integration })
         },

@@ -58,7 +58,7 @@ export default function multipartStart(
     () =>
       request({
         method: 'POST',
-        url: getUrl(baseURL, '/multipart/start/'),
+        url: getUrl(baseURL, '/multipart/start/', { jsonerrors: 1 }),
         headers: {
           'X-UC-User-Agent': getUserAgent({ publicKey, integration })
         },
@@ -85,6 +85,11 @@ export default function multipartStart(
             headers
           )
         } else {
+          // convert to array
+          response.parts = Object.keys(response.parts).map(
+            key => response.parts[key]
+          )
+
           return response
         }
       }),
