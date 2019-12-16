@@ -1,11 +1,11 @@
 import fromObject from './fromObject'
+import CancelController from '../CancelController'
+import defaultSettings from '../defaultSettings'
 
 /* Types */
 import { FileData, UploadcareFileInterface } from '../types'
 import { Url, Uuid } from '../api/types'
 import { isFileData, isUrl, isUuid } from './types'
-import CancelController from '../CancelController'
-import defaultSettings from '../defaultSettings'
 
 /**
  * Uploads file from provided data.
