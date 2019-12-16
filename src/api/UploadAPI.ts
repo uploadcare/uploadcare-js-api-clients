@@ -98,7 +98,7 @@ class UploadAPI {
   }
 
   multipartUpload(
-    part: Buffer,
+    part: Buffer | Blob,
     url: MultipartPart,
     options: MultipartUploadOptions
   ): Promise<MultipartUploadResponse> {
