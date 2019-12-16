@@ -5,7 +5,7 @@ import {
 } from './_helpers'
 import { isNode } from '../src/tools/isNode'
 
-const settings = getSettingsForTesting()
+const settings = getSettingsForTesting({})
 
 /* eslint-disable max-len */
 const images: { [key: string]: string } = {
