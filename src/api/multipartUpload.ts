@@ -1,11 +1,7 @@
-import { FailedResponse } from './request/types'
 import { MultipartPart } from './multipartStart'
 
 import request from './request/request.node'
-import defaultSettings, { getUserAgent } from '../defaultSettings'
-import camelizeKeys from '../tools/camelizeKeys'
-import retryIfThrottled from '../tools/retryIfThrottled'
-import { UploadClientError } from '../errors/errors'
+import { getUserAgent } from '../defaultSettings'
 import CancelController from '../CancelController'
 
 export type MultipartUploadOptions = {
@@ -17,52 +13,27 @@ export type MultipartUploadOptions = {
 }
 
 export type MultipartUploadResponse = {
-  code: number
+  code?: number
 }
-
-type Response = FailedResponse | MultipartUploadResponse
 
 /**
  * Complete multipart uploading.
  */
 export default function multipartUpload(
-  part: Buffer,
+  part: Buffer | Blob,
   url: MultipartPart,
-  {
-    publicKey,
-    cancel,
-    onProgress,
-    integration,
-    retryThrottledRequestMaxTimes = defaultSettings.retryThrottledRequestMaxTimes
-  }: MultipartUploadOptions
+  { publicKey, cancel, onProgress, integration }: MultipartUploadOptions
 ): Promise<MultipartUploadResponse> {
-  return retryIfThrottled(
-    () =>
-      request({
-        method: 'PUT',
-        url,
-        headers: {
-          'X-UC-User-Agent': publicKey
-            ? getUserAgent({ publicKey, integration })
-            : undefined
-        },
-        data: part,
-        onProgress,
-        cancel
-      }).then(({ data, headers, request }) => {
-        const response = camelizeKeys<Response>(JSON.parse(data))
-
-        if ('error' in response) {
-          throw new UploadClientError(
-            `[${response.error.statusCode}] ${response.error.content}`,
-            request,
-            response.error,
-            headers
-          )
-        } else {
-          return response
-        }
-      }),
-    retryThrottledRequestMaxTimes
-  )
+  return request({
+    method: 'PUT',
+    url,
+    headers: {
+      'X-UC-User-Agent': publicKey
+        ? getUserAgent({ publicKey, integration })
+        : undefined
+    },
+    data: part,
+    onProgress,
+    cancel
+  }).then(({ status }) => ({ code: status }))
 }
