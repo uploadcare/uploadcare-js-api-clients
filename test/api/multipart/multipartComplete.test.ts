@@ -29,7 +29,7 @@ const naiveMultipart = (file, parts, options) => Promise.all(
 )
 
 
-fdescribe('API - multipartComplete', () => {
+describe('API - multipartComplete', () => {
   it('should be able to complete upload data', async () => {
     const file = factory.file(11)
     const settings = getSettingsForTesting({
