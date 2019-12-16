@@ -1,63 +1,79 @@
-import { UploadLifecycle } from '../lifecycle/UploadLifecycle'
-import { FileUploadLifecycle } from '../lifecycle/FileUploadLifecycle'
-import { FileFromObject } from './FileFromObject'
-import { FileFromUploaded } from './FileFromUploaded'
-import { FileFromUrl } from './FileFromUrl'
+import fromObject from './fromObject'
 
 /* Types */
-import { FileData, SettingsInterface, UploadcareFileInterface } from '../types'
-import { Url } from '../api/fromUrl'
-import { Uuid } from '../api/types'
-import {
-  FileUploadLifecycleInterface,
-  LifecycleHooksInterface,
-  UploadInterface
-} from '../lifecycle/types'
+import { FileData, UploadcareFileInterface } from '../types'
+import { Url, Uuid } from '../api/types'
 import { isFileData, isUrl, isUuid } from './types'
-import { Upload } from '../lifecycle/Upload'
 
 /**
  * Uploads file from provided data.
- *
- * @param {FileData | Url | Uuid} data
- * @param {SettingsInterface} settings
- * @param {LifecycleHooksInterface<UploadcareFileInterface>} hooks
- * @throws TypeError
- * @returns {UploadInterface<UploadcareFileInterface>}
+ * @param data
+ * @param options
+ * @param [options.publicKey]
+ * @param [options.fileName]
+ * @param [options.baseURL]
+ * @param [options.secureSignature]
+ * @param [options.secureExpire]
+ * @param [options.store]
+ * @param [options.cancel]
+ * @param [options.onProgress]
+ * @param [options.source]
+ * @param [options.integration]
+ * @param [options.retryThrottledRequestMaxTimes]
  */
 export default function fileFrom(
   data: FileData | Url | Uuid,
-  settings: SettingsInterface = {},
-  hooks?: LifecycleHooksInterface<UploadcareFileInterface>
-): UploadInterface<UploadcareFileInterface> {
-  const lifecycle = new UploadLifecycle<UploadcareFileInterface>(hooks)
-  const fileUploadLifecycle = new FileUploadLifecycle(lifecycle)
-
+  {
+    publicKey,
+    fileName,
+    baseURL,
+    secureSignature,
+    secureExpire,
+    store,
+    cancel,
+    onProgress,
+    source,
+    integration,
+    retryThrottledRequestMaxTimes,
+    baseCDN,
+    defaultEffects
+  }
+): Promise<UploadcareFileInterface> {
   if (isFileData(data)) {
-    const fileHandler = new FileFromObject(data, settings, lifecycle)
+    return fromObject(data, {
+      publicKey,
+      fileName,
+      baseURL,
+      secureSignature,
+      secureExpire,
+      store,
+      cancel,
+      onProgress,
+      source,
+      integration,
+      retryThrottledRequestMaxTimes,
 
-    return new Upload<UploadcareFileInterface, FileUploadLifecycleInterface>(
-      fileUploadLifecycle,
-      fileHandler
-    )
+      baseCDN,
+      defaultEffects
+    })
   }
 
   if (isUrl(data)) {
-    const fileHandler = new FileFromUrl(data, settings)
-
-    return new Upload<UploadcareFileInterface, FileUploadLifecycleInterface>(
-      fileUploadLifecycle,
-      fileHandler
-    )
+    // const fileHandler = new FileFromUrl(data, settings)
+    //
+    // return new Upload<UploadcareFileInterface, FileUploadLifecycleInterface>(
+    //   fileUploadLifecycle,
+    //   fileHandler
+    // )
   }
 
   if (isUuid(data)) {
-    const fileHandler = new FileFromUploaded(data, settings)
-
-    return new Upload<UploadcareFileInterface, FileUploadLifecycleInterface>(
-      fileUploadLifecycle,
-      fileHandler
-    )
+    // const fileHandler = new FileFromUploaded(data, settings)
+    //
+    // return new Upload<UploadcareFileInterface, FileUploadLifecycleInterface>(
+    //   fileUploadLifecycle,
+    //   fileHandler
+    // )
   }
 
   throw new TypeError(`File uploading from "${data}" is not supported`)
