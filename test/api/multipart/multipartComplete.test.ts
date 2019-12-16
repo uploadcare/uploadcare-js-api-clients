@@ -1,56 +1,78 @@
+import multipartStart from '../../../src/api/multipartStart'
+import multipartUpload from '../../../src/api/multipartUpload'
 import multipartComplete from '../../../src/api/multipartComplete'
 import * as factory from '../../_fixtureFactory'
 import { getSettingsForTesting } from '../../_helpers'
 import { UploadClientError } from '../../../src/errors/errors'
+import CancelController from '../../../src/CancelController'
+
+const getChunk = (
+  file: Buffer | Blob,
+  index: number,
+  fileSize: number,
+  chunkSize: number
+): Buffer | Blob => {
+  const start = chunkSize * index
+  const end = Math.min(start + chunkSize, fileSize)
+
+  return file.slice(start, end)
+}
+
+const naiveMultipart = (file, parts, options) => Promise.all(
+  parts.map((url, index) =>
+    multipartUpload(
+      getChunk(file.data, index, file.size, options.multipartChunkSize),
+      url,
+      options
+    )
+  )
+)
 
 
-describe('API - multipartComplete', () => {
-  const settings = getSettingsForTesting({
-    publicKey: factory.publicKey('multipart')
+fdescribe('API - multipartComplete', () => {
+  it('should be able to complete upload data', async () => {
+    const file = factory.file(11)
+    const settings = getSettingsForTesting({
+      publicKey: factory.publicKey('multipart'),
+      contentType: 'application/octet-stream'
+    })
+    const { uuid: completedUuid, parts } = await multipartStart(file.size, settings)
+
+    await naiveMultipart(file, parts, settings)
+
+    const { uuid } = await multipartComplete(completedUuid, settings)
+
+    expect(uuid).toBeTruthy()
   })
 
-  // it('should be able to complete upload data', async () => {
-  //   const multipartStartUpload = multipartStart(fileToUpload, settings)
-  //   const { uuid: completedUuid, parts } = await multipartStartUpload
+  it('should be able to cancel uploading', async () => {
+    const ctrl = new CancelController()
+    const file = factory.file(11)
+    const settings = getSettingsForTesting({
+      publicKey: factory.publicKey('multipart'),
+      contentType: 'application/octet-stream',
+      cancel: ctrl
+    })
+    const { uuid: completedUuid, parts } = await multipartStart(file.size, settings)
 
-  //   await multipartUpload(fileToUpload, parts, settings)
+    await naiveMultipart(file, parts, settings)
 
-  //   const upload = multipartComplete(completedUuid, settings)
-  //   const { uuid } = await upload
+    let time
+    setTimeout(() => {
+      time = Date.now()
+      ctrl.cancel()
+    })
 
-  //   expect(uuid).toBeTruthy()
-  // }, 250000)
+    await expectAsync(multipartComplete(completedUuid, settings)).toBeRejectedWithError(UploadClientError, 'Request canceled')
 
-  // it('should be able to cancel uploading', async () => {
-  //   const multipartStartUpload = multipartStart(fileToUpload, settings)
-  //   const { uuid: completedUuid, parts } = await multipartStartUpload
-
-  //   await multipartUpload(fileToUpload, parts, settings)
-
-  //   const upload = multipartComplete(completedUuid, settings)
-
-  //   upload.cancel()
-
-  //   await (expectAsync(upload) as any).toBeRejectedWithError(CancelError)
-  // })
-
-  // it('should be able to handle cancel uploading', async () => {
-  //   const multipartStartUpload = multipartStart(fileToUpload, settings)
-  //   const { uuid: completedUuid, parts } = await multipartStartUpload
-
-  //   await multipartUpload(fileToUpload, parts, settings)
-
-  //   const onCancel = jasmine.createSpy('onCancel')
-  //   const upload = multipartComplete(completedUuid, settings, { onCancel })
-
-  //   upload.cancel()
-
-  //   await (expectAsync(upload) as any).toBeRejectedWithError(CancelError)
-
-  //   expect(onCancel).toHaveBeenCalled()
-  // })
+    expect(Date.now() - time).toBeLessThan(16)
+  })
 
   it('should be rejected with bad options', async () => {
+    const settings = getSettingsForTesting({
+      publicKey: factory.publicKey('multipart'),
+    })
+
     const upload = multipartComplete('', settings)
 
     await (expectAsync(upload) as any).toBeRejectedWithError(UploadClientError, '[400] uuid is required.')
