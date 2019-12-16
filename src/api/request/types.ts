@@ -12,7 +12,7 @@ export type RequestOptions = {
   data?: FormData | Buffer | Blob
   headers?: Headers
   cancel?: CancelController
-  onProgress?: (event: any) => void
+  onProgress?: (value: number) => void
 }
 
 export type ErrorRequestInfo = {
