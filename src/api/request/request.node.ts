@@ -12,11 +12,11 @@ import { RequestOptions, RequestResponse } from './types'
 // track of the number of bytes which have been piped through it and will
 // invoke the `onprogress` function whenever new number are available.
 class ProgressEmitter extends Transform {
-  private readonly _onprogress: (value: number) => void
+  private readonly _onprogress: ({ value: number }) => void
   private _position: number
   private readonly size: number
 
-  constructor(onProgress, size) {
+  constructor(onProgress: ({ value: number }) => void, size: number) {
     super()
 
     this._onprogress = onProgress
@@ -26,7 +26,7 @@ class ProgressEmitter extends Transform {
 
   _transform(chunk, encoding, callback): void {
     this._position += chunk.length
-    this._onprogress(this._position / this.size)
+    this._onprogress({ value: this._position / this.size })
     callback(null, chunk)
   }
 }
@@ -126,7 +126,7 @@ const request = (params: RequestOptions): Promise<RequestResponse> => {
           })
 
           if (isReadable(data, isFormData)) {
-            if (onProgress) {
+            if (onProgress && length) {
               data.pipe(new ProgressEmitter(onProgress, length)).pipe(req)
             } else {
               data.pipe(req)
