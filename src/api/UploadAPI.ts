@@ -31,8 +31,6 @@ import { SettingsInterface } from '../types'
 
 /**
  * Populate options with settings.
- * @param {<T>} options
- * @param {SettingsInterface} settings
  */
 const populateOptionsWithSettings = <T>(
   options: T,
