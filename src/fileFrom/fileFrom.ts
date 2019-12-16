@@ -4,6 +4,8 @@ import fromObject from './fromObject'
 import { FileData, UploadcareFileInterface } from '../types'
 import { Url, Uuid } from '../api/types'
 import { isFileData, isUrl, isUuid } from './types'
+import CancelController from '../CancelController'
+import defaultSettings from '../defaultSettings'
 
 /**
  * Uploads file from provided data.
@@ -25,18 +27,42 @@ export default function fileFrom(
   data: FileData | Url | Uuid,
   {
     publicKey,
-    fileName,
-    baseURL,
+
+    fileName = defaultSettings.fileName,
+    baseURL = defaultSettings.baseURL,
     secureSignature,
     secureExpire,
     store,
+
     cancel,
     onProgress,
+
     source,
     integration,
+
     retryThrottledRequestMaxTimes,
-    baseCDN,
+
+    baseCDN = defaultSettings.baseCDN,
     defaultEffects
+  }: {
+    publicKey: string
+
+    fileName?: string
+    baseURL?: string
+    secureSignature?: string
+    secureExpire?: string
+    store?: boolean
+
+    cancel?: CancelController
+    onProgress?: (value: number) => void
+
+    source?: string
+    integration?: string
+
+    retryThrottledRequestMaxTimes?: number
+
+    baseCDN?: string
+    defaultEffects?: string
   }
 ): Promise<UploadcareFileInterface> {
   if (isFileData(data)) {
