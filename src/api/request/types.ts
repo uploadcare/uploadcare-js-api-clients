@@ -19,7 +19,7 @@ export type ErrorRequestInfo = {
   method?: string
   url: string
   query?: string
-  data?: FormData | Buffer | Blob
+  data?: NodeFormData | FormData | Buffer | Blob
   headers?: Headers
 }
 
