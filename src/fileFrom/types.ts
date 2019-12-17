@@ -1,6 +1,6 @@
-import { FileData } from '../types'
 import { Url, Uuid } from '..'
 import { isNode } from '../tools/isNode'
+import { FileData } from '../api/types'
 
 /**
  * FileData type guard.
