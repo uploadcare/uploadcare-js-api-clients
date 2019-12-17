@@ -20,7 +20,7 @@ export type MultipartUploadResponse = {
  * Complete multipart uploading.
  */
 export default function multipartUpload(
-  part: Buffer | Blob,
+  part: File | Buffer | Blob,
   url: MultipartPart,
   { publicKey, cancel, onProgress, integration }: MultipartUploadOptions
 ): Promise<MultipartUploadResponse> {
