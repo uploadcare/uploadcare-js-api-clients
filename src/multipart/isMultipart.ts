@@ -1,5 +1,5 @@
-import { FileData } from '../types'
 import { getFileSize } from '../api/multipart/getFileSize'
+import { FileData } from '../api/types'
 
 /**
  * Check if FileData is multipart data.
