@@ -71,6 +71,7 @@ const fromObject = (
         })
 
         if (response.isReady) {
+          onProgress && onProgress(1)
           return response
         }
 
