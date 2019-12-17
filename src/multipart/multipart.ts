@@ -1,17 +1,18 @@
 import multipartStart from '../api/multipartStart'
 import multipartUpload from '../api/multipartUpload'
 import multipartComplete from '../api/multipartComplete'
+import CancelController from '../CancelController'
+import defaultSettings from '../defaultSettings'
 
 /* Types */
 import { FileInfo } from '../api/types'
-import CancelController from '../CancelController'
 
 type progressCallback = ({ value: number }) => void
 
 export type MultipartOptions = {
   publicKey: string
   contentType: string
-  multipartChunkSize: number
+  multipartChunkSize?: number
   fileName?: string
   baseURL?: string
   secureSignature?: string
@@ -40,11 +41,11 @@ const getChunk = (
  * Upload multipart file.
  */
 export default function multipart(
-  file: Buffer | Blob,
+  file: File | Buffer | Blob,
   {
     publicKey,
     contentType,
-    multipartChunkSize,
+    multipartChunkSize = defaultSettings.multipartChunkSize,
     fileName,
     baseURL,
     secureSignature,
@@ -122,6 +123,7 @@ export default function multipart(
     .then(result => {
       // hack for node ¯\_(ツ)_/¯
       if (onProgress) onProgress({ value: 1 })
+
       return result
     })
 }
