@@ -10,8 +10,8 @@ import multipartComplete from './multipartComplete'
 import multipartUpload from './multipartUpload'
 
 /* Types */
-import { BaseOptions, FileData, BaseResponse } from './base'
-import { FileInfo, GroupId, GroupInfo, Token, Url, Uuid } from './types'
+import { BaseOptions, BaseResponse } from './base'
+import {FileData, FileInfo, GroupId, GroupInfo, Token, Url, Uuid} from './types'
 import { InfoOptions } from './info'
 import { FromUrlOptions, FromUrlResponse } from './fromUrl'
 import { FromUrlStatusOptions, FromUrlStatusResponse } from './fromUrlStatus'

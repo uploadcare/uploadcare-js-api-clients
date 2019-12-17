@@ -8,7 +8,7 @@ import { UploadClientError } from '../errors/errors'
 import retryIfThrottled from '../tools/retryIfThrottled'
 
 /* Types */
-import { Uuid } from './types'
+import { FileData, Uuid } from './types'
 import { FailedResponse } from './request/types'
 
 export type BaseResponse = {
@@ -34,8 +34,6 @@ export type BaseOptions = {
 
   retryThrottledRequestMaxTimes?: number
 }
-
-export type FileData = Blob | File | NodeJS.ReadableStream | Buffer
 
 /**
  * Performs file uploading request to Uploadcare Upload API.

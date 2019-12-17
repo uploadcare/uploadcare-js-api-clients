@@ -74,3 +74,5 @@ export type Uuid = string
 export type GroupId = string
 
 export type Url = string
+
+export type FileData = Blob | File | NodeJS.ReadableStream | Buffer
