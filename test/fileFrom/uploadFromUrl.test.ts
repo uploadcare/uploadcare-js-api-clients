@@ -41,7 +41,7 @@ describe('fileFrom URL', () => {
       ctrl.cancel()
     })
 
-    await expectAsync(uploadFromUrl(sourceUrl, settings)).toBeRejectedWithError(UploadClientError, '')
+    await expectAsync(uploadFromUrl(sourceUrl, settings)).toBeRejectedWithError(UploadClientError, 'Request canceled')
   })
 
   it('should accept new file name setting', async () => {
@@ -67,6 +67,6 @@ describe('fileFrom URL', () => {
     await uploadFromUrl(sourceUrl, settings)
 
     expect(onProgress).toHaveBeenCalled()
-    expect(onProgress).toHaveBeenCalledWith([1])
+    expect(onProgress).toHaveBeenCalledWith({ value: 1 })
   })
 })
