@@ -9,10 +9,18 @@ export type RequestOptions = {
   method?: string
   url: string
   query?: string
-  data?: NodeFormData | FormData
+  data?: NodeFormData | FormData | Buffer | Blob
   headers?: Headers
   cancel?: CancelController
   onProgress?: ({ value: number }) => void
+}
+
+export type ErrorRequestInfo = {
+  method?: string
+  url: string
+  query?: string
+  data?: NodeFormData | FormData | Buffer | Blob
+  headers?: Headers
 }
 
 export type RequestResponse = {

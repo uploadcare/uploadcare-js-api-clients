@@ -1,13 +1,4 @@
-import * as NodeFormData from 'form-data'
-import { Headers } from '../api/request/types'
-
-type ErrorRequestInfo = {
-  method?: string
-  url: string
-  query?: string
-  data?: NodeFormData | FormData
-  headers?: Headers
-}
+import { Headers, ErrorRequestInfo } from '../api/request/types'
 
 type ErrorResponseInfo = {
   statusCode: number

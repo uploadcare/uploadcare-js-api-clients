@@ -12,22 +12,21 @@ import { RequestOptions, RequestResponse } from './types'
 // track of the number of bytes which have been piped through it and will
 // invoke the `onprogress` function whenever new number are available.
 class ProgressEmitter extends Transform {
-  private _onprogress: (evn: any) => void
+  private readonly _onprogress: ({ value: number }) => void
   private _position: number
+  private readonly size: number
 
-  constructor(onprogress) {
+  constructor(onProgress: ({ value: number }) => void, size: number) {
     super()
 
-    this._onprogress = onprogress
+    this._onprogress = onProgress
     this._position = 0
+    this.size = size
   }
 
   _transform(chunk, encoding, callback): void {
     this._position += chunk.length
-    this._onprogress({
-      lengthComputable: true,
-      loaded: this._position
-    })
+    this._onprogress({ value: this._position / this.size })
     callback(null, chunk)
   }
 }
@@ -40,13 +39,32 @@ const getLength = (formData: FormData): Promise<number> =>
     })
   })
 
+function isFormData(formData?: FormData | Buffer | Blob): formData is FormData {
+  if (formData && formData.toString() === '[object FormData]') {
+    return true
+  }
+
+  return false
+}
+
+function isReadable(
+  data?: Readable | FormData | Buffer | Blob,
+  isFormData?: boolean
+): data is Readable {
+  if (data && (data instanceof Readable || isFormData)) {
+    return true
+  }
+
+  return false
+}
+
 const request = (params: RequestOptions): Promise<RequestResponse> => {
   const { method, url, data, headers = {}, cancel, onProgress } = params
 
   return Promise.resolve()
     .then(() => {
-      if (data && data.toString() === '[object FormData]') {
-        return getLength(data as FormData)
+      if (isFormData(data)) {
+        return getLength(data)
       } else {
         return undefined
       }
@@ -63,8 +81,9 @@ const request = (params: RequestOptions): Promise<RequestResponse> => {
             ? Object.assign((data as FormData).getHeaders(), headers)
             : headers
 
-          if (isFormData) {
-            options.headers['Content-Length'] = length
+          if (isFormData || (data && (data as Buffer).length)) {
+            options.headers['Content-Length'] =
+              length || (data as Buffer).length
           }
 
           const req =
@@ -106,13 +125,11 @@ const request = (params: RequestOptions): Promise<RequestResponse> => {
             reject(err)
           })
 
-          if (data && (data instanceof Readable || isFormData)) {
-            if (onProgress) {
-              ;(data as FormData)
-                .pipe(new ProgressEmitter(onProgress))
-                .pipe(req)
+          if (isReadable(data, isFormData)) {
+            if (onProgress && length) {
+              data.pipe(new ProgressEmitter(onProgress, length)).pipe(req)
             } else {
-              ;(data as FormData).pipe(req)
+              data.pipe(req)
             }
           } else {
             req.end(data)
