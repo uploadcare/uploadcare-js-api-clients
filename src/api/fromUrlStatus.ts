@@ -18,82 +18,43 @@ export enum Status {
   Success = 'success'
 }
 
-type UnknownResponse = {
+type StatusUnknownResponse = {
   status: Status.Unknown
 }
 
-type WaitingResponse = {
+type StatusWaitingResponse = {
   status: Status.Waiting
 }
 
-type ProgressResponse = {
+type StatusProgressResponse = {
   status: Status.Progress
   size: number
   done: number
   total: number
 }
 
-type ErrorResponse = {
+type StatusErrorResponse = {
   status: Status.Error
   error: string
 }
 
-type SuccessResponse = {
+type StatusSuccessResponse = {
   status: Status.Success
 } & FileInfo
 
 export type FromUrlStatusResponse =
-  | UnknownResponse
-  | WaitingResponse
-  | ProgressResponse
-  | ErrorResponse
-  | SuccessResponse
+  | StatusUnknownResponse
+  | StatusWaitingResponse
+  | StatusProgressResponse
+  | StatusErrorResponse
+  | StatusSuccessResponse
 
 type Response = FromUrlStatusResponse | FailedResponse
 
-/**
- * UnknownResponse Type Guard.
- */
-export const isUnknownResponse = (
-  response: FromUrlStatusResponse
-): response is UnknownResponse => {
-  return response.status !== undefined && response.status === Status.Unknown
-}
-
-/**
- * WaitingResponse Type Guard.
- */
-export const isWaitingResponse = (
-  response: FromUrlStatusResponse
-): response is WaitingResponse => {
-  return response.status !== undefined && response.status === Status.Waiting
-}
-
-/**
- * UnknownResponse Type Guard.
- */
-export const isProgressResponse = (
-  response: FromUrlStatusResponse
-): response is ProgressResponse => {
-  return response.status !== undefined && response.status === Status.Progress
-}
-
-/**
- * UnknownResponse Type Guard.
- */
-export const isErrorResponse = (
+const isErrorResponse = (
   response: Response
-): response is ErrorResponse => {
+): response is StatusErrorResponse => {
   return 'status' in response && response.status === Status.Error
-}
-
-/**
- * SuccessResponse Type Guard.
- */
-export const isSuccessResponse = (
-  response: FromUrlStatusResponse
-): response is SuccessResponse => {
-  return response.status !== undefined && response.status === Status.Success
 }
 
 export type FromUrlStatusOptions = {
