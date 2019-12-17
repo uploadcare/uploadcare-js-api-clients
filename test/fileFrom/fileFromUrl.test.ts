@@ -1,5 +1,5 @@
 import * as factory from '../_fixtureFactory'
-import uploadFromUrl from '../../src/fileFrom/uploadFromUrl'
+import fileFrom from '../../src/fileFrom/fileFrom'
 import { getSettingsForTesting } from '../_helpers'
 import { UploadClientError } from '../../src/errors/errors'
 import CancelController from '../../src/CancelController'
@@ -11,9 +11,9 @@ describe('fileFrom URL', () => {
       publicKey: factory.publicKey('image')
     })
 
-    const file = await uploadFromUrl(sourceUrl, settings)
+    const file = await fileFrom(sourceUrl, settings)
 
-    // expect(file.cdnUrl).toBeTruthy()
+    expect(file.cdnUrl).toBeTruthy()
     expect(file.uuid).toBeTruthy()
   })
 
@@ -24,7 +24,7 @@ describe('fileFrom URL', () => {
       store: false
     })
 
-    const file = await uploadFromUrl(sourceUrl, settings)
+    const file = await fileFrom(sourceUrl, settings)
 
     expect(file.isStored).toBeFalsy()
   })
@@ -41,7 +41,7 @@ describe('fileFrom URL', () => {
       ctrl.cancel()
     })
 
-    await expectAsync(uploadFromUrl(sourceUrl, settings)).toBeRejectedWithError(UploadClientError, 'Request canceled')
+    await expectAsync(fileFrom(sourceUrl, settings)).toBeRejectedWithError(UploadClientError, 'Request canceled')
   })
 
   it('should accept new file name setting', async () => {
@@ -51,9 +51,9 @@ describe('fileFrom URL', () => {
       store: false,
       fileName: 'newFileName.jpg'
     })
-    const file = await uploadFromUrl(sourceUrl, settings)
+    const file = await fileFrom(sourceUrl, settings)
 
-    expect(file.filename).toEqual('newFileName.jpg')
+    expect(file.name).toEqual('newFileName.jpg')
   })
 
   it('should be able to handle progress', async () => {
@@ -64,7 +64,7 @@ describe('fileFrom URL', () => {
       onProgress
     })
 
-    await uploadFromUrl(sourceUrl, settings)
+    await fileFrom(sourceUrl, settings)
 
     expect(onProgress).toHaveBeenCalled()
     expect(onProgress).toHaveBeenCalledWith({ value: 1 })
