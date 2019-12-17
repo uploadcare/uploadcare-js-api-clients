@@ -18,6 +18,7 @@ export type InfoOptions = {
   baseURL?: string
 
   cancel?: CancelController
+  onProgress?: ({ value: number }) => void
 
   source?: string
   integration?: string
@@ -37,6 +38,7 @@ export default function info(
     publicKey,
     baseURL = defaultSettings.baseURL,
     cancel,
+    onProgress,
     source,
     integration,
     retryThrottledRequestMaxTimes = defaultSettings.retryThrottledRequestMaxTimes
@@ -55,7 +57,8 @@ export default function info(
           file_id: uuid,
           source
         }),
-        cancel
+        cancel,
+        onProgress
       }).then(({ data, headers, request }) => {
         const response = camelizeKeys<Response>(JSON.parse(data))
 
