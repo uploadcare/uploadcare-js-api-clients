@@ -5,7 +5,7 @@ import CancelController from '../../src/CancelController'
 
 describe('API - from url status', () => {
   const token = factory.token('valid')
-  const settings = getSettingsForTesting()
+  const settings = getSettingsForTesting({})
 
   it('should return info about file uploaded from url', async () => {
     const data = await fromUrlStatus(token, settings)

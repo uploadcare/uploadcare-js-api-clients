@@ -13,20 +13,20 @@ const poller = <T>({
   check,
   timeout = DEFAULT_TIMEOUT,
   interval = DEFAULT_INTERVAL,
-  cancelController
+  cancel
 }: {
   check: CheckFunction<T>
   timeout?: number
   interval?: number
-  cancelController?: CancelController
+  cancel?: CancelController
 }): Promise<T> =>
   new Promise((resolve, reject) => {
     let timeoutId: NodeJS.Timeout
     const startTime = Date.now()
     const endTime = startTime + timeout
 
-    if (cancelController) {
-      cancelController.onCancel(() => {
+    if (cancel) {
+      cancel.onCancel(() => {
         timeoutId && clearTimeout(timeoutId)
         reject(cancelError('Poll canceled'))
       })
@@ -34,7 +34,7 @@ const poller = <T>({
 
     const tick = (): void => {
       try {
-        Promise.resolve(check(cancelController))
+        Promise.resolve(check(cancel))
           .then(result => {
             const nowTime = Date.now()
 
