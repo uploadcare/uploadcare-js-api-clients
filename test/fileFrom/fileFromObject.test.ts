@@ -4,7 +4,7 @@ import { getSettingsForTesting } from '../_helpers'
 import fileFrom from '../../src/fileFrom/fileFrom'
 import CancelController from '../../src/CancelController'
 
-fdescribe('fileFrom Object', () => {
+describe('fileFrom Object', () => {
   const fileToUpload = factory.image('blackSquare').data
   const settings = getSettingsForTesting({
     publicKey: factory.publicKey('image')
