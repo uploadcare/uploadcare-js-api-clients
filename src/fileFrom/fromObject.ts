@@ -3,6 +3,7 @@ import info from '../api/info'
 import { poll } from '../tools/poller'
 import { UploadcareFile } from '../UploadcareFile'
 import CancelController from '../CancelController'
+import { FileInfo } from '../api/types'
 
 const fromObject = (
   file: FileData,
@@ -57,8 +58,8 @@ const fromObject = (
     integration,
     retryThrottledRequestMaxTimes
   }).then(({ file }) => {
-    return poll({
-      check: async () => {
+    return poll<FileInfo>({
+      check: async cancel => {
         const response = await info(file, {
           publicKey,
           baseURL,
@@ -80,6 +81,7 @@ const fromObject = (
             value: progress + done / total
           })
         }
+
         return false
       }
     }).then(fileInfo =>

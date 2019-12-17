@@ -100,7 +100,6 @@ const uploadFromUrl = (
               }
             }
           }),
-
         cancel
       }).then(fileInfo =>
         Promise.resolve(UploadcareFile.fromFileInfo(fileInfo, { baseCDN }))
