@@ -29,7 +29,7 @@ const fromObject = (
     store?: boolean
 
     cancel?: CancelController
-    onProgress?: (value: number) => void
+    onProgress?: ({ value: number }) => void
 
     source?: string
     integration?: string
@@ -39,7 +39,7 @@ const fromObject = (
     baseCDN?: string
   }
 ): Promise<UploadcareFile> => {
-  let progress
+  let progress: number
 
   return base(file, {
     publicKey,
@@ -49,9 +49,9 @@ const fromObject = (
     secureExpire,
     store,
     cancel,
-    onProgress: (value: number) => {
+    onProgress: ({ value }) => {
       progress = value * 0.98
-      onProgress && onProgress(progress)
+      onProgress && onProgress({ value: progress })
     },
     source,
     integration,
@@ -69,14 +69,16 @@ const fromObject = (
         })
 
         if (response.isReady) {
-          onProgress && onProgress(1)
+          onProgress && onProgress({ value: 1 })
           return response
         }
 
         if (onProgress) {
           const { done, total } = response
 
-          onProgress(progress + done / total)
+          onProgress({
+            value: progress + done / total
+          })
         }
         return false
       }

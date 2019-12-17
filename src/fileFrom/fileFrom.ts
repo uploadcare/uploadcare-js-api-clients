@@ -42,7 +42,7 @@ export default function fileFrom(
 
     retryThrottledRequestMaxTimes,
 
-    baseCDN = defaultSettings.baseCDN,
+    baseCDN = defaultSettings.baseCDN
   }: {
     publicKey: string
 
@@ -53,7 +53,7 @@ export default function fileFrom(
     store?: boolean
 
     cancel?: CancelController
-    onProgress?: (value: number) => void
+    onProgress?: ({ value: number }) => void
 
     source?: string
     integration?: string

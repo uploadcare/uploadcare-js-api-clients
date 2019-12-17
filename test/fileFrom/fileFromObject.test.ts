@@ -4,7 +4,7 @@ import { getSettingsForTesting } from '../_helpers'
 import fileFrom from '../../src/fileFrom/fileFrom'
 import CancelController from '../../src/CancelController'
 
-describe('fileFrom Object', () => {
+fdescribe('fileFrom Object', () => {
   const fileToUpload = factory.image('blackSquare').data
   const settings = getSettingsForTesting({
     publicKey: factory.publicKey('image')
@@ -30,7 +30,7 @@ describe('fileFrom Object', () => {
     const ctrl = new CancelController()
     const upload = fileFrom(fileToUpload, {
       ...settings,
-      cancel: ctrl,
+      cancel: ctrl
     })
 
     ctrl.cancel()
@@ -61,14 +61,16 @@ describe('fileFrom Object', () => {
 
       ctrl.cancel()
 
-      await (expectAsync(upload) as any).toBeRejectedWithError('Request canceled')
+      await (expectAsync(upload) as any).toBeRejectedWithError(
+        'Request canceled'
+      )
 
       expect(onCancel).toHaveBeenCalled()
     })
 
     it('progress', async () => {
       let progressValue = 0
-      const onProgress = value => {
+      const onProgress = ({value}) => {
         progressValue = value
       }
       const upload = fileFrom(fileToUpload, {
