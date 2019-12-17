@@ -97,6 +97,7 @@ const request = ({
 
     if (onProgress && typeof onProgress === 'function') {
       xhr.upload.onprogress = (event: ProgressEvent): void => {
+        // lol
         onProgress({ value: event.loaded / event.total })
       }
     }
