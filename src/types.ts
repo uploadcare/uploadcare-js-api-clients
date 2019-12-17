@@ -1,10 +1,11 @@
 import {
-  FileInfoInterface,
-  GeoLocationInterface,
+  FileData,
+  FileInfo,
+  GeoLocation,
   GroupId,
+  Url,
   Uuid
 } from './api/types'
-import { Url } from './api/fromUrl'
 import { LifecycleHooksInterface, UploadInterface } from './lifecycle/types'
 
 export interface SettingsInterface {
@@ -42,14 +43,12 @@ export interface DefaultSettingsInterface extends SettingsInterface {
   pollingTimeoutMilliseconds: number
 }
 
-export type FileData = Blob | File | Buffer
-
 export interface OriginalImageInfoInterface {
   width: number
   height: number
   format: string
   datetimeOriginal: null | string
-  geoLocation: null | GeoLocationInterface
+  geoLocation: null | GeoLocation
   orientation: null | number
   dpi: null | number[]
   colorMode: string
@@ -101,7 +100,7 @@ export interface UploadcareGroupInterface {
   readonly isStored: boolean
   readonly isImage: boolean
   readonly cdnUrl: string
-  readonly files: FileInfoInterface[]
+  readonly files: FileInfo[]
   readonly createdAt: string
   readonly storedAt: string | null
 }

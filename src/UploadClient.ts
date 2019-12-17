@@ -5,19 +5,17 @@ import groupFrom from './groupFrom/groupFrom'
 
 /* Types */
 import {
-  FileData,
   SettingsInterface,
   UploadcareFileInterface,
   UploadcareGroupInterface,
   UploadClientInterface
 } from './types'
-import { Url } from './api/fromUrl'
-import { UploadAPIInterface, Uuid } from './api/types'
+import { FileData, Url, Uuid } from './api/types'
 import { LifecycleHooksInterface, UploadInterface } from './lifecycle/types'
 
 class UploadClient implements UploadClientInterface {
   private settings: SettingsInterface
-  readonly api: UploadAPIInterface
+  readonly api: UploadAPI
 
   constructor(settings: SettingsInterface = {}) {
     this.settings = {
