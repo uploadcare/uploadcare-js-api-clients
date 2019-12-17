@@ -58,9 +58,7 @@ const uploadFromUrl = (
     retryThrottledRequestMaxTimes
   }).then(urlResponse => {
     if (urlResponse.type === TypeEnum.FileInfo) {
-      return Promise.resolve(
-        UploadcareFile.fromFileInfo(urlResponse, { baseCDN })
-      )
+      return Promise.resolve(new UploadcareFile(urlResponse, { baseCDN }))
     } else {
       return poll<FileInfo>({
         check: cancel =>
@@ -102,7 +100,7 @@ const uploadFromUrl = (
           }),
         cancel
       }).then(fileInfo =>
-        Promise.resolve(UploadcareFile.fromFileInfo(fileInfo, { baseCDN }))
+        Promise.resolve(new UploadcareFile(fileInfo, { baseCDN }))
       )
     }
   })

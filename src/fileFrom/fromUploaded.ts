@@ -41,9 +41,7 @@ const fromUploaded = (
     integration,
     retryThrottledRequestMaxTimes
   }).then(fileInfo =>
-    Promise.resolve(
-      UploadcareFile.fromFileInfo(fileInfo, { baseCDN, fileName })
-    )
+    Promise.resolve(new UploadcareFile(fileInfo, { baseCDN, fileName }))
   )
 }
 
