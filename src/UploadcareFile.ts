@@ -1,10 +1,12 @@
+import camelizeKeys from './tools/camelizeKeys'
+
+/* Types */
 import {
   OriginalImageInfoInterface,
   OriginalVideoInfoInterface,
   UploadcareFileInterface
 } from './types'
 import { FileInfo, Uuid } from './api/types'
-import camelizeKeys from './tools/camelizeKeys'
 
 export class UploadcareFile implements UploadcareFileInterface {
   readonly uuid: Uuid
@@ -19,21 +21,7 @@ export class UploadcareFile implements UploadcareFileInterface {
   readonly originalImageInfo: null | OriginalImageInfoInterface = null
   readonly originalVideoInfo: null | OriginalVideoInfoInterface = null
 
-  constructor(file: UploadcareFileInterface) {
-    this.uuid = file.uuid
-    this.name = file.name
-    this.size = file.size
-    this.isStored = file.isStored
-    this.isImage = file.isImage
-    this.cdnUrl = file.cdnUrl
-    this.cdnUrlModifiers = file.cdnUrlModifiers
-    this.originalUrl = file.originalUrl
-    this.originalFilename = file.originalFilename
-    this.originalImageInfo = file.originalImageInfo
-    this.originalVideoInfo = file.originalVideoInfo
-  }
-
-  static fromFileInfo(
+  constructor(
     fileInfo: FileInfo,
     {
       baseCDN,
@@ -44,7 +32,7 @@ export class UploadcareFile implements UploadcareFileInterface {
       defaultEffects?: string
       fileName?: string
     }
-  ): UploadcareFileInterface {
+  ) {
     const { uuid, s3Bucket } = fileInfo
 
     const urlBase = s3Bucket
@@ -54,34 +42,16 @@ export class UploadcareFile implements UploadcareFileInterface {
     const cdnUrl = uuid ? `${urlBase}${cdnUrlModifiers || ''}` : null
     const originalUrl = uuid ? urlBase : null
 
-    return new UploadcareFile({
-      uuid,
-      name: fileName || fileInfo.filename,
-      size: fileInfo.size,
-      isStored: fileInfo.isStored,
-      isImage: fileInfo.isImage,
-      cdnUrl: cdnUrl,
-      cdnUrlModifiers,
-      originalUrl,
-      originalFilename: fileInfo.originalFilename,
-      originalImageInfo: camelizeKeys(fileInfo.imageInfo),
-      originalVideoInfo: camelizeKeys(fileInfo.videoInfo)
-    })
-  }
-
-  static fromUuid(uuid: Uuid): UploadcareFileInterface {
-    return new UploadcareFile({
-      uuid,
-      name: null,
-      size: null,
-      isStored: null,
-      isImage: null,
-      cdnUrl: null,
-      cdnUrlModifiers: null,
-      originalUrl: null,
-      originalFilename: null,
-      originalImageInfo: null,
-      originalVideoInfo: null
-    })
+    this.uuid = uuid
+    this.name = fileName || fileInfo.filename
+    this.size = fileInfo.size
+    this.isStored = fileInfo.isStored
+    this.isImage = fileInfo.isImage
+    this.cdnUrl = cdnUrl
+    this.cdnUrlModifiers = cdnUrlModifiers
+    this.originalUrl = originalUrl
+    this.originalFilename = fileInfo.originalFilename
+    this.originalImageInfo = camelizeKeys(fileInfo.imageInfo)
+    this.originalVideoInfo = camelizeKeys(fileInfo.videoInfo)
   }
 }
