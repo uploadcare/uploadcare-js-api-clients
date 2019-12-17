@@ -40,9 +40,16 @@ const fromUploaded = (
     source,
     integration,
     retryThrottledRequestMaxTimes
-  }).then(fileInfo =>
-    Promise.resolve(new UploadcareFile(fileInfo, { baseCDN, fileName }))
-  )
+  })
+    .then(fileInfo =>
+      Promise.resolve(new UploadcareFile(fileInfo, { baseCDN, fileName }))
+    )
+    .then(result => {
+      // hack for node ¯\_(ツ)_/¯
+      if (onProgress) onProgress({ value: 1 })
+
+      return result
+    })
 }
 
 export default fromUploaded
