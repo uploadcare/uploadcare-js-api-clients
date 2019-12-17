@@ -5,7 +5,8 @@ import {
   UploadcareFileInterface
 } from './types'
 import prettyFileInfo from './prettyFileInfo'
-import { FileInfoInterface, Uuid } from './api/types'
+import { FileInfo, Uuid } from './api/types'
+import camelizeKeys from './tools/camelizeKeys'
 
 export class UploadcareFile implements UploadcareFileInterface {
   readonly uuid: Uuid
@@ -35,23 +36,30 @@ export class UploadcareFile implements UploadcareFileInterface {
   }
 
   static fromFileInfo(
-    fileInfo: FileInfoInterface,
-    settings: SettingsInterface
+    fileInfo: FileInfo,
+    { baseCDN, defaultEffects }: { baseCDN?: string; defaultEffects?: string }
   ): UploadcareFileInterface {
-    const pretty = prettyFileInfo(fileInfo, settings)
+    const { uuid, s3Bucket } = fileInfo
+
+    const urlBase = s3Bucket
+      ? `https://${s3Bucket}.s3.amazonaws.com/${uuid}/${fileInfo.filename}`
+      : `${baseCDN}/${uuid}/`
+    const cdnUrlModifiers = defaultEffects ? `-/${defaultEffects}` : null
+    const cdnUrl = uuid ? `${urlBase}${cdnUrlModifiers || ''}` : null
+    const originalUrl = uuid ? urlBase : null
 
     return new UploadcareFile({
-      uuid: pretty.uuid,
-      name: pretty.name,
-      size: pretty.size,
-      isStored: pretty.isStored,
-      isImage: pretty.isImage,
-      cdnUrl: pretty.cdnUrl,
-      cdnUrlModifiers: pretty.cdnUrlModifiers,
-      originalUrl: pretty.originalUrl,
-      originalFilename: pretty.originalFilename,
-      originalImageInfo: pretty.originalImageInfo,
-      originalVideoInfo: pretty.originalVideoInfo
+      uuid,
+      name: fileInfo.filename,
+      size: fileInfo.size,
+      isStored: fileInfo.isStored,
+      isImage: fileInfo.isImage,
+      cdnUrl: cdnUrl,
+      cdnUrlModifiers,
+      originalUrl,
+      originalFilename: fileInfo.originalFilename,
+      originalImageInfo: camelizeKeys(fileInfo.imageInfo),
+      originalVideoInfo: camelizeKeys(fileInfo.videoInfo)
     })
   }
 

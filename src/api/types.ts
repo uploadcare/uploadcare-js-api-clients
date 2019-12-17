@@ -49,11 +49,12 @@ export type FileInfo = {
   originalFilename: string
   filename: string
   mimeType: string
-  isImage: string
-  isStored: string
+  isImage: boolean
+  isStored: boolean
   isReady: string
   imageInfo: ImageInfo | null
   videoInfo: VideoInfo | null
+  s3Bucket: string | null
 }
 
 export type GroupInfo = {
