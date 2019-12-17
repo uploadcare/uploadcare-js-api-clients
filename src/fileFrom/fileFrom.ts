@@ -1,4 +1,5 @@
 import fromObject from './fromObject'
+import fromUrl from './fromUrl'
 import CancelController from '../CancelController'
 import defaultSettings from '../defaultSettings'
 
@@ -66,15 +67,19 @@ export default function fileFrom(
   if (isFileData(data)) {
     return fromObject(data, {
       publicKey,
+
       fileName,
       baseURL,
       secureSignature,
       secureExpire,
       store,
+
       cancel,
       onProgress,
+
       source,
       integration,
+
       retryThrottledRequestMaxTimes,
 
       baseCDN
@@ -82,12 +87,25 @@ export default function fileFrom(
   }
 
   if (isUrl(data)) {
-    // const fileHandler = new FileFromUrl(data, settings)
-    //
-    // return new Upload<UploadcareFileInterface, FileUploadLifecycleInterface>(
-    //   fileUploadLifecycle,
-    //   fileHandler
-    // )
+    return fromUrl(data, {
+      publicKey,
+
+      fileName,
+      baseURL,
+      secureSignature,
+      secureExpire,
+      store,
+
+      cancel,
+      onProgress,
+
+      source,
+      integration,
+
+      retryThrottledRequestMaxTimes,
+
+      baseCDN
+    })
   }
 
   if (isUuid(data)) {
