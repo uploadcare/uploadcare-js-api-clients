@@ -46,14 +46,6 @@ export type FixtureFile = {
   size: number
 }
 
-export function image(id: string): FixtureFile {
-  if (isNode()) {
-    return imageBuffer(id)
-  }
-
-  return imageBlob(id)
-}
-
 function imageBuffer(id: string): FixtureFile {
   const data = dataURItoBuffer(images[id])
   const size = data.length
@@ -74,14 +66,12 @@ function imageBlob(id: string): FixtureFile {
   }
 }
 
-export function file(mbSize: number): FixtureFile {
-  const byteLength = mbSize * 1024 * 1024
-
+export function image(id: string): FixtureFile {
   if (isNode()) {
-    return fileBuffer(byteLength)
+    return imageBuffer(id)
   }
 
-  return fileBlob(byteLength)
+  return imageBlob(id)
 }
 
 function fileBuffer(bytes: number): FixtureFile {
@@ -101,6 +91,16 @@ function fileBlob(bytes: number): FixtureFile {
     data: blob,
     size: blob.size
   }
+}
+
+export function file(mbSize: number): FixtureFile {
+  const byteLength = mbSize * 1024 * 1024
+
+  if (isNode()) {
+    return fileBuffer(byteLength)
+  }
+
+  return fileBlob(byteLength)
 }
 
 export function uuid(id: string): string {

@@ -30,10 +30,11 @@ describe('API - multipart', () => {
       ctrl.cancel()
     })
 
-    await expectAsync(multipart(fileToUpload, settings))
-      .toBeRejectedWithError(UploadClientError, 'Request canceled')
+    await expectAsync(multipart(fileToUpload, settings)).toBeRejectedWithError(
+      UploadClientError,
+      'Request canceled'
+    )
   })
-
 
   it('should be able to handle progress', async () => {
     const onProgress = jasmine.createSpy('onProgress')
@@ -41,7 +42,7 @@ describe('API - multipart', () => {
     const settings = getSettingsForTesting({
       publicKey: factory.publicKey('multipart'),
       contentType: 'application/octet-stream',
-      onProgress,
+      onProgress
     })
 
     await multipart(fileToUpload, settings)

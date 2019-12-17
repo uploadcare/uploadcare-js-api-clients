@@ -1,14 +1,15 @@
 import { poll, CheckFunction } from '../../src/tools/poller'
 import CancelController from '../../src/CancelController'
-import { delay } from '../../src/api/request/delay'
+import { delay } from '../../src/tools/delay'
 import { UploadClientError } from '../../src/errors/errors'
 
-let longJob = (attemps: number, fails: Error | null = null) => {
+// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+const longJob = (attemps: number, fails: Error | null = null) => {
   let runs = 1
-  let condition = jasmine.createSpy('condition')
-  let cancel = jasmine.createSpy('cancelCondition')
+  const condition = jasmine.createSpy('condition')
+  const cancel = jasmine.createSpy('cancelCondition')
 
-  let isFinish: CheckFunction<boolean> = cancelCrtl => {
+  const isFinish: CheckFunction<boolean> = cancelCrtl => {
     condition()
 
     if (cancelCrtl) {
@@ -27,7 +28,7 @@ let longJob = (attemps: number, fails: Error | null = null) => {
     }
   }
 
-  let asyncIsFinish: CheckFunction<boolean> = cancel =>
+  const asyncIsFinish: CheckFunction<boolean> = cancel =>
     new Promise<boolean>((resolve, reject) => {
       try {
         resolve(isFinish(cancel))
@@ -48,8 +49,8 @@ let longJob = (attemps: number, fails: Error | null = null) => {
 
 describe('poll', () => {
   it('should be resolved', async () => {
-    let job = longJob(3)
-    let result = await poll({ check: job.isFinish, interval: 20 })
+    const job = longJob(3)
+    const result = await poll({ check: job.isFinish, interval: 20 })
 
     expect(result).toBeTruthy()
     expect(job.spy.condition).toHaveBeenCalledTimes(3)
@@ -57,8 +58,8 @@ describe('poll', () => {
   })
 
   it('should be able to cancel polling async', async () => {
-    let job = longJob(3)
-    let ctrl = new CancelController()
+    const job = longJob(3)
+    const ctrl = new CancelController()
 
     ctrl.cancel()
 
@@ -71,8 +72,8 @@ describe('poll', () => {
   })
 
   it('should not run any logic after cancel', async () => {
-    let job = longJob(10)
-    let ctrl = new CancelController()
+    const job = longJob(10)
+    const ctrl = new CancelController()
 
     ctrl.cancel()
 
@@ -80,8 +81,8 @@ describe('poll', () => {
       poll({ check: job.isFinish, interval: 20, cancel: ctrl })
     ).toBeRejectedWithError(UploadClientError, 'Poll canceled')
 
-    let conditionCallsCount = job.spy.condition.calls.count()
-    let cancelCallsCount = job.spy.cancel.calls.count()
+    const conditionCallsCount = job.spy.condition.calls.count()
+    const cancelCallsCount = job.spy.cancel.calls.count()
 
     await delay(50)
 
@@ -90,8 +91,8 @@ describe('poll', () => {
   })
 
   it('should be able to cancel polling async after first request', async () => {
-    let job = longJob(10)
-    let ctrl = new CancelController()
+    const job = longJob(10)
+    const ctrl = new CancelController()
 
     setTimeout(() => {
       ctrl.cancel()
@@ -106,7 +107,7 @@ describe('poll', () => {
   })
 
   it('should fails with timeout error', async () => {
-    let job = longJob(30)
+    const job = longJob(30)
 
     await expectAsync(
       poll({ check: job.isFinish, interval: 40, timeout: 20 })
@@ -114,13 +115,13 @@ describe('poll', () => {
   })
 
   it('should not run any logic after timeout error', async () => {
-    let job = longJob(30)
+    const job = longJob(30)
 
     await expectAsync(
       poll({ check: job.isFinish, interval: 40, timeout: 20 })
     ).toBeRejectedWithError(UploadClientError, 'Poll Timeout')
 
-    let conditionCallsCount = job.spy.condition.calls.count()
+    const conditionCallsCount = job.spy.condition.calls.count()
 
     await delay(50)
 
@@ -128,8 +129,8 @@ describe('poll', () => {
   })
 
   it('should handle errors', async () => {
-    let error = new Error('test error')
-    let job = longJob(3, error)
+    const error = new Error('test error')
+    const job = longJob(3, error)
 
     await expectAsync(
       poll({ check: job.isFinish, interval: 20 })
@@ -137,8 +138,8 @@ describe('poll', () => {
   })
 
   it('should work with async test function', async () => {
-    let job = longJob(3)
-    let result = await poll({ check: job.asyncIsFinish, interval: 20 })
+    const job = longJob(3)
+    const result = await poll({ check: job.asyncIsFinish, interval: 20 })
 
     expect(result).toBeTruthy()
     expect(job.spy.condition).toHaveBeenCalledTimes(3)
