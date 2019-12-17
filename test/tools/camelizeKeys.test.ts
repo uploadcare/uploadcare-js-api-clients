@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/camelcase */
 import camelizeKeys, { camelize } from '../../src/tools/camelizeKeys'
 
 describe('camelize', () => {

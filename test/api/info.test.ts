@@ -21,11 +21,13 @@ describe('API - info', () => {
     })
     const upload = info(uuid, settings)
 
-    await (expectAsync(upload)).toBeRejectedWithError('[403] pub_key is required.')
+    await expectAsync(upload).toBeRejectedWithError(
+      '[403] pub_key is required.'
+    )
   })
 
   it('should be able to cancel uploading', async () => {
-    let controller = new CancelController()
+    const controller = new CancelController()
 
     const settings = getSettingsForTesting({
       publicKey: factory.publicKey('image'),
@@ -36,6 +38,8 @@ describe('API - info', () => {
       controller.cancel()
     }, 10)
 
-    await expectAsync(info(uuid, settings)).toBeRejectedWithError('Request canceled')
+    await expectAsync(info(uuid, settings)).toBeRejectedWithError(
+      'Request canceled'
+    )
   })
 })

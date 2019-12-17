@@ -36,7 +36,6 @@
     "cdn"
   ],
   "devDependencies": {
-    "@types/axios": "^0.14.0",
     "@types/form-data": "^2.5.0",
     "@types/jasmine": "^3.5.0",
     "@types/promise": "^7.1.30",
@@ -74,7 +73,6 @@
     "typescript": "^3.6.3"
   },
   "dependencies": {
-    "axios": "^0.19.0",
     "form-data": "^2.5.1"
   }
 }
