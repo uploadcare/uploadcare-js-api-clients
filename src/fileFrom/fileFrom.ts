@@ -1,5 +1,6 @@
 import fromObject from './fromObject'
 import fromUrl from './fromUrl'
+import fromUploaded from './fromUploaded'
 import CancelController from '../CancelController'
 import defaultSettings from '../defaultSettings'
 
@@ -109,12 +110,22 @@ export default function fileFrom(
   }
 
   if (isUuid(data)) {
-    // const fileHandler = new FileFromUploaded(data, settings)
-    //
-    // return new Upload<UploadcareFileInterface, FileUploadLifecycleInterface>(
-    //   fileUploadLifecycle,
-    //   fileHandler
-    // )
+    return fromUploaded(data, {
+      publicKey,
+
+      fileName,
+      baseURL,
+
+      cancel,
+      onProgress,
+
+      source,
+      integration,
+
+      retryThrottledRequestMaxTimes,
+
+      baseCDN
+    })
   }
 
   throw new TypeError(`File uploading from "${data}" is not supported`)
