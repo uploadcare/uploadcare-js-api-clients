@@ -43,7 +43,6 @@ export default function fileFrom(
     retryThrottledRequestMaxTimes,
 
     baseCDN = defaultSettings.baseCDN,
-    defaultEffects
   }: {
     publicKey: string
 
@@ -62,7 +61,6 @@ export default function fileFrom(
     retryThrottledRequestMaxTimes?: number
 
     baseCDN?: string
-    defaultEffects?: string
   }
 ): Promise<UploadcareFileInterface> {
   if (isFileData(data)) {
@@ -79,8 +77,7 @@ export default function fileFrom(
       integration,
       retryThrottledRequestMaxTimes,
 
-      baseCDN,
-      defaultEffects
+      baseCDN
     })
   }
 

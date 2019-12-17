@@ -18,8 +18,7 @@ const fromObject = (
     source,
     integration,
     retryThrottledRequestMaxTimes,
-    baseCDN,
-    defaultEffects
+    baseCDN
   }: {
     publicKey: string
 
@@ -38,7 +37,6 @@ const fromObject = (
     retryThrottledRequestMaxTimes?: number
 
     baseCDN?: string
-    defaultEffects?: string
   }
 ): Promise<UploadcareFile> => {
   let progress
@@ -83,9 +81,7 @@ const fromObject = (
         return false
       }
     }).then(fileInfo =>
-      Promise.resolve(
-        UploadcareFile.fromFileInfo(fileInfo, { baseCDN, defaultEffects })
-      )
+      Promise.resolve(UploadcareFile.fromFileInfo(fileInfo, { baseCDN }))
     )
   })
 }
