@@ -1,10 +1,8 @@
 import {
   OriginalImageInfoInterface,
   OriginalVideoInfoInterface,
-  SettingsInterface,
   UploadcareFileInterface
 } from './types'
-import prettyFileInfo from './prettyFileInfo'
 import { FileInfo, Uuid } from './api/types'
 import camelizeKeys from './tools/camelizeKeys'
 
@@ -37,7 +35,15 @@ export class UploadcareFile implements UploadcareFileInterface {
 
   static fromFileInfo(
     fileInfo: FileInfo,
-    { baseCDN, defaultEffects }: { baseCDN?: string; defaultEffects?: string }
+    {
+      baseCDN,
+      defaultEffects,
+      fileName
+    }: {
+      baseCDN?: string
+      defaultEffects?: string
+      fileName?: string
+    }
   ): UploadcareFileInterface {
     const { uuid, s3Bucket } = fileInfo
 
@@ -50,7 +56,7 @@ export class UploadcareFile implements UploadcareFileInterface {
 
     return new UploadcareFile({
       uuid,
-      name: fileInfo.filename,
+      name: fileName || fileInfo.filename,
       size: fileInfo.size,
       isStored: fileInfo.isStored,
       isImage: fileInfo.isImage,
