@@ -13,8 +13,7 @@ describe('API - base', () => {
   })
 
   it('should be able to cancel uploading', async () => {
-    let timeoutId
-    let timeout = jasmine.createSpy('timeout')
+    const timeout = jasmine.createSpy('timeout')
     const publicKey = factory.publicKey('demo')
     const controller = new CancelController()
     const directUpload = base(fileToUpload.data, {
@@ -24,7 +23,7 @@ describe('API - base', () => {
 
     controller.cancel()
 
-    timeoutId = setTimeout(timeout, 10)
+    const timeoutId = setTimeout(timeout, 10)
 
     await expectAsync(directUpload).toBeRejectedWithError('Request canceled')
 

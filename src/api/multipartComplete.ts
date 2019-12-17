@@ -1,89 +1,54 @@
-import getFormData from './request/buildFormData.node'
+import { FailedResponse } from './request/types'
+import { Uuid, FileInfo } from './types'
+
 import request from './request/request.node'
+import getFormData from './request/buildFormData.node'
 import getUrl from './request/getUrl'
-import CancelController from '../CancelController'
 import defaultSettings, { getUserAgent } from '../defaultSettings'
 import camelizeKeys from '../tools/camelizeKeys'
-import { UploadClientError } from '../errors/errors'
 import retryIfThrottled from '../tools/retryIfThrottled'
+import { UploadClientError } from '../errors/errors'
+import CancelController from '../CancelController'
 
-/* Types */
-import { Uuid } from './types'
-import { FailedResponse } from './request/types'
-
-export type BaseResponse = {
-  file: Uuid
-}
-
-type Response = BaseResponse | FailedResponse
-
-export type BaseOptions = {
+export type MultipartCompleteOptions = {
   publicKey: string
-
-  fileName?: string
   baseURL?: string
-  secureSignature?: string
-  secureExpire?: string
-  store?: boolean
-
   cancel?: CancelController
-  onProgress?: ({ value: number }) => void
-
   source?: string
   integration?: string
-
   retryThrottledRequestMaxTimes?: number
 }
 
-export type FileData = Blob | File | NodeJS.ReadableStream | Buffer
+type Response = FailedResponse | FileInfo
 
 /**
- * Performs file uploading request to Uploadcare Upload API.
- * Can be canceled and has progress.
+ * Complete multipart uploading.
  */
-export default function base(
-  file: FileData,
+export default function multipartComplete(
+  uuid: Uuid,
   {
     publicKey,
-    fileName,
     baseURL = defaultSettings.baseURL,
-    secureSignature,
-    secureExpire,
-    store,
-    cancel,
-    onProgress,
     source = 'local',
+    cancel,
     integration,
     retryThrottledRequestMaxTimes = defaultSettings.retryThrottledRequestMaxTimes
-  }: BaseOptions
-): Promise<BaseResponse> {
+  }: MultipartCompleteOptions
+): Promise<FileInfo> {
   return retryIfThrottled(
     () =>
       request({
         method: 'POST',
-        url: getUrl(baseURL, '/base/', {
-          jsonerrors: 1
-        }),
+        url: getUrl(baseURL, '/multipart/complete/', { jsonerrors: 1 }),
         headers: {
           'X-UC-User-Agent': getUserAgent({ publicKey, integration })
         },
         data: getFormData([
-          [
-            'file',
-            file,
-            fileName || (file as File).name || defaultSettings.fileName
-          ],
+          ['uuid', uuid],
           ['UPLOADCARE_PUB_KEY', publicKey],
-          [
-            'UPLOADCARE_STORE',
-            typeof store === 'undefined' ? 'auto' : store ? 1 : 0
-          ],
-          ['signature', secureSignature],
-          ['expire', secureExpire],
           ['source', source]
         ]),
-        cancel,
-        onProgress
+        cancel
       }).then(({ data, headers, request }) => {
         const response = camelizeKeys<Response>(JSON.parse(data))
 

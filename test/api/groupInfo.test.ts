@@ -22,11 +22,13 @@ describe('API - group info', () => {
     const groupId = factory.groupId('invalid')
     const upload = groupInfo(groupId, settings)
 
-    await expectAsync(upload).toBeRejectedWithError(`[404] group_id is invalid.`)
+    await expectAsync(upload).toBeRejectedWithError(
+      `[404] group_id is invalid.`
+    )
   })
 
   it('should be able to cancel uploading', async () => {
-    let controller = new CancelController()
+    const controller = new CancelController()
 
     const settingsWithCancel = getSettingsForTesting({
       publicKey: factory.publicKey('image'),

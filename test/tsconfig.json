@@ -10,6 +10,6 @@
     "resolveJsonModule": true,
     "moduleResolution": "node"
   },
-  "include": ["src", "test"],
-  "exclude": ["node_modules"]
+  "include": ["../src", "../test"],
+  "exclude": ["../node_modules"]
 }

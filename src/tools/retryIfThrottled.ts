@@ -1,5 +1,5 @@
 import { UploadClientError } from '../errors/errors'
-import { delay } from '../api/request/delay'
+import { delay } from './delay'
 
 const REQUEST_WAS_THROTTLED_CODE = 429
 const DEFAULT_RETRY_AFTER_TIMEOUT = 15000

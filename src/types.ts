@@ -10,7 +10,7 @@ import { LifecycleHooksInterface, UploadInterface } from './lifecycle/types'
 export interface SettingsInterface {
   baseCDN?: string
   baseURL?: string
-  publicKey?: string | null
+  publicKey?: string
   fileName?: string
   store?: boolean
   secureSignature?: string

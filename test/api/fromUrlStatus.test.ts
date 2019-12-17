@@ -5,7 +5,7 @@ import CancelController from '../../src/CancelController'
 
 describe('API - from url status', () => {
   const token = factory.token('valid')
-  const settings = getSettingsForTesting()
+  const settings = getSettingsForTesting({})
 
   it('should return info about file uploaded from url', async () => {
     const data = await fromUrlStatus(token, settings)
@@ -24,11 +24,11 @@ describe('API - from url status', () => {
     const token = factory.token('empty')
     const upload = fromUrlStatus(token, settings)
 
-    await (expectAsync(upload)).toBeRejectedWithError('[400] token is required.')
+    await expectAsync(upload).toBeRejectedWithError('[400] token is required.')
   })
 
   it('should be able to cancel uploading', async () => {
-    let controller = new CancelController()
+    const controller = new CancelController()
 
     const settings = getSettingsForTesting({
       publicKey: factory.publicKey('demo'),

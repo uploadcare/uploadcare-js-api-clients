@@ -1,85 +1,127 @@
-import multipartStart from '../api/multipart/multipartStart'
-import multipartUpload from '../api/multipart/multipartUpload'
-import multipartComplete from '../api/multipart/multipartComplete'
-import { Thenable } from '../thenable/Thenable'
+import multipartStart from '../api/multipartStart'
+import multipartUpload from '../api/multipartUpload'
+import multipartComplete from '../api/multipartComplete'
 
 /* Types */
-import { FileData, SettingsInterface } from '../types'
-import { Uuid } from '..'
-import {
-  BaseThenableInterface,
-  CancelableThenableInterface
-} from '../thenable/types'
-import { FileInfoInterface } from '../api/types'
-import { BaseHooksInterface } from '../lifecycle/types'
+import { FileInfo } from '../api/types'
+import CancelController from '../CancelController'
 
-class Multipart extends Thenable<FileInfoInterface>
-  implements BaseThenableInterface<FileInfoInterface> {
-  onCancel: (() => void) | null = null
-  onProgress: ((progressEvent: ProgressEvent) => void) | null = null
+type progressCallback = ({ value: number }) => void
 
-  protected readonly promise: Promise<FileInfoInterface>
-  private request: BaseThenableInterface<any> | CancelableThenableInterface<any>
+export type MultipartOptions = {
+  publicKey: string
+  contentType: string
+  multipartChunkSize: number
+  fileName?: string
+  baseURL?: string
+  secureSignature?: string
+  secureExpire?: string
+  store?: boolean
+  cancel?: CancelController
+  onProgress?: progressCallback
+  source?: string
+  integration?: string
+  retryThrottledRequestMaxTimes?: number
+}
 
-  constructor(
-    file: FileData,
-    settings: SettingsInterface,
-    hooks?: BaseHooksInterface
-  ) {
-    super()
+const getChunk = (
+  file: Buffer | Blob,
+  index: number,
+  fileSize: number,
+  chunkSize: number
+): Buffer | Blob => {
+  const start = chunkSize * index
+  const end = Math.min(start + chunkSize, fileSize)
 
-    this.request = multipartStart(file, settings)
-
-    this.promise = this.request
-      .then(({ uuid, parts }) => {
-        const onProgress = (progressEvent: ProgressEvent): void => {
-          if (hooks && typeof hooks.onProgress === 'function') {
-            hooks.onProgress({
-              ...progressEvent,
-              loaded: progressEvent.loaded,
-              total: progressEvent.total
-            })
-          }
-        }
-        this.request = multipartUpload(file, parts, settings, { onProgress })
-
-        return this.request.then(() => Promise.resolve(uuid))
-      })
-      .then((uuid: Uuid) => {
-        this.request = multipartComplete(uuid, settings)
-
-        return this.request
-      })
-      .catch(error => {
-        if (
-          error.name === 'CancelError' &&
-          hooks &&
-          typeof hooks.onCancel === 'function'
-        ) {
-          hooks.onCancel()
-        }
-
-        return Promise.reject(error)
-      })
-  }
-
-  cancel(): void {
-    this.request.cancel()
-  }
+  return file.slice(start, end)
 }
 
 /**
  * Upload multipart file.
- *
- * @param {FileData} file
- * @param {SettingsInterface} settings
- * @param {BaseHooksInterface} hooks
- * @return {BaseThenableInterface<FileInfoInterface>}
  */
 export default function multipart(
-  file: FileData,
-  settings: SettingsInterface = {},
-  hooks?: BaseHooksInterface
-): BaseThenableInterface<FileInfoInterface> {
-  return new Multipart(file, settings, hooks)
+  file: Buffer | Blob,
+  {
+    publicKey,
+    contentType,
+    multipartChunkSize,
+    fileName,
+    baseURL,
+    secureSignature,
+    secureExpire,
+    store,
+    cancel,
+    onProgress,
+    source,
+    integration,
+    retryThrottledRequestMaxTimes
+  }: MultipartOptions
+): Promise<FileInfo> {
+  const fileSize: number = (file as Buffer).length || (file as Blob).size
+
+  let progressValues: number[]
+  const createProgressHandler = (
+    size: number,
+    index: number
+  ): progressCallback | undefined => {
+    if (!onProgress) return
+    if (!progressValues) {
+      progressValues = Array(size).fill(0)
+    }
+
+    const normalize = (values: number[]): number =>
+      values.reduce((sum, next) => sum + next) / size
+
+    return ({ value }: { value: number }): void => {
+      progressValues[index] = value
+      onProgress({ value: normalize(progressValues) })
+    }
+  }
+
+  return multipartStart(fileSize, {
+    publicKey,
+    contentType,
+    fileName,
+    baseURL,
+    secureSignature,
+    secureExpire,
+    store,
+    cancel,
+    source,
+    integration,
+    retryThrottledRequestMaxTimes
+  })
+    .then(({ uuid, parts }) =>
+      Promise.all([
+        uuid,
+        Promise.all(
+          parts.map((url, index) =>
+            multipartUpload(
+              getChunk(file, index, fileSize, multipartChunkSize),
+              url,
+              {
+                publicKey,
+                onProgress: createProgressHandler(parts.length, index),
+                cancel,
+                integration
+              }
+            )
+          )
+        )
+      ])
+    )
+    .then(([uuid]) =>
+      multipartComplete(uuid, {
+        publicKey,
+        baseURL,
+        source,
+        integration,
+        retryThrottledRequestMaxTimes
+      })
+    )
+    .then(result => {
+      // hack for node ¯\_(ツ)_/¯
+      if (onProgress) onProgress({ value: 1 })
+      return result
+    })
 }
