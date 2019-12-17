@@ -41,7 +41,10 @@ describe('fileFrom URL', () => {
       ctrl.cancel()
     })
 
-    await expectAsync(fileFrom(sourceUrl, settings)).toBeRejectedWithError(UploadClientError, 'Request canceled')
+    await expectAsync(fileFrom(sourceUrl, settings)).toBeRejectedWithError(
+      UploadClientError,
+      'Request canceled'
+    )
   })
 
   it('should accept new file name setting', async () => {

@@ -1,7 +1,8 @@
 import * as factory from '../_fixtureFactory'
 import fileFrom from '../../src/fileFrom/fileFrom'
 import { getSettingsForTesting } from '../_helpers'
-import CancelError from '../../src/errors/CancelError'
+import CancelController from '../../src/CancelController'
+import { UploadClientError } from '../../src/errors/errors'
 
 describe('fileFrom Uploaded', () => {
   const uuid = factory.uuid('image')
@@ -16,11 +17,18 @@ describe('fileFrom Uploaded', () => {
   })
 
   it('should be able to cancel uploading', async () => {
-    const upload = fileFrom(uuid, settings)
+    const ctrl = new CancelController()
+    const upload = fileFrom(uuid, {
+      ...settings,
+      cancel: ctrl
+    })
 
-    upload.cancel()
+    ctrl.cancel()
 
-    await (expectAsync(upload) as any).toBeRejectedWithError(CancelError)
+    await (expectAsync(upload) as any).toBeRejectedWithError(
+      UploadClientError,
+      'Request canceled'
+    )
   })
 
   it('should accept new file name setting', async () => {
@@ -36,46 +44,37 @@ describe('fileFrom Uploaded', () => {
 
   describe('should be able to handle', () => {
     it('cancel uploading', async () => {
+      const ctrl = new CancelController()
       const onCancel = jasmine.createSpy('onCancel')
-      const upload = fileFrom(uuid, settings, { onCancel })
+      ctrl.onCancel(onCancel)
+      const upload = fileFrom(uuid, {
+        ...settings,
+        cancel: ctrl
+      })
 
-      upload.cancel()
+      ctrl.cancel()
 
-      await (expectAsync(upload) as any).toBeRejectedWithError(CancelError)
+      await (expectAsync(upload) as any).toBeRejectedWithError(
+        UploadClientError,
+        'Request canceled'
+      )
 
       expect(onCancel).toHaveBeenCalled()
     })
 
     it('progress', async () => {
       let progressValue = 0
-      const onProgress = progress => {
-        const { value } = progress
-
+      const onProgress = ({ value }) => {
         progressValue = value
       }
-      const upload = fileFrom(uuid, settings, { onProgress })
+      const upload = fileFrom(uuid, {
+        ...settings,
+        onProgress
+      })
 
       await upload
 
       expect(progressValue).toBe(1)
-    })
-
-    it('uploaded', async () => {
-      const onUploaded = jasmine.createSpy('onUploaded')
-      const upload = fileFrom(uuid, settings, { onUploaded })
-
-      await (expectAsync(upload) as any).toBeResolved()
-
-      expect(onUploaded).toHaveBeenCalled()
-    })
-
-    it('ready', async () => {
-      const onReady = jasmine.createSpy('onReady')
-      const upload = fileFrom(uuid, settings, { onReady })
-
-      await (expectAsync(upload) as any).toBeResolved()
-
-      expect(onReady).toHaveBeenCalled()
     })
   })
 })

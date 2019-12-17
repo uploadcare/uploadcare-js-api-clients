@@ -70,7 +70,7 @@ describe('fileFrom Object', () => {
 
     it('progress', async () => {
       let progressValue = 0
-      const onProgress = ({value}) => {
+      const onProgress = ({ value }) => {
         progressValue = value
       }
       const upload = fileFrom(fileToUpload, {
