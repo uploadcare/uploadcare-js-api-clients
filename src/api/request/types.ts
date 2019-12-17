@@ -12,7 +12,7 @@ export type RequestOptions = {
   data?: NodeFormData | FormData
   headers?: Headers
   cancel?: CancelController
-  onProgress?: (value: number) => void
+  onProgress?: ({ value: number }) => void
 }
 
 export type RequestResponse = {
