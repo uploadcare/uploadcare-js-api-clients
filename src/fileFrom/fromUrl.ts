@@ -5,6 +5,7 @@ import { UploadClientError } from '../errors/errors'
 
 import { FileInfo } from '../api/types'
 import CancelController from '../CancelController'
+import { UploadcareFile } from '../UploadcareFile'
 
 type FromUrlOptions = {
   publicKey: string
@@ -41,7 +42,7 @@ const uploadFromUrl = (
     integration,
     retryThrottledRequestMaxTimes
   }: FromUrlOptions
-): Promise<FileInfo> =>
+): Promise<UploadcareFile> =>
   fromUrl(sourceUrl, {
     publicKey,
     fileName,
@@ -57,7 +58,9 @@ const uploadFromUrl = (
     retryThrottledRequestMaxTimes
   }).then(urlResponse => {
     if (urlResponse.type === TypeEnum.FileInfo) {
-      return urlResponse
+      return Promise.resolve(
+        UploadcareFile.fromFileInfo(urlResponse, { baseCDN })
+      )
     } else {
       return poll<FileInfo>({
         check: cancel =>
@@ -99,7 +102,9 @@ const uploadFromUrl = (
           }),
 
         cancel
-      })
+      }).then(fileInfo =>
+        Promise.resolve(UploadcareFile.fromFileInfo(fileInfo, { baseCDN }))
+      )
     }
   })
 
