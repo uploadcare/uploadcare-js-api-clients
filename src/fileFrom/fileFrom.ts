@@ -5,8 +5,8 @@ import CancelController from '../CancelController'
 import defaultSettings from '../defaultSettings'
 
 /* Types */
-import { FileData, UploadcareFileInterface } from '../types'
-import { Url, Uuid } from '../api/types'
+import { UploadcareFileInterface } from '../types'
+import { FileData, Url, Uuid } from '../api/types'
 import { isFileData, isUrl, isUuid } from './types'
 
 /**
@@ -44,6 +44,9 @@ export default function fileFrom(
 
     retryThrottledRequestMaxTimes,
 
+    contentType,
+    multipartChunkSize = defaultSettings.multipartChunkSize,
+
     baseCDN = defaultSettings.baseCDN
   }: {
     publicKey: string
@@ -61,6 +64,9 @@ export default function fileFrom(
     integration?: string
 
     retryThrottledRequestMaxTimes?: number
+
+    contentType: string
+    multipartChunkSize?: number
 
     baseCDN?: string
   }
@@ -82,6 +88,9 @@ export default function fileFrom(
       integration,
 
       retryThrottledRequestMaxTimes,
+
+      contentType,
+      multipartChunkSize,
 
       baseCDN
     })
