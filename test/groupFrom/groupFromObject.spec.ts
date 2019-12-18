@@ -32,7 +32,7 @@ describe('groupFrom Object[]', () => {
 
     upload.cancel()
 
-    await (expectAsync(upload) as any).toBeRejectedWithError(CancelError)
+    await expectAsync(upload).toBeRejectedWithError(CancelError)
   })
 
   describe('should be able to handle', () => {
@@ -42,7 +42,7 @@ describe('groupFrom Object[]', () => {
 
       upload.cancel()
 
-      await (expectAsync(upload) as any).toBeRejectedWithError(CancelError)
+      await expectAsync(upload).toBeRejectedWithError(CancelError)
 
       expect(onCancel).toHaveBeenCalled()
     })
@@ -65,7 +65,7 @@ describe('groupFrom Object[]', () => {
       const onUploaded = jasmine.createSpy('onUploaded')
       const upload = groupFrom(files, settings, { onUploaded })
 
-      await (expectAsync(upload) as any).toBeResolved()
+      await expectAsync(upload).toBeResolved()
 
       expect(onUploaded).toHaveBeenCalled()
     })
@@ -74,7 +74,7 @@ describe('groupFrom Object[]', () => {
       const onReady = jasmine.createSpy('onReady')
       const upload = groupFrom(files, settings, { onReady })
 
-      await (expectAsync(upload) as any).toBeResolved()
+      await expectAsync(upload).toBeResolved()
 
       expect(onReady).toHaveBeenCalled()
     })

@@ -25,7 +25,7 @@ describe('fileFrom Uploaded', () => {
 
     ctrl.cancel()
 
-    await (expectAsync(upload) as any).toBeRejectedWithError(
+    await expectAsync(upload).toBeRejectedWithError(
       UploadClientError,
       'Request canceled'
     )
@@ -54,7 +54,7 @@ describe('fileFrom Uploaded', () => {
 
       ctrl.cancel()
 
-      await (expectAsync(upload) as any).toBeRejectedWithError(
+      await expectAsync(upload).toBeRejectedWithError(
         UploadClientError,
         'Request canceled'
       )
