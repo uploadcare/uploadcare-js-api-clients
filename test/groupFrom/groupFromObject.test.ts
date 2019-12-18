@@ -50,7 +50,10 @@ describe('groupFrom Object[]', () => {
 
       ctrl.onCancel(onCancel)
 
-      const upload = groupFrom(files, settings)
+      const upload = groupFrom(files, {
+        ...settings,
+        cancel: ctrl
+      })
 
       ctrl.cancel()
 
