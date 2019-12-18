@@ -1,64 +1,104 @@
-import { GroupUploadLifecycle } from '../lifecycle/GroupUploadLifecycle'
-import { UploadLifecycle } from '../lifecycle/UploadLifecycle'
-import { GroupFromObject } from './GroupFromObject'
-import { GroupFromUploaded } from './GroupFromUploaded'
-import { GroupFromUrl } from './GroupFromUrl'
+import fileFrom, { FileFromOptions } from '../fileFrom/fileFrom'
+import defaultSettings from '../defaultSettings'
+import group from '../api/group'
 
 /* Types */
-import { FileData, SettingsInterface, UploadcareGroupInterface } from '../types'
-import { Url } from '../api/fromUrl'
-import { Uuid } from '../api/types'
 import { isFileDataArray, isUrlArray, isUuidArray } from './types'
-import {
-  GroupUploadLifecycleInterface,
-  LifecycleHooksInterface,
-  UploadInterface
-} from '../lifecycle/types'
-import { Upload } from '../lifecycle/Upload'
+import { FileData, Url, Uuid } from '../api/types'
+import { UploadcareGroup } from '../UploadcareGroup'
+
+export type GroupFromOptions = {
+  jsonpCallback?: string
+}
 
 /**
  * Uploads file from provided data.
- *
- * @param {FileData} data
- * @param {SettingsInterface} settings
- * @param {LifecycleHooksInterface<UploadcareGroupInterface>} hooks
- * @throws TypeError
- * @returns {UploadInterface<UploadcareGroupInterface>}
+ * @param data
+ * @param options
+ * @param [options.publicKey]
+ * @param [options.fileName]
+ * @param [options.baseURL]
+ * @param [options.secureSignature]
+ * @param [options.secureExpire]
+ * @param [options.store]
+ * @param [options.cancel]
+ * @param [options.onProgress]
+ * @param [options.source]
+ * @param [options.integration]
+ * @param [options.retryThrottledRequestMaxTimes]
+ * @param [options.contentType]
+ * @param [options.multipartChunkSize]
+ * @param [options.baseCDN]
  */
 export default function groupFrom(
   data: FileData[] | Url[] | Uuid[],
-  settings: SettingsInterface = {},
-  hooks?: LifecycleHooksInterface<UploadcareGroupInterface>
-): UploadInterface<UploadcareGroupInterface> {
-  const lifecycle = new UploadLifecycle<UploadcareGroupInterface>(hooks)
-  const groupUploadLifecycle = new GroupUploadLifecycle(lifecycle)
+  {
+    publicKey,
 
-  if (isFileDataArray(data)) {
-    const fileHandler = new GroupFromObject(data, settings)
+    fileName = defaultSettings.fileName,
+    baseURL = defaultSettings.baseURL,
+    secureSignature,
+    secureExpire,
+    store,
 
-    return new Upload<UploadcareGroupInterface, GroupUploadLifecycleInterface>(
-      groupUploadLifecycle,
-      fileHandler
-    )
+    cancel,
+    onProgress,
+
+    source,
+    integration,
+
+    retryThrottledRequestMaxTimes,
+
+    contentType = 'application/octet-stream',
+    multipartChunkSize = defaultSettings.multipartChunkSize,
+
+    baseCDN = defaultSettings.baseCDN,
+
+    jsonpCallback
+  }: FileFromOptions & GroupFromOptions
+): Promise<UploadcareGroup> {
+  if (!isFileDataArray(data) || !isUrlArray(data) || !isUuidArray(data)) {
+    throw new TypeError(`Group uploading from "${data}" is not supported`)
   }
 
-  if (isUrlArray(data)) {
-    const fileHandler = new GroupFromUrl(data, settings)
+  return Promise.all(
+    data.map(file =>
+      fileFrom(file, {
+        publicKey,
 
-    return new Upload<UploadcareGroupInterface, GroupUploadLifecycleInterface>(
-      groupUploadLifecycle,
-      fileHandler
+        fileName,
+        baseURL,
+        secureSignature,
+        secureExpire,
+        store,
+
+        cancel,
+        onProgress,
+
+        source,
+        integration,
+
+        retryThrottledRequestMaxTimes,
+
+        contentType,
+        multipartChunkSize,
+
+        baseCDN
+      })
     )
-  }
+  ).then(files => {
+    const uuids = files.map(file => file.uuid)
 
-  if (isUuidArray(data)) {
-    const fileHandler = new GroupFromUploaded(data, settings)
-
-    return new Upload<UploadcareGroupInterface, GroupUploadLifecycleInterface>(
-      groupUploadLifecycle,
-      fileHandler
-    )
-  }
-
-  throw new TypeError(`Group uploading from "${data}" is not supported`)
+    return group(uuids, {
+      publicKey,
+      baseURL,
+      jsonpCallback,
+      secureSignature,
+      secureExpire,
+      cancel,
+      source,
+      integration,
+      retryThrottledRequestMaxTimes
+    }).then(groupInfo => new UploadcareGroup(groupInfo, files))
+  })
 }
