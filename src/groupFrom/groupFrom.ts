@@ -1,13 +1,15 @@
 import fileFrom, { FileFromOptions } from '../fileFrom/fileFrom'
 import defaultSettings from '../defaultSettings'
 import group from '../api/group'
+import { UploadcareGroup } from '../UploadcareGroup'
+import { UploadcareFile } from '../UploadcareFile'
 
 /* Types */
 import { isFileDataArray, isUrlArray, isUuidArray } from './types'
 import { FileData, Url, Uuid } from '../api/types'
-import { UploadcareGroup } from '../UploadcareGroup'
 
 export type GroupFromOptions = {
+  defaultEffects?: string
   jsonpCallback?: string
 }
 
@@ -49,20 +51,21 @@ export default function groupFrom(
 
     retryThrottledRequestMaxTimes,
 
-    contentType = 'application/octet-stream',
+    contentType = defaultSettings.contentType,
     multipartChunkSize = defaultSettings.multipartChunkSize,
 
     baseCDN = defaultSettings.baseCDN,
 
-    jsonpCallback
+    jsonpCallback,
+    defaultEffects
   }: FileFromOptions & GroupFromOptions
 ): Promise<UploadcareGroup> {
-  if (!isFileDataArray(data) || !isUrlArray(data) || !isUuidArray(data)) {
+  if (!isFileDataArray(data) && !isUrlArray(data) && !isUuidArray(data)) {
     throw new TypeError(`Group uploading from "${data}" is not supported`)
   }
 
   return Promise.all(
-    data.map(file =>
+    (data as FileData[]).map(file =>
       fileFrom(file, {
         publicKey,
 
@@ -88,6 +91,18 @@ export default function groupFrom(
     )
   ).then(files => {
     const uuids = files.map(file => file.uuid)
+    const addDefaultEffects = (file): UploadcareFile => {
+      const cdnUrlModifiers = defaultEffects ? `-/${defaultEffects}` : null
+      const cdnUrl = `${file.urlBase}${cdnUrlModifiers || ''}`
+
+      return {
+        ...file,
+        cdnUrlModifiers,
+        cdnUrl
+      }
+    }
+
+    const filesInGroup = defaultEffects ? files.map(addDefaultEffects) : files
 
     return group(uuids, {
       publicKey,
@@ -99,6 +114,6 @@ export default function groupFrom(
       source,
       integration,
       retryThrottledRequestMaxTimes
-    }).then(groupInfo => new UploadcareGroup(groupInfo, files))
+    }).then(groupInfo => new UploadcareGroup(groupInfo, filesInGroup))
   })
 }
