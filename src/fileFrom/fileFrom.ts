@@ -128,6 +128,7 @@ export default function fileFrom(
       baseURL,
 
       cancel,
+      onProgress,
 
       source,
       integration,

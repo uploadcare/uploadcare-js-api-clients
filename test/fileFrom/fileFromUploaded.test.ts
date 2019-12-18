@@ -34,7 +34,7 @@ describe('fileFrom Uploaded', () => {
   it('should accept new file name setting', async () => {
     const settings = getSettingsForTesting({
       publicKey: factory.publicKey('image'),
-      doNotStore: true,
+      store: true,
       fileName: 'newFileName.jpg'
     })
     const file = await fileFrom(uuid, settings)
@@ -63,18 +63,16 @@ describe('fileFrom Uploaded', () => {
     })
 
     it('progress', async () => {
-      let progressValue = 0
-      const onProgress = ({ value }) => {
-        progressValue = value
-      }
-      const upload = fileFrom(uuid, {
-        ...settings,
+      const onProgress = jasmine.createSpy('onProgress')
+      const settings = getSettingsForTesting({
+        publicKey: factory.publicKey('image'),
         onProgress
       })
 
-      await upload
+      await fileFrom(uuid, settings)
 
-      expect(progressValue).toBe(1)
+      expect(onProgress).toHaveBeenCalled()
+      expect(onProgress).toHaveBeenCalledWith({ value: 1 })
     })
   })
 })
