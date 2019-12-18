@@ -1,8 +1,4 @@
-import {
-  FileInfo,
-  GeoLocation,
-  GroupId,
-} from './api/types'
+import { FileInfo, GeoLocation, GroupId } from './api/types'
 
 export interface SettingsInterface {
   baseCDN?: string
@@ -24,6 +20,7 @@ export interface SettingsInterface {
   multipartMinFileSize?: number
   multipartMinLastPartSize?: number
   maxConcurrentRequests?: number
+  contentType?: string
 }
 
 export interface DefaultSettingsInterface extends SettingsInterface {
@@ -37,6 +34,7 @@ export interface DefaultSettingsInterface extends SettingsInterface {
   multipartMinLastPartSize: number
   maxConcurrentRequests: number
   pollingTimeoutMilliseconds: number
+  contentType: string
 }
 
 export interface OriginalImageInfoInterface {
