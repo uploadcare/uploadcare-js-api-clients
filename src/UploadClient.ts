@@ -9,6 +9,9 @@ import multipartStart from './api/multipartStart'
 import multipartComplete from './api/multipartComplete'
 import multipartUpload from './api/multipartUpload'
 import fileFrom from './fileFrom/fileFrom'
+import { UploadcareFile } from './UploadcareFile'
+import groupFrom from './groupFrom/groupFrom'
+import { UploadcareGroup } from './UploadcareGroup'
 
 /* Types */
 import { SettingsInterface } from './types'
@@ -41,7 +44,7 @@ import {
   MultipartUploadResponse
 } from './api/multipartUpload'
 import { FileFromOptions } from './fileFrom/fileFrom'
-import { UploadcareFile } from './UploadcareFile'
+import { GroupFromOptions } from './groupFrom/groupFrom'
 
 /**
  * Populate options with settings.
@@ -152,20 +155,14 @@ class UploadClient {
     return fileFrom(data, populateOptionsWithSettings(options, settings))
   }
 
-  // groupFrom(
-  //   data: FileData[] | Url[] | Uuid[],
-  //   settings?: SettingsInterface,
-  //   hooks?: LifecycleHooksInterface<UploadcareGroupInterface>
-  // ): UploadInterface<UploadcareGroupInterface> {
-  //   return groupFrom(
-  //     data,
-  //     {
-  //       ...this.settings,
-  //       ...settings
-  //     },
-  //     hooks
-  //   )
-  // }
+  groupFrom(
+    data: FileData[] | Url[] | Uuid[],
+    options: FileFromOptions & GroupFromOptions
+  ): Promise<UploadcareGroup> {
+    const settings = this.getSettings()
+
+    return groupFrom(data, populateOptionsWithSettings(options, settings))
+  }
 }
 
 export default UploadClient
