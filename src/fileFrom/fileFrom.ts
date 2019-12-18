@@ -9,6 +9,29 @@ import { UploadcareFileInterface } from '../types'
 import { FileData, Url, Uuid } from '../api/types'
 import { isFileData, isUrl, isUuid } from './types'
 
+export type FileFromOptions = {
+  publicKey: string
+
+  fileName?: string
+  baseURL?: string
+  secureSignature?: string
+  secureExpire?: string
+  store?: boolean
+
+  cancel?: CancelController
+  onProgress?: ({ value: number }) => void
+
+  source?: string
+  integration?: string
+
+  retryThrottledRequestMaxTimes?: number
+
+  contentType?: string
+  multipartChunkSize?: number
+
+  baseCDN?: string
+}
+
 /**
  * Uploads file from provided data.
  * @param data
@@ -48,28 +71,7 @@ export default function fileFrom(
     multipartChunkSize = defaultSettings.multipartChunkSize,
 
     baseCDN = defaultSettings.baseCDN
-  }: {
-    publicKey: string
-
-    fileName?: string
-    baseURL?: string
-    secureSignature?: string
-    secureExpire?: string
-    store?: boolean
-
-    cancel?: CancelController
-    onProgress?: ({ value: number }) => void
-
-    source?: string
-    integration?: string
-
-    retryThrottledRequestMaxTimes?: number
-
-    contentType?: string
-    multipartChunkSize?: number
-
-    baseCDN?: string
-  }
+  }: FileFromOptions
 ): Promise<UploadcareFileInterface> {
   if (isFileData(data)) {
     return fromObject(data, {
