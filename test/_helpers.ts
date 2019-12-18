@@ -1,4 +1,4 @@
-const dataUriToBuffer = require('data-uri-to-buffer')
+import dataUriToBuffer = require('data-uri-to-buffer')
 import dataUriToBlob from 'dataurl-to-blob'
 import defaultSettings from '../src/defaultSettings'
 import { DefaultSettingsInterface } from '../src/types'

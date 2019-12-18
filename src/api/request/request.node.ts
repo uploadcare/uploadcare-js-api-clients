@@ -1,4 +1,4 @@
-import * as FormData from 'form-data'
+import * as NodeFormData from 'form-data'
 
 import * as http from 'http'
 import * as https from 'https'
@@ -31,7 +31,7 @@ class ProgressEmitter extends Transform {
   }
 }
 
-const getLength = (formData: FormData): Promise<number> =>
+const getLength = (formData: NodeFormData): Promise<number> =>
   new Promise<number>((resolve, reject) => {
     formData.getLength((error, length) => {
       if (error) reject(error)
@@ -39,7 +39,9 @@ const getLength = (formData: FormData): Promise<number> =>
     })
   })
 
-function isFormData(formData?: FormData | Buffer | Blob): formData is FormData {
+function isFormData(
+  formData?: NodeFormData | FormData | Buffer | Blob
+): formData is NodeFormData {
   if (formData && formData.toString() === '[object FormData]') {
     return true
   }
@@ -48,7 +50,7 @@ function isFormData(formData?: FormData | Buffer | Blob): formData is FormData {
 }
 
 function isReadable(
-  data?: Readable | FormData | Buffer | Blob,
+  data?: Readable | NodeFormData | FormData | Buffer | Blob,
   isFormData?: boolean
 ): data is Readable {
   if (data && (data instanceof Readable || isFormData)) {
@@ -78,7 +80,7 @@ const request = (params: RequestOptions): Promise<RequestResponse> => {
 
           options.method = method
           options.headers = isFormData
-            ? Object.assign((data as FormData).getHeaders(), headers)
+            ? Object.assign((data as NodeFormData).getHeaders(), headers)
             : headers
 
           if (isFormData || (data && (data as Buffer).length)) {

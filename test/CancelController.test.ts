@@ -2,15 +2,15 @@ import CancelController from '../src/CancelController'
 
 describe('CancelController', () => {
   it('should work', done => {
-    let ctrl = new CancelController()
+    const ctrl = new CancelController()
 
     ctrl.onCancel(done)
     ctrl.cancel()
   })
 
   it('should run onCancel callback ones', async () => {
-    let ctrl = new CancelController()
-    let onCancel = jasmine.createSpy('cancel')
+    const ctrl = new CancelController()
+    const onCancel = jasmine.createSpy('cancel')
 
     ctrl.onCancel(onCancel)
     ctrl.cancel()
@@ -18,15 +18,15 @@ describe('CancelController', () => {
 
     // onCancel works async
     // this hack for wait execution of CancelController
-    let spy = await Promise.resolve(onCancel)
+    const spy = await Promise.resolve(onCancel)
 
     expect(spy).toHaveBeenCalledTimes(1)
   })
 
   it('should execute more than one callback', async () => {
-    let ctrl = new CancelController()
-    let firstOnCancel = jasmine.createSpy('cancel')
-    let secondOnCancel = jasmine.createSpy('cancel')
+    const ctrl = new CancelController()
+    const firstOnCancel = jasmine.createSpy('cancel')
+    const secondOnCancel = jasmine.createSpy('cancel')
 
     ctrl.onCancel(firstOnCancel)
     ctrl.onCancel(secondOnCancel)
@@ -35,15 +35,15 @@ describe('CancelController', () => {
 
     // onCancel works async
     // this hack for wait execution of CancelController
-    let [spy1, spy2] = await Promise.resolve([firstOnCancel, secondOnCancel])
+    const [spy1, spy2] = await Promise.resolve([firstOnCancel, secondOnCancel])
 
     expect(spy1).toHaveBeenCalledTimes(1)
     expect(spy2).toHaveBeenCalledTimes(1)
   })
 
   it('should run callback on already cancelled controller', async () => {
-    let spy = jasmine.createSpy('cancel')
-    let ctrl = new CancelController()
+    const spy = jasmine.createSpy('cancel')
+    const ctrl = new CancelController()
 
     ctrl.cancel()
     // this hack for wait execution of CancelController

@@ -1,5 +1,3 @@
-import * as FormData from 'form-data'
-
 /**
  * Constructs FormData instance from object.
  * Uses 'form-data' package which internally use native FormData
@@ -9,8 +7,8 @@ import * as FormData from 'form-data'
  * @returns {FormData} FormData instance
  */
 
-type FileTuple = ['file', Blob | File | NodeJS.ReadableStream | Buffer, string]
-type BaseType = string | number | void
+type FileTuple = ['file', Blob | File, string]
+type BaseType = string | Blob
 type FormDataTuple = [string, BaseType | BaseType[]]
 
 function getFormData(body: (FormDataTuple | FileTuple)[]): FormData {

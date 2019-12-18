@@ -1,4 +1,4 @@
-import * as FormData from 'form-data'
+import * as NodeFormData from 'form-data'
 import CancelController from '../../CancelController'
 
 export type Headers = {
@@ -9,7 +9,7 @@ export type RequestOptions = {
   method?: string
   url: string
   query?: string
-  data?: FormData | Buffer | Blob
+  data?: NodeFormData | FormData | Buffer | Blob
   headers?: Headers
   cancel?: CancelController
   onProgress?: ({ value: number }) => void
@@ -19,7 +19,7 @@ export type ErrorRequestInfo = {
   method?: string
   url: string
   query?: string
-  data?: FormData | Buffer | Blob
+  data?: NodeFormData | FormData | Buffer | Blob
   headers?: Headers
 }
 

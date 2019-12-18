@@ -24,11 +24,11 @@ describe('API - from url status', () => {
     const token = factory.token('empty')
     const upload = fromUrlStatus(token, settings)
 
-    await (expectAsync(upload)).toBeRejectedWithError('[400] token is required.')
+    await expectAsync(upload).toBeRejectedWithError('[400] token is required.')
   })
 
   it('should be able to cancel uploading', async () => {
-    let controller = new CancelController()
+    const controller = new CancelController()
 
     const settings = getSettingsForTesting({
       publicKey: factory.publicKey('demo'),
