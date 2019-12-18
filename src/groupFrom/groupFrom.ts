@@ -64,8 +64,28 @@ export default function groupFrom(
     throw new TypeError(`Group uploading from "${data}" is not supported`)
   }
 
+  let progressValues: number[]
+  const filesCount = data.length
+  const createProgressHandler = (
+    size: number,
+    index: number
+  ): (({ value: number }) => void) | undefined => {
+    if (!onProgress) return
+    if (!progressValues) {
+      progressValues = Array(size).fill(0)
+    }
+
+    const normalize = (values: number[]): number =>
+      values.reduce((sum, next) => sum + next) / size
+
+    return ({ value }: { value: number }): void => {
+      progressValues[index] = value
+      onProgress({ value: normalize(progressValues) })
+    }
+  }
+
   return Promise.all(
-    (data as FileData[]).map(file =>
+    (data as FileData[]).map((file, index) =>
       fileFrom(file, {
         publicKey,
 
@@ -76,7 +96,7 @@ export default function groupFrom(
         store,
 
         cancel,
-        onProgress,
+        onProgress: createProgressHandler(filesCount, index),
 
         source,
         integration,
