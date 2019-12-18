@@ -36,7 +36,6 @@ const fromUploaded = (
     publicKey,
     baseURL,
     cancel,
-    onProgress,
     source,
     integration,
     retryThrottledRequestMaxTimes
