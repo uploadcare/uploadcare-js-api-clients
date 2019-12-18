@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 import retryIfThrottled from '../../src/tools/retryIfThrottled'
-import { UploadClientError } from '../../src/errors/errors'
+import { UploadClientError } from '../../src/tools/errors'
 
 const createRunner = ({
   attempts = 10,

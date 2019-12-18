@@ -1,14 +1,15 @@
-import { FailedResponse } from './request/types'
+import { FailedResponse } from '../request/types'
 import { Uuid } from './types'
 
-import request from './request/request.node'
-import getFormData from './request/buildFormData.node'
-import getUrl from './request/getUrl'
-import defaultSettings, { getUserAgent } from '../defaultSettings'
+import request from '../request/request.node'
+import getFormData from '../tools/buildFormData'
+import getUrl from '../tools/getUrl'
+import defaultSettings from '../defaultSettings'
+import { getUserAgent } from '../tools/userAgent'
 import camelizeKeys from '../tools/camelizeKeys'
 import retryIfThrottled from '../tools/retryIfThrottled'
-import { UploadClientError } from '../errors/errors'
-import CancelController from '../CancelController'
+import { UploadClientError } from '../tools/errors'
+import CancelController from '../tools/CancelController'
 
 export type MultipartStartOptions = {
   publicKey: string

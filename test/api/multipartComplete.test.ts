@@ -3,8 +3,8 @@ import multipartUpload from '../../src/api/multipartUpload'
 import multipartComplete from '../../src/api/multipartComplete'
 import * as factory from '../_fixtureFactory'
 import { getSettingsForTesting } from '../_helpers'
-import { UploadClientError } from '../../src/errors/errors'
-import CancelController from '../../src/CancelController'
+import { UploadClientError } from '../../src/tools/errors'
+import CancelController from '../../src/tools/CancelController'
 
 const getChunk = (
   file: Buffer | Blob,

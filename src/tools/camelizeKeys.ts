@@ -2,9 +2,6 @@ const SEPARATOR = /\W|_/g
 
 /**
  * Transforms a string to camelCased.
- *
- * @param {string} text
- * @returns {string}
  */
 export function camelize(text: string): string {
   return text
@@ -19,10 +16,8 @@ export function camelize(text: string): string {
 
 /**
  * Transforms keys of an object to camelCased recursively.
- *
- * @param {Object} source
- * @returns {Object}
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default function camelizeKeys<T>(source: any): T {
   if (!source || typeof source !== 'object') {
     return source

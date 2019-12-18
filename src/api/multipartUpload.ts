@@ -1,8 +1,10 @@
 import { MultipartPart } from './multipartStart'
 
-import request from './request/request.node'
-import { getUserAgent } from '../defaultSettings'
-import CancelController from '../CancelController'
+import request from '../request/request.node'
+import { getUserAgent } from '../tools/userAgent'
+import CancelController from '../tools/CancelController'
+
+import { NodeFile, BrowserFile } from '../request/types'
 
 export type MultipartUploadOptions = {
   publicKey?: string
@@ -20,7 +22,7 @@ export type MultipartUploadResponse = {
  * Complete multipart uploading.
  */
 export default function multipartUpload(
-  part: File | Buffer | Blob,
+  part: NodeFile | BrowserFile,
   url: MultipartPart,
   { publicKey, cancel, onProgress, integration }: MultipartUploadOptions
 ): Promise<MultipartUploadResponse> {

@@ -1,7 +1,7 @@
 import { poll, CheckFunction } from '../../src/tools/poller'
-import CancelController from '../../src/CancelController'
+import CancelController from '../../src/tools/CancelController'
 import { delay } from '../../src/tools/delay'
-import { UploadClientError } from '../../src/errors/errors'
+import { UploadClientError } from '../../src/tools/errors'
 
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 const longJob = (attemps: number, fails: Error | null = null) => {

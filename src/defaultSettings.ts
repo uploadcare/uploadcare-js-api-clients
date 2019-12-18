@@ -1,5 +1,4 @@
-import { version } from '../package.json'
-import { DefaultSettingsInterface, SettingsInterface } from './types'
+import { DefaultSettingsInterface } from './types'
 
 /*
   SettingsInterface for future support:
@@ -18,20 +17,7 @@ const defaultSettings: DefaultSettingsInterface = {
   multipartMinLastPartSize: 1024 * 1024, // 1MB
   maxConcurrentRequests: 4,
   pollingTimeoutMilliseconds: 10000,
-  contentType: 'application/octet-stream'
+  contentType: 'application/octet-stream' // ??
 }
 
 export default defaultSettings
-
-/**
- * Returns User Agent based on version and settings.
- *
- * @param {SettingsInterface} [settings]
- * @returns {string}
- */
-export function getUserAgent(settings: SettingsInterface = {}): string {
-  const publicKey = settings.publicKey ? '/' + settings.publicKey : ''
-  const integration = settings.integration ? '; ' + settings.integration : ''
-
-  return `UploadcareUploadClient/${version}${publicKey} (JavaScript${integration})`
-}

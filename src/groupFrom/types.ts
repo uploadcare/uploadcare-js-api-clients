@@ -1,14 +1,14 @@
 import { isFileData, isUrl, isUuid } from '../fileFrom/types'
-import { FileData, Url, Uuid } from '../api/types'
+import { Url, Uuid } from '../api/types'
+import { NodeFile, BrowserFile } from '../request/types'
 
 /**
  * FileData type guard.
- *
- * @param {FileData | Url | Uuid} data
  */
+
 export const isFileDataArray = (
-  data: FileData[] | Url[] | Uuid[]
-): data is FileData[] => {
+  data: (NodeFile | BrowserFile)[] | Url[] | Uuid[]
+): data is (NodeFile | BrowserFile)[] => {
   for (const item of data) {
     if (!isFileData(item)) {
       return false
@@ -20,11 +20,9 @@ export const isFileDataArray = (
 
 /**
  * Uuid type guard.
- *
- * @param {FileData | Url | Uuid} data
  */
 export const isUuidArray = (
-  data: FileData[] | Url[] | Uuid[]
+  data: (NodeFile | BrowserFile)[] | Url[] | Uuid[]
 ): data is Uuid[] => {
   for (const item of data) {
     if (!isUuid(item)) {
@@ -37,11 +35,9 @@ export const isUuidArray = (
 
 /**
  * Url type guard.
- *
- * @param {FileData | Url | Uuid} data
  */
 export const isUrlArray = (
-  data: FileData[] | Url[] | Uuid[]
+  data: (NodeFile | BrowserFile)[] | Url[] | Uuid[]
 ): data is Url[] => {
   for (const item of data) {
     if (!isUrl(item)) {

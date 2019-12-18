@@ -1,4 +1,4 @@
-import { UploadClientError } from '../errors/errors'
+import { UploadClientError } from './errors'
 import { delay } from './delay'
 
 const REQUEST_WAS_THROTTLED_CODE = 429

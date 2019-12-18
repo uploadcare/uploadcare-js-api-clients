@@ -1,14 +1,15 @@
 import base from '../api/base'
 import info from '../api/info'
 import { poll } from '../tools/poller'
-import { UploadcareFile } from '../UploadcareFile'
-import CancelController from '../CancelController'
+import { UploadcareFile } from '../tools/UploadcareFile'
+import CancelController from '../tools/CancelController'
 import { isMultipart } from '../multipart/isMultipart'
 import multipart from '../multipart/multipart'
 import { isNode } from '../tools/isNode'
 
 /* Types */
-import { FileData, FileInfo } from '../api/types'
+import { FileInfo } from '../api/types'
+import { NodeFile, BrowserFile } from '../request/types'
 
 type FromObjectOptions = {
   publicKey: string
@@ -34,7 +35,7 @@ type FromObjectOptions = {
 }
 
 const fromObject = (
-  file: FileData,
+  file: NodeFile | BrowserFile,
   {
     publicKey,
 

@@ -5,7 +5,7 @@ import * as https from 'https'
 import { parse } from 'url'
 import { Readable, Transform } from 'stream'
 
-import { cancelError } from '../../errors/errors'
+import { cancelError } from '../tools/errors'
 import { RequestOptions, RequestResponse } from './types'
 
 // ProgressEmitter is a simple PassThrough-style transform stream which keeps
@@ -61,7 +61,7 @@ function isReadable(
 }
 
 const request = (params: RequestOptions): Promise<RequestResponse> => {
-  const { method, url, data, headers = {}, cancel, onProgress } = params
+  const { method = 'GET', url, data, headers = {}, cancel, onProgress } = params
 
   return Promise.resolve()
     .then(() => {
@@ -105,6 +105,7 @@ const request = (params: RequestOptions): Promise<RequestResponse> => {
           req.on('response', res => {
             if (aborted) return
 
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const resChunks: any[] = []
 
             res.on('data', data => {

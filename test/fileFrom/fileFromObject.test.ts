@@ -2,7 +2,7 @@ import * as factory from '../_fixtureFactory'
 import { getSettingsForTesting } from '../_helpers'
 
 import fileFrom from '../../src/fileFrom/fileFrom'
-import CancelController from '../../src/CancelController'
+import CancelController from '../../src/tools/CancelController'
 
 describe('fileFrom Object', () => {
   it('should resolves when file is ready on CDN', async () => {

@@ -1,5 +1,5 @@
-import CancelController from '../CancelController'
-import { UploadcareFile } from '../UploadcareFile'
+import CancelController from '../tools/CancelController'
+import { UploadcareFile } from '../tools/UploadcareFile'
 import info from '../api/info'
 
 /* Types */

@@ -1,7 +1,7 @@
 import fromUrl, { TypeEnum } from '../../src/api/fromUrl'
 import * as factory from '../_fixtureFactory'
 import { getSettingsForTesting } from '../_helpers'
-import CancelController from '../../src/CancelController'
+import CancelController from '../../src/tools/CancelController'
 
 describe('API - from url', () => {
   const sourceUrl = factory.imageUrl('valid')

@@ -1,8 +1,8 @@
 import * as factory from '../_fixtureFactory'
 import groupFrom from '../../src/groupFrom/groupFrom'
 import { getSettingsForTesting } from '../_helpers'
-import CancelController from '../../src/CancelController'
-import { UploadClientError } from '../../src/errors/errors'
+import CancelController from '../../src/tools/CancelController'
+import { UploadClientError } from '../../src/tools/errors'
 
 describe('groupFrom Object[]', () => {
   const fileToUpload = factory.image('blackSquare').data

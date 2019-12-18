@@ -1,12 +1,14 @@
 import fileFrom, { FileFromOptions } from '../fileFrom/fileFrom'
 import defaultSettings from '../defaultSettings'
 import group from '../api/group'
-import { UploadcareGroup } from '../UploadcareGroup'
-import { UploadcareFile } from '../UploadcareFile'
+import { UploadcareGroup } from '../tools/UploadcareGroup'
+import { UploadcareFile } from '../tools/UploadcareFile'
 
 /* Types */
 import { isFileDataArray, isUrlArray, isUuidArray } from './types'
-import { FileData, Url, Uuid } from '../api/types'
+import { Url, Uuid } from '../api/types'
+import { NodeFile, BrowserFile } from '../request/types'
+import { UploadcareFileInterface } from '../types'
 
 export type GroupFromOptions = {
   defaultEffects?: string
@@ -33,7 +35,7 @@ export type GroupFromOptions = {
  * @param [options.baseCDN]
  */
 export default function groupFrom(
-  data: FileData[] | Url[] | Uuid[],
+  data: (NodeFile | BrowserFile)[] | Url[] | Uuid[],
   {
     publicKey,
 
@@ -84,30 +86,31 @@ export default function groupFrom(
     }
   }
 
-  return Promise.all(
-    (data as FileData[]).map((file, index) =>
-      fileFrom(file, {
-        publicKey,
+  return Promise.all<UploadcareFileInterface>(
+    (data as (NodeFile | BrowserFile)[]).map(
+      (file: NodeFile | BrowserFile | Url | Uuid, index: number) =>
+        fileFrom(file, {
+          publicKey,
 
-        fileName,
-        baseURL,
-        secureSignature,
-        secureExpire,
-        store,
+          fileName,
+          baseURL,
+          secureSignature,
+          secureExpire,
+          store,
 
-        cancel,
-        onProgress: createProgressHandler(filesCount, index),
+          cancel,
+          onProgress: createProgressHandler(filesCount, index),
 
-        source,
-        integration,
+          source,
+          integration,
 
-        retryThrottledRequestMaxTimes,
+          retryThrottledRequestMaxTimes,
 
-        contentType,
-        multipartChunkSize,
+          contentType,
+          multipartChunkSize,
 
-        baseCDN
-      })
+          baseCDN
+        })
     )
   ).then(files => {
     const uuids = files.map(file => file.uuid)

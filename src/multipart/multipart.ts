@@ -1,7 +1,7 @@
 import multipartStart from '../api/multipartStart'
 import multipartUpload from '../api/multipartUpload'
 import multipartComplete from '../api/multipartComplete'
-import CancelController from '../CancelController'
+import CancelController from '../tools/CancelController'
 import defaultSettings from '../defaultSettings'
 
 /* Types */
