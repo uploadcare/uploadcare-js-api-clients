@@ -1,12 +1,8 @@
 import {
-  FileData,
   FileInfo,
   GeoLocation,
   GroupId,
-  Url,
-  Uuid
 } from './api/types'
-import { LifecycleHooksInterface, UploadInterface } from './lifecycle/types'
 
 export interface SettingsInterface {
   baseCDN?: string
@@ -123,22 +119,4 @@ export type UploadingProgress = {
   state: ProgressStateEnum
   uploaded: null | ProgressParamsInterface
   value: number
-}
-
-export interface UploadClientInterface {
-  updateSettings(newSettings: SettingsInterface): void
-
-  getSettings(): SettingsInterface
-
-  fileFrom(
-    data: FileData | Url | Uuid,
-    settings?: SettingsInterface,
-    hooks?: LifecycleHooksInterface<UploadcareFileInterface>
-  ): UploadInterface<UploadcareFileInterface>
-
-  groupFrom(
-    data: FileData[] | Url[] | Uuid[],
-    settings?: SettingsInterface,
-    hooks?: LifecycleHooksInterface<UploadcareGroupInterface>
-  ): UploadInterface<UploadcareGroupInterface>
 }
