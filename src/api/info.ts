@@ -38,7 +38,6 @@ export default function info(
     publicKey,
     baseURL = defaultSettings.baseURL,
     cancel,
-    onProgress,
     source,
     integration,
     retryThrottledRequestMaxTimes = defaultSettings.retryThrottledRequestMaxTimes
@@ -57,8 +56,7 @@ export default function info(
           file_id: uuid,
           source
         }),
-        cancel,
-        onProgress
+        cancel
       }).then(({ data, headers, request }) => {
         const response = camelizeKeys<Response>(JSON.parse(data))
 
