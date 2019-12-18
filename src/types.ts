@@ -1,11 +1,8 @@
 import {
-  FileInfoInterface,
-  GeoLocationInterface,
+  FileInfo,
+  GeoLocation,
   GroupId,
-  Uuid
 } from './api/types'
-import { Url } from './api/fromUrl'
-import { LifecycleHooksInterface, UploadInterface } from './lifecycle/types'
 
 export interface SettingsInterface {
   baseCDN?: string
@@ -42,14 +39,12 @@ export interface DefaultSettingsInterface extends SettingsInterface {
   pollingTimeoutMilliseconds: number
 }
 
-export type FileData = Blob | File | Buffer
-
 export interface OriginalImageInfoInterface {
   width: number
   height: number
   format: string
   datetimeOriginal: null | string
-  geoLocation: null | GeoLocationInterface
+  geoLocation: null | GeoLocation
   orientation: null | number
   dpi: null | number[]
   colorMode: string
@@ -101,7 +96,7 @@ export interface UploadcareGroupInterface {
   readonly isStored: boolean
   readonly isImage: boolean
   readonly cdnUrl: string
-  readonly files: FileInfoInterface[]
+  readonly files: FileInfo[]
   readonly createdAt: string
   readonly storedAt: string | null
 }
@@ -124,22 +119,4 @@ export type UploadingProgress = {
   state: ProgressStateEnum
   uploaded: null | ProgressParamsInterface
   value: number
-}
-
-export interface UploadClientInterface {
-  updateSettings(newSettings: SettingsInterface): void
-
-  getSettings(): SettingsInterface
-
-  fileFrom(
-    data: FileData | Url | Uuid,
-    settings?: SettingsInterface,
-    hooks?: LifecycleHooksInterface<UploadcareFileInterface>
-  ): UploadInterface<UploadcareFileInterface>
-
-  groupFrom(
-    data: FileData[] | Url[] | Uuid[],
-    settings?: SettingsInterface,
-    hooks?: LifecycleHooksInterface<UploadcareGroupInterface>
-  ): UploadInterface<UploadcareGroupInterface>
 }

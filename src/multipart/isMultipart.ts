@@ -1,5 +1,16 @@
-import { FileData } from '../types'
-import { getFileSize } from '../api/multipart/getFileSize'
+import { isNode } from '../tools/isNode'
+
+/* Types */
+import { FileData } from '../api/types'
+
+/**
+ * Get file size.
+ *
+ * @param {FileData} file
+ */
+export const getFileSize = (file: FileData): number => {
+  return isNode() ? (file as Buffer).length : (file as Blob).size
+}
 
 /**
  * Check if FileData is multipart data.

@@ -8,11 +8,20 @@ import groupInfo from './api/groupInfo'
 import multipartStart from './api/multipartStart'
 import multipartComplete from './api/multipartComplete'
 import multipartUpload from './api/multipartUpload'
+import fileFrom from './fileFrom/fileFrom'
 
 /* Types */
 import { SettingsInterface } from './types'
-import { BaseOptions, FileData as BaseFileData, BaseResponse } from './api/base'
-import { FileInfo, GroupId, GroupInfo, Token, Url, Uuid } from './api/types'
+import { BaseOptions, BaseResponse } from './api/base'
+import {
+  FileData,
+  FileInfo,
+  GroupId,
+  GroupInfo,
+  Token,
+  Url,
+  Uuid
+} from './api/types'
 import { InfoOptions } from './api/info'
 import { FromUrlOptions, FromUrlResponse } from './api/fromUrl'
 import {
@@ -31,6 +40,8 @@ import {
   MultipartUploadOptions,
   MultipartUploadResponse
 } from './api/multipartUpload'
+import { FileFromOptions } from './fileFrom/fileFrom'
+import { UploadcareFile } from './UploadcareFile'
 
 /**
  * Populate options with settings.
@@ -58,7 +69,7 @@ class UploadClient {
     return this.settings
   }
 
-  base(file: BaseFileData, options: BaseOptions): Promise<BaseResponse> {
+  base(file: FileData, options: BaseOptions): Promise<BaseResponse> {
     const settings = this.getSettings()
 
     return base(file, populateOptionsWithSettings(options, settings))
@@ -132,20 +143,14 @@ class UploadClient {
     )
   }
 
-  // fileFrom(
-  //   data: FileData | Url | Uuid,
-  //   settings?: SettingsInterface,
-  //   hooks?: LifecycleHooksInterface<UploadcareFileInterface>
-  // ): UploadInterface<UploadcareFileInterface> {
-  //   return fileFrom(
-  //     data,
-  //     {
-  //       ...this.settings,
-  //       ...settings
-  //     },
-  //     hooks
-  //   )
-  // }
+  fileFrom(
+    data: FileData | Url | Uuid,
+    options: FileFromOptions
+  ): Promise<UploadcareFile> {
+    const settings = this.getSettings()
+
+    return fileFrom(data, populateOptionsWithSettings(options, settings))
+  }
 
   // groupFrom(
   //   data: FileData[] | Url[] | Uuid[],

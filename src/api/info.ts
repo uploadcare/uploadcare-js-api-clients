@@ -18,6 +18,7 @@ export type InfoOptions = {
   baseURL?: string
 
   cancel?: CancelController
+  onProgress?: ({ value: number }) => void
 
   source?: string
   integration?: string

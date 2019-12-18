@@ -1,11 +1,36 @@
 import fromObject from './fromObject'
+import fromUrl from './fromUrl'
+import fromUploaded from './fromUploaded'
 import CancelController from '../CancelController'
 import defaultSettings from '../defaultSettings'
 
 /* Types */
-import { FileData, UploadcareFileInterface } from '../types'
-import { Url, Uuid } from '../api/types'
+import { UploadcareFileInterface } from '../types'
+import { FileData, Url, Uuid } from '../api/types'
 import { isFileData, isUrl, isUuid } from './types'
+
+export type FileFromOptions = {
+  publicKey: string
+
+  fileName?: string
+  baseURL?: string
+  secureSignature?: string
+  secureExpire?: string
+  store?: boolean
+
+  cancel?: CancelController
+  onProgress?: ({ value: number }) => void
+
+  source?: string
+  integration?: string
+
+  retryThrottledRequestMaxTimes?: number
+
+  contentType?: string
+  multipartChunkSize?: number
+
+  baseCDN?: string
+}
 
 /**
  * Uploads file from provided data.
@@ -42,61 +67,76 @@ export default function fileFrom(
 
     retryThrottledRequestMaxTimes,
 
+    contentType = 'application/octet-stream',
+    multipartChunkSize = defaultSettings.multipartChunkSize,
+
     baseCDN = defaultSettings.baseCDN
-  }: {
-    publicKey: string
-
-    fileName?: string
-    baseURL?: string
-    secureSignature?: string
-    secureExpire?: string
-    store?: boolean
-
-    cancel?: CancelController
-    onProgress?: ({ value: number }) => void
-
-    source?: string
-    integration?: string
-
-    retryThrottledRequestMaxTimes?: number
-
-    baseCDN?: string
-  }
+  }: FileFromOptions
 ): Promise<UploadcareFileInterface> {
   if (isFileData(data)) {
     return fromObject(data, {
       publicKey,
+
       fileName,
       baseURL,
       secureSignature,
       secureExpire,
       store,
+
       cancel,
       onProgress,
+
       source,
       integration,
+
       retryThrottledRequestMaxTimes,
+
+      contentType,
+      multipartChunkSize,
 
       baseCDN
     })
   }
 
   if (isUrl(data)) {
-    // const fileHandler = new FileFromUrl(data, settings)
-    //
-    // return new Upload<UploadcareFileInterface, FileUploadLifecycleInterface>(
-    //   fileUploadLifecycle,
-    //   fileHandler
-    // )
+    return fromUrl(data, {
+      publicKey,
+
+      fileName,
+      baseURL,
+      secureSignature,
+      secureExpire,
+      store,
+
+      cancel,
+      onProgress,
+
+      source,
+      integration,
+
+      retryThrottledRequestMaxTimes,
+
+      baseCDN
+    })
   }
 
   if (isUuid(data)) {
-    // const fileHandler = new FileFromUploaded(data, settings)
-    //
-    // return new Upload<UploadcareFileInterface, FileUploadLifecycleInterface>(
-    //   fileUploadLifecycle,
-    //   fileHandler
-    // )
+    return fromUploaded(data, {
+      publicKey,
+
+      fileName,
+      baseURL,
+
+      cancel,
+      onProgress,
+
+      source,
+      integration,
+
+      retryThrottledRequestMaxTimes,
+
+      baseCDN
+    })
   }
 
   throw new TypeError(`File uploading from "${data}" is not supported`)
