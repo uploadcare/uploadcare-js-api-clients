@@ -59,7 +59,10 @@ describe('fileFrom Object (multipart)', () => {
 
       ctrl.onCancel(onCancel)
 
-      const upload = fileFrom(fileToUpload, settings)
+      const upload = fileFrom(fileToUpload, {
+        ...settings,
+        cancel: ctrl
+      })
 
       ctrl.cancel()
 
