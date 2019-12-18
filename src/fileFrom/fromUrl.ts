@@ -3,6 +3,7 @@ import fromUrlStatus, { Status } from '../api/fromUrlStatus'
 import { poll } from '../tools/poller'
 import { UploadClientError } from '../errors/errors'
 
+/* Types */
 import { FileInfo } from '../api/types'
 import CancelController from '../CancelController'
 import { UploadcareFile } from '../UploadcareFile'
@@ -58,7 +59,7 @@ const uploadFromUrl = (
     retryThrottledRequestMaxTimes
   }).then(urlResponse => {
     if (urlResponse.type === TypeEnum.FileInfo) {
-      return Promise.resolve(new UploadcareFile(urlResponse, { baseCDN }))
+      return new UploadcareFile(urlResponse, { baseCDN })
     } else {
       return poll<FileInfo>({
         check: cancel =>
@@ -99,9 +100,7 @@ const uploadFromUrl = (
             }
           }),
         cancel
-      }).then(fileInfo =>
-        Promise.resolve(new UploadcareFile(fileInfo, { baseCDN }))
-      )
+      }).then(fileInfo => new UploadcareFile(fileInfo, { baseCDN }))
     }
   })
 

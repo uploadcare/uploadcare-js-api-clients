@@ -3,10 +3,35 @@ import info from '../api/info'
 import { poll } from '../tools/poller'
 import { UploadcareFile } from '../UploadcareFile'
 import CancelController from '../CancelController'
-import { FileData, FileInfo } from '../api/types'
 import { isMultipart } from '../multipart/isMultipart'
 import multipart from '../multipart/multipart'
-import {isNode} from '../tools/isNode'
+import { isNode } from '../tools/isNode'
+
+/* Types */
+import { FileData, FileInfo } from '../api/types'
+
+type FromObjectOptions = {
+  publicKey: string
+
+  fileName?: string
+  baseURL?: string
+  secureSignature?: string
+  secureExpire?: string
+  store?: boolean
+
+  cancel?: CancelController
+  onProgress?: ({ value: number }) => void
+
+  source?: string
+  integration?: string
+
+  retryThrottledRequestMaxTimes?: number
+
+  contentType: string
+  multipartChunkSize: number
+
+  baseCDN?: string
+}
 
 const fromObject = (
   file: FileData,
@@ -31,28 +56,7 @@ const fromObject = (
     multipartChunkSize,
 
     baseCDN
-  }: {
-    publicKey: string
-
-    fileName?: string
-    baseURL?: string
-    secureSignature?: string
-    secureExpire?: string
-    store?: boolean
-
-    cancel?: CancelController
-    onProgress?: ({ value: number }) => void
-
-    source?: string
-    integration?: string
-
-    retryThrottledRequestMaxTimes?: number
-
-    contentType: string
-    multipartChunkSize: number
-
-    baseCDN?: string
-  }
+  }: FromObjectOptions
 ): Promise<UploadcareFile> => {
   let progress: number
   let upload: Promise<FileInfo>
@@ -122,9 +126,7 @@ const fromObject = (
     })
   }
 
-  return upload.then(fileInfo =>
-    Promise.resolve(new UploadcareFile(fileInfo, { baseCDN }))
-  )
+  return upload.then(fileInfo => new UploadcareFile(fileInfo, { baseCDN }))
 }
 
 export default fromObject

@@ -1,7 +1,26 @@
-import { Uuid } from '..'
 import CancelController from '../CancelController'
 import { UploadcareFile } from '../UploadcareFile'
 import info from '../api/info'
+
+/* Types */
+import { Uuid } from '..'
+
+type FromUploadedOptions = {
+  publicKey: string
+
+  fileName?: string
+  baseURL?: string
+
+  cancel?: CancelController
+  onProgress?: ({ value: number }) => void
+
+  source?: string
+  integration?: string
+
+  retryThrottledRequestMaxTimes?: number
+
+  baseCDN?: string
+}
 
 const fromUploaded = (
   uuid: Uuid,
@@ -15,22 +34,7 @@ const fromUploaded = (
     integration,
     retryThrottledRequestMaxTimes,
     baseCDN
-  }: {
-    publicKey: string
-
-    fileName?: string
-    baseURL?: string
-
-    cancel?: CancelController
-    onProgress?: ({ value: number }) => void
-
-    source?: string
-    integration?: string
-
-    retryThrottledRequestMaxTimes?: number
-
-    baseCDN?: string
-  }
+  }: FromUploadedOptions
 ): Promise<UploadcareFile> => {
   return info(uuid, {
     publicKey,
@@ -40,9 +44,7 @@ const fromUploaded = (
     integration,
     retryThrottledRequestMaxTimes
   })
-    .then(fileInfo =>
-      Promise.resolve(new UploadcareFile(fileInfo, { baseCDN, fileName }))
-    )
+    .then(fileInfo => new UploadcareFile(fileInfo, { baseCDN, fileName }))
     .then(result => {
       // hack for node ¯\_(ツ)_/¯
       if (onProgress) onProgress({ value: 1 })
