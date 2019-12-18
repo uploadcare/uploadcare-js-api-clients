@@ -96,32 +96,31 @@ const fromObject = (
       retryThrottledRequestMaxTimes
     }).then(({ file }) => {
       return poll<FileInfo>({
-        check: async cancel => {
-          const response = await info(file, {
+        check: cancel =>
+          info(file, {
             publicKey,
             baseURL,
             cancel,
             source,
             integration,
             retryThrottledRequestMaxTimes
+          }).then(response => {
+            if (response.isReady) {
+              onProgress && onProgress({ value: 1 })
+
+              return response
+            }
+
+            if (onProgress) {
+              const { done, total } = response
+
+              onProgress({
+                value: progress + (done / total) * 0.02
+              })
+            }
+
+            return false
           })
-
-          if (response.isReady) {
-            onProgress && onProgress({ value: 1 })
-
-            return response
-          }
-
-          if (onProgress) {
-            const { done, total } = response
-
-            onProgress({
-              value: progress + (done / total) * 0.02
-            })
-          }
-
-          return false
-        }
       })
     })
   }
