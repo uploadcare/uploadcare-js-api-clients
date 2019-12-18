@@ -25,7 +25,7 @@ const request = ({
       })
     }
 
-    xhr.responseType = 'json'
+    xhr.responseType = 'text'
 
     if (cancel) {
       cancel.onCancel(() => {
@@ -34,12 +34,6 @@ const request = ({
 
         reject(cancelError())
       })
-    }
-
-    if (data) {
-      xhr.send(data as FormData)
-    } else {
-      xhr.send()
     }
 
     xhr.onload = (): void => {
@@ -99,6 +93,12 @@ const request = ({
       xhr.upload.onprogress = (event: ProgressEvent): void => {
         onProgress({ value: event.loaded / event.total })
       }
+    }
+
+    if (data) {
+      xhr.send(data as FormData)
+    } else {
+      xhr.send()
     }
   })
 
