@@ -67,7 +67,7 @@ export default function fileFrom(
 
     retryThrottledRequestMaxTimes,
 
-    contentType = 'application/octet-stream',
+    contentType = defaultSettings.contentType,
     multipartChunkSize = defaultSettings.multipartChunkSize,
 
     baseCDN = defaultSettings.baseCDN

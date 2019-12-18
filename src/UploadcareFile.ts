@@ -39,7 +39,7 @@ export class UploadcareFile implements UploadcareFileInterface {
       ? `https://${s3Bucket}.s3.amazonaws.com/${uuid}/${fileInfo.filename}`
       : `${baseCDN}/${uuid}/`
     const cdnUrlModifiers = defaultEffects ? `-/${defaultEffects}` : null
-    const cdnUrl = uuid ? `${urlBase}${cdnUrlModifiers || ''}` : null
+    const cdnUrl = `${urlBase}${cdnUrlModifiers || ''}`
     const originalUrl = uuid ? urlBase : null
 
     this.uuid = uuid

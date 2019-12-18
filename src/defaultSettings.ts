@@ -17,7 +17,8 @@ const defaultSettings: DefaultSettingsInterface = {
   multipartChunkSize: 5 * 1024 * 1024, // 5 MB
   multipartMinLastPartSize: 1024 * 1024, // 1MB
   maxConcurrentRequests: 4,
-  pollingTimeoutMilliseconds: 10000
+  pollingTimeoutMilliseconds: 10000,
+  contentType: 'application/octet-stream'
 }
 
 export default defaultSettings
