@@ -1,4 +1,4 @@
-import uploadFromObject from './uploadFromObject'
+import uploadBase from './uploadBase'
 import uploadFromUrl from './uploadFromUrl'
 import uploadFromUploaded from './uploadFromUploaded'
 import CancelController from '../tools/CancelController'
@@ -9,6 +9,8 @@ import { Url, Uuid } from '../api/types'
 import { NodeFile, BrowserFile } from '../request/types'
 import { isFileData, isUrl, isUuid } from './types'
 import { UploadcareFile } from '../tools/UploadcareFile'
+import { isMultipart, getFileSize } from '../tools/isMultipart'
+import uploadMultipart from './uploadMultipart'
 
 export type FileFromOptions = {
   publicKey: string
@@ -75,7 +77,33 @@ export default function uploadFile(
   }: FileFromOptions
 ): Promise<UploadcareFile> {
   if (isFileData(data)) {
-    return uploadFromObject(data, {
+    const fileSize = getFileSize(data)
+
+    if (isMultipart(fileSize)) {
+      return uploadMultipart(data, {
+        publicKey,
+        contentType,
+        multipartChunkSize,
+
+        fileName,
+        baseURL,
+        secureSignature,
+        secureExpire,
+        store,
+
+        cancel,
+        onProgress,
+
+        source,
+        integration,
+
+        retryThrottledRequestMaxTimes,
+
+        baseCDN
+      })
+    }
+
+    return uploadBase(data, {
       publicKey,
 
       fileName,
@@ -91,9 +119,6 @@ export default function uploadFile(
       integration,
 
       retryThrottledRequestMaxTimes,
-
-      contentType,
-      multipartChunkSize,
 
       baseCDN
     })
