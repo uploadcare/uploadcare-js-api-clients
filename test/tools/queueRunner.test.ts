@@ -45,7 +45,7 @@ const returnAfter = (value: number, ms = 10): (() => Promise<number>) => () =>
 const rejectAfter = (error: Error, ms = 10): (() => Promise<never>) => () =>
   delay(ms).then(() => Promise.reject(error))
 
-fdescribe('queueRunner', () => {
+describe('queueRunner', () => {
   it('should work', async () => {
     await expectAsync(
       runWithConcurrency(1, [returnAfter(1), returnAfter(2), returnAfter(3)])
