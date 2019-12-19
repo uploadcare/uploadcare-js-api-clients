@@ -1,14 +1,9 @@
 import camelizeKeys from './camelizeKeys'
 
 /* Types */
-import {
-  OriginalImageInfoInterface,
-  OriginalVideoInfoInterface,
-  UploadcareFileInterface
-} from '../types'
-import { FileInfo, Uuid } from '../api/types'
+import { FileInfo, Uuid, ImageInfo, VideoInfo } from '../api/types'
 
-export class UploadcareFile implements UploadcareFileInterface {
+export class UploadcareFile {
   readonly uuid: Uuid
   readonly name: null | string = null
   readonly size: null | number = null
@@ -18,8 +13,8 @@ export class UploadcareFile implements UploadcareFileInterface {
   readonly cdnUrlModifiers: null | string = null
   readonly originalUrl: null | string = null
   readonly originalFilename: null | string = null
-  readonly originalImageInfo: null | OriginalImageInfoInterface = null
-  readonly originalVideoInfo: null | OriginalVideoInfoInterface = null
+  readonly imageInfo: null | ImageInfo = null
+  readonly videoInfo: null | VideoInfo = null
 
   constructor(
     fileInfo: FileInfo,
@@ -51,7 +46,7 @@ export class UploadcareFile implements UploadcareFileInterface {
     this.cdnUrlModifiers = cdnUrlModifiers
     this.originalUrl = originalUrl
     this.originalFilename = fileInfo.originalFilename
-    this.originalImageInfo = camelizeKeys(fileInfo.imageInfo)
-    this.originalVideoInfo = camelizeKeys(fileInfo.videoInfo)
+    this.imageInfo = camelizeKeys(fileInfo.imageInfo)
+    this.videoInfo = camelizeKeys(fileInfo.videoInfo)
   }
 }

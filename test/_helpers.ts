@@ -1,13 +1,10 @@
 import dataUriToBuffer = require('data-uri-to-buffer')
 import dataUriToBlob from 'dataurl-to-blob'
 import defaultSettings from '../src/defaultSettings'
-import { DefaultSettingsInterface } from '../src/types'
+import { DefaultSettings } from '../src/types'
 
 export const dataURItoBuffer: (uri: string) => Buffer = dataUriToBuffer
 export const dataURItoBlob: (uri: string) => Blob = dataUriToBlob
-
-export const sleep = (ms: number): Promise<void> =>
-  new Promise(resolve => setTimeout(resolve, ms))
 
 export enum Environment {
   Development = 'development',
@@ -17,7 +14,7 @@ export enum Environment {
 export const getSettingsForTesting = <T>(
   options: T,
   environment: Environment | null = null
-): T & DefaultSettingsInterface => {
+): T & DefaultSettings => {
   const selectedEnvironment =
     environment || process.env.NODE_ENV || Environment.Production
 

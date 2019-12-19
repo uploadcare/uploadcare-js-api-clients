@@ -8,13 +8,13 @@ import groupInfo from './api/groupInfo'
 import multipartStart from './api/multipartStart'
 import multipartComplete from './api/multipartComplete'
 import multipartUpload from './api/multipartUpload'
-import fileFrom from './fileFrom/fileFrom'
+import uploadFile from './uploadFile'
 import { UploadcareFile } from './tools/UploadcareFile'
-import groupFrom from './groupFrom/groupFrom'
+import uploadFileGroup from './uploadFileGroup'
 import { UploadcareGroup } from './tools/UploadcareGroup'
 
 /* Types */
-import { SettingsInterface } from './types'
+import { Settings } from './types'
 import { NodeFile, BrowserFile } from './request/types'
 import { BaseOptions, BaseResponse } from './api/base'
 import { FileInfo, GroupId, GroupInfo, Token, Url, Uuid } from './api/types'
@@ -36,32 +36,29 @@ import {
   MultipartUploadOptions,
   MultipartUploadResponse
 } from './api/multipartUpload'
-import { FileFromOptions } from './fileFrom/fileFrom'
-import { GroupFromOptions } from './groupFrom/groupFrom'
+import { FileFromOptions } from './uploadFile'
+import { GroupFromOptions } from './uploadFileGroup'
 
 /**
  * Populate options with settings.
  */
-const populateOptionsWithSettings = <T>(
-  options: T,
-  settings: SettingsInterface
-): T => ({
+const populateOptionsWithSettings = <T>(options: T, settings: Settings): T => ({
   ...settings,
   ...options
 })
 
 class UploadClient {
-  private settings: SettingsInterface
+  private settings: Settings
 
-  constructor(settings: SettingsInterface = {}) {
+  constructor(settings: Settings = {}) {
     this.settings = Object.assign({}, defaultSettings, settings)
   }
 
-  updateSettings(newSettings: SettingsInterface = {}): void {
+  updateSettings(newSettings: Settings = {}): void {
     this.settings = Object.assign(this.settings, newSettings)
   }
 
-  getSettings(): SettingsInterface {
+  getSettings(): Settings {
     return this.settings
   }
 
@@ -142,22 +139,22 @@ class UploadClient {
     )
   }
 
-  fileFrom(
+  uploadFile(
     data: NodeFile | BrowserFile | Url | Uuid,
     options: FileFromOptions
   ): Promise<UploadcareFile> {
     const settings = this.getSettings()
 
-    return fileFrom(data, populateOptionsWithSettings(options, settings))
+    return uploadFile(data, populateOptionsWithSettings(options, settings))
   }
 
-  groupFrom(
+  uploadFileGroup(
     data: (NodeFile | BrowserFile)[] | Url[] | Uuid[],
     options: FileFromOptions & GroupFromOptions
   ): Promise<UploadcareGroup> {
     const settings = this.getSettings()
 
-    return groupFrom(data, populateOptionsWithSettings(options, settings))
+    return uploadFileGroup(data, populateOptionsWithSettings(options, settings))
   }
 }
 

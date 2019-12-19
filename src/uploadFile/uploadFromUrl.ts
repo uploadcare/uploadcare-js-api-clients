@@ -1,6 +1,6 @@
 import fromUrl, { TypeEnum } from '../api/fromUrl'
 import fromUrlStatus, { Status } from '../api/fromUrlStatus'
-import { poll } from '../tools/poller'
+import { poll } from '../tools/poll'
 import { UploadClientError } from '../tools/errors'
 
 /* Types */

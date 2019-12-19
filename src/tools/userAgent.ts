@@ -2,7 +2,7 @@ const version = '1.0.0alpha-amega'
 /**
  * Returns User Agent based on version and settings.
  *
- * @param {SettingsInterface} [settings]
+ * @param {Settings} [settings]
  * @returns {string}
  */
 export function getUserAgent({

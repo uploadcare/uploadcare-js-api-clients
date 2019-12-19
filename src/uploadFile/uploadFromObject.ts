@@ -1,6 +1,6 @@
 import base from '../api/base'
 import info from '../api/info'
-import { poll } from '../tools/poller'
+import { poll } from '../tools/poll'
 import { UploadcareFile } from '../tools/UploadcareFile'
 import CancelController from '../tools/CancelController'
 import { isMultipart } from '../multipart/isMultipart'
@@ -34,7 +34,7 @@ type FromObjectOptions = {
   baseCDN?: string
 }
 
-const fromObject = (
+const uploadFromObject = (
   file: NodeFile | BrowserFile,
   {
     publicKey,
@@ -129,4 +129,4 @@ const fromObject = (
   return upload.then(fileInfo => new UploadcareFile(fileInfo, { baseCDN }))
 }
 
-export default fromObject
+export default uploadFromObject

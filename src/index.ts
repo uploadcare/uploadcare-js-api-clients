@@ -12,14 +12,13 @@ import multipartComplete from './api/multipartComplete'
 
 import multipart from './multipart/multipart'
 
-import fileFrom from './fileFrom/fileFrom'
-import groupFrom from './groupFrom/groupFrom'
+import uploadFile from './uploadFile'
+import uploadFileGroup from './uploadFileGroup'
 
 import CancelController from './tools/CancelController'
 
 /* Types */
-/* Types */
-export { SettingsInterface } from './types'
+export { Settings } from './types'
 export { NodeFile, BrowserFile } from './request/types'
 export { BaseOptions, BaseResponse } from './api/base'
 export { FileInfo, GroupId, GroupInfo, Token, Url, Uuid } from './api/types'
@@ -41,8 +40,8 @@ export {
   MultipartUploadOptions,
   MultipartUploadResponse
 } from './api/multipartUpload'
-export { FileFromOptions } from './fileFrom/fileFrom'
-export { GroupFromOptions } from './groupFrom/groupFrom'
+export { FileFromOptions } from './uploadFile'
+export { GroupFromOptions } from './uploadFileGroup'
 
 /* Middle-Level API */
 export {
@@ -58,7 +57,7 @@ export {
 }
 
 /* High-Level API */
-export { multipart, fileFrom, groupFrom }
+export { multipart, uploadFile, uploadFileGroup }
 
 /* Helpers */
 export { CancelController }

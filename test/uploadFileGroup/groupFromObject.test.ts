@@ -1,18 +1,18 @@
 import * as factory from '../_fixtureFactory'
+import uploadFileGroup from '../../src/uploadFileGroup'
 import { getSettingsForTesting } from '../_helpers'
-import groupFrom from '../../src/groupFrom/groupFrom'
 import CancelController from '../../src/tools/CancelController'
 import { UploadClientError } from '../../src/tools/errors'
 
-describe('groupFrom Uploaded[]', () => {
-  const uuid = factory.uuid('image')
-  const files = [uuid, uuid]
+describe('groupFrom Object[]', () => {
+  const fileToUpload = factory.image('blackSquare').data
+  const files = [fileToUpload, fileToUpload]
   const settings = getSettingsForTesting({
     publicKey: factory.publicKey('image')
   })
 
   it('should resolves when file is ready on CDN', async () => {
-    const { cdnUrl } = await groupFrom(files, settings)
+    const { cdnUrl } = await uploadFileGroup(files, settings)
 
     expect(cdnUrl).toBeTruthy()
   })
@@ -22,7 +22,7 @@ describe('groupFrom Uploaded[]', () => {
       publicKey: factory.publicKey('image'),
       store: false
     })
-    const upload = groupFrom(files, settings)
+    const upload = uploadFileGroup(files, settings)
     const group = await upload
 
     expect(group.isStored).toBeFalsy()
@@ -30,7 +30,7 @@ describe('groupFrom Uploaded[]', () => {
 
   it('should be able to cancel uploading', async () => {
     const ctrl = new CancelController()
-    const upload = groupFrom(files, {
+    const upload = uploadFileGroup(files, {
       ...settings,
       cancel: ctrl
     })
@@ -50,7 +50,7 @@ describe('groupFrom Uploaded[]', () => {
 
       ctrl.onCancel(onCancel)
 
-      const upload = groupFrom(files, {
+      const upload = uploadFileGroup(files, {
         ...settings,
         cancel: ctrl
       })
@@ -70,7 +70,7 @@ describe('groupFrom Uploaded[]', () => {
       const onProgress = ({ value }): void => {
         progressValue = value
       }
-      const upload = groupFrom(files, {
+      const upload = uploadFileGroup(files, {
         ...settings,
         onProgress
       })

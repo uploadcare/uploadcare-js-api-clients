@@ -1,4 +1,4 @@
-import fileFrom, { FileFromOptions } from '../fileFrom/fileFrom'
+import uploadFile, { FileFromOptions } from '../uploadFile'
 import defaultSettings from '../defaultSettings'
 import group from '../api/group'
 import { UploadcareGroup } from '../tools/UploadcareGroup'
@@ -8,7 +8,6 @@ import { UploadcareFile } from '../tools/UploadcareFile'
 import { isFileDataArray, isUrlArray, isUuidArray } from './types'
 import { Url, Uuid } from '../api/types'
 import { NodeFile, BrowserFile } from '../request/types'
-import { UploadcareFileInterface } from '../types'
 
 export type GroupFromOptions = {
   defaultEffects?: string
@@ -34,7 +33,7 @@ export type GroupFromOptions = {
  * @param [options.multipartChunkSize]
  * @param [options.baseCDN]
  */
-export default function groupFrom(
+export default function uploadFileGroup(
   data: (NodeFile | BrowserFile)[] | Url[] | Uuid[],
   {
     publicKey,
@@ -86,10 +85,10 @@ export default function groupFrom(
     }
   }
 
-  return Promise.all<UploadcareFileInterface>(
+  return Promise.all<UploadcareFile>(
     (data as (NodeFile | BrowserFile)[]).map(
       (file: NodeFile | BrowserFile | Url | Uuid, index: number) =>
-        fileFrom(file, {
+        uploadFile(file, {
           publicKey,
 
           fileName,

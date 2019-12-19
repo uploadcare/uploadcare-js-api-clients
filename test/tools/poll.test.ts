@@ -1,4 +1,4 @@
-import { poll, CheckFunction } from '../../src/tools/poller'
+import { poll, CheckFunction } from '../../src/tools/poll'
 import CancelController from '../../src/tools/CancelController'
 import { delay } from '../../src/tools/delay'
 import { UploadClientError } from '../../src/tools/errors'

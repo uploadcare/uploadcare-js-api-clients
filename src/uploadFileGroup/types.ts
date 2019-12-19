@@ -1,11 +1,10 @@
-import { isFileData, isUrl, isUuid } from '../fileFrom/types'
+import { isFileData, isUrl, isUuid } from '../uploadFile/types'
 import { Url, Uuid } from '../api/types'
 import { NodeFile, BrowserFile } from '../request/types'
 
 /**
  * FileData type guard.
  */
-
 export const isFileDataArray = (
   data: (NodeFile | BrowserFile)[] | Url[] | Uuid[]
 ): data is (NodeFile | BrowserFile)[] => {
