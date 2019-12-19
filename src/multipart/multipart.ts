@@ -2,10 +2,12 @@ import multipartStart from '../api/multipartStart'
 import multipartUpload from '../api/multipartUpload'
 import multipartComplete from '../api/multipartComplete'
 import CancelController from '../tools/CancelController'
+import runWithConcurrency from '../tools/runWithConcurrency'
 import defaultSettings from '../defaultSettings'
 
 /* Types */
 import { FileInfo } from '../api/types'
+import { MultipartUploadResponse } from '../api/multipartUpload'
 
 type progressCallback = ({ value: number }) => void
 
@@ -23,6 +25,7 @@ export type MultipartOptions = {
   source?: string
   integration?: string
   retryThrottledRequestMaxTimes?: number
+  maxConcurrentRequests?: number
 }
 
 const getChunk = (
@@ -55,7 +58,8 @@ export default function multipart(
     onProgress,
     source,
     integration,
-    retryThrottledRequestMaxTimes
+    retryThrottledRequestMaxTimes,
+    maxConcurrentRequests = defaultSettings.maxConcurrentRequests
   }: MultipartOptions
 ): Promise<FileInfo> {
   const fileSize: number = (file as Buffer).length || (file as Blob).size
@@ -95,8 +99,9 @@ export default function multipart(
     .then(({ uuid, parts }) =>
       Promise.all([
         uuid,
-        Promise.all(
-          parts.map((url, index) =>
+        runWithConcurrency(
+          maxConcurrentRequests,
+          parts.map((url, index) => (): Promise<MultipartUploadResponse> =>
             multipartUpload(
               getChunk(file, index, fileSize, multipartChunkSize),
               url,

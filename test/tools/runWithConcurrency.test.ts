@@ -1,43 +1,6 @@
+/* eslint-disable @typescript-eslint/explicit-function-return-type */
 import { delay } from '../../src/tools/delay'
-
-const runWithConcurrency = <T>(
-  concurrency: number,
-  tasks: (() => Promise<T>)[]
-): Promise<T[]> => {
-  return new Promise((resolve, reject) => {
-    const results: T[] = []
-    let rejected = false
-    let settled = tasks.length
-    const tyRun = [...tasks]
-
-    const run = (): void => {
-      const index = tasks.length - tyRun.length
-      const next = tyRun.shift()
-      if (next) {
-        next()
-          .then((result: T) => {
-            if (rejected) return
-
-            results[index] = result
-            settled -= 1
-            if (settled) {
-              run()
-            } else {
-              resolve(results)
-            }
-          })
-          .catch(error => {
-            rejected = true
-            reject(error)
-          })
-      }
-    }
-
-    for (let i = 0; i < concurrency; i++) {
-      run()
-    }
-  })
-}
+import runWithConcurrency from '../../src/tools/runWithConcurrency'
 
 const returnAfter = (value: number, ms = 10): (() => Promise<number>) => () =>
   delay(ms).then(() => value)
@@ -45,7 +8,7 @@ const returnAfter = (value: number, ms = 10): (() => Promise<number>) => () =>
 const rejectAfter = (error: Error, ms = 10): (() => Promise<never>) => () =>
   delay(ms).then(() => Promise.reject(error))
 
-describe('queueRunner', () => {
+describe('runWithConcurrency', () => {
   it('should work', async () => {
     await expectAsync(
       runWithConcurrency(1, [returnAfter(1), returnAfter(2), returnAfter(3)])
@@ -80,5 +43,47 @@ describe('queueRunner', () => {
         returnAfter(3)
       ])
     ).toBeRejectedWith(error)
+  })
+
+  it('should not run task after reject', async () => {
+    const error = new Error('test')
+
+    const spy = jasmine.createSpy('last', returnAfter(3))
+
+    await expectAsync(
+      runWithConcurrency(2, [returnAfter(1), rejectAfter(error, 0), spy])
+    ).toBeRejectedWith(error)
+
+    await delay(20)
+
+    expect(spy).not.toHaveBeenCalled()
+  })
+
+  it('should run task with right concurrency', async () => {
+    let maxConcurrency = 0
+    let running = 0
+
+    const trackedTask = () =>
+      Promise.resolve()
+        .then(() => (running += 1))
+        .then(() => delay(10))
+        .then(() => {
+          maxConcurrency = Math.max(maxConcurrency, running)
+          running -= 1
+        })
+
+    await expectAsync(
+      runWithConcurrency(3, [
+        trackedTask,
+        trackedTask,
+        trackedTask,
+        trackedTask,
+        trackedTask,
+        trackedTask,
+        trackedTask
+      ])
+    ).toBeResolved()
+
+    expect(maxConcurrency).toBe(3)
   })
 })
