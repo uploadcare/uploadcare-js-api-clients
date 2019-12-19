@@ -1,7 +1,7 @@
 import info from '../../src/api/info'
 import * as factory from '../_fixtureFactory'
 import { getSettingsForTesting } from '../_helpers'
-import CancelController from '../../src/CancelController'
+import CancelController from '../../src/tools/CancelController'
 
 describe('API - info', () => {
   const settings = getSettingsForTesting({

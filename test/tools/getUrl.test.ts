@@ -1,4 +1,4 @@
-import getUrl from '../../src/api/request/getUrl'
+import getUrl from '../../src/tools/getUrl'
 
 describe('create URL', () => {
   it('should create url', () => {

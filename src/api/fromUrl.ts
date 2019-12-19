@@ -1,13 +1,14 @@
 import { FileInfo } from './types'
-import { FailedResponse } from './request/types'
+import { FailedResponse } from '../request/types'
 
-import request from './request/request.node'
-import getUrl from './request/getUrl'
+import request from '../request/request.node'
+import getUrl from '../tools/getUrl'
 
-import CancelController from '../CancelController'
-import defaultSettings, { getUserAgent } from '../defaultSettings'
+import CancelController from '../tools/CancelController'
+import defaultSettings from '../defaultSettings'
+import { getUserAgent } from '../tools/userAgent'
 import camelizeKeys from '../tools/camelizeKeys'
-import { UploadClientError } from '../errors/errors'
+import { UploadClientError } from '../tools/errors'
 import retryIfThrottled from '../tools/retryIfThrottled'
 
 type Url = string

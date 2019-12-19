@@ -1,6 +1,6 @@
 import base from '../../src/api/base'
 import * as factory from '../_fixtureFactory'
-import CancelController from '../../src/CancelController'
+import CancelController from '../../src/tools/CancelController'
 
 describe('API - base', () => {
   const fileToUpload = factory.image('blackSquare')

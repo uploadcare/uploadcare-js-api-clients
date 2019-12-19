@@ -1,8 +1,8 @@
 import * as factory from '../_fixtureFactory'
 import { getSettingsForTesting } from '../_helpers'
 import groupFrom from '../../src/groupFrom/groupFrom'
-import CancelController from '../../src/CancelController'
-import { UploadClientError } from '../../src/errors/errors'
+import CancelController from '../../src/tools/CancelController'
+import { UploadClientError } from '../../src/tools/errors'
 
 describe('groupFrom Uploaded[]', () => {
   const uuid = factory.uuid('image')

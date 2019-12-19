@@ -1,4 +1,4 @@
-import { UploadClientError, cancelError } from '../src/errors/errors'
+import { UploadClientError, cancelError } from '../../src/tools/errors'
 
 describe('UploadClientError', () => {
   it('should work', () => {

@@ -1,4 +1,4 @@
-import buildFormData from '../../src/api/request/buildFormData.node'
+import buildFormData from '../../src/tools/buildFormData'
 import * as factory from '../_fixtureFactory'
 
 describe('buildFormData', () => {
@@ -16,7 +16,7 @@ describe('buildFormData', () => {
   it('should support arrays', () => {
     const data = buildFormData([
       ['test', ['test', '1', 2]],
-      ['test', 'test']
+      ['test2', 'test']
     ])
 
     expect(data).toBeDefined()

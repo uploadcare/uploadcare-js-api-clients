@@ -1,4 +1,4 @@
-import CancelController from '../src/CancelController'
+import CancelController from '../../src/tools/CancelController'
 
 describe('CancelController', () => {
   it('should work', done => {

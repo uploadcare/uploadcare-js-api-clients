@@ -1,13 +1,13 @@
 import { Url, Uuid } from '..'
 import { isNode } from '../tools/isNode'
-import { FileData } from '../api/types'
+import { NodeFile, BrowserFile } from '../request/types'
 
 /**
  * FileData type guard.
- *
- * @param {FileData | Url | Uuid} data
  */
-export const isFileData = (data: FileData | Url | Uuid): data is FileData => {
+export const isFileData = (
+  data: NodeFile | BrowserFile | Url | Uuid
+): data is NodeFile | BrowserFile => {
   return (
     data !== undefined &&
     ((!isNode() && data instanceof Blob) ||
@@ -18,10 +18,10 @@ export const isFileData = (data: FileData | Url | Uuid): data is FileData => {
 
 /**
  * Uuid type guard.
- *
- * @param {FileData | Url | Uuid} data
  */
-export const isUuid = (data: FileData | Url | Uuid): data is Uuid => {
+export const isUuid = (
+  data: NodeFile | BrowserFile | Url | Uuid
+): data is Uuid => {
   const UUID_REGEX =
     '[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}'
   const regExp = new RegExp(UUID_REGEX)
@@ -34,7 +34,9 @@ export const isUuid = (data: FileData | Url | Uuid): data is Uuid => {
  *
  * @param {FileData | Url | Uuid} data
  */
-export const isUrl = (data: FileData | Url | Uuid): data is Url => {
+export const isUrl = (
+  data: NodeFile | BrowserFile | Url | Uuid
+): data is Url => {
   const URL_REGEX =
     '^(?:\\w+:)?\\/\\/([^\\s\\.]+\\.\\S{2}|localhost[\\:?\\d]*)\\S*$'
   const regExp = new RegExp(URL_REGEX)

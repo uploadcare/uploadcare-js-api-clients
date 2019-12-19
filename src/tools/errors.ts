@@ -1,4 +1,4 @@
-import { Headers, ErrorRequestInfo } from '../api/request/types'
+import { Headers, ErrorRequestInfo } from '../request/types'
 
 type ErrorResponseInfo = {
   statusCode: number

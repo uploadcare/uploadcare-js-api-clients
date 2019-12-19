@@ -1,4 +1,4 @@
-import { cancelError } from '../../errors/errors'
+import { cancelError } from '../tools/errors'
 import { RequestOptions, RequestResponse } from './types'
 
 const request = ({

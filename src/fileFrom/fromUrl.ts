@@ -1,12 +1,12 @@
 import fromUrl, { TypeEnum } from '../api/fromUrl'
 import fromUrlStatus, { Status } from '../api/fromUrlStatus'
 import { poll } from '../tools/poller'
-import { UploadClientError } from '../errors/errors'
+import { UploadClientError } from '../tools/errors'
 
 /* Types */
 import { FileInfo } from '../api/types'
-import CancelController from '../CancelController'
-import { UploadcareFile } from '../UploadcareFile'
+import CancelController from '../tools/CancelController'
+import { UploadcareFile } from '../tools/UploadcareFile'
 
 type FromUrlOptions = {
   publicKey: string

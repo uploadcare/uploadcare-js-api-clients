@@ -1,6 +1,5 @@
-import { cancelError, UploadClientError } from '../../src/errors/errors'
-
-import CancelController from '../CancelController'
+import { cancelError, UploadClientError } from './errors'
+import CancelController from './CancelController'
 
 type CheckFunction<T> = (
   cancel: CancelController | undefined

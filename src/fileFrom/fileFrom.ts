@@ -1,12 +1,13 @@
 import fromObject from './fromObject'
 import fromUrl from './fromUrl'
 import fromUploaded from './fromUploaded'
-import CancelController from '../CancelController'
+import CancelController from '../tools/CancelController'
 import defaultSettings from '../defaultSettings'
 
 /* Types */
 import { UploadcareFileInterface } from '../types'
-import { FileData, Url, Uuid } from '../api/types'
+import { Url, Uuid } from '../api/types'
+import { NodeFile, BrowserFile } from '../request/types'
 import { isFileData, isUrl, isUuid } from './types'
 
 export type FileFromOptions = {
@@ -49,7 +50,7 @@ export type FileFromOptions = {
  * @param [options.retryThrottledRequestMaxTimes]
  */
 export default function fileFrom(
-  data: FileData | Url | Uuid,
+  data: NodeFile | BrowserFile | Url | Uuid,
   {
     publicKey,
 

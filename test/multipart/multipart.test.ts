@@ -1,8 +1,8 @@
 import * as factory from '../_fixtureFactory'
 import { getSettingsForTesting } from '../_helpers'
 import multipart from '../../src/multipart/multipart'
-import { UploadClientError } from '../../src/errors/errors'
-import CancelController from '../../src/CancelController'
+import { UploadClientError } from '../../src/tools/errors'
+import CancelController from '../../src/tools/CancelController'
 
 describe('API - multipart', () => {
   it('should be able to upload multipart file', async () => {

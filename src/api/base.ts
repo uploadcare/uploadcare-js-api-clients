@@ -1,15 +1,16 @@
-import getFormData from './request/buildFormData.node'
-import request from './request/request.node'
-import getUrl from './request/getUrl'
-import CancelController from '../CancelController'
-import defaultSettings, { getUserAgent } from '../defaultSettings'
+import request from '../request/request.node'
+import getFormData from '../tools/buildFormData'
+import getUrl from '../tools/getUrl'
+import CancelController from '../tools/CancelController'
+import defaultSettings from '../defaultSettings'
+import { getUserAgent } from '../tools/userAgent'
 import camelizeKeys from '../tools/camelizeKeys'
-import { UploadClientError } from '../errors/errors'
+import { UploadClientError } from '../tools/errors'
 import retryIfThrottled from '../tools/retryIfThrottled'
 
 /* Types */
-import { FileData, Uuid } from './types'
-import { FailedResponse } from './request/types'
+import { Uuid } from './types'
+import { FailedResponse, NodeFile, BrowserFile } from '../request/types'
 
 export type BaseResponse = {
   file: Uuid
@@ -40,7 +41,7 @@ export type BaseOptions = {
  * Can be canceled and has progress.
  */
 export default function base(
-  file: FileData,
+  file: NodeFile | BrowserFile,
   {
     publicKey,
     fileName,

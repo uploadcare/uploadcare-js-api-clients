@@ -1,36 +1,48 @@
 import UploadClient from './UploadClient'
 
-import request from './api/request/request'
 import base from './api/base'
 import fromUrl from './api/fromUrl'
 import fromUrlStatus from './api/fromUrlStatus'
 import group from './api/group'
 import groupInfo from './api/groupInfo'
 import info from './api/info'
-
-import multipartStart from './api/multipart/multipartStart'
-import multipartUpload from './api/multipart/multipartUpload'
-import multipartComplete from './api/multipart/multipartComplete'
+import multipartStart from './api/multipartStart'
+import multipartUpload from './api/multipartUpload'
+import multipartComplete from './api/multipartComplete'
 
 import multipart from './multipart/multipart'
 
 import fileFrom from './fileFrom/fileFrom'
 import groupFrom from './groupFrom/groupFrom'
 
-/* Types */
-export {
-  SettingsInterface,
-  FileData,
-  OriginalImageInfoInterface,
-  UploadcareFileInterface,
-  UploadClientInterface
-} from './types'
-export { Url } from './api/fromUrl'
-export { Uuid, UploadAPIInterface } from './api/types'
-export { RequestOptionsInterface, RequestInterface } from './api/request/types'
+import CancelController from './tools/CancelController'
 
-/* Low-Level API */
-export { request }
+/* Types */
+/* Types */
+export { SettingsInterface } from './types'
+export { NodeFile, BrowserFile } from './request/types'
+export { BaseOptions, BaseResponse } from './api/base'
+export { FileInfo, GroupId, GroupInfo, Token, Url, Uuid } from './api/types'
+export { InfoOptions } from './api/info'
+export { FromUrlOptions, FromUrlResponse } from './api/fromUrl'
+export {
+  FromUrlStatusOptions,
+  FromUrlStatusResponse
+} from './api/fromUrlStatus'
+export { GroupOptions } from './api/group'
+export { GroupInfoOptions } from './api/groupInfo'
+export {
+  MultipartStartOptions,
+  MultipartStartResponse,
+  MultipartPart
+} from './api/multipartStart'
+export { MultipartCompleteOptions } from './api/multipartComplete'
+export {
+  MultipartUploadOptions,
+  MultipartUploadResponse
+} from './api/multipartUpload'
+export { FileFromOptions } from './fileFrom/fileFrom'
+export { GroupFromOptions } from './groupFrom/groupFrom'
 
 /* Middle-Level API */
 export {
@@ -47,5 +59,8 @@ export {
 
 /* High-Level API */
 export { multipart, fileFrom, groupFrom }
+
+/* Helpers */
+export { CancelController }
 
 export default UploadClient

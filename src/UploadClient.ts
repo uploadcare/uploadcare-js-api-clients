@@ -9,22 +9,15 @@ import multipartStart from './api/multipartStart'
 import multipartComplete from './api/multipartComplete'
 import multipartUpload from './api/multipartUpload'
 import fileFrom from './fileFrom/fileFrom'
-import { UploadcareFile } from './UploadcareFile'
+import { UploadcareFile } from './tools/UploadcareFile'
 import groupFrom from './groupFrom/groupFrom'
-import { UploadcareGroup } from './UploadcareGroup'
+import { UploadcareGroup } from './tools/UploadcareGroup'
 
 /* Types */
 import { SettingsInterface } from './types'
+import { NodeFile, BrowserFile } from './request/types'
 import { BaseOptions, BaseResponse } from './api/base'
-import {
-  FileData,
-  FileInfo,
-  GroupId,
-  GroupInfo,
-  Token,
-  Url,
-  Uuid
-} from './api/types'
+import { FileInfo, GroupId, GroupInfo, Token, Url, Uuid } from './api/types'
 import { InfoOptions } from './api/info'
 import { FromUrlOptions, FromUrlResponse } from './api/fromUrl'
 import {
@@ -72,7 +65,10 @@ class UploadClient {
     return this.settings
   }
 
-  base(file: FileData, options: BaseOptions): Promise<BaseResponse> {
+  base(
+    file: NodeFile | BrowserFile,
+    options: BaseOptions
+  ): Promise<BaseResponse> {
     const settings = this.getSettings()
 
     return base(file, populateOptionsWithSettings(options, settings))
@@ -147,7 +143,7 @@ class UploadClient {
   }
 
   fileFrom(
-    data: FileData | Url | Uuid,
+    data: NodeFile | BrowserFile | Url | Uuid,
     options: FileFromOptions
   ): Promise<UploadcareFile> {
     const settings = this.getSettings()
@@ -156,7 +152,7 @@ class UploadClient {
   }
 
   groupFrom(
-    data: FileData[] | Url[] | Uuid[],
+    data: (NodeFile | BrowserFile)[] | Url[] | Uuid[],
     options: FileFromOptions & GroupFromOptions
   ): Promise<UploadcareGroup> {
     const settings = this.getSettings()

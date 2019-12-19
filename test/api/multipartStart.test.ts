@@ -1,8 +1,8 @@
 import multipartStart from '../../src/api/multipartStart'
 import * as factory from '../_fixtureFactory'
 import { getSettingsForTesting } from '../_helpers'
-import { UploadClientError } from '../../src/errors/errors'
-import CancelController from '../../src/CancelController'
+import { UploadClientError } from '../../src/tools/errors'
+import CancelController from '../../src/tools/CancelController'
 
 describe('API - multipartStart', () => {
   const size = factory.file(12).size

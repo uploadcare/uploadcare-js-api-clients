@@ -2,8 +2,8 @@ import * as factory from '../_fixtureFactory'
 import multipartUpload from '../../src/api/multipartUpload'
 import { getSettingsForTesting } from '../_helpers'
 import multipartStart from '../../src/api/multipartStart'
-import { UploadClientError } from '../../src/errors/errors'
-import CancelController from '../../src/CancelController'
+import { UploadClientError } from '../../src/tools/errors'
+import CancelController from '../../src/tools/CancelController'
 
 let parts: [string, Blob | Buffer][] = []
 

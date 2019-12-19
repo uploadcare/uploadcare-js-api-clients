@@ -1,4 +1,4 @@
-import { GroupId, GroupInfo } from './api/types'
+import { GroupId, GroupInfo } from '../api/types'
 import { UploadcareFile } from './UploadcareFile'
 
 export class UploadcareGroup {

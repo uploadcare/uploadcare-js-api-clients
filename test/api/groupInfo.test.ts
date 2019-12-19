@@ -2,7 +2,7 @@ import * as factory from '../_fixtureFactory'
 import { getSettingsForTesting } from '../_helpers'
 import group from '../../src/api/group'
 import groupInfo from '../../src/api/groupInfo'
-import CancelController from '../../src/CancelController'
+import CancelController from '../../src/tools/CancelController'
 
 describe('API - group info', () => {
   const files = factory.groupOfFiles('valid')

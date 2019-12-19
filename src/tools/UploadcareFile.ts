@@ -1,12 +1,12 @@
-import camelizeKeys from './tools/camelizeKeys'
+import camelizeKeys from './camelizeKeys'
 
 /* Types */
 import {
   OriginalImageInfoInterface,
   OriginalVideoInfoInterface,
   UploadcareFileInterface
-} from './types'
-import { FileInfo, Uuid } from './api/types'
+} from '../types'
+import { FileInfo, Uuid } from '../api/types'
 
 export class UploadcareFile implements UploadcareFileInterface {
   readonly uuid: Uuid
