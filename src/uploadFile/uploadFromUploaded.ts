@@ -22,7 +22,7 @@ type FromUploadedOptions = {
   baseCDN?: string
 }
 
-const fromUploaded = (
+const uploadFromUploaded = (
   uuid: Uuid,
   {
     publicKey,
@@ -53,4 +53,4 @@ const fromUploaded = (
     })
 }
 
-export default fromUploaded
+export default uploadFromUploaded

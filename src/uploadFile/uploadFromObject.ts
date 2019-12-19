@@ -34,7 +34,7 @@ type FromObjectOptions = {
   baseCDN?: string
 }
 
-const fromObject = (
+const uploadFromObject = (
   file: NodeFile | BrowserFile,
   {
     publicKey,
@@ -129,4 +129,4 @@ const fromObject = (
   return upload.then(fileInfo => new UploadcareFile(fileInfo, { baseCDN }))
 }
 
-export default fromObject
+export default uploadFromObject

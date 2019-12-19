@@ -1,17 +1,17 @@
 import * as factory from '../_fixtureFactory'
 import { getSettingsForTesting } from '../_helpers'
 
-import fileFrom from '../../src/fileFrom/fileFrom'
+import uploadFile from '../../src/uploadFile'
 import CancelController from '../../src/tools/CancelController'
 
-describe('fileFrom Object', () => {
+describe('uploadFrom Object', () => {
   it('should resolves when file is ready on CDN', async () => {
     const fileToUpload = factory.image('blackSquare').data
     const settings = getSettingsForTesting({
       publicKey: factory.publicKey('image')
     })
 
-    const file = await fileFrom(fileToUpload, settings)
+    const file = await uploadFile(fileToUpload, settings)
 
     expect(file.cdnUrl).toBeTruthy()
   })
@@ -22,7 +22,7 @@ describe('fileFrom Object', () => {
       publicKey: factory.publicKey('image'),
       store: false
     })
-    const file = await fileFrom(fileToUpload, settings)
+    const file = await uploadFile(fileToUpload, settings)
 
     expect(file.isStored).toBeFalsy()
   })
@@ -34,7 +34,7 @@ describe('fileFrom Object', () => {
       publicKey: factory.publicKey('image'),
       cancel: ctrl
     })
-    const upload = fileFrom(fileToUpload, settings)
+    const upload = uploadFile(fileToUpload, settings)
 
     setTimeout(() => {
       ctrl.cancel()
@@ -50,7 +50,7 @@ describe('fileFrom Object', () => {
       store: false,
       fileName: 'newFileName.jpg'
     })
-    const file = await fileFrom(fileToUpload, settings)
+    const file = await uploadFile(fileToUpload, settings)
 
     expect(file.name).toEqual('newFileName.jpg')
   })
@@ -63,7 +63,7 @@ describe('fileFrom Object', () => {
       onProgress
     })
 
-    await fileFrom(fileToUpload, settings)
+    await uploadFile(fileToUpload, settings)
 
     expect(onProgress).toHaveBeenCalled()
     expect(onProgress).toHaveBeenCalledWith({ value: 1 })

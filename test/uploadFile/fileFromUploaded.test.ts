@@ -1,36 +1,24 @@
 import * as factory from '../_fixtureFactory'
+import uploadFile from '../../src/uploadFile'
 import { getSettingsForTesting } from '../_helpers'
-import groupFrom from '../../src/groupFrom/groupFrom'
-import { UploadClientError } from '../../src/tools/errors'
 import CancelController from '../../src/tools/CancelController'
+import { UploadClientError } from '../../src/tools/errors'
 
-describe('groupFrom Url[]', () => {
-  const sourceUrl = factory.imageUrl('valid')
-  const files = [sourceUrl, sourceUrl]
+describe('uploadFrom Uploaded', () => {
+  const uuid = factory.uuid('image')
   const settings = getSettingsForTesting({
     publicKey: factory.publicKey('image')
   })
 
   it('should resolves when file is ready on CDN', async () => {
-    const { cdnUrl } = await groupFrom(files, settings)
+    const file = await uploadFile(uuid, settings)
 
-    expect(cdnUrl).toBeTruthy()
-  })
-
-  it('should accept store setting', async () => {
-    const settings = getSettingsForTesting({
-      publicKey: factory.publicKey('image'),
-      store: false
-    })
-    const upload = groupFrom(files, settings)
-    const group = await upload
-
-    expect(group.isStored).toBeFalsy()
+    expect(file.cdnUrl).toBeTruthy()
   })
 
   it('should be able to cancel uploading', async () => {
     const ctrl = new CancelController()
-    const upload = groupFrom(files, {
+    const upload = uploadFile(uuid, {
       ...settings,
       cancel: ctrl
     })
@@ -43,14 +31,23 @@ describe('groupFrom Url[]', () => {
     )
   })
 
+  it('should accept new file name setting', async () => {
+    const settings = getSettingsForTesting({
+      publicKey: factory.publicKey('image'),
+      store: true,
+      fileName: 'newFileName.jpg'
+    })
+    const file = await uploadFile(uuid, settings)
+
+    expect(file.name).toEqual('newFileName.jpg')
+  })
+
   describe('should be able to handle', () => {
     it('cancel uploading', async () => {
       const ctrl = new CancelController()
       const onCancel = jasmine.createSpy('onCancel')
-
       ctrl.onCancel(onCancel)
-
-      const upload = groupFrom(files, {
+      const upload = uploadFile(uuid, {
         ...settings,
         cancel: ctrl
       })
@@ -66,18 +63,16 @@ describe('groupFrom Url[]', () => {
     })
 
     it('progress', async () => {
-      let progressValue = 0
-      const onProgress = ({ value }): void => {
-        progressValue = value
-      }
-      const upload = groupFrom(files, {
-        ...settings,
+      const onProgress = jasmine.createSpy('onProgress')
+      const settings = getSettingsForTesting({
+        publicKey: factory.publicKey('image'),
         onProgress
       })
 
-      await upload
+      await uploadFile(uuid, settings)
 
-      expect(progressValue).toBe(1)
+      expect(onProgress).toHaveBeenCalled()
+      expect(onProgress).toHaveBeenCalledWith({ value: 1 })
     })
   })
 })

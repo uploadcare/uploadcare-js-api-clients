@@ -1,17 +1,17 @@
 import * as factory from '../_fixtureFactory'
-import fileFrom from '../../src/fileFrom/fileFrom'
+import uploadFile from '../../src/uploadFile'
 import { getSettingsForTesting } from '../_helpers'
 import CancelController from '../../src/tools/CancelController'
 import { UploadClientError } from '../../src/tools/errors'
 
-describe('fileFrom Object (multipart)', () => {
+describe('uploadFrom Object (multipart)', () => {
   const fileToUpload = factory.file(12).data
   const settings = getSettingsForTesting({
     publicKey: factory.publicKey('multipart')
   })
 
   it('should resolves when file is ready on CDN', async () => {
-    const file = await fileFrom(fileToUpload, settings)
+    const file = await uploadFile(fileToUpload, settings)
 
     expect(file.cdnUrl).toBeTruthy()
   }, 250000)
@@ -21,14 +21,14 @@ describe('fileFrom Object (multipart)', () => {
       publicKey: factory.publicKey('image'),
       store: false
     })
-    const file = await fileFrom(fileToUpload, settings)
+    const file = await uploadFile(fileToUpload, settings)
 
     expect(file.isStored).toBeFalsy()
   }, 250000)
 
   it('should be able to cancel uploading', async () => {
     const ctrl = new CancelController()
-    const upload = fileFrom(fileToUpload, {
+    const upload = uploadFile(fileToUpload, {
       ...settings,
       cancel: ctrl
     })
@@ -47,7 +47,7 @@ describe('fileFrom Object (multipart)', () => {
       doNotStore: true,
       fileName: 'newFileName.jpg'
     })
-    const file = await fileFrom(fileToUpload, settings)
+    const file = await uploadFile(fileToUpload, settings)
 
     expect(file.name).toEqual('newFileName.jpg')
   }, 250000)
@@ -59,7 +59,7 @@ describe('fileFrom Object (multipart)', () => {
 
       ctrl.onCancel(onCancel)
 
-      const upload = fileFrom(fileToUpload, {
+      const upload = uploadFile(fileToUpload, {
         ...settings,
         cancel: ctrl
       })
@@ -79,7 +79,7 @@ describe('fileFrom Object (multipart)', () => {
       const onProgress = ({ value }) => {
         progressValue = value
       }
-      const upload = fileFrom(fileToUpload, {
+      const upload = uploadFile(fileToUpload, {
         ...settings,
         onProgress
       })

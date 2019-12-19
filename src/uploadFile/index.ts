@@ -1,6 +1,6 @@
-import fromObject from './fromObject'
-import fromUrl from './fromUrl'
-import fromUploaded from './fromUploaded'
+import uploadFromObject from './uploadFromObject'
+import uploadFromUrl from './uploadFromUrl'
+import uploadFromUploaded from './uploadFromUploaded'
 import CancelController from '../tools/CancelController'
 import defaultSettings from '../defaultSettings'
 
@@ -49,7 +49,7 @@ export type FileFromOptions = {
  * @param [options.integration]
  * @param [options.retryThrottledRequestMaxTimes]
  */
-export default function fileFrom(
+export default function uploadFile(
   data: NodeFile | BrowserFile | Url | Uuid,
   {
     publicKey,
@@ -75,7 +75,7 @@ export default function fileFrom(
   }: FileFromOptions
 ): Promise<UploadcareFile> {
   if (isFileData(data)) {
-    return fromObject(data, {
+    return uploadFromObject(data, {
       publicKey,
 
       fileName,
@@ -100,7 +100,7 @@ export default function fileFrom(
   }
 
   if (isUrl(data)) {
-    return fromUrl(data, {
+    return uploadFromUrl(data, {
       publicKey,
 
       fileName,
@@ -122,7 +122,7 @@ export default function fileFrom(
   }
 
   if (isUuid(data)) {
-    return fromUploaded(data, {
+    return uploadFromUploaded(data, {
       publicKey,
 
       fileName,
