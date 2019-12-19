@@ -70,12 +70,12 @@ export default function multipart(
       progressValues = Array(size).fill(0)
     }
 
-    const normalize = (values: number[]): number =>
-      values.reduce((sum, next) => sum + next) / size
+    const sum = (values: number[]): number =>
+      values.reduce((sum, next) => sum + next, 0)
 
     return ({ value }: { value: number }): void => {
       progressValues[index] = value
-      onProgress({ value: normalize(progressValues) })
+      onProgress({ value: sum(progressValues) / size })
     }
   }
 
