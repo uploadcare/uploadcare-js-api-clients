@@ -15,15 +15,14 @@ This is an Uploadcare [Upload API][uc-docs-upload-api] wrapper to work with Node
 
 <!-- toc -->
 
-* [Install](#install)
-* [Usage](#usage)
-    * [High-Level API](#high-level-api)
-    * [Middle-Level API](#middle-level-api)
-    * [Low-Level API](#low-level-api)
-    * [Settings](#settings)
-* [Testing](#testing)
-* [Security issues](#security-issues)
-* [Feedback](#feedback)
+- [Install](#install)
+- [Usage](#usage)
+  - [High-Level API](#high-level-api)
+  - [Low-Level API](#low-level-api)
+  - [Settings](#settings)
+- [Testing](#testing)
+- [Security issues](#security-issues)
+- [Feedback](#feedback)
 
 <!-- tocstop -->
 
@@ -45,211 +44,201 @@ Uploadcare project:
 ```javascript
 import UploadClient from '@uploadcare/upload-client'
 
-const client = new UploadClient({publicKey: 'YOUR_PUBLIC_KEY'})
+const client = new UploadClient({ publicKey: 'YOUR_PUBLIC_KEY' })
 ```
 
 Once the UploadClient instance is created, you can start using
 the wrapper to upload files from binary data:
 
 ```javascript
-const fileUpload = client.fileFrom(fileData)
+const fileUpload = client.uploadFile(fileData)
 
-fileUpload
-  .then(file => console.log(file.uuid))
+fileUpload.then(file => console.log(file.uuid))
 ```
 
-Another option is uploading files from URL, via the `fileFrom` method:
+Another option is uploading files from URL, via the `uploadFile` method:
 
 ```javascript
 const fileURL = 'https://example.com/file.jpg'
-const fileUpload = client.fileFrom(fileURL)
+const fileUpload = client.uploadFile(fileURL)
 
-fileUpload
-  .then(file => console.log(file.uuid))
+fileUpload.then(file => console.log(file.uuid))
 ```
 
-You can also use the `fileFrom` method to get previously uploaded files
+You can also use the `uploadFile` method to get previously uploaded files
 via their UUIDs:
 
 ```javascript
 const fileUUID = 'edfdf045-34c0-4087-bbdd-e3834921f890'
-const fileUpload = client.fileFrom(fileUUID)
+const fileUpload = client.uploadFile(fileUUID)
 
-fileUpload
-  .then(file => console.log(file.uuid))
+fileUpload.then(file => console.log(file.uuid))
 ```
 
 You can track uploading progress:
+
 ```javascript
 const fileUUID = 'edfdf045-34c0-4087-bbdd-e3834921f890'
-const onProgress = (progress) => {
-  console.log(progress.state)
-  console.log(progress.uploaded.loaded / progress.uploaded.total)
-  console.log(progress.value)
+const onProgress = ({ value }) => {
+  console.log(value)
 }
-const fileUpload = client.fileFrom(fileUUID, {}, {onProgress})
+const fileUpload = client.uploadFile(fileUUID, { onProgress })
 
-fileUpload
-  .then(file => console.log(file.uuid))
-```
-
-Or set callback function that will be called when file was uploaded:
-```javascript
-const fileUUID = 'edfdf045-34c0-4087-bbdd-e3834921f890'
-const onUploaded = (uuid) => console.log(`File "${uuid}" was uploaded.`)
-const fileUpload = client.fileFrom(fileUUID, {}, {onUploaded})
-
-fileUpload
-  .then(file => console.log(file.uuid))
-```
-
-Or when file is ready on CDN:
-```javascript
-const fileUUID = 'edfdf045-34c0-4087-bbdd-e3834921f890'
-const onReady = (file) => console.log(`File "${file.uuid}" is ready on CDN.`)
-const fileUpload = client.fileFrom(fileUUID, {}, {onReady})
-
-fileUpload
-  .then(file => console.log(file.uuid))
+fileUpload.then(file => console.log(file.uuid))
 ```
 
 You can cancel file uploading and track this event:
+
 ```javascript
 const fileUUID = 'edfdf045-34c0-4087-bbdd-e3834921f890'
+const cancelController = new CancelController()
 const onCancel = () => console.log(`File uploading was canceled.`)
-const fileUpload = client.fileFrom(fileUUID, {}, {onCancel})
 
-fileUpload
-  .then(file => console.log(file.uuid))
+cancelController.onCancel(onCancel)
+
+const fileUpload = client.uploadFile(fileUUID, { cancel: cancelController })
+
+fileUpload.then(file => console.log(file.uuid))
 
 // Cancel uploading
-fileUpload.cancel()
+cancelController.cancel()
 ```
 
-List of all available high level API methods:
+List of all available `UploadClient` API methods:
 
 ```typescript
-interface UploadClientInterface {
-  updateSettings(newSettings: SettingsInterface): void;
+interface UploadClient {
+  updateSettings(newSettings: Settings = {}): void
 
-  getSettings(): SettingsInterface;
-
-  fileFrom(
-    data: FileData | Url | Uuid,
-    settings?: SettingsInterface,
-    hooks?: LifecycleHooksInterface<UploadcareFileInterface>,
-  ): UploadInterface<UploadcareFileInterface>;
-
-  groupFrom(
-    data: FileData[] | Url[] | Uuid[],
-    settings?: SettingsInterface,
-    hooks?: LifecycleHooksInterface<UploadcareGroupInterface>,
-  ): UploadInterface<UploadcareGroupInterface>;
-}
-```
-
-### Middle-Level API
-
-Also, you can use wrappers around low level to call the API endpoints:
-
-```javascript
-import UploadClient from '@uploadcare/upload-client'
-
-const client = new UploadClient({publicKey: 'YOUR_PUBLIC_KEY'})
-
-const onProgress = (progressEvent) => console.log(progressEvent.loaded / progressEvent.total)
-// and set callback to track cancel event:
-const onCancel = () => console.log('File upload was canceled.')
-
-const directUpload = client.api.base(fileData, {}, {onProgress, onCancel}) // fileData must be `Blob` or `File` or `Buffer`
-
-directUpload
-  .then(data => console.log(data.file))
-
-// Also you can cancel upload:
-directUpload.cancel()
-```
-
-List of all available API methods:
-
-```typescript
-interface UploadAPIInterface {
-  request(options: RequestOptionsInterface): Promise<RequestResponse>;
+  getSettings(): Settings
 
   base(
-    data: FileData,
-    settings?: SettingsInterface,
-    hooks?: BaseHooksInterface,
-  ): BaseThenableInterface<BaseResponse>;
+    file: NodeFile | BrowserFile,
+    options: BaseOptions
+  ): Promise<BaseResponse>
 
-  info(
-    uuid: Uuid,
-    settings?: SettingsInterface,
-    hooks?: CancelHookInterface,
-  ): CancelableThenableInterface<FileInfoInterface>;
+  info(uuid: Uuid, options: InfoOptions): Promise<FileInfo>
 
-  fromUrl(
-    sourceUrl: Url,
-    settings?: SettingsInterface,
-    hooks?: CancelHookInterface,
-  ): CancelableThenableInterface<FromUrlResponse>;
+  fromUrl(sourceUrl: Url, options: FromUrlOptions): Promise<FromUrlResponse>
 
   fromUrlStatus(
     token: Token,
-    settings?: SettingsInterface,
-    hooks?: CancelHookInterface,
-  ): CancelableThenableInterface<FromUrlStatusResponse>;
+    options: FromUrlStatusOptions
+  ): Promise<FromUrlStatusResponse>
 
-  group(
-    files: Uuid[],
-    settings?: SettingsInterface,
-    hooks?: CancelHookInterface,
-  ): CancelableThenableInterface<GroupInfoInterface>;
+  group(uuids: Uuid[], options: GroupOptions): Promise<GroupInfo>
 
-  groupInfo(
-    id: GroupId,
-    settings?: SettingsInterface,
-    hooks?: CancelHookInterface
-  ): CancelableThenableInterface<GroupInfoInterface>;
+  groupInfo(id: GroupId, options: GroupInfoOptions): Promise<GroupInfo>
 
   multipartStart(
-    file: FileData,
-    settings: SettingsInterface,
-    hooks?: CancelHookInterface,
-  ): CancelableThenableInterface<MultipartStartResponse>;
+    size: number,
+    options: MultipartStartOptions
+  ): Promise<MultipartStartResponse>
 
   multipartUpload(
-    file: FileData,
-    parts: MultipartPart[],
-    settings: SettingsInterface,
-    hooks?: CancelHookInterface,
-  ): BaseThenableInterface<any>;
+    part: Buffer | Blob,
+    url: MultipartPart,
+    options: MultipartUploadOptions
+  ): Promise<MultipartUploadResponse>
 
   multipartComplete(
     uuid: Uuid,
-    settings: SettingsInterface,
-    hooks?: CancelHookInterface,
-  ): CancelableThenableInterface<FileInfoInterface>;
+    options: MultipartCompleteOptions
+  ): Promise<FileInfo>
+
+  uploadFile(
+    data: NodeFile | BrowserFile | Url | Uuid,
+    options: FileFromOptions
+  ): Promise<UploadcareFile>
+
+  uploadFileGroup(
+    data: (NodeFile | BrowserFile)[] | Url[] | Uuid[],
+    options: FileFromOptions & GroupFromOptions
+  ): Promise<UploadcareGroup>
 }
 ```
 
 ### Low-Level API
 
-The Low-Level API is accessible via `api.request()`, here's the basic example,
+Also, you can use wrappers around low level to call the API endpoints:
 
 ```javascript
-import UploadClient from '@uploadcare/upload-client'
+import { base, CancelController } from '@uploadcare/upload-client'
 
-const client = new UploadClient({publicKey: 'YOUR_PUBLIC_KEY'})
+const onProgress = ({ value }) => console.log(value)
+const cancelController = new CancelController()
+// and set callback to track cancel event:
+const onCancel = () => console.log('File upload was canceled.')
 
-client.api.request({
-  path: 'info',
-  query: {
-    pub_key: `YOUR_PUBLIC_KEY`,
-    file_id: `6db2621d-3ca4-4edc-9c67-832b641fae85`,
-  },
-})
-  .then(response => console.log(response.data))
+cancelController.onCancel(onCancel)
+
+const directUpload = base(fileData, { onProgress, cancel: cancelController }) // fileData must be `Blob` or `File` or `Buffer`
+
+directUpload.then(data => console.log(data.file))
+
+// Also you can cancel upload:
+cancelController.cancel()
+```
+
+List of all available API methods:
+
+```typescript
+  base(
+    file: NodeFile | BrowserFile,
+    options: BaseOptions
+  ): Promise<BaseResponse>
+```
+
+```typescript
+  info(uuid: Uuid, options: InfoOptions): Promise<FileInfo>
+```
+
+```typescript
+  fromUrl(sourceUrl: Url, options: FromUrlOptions): Promise<FromUrlResponse>
+```
+
+```typescript
+  fromUrlStatus(
+    token: Token,
+    options: FromUrlStatusOptions
+  ): Promise<FromUrlStatusResponse>
+```
+
+```typescript
+  group(uuids: Uuid[], options: GroupOptions): Promise<GroupInfo>
+```
+
+```typescript
+  groupInfo(id: GroupId, options: GroupInfoOptions): Promise<GroupInfo>
+```
+
+```typescript
+  multipartStart(
+    size: number,
+    options: MultipartStartOptions
+  ): Promise<MultipartStartResponse>
+```
+
+```typescript
+  multipartUpload(
+    part: Buffer | Blob,
+    url: MultipartPart,
+    options: MultipartUploadOptions
+  ): Promise<MultipartUploadResponse>
+```
+
+```typescript
+  multipartComplete(
+    uuid: Uuid,
+    options: MultipartCompleteOptions
+  ): Promise<FileInfo>
+```
+
+```typescript
+  multipart(
+    file: File | Buffer | Blob,
+    options: MultipartOptions
+  ): Promise<FileInfo>
 ```
 
 ### Settings
@@ -278,9 +267,9 @@ You can specify an original filename.
 
 Defaults to `original`.
 
-#### `doNotStore: boolean`
+#### `store: boolean`
 
-Forces files uploaded with a `UploadClient` not to be stored.
+Forces files uploaded with a `UploadClient` to be stored or not.
 For instance, you might want to turn this on when automatic file storing
 is enabled in your project, but you do not want to store files uploaded
 with a particular instance.
@@ -301,7 +290,7 @@ Stands for the Unix time to which the signature is valid, e.g., `1454902434`.
 
 `X-UC-User-Agent` header value.
 
-Defaults to `UploadcareUploadClient/${version}${publicKey} (JavaScript${integration})`
+Defaults to `UploadcareUploadClient/${version}/${publicKey} (JavaScript${integration})`
 
 #### `checkForUrlDuplicates: boolean`
 
@@ -371,6 +360,12 @@ Defaults to `1048576` bytes (1 MB).
 Allows specifying the number of concurrent requests.
 
 Defaults to `4`.
+
+### `contentType: string`
+
+This setting is needed for correct multipart uploads.
+
+Defaults to `application/octet-stream`.
 
 ## Testing
 
