@@ -18,8 +18,7 @@ import groupFrom from './groupFrom/groupFrom'
 import CancelController from './tools/CancelController'
 
 /* Types */
-/* Types */
-export { SettingsInterface } from './types'
+export { Settings } from './types'
 export { NodeFile, BrowserFile } from './request/types'
 export { BaseOptions, BaseResponse } from './api/base'
 export { FileInfo, GroupId, GroupInfo, Token, Url, Uuid } from './api/types'

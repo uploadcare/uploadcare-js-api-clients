@@ -32,7 +32,7 @@ export const isUuid = (
 /**
  * Url type guard.
  *
- * @param {FileData | Url | Uuid} data
+ * @param {NodeFile | BrowserFile | Url | Uuid} data
  */
 export const isUrl = (
   data: NodeFile | BrowserFile | Url | Uuid

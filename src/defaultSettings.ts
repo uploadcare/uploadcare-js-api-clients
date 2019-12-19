@@ -1,12 +1,12 @@
-import { DefaultSettingsInterface } from './types'
+import { DefaultSettings } from './types'
 
 /*
-  SettingsInterface for future support:
+  Settings for future support:
   multipartMaxAttempts: 3,
   parallelDirectUploads: 10,
   pusherKey: '79ae88bd931ea68464d9',
  */
-const defaultSettings: DefaultSettingsInterface = {
+const defaultSettings: DefaultSettings = {
   baseCDN: 'https://ucarecdn.com',
   baseURL: 'https://upload.uploadcare.com',
   fileName: 'original',

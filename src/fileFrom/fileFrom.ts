@@ -5,10 +5,10 @@ import CancelController from '../tools/CancelController'
 import defaultSettings from '../defaultSettings'
 
 /* Types */
-import { UploadcareFileInterface } from '../types'
 import { Url, Uuid } from '../api/types'
 import { NodeFile, BrowserFile } from '../request/types'
 import { isFileData, isUrl, isUuid } from './types'
+import { UploadcareFile } from '../tools/UploadcareFile'
 
 export type FileFromOptions = {
   publicKey: string
@@ -73,7 +73,7 @@ export default function fileFrom(
 
     baseCDN = defaultSettings.baseCDN
   }: FileFromOptions
-): Promise<UploadcareFileInterface> {
+): Promise<UploadcareFile> {
   if (isFileData(data)) {
     return fromObject(data, {
       publicKey,

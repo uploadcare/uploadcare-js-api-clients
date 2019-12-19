@@ -5,7 +5,6 @@ import { NodeFile, BrowserFile } from '../request/types'
 /**
  * FileData type guard.
  */
-
 export const isFileDataArray = (
   data: (NodeFile | BrowserFile)[] | Url[] | Uuid[]
 ): data is (NodeFile | BrowserFile)[] => {

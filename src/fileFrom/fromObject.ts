@@ -1,6 +1,6 @@
 import base from '../api/base'
 import info from '../api/info'
-import { poll } from '../tools/poller'
+import { poll } from '../tools/poll'
 import { UploadcareFile } from '../tools/UploadcareFile'
 import CancelController from '../tools/CancelController'
 import { isMultipart } from '../multipart/isMultipart'

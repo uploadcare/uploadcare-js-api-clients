@@ -4,7 +4,7 @@ import { NodeFile, BrowserFile } from '../request/types'
 /**
  * Get file size.
  *
- * @param {FileData} file
+ * @param {NodeFile | BrowserFile} file
  */
 export const getFileSize = (file: NodeFile | BrowserFile): number => {
   return (file as Buffer).length || (file as Blob).size
@@ -13,7 +13,7 @@ export const getFileSize = (file: NodeFile | BrowserFile): number => {
 /**
  * Check if FileData is multipart data.
  *
- * @param {FileData} data
+ * @param {NodeFile | BrowserFile} data
  * @param {number} multipartMinFileSize
  * @return {boolean}
  */

@@ -8,7 +8,7 @@ type CheckFunction<T> = (
 const DEFAULT_TIMEOUT = 10000
 const DEFAULT_INTERVAL = 500
 
-const poller = <T>({
+const poll = <T>({
   check,
   timeout = DEFAULT_TIMEOUT,
   interval = DEFAULT_INTERVAL,
@@ -54,4 +54,4 @@ const poller = <T>({
     timeoutId = setTimeout(tick, 0)
   })
 
-export { poller as poll, CheckFunction }
+export { poll, CheckFunction }

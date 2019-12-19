@@ -8,7 +8,6 @@ import { UploadcareFile } from '../tools/UploadcareFile'
 import { isFileDataArray, isUrlArray, isUuidArray } from './types'
 import { Url, Uuid } from '../api/types'
 import { NodeFile, BrowserFile } from '../request/types'
-import { UploadcareFileInterface } from '../types'
 
 export type GroupFromOptions = {
   defaultEffects?: string
@@ -86,7 +85,7 @@ export default function groupFrom(
     }
   }
 
-  return Promise.all<UploadcareFileInterface>(
+  return Promise.all<UploadcareFile>(
     (data as (NodeFile | BrowserFile)[]).map(
       (file: NodeFile | BrowserFile | Url | Uuid, index: number) =>
         fileFrom(file, {

@@ -14,7 +14,7 @@ import groupFrom from './groupFrom/groupFrom'
 import { UploadcareGroup } from './tools/UploadcareGroup'
 
 /* Types */
-import { SettingsInterface } from './types'
+import { Settings } from './types'
 import { NodeFile, BrowserFile } from './request/types'
 import { BaseOptions, BaseResponse } from './api/base'
 import { FileInfo, GroupId, GroupInfo, Token, Url, Uuid } from './api/types'
@@ -42,26 +42,23 @@ import { GroupFromOptions } from './groupFrom/groupFrom'
 /**
  * Populate options with settings.
  */
-const populateOptionsWithSettings = <T>(
-  options: T,
-  settings: SettingsInterface
-): T => ({
+const populateOptionsWithSettings = <T>(options: T, settings: Settings): T => ({
   ...settings,
   ...options
 })
 
 class UploadClient {
-  private settings: SettingsInterface
+  private settings: Settings
 
-  constructor(settings: SettingsInterface = {}) {
+  constructor(settings: Settings = {}) {
     this.settings = Object.assign({}, defaultSettings, settings)
   }
 
-  updateSettings(newSettings: SettingsInterface = {}): void {
+  updateSettings(newSettings: Settings = {}): void {
     this.settings = Object.assign(this.settings, newSettings)
   }
 
-  getSettings(): SettingsInterface {
+  getSettings(): Settings {
     return this.settings
   }
 
