@@ -11,42 +11,42 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Changed
 
-- All methods return `Promise` now instead of `ThenableInterface`
+- All methods return a `Promise` now instead of `ThenableInterface`
 - `SettingsInterface` was renamed to `Settings`
 - `fileFrom` was renamed to `uploadFile`.
-- `groupFrom` was rename to `uploadFileGroup`.
-- `request` low level api method is not exported now outside.
+- `groupFrom` was renamed to `uploadFileGroup`.
+- `request` low-level API method is not exported outside now.
 - Method `setSettings` of `UploadClient` was renamed to `updateSettings`.
 - Methods (`base`, `fromUrl`, `fromUrlStatus`, `group`,
   `groupInfo`, `info`, `multipartStart`, `multipartUpload`,
-  `multipartComplete`, `multipart`, `uploadFile`, `uploadGroup`) was exported
-  from `index.ts` to make better tree shaking.
+  `multipartComplete`, `multipart`, `uploadFile`, `uploadGroup`) were exported
+  from `index.ts` to make the tree shaking better.
 - Methods (`base`, `fromUrl`, `fromUrlStatus`, `group`,
   `groupInfo`, `info`, `multipartStart`, `multipartUpload`,
   `multipartComplete`, `multipart`, `uploadFile`, `uploadGroup`) accept
-  `options` instead of `settings` as second argument.
+  `options` instead of `settings` as a second argument.
 - `UploadClient` now contains all low-level API methods (`base`,
   `fromUrl`, `fromUrlStatus`, `group`, `groupInfo`, `info`,
   `multipartStart`, `multipartUpload`, `multipartComplete`, `multipart`,
   `fileFrom`, `groupFrom`).
-- `UploadcareGroup` files now contains `UploadcareFile[]`, but not `FileInfo[]`.
+- `UploadcareGroup` files now contain `UploadcareFile[]`, but not `FileInfo[]`.
 - `README.md` was updated according to library API.
-- `FileData` now is `NodeFile` and `BrowserFile`.
+- `FileData` became `NodeFile` and `BrowserFile`.
 
 ### Removed
 
 - `UploadAPI` class.
-- `Thenable`, `CancelableThenable`, `BaseThenable`, `Upload` that implements
-  appropriate interfaces.
+- `Thenable`, `CancelableThenable`, `BaseThenable`, `Upload` classes
+  implementing respective interfaces.
 - `onReady`, `onUploaded` callbacks.
 - `addUpdateSettingsListener` and `removeUpdateSettingsListener` from
   `UploadClientInterface`.
-- Removed `from` param from `uploadFile` and `uploadFileGroup`.
-- Removed `FileFromEnum` and `GroupFromEnum`.
+- `from` param of `uploadFile` and `uploadFileGroup`.
+- `FileFromEnum` and `GroupFromEnum`.
 
 ### Added
 
-- `CancelController` to make api calls cancellable. See README for how
+- `CancelController` to make API calls cancellable. See README for how
   to use this feature.
 
 ## [1.0.0-alpha.5]
@@ -54,13 +54,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Added
 
 - Support of multipart and uploading of big files: `multipartStart`,
-  `multipartUpload` and `multipartComplete` methods to `UploadAPI`.
-- Support of cancel and handling canceling uploads for all api methods
+  `multipartUpload`, and `multipartComplete` methods to `UploadAPI`.
+- Support of cancel and handling canceling uploads for all API methods
   (`info`, `fromUrl`, `fromUrlStatus`, `group`, `groupInfo`).
 - `DefaultSettingsInterface` with required properties.
 - `pollingTimeoutMilliseconds` to `SettingsInterface`.
-  Now you can adjust the timeout for checking file is ready
-  and checking file is uploaded from url.
+  Now you can adjust the timeout for checking is file ready,
+  and checking is file being uploaded from URL.
 - `maxConcurrentRequests` setting that allows you to specify the number
   of concurrent requests.
 
@@ -89,8 +89,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Fixed
 
 - Example with `directUpload.onProgress` in `README.md`.
-- All tests now passed.
-- Mock server tests are now passed.
+- All tests are passing now.
+- Mock server tests are passing now.
 
 ### Removed
 
@@ -107,7 +107,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 - Wrappers for group paths of Upload API (`group`, `groupInfo`).
 - The high-level function for group uploading, aka filesGroupFrom.
-- Uploading progress for Node.js in `base` method.
+- Uploading progress for Node.js in the `base` method.
 
 ### Changed
 
@@ -123,7 +123,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 - Support `fileFrom` 'uploaded' file (`uuid`).
 - Support of `waiting` status from `/from_url/status/` endpoint.
-- Export some main types from `index.ts` file.
+- Export some main types from the `index.ts` file.
   So you can import them now directly from `@uploadcare/upload-client`.
 - Throttling for `request`.
 - `retryThrottledMaxTimes` param to set count of max retries after
@@ -133,7 +133,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Fixed
 
-- Default timeout for polling functions increased from 3s to 10s.
+- The default timeout for polling functions increased from 3s to 10s.
 - Removed restrictions for timeout and interval.
 
 [1.0.0-alpha.3]: https://github.com/uploadcare/uploadcare-upload-client/compare/v1.0.0-alpha.2...v1.0.0-alpha.3
@@ -142,10 +142,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Changed
 
-- Project was moved from Flow notations to TypeScript.
-- The `base` function now returns object that implements
+- The project was moved from Flow notations to TypeScript.
+- The `base` function now returns an object that implements
   `DirectUploadInterface`.
-- The `fileFrom` function now returns object that implements
+- The `fileFrom` function now returns an object that implements
   `UploadFromInterface`.
 - The `UCFile` type renamed to `UploadcareFile`.
 - The progress of `fileFrom` now based on the `UploadingProgress` type.
