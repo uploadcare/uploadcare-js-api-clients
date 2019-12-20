@@ -92,13 +92,15 @@ You can cancel file uploading and track this event:
 ```javascript
 const fileUUID = 'edfdf045-34c0-4087-bbdd-e3834921f890'
 const cancelController = new CancelController()
-const onCancel = () => console.log(`File uploading was canceled.`)
-
-cancelController.onCancel(onCancel)
-
 const fileUpload = client.uploadFile(fileUUID, { cancel: cancelController })
 
-fileUpload.then(file => console.log(file.uuid))
+fileUpload
+  .then(file => console.log(file.uuid))
+  .catch(error => {
+    if (error.isCancel) {
+      console.log(`File uploading was canceled.`)
+    }
+  })
 
 // Cancel uploading
 cancelController.cancel()
@@ -167,14 +169,15 @@ import { base, CancelController } from '@uploadcare/upload-client'
 
 const onProgress = ({ value }) => console.log(value)
 const cancelController = new CancelController()
-// and set callback to track cancel event:
-const onCancel = () => console.log('File upload was canceled.')
-
-cancelController.onCancel(onCancel)
-
 const directUpload = base(fileData, { onProgress, cancel: cancelController }) // fileData must be `Blob` or `File` or `Buffer`
 
-directUpload.then(data => console.log(data.file))
+directUpload
+  .then(data => console.log(data.file))
+  .catch(error => {
+    if (error.isCancel) {
+      console.log(`File uploading was canceled.`)
+    }
+  })
 
 // Also you can cancel upload:
 cancelController.cancel()
@@ -183,25 +186,25 @@ cancelController.cancel()
 List of all available API methods:
 
 ```typescript
-  base(
-    file: NodeFile | BrowserFile,
-    options: BaseOptions
-  ): Promise<BaseResponse>
+base(
+  file: NodeFile | BrowserFile,
+  options: BaseOptions
+): Promise<BaseResponse>
 ```
 
 ```typescript
-  info(uuid: Uuid, options: InfoOptions): Promise<FileInfo>
+info(uuid: Uuid, options: InfoOptions): Promise<FileInfo>
 ```
 
 ```typescript
-  fromUrl(sourceUrl: Url, options: FromUrlOptions): Promise<FromUrlResponse>
+fromUrl(sourceUrl: Url, options: FromUrlOptions): Promise<FromUrlResponse>
 ```
 
 ```typescript
-  fromUrlStatus(
-    token: Token,
-    options: FromUrlStatusOptions
-  ): Promise<FromUrlStatusResponse>
+fromUrlStatus(
+  token: Token,
+  options: FromUrlStatusOptions
+): Promise<FromUrlStatusResponse>
 ```
 
 ```typescript
@@ -213,32 +216,32 @@ List of all available API methods:
 ```
 
 ```typescript
-  multipartStart(
-    size: number,
-    options: MultipartStartOptions
-  ): Promise<MultipartStartResponse>
+multipartStart(
+  size: number,
+  options: MultipartStartOptions
+): Promise<MultipartStartResponse>
 ```
 
 ```typescript
-  multipartUpload(
-    part: Buffer | Blob,
-    url: MultipartPart,
-    options: MultipartUploadOptions
-  ): Promise<MultipartUploadResponse>
+multipartUpload(
+  part: Buffer | Blob,
+  url: MultipartPart,
+  options: MultipartUploadOptions
+): Promise<MultipartUploadResponse>
 ```
 
 ```typescript
-  multipartComplete(
-    uuid: Uuid,
-    options: MultipartCompleteOptions
-  ): Promise<FileInfo>
+multipartComplete(
+  uuid: Uuid,
+  options: MultipartCompleteOptions
+): Promise<FileInfo>
 ```
 
 ```typescript
-  multipart(
-    file: File | Buffer | Blob,
-    options: MultipartOptions
-  ): Promise<FileInfo>
+multipart(
+  file: File | Buffer | Blob,
+  options: MultipartOptions
+): Promise<FileInfo>
 ```
 
 ### Settings
