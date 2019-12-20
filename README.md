@@ -374,16 +374,16 @@ Defaults to `application/octet-stream`.
 npm run test
 ```
 
-By default, the testing environment is production, but you can run test with
-local environment. It requires starting a mock server to run tests.
+By default, the testing environment is production, but you can run tests with
+the local environment. It requires starting a mock server.
 
-To start a mock server you need to run next command:
+To start a mock server, you need to execute the following:
 
 ```
 npm run mock:start
 ```
 
-and after that you can run:
+And then you can run:
 
 ```
 NODE_ENV=development npm run test
@@ -391,7 +391,7 @@ NODE_ENV=development npm run test
 
 ## Security issues
 
-If you think you ran into something in Uploadcare libraries which might have
+If you think you ran into something in Uploadcare libraries that might have
 security implications, please hit us up at
 [bugbounty@uploadcare.com][uc-email-bounty] or Hackerone.
 

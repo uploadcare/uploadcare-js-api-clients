@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
+The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
@@ -53,9 +53,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Added
 
-- Support of multipart and uploading of big files: `multipartStart`,
+- Support of multipart and big files uploading: `multipartStart`,
   `multipartUpload`, and `multipartComplete` methods to `UploadAPI`.
-- Support of cancel and handling canceling uploads for all API methods
+- Support of canceling uploads and handling them for all API methods
   (`info`, `fromUrl`, `fromUrlStatus`, `group`, `groupInfo`).
 - `DefaultSettingsInterface` with required properties.
 - `pollingTimeoutMilliseconds` to `SettingsInterface`.
