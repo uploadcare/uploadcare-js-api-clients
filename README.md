@@ -6,7 +6,8 @@
       alt="">
 </a>
 
-This is an Uploadcare [Upload API][uc-docs-upload-api] wrapper to work with Node.js and browser.
+This is an Uploadcare [Upload API][uc-docs-upload-api] wrapper to work with
+Node.js and browser.
 
 [![Build Status](https://travis-ci.org/uploadcare/uploadcare-upload-client.svg?branch=master)](https://travis-ci.org/uploadcare/uploadcare-upload-client)
 [![NPM version][npm-img]][npm-url]
@@ -36,10 +37,9 @@ npm install @uploadcare/upload-client --save
 
 ### High-Level API
 
-To access the High-Level API, you need to create an instance
-of `UploadClient` providing the necessary settings.
-Specifying `YOUR_PUBLIC_KEY` is mandatory: it points to the specific
-Uploadcare project:
+To access the High-Level API, you need to create an instance of `UploadClient`
+providing the necessary settings. Specifying `YOUR_PUBLIC_KEY` is mandatory: it
+points to the specific Uploadcare project:
 
 ```javascript
 import UploadClient from '@uploadcare/upload-client'
@@ -47,8 +47,8 @@ import UploadClient from '@uploadcare/upload-client'
 const client = new UploadClient({ publicKey: 'YOUR_PUBLIC_KEY' })
 ```
 
-Once the UploadClient instance is created, you can start using
-the wrapper to upload files from binary data:
+Once the UploadClient instance is created, you can start using the wrapper to
+upload files from binary data:
 
 ```javascript
 const fileUpload = client.uploadFile(fileData)
@@ -65,8 +65,8 @@ const fileUpload = client.uploadFile(fileURL)
 fileUpload.then(file => console.log(file.uuid))
 ```
 
-You can also use the `uploadFile` method to get previously uploaded files
-via their UUIDs:
+You can also use the `uploadFile` method to get previously uploaded files via
+their UUIDs:
 
 ```javascript
 const fileUUID = 'edfdf045-34c0-4087-bbdd-e3834921f890'
@@ -162,7 +162,7 @@ interface UploadClient {
 
 ### Low-Level API
 
-Also, you can use wrappers around low level to call the API endpoints:
+Also, you can use low-level wrappers to call the API endpoints directly:
 
 ```javascript
 import { base, CancelController } from '@uploadcare/upload-client'
@@ -253,8 +253,8 @@ It is required when using Upload API.
 
 #### `baseCDN: string`
 
-Defines your schema and CDN domain. Can be changed to one of
-the predefined values (`https://ucarecdn.com/`) or your custom CNAME.
+Defines your schema and CDN domain. Can be changed to one of the predefined
+values (`https://ucarecdn.com/`) or your custom CNAME.
 
 Defaults to `https://ucarecdn.com/`.
 
@@ -272,10 +272,9 @@ Defaults to `original`.
 
 #### `store: boolean`
 
-Forces files uploaded with a `UploadClient` to be stored or not.
-For instance, you might want to turn this on when automatic file storing
-is enabled in your project, but you do not want to store files uploaded
-with a particular instance.
+Forces files uploaded with `UploadClient` to be stored or not. For instance,
+you might want to turn this off when automatic file storing is enabled in your
+project, but you do not want to store files uploaded with a particular instance.
 
 #### `secureSignature: string`
 
@@ -301,10 +300,9 @@ Runs the duplicate check and provides the immediate-download behavior.
 
 #### `saveUrlForRecurrentUploads: boolean`
 
-Provides the save/update URL behavior. The parameter can be used
-if you believe a `sourceUrl` will be used more than once.
-Using the parameter also updates an existing reference with a new
-`sourceUrl` content.
+Provides the save/update URL behavior. The parameter can be used if you believe
+that the `sourceUrl` will be used more than once. Using the parameter also
+updates an existing reference with a new `sourceUrl` content.
 
 #### `source: string`
 
@@ -312,20 +310,20 @@ Defines the upload source to use, can be set to local, url, etc.
 
 #### `jsonpCallback: string`
 
-Sets the name of your JSONP callback function to create files group from
-a set of files by using their UUIDs.
+Sets the name of your JSONP callback function to create files group from a set
+of files by using their UUIDs.
 
 #### `pollingTimeoutMilliseconds: number`
 
-Internally, Upload Client implements polling to ensure that a file
-s available on CDN or has finished uploading from URL.
+Internally, Upload Client implements polling to ensure that a file is available
+on CDN or has finished uploading from URL.
 
 Defaults to `10000` milliseconds (10 seconds).
 
 #### `maxContentLength: number`
 
-`maxContentLength` defines the maximum allowed size (in bytes) of
-the HTTP response content.
+`maxContentLength` defines the maximum allowed size (in bytes) of the HTTP
+response content.
 
 Defaults to `52428800` bytes (50 MB).
 
@@ -353,8 +351,8 @@ Defaults to `26214400` (25 MB).
 
 #### `multipartMinLastPartSize: number`
 
-This option is only applicable when handling local files.
-Set the minimum size of the last multipart part.
+This option is only applicable when handling local files. Set the minimum size
+of the last multipart part.
 
 Defaults to `1048576` bytes (1 MB).
 
@@ -376,17 +374,16 @@ Defaults to `application/octet-stream`.
 npm run test
 ```
 
-By default, the testing environment is production, but you can run
-test with local environment. It requires starting a mock server to
-run tests.
+By default, the testing environment is production, but you can run tests with
+the local environment. It requires starting a mock server.
 
-To start a mock server you need to run next command:
+To start a mock server, you need to execute the following:
 
 ```
 npm run mock:start
 ```
 
-and after that you can run:
+And then you can run:
 
 ```
 NODE_ENV=development npm run test
@@ -394,9 +391,9 @@ NODE_ENV=development npm run test
 
 ## Security issues
 
-If you think you ran into something in Uploadcare libraries which might have
-security implications, please hit us up at [bugbounty@uploadcare.com][uc-email-bounty]
-or Hackerone.
+If you think you ran into something in Uploadcare libraries that might have
+security implications, please hit us up at
+[bugbounty@uploadcare.com][uc-email-bounty] or Hackerone.
 
 We'll contact you personally in a short time to fix an issue through co-op and
 prior to any public disclosure.
