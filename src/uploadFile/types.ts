@@ -1,5 +1,4 @@
 import { Url, Uuid } from '..'
-import { isNode } from '../tools/isNode'
 import { NodeFile, BrowserFile } from '../request/types'
 
 /**
@@ -10,9 +9,9 @@ export const isFileData = (
 ): data is NodeFile | BrowserFile => {
   return (
     data !== undefined &&
-    ((!isNode() && data instanceof Blob) ||
-      (!isNode() && data instanceof File) ||
-      (isNode() && data instanceof Buffer))
+    ((typeof Blob !== 'undefined' && data instanceof Blob) ||
+      (typeof File !== 'undefined' && data instanceof File) ||
+      (typeof Buffer !== 'undefined' && data instanceof Buffer))
   )
 }
 

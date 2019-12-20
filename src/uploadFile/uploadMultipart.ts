@@ -1,11 +1,15 @@
+import defaultSettings from '../defaultSettings'
 import multipartStart from '../api/multipartStart'
 import multipartUpload from '../api/multipartUpload'
 import multipartComplete from '../api/multipartComplete'
 import CancelController from '../tools/CancelController'
-import defaultSettings from '../defaultSettings'
+import runWithConcurrency from '../tools/runWithConcurrency'
+import { UploadcareFile } from '../tools/UploadcareFile'
+import { getFileSize } from '../tools/isMultipart'
 
 /* Types */
-import { FileInfo } from '../api/types'
+import { MultipartUploadResponse } from '../api/multipartUpload'
+import { NodeFile, BrowserFile } from '../request/types'
 
 type progressCallback = ({ value: number }) => void
 
@@ -14,6 +18,7 @@ export type MultipartOptions = {
   contentType: string
   multipartChunkSize?: number
   fileName?: string
+  fileSize?: number
   baseURL?: string
   secureSignature?: string
   secureExpire?: string
@@ -23,6 +28,8 @@ export type MultipartOptions = {
   source?: string
   integration?: string
   retryThrottledRequestMaxTimes?: number
+  maxConcurrentRequests?: number
+  baseCDN?: string
 }
 
 const getChunk = (
@@ -37,28 +44,34 @@ const getChunk = (
   return file.slice(start, end)
 }
 
-/**
- * Upload multipart file.
- */
-export default function multipart(
-  file: File | Buffer | Blob,
+const uploadMultipart = (
+  file: NodeFile | BrowserFile,
   {
     publicKey,
-    contentType,
-    multipartChunkSize = defaultSettings.multipartChunkSize,
+
     fileName,
+    fileSize,
     baseURL,
     secureSignature,
     secureExpire,
     store,
+
     cancel,
     onProgress,
+
     source,
     integration,
-    retryThrottledRequestMaxTimes
+
+    retryThrottledRequestMaxTimes,
+
+    contentType,
+    multipartChunkSize = defaultSettings.multipartChunkSize,
+    maxConcurrentRequests = defaultSettings.maxConcurrentRequests,
+
+    baseCDN
   }: MultipartOptions
-): Promise<FileInfo> {
-  const fileSize: number = (file as Buffer).length || (file as Blob).size
+): Promise<UploadcareFile> => {
+  const size = fileSize || getFileSize(file)
 
   let progressValues: number[]
   const createProgressHandler = (
@@ -70,16 +83,16 @@ export default function multipart(
       progressValues = Array(size).fill(0)
     }
 
-    const normalize = (values: number[]): number =>
-      values.reduce((sum, next) => sum + next) / size
+    const sum = (values: number[]): number =>
+      values.reduce((sum, next) => sum + next, 0)
 
     return ({ value }: { value: number }): void => {
       progressValues[index] = value
-      onProgress({ value: normalize(progressValues) })
+      onProgress({ value: sum(progressValues) / size })
     }
   }
 
-  return multipartStart(fileSize, {
+  return multipartStart(size, {
     publicKey,
     contentType,
     fileName,
@@ -95,10 +108,11 @@ export default function multipart(
     .then(({ uuid, parts }) =>
       Promise.all([
         uuid,
-        Promise.all(
-          parts.map((url, index) =>
+        runWithConcurrency(
+          maxConcurrentRequests,
+          parts.map((url, index) => (): Promise<MultipartUploadResponse> =>
             multipartUpload(
-              getChunk(file, index, fileSize, multipartChunkSize),
+              getChunk(file, index, size, multipartChunkSize),
               url,
               {
                 publicKey,
@@ -126,4 +140,7 @@ export default function multipart(
 
       return result
     })
+    .then(fileInfo => new UploadcareFile(fileInfo, { baseCDN }))
 }
+
+export default uploadMultipart

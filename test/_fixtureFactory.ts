@@ -3,7 +3,14 @@ import {
   dataURItoBuffer,
   getSettingsForTesting
 } from './_helpers'
-import { isNode } from '../src/tools/isNode'
+
+const isNode = (): boolean => {
+  try {
+    return Object.prototype.toString.call(global.process) === '[object process]'
+  } catch (e) {
+    return false
+  }
+}
 
 const settings = getSettingsForTesting({})
 

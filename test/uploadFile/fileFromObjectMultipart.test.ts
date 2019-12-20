@@ -14,7 +14,7 @@ describe('uploadFrom Object (multipart)', () => {
     const file = await uploadFile(fileToUpload, settings)
 
     expect(file.cdnUrl).toBeTruthy()
-  }, 250000)
+  })
 
   it('should accept store setting', async () => {
     const settings = getSettingsForTesting({
@@ -24,7 +24,7 @@ describe('uploadFrom Object (multipart)', () => {
     const file = await uploadFile(fileToUpload, settings)
 
     expect(file.isStored).toBeFalsy()
-  }, 250000)
+  })
 
   it('should be able to cancel uploading', async () => {
     const ctrl = new CancelController()
@@ -50,7 +50,7 @@ describe('uploadFrom Object (multipart)', () => {
     const file = await uploadFile(fileToUpload, settings)
 
     expect(file.name).toEqual('newFileName.jpg')
-  }, 250000)
+  })
 
   describe('should be able to handle', () => {
     it('cancel uploading', async () => {
@@ -87,6 +87,6 @@ describe('uploadFrom Object (multipart)', () => {
       await upload
 
       expect(progressValue).toBe(1)
-    }, 250000)
+    })
   })
 })

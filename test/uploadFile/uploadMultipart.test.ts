@@ -1,6 +1,6 @@
 import * as factory from '../_fixtureFactory'
 import { getSettingsForTesting } from '../_helpers'
-import multipart from '../../src/multipart/multipart'
+import uploadMultipart from '../../src/uploadFile/uploadMultipart'
 import { UploadClientError } from '../../src/tools/errors'
 import CancelController from '../../src/tools/CancelController'
 
@@ -12,7 +12,7 @@ describe('API - multipart', () => {
       contentType: 'application/octet-stream'
     })
 
-    const { uuid } = await multipart(fileToUpload, settings)
+    const { uuid } = await uploadMultipart(fileToUpload, settings)
 
     expect(uuid).toBeTruthy()
   })
@@ -30,10 +30,9 @@ describe('API - multipart', () => {
       ctrl.cancel()
     })
 
-    await expectAsync(multipart(fileToUpload, settings)).toBeRejectedWithError(
-      UploadClientError,
-      'Request canceled'
-    )
+    await expectAsync(
+      uploadMultipart(fileToUpload, settings)
+    ).toBeRejectedWithError(UploadClientError, 'Request canceled')
   })
 
   it('should be able to handle progress', async () => {
@@ -45,7 +44,7 @@ describe('API - multipart', () => {
       onProgress
     })
 
-    await multipart(fileToUpload, settings)
+    await uploadMultipart(fileToUpload, settings)
 
     expect(onProgress).toHaveBeenCalled()
     expect(onProgress).toHaveBeenCalledWith({ value: 1 })
