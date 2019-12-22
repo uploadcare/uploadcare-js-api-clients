@@ -1,87 +1,70 @@
-import {RequestOptionsInterface, RequestResponse} from './request/types'
-import {FileData, SettingsInterface} from '../types'
-import {FromUrlResponse, Url} from './fromUrl'
-import {FromUrlStatusResponse} from './fromUrlStatus'
-import {
-  MultipartPart,
-  MultipartStartResponse,
-} from './multipart/types'
-import {BaseThenableInterface, CancelableThenableInterface} from '../thenable/types'
-import {BaseResponse} from './base'
-
-interface StatusInterface {
-  status: string;
+export type GeoLocation = {
+  latitude: number
+  longitude: number
 }
 
-interface ProgressInterface {
-  size: number;
-  done: number;
-  total: number;
+export type ImageInfo = {
+  height: number
+  width: number
+  geoLocation: GeoLocation | null
+  datetimeOriginal: string
+  format: string
+  colorMode: string
+  dpi: {
+    '0': number
+    '1': number
+  } | null
+  orientation: number | null
+  sequence: boolean | null
 }
 
-export interface ProgressStatusInterface extends StatusInterface, ProgressInterface {}
-
-export interface GeoLocationInterface {
-  latitude: number;
-  longitude: number;
+export type AudioInfo = {
+  bitrate: number | null
+  codec: string | null
+  sampleRate: number | null
+  channels: string | null
 }
 
-interface ImageInfoInterface {
-  height: number;
-  width: number;
-  geo_location: null | GeoLocationInterface;
-  datetime_original: string;
-  format: string;
-  color_mode: string;
-  dpi: null | number[];
-  orientation: null | number;
-  sequence?: boolean;
+export type VideoInfo = {
+  duration: number
+  format: string
+  bitrate: number
+  audio: AudioInfo | null
+  video: {
+    height: number
+    width: number
+    frameRate: number
+    bitrate: number
+    codec: string
+  }
 }
 
-interface AudioInterface {
-  bitrate: number | null;
-  codec: string | null;
-  sample_rate: number | null;
-  channels: string | null;
+export type FileInfo = {
+  size: number
+  done: number
+  total: number
+
+  uuid: Uuid
+  fileId: Uuid
+  originalFilename: string
+  filename: string
+  mimeType: string
+  isImage: boolean
+  isStored: boolean
+  isReady: string
+  imageInfo: ImageInfo | null
+  videoInfo: VideoInfo | null
+  s3Bucket: string | null
 }
 
-interface VideoInterface {
-  height: number;
-  width: number;
-  frame_rate: number;
-  bitrate: number;
-  codec: string;
-}
-
-interface VideoInfoInterface {
-  duration: number;
-  format: string;
-  bitrate: number;
-  audio: AudioInterface | null;
-  video: VideoInterface;
-}
-
-export interface FileInfoInterface extends ProgressInterface {
-  uuid: Uuid;
-  file_id: Uuid;
-  original_filename: string;
-  filename: string;
-  mime_type: string;
-  is_image: string;
-  is_store: string;
-  is_ready: string;
-  image_info: null | ImageInfoInterface;
-  video_info: null | VideoInfoInterface;
-}
-
-export interface GroupInfoInterface {
-  datetime_created: string;
-  datetime_stored: string | null;
-  files_count: string;
-  cdn_url: string;
-  files: FileInfoInterface[];
-  url: string;
-  id: GroupId;
+export type GroupInfo = {
+  datetimeCreated: string
+  datetimeStored: string | null
+  filesCount: string
+  cdnUrl: string
+  files: FileInfo[]
+  url: string
+  id: GroupId
 }
 
 export type Token = string
@@ -90,24 +73,4 @@ export type Uuid = string
 
 export type GroupId = string
 
-export interface UploadAPIInterface {
-  request(options: RequestOptionsInterface): Promise<RequestResponse>;
-
-  base(data: FileData, settings?: SettingsInterface): BaseThenableInterface<BaseResponse>;
-
-  info(uuid: Uuid, settings?: SettingsInterface): CancelableThenableInterface<FileInfoInterface>;
-
-  fromUrl(sourceUrl: Url, settings?: SettingsInterface): CancelableThenableInterface<FromUrlResponse>;
-
-  fromUrlStatus(token: Token, settings?: SettingsInterface): CancelableThenableInterface<FromUrlStatusResponse>;
-
-  group(files: Uuid[], settings: SettingsInterface): CancelableThenableInterface<GroupInfoInterface>;
-
-  groupInfo(id: GroupId, settings: SettingsInterface): CancelableThenableInterface<GroupInfoInterface>;
-
-  multipartStart(file: FileData, settings: SettingsInterface): CancelableThenableInterface<MultipartStartResponse>;
-
-  multipartUpload(file: FileData, parts: MultipartPart[], settings: SettingsInterface): BaseThenableInterface<any>;
-
-  multipartComplete(uuid: Uuid, settings: SettingsInterface): CancelableThenableInterface<FileInfoInterface>;
-}
+export type Url = string

@@ -2,7 +2,8 @@ import * as json from '../data/group.json'
 import find from '../utils/find'
 import error from '../utils/error'
 
-const UUID_REGEX = '[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}'
+const UUID_REGEX =
+  '[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}'
 const GROUP_ID_REGEX = `${UUID_REGEX}~[1-9][0-9]*$`
 
 /**
@@ -10,14 +11,15 @@ const GROUP_ID_REGEX = `${UUID_REGEX}~[1-9][0-9]*$`
  * @param {string} uuid
  * @return {boolean}
  */
-const isValidUuid = (uuid: string): boolean => (new RegExp(UUID_REGEX)).test(uuid)
+const isValidUuid = (uuid: string): boolean => new RegExp(UUID_REGEX).test(uuid)
 
 /**
  * Check group id.
  * @param {string} groupId
  * @return {boolean}
  */
-const isValidGroupId = (groupId: string): boolean => (new RegExp(GROUP_ID_REGEX)).test(groupId)
+const isValidGroupId = (groupId: string): boolean =>
+  new RegExp(GROUP_ID_REGEX).test(groupId)
 
 /**
  * Get UUID from file
@@ -26,7 +28,7 @@ const isValidGroupId = (groupId: string): boolean => (new RegExp(GROUP_ID_REGEX)
  */
 const getFileUuid = (file: string): string => {
   // If file contains CDN operations
-  if ((new RegExp(/\//)).test(file)) {
+  if (new RegExp(/\//).test(file)) {
     const array = file.split('/')
 
     return array[0]
@@ -50,7 +52,7 @@ const isValidFile = (file: string): boolean => {
  * '/group/'
  * @param {object} ctx
  */
-const index = (ctx) => {
+const index = ctx => {
   let files = ctx.query && ctx.query['files[]']
   const publicKey = ctx.query && ctx.query.pub_key
 
@@ -86,7 +88,7 @@ const index = (ctx) => {
  * '/group/info/?pub_key=XXXXXXXXXXXXXXXXXXXX&group_id=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX~N'
  * @param {object} ctx
  */
-const info = (ctx) => {
+const info = ctx => {
   const groupId = ctx.query && ctx.query.group_id
 
   if (!groupId) {
@@ -105,7 +107,4 @@ const info = (ctx) => {
   ctx.body = find(json, 'info')
 }
 
-export {
-  index,
-  info,
-}
+export { index, info }

@@ -1,48 +1,85 @@
-import {prepareOptions} from './request/prepareOptions'
+import { Uuid, GroupInfo } from './types'
+import { FailedResponse } from '../request/types'
 
-/* Types */
-import {Query, RequestOptionsInterface} from './request/types'
-import {GroupInfoInterface, Uuid} from './types'
-import {SettingsInterface} from '../types'
-import {CancelableThenable} from '../thenable/CancelableThenable'
-import {CancelableThenableInterface} from '../thenable/types'
+import request from '../request/request.node'
+import getUrl from '../tools/getUrl'
 
-const getRequestQuery = (uuids: Uuid[], settings: SettingsInterface): Query => {
-  const query = {
-    pub_key: settings.publicKey || '',
-    files: uuids,
-    callback: settings.jsonpCallback || undefined,
-    signature: settings.secureSignature || undefined,
-    expire: settings.secureExpire || undefined,
-  }
+import CancelController from '../tools/CancelController'
+import defaultSettings from '../defaultSettings'
+import { getUserAgent } from '../tools/userAgent'
+import camelizeKeys from '../tools/camelizeKeys'
+import { UploadClientError } from '../tools/errors'
+import retryIfThrottled from '../tools/retryIfThrottled'
 
-  if (settings.source) {
-    return {
-      ...query,
-      source: settings.source,
-    }
-  }
+export type GroupOptions = {
+  publicKey: string
 
-  return  {...query}
+  baseURL?: string
+  jsonpCallback?: string
+  secureSignature?: string
+  secureExpire?: string
+
+  cancel?: CancelController
+
+  source?: string // ??
+  integration?: string
+
+  retryThrottledRequestMaxTimes?: number
 }
 
-const getRequestOptions = (uuids: Uuid[], settings: SettingsInterface): RequestOptionsInterface => {
-  return prepareOptions({
-    method: 'POST',
-    path: '/group/',
-    query: getRequestQuery(uuids, settings),
-  }, settings)
-}
+type Response = GroupInfo | FailedResponse
 
 /**
  * Create files group.
- *
- * @param {Uuid[]} uuids – A set of files you want to join in a group.
- * @param {SettingsInterface} settings
- * @return {CancelableThenableInterface<GroupInfoInterface>}
  */
-export default function group(uuids: Uuid[], settings: SettingsInterface = {}): CancelableThenableInterface<GroupInfoInterface> {
-  const options = getRequestOptions(uuids, settings)
 
-  return new CancelableThenable(options)
+/* eslint @typescript-eslint/camelcase: [2, {allow: ["pub_key"]}] */
+
+export default function group(
+  uuids: Uuid[],
+  {
+    publicKey,
+    baseURL = defaultSettings.baseURL,
+    jsonpCallback,
+    secureSignature,
+    secureExpire,
+    cancel,
+    source,
+    integration,
+    retryThrottledRequestMaxTimes = defaultSettings.retryThrottledRequestMaxTimes
+  }: GroupOptions
+): Promise<GroupInfo> {
+  return retryIfThrottled(
+    () =>
+      request({
+        method: 'POST',
+        headers: {
+          'X-UC-User-Agent': getUserAgent({ publicKey, integration })
+        },
+        url: getUrl(baseURL, '/group/', {
+          jsonerrors: 1,
+          pub_key: publicKey,
+          files: uuids,
+          callback: jsonpCallback,
+          signature: secureSignature,
+          expire: secureExpire,
+          source
+        }),
+        cancel
+      }).then(({ data, headers, request }) => {
+        const response = camelizeKeys<Response>(JSON.parse(data))
+
+        if ('error' in response) {
+          throw new UploadClientError(
+            `[${response.error.statusCode}] ${response.error.content}`,
+            request,
+            response.error,
+            headers
+          )
+        } else {
+          return response
+        }
+      }),
+    retryThrottledRequestMaxTimes
+  )
 }
