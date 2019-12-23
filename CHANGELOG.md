@@ -1,3 +1,35 @@
+# [1.0.0](https://github.com/uploadcare/uploadcare-upload-client/compare/v1.0.0-alpha.5...v1.0.0) (2019-12-23)
+
+
+### Bug Fixes
+
+* don't parse json in browser request and send data after subscribe on progress ([#111](https://github.com/uploadcare/uploadcare-upload-client/issues/111)) ([26a3669](https://github.com/uploadcare/uploadcare-upload-client/commit/26a3669ce04a99713f8dc8a5f3b7282c5bf88a41))
+* provide only uploadFile as High-Level API ([#121](https://github.com/uploadcare/uploadcare-upload-client/issues/121)) ([f5d40d9](https://github.com/uploadcare/uploadcare-upload-client/commit/f5d40d90370fa2f546d0115fa44dc0d07b1ea80a))
+* rewrite async / await with promise chain ([#108](https://github.com/uploadcare/uploadcare-upload-client/issues/108)) ([07ab816](https://github.com/uploadcare/uploadcare-upload-client/commit/07ab816196f956768326ebf557ab97c1597117e5))
+* **errors:** set prototype for all errors ([#82](https://github.com/uploadcare/uploadcare-upload-client/issues/82)) ([17eccc3](https://github.com/uploadcare/uploadcare-upload-client/commit/17eccc3465f1e67a8d7df33427106379bdb636b0))
+* **types:** improves poller ([#102](https://github.com/uploadcare/uploadcare-upload-client/issues/102)) ([68a1c5f](https://github.com/uploadcare/uploadcare-upload-client/commit/68a1c5f751f7063c23124f4c5c6a04908dce2cd9))
+* update progress in node request ([#101](https://github.com/uploadcare/uploadcare-upload-client/issues/101)) ([d80ea93](https://github.com/uploadcare/uploadcare-upload-client/commit/d80ea93e84613976219ba1ffe1ff783381ed2145))
+* update request types ([#94](https://github.com/uploadcare/uploadcare-upload-client/issues/94)) ([20a4425](https://github.com/uploadcare/uploadcare-upload-client/commit/20a4425f557c0a97de5f9764b3c97d4b127a1b9f))
+
+
+### Features
+
+* add build step, configure browser field in package.json ([#110](https://github.com/uploadcare/uploadcare-upload-client/issues/110)) ([80e400e](https://github.com/uploadcare/uploadcare-upload-client/commit/80e400e6f1b4041b8ea7417f94a62055cc03ba47))
+* add cancel controller ([#77](https://github.com/uploadcare/uploadcare-upload-client/issues/77)) ([49ad25d](https://github.com/uploadcare/uploadcare-upload-client/commit/49ad25d1a8d5ce3cb22f1070a07cba5f0adf4d3d))
+* add concurrency runner ([#118](https://github.com/uploadcare/uploadcare-upload-client/issues/118)) ([4835b9f](https://github.com/uploadcare/uploadcare-upload-client/commit/4835b9f7968f379a71a7febdda340da178966fc4))
+* add errors and retry if throttled ([#97](https://github.com/uploadcare/uploadcare-upload-client/issues/97)) ([292d869](https://github.com/uploadcare/uploadcare-upload-client/commit/292d8693b9f5115ef519a4282ae6f9ac8bb2de2c))
+* add multipart  ([#104](https://github.com/uploadcare/uploadcare-upload-client/issues/104)) ([4f76b9f](https://github.com/uploadcare/uploadcare-upload-client/commit/4f76b9fc8f875a68bab10bf723a6a0180eba92a2))
+* add request for browser ([#99](https://github.com/uploadcare/uploadcare-upload-client/issues/99)) ([39716d7](https://github.com/uploadcare/uploadcare-upload-client/commit/39716d792b548eb7860a658dc0e3081f2f1cd2d2))
+* add upload from url ([#103](https://github.com/uploadcare/uploadcare-upload-client/issues/103)) ([6c7b405](https://github.com/uploadcare/uploadcare-upload-client/commit/6c7b405d50a6a48bab3441779587cd2ba3c1e84c))
+* poller ([#80](https://github.com/uploadcare/uploadcare-upload-client/issues/80)) ([4fb7153](https://github.com/uploadcare/uploadcare-upload-client/commit/4fb71538070cc4cfc879c3c0859ed3c845a68641))
+
+
+### Reverts
+
+* Revert "remove reporters" ([19ade42](https://github.com/uploadcare/uploadcare-upload-client/commit/19ade421cecfeb52e14494491402efe0068fa9cd))
+
+
+
 # Changelog
 
 All notable changes to this project will be documented in this file.
