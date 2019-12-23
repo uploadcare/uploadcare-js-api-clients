@@ -5,8 +5,13 @@ node_js:
   - 'lts/*'
   - '8'
 
+env:
+  - NODE_ENV=production
+
 install:
   - NODE_ENV=dev npm install
 
-env:
-  - NODE_ENV=production
+jobs:
+  include:
+    - stage: Browser
+      script: npm run test:browser
