@@ -1,9 +1,7 @@
-const version = '1.0.0'
+import version from '../version'
+
 /**
  * Returns User Agent based on version and settings.
- *
- * @param {Settings} [settings]
- * @returns {string}
  */
 export function getUserAgent({
   publicKey = '',
