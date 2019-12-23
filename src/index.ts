@@ -11,10 +11,6 @@ import multipartUpload from './api/multipartUpload'
 import multipartComplete from './api/multipartComplete'
 
 import uploadFile from './uploadFile'
-import uploadBase from './uploadFile/uploadBase'
-import uploadFromUrl from './uploadFile/uploadFromUrl'
-import uploadFromUploaded from './uploadFile/uploadFromUploaded'
-import uploadMultipart from './uploadFile/uploadMultipart'
 import uploadFileGroup from './uploadFileGroup'
 
 import CancelController from './tools/CancelController'
@@ -59,14 +55,7 @@ export {
 }
 
 /* High-Level API */
-export {
-  uploadBase,
-  uploadMultipart,
-  uploadFromUrl,
-  uploadFromUploaded,
-  uploadFile,
-  uploadFileGroup
-}
+export { uploadFile, uploadFileGroup }
 
 /* Helpers */
 export { CancelController }
