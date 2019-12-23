@@ -15,7 +15,7 @@
     "mock:start": "cd ./mock-server && npm run start",
     "test": "npm run test:node",
     "test:node": "jasmine-ts --project test/tsconfig.json --config=test/jasmine.config.json",
-    "test:browser": "karma start karma.config.js --single-run --nocache",
+    "test:browser": "karma start ./browser-test/karma.config.js --single-run --nocache",
     "test:browser:debug": "karma start karma.config.js --browsers=Chrome --single-run=false --watch --debug --nocache",
     "prebuild": "npm run clean",
     "build": "tsc --build tsconfig.build.json",
