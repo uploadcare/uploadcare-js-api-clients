@@ -1,10 +1,12 @@
 {
   "name": "@uploadcare/upload-client",
-  "version": "1.0.0-alpha.5",
+  "version": "1.0.0",
   "description": "Library for work with Uploadcare Upload API",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
-  "files": ["lib/**/*"],
+  "files": [
+    "lib/**/*"
+  ],
   "browser": {
     "./lib/request/request.node.js": "./lib/request/request.browser.js",
     "./lib/tools/getFormData.node.js": "./lib/tools/getFormData.browser.js"

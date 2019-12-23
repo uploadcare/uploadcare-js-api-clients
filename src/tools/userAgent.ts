@@ -1,4 +1,4 @@
-const version = '1.0.0alpha-amega'
+const version = '1.0.0'
 /**
  * Returns User Agent based on version and settings.
  *
