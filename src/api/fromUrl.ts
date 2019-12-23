@@ -1,13 +1,17 @@
-import {prepareOptions} from './request/prepareOptions'
+import { FileInfo } from './types'
+import { FailedResponse } from '../request/types'
 
-/* Types */
-import {Query, RequestOptionsInterface} from './request/types'
-import {SettingsInterface} from '../types'
-import {FileInfoInterface} from './types'
-import {CancelableThenable} from '../thenable/CancelableThenable'
-import {CancelableThenableInterface} from '../thenable/types'
+import request from '../request/request.node'
+import getUrl from '../tools/getUrl'
 
-export type Url = string
+import CancelController from '../tools/CancelController'
+import defaultSettings from '../defaultSettings'
+import { getUserAgent } from '../tools/userAgent'
+import camelizeKeys from '../tools/camelizeKeys'
+import { UploadClientError } from '../tools/errors'
+import retryIfThrottled from '../tools/retryIfThrottled'
+
+type Url = string
 
 export enum TypeEnum {
   Token = 'token',
@@ -15,65 +19,114 @@ export enum TypeEnum {
 }
 
 type TokenResponse = {
-  type: TypeEnum.Token;
-  token: string;
+  type: TypeEnum.Token
+  token: string
 }
 
 type FileInfoResponse = {
-  type: TypeEnum.FileInfo;
-} & FileInfoInterface
+  type: TypeEnum.FileInfo
+} & FileInfo
 
-export type FromUrlResponse = FileInfoResponse | TokenResponse
+type FromUrlSuccessResponse = FileInfoResponse | TokenResponse
+
+type Response = FailedResponse | FromUrlSuccessResponse
+
+export type FromUrlResponse = FromUrlSuccessResponse
 
 /**
  * TokenResponse Type Guard.
- *
- * @param {FromUrlResponse} response
  */
-export const isTokenResponse = (response: FromUrlResponse): response is TokenResponse => {
+export const isTokenResponse = (
+  response: FromUrlSuccessResponse
+): response is TokenResponse => {
   return response.type !== undefined && response.type === TypeEnum.Token
 }
 
 /**
- * InfoResponse Type Guard.
- *
- * @param {FromUrlResponse} response
+ * FileInfoResponse Type Guard.
  */
-export const isFileInfoResponse = (response: FromUrlResponse): response is FileInfoResponse => {
+export const isFileInfoResponse = (
+  response: FromUrlSuccessResponse
+): response is FileInfoResponse => {
   return response.type !== undefined && response.type === TypeEnum.FileInfo
 }
 
-const getRequestQuery = (sourceUrl: Url, settings: SettingsInterface): Query => ({
-  pub_key: settings.publicKey || '',
-  source_url: sourceUrl,
-  store: settings.doNotStore ? '' : 'auto',
-  filename: settings.fileName || '',
-  check_URL_duplicates: settings.checkForUrlDuplicates ? 1 : 0,
-  save_URL_duplicates: settings.saveUrlForRecurrentUploads ? 1 : 0,
-  signature: settings.secureSignature || '',
-  expire: settings.secureExpire || '',
-  source: settings.source || 'url',
-})
+export type FromUrlOptions = {
+  publicKey: string
 
-const getRequestOptions = (sourceUrl: Url, settings: SettingsInterface): RequestOptionsInterface => {
-  return prepareOptions({
-    method: 'POST',
-    path: '/from_url/',
-    query: getRequestQuery(sourceUrl, settings),
-  }, settings)
+  baseURL?: string
+  store?: boolean
+  fileName?: string
+  checkForUrlDuplicates?: boolean
+  saveUrlForRecurrentUploads?: boolean
+  secureSignature?: string
+  secureExpire?: string
+
+  cancel?: CancelController
+
+  source?: string
+  integration?: string
+
+  retryThrottledRequestMaxTimes?: number
 }
 
 /**
  * Uploading files from URL.
- *
- * @param {Url} sourceUrl – Source file URL, which should be a public HTTP or HTTPS link.
- * @param {SettingsInterface} settings
- * @return {CancelableThenableInterface<FromUrlResponse>}
  */
-export default function fromUrl(
-  sourceUrl: Url, settings: SettingsInterface = {}
-): CancelableThenableInterface<FromUrlResponse> {
-  const options = getRequestOptions(sourceUrl, settings)
 
-  return new CancelableThenable(options)
+/* eslint @typescript-eslint/camelcase: [2, {allow: ["pub_key", "source_url", "check_URL_duplicates", "save_URL_duplicates"]}] */
+
+export default function fromUrl(
+  sourceUrl: Url,
+  {
+    publicKey,
+    baseURL = defaultSettings.baseURL,
+    store,
+    fileName,
+    checkForUrlDuplicates,
+    saveUrlForRecurrentUploads,
+    secureSignature,
+    secureExpire,
+    source = 'url',
+    cancel,
+    integration,
+    retryThrottledRequestMaxTimes = defaultSettings.retryThrottledRequestMaxTimes
+  }: FromUrlOptions
+): Promise<FromUrlSuccessResponse> {
+  return retryIfThrottled(
+    () =>
+      request({
+        method: 'POST',
+        headers: {
+          'X-UC-User-Agent': getUserAgent({ publicKey, integration })
+        },
+        url: getUrl(baseURL, '/from_url/', {
+          jsonerrors: 1,
+          pub_key: publicKey,
+          source_url: sourceUrl,
+          store: typeof store === 'undefined' ? 'auto' : store ? 1 : undefined,
+          filename: fileName,
+          check_URL_duplicates: checkForUrlDuplicates ? 1 : undefined,
+          save_URL_duplicates: saveUrlForRecurrentUploads ? 1 : undefined,
+          signature: secureSignature,
+          expire: secureExpire,
+          source: source
+        }),
+        cancel
+      }).then(({ data, headers, request }) => {
+        const response = camelizeKeys<Response>(JSON.parse(data))
+
+        if ('error' in response) {
+          throw new UploadClientError(
+            `[${response.error.statusCode}] ${response.error.content}`,
+            request,
+            response.error,
+            headers
+          )
+        } else {
+          return response
+        }
+      }),
+    retryThrottledRequestMaxTimes
+  )
 }

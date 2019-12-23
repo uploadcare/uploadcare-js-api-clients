@@ -1,13 +1,17 @@
-import {prepareOptions} from './request/prepareOptions'
+import { FileInfo, Token } from './types'
+import { FailedResponse } from '../request/types'
 
-/* Types */
-import {Query, RequestOptionsInterface} from './request/types'
-import {SettingsInterface} from '../types'
-import {FileInfoInterface, ProgressStatusInterface, Token} from './types'
-import {CancelableThenable} from '../thenable/CancelableThenable'
-import {CancelableThenableInterface} from '../thenable/types'
+import request from '../request/request.node'
+import getUrl from '../tools/getUrl'
 
-export enum StatusEnum {
+import defaultSettings from '../defaultSettings'
+import { getUserAgent } from '../tools/userAgent'
+import CancelController from '../tools/CancelController'
+import camelizeKeys from '../tools/camelizeKeys'
+import { UploadClientError } from '../tools/errors'
+import retryIfThrottled from '../tools/retryIfThrottled'
+
+export enum Status {
   Unknown = 'unknown',
   Waiting = 'waiting',
   Progress = 'progress',
@@ -15,96 +19,96 @@ export enum StatusEnum {
   Success = 'success'
 }
 
-type UnknownResponse = {
-  status: StatusEnum.Unknown;
+type StatusUnknownResponse = {
+  status: Status.Unknown
 }
 
-type WaitingResponse = {
-  status: StatusEnum.Waiting;
+type StatusWaitingResponse = {
+  status: Status.Waiting
 }
 
-type ProgressResponse = {
-  status: StatusEnum.Progress;
-} & ProgressStatusInterface
-
-type ErrorResponse = {
-  status: StatusEnum.Error;
-  error: string;
+type StatusProgressResponse = {
+  status: Status.Progress
+  size: number
+  done: number
+  total: number
 }
 
-type SuccessResponse = {
-  status: StatusEnum.Success;
-} & FileInfoInterface
-
-export type FromUrlStatusResponse = UnknownResponse | WaitingResponse | ProgressResponse | ErrorResponse | SuccessResponse
-
-/**
- * UnknownResponse Type Guard.
- *
- * @param {FromUrlStatusResponse} response
- */
-export const isUnknownResponse = (response: FromUrlStatusResponse): response is UnknownResponse => {
-  return response.status !== undefined && response.status === StatusEnum.Unknown
+type StatusErrorResponse = {
+  status: Status.Error
+  error: string
 }
 
-/**
- * WaitingResponse Type Guard.
- *
- * @param {FromUrlStatusResponse} response
- */
-export const isWaitingResponse = (response: FromUrlStatusResponse): response is WaitingResponse => {
-  return response.status !== undefined && response.status === StatusEnum.Waiting
+type StatusSuccessResponse = {
+  status: Status.Success
+} & FileInfo
+
+export type FromUrlStatusResponse =
+  | StatusUnknownResponse
+  | StatusWaitingResponse
+  | StatusProgressResponse
+  | StatusErrorResponse
+  | StatusSuccessResponse
+
+type Response = FromUrlStatusResponse | FailedResponse
+
+const isErrorResponse = (
+  response: Response
+): response is StatusErrorResponse => {
+  return 'status' in response && response.status === Status.Error
 }
 
-/**
- * UnknownResponse Type Guard.
- *
- * @param {FromUrlStatusResponse} response
- */
-export const isProgressResponse = (response: FromUrlStatusResponse): response is ProgressResponse => {
-  return response.status !== undefined && response.status === StatusEnum.Progress
-}
+export type FromUrlStatusOptions = {
+  publicKey?: string
 
-/**
- * UnknownResponse Type Guard.
- *
- * @param {FromUrlStatusResponse} response
- */
-export const isErrorResponse = (response: FromUrlStatusResponse): response is ErrorResponse => {
-  return response.status !== undefined && response.status === StatusEnum.Error
-}
+  baseURL?: string
 
-/**
- * SuccessResponse Type Guard.
- *
- * @param {FromUrlStatusResponse} response
- */
-export const isSuccessResponse = (response: FromUrlStatusResponse): response is SuccessResponse => {
-  return response.status !== undefined && response.status === StatusEnum.Success
-}
+  cancel?: CancelController
 
-const getRequestQuery = (token: string, settings: SettingsInterface): Query => ({
-  token: token,
-  pub_key: settings.publicKey || '',
-})
+  integration?: string
 
-const getRequestOptions = (token: Token, settings: SettingsInterface): RequestOptionsInterface => {
-  return prepareOptions({
-    path: '/from_url/status/',
-    query: getRequestQuery(token, settings),
-  }, settings)
+  retryThrottledRequestMaxTimes?: number
 }
 
 /**
  * Checking upload status and working with file tokens.
- *
- * @param {Token} token – Source file URL, which should be a public HTTP or HTTPS link.
- * @param {SettingsInterface} settings
- * @throws {UploadcareError}
- * @return {CancelableThenableInterface<FromUrlStatusResponse>}
  */
-export default function fromUrlStatus(token: Token, settings: SettingsInterface = {}): CancelableThenableInterface<FromUrlStatusResponse> {
-  const options = getRequestOptions(token, settings)
+export default function fromUrlStatus(
+  token: Token,
+  {
+    publicKey,
+    baseURL = defaultSettings.baseURL,
+    cancel,
+    integration,
+    retryThrottledRequestMaxTimes = defaultSettings.retryThrottledRequestMaxTimes
+  }: FromUrlStatusOptions = {}
+): Promise<FromUrlStatusResponse> {
+  return retryIfThrottled(
+    () =>
+      request({
+        method: 'GET',
+        headers: publicKey
+          ? { 'X-UC-User-Agent': getUserAgent({ publicKey, integration }) }
+          : undefined,
+        url: getUrl(baseURL, '/from_url/status/', {
+          jsonerrors: 1,
+          token
+        }),
+        cancel
+      }).then(({ data, headers, request }) => {
+        const response = camelizeKeys<Response>(JSON.parse(data))
 
-  return new CancelableThenable(options)
+        if ('error' in response && !isErrorResponse(response)) {
+          throw new UploadClientError(
+            `[${response.error.statusCode}] ${response.error.content}`,
+            request,
+            response.error,
+            headers
+          )
+        } else {
+          return response
+        }
+      }),
+    retryThrottledRequestMaxTimes
+  )
 }

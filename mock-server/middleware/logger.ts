@@ -12,7 +12,8 @@ const pretty = (json: object): string => JSON.stringify(json, null, 2)
  * @param {object} object
  * @return {boolean}
  */
-const isEmptyObject = (object: object): boolean => Object.keys(object).length === 0 && object.constructor === Object
+const isEmptyObject = (object: object): boolean =>
+  Object.keys(object).length === 0 && object.constructor === Object
 
 /**
  * Logger for requests and responses.
@@ -20,9 +21,11 @@ const isEmptyObject = (object: object): boolean => Object.keys(object).length ==
  * @param {function} next
  */
 const logger = async (ctx, next) => {
-  await next();
+  await next()
 
-  const request = `${chalk.gray('-->')} ${chalk.bold(ctx.request.method)} ${chalk.gray(ctx.request.url)}`
+  const request = `${chalk.gray('-->')} ${chalk.bold(
+    ctx.request.method
+  )} ${chalk.gray(ctx.request.url)}`
   const requestHeaders = ctx.request.headers
   const requestBody = ctx.request.body
   const requestQuery = ctx.request.query
@@ -31,7 +34,9 @@ const logger = async (ctx, next) => {
   const message = ctx.response.message
   const isPositive = status >= 200 && status < 300
   const statusMessage = `${status.toString()} ${message}`
-  const coloredStatusMessage = isPositive ? `${chalk.green(statusMessage)}` : `${chalk.red(statusMessage)}`
+  const coloredStatusMessage = isPositive
+    ? `${chalk.green(statusMessage)}`
+    : `${chalk.red(statusMessage)}`
 
   const response = `${chalk.gray('<--')} ${chalk.bold(coloredStatusMessage)}`
   const responseBody = ctx.response.body
@@ -45,7 +50,11 @@ const logger = async (ctx, next) => {
 
   if (!isEmptyObject(requestBody)) {
     if (ctx.request.url.match(/\/multipart\/upload/)) {
-      console.log(`Request Body: ${chalk.gray('hidden (because a lot of binary data will be printed)')}`)
+      console.log(
+        `Request Body: ${chalk.gray(
+          'hidden (because a lot of binary data will be printed)'
+        )}`
+      )
     } else {
       console.log('Request Body:')
       console.log(pretty(requestBody))

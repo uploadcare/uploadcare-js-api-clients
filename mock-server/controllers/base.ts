@@ -5,10 +5,8 @@ import find from '../utils/find'
  * '/base/'
  * @param {object} ctx
  */
-const index = (ctx) => {
+const index = ctx => {
   ctx.body = find(json, 'info')
 }
 
-export {
-  index,
-}
+export { index }

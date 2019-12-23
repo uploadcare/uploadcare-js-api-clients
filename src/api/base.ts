@@ -1,43 +1,102 @@
-import {prepareOptions} from './request/prepareOptions'
+import request from '../request/request.node'
+import getFormData from '../tools/buildFormData'
+import getUrl from '../tools/getUrl'
+import CancelController from '../tools/CancelController'
+import defaultSettings from '../defaultSettings'
+import { getUserAgent } from '../tools/userAgent'
+import camelizeKeys from '../tools/camelizeKeys'
+import { UploadClientError } from '../tools/errors'
+import retryIfThrottled from '../tools/retryIfThrottled'
 
 /* Types */
-import {Body, RequestOptionsInterface} from './request/types'
-import {SettingsInterface, FileData} from '../types'
-import {Uuid} from './types'
-import {BaseThenableInterface} from '../thenable/types'
-import {BaseThenable} from '../thenable/BaseThenable'
+import { Uuid } from './types'
+import { FailedResponse, NodeFile, BrowserFile } from '../request/types'
 
 export type BaseResponse = {
-  file: Uuid;
+  file: Uuid
 }
 
-const getRequestBody = (file: FileData, settings: SettingsInterface): Body => ({
-  UPLOADCARE_PUB_KEY: settings.publicKey || '',
-  signature: settings.secureSignature || '',
-  expire: settings.secureExpire || '',
-  UPLOADCARE_STORE: settings.doNotStore ? '' : 'auto',
-  source: settings.source || 'local',
-  file: file,
-})
+type Response = BaseResponse | FailedResponse
 
-const getRequestOptions = (file: FileData, settings: SettingsInterface): RequestOptionsInterface => {
-  return prepareOptions({
-    method: 'POST',
-    path: '/base/',
-    body: getRequestBody(file, settings),
-  }, settings)
+export type BaseOptions = {
+  publicKey: string
+
+  fileName?: string
+  baseURL?: string
+  secureSignature?: string
+  secureExpire?: string
+  store?: boolean
+
+  cancel?: CancelController
+  onProgress?: ({ value: number }) => void
+
+  source?: string
+  integration?: string
+
+  retryThrottledRequestMaxTimes?: number
 }
 
 /**
  * Performs file uploading request to Uploadcare Upload API.
  * Can be canceled and has progress.
- *
- * @param {FileData} file
- * @param {SettingsInterface} settings
- * @return {BaseThenableInterface<BaseResponse>}
  */
-export default function base(file: FileData, settings: SettingsInterface = {}): BaseThenableInterface<BaseResponse> {
-  const options = getRequestOptions(file, settings)
+export default function base(
+  file: NodeFile | BrowserFile,
+  {
+    publicKey,
+    fileName,
+    baseURL = defaultSettings.baseURL,
+    secureSignature,
+    secureExpire,
+    store,
+    cancel,
+    onProgress,
+    source = 'local',
+    integration,
+    retryThrottledRequestMaxTimes = defaultSettings.retryThrottledRequestMaxTimes
+  }: BaseOptions
+): Promise<BaseResponse> {
+  return retryIfThrottled(
+    () =>
+      request({
+        method: 'POST',
+        url: getUrl(baseURL, '/base/', {
+          jsonerrors: 1
+        }),
+        headers: {
+          'X-UC-User-Agent': getUserAgent({ publicKey, integration })
+        },
+        data: getFormData([
+          [
+            'file',
+            file,
+            fileName || (file as File).name || defaultSettings.fileName
+          ],
+          ['UPLOADCARE_PUB_KEY', publicKey],
+          [
+            'UPLOADCARE_STORE',
+            typeof store === 'undefined' ? 'auto' : store ? 1 : 0
+          ],
+          ['signature', secureSignature],
+          ['expire', secureExpire],
+          ['source', source]
+        ]),
+        cancel,
+        onProgress
+      }).then(({ data, headers, request }) => {
+        const response = camelizeKeys<Response>(JSON.parse(data))
 
-  return new BaseThenable<BaseResponse>(options)
+        if ('error' in response) {
+          throw new UploadClientError(
+            `[${response.error.statusCode}] ${response.error.content}`,
+            request,
+            response.error,
+            headers
+          )
+        } else {
+          return response
+        }
+      }),
+    retryThrottledRequestMaxTimes
+  )
 }

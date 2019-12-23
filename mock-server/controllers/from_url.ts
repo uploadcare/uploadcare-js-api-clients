@@ -3,24 +3,30 @@ import * as jsonStatus from '../data/from_url/status.json'
 import find from '../utils/find'
 import error from '../utils/error'
 
-import {PORT} from '../config'
+import { PORT } from '../config'
 
 /**
  * '/from_url/?pub_key=XXXXXXXXXXXXXXXXXXXX'
  * @param {object} ctx
  */
-const index = (ctx) => {
-  const isPrivateIP = (url: string): boolean => url.includes('192.168.') || url.includes('localhost') && !url.includes(`http://localhost:${PORT}/`)
+const index = ctx => {
+  const isPrivateIP = (url: string): boolean =>
+    url.includes('192.168.') ||
+    (url.includes('localhost') && !url.includes(`http://localhost:${PORT}/`))
   const doesNotExist = (url: string): boolean => url === 'https://1.com/1.jpg'
 
   const sourceUrl = ctx.query && ctx.query.source_url
-  const checkForUrlDuplicates = !!parseInt(ctx.query && ctx.query.check_URL_duplicates)
-  const saveUrlForRecurrentUploads = !!parseInt(ctx.query && ctx.query.save_URL_duplicates)
+  const checkForUrlDuplicates = !!parseInt(
+    ctx.query && ctx.query.check_URL_duplicates
+  )
+  const saveUrlForRecurrentUploads = !!parseInt(
+    ctx.query && ctx.query.save_URL_duplicates
+  )
 
   // Check params
   if (!sourceUrl) {
     error(ctx, {
-      statusText: 'source_url is required.',
+      statusText: 'source_url is required.'
     })
 
     return
@@ -28,7 +34,7 @@ const index = (ctx) => {
 
   if (doesNotExist(sourceUrl)) {
     error(ctx, {
-      statusText: 'Host does not exist.',
+      statusText: 'Host does not exist.'
     })
 
     return
@@ -36,7 +42,7 @@ const index = (ctx) => {
 
   if (isPrivateIP(sourceUrl)) {
     error(ctx, {
-      statusText: 'Only public IPs are allowed.',
+      statusText: 'Only public IPs are allowed.'
     })
 
     return
@@ -53,7 +59,7 @@ const index = (ctx) => {
  * '/from_url/status/?pub_key=XXXXXXXXXXXXXXXXXXXX&token=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX'
  * @param {object} ctx
  */
-const status = (ctx) => {
+const status = ctx => {
   const token = ctx.query && ctx.query.token
   const publicKey = ctx.query && ctx.query.publicKey
 
@@ -65,12 +71,9 @@ const status = (ctx) => {
     }
   } else {
     error(ctx, {
-      statusText: 'token is required.',
+      statusText: 'token is required.'
     })
   }
 }
 
-export {
-  index,
-  status,
-}
+export { index, status }

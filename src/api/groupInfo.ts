@@ -1,44 +1,75 @@
-import {prepareOptions} from './request/prepareOptions'
+import { GroupId, GroupInfo } from './types'
+import { FailedResponse } from '../request/types'
 
-/* Types */
-import {Query, RequestOptionsInterface} from './request/types'
-import {GroupInfoInterface, GroupId} from './types'
-import {SettingsInterface} from '../types'
-import {CancelableThenable} from '../thenable/CancelableThenable'
-import {CancelableThenableInterface} from '../thenable/types'
+import request from '../request/request.node'
+import getUrl from '../tools/getUrl'
 
-const getRequestQuery = (id: GroupId, settings: SettingsInterface): Query => {
-  const query = {
-    pub_key: settings.publicKey || '',
-    group_id: id,
-  }
+import CancelController from '../tools/CancelController'
+import defaultSettings from '../defaultSettings'
+import { getUserAgent } from '../tools/userAgent'
+import camelizeKeys from '../tools/camelizeKeys'
+import { UploadClientError } from '../tools/errors'
+import retryIfThrottled from '../tools/retryIfThrottled'
 
-  if (settings.source) {
-    return {
-      ...query,
-      source: settings.source,
-    }
-  }
+export type GroupInfoOptions = {
+  publicKey: string
+  baseURL?: string
 
-  return query
+  cancel?: CancelController
+
+  source?: string
+  integration?: string
+
+  retryThrottledRequestMaxTimes?: number
 }
 
-const getRequestOptions = (id: GroupId, settings: SettingsInterface): RequestOptionsInterface => {
-  return prepareOptions({
-    path: '/group/info/',
-    query: getRequestQuery(id, settings),
-  }, settings)
-}
+type Response = GroupInfo | FailedResponse
 
 /**
  * Get info about group.
- *
- * @param {GroupId} id – Group ID. Group IDs look like UUID~N.
- * @param {SettingsInterface} settings
- * @return {CancelableThenableInterface<GroupInfoInterface>}
  */
-export default function groupInfo(id: GroupId, settings: SettingsInterface = {}): CancelableThenableInterface<GroupInfoInterface> {
-  const options = getRequestOptions(id, settings)
 
-  return new CancelableThenable(options)
+/* eslint @typescript-eslint/camelcase: [2, {allow: ["pub_key", "group_id"]}] */
+
+export default function groupInfo(
+  id: GroupId,
+  {
+    publicKey,
+    baseURL = defaultSettings.baseURL,
+    cancel,
+    source,
+    integration,
+    retryThrottledRequestMaxTimes = defaultSettings.retryThrottledRequestMaxTimes
+  }: GroupInfoOptions
+): Promise<GroupInfo> {
+  return retryIfThrottled(
+    () =>
+      request({
+        method: 'GET',
+        headers: {
+          'X-UC-User-Agent': getUserAgent({ publicKey, integration })
+        },
+        url: getUrl(baseURL, '/group/info/', {
+          jsonerrors: 1,
+          pub_key: publicKey,
+          group_id: id,
+          source
+        }),
+        cancel
+      }).then(({ data, headers, request }) => {
+        const response = camelizeKeys<Response>(JSON.parse(data))
+
+        if ('error' in response) {
+          throw new UploadClientError(
+            `[${response.error.statusCode}] ${response.error.content}`,
+            request,
+            response.error,
+            headers
+          )
+        } else {
+          return response
+        }
+      }),
+    retryThrottledRequestMaxTimes
+  )
 }

@@ -6,13 +6,13 @@ let times = 0
  * '/throttle/'
  * @param {object} ctx
  */
-const index = (ctx) => {
-  times++;
+const index = ctx => {
+  times++
 
   if (times === 2) {
     times = 0
 
-    return ctx.status = 200
+    return (ctx.status = 200)
   } else {
     return error(ctx, {
       status: 429,
@@ -21,6 +21,4 @@ const index = (ctx) => {
   }
 }
 
-export {
-  index,
-}
+export { index }

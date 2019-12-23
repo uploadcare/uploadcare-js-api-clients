@@ -10,6 +10,6 @@
     "resolveJsonModule": true,
     "moduleResolution": "node"
   },
-  "include": ["src"],
+  "include": ["src", "test", "browser-test"],
   "exclude": ["node_modules"]
 }

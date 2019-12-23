@@ -1,17 +1,17 @@
 {
   "spec_dir": "test",
-  "spec_files": ["**/*.spec.ts"],
+  "spec_files": ["**/*.test.ts", "**/*.test.node.ts"],
   "stopSpecOnExecutionFailure": false,
   "random": false,
+  "helpers": [
+    "./helpers/**/*.ts"
+  ],
   "reporters": [
     {
       "name": "jasmine-spec-reporter#SpecReporter",
       "options": {
         "displayStacktrace": "all"
       }
-    },
-    {
-      "name": "jasmine-ts-console-reporter"
     }
   ]
 }

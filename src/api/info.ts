@@ -1,44 +1,77 @@
-import {prepareOptions} from './request/prepareOptions'
+import request from '../request/request.node'
+import getUrl from '../tools/getUrl'
+import CancelController from '../tools/CancelController'
+import defaultSettings from '../defaultSettings'
+import { getUserAgent } from '../tools/userAgent'
+import camelizeKeys from '../tools/camelizeKeys'
+import { UploadClientError } from '../tools/errors'
+import retryIfThrottled from '../tools/retryIfThrottled'
 
 /* Types */
-import {Query, RequestOptionsInterface} from './request/types'
-import {FileInfoInterface, Uuid} from './types'
-import {SettingsInterface} from '../types'
-import {CancelableThenable} from '../thenable/CancelableThenable'
-import {CancelableThenableInterface} from '../thenable/types'
+import { Uuid, FileInfo } from './types'
+import { FailedResponse } from '../request/types'
 
-const getRequestQuery = (uuid: Uuid, settings: SettingsInterface): Query => {
-  const query = {
-    pub_key: settings.publicKey || '',
-    file_id: uuid,
-  }
+type Response = FileInfo | FailedResponse
 
-  if (settings.source) {
-    return {
-      ...query,
-      source: settings.source,
-    }
-  }
+export type InfoOptions = {
+  publicKey: string
 
-  return query
-}
+  baseURL?: string
 
-const getRequestOptions = (uuid: Uuid, settings: SettingsInterface): RequestOptionsInterface => {
-  return prepareOptions({
-    path: '/info/',
-    query: getRequestQuery(uuid, settings),
-  }, settings)
+  cancel?: CancelController
+  onProgress?: ({ value: number }) => void
+
+  source?: string
+  integration?: string
+
+  retryThrottledRequestMaxTimes?: number
 }
 
 /**
  * Returns a JSON dictionary holding file info.
- *
- * @param {Uuid} uuid – UUID of a target file to request its info.
- * @param {SettingsInterface} settings
- * @return {CancelableThenableInterface<FileInfoInterface>}
  */
-export default function info(uuid: Uuid, settings: SettingsInterface = {}): CancelableThenableInterface<FileInfoInterface> {
-  const options = getRequestOptions(uuid, settings)
 
-  return new CancelableThenable(options)
+/* eslint @typescript-eslint/camelcase: [2, {allow: ["pub_key", "file_id"]}] */
+
+export default function info(
+  uuid: Uuid,
+  {
+    publicKey,
+    baseURL = defaultSettings.baseURL,
+    cancel,
+    source,
+    integration,
+    retryThrottledRequestMaxTimes = defaultSettings.retryThrottledRequestMaxTimes
+  }: InfoOptions
+): Promise<FileInfo> {
+  return retryIfThrottled(
+    () =>
+      request({
+        method: 'GET',
+        headers: {
+          'X-UC-User-Agent': getUserAgent({ publicKey, integration })
+        },
+        url: getUrl(baseURL, '/info/', {
+          jsonerrors: 1,
+          pub_key: publicKey,
+          file_id: uuid,
+          source
+        }),
+        cancel
+      }).then(({ data, headers, request }) => {
+        const response = camelizeKeys<Response>(JSON.parse(data))
+
+        if ('error' in response) {
+          throw new UploadClientError(
+            `[${response.error.statusCode}] ${response.error.content}`,
+            request,
+            response.error,
+            headers
+          )
+        } else {
+          return response
+        }
+      }),
+    retryThrottledRequestMaxTimes
+  )
 }
