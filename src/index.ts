@@ -10,8 +10,6 @@ import multipartStart from './api/multipartStart'
 import multipartUpload from './api/multipartUpload'
 import multipartComplete from './api/multipartComplete'
 
-import multipart from './multipart/multipart'
-
 import uploadFile from './uploadFile'
 import uploadFileGroup from './uploadFileGroup'
 
@@ -57,7 +55,7 @@ export {
 }
 
 /* High-Level API */
-export { multipart, uploadFile, uploadFileGroup }
+export { uploadFile, uploadFileGroup }
 
 /* Helpers */
 export { CancelController }
