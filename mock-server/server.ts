@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-ts-ignore */
 // @ts-ignore
 import Koa from 'koa'
 import Router from '@koa/router'

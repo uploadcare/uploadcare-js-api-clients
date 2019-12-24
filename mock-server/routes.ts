@@ -15,7 +15,19 @@ export type RouteType = {
   }
 }
 
+// this route need for health check
+const index = ctx => {
+  ctx.body = 'server is up'
+}
+
 export const ROUTES: RouteType[] = [
+  {
+    '/': {
+      method: 'get',
+      fn: index,
+      isProtected: false
+    }
+  },
   {
     '/base': {
       method: 'post',
