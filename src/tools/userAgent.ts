@@ -12,7 +12,7 @@ export function getUserAgent({
   publicKey?: string
   integration?: string
 } = {}): string {
-  const mainInfo = [version, publicKey].join('/')
-  const additionInfo = ['JavaScript', integration].join('; ')
+  const mainInfo = [version, publicKey].filter(Boolean).join('/')
+  const additionInfo = ['JavaScript', integration].filter(Boolean).join('; ')
   return `UploadcareUploadClient/${mainInfo} (${additionInfo})`
 }
