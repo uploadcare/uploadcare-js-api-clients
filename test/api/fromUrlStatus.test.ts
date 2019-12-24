@@ -37,7 +37,7 @@ describe('API - from url status', () => {
 
     setTimeout(() => {
       controller.cancel()
-    }, 10)
+    })
 
     await expectAsync(fromUrlStatus(token, settings)).toBeRejectedWithError(
       'Request canceled'

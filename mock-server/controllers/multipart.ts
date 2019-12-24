@@ -27,7 +27,7 @@ const start = ctx => {
   ) {
     return error(ctx, {
       statusText:
-        'File size should not be less than 10485760 bytes. Please use direct uploads instead.'
+        'File size can not be less than 10485760 bytes. Please use direct upload instead of multipart.'
     })
   }
 
@@ -37,7 +37,7 @@ const start = ctx => {
     })
   }
 
-  return (ctx.body = find(multipartJson, 'start'))
+  ctx.body = find(multipartJson, 'start')
 }
 
 /**
@@ -45,7 +45,7 @@ const start = ctx => {
  * @param {object} ctx
  */
 const upload = ctx => {
-  return (ctx.status = 200)
+  ctx.status = 200
 }
 
 /**
@@ -55,11 +55,12 @@ const upload = ctx => {
 const complete = ctx => {
   if (ctx.request.body && !ctx.request.body.uuid) {
     return error(ctx, {
-      statusText: 'The "uuid" parameter is missing.'
+      statusText: 'uuid is required.'
     })
   }
 
-  return (ctx.body = find(infoJson, 'info'))
+  // eslint-disable-next-line require-atomic-updates
+  ctx.body = find(infoJson, 'info')
 }
 
 export { start, upload, complete }

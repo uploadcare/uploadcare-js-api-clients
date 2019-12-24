@@ -12,7 +12,7 @@
     "./lib/tools/getFormData.node.js": "./lib/tools/getFormData.browser.js"
   },
   "scripts": {
-    "mock:start": "ts-node --project ./mock-server/tsconfig.mock.json ./mock-server/server.ts",
+    "mock:start": "ts-node --project ./mock-server/tsconfig.mock.json ./mock-server/server.ts --silent",
     "clean": "rimraf lib",
     "lint": "eslint . --ext=ts",
     "test": "start-server-and-test mock:start :3000 test:node",

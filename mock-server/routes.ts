@@ -8,7 +8,7 @@ import * as multipart from './controllers/multipart'
 export type RouteType = {
   [path: string]: {
     method: string
-    fn: (ctx: object) => void
+    fn: (ctx: object, next?: Function) => void
     isProtected: boolean
     isFake?: boolean
     description?: string

@@ -39,7 +39,7 @@ describe('API - group info', () => {
 
     setTimeout(() => {
       controller.cancel()
-    }, 10)
+    })
 
     await expectAsync(groupInfo(id, settingsWithCancel)).toBeRejectedWithError(
       'Request canceled'
