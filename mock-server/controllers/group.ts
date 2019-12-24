@@ -70,7 +70,7 @@ const index = ctx => {
   for (const file of files) {
     if (!isValidFile(file)) {
       return error(ctx, {
-        statusText: `this is not valid file url: ${file}`
+        statusText: `this is not valid file url: ${file}.`
       })
     }
   }
