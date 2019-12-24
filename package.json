@@ -81,6 +81,6 @@
     "typescript": "3.7.2"
   },
   "dependencies": {
-    "form-data": "^2.5.1"
+    "form-data": "^3.0.0"
   }
 }
