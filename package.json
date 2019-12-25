@@ -89,7 +89,7 @@
     "shipjs": "0.12.0",
     "start-server-and-test": "^1.10.6",
     "ts-node": "8.5.4",
-    "typescript": "3.7.2"
+    "typescript": "3.7.4"
   },
   "dependencies": {
     "form-data": "^3.0.0"
