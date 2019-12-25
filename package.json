@@ -16,6 +16,7 @@
     "clean": "rimraf lib",
     "lint": "eslint . --ext=ts",
     "test": "start-server-and-test mock:start :3000 test:node",
+    "test:production": "NODE_ENV=production npm run test:node",
     "test:node": "jasmine-ts --project test/tsconfig.json --config=test/jasmine.config.json",
     "test:browser": "karma start ./browser-test/karma.config.js --single-run --nocache",
     "test:browser:debug": "karma start karma.config.js --browsers=Chrome --single-run=false --watch --debug --nocache",
