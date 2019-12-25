@@ -5,6 +5,8 @@ node_js:
   - 'lts/*'
   - '8'
 
+if: branch = master | type = pull_request
+
 install:
   - NODE_ENV=dev npm install
 
