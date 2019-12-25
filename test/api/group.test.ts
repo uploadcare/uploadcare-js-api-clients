@@ -51,7 +51,7 @@ describe('API - group', () => {
 
     setTimeout(() => {
       controller.cancel()
-    }, 10)
+    })
 
     await expectAsync(group(files, settings)).toBeRejectedWithError(
       'Request canceled'

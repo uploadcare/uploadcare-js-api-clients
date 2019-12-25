@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-ts-ignore */
 // @ts-ignore
 import Koa from 'koa'
 import Router from '@koa/router'
@@ -10,6 +11,7 @@ import addTrailingSlashes from 'koa-add-trailing-slashes'
 import koaBody from 'koa-body'
 
 import logger from './middleware/logger'
+import delayer from './middleware/delayer'
 import auth from './middleware/auth'
 
 // Config
@@ -21,10 +23,14 @@ import { ROUTES, RouteType } from './routes'
 const app = new Koa()
 const router = new Router()
 
+const silent = process.argv.includes('--silent')
+const noop = (_, next) => next()
+
 // Use middleware
 app.use(cors())
 app.use(addTrailingSlashes())
-app.use(logger)
+app.use(silent ? noop : logger)
+app.use(delayer)
 app.use(
   koaBody({
     multipart: true,
@@ -47,35 +53,39 @@ ROUTES.forEach((route: RouteType) => {
 
 // Handle errors
 app.on('error', (err, ctx) => {
-  console.error(`💔 ${chalk.red('Server error')}:`)
-  console.error(err)
-  console.error(ctx)
+  if (!silent) {
+    console.error(`💔 ${chalk.red('Server error')}:`)
+    console.error(err)
+    console.error(ctx)
+  }
 })
 
 // Listen server
 app.listen(PORT, () => {
-  console.log(
-    `🚀 ${chalk.bold('Server started at')} ${chalk.green(
-      chalk.bold(`http://localhost:${PORT}`)
-    )}`,
-    '\n'
-  )
-  console.log('Available routes:', '\n')
-
-  // Print all available routes
-  ROUTES.forEach((route: RouteType) => {
-    const keys = Object.keys(route)
-    const path = keys[0]
-    const routePath = route[path]
-    const method = routePath.method.toUpperCase()
-    const description = routePath.description || path
-    const isFake = routePath.isFake || false
-
+  if (!silent) {
     console.log(
-      `  ${chalk.bold(method)}: '${
-        isFake ? chalk.gray(description) : chalk.green(description)
-      }'`
+      `🚀 ${chalk.bold('Server started at')} ${chalk.green(
+        chalk.bold(`http://localhost:${PORT}`)
+      )}`,
+      '\n'
     )
-  })
-  console.log()
+    console.log('Available routes:', '\n')
+
+    // Print all available routes
+    ROUTES.forEach((route: RouteType) => {
+      const keys = Object.keys(route)
+      const path = keys[0]
+      const routePath = route[path]
+      const method = routePath.method.toUpperCase()
+      const description = routePath.description || path
+      const isFake = routePath.isFake || false
+
+      console.log(
+        `  ${chalk.bold(method)}: '${
+          isFake ? chalk.gray(description) : chalk.green(description)
+        }'`
+      )
+    })
+    console.log()
+  }
 })

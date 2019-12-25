@@ -61,7 +61,7 @@ const auth = (ctx, next) => {
   const url = urlWithSlash.substring(0, urlWithSlash.length - 1)
 
   let key = 'pub_key'
-  let params: IsAuthorizedParams = {
+  const params: IsAuthorizedParams = {
     url,
     publicKey: getPublicKeyFromSource(ctx.query, key)
   }

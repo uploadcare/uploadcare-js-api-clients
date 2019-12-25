@@ -8,14 +8,26 @@ import * as multipart from './controllers/multipart'
 export type RouteType = {
   [path: string]: {
     method: string
-    fn: (ctx: object) => void
+    fn: (ctx: object, next?: Function) => void
     isProtected: boolean
     isFake?: boolean
     description?: string
   }
 }
 
+// this route need for health check
+const index = ctx => {
+  ctx.body = 'server is up'
+}
+
 export const ROUTES: RouteType[] = [
+  {
+    '/': {
+      method: 'get',
+      fn: index,
+      isProtected: false
+    }
+  },
   {
     '/base': {
       method: 'post',

@@ -4,6 +4,6 @@
  * @param {string} value
  */
 const find = (json: object, value: string): object =>
-  (json.hasOwnProperty(value) && json[value]) || {}
+  (Object.prototype.hasOwnProperty.apply(json, [value]) && json[value]) || {}
 
 export default find

@@ -36,7 +36,7 @@ describe('API - info', () => {
 
     setTimeout(() => {
       controller.cancel()
-    }, 10)
+    })
 
     await expectAsync(info(uuid, settings)).toBeRejectedWithError(
       'Request canceled'

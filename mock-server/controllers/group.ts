@@ -28,7 +28,7 @@ const isValidGroupId = (groupId: string): boolean =>
  */
 const getFileUuid = (file: string): string => {
   // If file contains CDN operations
-  if (new RegExp(/\//).test(file)) {
+  if (file.includes('/')) {
     const array = file.split('/')
 
     return array[0]
@@ -70,7 +70,7 @@ const index = ctx => {
   for (const file of files) {
     if (!isValidFile(file)) {
       return error(ctx, {
-        statusText: `this is not valid file url: ${file}`
+        statusText: `this is not valid file url: ${file}.`
       })
     }
   }
