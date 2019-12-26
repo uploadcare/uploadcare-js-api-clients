@@ -3,6 +3,8 @@ type ErrorType = {
   statusText: string
 }
 
+/* eslint @typescript-eslint/camelcase: [2, {allow: ["status_code"]}] */
+
 const error = (ctx, { status = 400, statusText }: ErrorType) => {
   const isJson = !!ctx.query.jsonerrors
 
