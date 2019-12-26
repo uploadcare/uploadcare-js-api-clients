@@ -1,5 +1,5 @@
 {
   "extends": ["config:js-lib", "schedule:nonOfficeHours", ":automergeMinor"],
-  "reviewers": ["@uploadcare/librarians"],
+  "reviewers": ["jeetiss", "bautrukevich"],
   "timezone": "Europe/Moscow"
 }
