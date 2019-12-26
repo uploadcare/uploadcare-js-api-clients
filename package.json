@@ -55,7 +55,7 @@
     "@typescript-eslint/eslint-plugin": "2.13.0",
     "@typescript-eslint/parser": "2.13.0",
     "busboy": "0.3.1",
-    "chalk": "2.4.2",
+    "chalk": "3.0.0",
     "data-uri-to-buffer": "3.0.0",
     "dataurl-to-blob": "0.0.1",
     "eslint": "6.8.0",
