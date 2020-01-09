@@ -2,6 +2,7 @@ const fs = require('fs');
 const path = require('path');
 
 module.exports = {
+  testCommandBeforeRelease: () => 'npm run test:production',
   publishCommand: ({ defaultCommand }) => `${defaultCommand} --access public`,
   mergeStrategy: { toSameBranch: ['master'] },
   versionUpdated: ({ version, dir }) => {
