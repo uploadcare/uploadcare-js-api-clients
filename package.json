@@ -68,7 +68,7 @@
     "jasmine-ts-console-reporter": "3.1.1",
     "karma": "4.4.1",
     "karma-chrome-launcher": "3.1.0",
-    "karma-jasmine": "3.0.3",
+    "karma-jasmine": "3.1.0",
     "karma-typescript": "4.1.1",
     "koa": "2.11.0",
     "koa-add-trailing-slashes": "2.0.1",
