@@ -88,7 +88,7 @@
     "rollup-plugin-typescript2": "0.25.3",
     "shipjs": "0.14.0",
     "start-server-and-test": "1.10.6",
-    "ts-node": "8.6.1",
+    "ts-node": "8.6.2",
     "typescript": "3.7.4"
   },
   "dependencies": {
