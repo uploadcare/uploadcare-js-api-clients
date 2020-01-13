@@ -33,7 +33,7 @@ jobs:
   create_done_comment:
     if: success()
     needs: manual_prepare
-    runs-on: Ubuntu-latest
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/github@master
         env:
@@ -44,7 +44,7 @@ jobs:
   create_fail_comment:
     if: cancelled() || failure()
     needs: manual_prepare
-    runs-on: Ubuntu-latest
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/github@master
         env:
