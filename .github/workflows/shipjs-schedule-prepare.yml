@@ -7,11 +7,11 @@ jobs:
   schedule_prepare:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@master
+      - uses: actions/checkout@v2
         with:
           fetch-depth: 0
           ref: master
-      - uses: actions/setup-node@master
+      - uses: actions/setup-node@v1
       - run: |
           if [ -f "yarn.lock" ]; then
             yarn install
