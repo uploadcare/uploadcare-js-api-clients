@@ -1,3 +1,12 @@
+## [1.0.1](https://github.com/uploadcare/uploadcare-upload-client/compare/v1.0.0...v1.0.1) (2020-01-13)
+
+
+### Bug Fixes
+
+* **deps:** update dependency form-data to v3 ([#130](https://github.com/uploadcare/uploadcare-upload-client/issues/130)) ([1ece271](https://github.com/uploadcare/uploadcare-upload-client/commit/1ece271d8583ba257011d16b3f1930ad29329a96))
+
+
+
 # [1.0.0](https://github.com/uploadcare/uploadcare-upload-client/compare/v1.0.0-alpha.5...v1.0.0) (2019-12-23)
 
 ### Changed
