@@ -6,16 +6,25 @@ type StrangeFn<T> = (args: {
   cancel: CancelController
 }) => Promise<T>
 
-const race = <T>(fns: StrangeFn<T>[]): Promise<T> => {
+const race = <T>(
+  fns: StrangeFn<T>[],
+  { cancel }: { cancel?: CancelController } = {}
+): Promise<T> => {
   let lastError: Error | null = null
   let winnerIndex: number | null = null
   const controllers = fns.map(() => new CancelController())
-  const createCancelCallback = (i: number) => () => {
+  const createCancelCallback = (i: number) => (): void => {
     winnerIndex = i
 
     controllers.forEach(
       (controller, index) => index !== i && controller.cancel()
     )
+  }
+
+  if (cancel) {
+    cancel.onCancel(() => {
+      controllers.forEach(controller => controller.cancel())
+    })
   }
 
   return Promise.all(

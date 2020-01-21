@@ -1,5 +1,6 @@
 import CancelController from '../../src/tools/CancelController'
 import { race } from '../../src/tools/race'
+import { cancelError } from '../../src/tools/errors'
 
 const returnAfter = (
   value: number,
@@ -10,11 +11,11 @@ const returnAfter = (
     const id = setTimeout(resolve, ms, value)
     cancel.onCancel(() => {
       clearTimeout(id)
-      reject()
+      reject(cancelError('race cancel'))
     })
   })
 
-describe('race', () => {
+fdescribe('race', () => {
   it('should work', async () => {
     const value = await race([
       ({ cancel }): Promise<number> => returnAfter(1, cancel),
@@ -70,7 +71,7 @@ describe('race', () => {
       jasmine.createSpy('cancel for ' + i)
     )
 
-    const createCancelHandler = (index: number) => error => {
+    const createCancelHandler = (index: number) => (error): number => {
       spies[index]()
 
       throw error
@@ -103,7 +104,7 @@ describe('race', () => {
       jasmine.createSpy('cancel for ' + i)
     )
 
-    const createCancelHandler = (index: number) => error => {
+    const createCancelHandler = (index: number) => (error): number => {
       spies[index]()
 
       throw error
@@ -131,6 +132,44 @@ describe('race', () => {
       if (index !== 0) {
         expect(spy).toHaveBeenCalled()
       }
+    })
+  })
+
+  it('should be cancellable', async () => {
+    const cancel = new CancelController()
+
+    const spies = Array.from({ length: 5 }, i =>
+      jasmine.createSpy('cancel for ' + i)
+    )
+
+    const createCancelHandler = (index: number) => (error): number => {
+      spies[index]()
+
+      throw error
+    }
+
+    setTimeout(() => cancel.cancel())
+
+    await expectAsync(
+      race(
+        [
+          ({ cancel }): Promise<number> =>
+            returnAfter(1, cancel).catch(createCancelHandler(0)),
+          ({ cancel }): Promise<number> =>
+            returnAfter(2, cancel).catch(createCancelHandler(1)),
+          ({ cancel }): Promise<number> =>
+            returnAfter(3, cancel).catch(createCancelHandler(2)),
+          ({ cancel }): Promise<number> =>
+            returnAfter(4, cancel).catch(createCancelHandler(3)),
+          ({ cancel }): Promise<number> =>
+            returnAfter(5, cancel).catch(createCancelHandler(4))
+        ],
+        { cancel }
+      )
+    ).toBeRejectedWithError('race cancel')
+
+    spies.forEach(spy => {
+      expect(spy).toHaveBeenCalled()
     })
   })
 })
