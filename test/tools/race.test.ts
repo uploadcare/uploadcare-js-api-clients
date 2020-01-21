@@ -15,7 +15,7 @@ const returnAfter = (
     })
   })
 
-fdescribe('race', () => {
+describe('race', () => {
   it('should work', async () => {
     const value = await race([
       ({ cancel }): Promise<number> => returnAfter(1, cancel),
