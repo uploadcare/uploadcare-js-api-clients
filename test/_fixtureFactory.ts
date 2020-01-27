@@ -23,11 +23,11 @@ const images: { [key: string]: string } = {
 
 const uuids: { [key: string]: { publicKey: string; uuid: string } } = {
   image: {
-    publicKey: '657ec3b474e01b9045f7',
+    publicKey: process.env.UC_KEY_FOR_INTEGRATION_TESTS || '',
     uuid: 'd3275f8b-686d-4980-916a-53a1fc17450b'
   },
   token: {
-    publicKey: '657ec3b474e01b9045f7',
+    publicKey: process.env.UC_KEY_FOR_INTEGRATION_TESTS || '',
     uuid: 'b6aac6aa-be7b-46d2-9fc3-208290c78024'
   },
   demo: {
