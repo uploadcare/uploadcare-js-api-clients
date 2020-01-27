@@ -75,7 +75,7 @@
     "koa-body": "4.1.1",
     "prettier": "1.19.1",
     "prettier-config-standard": "1.0.1",
-    "puppeteer": "2.0.0",
+    "puppeteer": "2.1.0",
     "rimraf": "3.0.0",
     "rollup": "1.29.1",
     "rollup-plugin-commonjs": "10.1.0",
