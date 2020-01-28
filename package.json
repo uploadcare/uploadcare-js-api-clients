@@ -50,7 +50,7 @@
     "@types/form-data": "2.5.0",
     "@types/jasmine": "3.5.1",
     "@types/koa": "2.11.0",
-    "@types/node": "12.12.25",
+    "@types/node": "12.12.26",
     "@types/promise": "7.1.30",
     "@typescript-eslint/eslint-plugin": "2.17.0",
     "@typescript-eslint/parser": "2.17.0",
