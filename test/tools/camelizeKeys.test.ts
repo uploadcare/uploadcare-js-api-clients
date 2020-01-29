@@ -1,6 +1,13 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import camelizeKeys, { camelize } from '../../src/tools/camelizeKeys'
 
+type Camelize = {
+  fooBar: string
+  fooBarBaz: string
+  foo: string
+  fooBarBaz4: object
+}
+
 describe('camelize', () => {
   it('should works', () => {
     expect(camelize('foo_bar')).toBe('fooBar')
@@ -10,13 +17,6 @@ describe('camelize', () => {
     expect(camelize('foo_bar_baz')).toBe('fooBarBaz')
   })
 })
-
-type Camelize = {
-  fooBar: string
-  fooBarBaz: string
-  foo: string
-  fooBarBaz4: object
-}
 
 describe('camelizeKeys', () => {
   it('should works', () => {

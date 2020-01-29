@@ -24,7 +24,7 @@ describe('API - from url status', () => {
     const token = factory.token('empty')
     const upload = fromUrlStatus(token, settings)
 
-    await expectAsync(upload).toBeRejectedWithError('[400] token is required.')
+    await expect(upload).rejects.toThrowError('[400] token is required.')
   })
 
   it('should be able to cancel uploading', async () => {
@@ -39,7 +39,7 @@ describe('API - from url status', () => {
       controller.cancel()
     })
 
-    await expectAsync(fromUrlStatus(token, settings)).toBeRejectedWithError(
+    await expect(fromUrlStatus(token, settings)).rejects.toThrowError(
       'Request canceled'
     )
   })

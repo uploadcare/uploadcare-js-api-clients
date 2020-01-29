@@ -16,7 +16,7 @@ export const getSettingsForTesting = <T>(
   environment: Environment | null = null
 ): T & DefaultSettings => {
   const selectedEnvironment =
-    environment || process.env.NODE_ENV || Environment.Development
+    environment || process.env.TEST_ENV || Environment.Development
 
   const allEnvironments = {
     development: {

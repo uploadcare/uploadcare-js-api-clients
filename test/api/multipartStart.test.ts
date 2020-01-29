@@ -31,9 +31,8 @@ describe('API - multipartStart', () => {
       cntr.cancel()
     })
 
-    await expectAsync(upload).toBeRejectedWithError(
-      UploadClientError,
-      'Request canceled'
+    await expect(upload).rejects.toThrowError(
+      new UploadClientError('Request canceled')
     )
   })
 
@@ -46,9 +45,10 @@ describe('API - multipartStart', () => {
 
     const upload = multipartStart(size, settings)
 
-    await expectAsync(upload).toBeRejectedWithError(
-      UploadClientError,
-      '[400] File size can not be less than 10485760 bytes. Please use direct upload instead of multipart.'
+    await expect(upload).rejects.toThrowError(
+      new UploadClientError(
+        '[400] File size can not be less than 10485760 bytes. Please use direct upload instead of multipart.'
+      )
     )
   })
 })

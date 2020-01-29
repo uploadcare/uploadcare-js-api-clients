@@ -13,7 +13,7 @@ describe('API - base', () => {
   })
 
   it('should be able to cancel uploading', async () => {
-    const timeout = jasmine.createSpy('timeout')
+    const timeout = jest.fn()
     const publicKey = factory.publicKey('demo')
     const controller = new CancelController()
     const directUpload = base(fileToUpload.data, {
@@ -25,7 +25,7 @@ describe('API - base', () => {
 
     const timeoutId = setTimeout(timeout, 10)
 
-    await expectAsync(directUpload).toBeRejectedWithError('Request canceled')
+    await expect(directUpload).rejects.toThrowError('Request canceled')
 
     expect(timeout).not.toHaveBeenCalled()
     clearTimeout(timeoutId)
@@ -33,7 +33,7 @@ describe('API - base', () => {
 
   it('should be able to handle progress', async () => {
     const publicKey = factory.publicKey('demo')
-    const onProgress = jasmine.createSpy('onProgress')
+    const onProgress = jest.fn()
 
     await base(fileToUpload.data, { publicKey, onProgress })
 

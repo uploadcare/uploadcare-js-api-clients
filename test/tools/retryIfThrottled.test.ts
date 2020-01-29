@@ -8,7 +8,7 @@ const createRunner = ({
   resolve = 0
 }: { attempts?: number; error?: Error; resolve?: number } = {}) => {
   let runs = 0
-  const spy = jasmine.createSpy('task')
+  const spy = jest.fn()
 
   const task = () =>
     Promise.resolve().then(() => {
@@ -37,7 +37,7 @@ describe('retryIfThrottled', () => {
   it('should work', async () => {
     const { spy, task } = createRunner({ attempts: 1 })
 
-    await expectAsync(retryIfThrottled<number>(task, 10)).toBeResolvedTo(0)
+    await expect(retryIfThrottled<number>(task, 10)).resolves.toBe(0)
     expect(spy).toHaveBeenCalledTimes(2)
   })
 
@@ -45,14 +45,14 @@ describe('retryIfThrottled', () => {
     const error = new Error()
     const { spy, task } = createRunner({ error })
 
-    await expectAsync(retryIfThrottled<number>(task, 2)).toBeRejectedWith(error)
+    await expect(retryIfThrottled<number>(task, 2)).rejects.toThrowError(error)
     expect(spy).toHaveBeenCalledTimes(1)
   })
 
   it('should rejected with UploadClientError if MaxTimes = 0', async () => {
     const { spy, task } = createRunner()
 
-    await expectAsync(retryIfThrottled<number>(task, 0)).toBeRejectedWithError(
+    await expect(retryIfThrottled<number>(task, 0)).rejects.toThrowError(
       UploadClientError
     )
     expect(spy).toHaveBeenCalledTimes(1)
@@ -61,14 +61,14 @@ describe('retryIfThrottled', () => {
   it('should resolve if task resolve', async () => {
     const { spy, task } = createRunner({ attempts: 3, resolve: 100 })
 
-    await expectAsync(retryIfThrottled<number>(task, 10)).toBeResolvedTo(100)
+    await expect(retryIfThrottled<number>(task, 10)).resolves.toBe(100)
     expect(spy).toHaveBeenCalledTimes(4)
   })
 
   it('should resolve without errors if task resolve', async () => {
     const { spy, task } = createRunner({ attempts: 0 })
 
-    await expectAsync(retryIfThrottled<number>(task, 10)).toBeResolvedTo(0)
+    await expect(retryIfThrottled<number>(task, 10)).resolves.toBe(0)
     expect(spy).toHaveBeenCalledTimes(1)
   })
 })
