@@ -10,7 +10,5 @@ install:
 
 jobs:
   include:
-    - stage: Browser
-      script: npm run test:browser
     - stage: Linter
       script: npm run lint

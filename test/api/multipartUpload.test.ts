@@ -7,6 +7,8 @@ import CancelController from '../../src/tools/CancelController'
 
 let parts: [string, Blob | Buffer][] = []
 
+jest.setTimeout(60000)
+
 beforeAll(async () => {
   const file = factory.file(11)
   const settings = getSettingsForTesting({
@@ -31,9 +33,7 @@ describe('API - multipartUpload', () => {
   it('should be able to upload multipart file', async () => {
     const [url, part] = parts[0]
 
-    await expectAsync(
-      multipartUpload(part, url, settings).catch(error => console.log(error))
-    ).toBeResolved()
+    await expect(multipartUpload(part, url, settings)).resolves.toBeTruthy()
   })
 
   it('should be able to cancel uploading', async () => {
@@ -49,13 +49,13 @@ describe('API - multipartUpload', () => {
       cntr.cancel()
     })
 
-    await expectAsync(
-      multipartUpload(part, url, options)
-    ).toBeRejectedWithError(UploadClientError, 'Request canceled')
+    await expect(multipartUpload(part, url, options)).rejects.toThrowError(
+      new UploadClientError('Request canceled')
+    )
   })
 
   xit('should be able to handle progress', async () => {
-    const onProgress = jasmine.createSpy('onProgress')
+    const onProgress = jest.fn()
     const options = getSettingsForTesting({
       publicKey: factory.publicKey('multipart'),
       onProgress

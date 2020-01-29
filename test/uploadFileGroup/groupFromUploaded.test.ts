@@ -37,16 +37,15 @@ describe('groupFrom Uploaded[]', () => {
 
     ctrl.cancel()
 
-    await expectAsync(upload).toBeRejectedWithError(
-      UploadClientError,
-      'Request canceled'
+    await expect(upload).rejects.toThrowError(
+      new UploadClientError('Request canceled')
     )
   })
 
   describe('should be able to handle', () => {
     it('cancel uploading', async () => {
       const ctrl = new CancelController()
-      const onCancel = jasmine.createSpy('onCancel')
+      const onCancel = jest.fn()
 
       ctrl.onCancel(onCancel)
 
@@ -57,9 +56,8 @@ describe('groupFrom Uploaded[]', () => {
 
       ctrl.cancel()
 
-      await expectAsync(upload).toBeRejectedWithError(
-        UploadClientError,
-        'Request canceled'
+      await expect(upload).rejects.toThrowError(
+        new UploadClientError('Request canceled')
       )
 
       expect(onCancel).toHaveBeenCalled()

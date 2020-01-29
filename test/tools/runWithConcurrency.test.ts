@@ -10,19 +10,19 @@ const rejectAfter = (error: Error, ms = 10): (() => Promise<never>) => () =>
 
 describe('runWithConcurrency', () => {
   it('should work', async () => {
-    await expectAsync(
+    await expect(
       runWithConcurrency(1, [returnAfter(1), returnAfter(2), returnAfter(3)])
-    ).toBeResolvedTo([1, 2, 3])
+    ).resolves.toStrictEqual([1, 2, 3])
   })
 
   it('should work with big concurrency', async () => {
-    await expectAsync(
+    await expect(
       runWithConcurrency(20, [returnAfter(1), returnAfter(2), returnAfter(3)])
-    ).toBeResolvedTo([1, 2, 3])
+    ).resolves.toStrictEqual([1, 2, 3])
   })
 
   it('should return arrat with rigth order', async () => {
-    await expectAsync(
+    await expect(
       runWithConcurrency(2, [
         returnAfter(1, 100),
         returnAfter(2),
@@ -31,28 +31,28 @@ describe('runWithConcurrency', () => {
         returnAfter(5),
         returnAfter(6)
       ])
-    ).toBeResolvedTo([1, 2, 3, 4, 5, 6])
+    ).resolves.toStrictEqual([1, 2, 3, 4, 5, 6])
   })
 
   it('should reject if any task fails', async () => {
     const error = new Error('test')
-    await expectAsync(
+    await expect(
       runWithConcurrency(2, [
         returnAfter(1),
         rejectAfter(error),
         returnAfter(3)
       ])
-    ).toBeRejectedWith(error)
+    ).rejects.toThrowError(error)
   })
 
   it('should not run task after reject', async () => {
     const error = new Error('test')
 
-    const spy = jasmine.createSpy('last', returnAfter(3))
+    const spy = jest.fn()
 
-    await expectAsync(
+    await expect(
       runWithConcurrency(2, [returnAfter(1), rejectAfter(error, 0), spy])
-    ).toBeRejectedWith(error)
+    ).rejects.toThrowError(error)
 
     await delay(20)
 
@@ -70,9 +70,10 @@ describe('runWithConcurrency', () => {
         .then(() => {
           maxConcurrency = Math.max(maxConcurrency, running)
           running -= 1
+          return 1
         })
 
-    await expectAsync(
+    await expect(
       runWithConcurrency(3, [
         trackedTask,
         trackedTask,
@@ -82,7 +83,7 @@ describe('runWithConcurrency', () => {
         trackedTask,
         trackedTask
       ])
-    ).toBeResolved()
+    ).resolves.toStrictEqual([1, 1, 1, 1, 1, 1, 1])
 
     expect(maxConcurrency).toBe(3)
   })

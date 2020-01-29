@@ -6,8 +6,8 @@ import { UploadClientError } from '../../src/tools/errors'
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 const longJob = (attemps: number, fails: Error | null = null) => {
   let runs = 1
-  const condition = jasmine.createSpy('condition')
-  const cancel = jasmine.createSpy('cancelCondition')
+  const condition = jest.fn()
+  const cancel = jest.fn()
 
   const isFinish: CheckFunction<boolean> = cancelCrtl => {
     condition()
@@ -63,9 +63,9 @@ describe('poll', () => {
 
     ctrl.cancel()
 
-    await expectAsync(
+    await expect(
       poll({ check: job.isFinish, interval: 20, cancel: ctrl })
-    ).toBeRejectedWithError(UploadClientError, 'Poll canceled')
+    ).rejects.toThrowError(new UploadClientError('Poll canceled'))
 
     expect(job.spy.condition).not.toHaveBeenCalled()
     expect(job.spy.cancel).not.toHaveBeenCalled()
@@ -77,12 +77,12 @@ describe('poll', () => {
 
     ctrl.cancel()
 
-    await expectAsync(
+    await expect(
       poll({ check: job.isFinish, interval: 20, cancel: ctrl })
-    ).toBeRejectedWithError(UploadClientError, 'Poll canceled')
+    ).rejects.toThrowError(new UploadClientError('Poll canceled'))
 
-    const conditionCallsCount = job.spy.condition.calls.count()
-    const cancelCallsCount = job.spy.cancel.calls.count()
+    const conditionCallsCount = job.spy.condition.mock.calls.length
+    const cancelCallsCount = job.spy.cancel.mock.calls.length
 
     await delay(50)
 
@@ -98,9 +98,9 @@ describe('poll', () => {
       ctrl.cancel()
     }, 30)
 
-    await expectAsync(
+    await expect(
       poll({ check: job.isFinish, interval: 20, cancel: ctrl })
-    ).toBeRejectedWithError(UploadClientError, 'Poll canceled')
+    ).rejects.toThrowError(new UploadClientError('Poll canceled'))
 
     expect(job.spy.condition).toHaveBeenCalledTimes(2)
     expect(job.spy.cancel).toHaveBeenCalledTimes(2)
@@ -109,19 +109,19 @@ describe('poll', () => {
   it('should fails with timeout error', async () => {
     const job = longJob(30)
 
-    await expectAsync(
+    await expect(
       poll({ check: job.isFinish, interval: 40, timeout: 20 })
-    ).toBeRejectedWithError(UploadClientError, 'Poll Timeout')
+    ).rejects.toThrowError(new UploadClientError('Poll Timeout'))
   })
 
   it('should not run any logic after timeout error', async () => {
     const job = longJob(30)
 
-    await expectAsync(
+    await expect(
       poll({ check: job.isFinish, interval: 40, timeout: 20 })
-    ).toBeRejectedWithError(UploadClientError, 'Poll Timeout')
+    ).rejects.toThrowError(new UploadClientError('Poll Timeout'))
 
-    const conditionCallsCount = job.spy.condition.calls.count()
+    const conditionCallsCount = job.spy.condition.mock.calls.length
 
     await delay(50)
 
@@ -132,9 +132,9 @@ describe('poll', () => {
     const error = new Error('test error')
     const job = longJob(3, error)
 
-    await expectAsync(
+    await expect(
       poll({ check: job.isFinish, interval: 20 })
-    ).toBeRejectedWith(error)
+    ).rejects.toThrowError(error)
   })
 
   it('should work with async test function', async () => {

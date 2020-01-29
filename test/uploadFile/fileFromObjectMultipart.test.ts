@@ -4,6 +4,8 @@ import { getSettingsForTesting } from '../_helpers'
 import CancelController from '../../src/tools/CancelController'
 import { UploadClientError } from '../../src/tools/errors'
 
+jest.setTimeout(60000)
+
 describe('uploadFrom Object (multipart)', () => {
   const fileToUpload = factory.file(12).data
   const settings = getSettingsForTesting({
@@ -35,9 +37,8 @@ describe('uploadFrom Object (multipart)', () => {
 
     ctrl.cancel()
 
-    await expectAsync(upload).toBeRejectedWithError(
-      UploadClientError,
-      'Request canceled'
+    await expect(upload).rejects.toThrowError(
+      new UploadClientError('Request canceled')
     )
   })
 
@@ -55,7 +56,7 @@ describe('uploadFrom Object (multipart)', () => {
   describe('should be able to handle', () => {
     it('cancel uploading', async () => {
       const ctrl = new CancelController()
-      const onCancel = jasmine.createSpy('onCancel')
+      const onCancel = jest.fn()
 
       ctrl.onCancel(onCancel)
 
@@ -66,9 +67,8 @@ describe('uploadFrom Object (multipart)', () => {
 
       ctrl.cancel()
 
-      await expectAsync(upload).toBeRejectedWithError(
-        UploadClientError,
-        'Request canceled'
+      await expect(upload).rejects.toThrowError(
+        new UploadClientError('Request canceled')
       )
 
       expect(onCancel).toHaveBeenCalled()

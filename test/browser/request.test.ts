@@ -1,7 +1,11 @@
-import CancelController from '../src/tools/CancelController'
-import { UploadClientError } from '../src/tools/errors'
-import request from '../src/request/request.browser'
-import getUrl from '../src/tools/getUrl'
+/**
+ * @jest-environment jsdom
+ */
+
+import CancelController from '../../src/tools/CancelController'
+import { UploadClientError } from '../../src/tools/errors'
+import request from '../../src/request/request.browser'
+import getUrl from '../../src/tools/getUrl'
 
 describe('request', () => {
   it('should post', async () => {
@@ -44,14 +48,14 @@ describe('request', () => {
       cancel.cancel()
     })
 
-    await expectAsync(
+    await expect(
       request({
         url: getUrl('https://upload.uploadcare.com', '/from_url/status/', {
           token: 'test'
         }),
         cancel
       })
-    ).toBeRejectedWithError(UploadClientError, 'Request canceled')
+    ).rejects.toThrowError(new UploadClientError('Request canceled'))
   })
 
   it('should handle progress', async () => {
