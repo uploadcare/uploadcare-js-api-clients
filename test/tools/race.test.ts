@@ -55,7 +55,7 @@ describe('race', () => {
   })
 
   it('should throw error if all function fails', async () => {
-    await expectAsync(
+    await expect(
       race([
         (): Promise<number> => Promise.reject('test 1'),
         (): Promise<number> => Promise.reject('test 2'),
@@ -63,7 +63,7 @@ describe('race', () => {
         (): Promise<number> => Promise.reject('test 4'),
         (): Promise<number> => Promise.reject('test 5')
       ])
-    ).toBeRejectedWith('test 5')
+    ).rejects.toThrowError('test 5')
   })
 
   it('should cancel all functions when first resolves', async () => {
@@ -150,7 +150,7 @@ describe('race', () => {
 
     setTimeout(() => cancel.cancel())
 
-    await expectAsync(
+    await expect(
       race(
         [
           ({ cancel }): Promise<number> =>
@@ -166,7 +166,7 @@ describe('race', () => {
         ],
         { cancel }
       )
-    ).toBeRejectedWithError('race cancel')
+    ).rejects.toThrowError('race cancel')
 
     spies.forEach(spy => {
       expect(spy).toHaveBeenCalled()
