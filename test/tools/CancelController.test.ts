@@ -10,7 +10,7 @@ describe('CancelController', () => {
 
   it('should run onCancel callback ones', async () => {
     const ctrl = new CancelController()
-    const onCancel = jasmine.createSpy('cancel')
+    const onCancel = jest.fn()
 
     ctrl.onCancel(onCancel)
     ctrl.cancel()
@@ -25,8 +25,8 @@ describe('CancelController', () => {
 
   it('should execute more than one callback', async () => {
     const ctrl = new CancelController()
-    const firstOnCancel = jasmine.createSpy('cancel')
-    const secondOnCancel = jasmine.createSpy('cancel')
+    const firstOnCancel = jest.fn()
+    const secondOnCancel = jest.fn()
 
     ctrl.onCancel(firstOnCancel)
     ctrl.onCancel(secondOnCancel)
@@ -42,7 +42,7 @@ describe('CancelController', () => {
   })
 
   it('should run callback on already cancelled controller', async () => {
-    const spy = jasmine.createSpy('cancel')
+    const spy = jest.fn()
     const ctrl = new CancelController()
 
     ctrl.cancel()

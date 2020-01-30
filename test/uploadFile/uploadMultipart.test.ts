@@ -4,6 +4,8 @@ import uploadMultipart from '../../src/uploadFile/uploadMultipart'
 import { UploadClientError } from '../../src/tools/errors'
 import CancelController from '../../src/tools/CancelController'
 
+jest.setTimeout(60000)
+
 describe('API - multipart', () => {
   it('should be able to upload multipart file', async () => {
     const fileToUpload = factory.file(11).data
@@ -30,13 +32,13 @@ describe('API - multipart', () => {
       ctrl.cancel()
     })
 
-    await expectAsync(
-      uploadMultipart(fileToUpload, settings)
-    ).toBeRejectedWithError(UploadClientError, 'Request canceled')
+    await expect(uploadMultipart(fileToUpload, settings)).rejects.toThrowError(
+      new UploadClientError('Request canceled')
+    )
   })
 
   it('should be able to handle progress', async () => {
-    const onProgress = jasmine.createSpy('onProgress')
+    const onProgress = jest.fn()
     const fileToUpload = factory.file(11).data
     const settings = getSettingsForTesting({
       publicKey: factory.publicKey('multipart'),

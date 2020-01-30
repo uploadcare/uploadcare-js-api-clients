@@ -18,6 +18,8 @@ const getChunk = (
   return file.slice(start, end)
 }
 
+jest.setTimeout(60000)
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const naiveMultipart = (file, parts, options): Promise<any> =>
   Promise.all(
@@ -70,9 +72,9 @@ describe('API - multipartComplete', () => {
       ctrl.cancel()
     })
 
-    await expectAsync(
+    await expect(
       multipartComplete(completedUuid, settings)
-    ).toBeRejectedWithError(UploadClientError, 'Request canceled')
+    ).rejects.toThrowError(new UploadClientError('Request canceled'))
 
     expect(Date.now() - time).toBeLessThan(16)
   })
@@ -84,9 +86,8 @@ describe('API - multipartComplete', () => {
 
     const upload = multipartComplete('', settings)
 
-    await expectAsync(upload).toBeRejectedWithError(
-      UploadClientError,
-      '[400] uuid is required.'
+    await expect(upload).rejects.toThrowError(
+      new UploadClientError('[400] uuid is required.')
     )
   })
 })

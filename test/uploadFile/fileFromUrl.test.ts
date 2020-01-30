@@ -41,9 +41,8 @@ describe('uploadFrom URL', () => {
       ctrl.cancel()
     })
 
-    await expectAsync(uploadFile(sourceUrl, settings)).toBeRejectedWithError(
-      UploadClientError,
-      'Request canceled'
+    await expect(uploadFile(sourceUrl, settings)).rejects.toThrowError(
+      new UploadClientError('Request canceled')
     )
   })
 
@@ -60,7 +59,7 @@ describe('uploadFrom URL', () => {
   })
 
   it('should be able to handle progress', async () => {
-    const onProgress = jasmine.createSpy('onProgress')
+    const onProgress = jest.fn()
     const sourceUrl = factory.imageUrl('valid')
     const settings = getSettingsForTesting({
       publicKey: factory.publicKey('image'),

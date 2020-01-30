@@ -40,7 +40,7 @@ describe('uploadFrom Object', () => {
       ctrl.cancel()
     })
 
-    await expectAsync(upload).toBeRejectedWithError('Request canceled')
+    await expect(upload).rejects.toThrowError('Request canceled')
   })
 
   it('should accept new file name setting', async () => {
@@ -56,7 +56,7 @@ describe('uploadFrom Object', () => {
   })
 
   it('should be able to handle progress', async () => {
-    const onProgress = jasmine.createSpy('onProgress')
+    const onProgress = jest.fn()
     const fileToUpload = factory.image('blackSquare').data
     const settings = getSettingsForTesting({
       publicKey: factory.publicKey('image'),

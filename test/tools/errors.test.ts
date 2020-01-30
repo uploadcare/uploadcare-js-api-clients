@@ -4,7 +4,7 @@ describe('UploadClientError', () => {
   it('should work', () => {
     const error = new UploadClientError('test error')
 
-    expect(error instanceof UploadClientError).toBeTrue()
+    expect(error instanceof UploadClientError).toBeTruthy()
   })
 
   it('should have message', () => {
@@ -24,8 +24,8 @@ describe('CancelError', () => {
   it('should work', () => {
     const error = cancelError() // dumb api :sad:
 
-    expect(error instanceof UploadClientError).toBeTrue()
-    expect(error.isCancel).toBeTrue()
+    expect(error instanceof UploadClientError).toBeTruthy()
+    expect(error.isCancel).toBeTruthy()
   })
 
   it('should have default message', () => {

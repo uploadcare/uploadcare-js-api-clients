@@ -24,7 +24,7 @@ describe('API - from url', () => {
       publicKey: factory.publicKey('invalid')
     })
 
-    await expectAsync(fromUrl(sourceUrl, settings)).toBeRejectedWithError(
+    await expect(fromUrl(sourceUrl, settings)).rejects.toThrowError(
       '[403] pub_key is invalid.'
     )
   })
@@ -32,7 +32,7 @@ describe('API - from url', () => {
   it('should be rejected with image that does not exists', async () => {
     const sourceUrl = factory.imageUrl('doesNotExist')
 
-    await expectAsync(fromUrl(sourceUrl, settings)).toBeRejectedWithError(
+    await expect(fromUrl(sourceUrl, settings)).rejects.toThrowError(
       '[400] Host does not exist.'
     )
   })
@@ -40,7 +40,7 @@ describe('API - from url', () => {
   it('should be rejected with image from private IP', async () => {
     const sourceUrl = factory.imageUrl('privateIP')
 
-    await expectAsync(fromUrl(sourceUrl, settings)).toBeRejectedWithError(
+    await expect(fromUrl(sourceUrl, settings)).rejects.toThrowError(
       '[400] Only public IPs are allowed.'
     )
   })
@@ -57,7 +57,7 @@ describe('API - from url', () => {
       controller.cancel()
     })
 
-    await expectAsync(fromUrl(sourceUrl, settings)).toBeRejectedWithError(
+    await expect(fromUrl(sourceUrl, settings)).rejects.toThrowError(
       'Request canceled'
     )
   })

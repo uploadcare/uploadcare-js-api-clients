@@ -25,9 +25,8 @@ describe('uploadFrom Uploaded', () => {
 
     ctrl.cancel()
 
-    await expectAsync(upload).toBeRejectedWithError(
-      UploadClientError,
-      'Request canceled'
+    await expect(upload).rejects.toThrowError(
+      new UploadClientError('Request canceled')
     )
   })
 
@@ -45,7 +44,7 @@ describe('uploadFrom Uploaded', () => {
   describe('should be able to handle', () => {
     it('cancel uploading', async () => {
       const ctrl = new CancelController()
-      const onCancel = jasmine.createSpy('onCancel')
+      const onCancel = jest.fn()
       ctrl.onCancel(onCancel)
       const upload = uploadFile(uuid, {
         ...settings,
@@ -54,16 +53,15 @@ describe('uploadFrom Uploaded', () => {
 
       ctrl.cancel()
 
-      await expectAsync(upload).toBeRejectedWithError(
-        UploadClientError,
-        'Request canceled'
+      await expect(upload).rejects.toThrowError(
+        new UploadClientError('Request canceled')
       )
 
       expect(onCancel).toHaveBeenCalled()
     })
 
     it('progress', async () => {
-      const onProgress = jasmine.createSpy('onProgress')
+      const onProgress = jest.fn()
       const settings = getSettingsForTesting({
         publicKey: factory.publicKey('image'),
         onProgress
