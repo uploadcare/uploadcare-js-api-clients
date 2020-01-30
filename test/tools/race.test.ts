@@ -57,11 +57,11 @@ describe('race', () => {
   it('should throw error if all function fails', async () => {
     await expect(
       race([
-        (): Promise<number> => Promise.reject('test 1'),
-        (): Promise<number> => Promise.reject('test 2'),
-        (): Promise<number> => Promise.reject('test 3'),
-        (): Promise<number> => Promise.reject('test 4'),
-        (): Promise<number> => Promise.reject('test 5')
+        (): Promise<number> => Promise.reject(new Error('test 1')),
+        (): Promise<number> => Promise.reject(new Error('test 2')),
+        (): Promise<number> => Promise.reject(new Error('test 3')),
+        (): Promise<number> => Promise.reject(new Error('test 4')),
+        (): Promise<number> => Promise.reject(new Error('test 5'))
       ])
     ).rejects.toThrowError('test 5')
   })
