@@ -50,7 +50,7 @@ const longJob = (attemps: number, fails: Error | null = null) => {
 describe('poll', () => {
   it('should be resolved', async () => {
     const job = longJob(3)
-    const result = await poll({ check: job.isFinish, interval: 20 })
+    const result = await poll({ check: job.isFinish, interval: 10 })
 
     expect(result).toBeTruthy()
     expect(job.spy.condition).toHaveBeenCalledTimes(3)
@@ -96,10 +96,10 @@ describe('poll', () => {
 
     setTimeout(() => {
       ctrl.cancel()
-    }, 30)
+    }, 100)
 
     await expect(
-      poll({ check: job.isFinish, interval: 20, cancel: ctrl })
+      poll({ check: job.isFinish, interval: 60, cancel: ctrl })
     ).rejects.toThrowError(new UploadClientError('Poll canceled'))
 
     expect(job.spy.condition).toHaveBeenCalledTimes(2)
