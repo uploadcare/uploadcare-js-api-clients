@@ -65,7 +65,7 @@
     "koa-body": "4.1.1",
     "prettier": "1.19.1",
     "prettier-config-standard": "1.0.1",
-    "rimraf": "3.0.0",
+    "rimraf": "3.0.1",
     "rollup": "1.29.1",
     "rollup-plugin-commonjs": "10.1.0",
     "rollup-plugin-json": "4.0.0",
