@@ -22,7 +22,6 @@ jobs:
       - run: npm run test:production
         env:
           UC_KEY_FOR_INTEGRATION_TESTS: ${{ secrets.UC_KEY_FOR_INTEGRATION_TESTS }}
-      - run: npm run test:browser
       - run: npm run release:trigger
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
