@@ -21,13 +21,18 @@ const images: { [key: string]: string } = {
 }
 /* eslint-enable max-len */
 
+const pubkey = (): string =>
+  (process.env.TEST_ENV === 'production'
+    ? process.env.UC_KEY_FOR_INTEGRATION_TESTS
+    : 'secret_public_key') || ''
+
 const uuids: { [key: string]: { publicKey: string; uuid: string } } = {
   image: {
-    publicKey: process.env.UC_KEY_FOR_INTEGRATION_TESTS || '',
+    publicKey: pubkey(),
     uuid: 'd3275f8b-686d-4980-916a-53a1fc17450b'
   },
   token: {
-    publicKey: process.env.UC_KEY_FOR_INTEGRATION_TESTS || '',
+    publicKey: pubkey(),
     uuid: 'b6aac6aa-be7b-46d2-9fc3-208290c78024'
   },
   demo: {

@@ -6,7 +6,7 @@ const PORT = 3000
 
 const ALLOWED_PUBLIC_KEYS = [
   'demopublickey',
-  process.env.UC_KEY_FOR_INTEGRATION_TESTS,
+  'secret_public_key',
   'pub_test__no_storing'
 ]
 
