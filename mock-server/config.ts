@@ -1,7 +1,3 @@
-import { config } from 'dotenv'
-
-config()
-
 const PORT = 3000
 
 const ALLOWED_PUBLIC_KEYS = [
