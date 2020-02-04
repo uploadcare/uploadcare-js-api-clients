@@ -12,11 +12,12 @@
     "./lib/tools/getFormData.node.js": "./lib/tools/getFormData.browser.js"
   },
   "scripts": {
+    "check-env-vars": "node ./checkvars.js",
     "mock:start": "ts-node --project ./mock-server/tsconfig.mock.json ./mock-server/server.ts --silent",
     "clean": "rimraf lib",
     "lint": "eslint . --ext=ts",
     "test": "start-server-and-test mock:start :3000 test:jest",
-    "test:production": "TEST_ENV=production jest",
+    "test:production": "npm run check-env-vars && TEST_ENV=production jest",
     "test:jest": "jest",
     "prebuild": "npm run clean",
     "build": "tsc --build tsconfig.build.json",
@@ -55,6 +56,7 @@
     "chalk": "3.0.0",
     "data-uri-to-buffer": "3.0.0",
     "dataurl-to-blob": "0.0.1",
+    "dotenv": "^8.2.0",
     "eslint": "6.8.0",
     "eslint-config-prettier": "6.10.0",
     "eslint-plugin-prettier": "3.1.2",
