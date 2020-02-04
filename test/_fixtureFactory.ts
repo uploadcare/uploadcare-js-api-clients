@@ -1,3 +1,5 @@
+import './_envs'
+
 import {
   dataURItoBlob,
   dataURItoBuffer,
