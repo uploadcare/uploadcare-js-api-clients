@@ -51,6 +51,7 @@
     "@types/koa": "2.11.0",
     "@types/node": "12.12.26",
     "@types/promise": "7.1.30",
+    "@types/ws": "^7.2.1",
     "@typescript-eslint/eslint-plugin": "2.19.0",
     "@typescript-eslint/parser": "2.19.0",
     "chalk": "3.0.0",
@@ -79,11 +80,13 @@
     "rollup-plugin-typescript2": "0.25.3",
     "shipjs": "0.14.2",
     "start-server-and-test": "1.10.7",
-    "ts-node": "8.6.2",
     "ts-jest": "25.2.0",
+    "ts-node": "8.6.2",
     "typescript": "3.7.5"
   },
   "dependencies": {
-    "form-data": "^3.0.0"
+    "form-data": "^3.0.0",
+    "nanoevents": "^2.0.0",
+    "ws": "^7.2.1"
   }
 }
