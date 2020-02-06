@@ -1,27 +1,11 @@
-export interface Settings {
-  baseCDN?: string
-  baseURL?: string
-  publicKey?: string
-  fileName?: string
-  store?: boolean
-  secureSignature?: string
-  secureExpire?: string
-  integration?: string
-  checkForUrlDuplicates?: boolean
-  saveUrlForRecurrentUploads?: boolean
-  source?: string
-  jsonpCallback?: string
-  pollingTimeoutMilliseconds?: number
-  maxContentLength?: number
-  retryThrottledRequestMaxTimes?: number
-  multipartChunkSize?: number
-  multipartMinFileSize?: number
-  multipartMinLastPartSize?: number
-  maxConcurrentRequests?: number
-  contentType?: string
+/**
+ * Make all properties in T optional
+ */
+type Partial<T> = {
+  [P in keyof T]?: T[P]
 }
 
-export interface DefaultSettings extends Settings {
+export interface DefaultSettings {
   baseCDN: string
   baseURL: string
   fileName: string
@@ -33,4 +17,16 @@ export interface DefaultSettings extends Settings {
   maxConcurrentRequests: number
   pollingTimeoutMilliseconds: number
   contentType: string
+}
+
+export interface Settings extends Partial<DefaultSettings> {
+  publicKey?: string
+  store?: boolean
+  secureSignature?: string
+  secureExpire?: string
+  integration?: string
+  checkForUrlDuplicates?: boolean
+  saveUrlForRecurrentUploads?: boolean
+  source?: string
+  jsonpCallback?: string
 }
