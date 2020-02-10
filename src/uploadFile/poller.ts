@@ -20,8 +20,8 @@ function realPoll({
   retryThrottledRequestMaxTimes?: number
   onProgress?: (info: { value: number }) => void
   cancel?: CancelController
-}): Promise<FileInfo> {
-  return poll<FileInfo>({
+}): Promise<FileInfo | UploadClientError> {
+  return poll<FileInfo | UploadClientError>({
     check: cancel =>
       fromUrlStatus(token, {
         publicKey,
@@ -32,13 +32,13 @@ function realPoll({
       }).then(response => {
         switch (response.status) {
           case Status.Error: {
-            throw new UploadClientError(response.error)
+            return new UploadClientError(response.error)
           }
           case Status.Waiting: {
             return false
           }
           case Status.Unknown: {
-            throw new UploadClientError(`Token "${token}" was not found.`)
+            return new UploadClientError(`Token "${token}" was not found.`)
           }
           case Status.Progress: {
             if (onProgress)
@@ -51,7 +51,7 @@ function realPoll({
             return response
           }
           default: {
-            throw new UploadClientError('Unknown status')
+            throw new Error('Unknown status')
           }
         }
       }),

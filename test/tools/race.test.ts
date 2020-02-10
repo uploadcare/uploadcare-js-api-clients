@@ -67,10 +67,7 @@ describe('race', () => {
   })
 
   it('should cancel all functions when first resolves', async () => {
-    const spies = Array.from({ length: 5 }, i =>
-      jasmine.createSpy('cancel for ' + i)
-    )
-
+    const spies = Array.from({ length: 5 }, () => jest.fn())
     const createCancelHandler = (index: number) => (error): number => {
       spies[index]()
 
@@ -100,10 +97,7 @@ describe('race', () => {
   })
 
   it('should cancel all functions when callback fires', async () => {
-    const spies = Array.from({ length: 5 }, i =>
-      jasmine.createSpy('cancel for ' + i)
-    )
-
+    const spies = Array.from({ length: 5 }, () => jest.fn())
     const createCancelHandler = (index: number) => (error): number => {
       spies[index]()
 
@@ -137,11 +131,7 @@ describe('race', () => {
 
   it('should be cancellable', async () => {
     const cancel = new CancelController()
-
-    const spies = Array.from({ length: 5 }, i =>
-      jasmine.createSpy('cancel for ' + i)
-    )
-
+    const spies = Array.from({ length: 5 }, () => jest.fn())
     const createCancelHandler = (index: number) => (error): number => {
       spies[index]()
 

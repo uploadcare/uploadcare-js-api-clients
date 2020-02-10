@@ -4,8 +4,9 @@ import CancelController from '../tools/CancelController'
 import { UploadcareFile } from '../tools/UploadcareFile'
 import { race } from '../tools/race'
 import poll from './poller'
-import push from './pusher'
+import push, { preconnect } from './pusher'
 import { FileInfo } from '../api/types'
+import { UploadClientError } from '../tools/errors'
 
 type FromUrlOptions = {
   publicKey: string
@@ -43,27 +44,30 @@ const uploadFromUrl = (
     retryThrottledRequestMaxTimes
   }: FromUrlOptions
 ): Promise<UploadcareFile> =>
-  fromUrl(sourceUrl, {
-    publicKey,
-    fileName,
-    baseURL,
-    checkForUrlDuplicates,
-    saveUrlForRecurrentUploads,
-    secureSignature,
-    secureExpire,
-    store,
-    cancel,
-    source,
-    integration,
-    retryThrottledRequestMaxTimes
-  })
+  Promise.resolve(preconnect())
+    .then(() =>
+      fromUrl(sourceUrl, {
+        publicKey,
+        fileName,
+        baseURL,
+        checkForUrlDuplicates,
+        saveUrlForRecurrentUploads,
+        secureSignature,
+        secureExpire,
+        store,
+        cancel,
+        source,
+        integration,
+        retryThrottledRequestMaxTimes
+      })
+    )
     .then(urlResponse => {
       if (urlResponse.type === TypeEnum.FileInfo) {
         return urlResponse
       } else {
-        return race<FileInfo>(
+        return race<FileInfo | UploadClientError>(
           [
-            ({ cancel }): Promise<FileInfo> =>
+            ({ cancel }): Promise<FileInfo | UploadClientError> =>
               poll({
                 token: urlResponse.token,
                 publicKey,
@@ -73,17 +77,32 @@ const uploadFromUrl = (
                 onProgress,
                 cancel
               }),
-            ({ callback, cancel }): Promise<FileInfo> =>
+            ({ callback, cancel }): Promise<FileInfo | UploadClientError> =>
               push({
                 token: urlResponse.token,
                 callback,
                 cancel,
                 onProgress
-              })
+              }).then(() =>
+                poll({
+                  token: urlResponse.token,
+                  publicKey,
+                  baseURL,
+                  integration,
+                  retryThrottledRequestMaxTimes,
+                  onProgress,
+                  cancel
+                })
+              )
           ],
           { cancel }
         )
       }
+    })
+    .then(result => {
+      if (result instanceof UploadClientError) throw result
+      console.log(result)
+      return result
     })
     .then(fileInfo => new UploadcareFile(fileInfo, { baseCDN }))
 

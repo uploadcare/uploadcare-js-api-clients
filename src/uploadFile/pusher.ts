@@ -5,6 +5,7 @@ import fromUrl, { TypeEnum } from '../api/fromUrl'
 import { FileInfo } from '../api/types'
 import { Status } from '../api/fromUrlStatus'
 import CancelController from '../tools/CancelController'
+import { UploadClientError } from '../tools/errors'
 
 type ListenerStore<T extends object> = {
   [K in keyof T]: ((data: T[K]) => void)[]
@@ -23,7 +24,8 @@ type StatusProgressResponse = {
 
 type StatusErrorResponse = {
   status: Status.Error
-  error: string
+  msg: string
+  url: string
 }
 
 type StatusSuccessResponse = {
@@ -86,15 +88,9 @@ type Messages = {
 
 class Pusher {
   ws: WebSocket | undefined = undefined
-  queue: Message<{ channel: string }>[]
-  isConnected: boolean
-  emmitter: Events<Messages>
-
-  constructor() {
-    this.queue = []
-    this.emmitter = new Events()
-    this.isConnected = false
-  }
+  queue: Message<{ channel: string }>[] = []
+  isConnected = false
+  emmitter: Events<Messages> = new Events()
 
   connect(): void {
     if (!this.isConnected && !this.ws) {
@@ -107,8 +103,6 @@ class Pusher {
       })
 
       this.ws.addEventListener('message', e => {
-        console.log('recive: ')
-        console.log('  ', e.data)
         const data = JSON.parse(e.data)
 
         switch (data.event) {
@@ -120,9 +114,11 @@ class Pusher {
           case 'progress':
           case 'success':
           case 'fail': {
+            console.log(data)
+
             this.emmitter.emit<string>(
               data.channel,
-              response(data.event, data.data)
+              response(data.event, JSON.parse(data.data))
             )
           }
         }
@@ -132,8 +128,8 @@ class Pusher {
 
   send(data: { event: string; data: { channel: string } }): void {
     const str = JSON.stringify(data)
-    console.log('send: ')
-    console.log('  ', str)
+    // console.log('send: ')
+    // console.log('  ', str)
 
     this.ws?.send(str)
   }
@@ -190,43 +186,50 @@ const push = ({
   onProgress
 }: {
   token: string
-  cancel?: CancelController
+  cancel: CancelController
   callback: () => void
   onProgress?: (info: { value: number }) => void
-}): Promise<FileInfo> =>
+}): Promise<FileInfo | UploadClientError> =>
   new Promise((resolve, reject) => {
     const pusher = getPusher()
+
+    cancel.onCancel(() => {
+      pusher.unsubscribe(token)
+      reject('stop pisher')
+    })
 
     pusher.subscribe(token, result => {
       callback()
 
-      if (cancel) {
-        cancel.onCancel(() => {
-          pusher.unsubscribe(token)
-        })
-      }
-
       switch (result.status) {
         case Status.Success: {
           pusher.unsubscribe(token)
+          if (onProgress) onProgress({ value: result.done / result.total })
           resolve(result)
           break
         }
 
         case Status.Progress: {
-          onProgress && onProgress({ value: result.done / result.total })
+          if (onProgress) {
+            onProgress({ value: result.done / result.total })
+          }
           break
         }
 
         case Status.Error: {
           pusher.unsubscribe(token)
-          reject(result.error)
+          reject(new UploadClientError(result.msg))
         }
       }
     })
   })
 
+const preconnect = (): void => {
+  getPusher().connect()
+}
+
 export default push
+export { preconnect }
 
 // a.connect()
 

@@ -17,7 +17,7 @@
     "clean": "rimraf lib",
     "lint": "eslint . --ext=ts",
     "test": "start-server-and-test mock:start :3000 test:jest",
-    "test:production": "npm run check-env-vars && TEST_ENV=production jest",
+    "test:production": "npm run check-env-vars && TEST_ENV=production jest -w 1",
     "test:jest": "jest",
     "prebuild": "npm run clean",
     "build": "tsc --build tsconfig.build.json",

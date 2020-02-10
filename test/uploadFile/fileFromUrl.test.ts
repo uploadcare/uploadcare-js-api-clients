@@ -4,6 +4,8 @@ import { getSettingsForTesting } from '../_helpers'
 import { UploadClientError } from '../../src/tools/errors'
 import CancelController from '../../src/tools/CancelController'
 
+jest.setTimeout(60000)
+
 describe('uploadFrom URL', () => {
   it('should resolves when file is ready on CDN', async () => {
     const sourceUrl = factory.imageUrl('valid')
@@ -15,6 +17,17 @@ describe('uploadFrom URL', () => {
 
     expect(file.cdnUrl).toBeTruthy()
     expect(file.uuid).toBeTruthy()
+  })
+
+  it('should rejects when link is invalid', async () => {
+    const sourceUrl = factory.imageUrl('invalid')
+    const settings = getSettingsForTesting({
+      publicKey: factory.publicKey('image')
+    })
+
+    await expect(uploadFile(sourceUrl, settings)).rejects.toThrowError(
+      UploadClientError
+    )
   })
 
   it('should accept store setting', async () => {
