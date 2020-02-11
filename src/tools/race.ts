@@ -1,4 +1,4 @@
-import CancelController from '../../src/tools/CancelController'
+import CancelController from './CancelController'
 
 type Callback = () => void
 type StrangeFn<T> = (args: {

@@ -1,15 +1,10 @@
 import * as WebSocket from 'ws'
 
-import fromUrl, { TypeEnum } from '../api/fromUrl'
-
 import { FileInfo } from '../api/types'
 import { Status } from '../api/fromUrlStatus'
 import CancelController from '../tools/CancelController'
 import { UploadClientError } from '../tools/errors'
-
-type ListenerStore<T extends object> = {
-  [K in keyof T]: ((data: T[K]) => void)[]
-}
+import { Events } from './events'
 
 type AllStatuses =
   | StatusErrorResponse
@@ -31,31 +26,6 @@ type StatusErrorResponse = {
 type StatusSuccessResponse = {
   status: Status.Success
 } & FileInfo
-
-class Events<T extends object> {
-  events: ListenerStore<T>
-
-  constructor() {
-    this.events = Object.create({})
-  }
-
-  emit<U extends keyof T>(event: U, data: T[U]): void {
-    this.events[event]?.forEach(fn => fn(data))
-  }
-
-  on<U extends keyof T>(event: U, callback: (data: T[U]) => void): void {
-    this.events[event] = this.events[event] || []
-    this.events[event].push(callback)
-  }
-
-  off<U extends keyof T>(event: U, callback?: (data: T[U]) => void): void {
-    if (callback) {
-      this.events[event] = this.events[event].filter(fn => fn !== callback)
-    } else {
-      this.events[event] = []
-    }
-  }
-}
 
 const response = (
   type: 'progress' | 'success' | 'fail',
@@ -90,6 +60,7 @@ class Pusher {
   ws: WebSocket | undefined = undefined
   queue: Message<{ channel: string }>[] = []
   isConnected = false
+  connections = 0
   emmitter: Events<Messages> = new Events()
 
   connect(): void {
@@ -114,8 +85,6 @@ class Pusher {
           case 'progress':
           case 'success':
           case 'fail': {
-            console.log(data)
-
             this.emmitter.emit<string>(
               data.channel,
               response(data.event, JSON.parse(data.data))
@@ -135,6 +104,7 @@ class Pusher {
   }
 
   subscribe(token: string, handler: (data: AllStatuses) => void): void {
+    this.connections += 1
     this.connect()
 
     const channel = `task-status-${token}`
@@ -152,6 +122,8 @@ class Pusher {
   }
 
   unsubscribe(token: string): void {
+    this.connections -= 1
+
     const channel = `task-status-${token}`
     const message = {
       event: 'pusher:unsubscribe',
@@ -162,7 +134,14 @@ class Pusher {
     if (this.isConnected) {
       this.send(message)
     } else {
+      // rewrite this logic
       this.queue.push(message)
+    }
+
+    if (this.connections === 0) {
+      this.ws?.close()
+      this.ws = undefined
+      this.isConnected = false
     }
   }
 }
@@ -230,20 +209,3 @@ const preconnect = (): void => {
 
 export default push
 export { preconnect }
-
-// a.connect()
-
-// setTimeout(() => {
-//   fromUrl(
-//     'https://images.unsplash.com/photo-1580840612958-0fc3f8570eaa?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=2734&q=80',
-//     { publicKey: 'demopublickey' }
-//   ).then(result => {
-//     if (result.type === TypeEnum.Token) {
-//       a.subscribe(result.token, console.log)
-
-//       setTimeout(() => {
-//         a.unsubscribe(result.token)
-//       }, 5000)
-//     }
-//   })
-// }, 2000)
