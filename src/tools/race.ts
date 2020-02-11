@@ -1,8 +1,8 @@
-import CancelController from '../../src/tools/CancelController'
+import CancelController from './CancelController'
 
 type Callback = () => void
 type StrangeFn<T> = (args: {
-  callback: Callback
+  stopRace: Callback
   cancel: CancelController
 }) => Promise<T>
 
@@ -13,7 +13,7 @@ const race = <T>(
   let lastError: Error | null = null
   let winnerIndex: number | null = null
   const controllers = fns.map(() => new CancelController())
-  const createCancelCallback = (i: number) => (): void => {
+  const createStopRaceCallback = (i: number) => (): void => {
     winnerIndex = i
 
     controllers.forEach(
@@ -29,12 +29,12 @@ const race = <T>(
 
   return Promise.all(
     fns.map((fn, i) => {
-      const callback = createCancelCallback(i)
+      const stopRace = createStopRaceCallback(i)
 
       return Promise.resolve()
-        .then(() => fn({ callback, cancel: controllers[i] }))
+        .then(() => fn({ stopRace, cancel: controllers[i] }))
         .then(result => {
-          callback()
+          stopRace()
 
           return result
         })
