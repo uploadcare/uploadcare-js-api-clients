@@ -57,51 +57,53 @@ const uploadFromUrl = (
     source,
     integration,
     retryThrottledRequestMaxTimes
-  }).then(urlResponse => {
-    if (urlResponse.type === TypeEnum.FileInfo) {
-      return new UploadcareFile(urlResponse, { baseCDN })
-    } else {
-      return poll<FileInfo>({
-        check: cancel =>
-          fromUrlStatus(urlResponse.token, {
-            publicKey,
-            baseURL,
-            integration,
-            retryThrottledRequestMaxTimes,
-            cancel
-          }).then(response => {
-            switch (response.status) {
-              case Status.Error: {
-                throw new UploadClientError(response.error)
-              }
-              case Status.Waiting: {
-                return false
-              }
-              case Status.Unknown: {
-                throw new UploadClientError(
-                  `Token "${urlResponse.token}" was not found.`
-                )
-              }
-              case Status.Progress: {
-                if (onProgress)
-                  onProgress({ value: response.done / response.total })
-
-                return false
-              }
-              case Status.Success: {
-                if (onProgress)
-                  onProgress({ value: response.done / response.total })
-
-                return response
-              }
-              default: {
-                throw new UploadClientError('Unknown status')
-              }
-            }
-          }),
-        cancel
-      }).then(fileInfo => new UploadcareFile(fileInfo, { baseCDN }))
-    }
   })
+    .then(urlResponse => {
+      if (urlResponse.type === TypeEnum.FileInfo) {
+        return urlResponse
+      } else {
+        return poll<FileInfo>({
+          check: cancel =>
+            fromUrlStatus(urlResponse.token, {
+              publicKey,
+              baseURL,
+              integration,
+              retryThrottledRequestMaxTimes,
+              cancel
+            }).then(response => {
+              switch (response.status) {
+                case Status.Error: {
+                  throw new UploadClientError(response.error)
+                }
+                case Status.Waiting: {
+                  return false
+                }
+                case Status.Unknown: {
+                  throw new UploadClientError(
+                    `Token "${urlResponse.token}" was not found.`
+                  )
+                }
+                case Status.Progress: {
+                  if (onProgress)
+                    onProgress({ value: response.done / response.total })
+
+                  return false
+                }
+                case Status.Success: {
+                  if (onProgress)
+                    onProgress({ value: response.done / response.total })
+
+                  return response
+                }
+                default: {
+                  throw new UploadClientError('Unknown status')
+                }
+              }
+            }),
+          cancel
+        })
+      }
+    })
+    .then(fileInfo => new UploadcareFile(fileInfo, { baseCDN }))
 
 export default uploadFromUrl
