@@ -68,7 +68,7 @@
     "prettier": "1.19.1",
     "prettier-config-standard": "1.0.1",
     "rimraf": "3.0.1",
-    "shipjs": "0.14.2",
+    "shipjs": "0.15.0",
     "start-server-and-test": "1.10.8",
     "ts-node": "8.6.2",
     "ts-jest": "25.2.0",
