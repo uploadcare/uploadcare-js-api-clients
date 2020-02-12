@@ -99,7 +99,7 @@ describe('race', () => {
     })
   })
 
-  it('should cancel all functions when callback fires', async () => {
+  it('should cancel all functions after calling stopRace', async () => {
     const spies = Array.from({ length: 5 }, i =>
       jasmine.createSpy('cancel for ' + i)
     )
@@ -111,8 +111,8 @@ describe('race', () => {
     }
 
     const value = await race([
-      ({ callback }): Promise<number> => {
-        callback()
+      ({ stopRace }): Promise<number> => {
+        stopRace()
 
         return Promise.resolve(1)
       },
