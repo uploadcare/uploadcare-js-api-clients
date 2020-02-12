@@ -1,4 +1,4 @@
-import dataUriToBuffer = require('data-uri-to-buffer')
+import * as dataUriToBuffer from 'data-uri-to-buffer'
 import dataUriToBlob from 'dataurl-to-blob'
 import defaultSettings from '../src/defaultSettings'
 import { DefaultSettings } from '../src/types'
@@ -11,12 +11,8 @@ export enum Environment {
   Production = 'production'
 }
 
-export const getSettingsForTesting = <T>(
-  options: T,
-  environment: Environment | null = null
-): T & DefaultSettings => {
-  const selectedEnvironment =
-    environment || process.env.TEST_ENV || Environment.Development
+export const getSettingsForTesting = <T>(options: T): T & DefaultSettings => {
+  const selectedEnvironment = process.env.TEST_ENV || Environment.Development
 
   const allEnvironments = {
     development: {
