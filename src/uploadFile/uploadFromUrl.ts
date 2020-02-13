@@ -1,7 +1,9 @@
 import fromUrl, { TypeEnum } from '../api/fromUrl'
-import fromUrlStatus, { Status } from '../api/fromUrlStatus'
-import { poll } from '../tools/poll'
 import { UploadClientError } from '../tools/errors'
+import { race } from '../tools/race'
+
+import poll from './pollStrategy'
+import push, { preconnect } from './pushStrategy'
 
 /* Types */
 import { FileInfo } from '../api/types'
@@ -44,65 +46,65 @@ const uploadFromUrl = (
     retryThrottledRequestMaxTimes
   }: FromUrlOptions
 ): Promise<UploadcareFile> =>
-  fromUrl(sourceUrl, {
-    publicKey,
-    fileName,
-    baseURL,
-    checkForUrlDuplicates,
-    saveUrlForRecurrentUploads,
-    secureSignature,
-    secureExpire,
-    store,
-    cancel,
-    source,
-    integration,
-    retryThrottledRequestMaxTimes
-  })
+  Promise.resolve(preconnect())
+    .then(() =>
+      fromUrl(sourceUrl, {
+        publicKey,
+        fileName,
+        baseURL,
+        checkForUrlDuplicates,
+        saveUrlForRecurrentUploads,
+        secureSignature,
+        secureExpire,
+        store,
+        cancel,
+        source,
+        integration,
+        retryThrottledRequestMaxTimes
+      })
+    )
     .then(urlResponse => {
       if (urlResponse.type === TypeEnum.FileInfo) {
         return urlResponse
       } else {
-        return poll<FileInfo>({
-          check: cancel =>
-            fromUrlStatus(urlResponse.token, {
-              publicKey,
-              baseURL,
-              integration,
-              retryThrottledRequestMaxTimes,
-              cancel
-            }).then(response => {
-              switch (response.status) {
-                case Status.Error: {
-                  throw new UploadClientError(response.error)
-                }
-                case Status.Waiting: {
-                  return false
-                }
-                case Status.Unknown: {
-                  throw new UploadClientError(
-                    `Token "${urlResponse.token}" was not found.`
-                  )
-                }
-                case Status.Progress: {
-                  if (onProgress)
-                    onProgress({ value: response.done / response.total })
-
-                  return false
-                }
-                case Status.Success: {
-                  if (onProgress)
-                    onProgress({ value: response.done / response.total })
-
-                  return response
-                }
-                default: {
-                  throw new UploadClientError('Unknown status')
-                }
-              }
-            }),
-          cancel
-        })
+        return race<FileInfo | UploadClientError>(
+          [
+            ({ cancel }): Promise<FileInfo | UploadClientError> =>
+              poll({
+                token: urlResponse.token,
+                publicKey,
+                baseURL,
+                integration,
+                retryThrottledRequestMaxTimes,
+                onProgress,
+                cancel
+              }),
+            ({ stopRace, cancel }): Promise<FileInfo | UploadClientError> =>
+              push({
+                token: urlResponse.token,
+                stopRace,
+                cancel,
+                onProgress
+              }).then(() =>
+                poll({
+                  token: urlResponse.token,
+                  publicKey,
+                  baseURL,
+                  integration,
+                  retryThrottledRequestMaxTimes,
+                  onProgress,
+                  cancel
+                })
+              )
+          ],
+          { cancel }
+        )
       }
+    })
+    .then(result => {
+      if (result instanceof UploadClientError) throw result
+
+      return result
     })
     .then(fileInfo => new UploadcareFile(fileInfo, { baseCDN }))
 
