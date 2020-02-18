@@ -11,7 +11,6 @@ const getPusher = (): Pusher => {
     pusher = new Pusher()
   }
 
-  pusher.connect()
   return pusher
 }
 
