@@ -59,6 +59,8 @@ type EventTypes = {
   [key: string]: AllStatuses
 } & {
   connected: undefined
+} & {
+  error: Error
 }
 
 class Pusher {
@@ -71,6 +73,10 @@ class Pusher {
   connect(): void {
     if (!this.isConnected && !this.ws) {
       this.ws = new WebSocket(pusherUrl)
+
+      this.ws.addEventListener('error', error => {
+        this.emmitter.emit('error', new Error(error.message))
+      })
 
       this.emmitter.on('connected', () => {
         this.isConnected = true
@@ -147,6 +153,15 @@ class Pusher {
       this.ws = undefined
       this.isConnected = false
     }
+  }
+
+  error(callback: (error: Error) => void): void {
+    const handler = (error: Error): void => {
+      callback(error)
+
+      this.emmitter.off('error', handler)
+    }
+    this.emmitter.on('error', handler)
   }
 }
 

@@ -1,11 +1,20 @@
+import WS from 'jest-websocket-mock'
+
 import * as factory from '../_fixtureFactory'
 import uploadFile from '../../src/uploadFile'
 import { getSettingsForTesting } from '../_helpers'
 import { UploadClientError } from '../../src/tools/errors'
 import CancelController from '../../src/tools/CancelController'
 
-describe('uploadFrom URL', () => {
+const url =
+  'wss://ws.pusherapp.com:443/app/79ae88bd931ea68464d9?protocol=5&client=js&version=1.12.2'
+
+fdescribe('uploadFrom URL', () => {
   it('should resolves when file is ready on CDN', async () => {
+    const server = new WS(url)
+
+    server.on('message', data => console.log(data))
+
     const sourceUrl = factory.imageUrl('valid')
     const settings = getSettingsForTesting({
       publicKey: factory.publicKey('image')

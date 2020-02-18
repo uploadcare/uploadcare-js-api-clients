@@ -34,6 +34,8 @@ const pushStrategy = ({
       reject('stop pisher')
     })
 
+    pusher.error(reject)
+
     pusher.subscribe(token, result => {
       stopRace()
 
