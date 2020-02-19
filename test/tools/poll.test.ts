@@ -65,7 +65,7 @@ describe('poll', () => {
 
     await expect(
       poll({ check: job.isFinish, interval: 20, cancel: ctrl })
-    ).rejects.toThrowError(new UploadClientError('Poll canceled'))
+    ).rejects.toThrowError(new UploadClientError('Poll cancelled'))
 
     expect(job.spy.condition).not.toHaveBeenCalled()
     expect(job.spy.cancel).not.toHaveBeenCalled()
@@ -79,7 +79,7 @@ describe('poll', () => {
 
     await expect(
       poll({ check: job.isFinish, interval: 20, cancel: ctrl })
-    ).rejects.toThrowError(new UploadClientError('Poll canceled'))
+    ).rejects.toThrowError(new UploadClientError('Poll cancelled'))
 
     const conditionCallsCount = job.spy.condition.mock.calls.length
     const cancelCallsCount = job.spy.cancel.mock.calls.length
@@ -100,7 +100,7 @@ describe('poll', () => {
 
     await expect(
       poll({ check: job.isFinish, interval: 60, cancel: ctrl })
-    ).rejects.toThrowError(new UploadClientError('Poll canceled'))
+    ).rejects.toThrowError(new UploadClientError('Poll cancelled'))
 
     expect(job.spy.condition).toHaveBeenCalledTimes(2)
     expect(job.spy.cancel).toHaveBeenCalledTimes(2)
