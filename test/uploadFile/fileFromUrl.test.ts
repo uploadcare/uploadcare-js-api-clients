@@ -4,7 +4,7 @@ import { getSettingsForTesting } from '../_helpers'
 import { UploadClientError } from '../../src/tools/errors'
 import CancelController from '../../src/tools/CancelController'
 
-fdescribe('uploadFrom URL', () => {
+describe('uploadFrom URL', () => {
   it('should resolves when file is ready on CDN', async () => {
     const sourceUrl = factory.imageUrl('valid')
     const settings = getSettingsForTesting({
