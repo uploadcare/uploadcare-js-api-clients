@@ -1,5 +1,5 @@
 import CancelController from '../tools/CancelController'
-import { UploadClientError } from '../tools/errors'
+import { UploadClientError, cancelError } from '../tools/errors'
 import Pusher from './pusher'
 
 import { FileInfo } from '../api/types'
@@ -30,7 +30,7 @@ const pushStrategy = ({
 
     cancel.onCancel(() => {
       pusher.unsubscribe(token)
-      reject('stop pisher')
+      reject(cancelError('pisher cancelled'))
     })
 
     pusher.error(reject)
