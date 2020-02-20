@@ -67,7 +67,7 @@ class Pusher {
   ws: WebSocket | undefined = undefined
   queue: Message[] = []
   isConnected = false
-  connections = 0
+  subscribers = 0
   emmitter: Events<EventTypes> = new Events()
 
   connect(): void {
@@ -115,7 +115,7 @@ class Pusher {
   }
 
   subscribe(token: string, handler: (data: AllStatuses) => void): void {
-    this.connections += 1
+    this.subscribers += 1
     this.connect()
 
     const channel = `task-status-${token}`
@@ -133,7 +133,7 @@ class Pusher {
   }
 
   unsubscribe(token: string): void {
-    this.connections -= 1
+    this.subscribers -= 1
 
     const channel = `task-status-${token}`
     const message = {
@@ -148,7 +148,7 @@ class Pusher {
       this.queue = this.queue.filter(msg => msg.data.channel !== channel)
     }
 
-    if (this.connections === 0) {
+    if (this.subscribers === 0) {
       this.ws?.close()
       this.ws = undefined
       this.isConnected = false
