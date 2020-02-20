@@ -41,12 +41,7 @@ const response = (
 }
 
 const key = '79ae88bd931ea68464d9'
-const protocol =
-  typeof window !== 'undefined' && document.location.protocol !== 'https:'
-    ? 'ws://'
-    : 'wss://'
-
-const pusherUrl = `${protocol}ws.pusherapp.com/app/${key}?protocol=5&client=js&version=1.12.2`
+const pusherUrl = `wss://ws.pusherapp.com/app/${key}?protocol=5&client=js&version=1.12.2`
 
 type Message = {
   event: string
