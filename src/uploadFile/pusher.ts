@@ -104,6 +104,12 @@ class Pusher {
     }
   }
 
+  disconnect(): void {
+    this.ws?.close()
+    this.ws = undefined
+    this.isConnected = false
+  }
+
   send(event: string, data: any): void {
     const str = JSON.stringify({ event, data })
     // console.log('send: ')
@@ -147,9 +153,7 @@ class Pusher {
     }
 
     if (this.subscribers === 0) {
-      this.ws?.close()
-      this.ws = undefined
-      this.isConnected = false
+      this.disconnect()
     }
   }
 
