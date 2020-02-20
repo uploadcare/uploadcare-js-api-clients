@@ -40,9 +40,6 @@ const response = (
   return { status: Status.Error, ...data } as StatusErrorResponse
 }
 
-const key = '79ae88bd931ea68464d9'
-const pusherUrl = `wss://ws.pusherapp.com/app/${key}?protocol=5&client=js&version=1.12.2`
-
 type Message = {
   event: string
   data: { channel: string }
@@ -57,14 +54,21 @@ type EventTypes = {
 }
 
 class Pusher {
+  key: string
   ws: WebSocket | undefined = undefined
   queue: Message[] = []
   isConnected = false
   subscribers = 0
   emmitter: Events<EventTypes> = new Events()
 
+  constructor(pusherKey: string) {
+    this.key = pusherKey
+  }
+
   connect(): void {
     if (!this.isConnected && !this.ws) {
+      const pusherUrl = `wss://ws.pusherapp.com/app/${this.key}?protocol=5&client=js&version=1.12.2`
+
       this.ws = new WebSocket(pusherUrl)
 
       this.ws.addEventListener('error', error => {

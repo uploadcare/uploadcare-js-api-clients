@@ -4,7 +4,6 @@ import { DefaultSettings } from './types'
   Settings for future support:
   multipartMaxAttempts: 3,
   parallelDirectUploads: 10,
-  pusherKey: '79ae88bd931ea68464d9',
  */
 const defaultSettings: DefaultSettings = {
   baseCDN: 'https://ucarecdn.com',
@@ -17,7 +16,8 @@ const defaultSettings: DefaultSettings = {
   multipartMinLastPartSize: 1024 * 1024, // 1MB
   maxConcurrentRequests: 4,
   pollingTimeoutMilliseconds: 10000,
-  contentType: 'application/octet-stream' // ??
+  contentType: 'application/octet-stream', // ??
+  pusherKey: '79ae88bd931ea68464d9'
 }
 
 export default defaultSettings

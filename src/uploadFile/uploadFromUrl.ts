@@ -1,6 +1,7 @@
 import fromUrl, { TypeEnum } from '../api/fromUrl'
 import { UploadClientError } from '../tools/errors'
 import { race } from '../tools/race'
+import defaultSettings from '../defaultSettings'
 
 import poll from './pollStrategy'
 import push, { preconnect } from './pushStrategy'
@@ -25,6 +26,7 @@ type FromUrlOptions = {
   source?: string
   integration?: string
   retryThrottledRequestMaxTimes?: number
+  pusherKey?: string
 }
 
 const uploadFromUrl = (
@@ -43,10 +45,11 @@ const uploadFromUrl = (
     onProgress,
     source,
     integration,
-    retryThrottledRequestMaxTimes
+    retryThrottledRequestMaxTimes,
+    pusherKey = defaultSettings.pusherKey
   }: FromUrlOptions
 ): Promise<UploadcareFile> =>
-  Promise.resolve(preconnect())
+  Promise.resolve(preconnect(pusherKey))
     .then(() =>
       fromUrl(sourceUrl, {
         publicKey,
@@ -82,6 +85,7 @@ const uploadFromUrl = (
             ({ stopRace, cancel }): Promise<FileInfo | UploadClientError> =>
               push({
                 token: urlResponse.token,
+                pusherKey,
                 stopRace,
                 cancel,
                 onProgress

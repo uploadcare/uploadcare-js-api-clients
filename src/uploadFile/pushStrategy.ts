@@ -6,9 +6,9 @@ import { FileInfo } from '../api/types'
 import { Status } from '../api/fromUrlStatus'
 
 let pusher: Pusher | null = null
-const getPusher = (): Pusher => {
+const getPusher = (key: string): Pusher => {
   if (!pusher) {
-    pusher = new Pusher()
+    pusher = new Pusher(key)
   }
 
   return pusher
@@ -16,17 +16,19 @@ const getPusher = (): Pusher => {
 
 const pushStrategy = ({
   token,
+  pusherKey,
   cancel,
   stopRace,
   onProgress
 }: {
   token: string
+  pusherKey: string
   cancel: CancelController
   stopRace: () => void
   onProgress?: (info: { value: number }) => void
 }): Promise<FileInfo | UploadClientError> =>
   new Promise((resolve, reject) => {
-    const pusher = getPusher()
+    const pusher = getPusher(pusherKey)
     const unsubErrorHandler = pusher.onError(reject)
 
     cancel.onCancel(() => {
@@ -63,8 +65,8 @@ const pushStrategy = ({
     })
   })
 
-const preconnect = (): void => {
-  getPusher().connect()
+const preconnect = (key: string): void => {
+  getPusher(key).connect()
 }
 
 export default pushStrategy

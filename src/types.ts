@@ -19,6 +19,7 @@ export interface Settings {
   multipartMinLastPartSize?: number
   maxConcurrentRequests?: number
   contentType?: string
+  pusherKey?: string
 }
 
 export interface DefaultSettings extends Settings {
@@ -33,4 +34,5 @@ export interface DefaultSettings extends Settings {
   maxConcurrentRequests: number
   pollingTimeoutMilliseconds: number
   contentType: string
+  pusherKey: string
 }
