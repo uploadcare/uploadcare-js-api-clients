@@ -27,19 +27,20 @@ const pushStrategy = ({
 }): Promise<FileInfo | UploadClientError> =>
   new Promise((resolve, reject) => {
     const pusher = getPusher()
+    const unsubErrorHandler = pusher.onError(reject)
 
     cancel.onCancel(() => {
+      unsubErrorHandler()
       pusher.unsubscribe(token)
       reject(cancelError('pisher cancelled'))
     })
-
-    pusher.error(reject)
 
     pusher.subscribe(token, result => {
       stopRace()
 
       switch (result.status) {
         case Status.Success: {
+          unsubErrorHandler()
           pusher.unsubscribe(token)
           if (onProgress) onProgress({ value: result.done / result.total })
           resolve(result)
@@ -54,6 +55,7 @@ const pushStrategy = ({
         }
 
         case Status.Error: {
+          unsubErrorHandler()
           pusher.unsubscribe(token)
           reject(new UploadClientError(result.msg))
         }

@@ -155,13 +155,10 @@ class Pusher {
     }
   }
 
-  error(callback: (error: Error) => void): void {
-    const handler = (error: Error): void => {
-      callback(error)
+  onError(callback: (error: Error) => void): () => void {
+    this.emmitter.on('error', callback)
 
-      this.emmitter.off('error', handler)
-    }
-    this.emmitter.on('error', handler)
+    return (): void => this.emmitter.off('error', callback)
   }
 }
 
