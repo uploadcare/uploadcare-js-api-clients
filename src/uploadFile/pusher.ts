@@ -73,7 +73,7 @@ class Pusher {
 
       this.emmitter.on('connected', () => {
         this.isConnected = true
-        this.queue.forEach(message => this.send(message))
+        this.queue.forEach(message => this.send(message.event, message.data))
         this.queue = []
       })
 
@@ -83,6 +83,11 @@ class Pusher {
         switch (data.event) {
           case 'pusher:connection_established': {
             this.emmitter.emit('connected', undefined)
+            break
+          }
+
+          case 'pusher:ping': {
+            this.send('pusher:pong', {})
             break
           }
 
@@ -99,8 +104,8 @@ class Pusher {
     }
   }
 
-  send(data: { event: string; data: { channel: string } }): void {
-    const str = JSON.stringify(data)
+  send(event: string, data: any): void {
+    const str = JSON.stringify({ event, data })
     // console.log('send: ')
     // console.log('  ', str)
 
@@ -119,7 +124,7 @@ class Pusher {
 
     this.emmitter.on(channel, handler)
     if (this.isConnected) {
-      this.send(message)
+      this.send(message.event, message.data)
     } else {
       this.queue.push(message)
     }
@@ -136,7 +141,7 @@ class Pusher {
 
     this.emmitter.off(channel)
     if (this.isConnected) {
-      this.send(message)
+      this.send(message.event, message.data)
     } else {
       this.queue = this.queue.filter(msg => msg.data.channel !== channel)
     }
