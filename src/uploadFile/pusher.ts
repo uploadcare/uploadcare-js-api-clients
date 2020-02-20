@@ -116,9 +116,6 @@ class Pusher {
 
   send(event: string, data: any): void {
     const str = JSON.stringify({ event, data })
-    // console.log('send: ')
-    // console.log('  ', str)
-
     this.ws?.send(str)
   }
 
