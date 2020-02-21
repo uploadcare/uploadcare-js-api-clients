@@ -116,7 +116,7 @@ describe('poll', () => {
 
     await expect(
       poll({ check: job.isFinish, interval: 10, cancel: ctrl })
-    ).rejects.toThrowError(new UploadClientError('Poll cancelled'))
+    ).rejects.toThrowError(new UploadClientError('Poll canceled'))
 
     const conditionCallsCount = job.spy.condition.mock.calls.length
 
