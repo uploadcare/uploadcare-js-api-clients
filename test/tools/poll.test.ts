@@ -106,20 +106,17 @@ describe('poll', () => {
     expect(job.spy.cancel).toHaveBeenCalledTimes(2)
   })
 
-  it('should fails with timeout error', async () => {
+  it('should not run any logic after cancel', async () => {
     const job = longJob(30)
+    const ctrl = new CancelController()
+
+    setTimeout(() => {
+      ctrl.cancel()
+    }, 50)
 
     await expect(
-      poll({ check: job.isFinish, interval: 40, timeout: 20 })
-    ).rejects.toThrowError(new UploadClientError('Poll Timeout'))
-  })
-
-  it('should not run any logic after timeout error', async () => {
-    const job = longJob(30)
-
-    await expect(
-      poll({ check: job.isFinish, interval: 40, timeout: 20 })
-    ).rejects.toThrowError(new UploadClientError('Poll Timeout'))
+      poll({ check: job.isFinish, interval: 10 })
+    ).rejects.toThrowError(new UploadClientError('Poll cancelled'))
 
     const conditionCallsCount = job.spy.condition.mock.calls.length
 
@@ -134,6 +131,15 @@ describe('poll', () => {
 
     await expect(
       poll({ check: job.isFinish, interval: 20 })
+    ).rejects.toThrowError(error)
+  })
+
+  it('should handle async errors', async () => {
+    const error = new Error('test error')
+    const job = longJob(3, error)
+
+    await expect(
+      poll({ check: job.asyncIsFinish, interval: 20 })
     ).rejects.toThrowError(error)
   })
 
