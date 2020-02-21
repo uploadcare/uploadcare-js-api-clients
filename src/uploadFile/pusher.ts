@@ -55,17 +55,24 @@ type EventTypes = {
 
 class Pusher {
   key: string
+  disconnectTime: number
+
   ws: WebSocket | undefined = undefined
   queue: Message[] = []
   isConnected = false
   subscribers = 0
   emmitter: Events<EventTypes> = new Events()
 
-  constructor(pusherKey: string) {
+  disconnectTimeoutId: NodeJS.Timeout | null = null
+
+  constructor(pusherKey: string, disconnectTime = 30000) {
     this.key = pusherKey
+    this.disconnectTime = disconnectTime
   }
 
   connect(): void {
+    this.disconnectTimeoutId && clearTimeout(this.disconnectTimeoutId)
+
     if (!this.isConnected && !this.ws) {
       const pusherUrl = `wss://ws.pusherapp.com/app/${this.key}?protocol=5&client=js&version=1.12.2`
 
@@ -109,9 +116,19 @@ class Pusher {
   }
 
   disconnect(): void {
-    this.ws?.close()
-    this.ws = undefined
-    this.isConnected = false
+    const actualDisconect = (): void => {
+      this.ws?.close()
+      this.ws = undefined
+      this.isConnected = false
+    }
+
+    if (this.disconnectTime) {
+      this.disconnectTimeoutId = setTimeout(() => {
+        actualDisconect()
+      }, this.disconnectTime)
+    } else {
+      actualDisconect()
+    }
   }
 
   send(event: string, data: any): void {

@@ -5,10 +5,13 @@ import Pusher from './pusher'
 import { FileInfo } from '../api/types'
 import { Status } from '../api/fromUrlStatus'
 
+// no timeout for nodeJS and 30000 ms for browser
+const disconectTimeout = typeof window === 'undefined' ? 0 : 30000
+
 let pusher: Pusher | null = null
 const getPusher = (key: string): Pusher => {
   if (!pusher) {
-    pusher = new Pusher(key)
+    pusher = new Pusher(key, disconectTimeout)
   }
 
   return pusher
