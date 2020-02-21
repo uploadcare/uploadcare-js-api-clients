@@ -1,16 +1,14 @@
-import { cancelError, UploadClientError } from './errors'
+import { cancelError } from './errors'
 import CancelController from './CancelController'
 
 type CheckFunction<T> = (
   cancel: CancelController | undefined
 ) => Promise<false | T> | false | T
 
-const DEFAULT_TIMEOUT = 10000
 const DEFAULT_INTERVAL = 500
 
 const poll = <T>({
   check,
-  timeout = DEFAULT_TIMEOUT,
   interval = DEFAULT_INTERVAL,
   cancel
 }: {
@@ -21,8 +19,6 @@ const poll = <T>({
 }): Promise<T> =>
   new Promise((resolve, reject) => {
     let timeoutId: NodeJS.Timeout
-    const startTime = Date.now()
-    const endTime = startTime + timeout
 
     if (cancel) {
       cancel.onCancel(() => {
@@ -35,12 +31,8 @@ const poll = <T>({
       try {
         Promise.resolve(check(cancel))
           .then(result => {
-            const nowTime = Date.now()
-
             if (result) {
               resolve(result)
-            } else if (nowTime > endTime) {
-              reject(new UploadClientError('Poll Timeout'))
             } else {
               timeoutId = setTimeout(tick, interval)
             }
