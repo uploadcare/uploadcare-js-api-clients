@@ -17,6 +17,7 @@ export interface DefaultSettings {
   maxConcurrentRequests: number
   pollingTimeoutMilliseconds: number
   contentType: string
+  pusherKey: string
 }
 
 export interface Settings extends Partial<DefaultSettings> {

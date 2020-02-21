@@ -9,7 +9,8 @@
   ],
   "browser": {
     "./lib/request/request.node.js": "./lib/request/request.browser.js",
-    "./lib/tools/getFormData.node.js": "./lib/tools/getFormData.browser.js"
+    "./lib/tools/getFormData.node.js": "./lib/tools/getFormData.browser.js",
+    "./lib/tools/sockets.node.js": "./lib/tools/sockets.browser.js"
   },
   "scripts": {
     "check-env-vars": "node ./checkvars.js",
@@ -53,6 +54,7 @@
     "@types/promise": "7.1.30",
     "@typescript-eslint/eslint-plugin": "2.19.2",
     "@typescript-eslint/parser": "2.19.2",
+    "@types/ws": "^7.2.1",
     "chalk": "3.0.0",
     "data-uri-to-buffer": "3.0.0",
     "dataurl-to-blob": "0.0.1",
@@ -62,19 +64,31 @@
     "eslint-plugin-prettier": "3.1.2",
     "jest": "25.1.0",
     "jest-environment-jsdom": "25.1.0",
+    "jest-websocket-mock": "^2.0.1",
     "koa": "2.11.0",
     "koa-add-trailing-slashes": "2.0.1",
     "koa-body": "4.1.1",
+    "mock-socket": "^9.0.3",
     "prettier": "1.19.1",
     "prettier-config-standard": "1.0.1",
     "rimraf": "3.0.2",
-    "shipjs": "0.15.0",
+    "rollup": "1.31.0",
+    "rollup-plugin-commonjs": "10.1.0",
+    "rollup-plugin-json": "4.0.0",
+    "rollup-plugin-license": "0.13.0",
+    "rollup-plugin-node-resolve": "5.2.0",
+    "rollup-plugin-replace": "2.2.0",
+    "rollup-plugin-size-snapshot": "0.10.0",
+    "rollup-plugin-terser": "5.2.0",
+    "rollup-plugin-typescript2": "0.25.3",
+    "shipjs": "0.14.2",
     "start-server-and-test": "1.10.8",
-    "ts-node": "8.6.2",
     "ts-jest": "25.2.0",
+    "ts-node": "8.6.2",
     "typescript": "3.7.5"
   },
   "dependencies": {
-    "form-data": "^3.0.0"
+    "form-data": "^3.0.0",
+    "ws": "^7.2.1"
   }
 }

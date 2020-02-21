@@ -23,7 +23,7 @@ const poll = <T>({
     if (cancel) {
       cancel.onCancel(() => {
         timeoutId && clearTimeout(timeoutId)
-        reject(cancelError('Poll canceled'))
+        reject(cancelError('Poll cancelled'))
       })
     }
 
