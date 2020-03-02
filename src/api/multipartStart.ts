@@ -4,7 +4,7 @@ import { Uuid } from './types'
 import request from '../request/request.node'
 import getFormData from '../tools/buildFormData'
 import getUrl from '../tools/getUrl'
-import defaultSettings from '../defaultSettings'
+import { defaultSettings, defaultFilename } from '../defaultSettings'
 import { getUserAgent } from '../tools/userAgent'
 import camelizeKeys from '../tools/camelizeKeys'
 import retryIfThrottled from '../tools/retryIfThrottled'
@@ -43,7 +43,7 @@ export default function multipartStart(
   {
     publicKey,
     contentType,
-    fileName = defaultSettings.fileName,
+    fileName,
     multipartChunkSize = defaultSettings.multipartChunkSize,
     baseURL = '',
     secureSignature,
@@ -64,7 +64,7 @@ export default function multipartStart(
           'X-UC-User-Agent': getUserAgent({ publicKey, integration })
         },
         data: getFormData([
-          ['filename', fileName],
+          ['filename', fileName ?? defaultFilename],
           ['size', size],
           ['content_type', contentType],
           ['part_size', multipartChunkSize],

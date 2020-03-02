@@ -56,7 +56,7 @@ export default function uploadFile(
   {
     publicKey,
 
-    fileName = defaultSettings.fileName,
+    fileName,
     baseURL = defaultSettings.baseURL,
     secureSignature,
     secureExpire,

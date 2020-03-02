@@ -2,7 +2,7 @@ import request from '../request/request.node'
 import getFormData from '../tools/buildFormData'
 import getUrl from '../tools/getUrl'
 import CancelController from '../tools/CancelController'
-import defaultSettings from '../defaultSettings'
+import { defaultSettings, defaultFilename } from '../defaultSettings'
 import { getUserAgent } from '../tools/userAgent'
 import camelizeKeys from '../tools/camelizeKeys'
 import { UploadClientError } from '../tools/errors'
@@ -67,11 +67,7 @@ export default function base(
           'X-UC-User-Agent': getUserAgent({ publicKey, integration })
         },
         data: getFormData([
-          [
-            'file',
-            file,
-            fileName || (file as File).name || defaultSettings.fileName
-          ],
+          ['file', file, fileName ?? (file as File).name ?? defaultFilename],
           ['UPLOADCARE_PUB_KEY', publicKey],
           [
             'UPLOADCARE_STORE',
