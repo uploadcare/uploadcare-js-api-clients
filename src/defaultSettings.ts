@@ -8,7 +8,6 @@ import { DefaultSettings } from './types'
 const defaultSettings: DefaultSettings = {
   baseCDN: 'https://ucarecdn.com',
   baseURL: 'https://upload.uploadcare.com',
-  fileName: 'original',
   maxContentLength: 50 * 1024 * 1024, // 50 MB
   retryThrottledRequestMaxTimes: 1,
   multipartMinFileSize: 25 * 1024 * 1024, // 25 MB
@@ -20,4 +19,7 @@ const defaultSettings: DefaultSettings = {
   pusherKey: '79ae88bd931ea68464d9'
 }
 
+const defaultFilename = 'original'
+
+export { defaultFilename, defaultSettings }
 export default defaultSettings

@@ -8,7 +8,6 @@ type Partial<T> = {
 export interface DefaultSettings {
   baseCDN: string
   baseURL: string
-  fileName: string
   maxContentLength: number
   retryThrottledRequestMaxTimes: number
   multipartMinFileSize: number
@@ -22,6 +21,7 @@ export interface DefaultSettings {
 
 export interface Settings extends Partial<DefaultSettings> {
   publicKey?: string
+  fileName?: string
   store?: boolean
   secureSignature?: string
   secureExpire?: string
