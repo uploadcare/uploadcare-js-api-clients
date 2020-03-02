@@ -38,7 +38,7 @@ export default function uploadFileGroup(
   {
     publicKey,
 
-    fileName = defaultSettings.fileName,
+    fileName,
     baseURL = defaultSettings.baseURL,
     secureSignature,
     secureExpire,
