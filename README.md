@@ -30,7 +30,7 @@ Node.js and browser.
 ## Install
 
 ```bash
-npm install @uploadcare/upload-client --save
+npm install @uploadcare/upload-client
 ```
 
 ## Usage
@@ -51,18 +51,19 @@ Once the UploadClient instance is created, you can start using the wrapper to
 upload files from binary data:
 
 ```javascript
-const fileUpload = client.uploadFile(fileData)
-
-fileUpload.then(file => console.log(file.uuid))
+client
+  .uploadFile(fileData)
+  .then(file => console.log(file.uuid))
 ```
 
 Another option is uploading files from URL, via the `uploadFile` method:
 
 ```javascript
 const fileURL = 'https://example.com/file.jpg'
-const fileUpload = client.uploadFile(fileURL)
 
-fileUpload.then(file => console.log(file.uuid))
+client
+  .uploadFile(fileURL)
+  .then(file => console.log(file.uuid))
 ```
 
 You can also use the `uploadFile` method to get previously uploaded files via
@@ -70,9 +71,10 @@ their UUIDs:
 
 ```javascript
 const fileUUID = 'edfdf045-34c0-4087-bbdd-e3834921f890'
-const fileUpload = client.uploadFile(fileUUID)
 
-fileUpload.then(file => console.log(file.uuid))
+client
+  .uploadFile(fileUUID)
+  .then(file => console.log(file.uuid))
 ```
 
 You can track uploading progress:
@@ -82,19 +84,20 @@ const fileUUID = 'edfdf045-34c0-4087-bbdd-e3834921f890'
 const onProgress = ({ value }) => {
   console.log(value)
 }
-const fileUpload = client.uploadFile(fileUUID, { onProgress })
 
-fileUpload.then(file => console.log(file.uuid))
+client
+  .uploadFile(fileUUID, { onProgress })
+  .then(file => console.log(file.uuid))
 ```
 
 You can cancel file uploading and track this event:
 
 ```javascript
 const fileUUID = 'edfdf045-34c0-4087-bbdd-e3834921f890'
-const cancelController = new CancelController()
-const fileUpload = client.uploadFile(fileUUID, { cancel: cancelController })
+const controller = new CancelController()
 
-fileUpload
+client
+  .uploadFile(fileUUID, { cancel: controller })
   .then(file => console.log(file.uuid))
   .catch(error => {
     if (error.isCancel) {
@@ -103,7 +106,7 @@ fileUpload
   })
 
 // Cancel uploading
-cancelController.cancel()
+controller.cancel()
 ```
 
 List of all available `UploadClient` API methods:
@@ -169,9 +172,8 @@ import { base, CancelController } from '@uploadcare/upload-client'
 
 const onProgress = ({ value }) => console.log(value)
 const cancelController = new CancelController()
-const directUpload = base(fileData, { onProgress, cancel: cancelController }) // fileData must be `Blob` or `File` or `Buffer`
 
-directUpload
+base(fileData, { onProgress, cancel: cancelController }) // fileData must be `Blob` or `File` or `Buffer`
   .then(data => console.log(data.file))
   .catch(error => {
     if (error.isCancel) {
@@ -292,7 +294,7 @@ Stands for the Unix time to which the signature is valid, e.g., `1454902434`.
 
 `X-UC-User-Agent` header value.
 
-Defaults to `UploadcareUploadClient/${version}/${publicKey} (JavaScript${integration})`
+Defaults to `UploadcareUploadClient/${version}/${publicKey} (JavaScript; ${integration})`
 
 #### `checkForUrlDuplicates: boolean`
 
@@ -312,13 +314,6 @@ Defines the upload source to use, can be set to local, url, etc.
 
 Sets the name of your JSONP callback function to create files group from a set
 of files by using their UUIDs.
-
-#### `pollingTimeoutMilliseconds: number`
-
-Internally, Upload Client implements polling to ensure that a file is available
-on CDN or has finished uploading from URL.
-
-Defaults to `10000` milliseconds (10 seconds).
 
 #### `maxContentLength: number`
 
@@ -374,19 +369,31 @@ Defaults to `application/octet-stream`.
 npm run test
 ```
 
-By default, the testing environment is production, but you can run tests with
-the local environment. It requires starting a mock server.
+By default, tests runs with mock server, but you can run tests with
+production environment.
 
-To start a mock server, you need to execute the following:
+Run test on production servers: 
+
+```bash
+npm run test:production
+```
+
+Run test with mock server (mock server starts automaticaly):
+
+```bash
+npm run test
+```
+
+Run mock server:
 
 ```
 npm run mock:start
 ```
 
-And then you can run:
+And then you can run test:
 
 ```
-NODE_ENV=development npm run test
+npm run test:jest
 ```
 
 ## Security issues
