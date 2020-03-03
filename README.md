@@ -9,7 +9,7 @@
 This is an Uploadcare [Upload API][uc-docs-upload-api] wrapper to work with
 Node.js and browser.
 
-[![Build Status](https://travis-ci.org/uploadcare/uploadcare-upload-client.svg?branch=master)](https://travis-ci.org/uploadcare/uploadcare-upload-client)
+[![Build Status][badge-build]][build-url]
 [![NPM version][npm-img]][npm-url]
 [![GitHub release][badge-release-img]][badge-release-url]&nbsp;
 [![Uploadcare stack on StackShare][badge-stack-img]][badge-stack-url]
@@ -414,4 +414,6 @@ request at [hello@uploadcare.com][uc-email-hello].
 [badge-release-url]: https://github.com/uploadcare/uploadcare-upload-client/releases
 [npm-img]: http://img.shields.io/npm/v/@uploadcare/upload-client.svg
 [npm-url]: https://www.npmjs.org/package/@uploadcare/upload-client
+[badge-build]: https://img.shields.io/github/workflow/status/uploadcare/uploadcare-upload-client/Ship%20js%20trigger
+[build-url]: https://github.com/uploadcare/uploadcare-upload-client/actions?query=workflow%3A%22Ship+js+trigger%22
 [uc-docs-upload-api]: https://uploadcare.com/docs/api_reference/upload/?utm_source=github&utm_campaign=uploadcare-upload-client
