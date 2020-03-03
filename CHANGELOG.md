@@ -1,3 +1,21 @@
+# [1.1.0](https://github.com/uploadcare/uploadcare-upload-client/compare/v1.0.1...v1.1.0) (2020-03-03)
+
+
+### Features
+
+* implement push strategy with sockets for `uploadFromUrl` ([#222](https://github.com/uploadcare/uploadcare-upload-client/issues/222)) ([4cafe97](https://github.com/uploadcare/uploadcare-upload-client/commit/4cafe9759ebfe1f54b0e6d2f9cf2cffa36ec3283))
+* add deferred disconnect for push strategy ([#229](https://github.com/uploadcare/uploadcare-upload-client/issues/229)) ([a9901f7](https://github.com/uploadcare/uploadcare-upload-client/commit/a9901f74aa1512471b3f4bd470ccc794eb31dac0))
+* add strong typed event emitter ([#217](https://github.com/uploadcare/uploadcare-upload-client/issues/217)) ([35b9eef](https://github.com/uploadcare/uploadcare-upload-client/commit/35b9eef22ae0638d52915a2338e3c3978e3d6f2b))
+* add custom race function ([#177](https://github.com/uploadcare/uploadcare-upload-client/issues/177)) ([219c02a](https://github.com/uploadcare/uploadcare-upload-client/commit/219c02aceb233886383e6d66c5ecdfbd5a1626ea))
+
+
+### Bug Fixes
+
+* make `fileName` optional and remove it from default settings ([#233](https://github.com/uploadcare/uploadcare-upload-client/issues/233)) ([a28d181](https://github.com/uploadcare/uploadcare-upload-client/commit/a28d181e5c412f6ff2aeee2e7ae02a7ae848c8a2))
+* remove timeout from `uploadFromUrl` function ([#226](https://github.com/uploadcare/uploadcare-upload-client/issues/226)) ([76db2e4](https://github.com/uploadcare/uploadcare-upload-client/commit/76db2e4c607164afcaf07132789348927ea65577))
+* use direct import for CancelController and rename callback to stopRace ([#216](https://github.com/uploadcare/uploadcare-upload-client/issues/216)) ([ea4ef7a](https://github.com/uploadcare/uploadcare-upload-client/commit/ea4ef7ac291ed1503e359901a315239563b53e83))
+
+
 ## [1.0.1](https://github.com/uploadcare/uploadcare-upload-client/compare/v1.0.0...v1.0.1) (2020-01-13)
 
 
