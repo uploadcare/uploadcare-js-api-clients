@@ -182,4 +182,20 @@ class Pusher {
   }
 }
 
+let pusher: Pusher | null = null
+const getPusher = (key: string): Pusher => {
+  if (!pusher) {
+    // no timeout for nodeJS and 30000 ms for browser
+    const disconectTimeout = typeof window === 'undefined' ? 0 : 30000
+    pusher = new Pusher(key, disconectTimeout)
+  }
+
+  return pusher
+}
+
+const preconnect = (key: string): void => {
+  getPusher(key).connect()
+}
+
 export default Pusher
+export { getPusher, preconnect }
