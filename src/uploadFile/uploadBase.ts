@@ -1,12 +1,9 @@
 import base from '../api/base'
-import info from '../api/info'
-import { poll } from '../tools/poll'
 import { UploadcareFile } from '../tools/UploadcareFile'
 import CancelController from '../tools/CancelController'
 
-/* Types */
-import { FileInfo } from '../api/types'
 import { NodeFile, BrowserFile } from '../request/types'
+import { isReadyPoll } from '../tools/isReadyPoll'
 
 type FromObjectOptions = {
   publicKey: string
@@ -50,13 +47,6 @@ const uploadFromObject = (
     baseCDN
   }: FromObjectOptions
 ): Promise<UploadcareFile> => {
-  let progress: number
-
-  const onProgressCallback = ({ value }): void => {
-    progress = value * 0.98
-    onProgress && onProgress({ value: progress })
-  }
-
   return base(file, {
     publicKey,
     fileName,
@@ -65,36 +55,21 @@ const uploadFromObject = (
     secureExpire,
     store,
     cancel,
-    onProgress: onProgress ? onProgressCallback : undefined,
+    onProgress,
     source,
     integration,
     retryThrottledRequestMaxTimes
   })
     .then(({ file }) => {
-      return poll<FileInfo>({
-        check: cancel =>
-          info(file, {
-            publicKey,
-            baseURL,
-            cancel,
-            source,
-            integration,
-            retryThrottledRequestMaxTimes
-          }).then(response => {
-            if (response.isReady) {
-              onProgress && onProgress({ value: 1 })
-
-              return response
-            }
-
-            if (onProgress) {
-              onProgress({
-                value: Math.min(progress + 0.02, 1)
-              })
-            }
-
-            return false
-          })
+      return isReadyPoll({
+        file,
+        publicKey,
+        baseURL,
+        source,
+        integration,
+        retryThrottledRequestMaxTimes,
+        onProgress,
+        cancel
       })
     })
     .then(fileInfo => new UploadcareFile(fileInfo, { baseCDN }))
