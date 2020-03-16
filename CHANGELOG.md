@@ -1,3 +1,12 @@
+## [1.1.1](https://github.com/uploadcare/uploadcare-upload-client/compare/v1.1.0...v1.1.1) (2020-03-16)
+
+
+### Bug Fixes
+
+* add is ready poll in `uploadFromUrl` ([#238](https://github.com/uploadcare/uploadcare-upload-client/issues/238)) ([dd0202d](https://github.com/uploadcare/uploadcare-upload-client/commit/dd0202d5ef2c787a63d345731ea2ccc39ecca70e))
+
+
+
 # [1.1.0](https://github.com/uploadcare/uploadcare-upload-client/compare/v1.0.1...v1.1.0) (2020-03-03)
 
 
