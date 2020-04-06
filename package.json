@@ -55,7 +55,7 @@
     "@typescript-eslint/eslint-plugin": "2.26.0",
     "@typescript-eslint/parser": "2.26.0",
     "@types/ws": "7.2.3",
-    "chalk": "3.0.0",
+    "chalk": "4.0.0",
     "data-uri-to-buffer": "3.0.0",
     "dataurl-to-blob": "0.0.1",
     "dotenv": "8.2.0",
