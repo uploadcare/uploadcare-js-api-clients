@@ -95,7 +95,7 @@ const uploadMultipart = (
   return multipartStart(size, {
     publicKey,
     contentType,
-    fileName,
+    fileName: fileName ?? (file as File).name,
     baseURL,
     secureSignature,
     secureExpire,
