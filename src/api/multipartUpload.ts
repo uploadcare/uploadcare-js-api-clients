@@ -37,5 +37,12 @@ export default function multipartUpload(
     data: part,
     onProgress,
     cancel
-  }).then(({ status }) => ({ code: status }))
+  })
+    .then(result => {
+      // hack for node ¯\_(ツ)_/¯
+      if (onProgress) onProgress({ value: 1 })
+
+      return result
+    })
+    .then(({ status }) => ({ code: status }))
 }
