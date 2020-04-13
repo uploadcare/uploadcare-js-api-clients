@@ -4,7 +4,11 @@ import { Uuid } from './types'
 import request from '../request/request.node'
 import getFormData from '../tools/buildFormData'
 import getUrl from '../tools/getUrl'
-import { defaultSettings, defaultFilename } from '../defaultSettings'
+import {
+  defaultSettings,
+  defaultFilename,
+  defaultContentType
+} from '../defaultSettings'
 import { getUserAgent } from '../tools/userAgent'
 import camelizeKeys from '../tools/camelizeKeys'
 import retryIfThrottled from '../tools/retryIfThrottled'
@@ -13,7 +17,7 @@ import CancelController from '../tools/CancelController'
 
 export type MultipartStartOptions = {
   publicKey: string
-  contentType: string
+  contentType?: string
   fileName?: string
   baseURL?: string
   secureSignature?: string
@@ -66,7 +70,7 @@ export default function multipartStart(
         data: getFormData([
           ['filename', fileName ?? defaultFilename],
           ['size', size],
-          ['content_type', contentType],
+          ['content_type', contentType ?? defaultContentType],
           ['part_size', multipartChunkSize],
           ['UPLOADCARE_STORE', store ? '' : 'auto'],
           ['UPLOADCARE_PUB_KEY', publicKey],

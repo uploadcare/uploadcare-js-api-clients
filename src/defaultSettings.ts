@@ -15,11 +15,11 @@ const defaultSettings: DefaultSettings = {
   multipartMinLastPartSize: 1024 * 1024, // 1MB
   maxConcurrentRequests: 4,
   pollingTimeoutMilliseconds: 10000,
-  contentType: 'application/octet-stream', // ??
   pusherKey: '79ae88bd931ea68464d9'
 }
 
+const defaultContentType = 'application/octet-stream'
 const defaultFilename = 'original'
 
-export { defaultFilename, defaultSettings }
+export { defaultFilename, defaultContentType, defaultSettings }
 export default defaultSettings

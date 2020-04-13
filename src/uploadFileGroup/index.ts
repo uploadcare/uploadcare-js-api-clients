@@ -52,7 +52,7 @@ export default function uploadFileGroup(
 
     retryThrottledRequestMaxTimes,
 
-    contentType = defaultSettings.contentType,
+    contentType,
     multipartChunkSize = defaultSettings.multipartChunkSize,
 
     baseCDN = defaultSettings.baseCDN,
