@@ -2,7 +2,6 @@ import { DefaultSettings } from './types'
 
 /*
   Settings for future support:
-  multipartMaxAttempts: 3,
   parallelDirectUploads: 10,
  */
 const defaultSettings: DefaultSettings = {
@@ -14,6 +13,7 @@ const defaultSettings: DefaultSettings = {
   multipartChunkSize: 5 * 1024 * 1024, // 5 MB
   multipartMinLastPartSize: 1024 * 1024, // 1MB
   maxConcurrentRequests: 4,
+  multipartMaxAttempts: 3,
   pollingTimeoutMilliseconds: 10000,
   contentType: 'application/octet-stream', // ??
   pusherKey: '79ae88bd931ea68464d9'
