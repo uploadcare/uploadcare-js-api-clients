@@ -134,12 +134,6 @@ const uploadMultipart = (
         retryThrottledRequestMaxTimes
       })
     )
-    .then(result => {
-      // hack for node ¯\_(ツ)_/¯
-      if (onProgress) onProgress({ value: 1 })
-
-      return result
-    })
     .then(fileInfo => new UploadcareFile(fileInfo, { baseCDN }))
 }
 

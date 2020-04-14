@@ -54,7 +54,7 @@ describe('API - multipartUpload', () => {
     )
   })
 
-  xit('should be able to handle progress', async () => {
+  it('should be able to handle progress', async () => {
     const onProgress = jest.fn()
     const options = getSettingsForTesting({
       publicKey: factory.publicKey('multipart'),
