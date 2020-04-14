@@ -15,13 +15,13 @@ export interface DefaultSettings {
   multipartMinLastPartSize: number
   maxConcurrentRequests: number
   pollingTimeoutMilliseconds: number
-  contentType: string
   pusherKey: string
 }
 
 export interface Settings extends Partial<DefaultSettings> {
   publicKey?: string
   fileName?: string
+  contentType?: string
   store?: boolean
   secureSignature?: string
   secureExpire?: string

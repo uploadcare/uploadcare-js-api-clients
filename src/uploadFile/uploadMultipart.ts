@@ -15,7 +15,7 @@ type progressCallback = ({ value: number }) => void
 
 export type MultipartOptions = {
   publicKey: string
-  contentType: string
+  contentType?: string
   multipartChunkSize?: number
   fileName?: string
   fileSize?: number
