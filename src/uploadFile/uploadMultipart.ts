@@ -6,6 +6,7 @@ import CancelController from '../tools/CancelController'
 import runWithConcurrency from '../tools/runWithConcurrency'
 import { UploadcareFile } from '../tools/UploadcareFile'
 import { getFileSize } from '../tools/isMultipart'
+import { isReadyPoll } from '../tools/isReadyPoll'
 import retrier from '../tools/retry'
 
 /* Types */
@@ -167,6 +168,22 @@ const uploadMultipart = (
         retryThrottledRequestMaxTimes
       })
     )
+    .then(fileInfo => {
+      if (fileInfo.isReady) {
+        return fileInfo
+      } else {
+        return isReadyPoll({
+          file: fileInfo.uuid,
+          publicKey,
+          baseURL,
+          source,
+          integration,
+          retryThrottledRequestMaxTimes,
+          onProgress,
+          cancel
+        })
+      }
+    })
     .then(fileInfo => new UploadcareFile(fileInfo, { baseCDN }))
 }
 
