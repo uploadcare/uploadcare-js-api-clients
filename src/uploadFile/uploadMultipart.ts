@@ -6,9 +6,13 @@ import CancelController from '../tools/CancelController'
 import runWithConcurrency from '../tools/runWithConcurrency'
 import { UploadcareFile } from '../tools/UploadcareFile'
 import { getFileSize } from '../tools/isMultipart'
+import retrier from '../tools/retry'
 
 /* Types */
-import { MultipartUploadResponse } from '../api/multipartUpload'
+import {
+  MultipartUploadResponse,
+  MultipartUploadOptions
+} from '../api/multipartUpload'
 import { NodeFile, BrowserFile } from '../request/types'
 
 type progressCallback = ({ value: number }) => void
@@ -29,6 +33,7 @@ export type MultipartOptions = {
   integration?: string
   retryThrottledRequestMaxTimes?: number
   maxConcurrentRequests?: number
+  multipartMaxAttempts?: number
   baseCDN?: string
 }
 
@@ -43,6 +48,32 @@ const getChunk = (
 
   return file.slice(start, end)
 }
+
+const uploadPartWithRetry = (
+  chunk: Buffer | Blob,
+  url: string,
+  {
+    publicKey,
+    onProgress,
+    cancel,
+    integration,
+    multipartMaxAttempts
+  }: MultipartUploadOptions & { multipartMaxAttempts: number }
+): Promise<MultipartUploadResponse> =>
+  retrier(({ attempt, retry }) =>
+    multipartUpload(chunk, url, {
+      publicKey,
+      onProgress,
+      cancel,
+      integration
+    }).catch(error => {
+      if (attempt < multipartMaxAttempts) {
+        return retry()
+      }
+
+      throw error
+    })
+  )
 
 const uploadMultipart = (
   file: NodeFile | BrowserFile,
@@ -67,6 +98,7 @@ const uploadMultipart = (
     contentType,
     multipartChunkSize = defaultSettings.multipartChunkSize,
     maxConcurrentRequests = defaultSettings.maxConcurrentRequests,
+    multipartMaxAttempts = defaultSettings.multipartMaxAttempts,
 
     baseCDN
   }: MultipartOptions
@@ -111,14 +143,15 @@ const uploadMultipart = (
         runWithConcurrency(
           maxConcurrentRequests,
           parts.map((url, index) => (): Promise<MultipartUploadResponse> =>
-            multipartUpload(
+            uploadPartWithRetry(
               getChunk(file, index, size, multipartChunkSize),
               url,
               {
                 publicKey,
                 onProgress: createProgressHandler(parts.length, index),
                 cancel,
-                integration
+                integration,
+                multipartMaxAttempts
               }
             )
           )
