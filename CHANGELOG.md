@@ -1,3 +1,16 @@
+## [1.1.2](https://github.com/uploadcare/uploadcare-upload-client/compare/v1.1.1...v1.1.2) (2020-04-20)
+
+
+### Bug Fixes
+
+* **multipart:** implement retry for part uploading ([#253](https://github.com/uploadcare/uploadcare-upload-client/issues/253)) ([e2330bb](https://github.com/uploadcare/uploadcare-upload-client/commit/e2330bb37ea75b2d82c3258696b5d18cf719eae5))
+* **multipart:** use browser contentType if option is not passed ([#251](https://github.com/uploadcare/uploadcare-upload-client/issues/251)) ([f5ab80a](https://github.com/uploadcare/uploadcare-upload-client/commit/f5ab80a295cd6e4fc59e426d9d73086999bf4197))
+* **multipart:** use browser filename if option is not passed ([#250](https://github.com/uploadcare/uploadcare-upload-client/issues/250)) ([749e4a9](https://github.com/uploadcare/uploadcare-upload-client/commit/749e4a988b7d10ee9368433a4ffa076471a4d3e3))
+* add is ready pool for mulipart upload ([#254](https://github.com/uploadcare/uploadcare-upload-client/issues/254)) ([fe7ca2a](https://github.com/uploadcare/uploadcare-upload-client/commit/fe7ca2a0bbee7b24de2a792669ec33691cb2fd0c))
+* implement multipart progress for node ([#252](https://github.com/uploadcare/uploadcare-upload-client/issues/252)) ([b60eb83](https://github.com/uploadcare/uploadcare-upload-client/commit/b60eb831ff966a4c6a80f2ee9d72ce3b76659d56))
+
+
+
 ## [1.1.1](https://github.com/uploadcare/uploadcare-upload-client/compare/v1.1.0...v1.1.1) (2020-03-16)
 
 
