@@ -14,6 +14,7 @@ export interface DefaultSettings {
   multipartChunkSize: number
   multipartMinLastPartSize: number
   maxConcurrentRequests: number
+  multipartMaxAttempts: number
   pollingTimeoutMilliseconds: number
   pusherKey: string
 }
