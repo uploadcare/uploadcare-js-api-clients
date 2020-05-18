@@ -75,7 +75,7 @@
     "shipjs": "0.19.0",
     "start-server-and-test": "1.11.0",
     "ts-node": "8.10.1",
-    "ts-jest": "25.5.1",
+    "ts-jest": "26.0.0",
     "typescript": "3.9.2"
   },
   "dependencies": {
