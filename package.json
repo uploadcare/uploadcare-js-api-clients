@@ -1,16 +1,29 @@
 {
   "name": "@uploadcare/upload-client",
-  "version": "1.1.2",
+  "version": "2.0.0-alpha.0",
   "description": "Library for work with Uploadcare Upload API",
+  "type": "module",
   "main": "lib/index.js",
+  "module": "module/index.js",
   "types": "lib/index.d.ts",
   "files": [
-    "lib/**/*"
+    "lib/**/*",
+    "module/**/*"
   ],
   "browser": {
     "./lib/request/request.node.js": "./lib/request/request.browser.js",
     "./lib/tools/getFormData.node.js": "./lib/tools/getFormData.browser.js",
-    "./lib/tools/sockets.node.js": "./lib/tools/sockets.browser.js"
+    "./lib/tools/sockets.node.js": "./lib/tools/sockets.browser.js",
+    "./module/request/request.node.js": "./module/request/request.browser.js",
+    "./module/tools/getFormData.node.js": "./module/tools/getFormData.browser.js",
+    "./module/tools/sockets.node.js": "./module/tools/sockets.browser.js"
+  },
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "require": "./lib/index.js",
+      "import": "./module/index.js"
+    }
   },
   "scripts": {
     "check-env-vars": "node ./checkvars.js",
@@ -18,10 +31,12 @@
     "clean": "rimraf lib",
     "lint": "eslint . --ext=ts",
     "test": "start-server-and-test mock:start :3000 test:jest",
-    "test:production": "npm run check-env-vars && TEST_ENV=production jest",
-    "test:jest": "jest",
+    "test:production": "npm run check-env-vars && TEST_ENV=production jest --config=configs/jest.config.js",
+    "test:jest": "jest --config=configs/jest.config.js",
     "prebuild": "npm run clean",
-    "build": "tsc --build tsconfig.build.json",
+    "build:cjs": "tsc --build configs/tsconfig.cjs.json",
+    "build:module": "tsc --build configs/tsconfig.module.json",
+    "build": "npm run build:cjs && npm run build:module",
     "release:prepare": "shipjs prepare",
     "release:trigger": "shipjs trigger"
   },

@@ -8,8 +8,8 @@
     "strictNullChecks": true,
     "strict": true,
     "moduleResolution": "node",
-    "outDir": "lib"
+    "outDir": "../lib"
   },
-  "include": ["src"],
-  "exclude": ["node_modules", "test"]
+  "include": ["../src"],
+  "exclude": ["../node_modules", "../test"]
 }

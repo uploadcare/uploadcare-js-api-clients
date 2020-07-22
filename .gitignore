@@ -8,4 +8,5 @@ browserstack.json
 coverage
 
 lib
+module
 .env
