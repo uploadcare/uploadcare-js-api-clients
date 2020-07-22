@@ -31,11 +31,11 @@ const pubkey = (): string =>
 const uuids: { [key: string]: { publicKey: string; uuid: string } } = {
   image: {
     publicKey: pubkey(),
-    uuid: 'd3275f8b-686d-4980-916a-53a1fc17450b'
+    uuid: '640b5b93-f27f-4833-be9d-7eaee35817ce'
   },
   token: {
     publicKey: pubkey(),
-    uuid: 'b6aac6aa-be7b-46d2-9fc3-208290c78024'
+    uuid: '640b5b93-f27f-4833-be9d-7eaee35817ce'
   },
   demo: {
     publicKey: 'demopublickey',
@@ -131,7 +131,7 @@ export function publicKey(id: string): string {
 
 export function imageUrl(id: string): string {
   const images = {
-    valid: `${settings.baseCDN}/d3275f8b-686d-4980-916a-53a1fc17450b/1findfacecropgrayscale.jpg`,
+    valid: `${settings.baseCDN}/640b5b93-f27f-4833-be9d-7eaee35817ce/20200721174713.png`,
     doesNotExist: 'https://1.com/1.jpg',
     privateIP: 'http://192.168.1.10/1.jpg'
   }
@@ -141,7 +141,7 @@ export function imageUrl(id: string): string {
 
 export function token(id: string): string {
   const tokens = {
-    valid: 'ee5b6d12-ee19-48fd-b226-b94ab61ce191',
+    valid: '640b5b93-f27f-4833-be9d-7eaee35817ce',
     empty: ''
   }
 
@@ -150,7 +150,7 @@ export function token(id: string): string {
 
 export function groupId(id: string): string {
   const groupIds = {
-    valid: '01136e2a-7d57-4546-81be-1043e7774e70~2',
+    valid: '0b14f2f6-6d30-482b-a6d6-da2d434779d3~2',
     invalid: '123ebb27-1fd6-46c6-a859-b9893'
   }
 
@@ -160,8 +160,8 @@ export function groupId(id: string): string {
 export function groupOfFiles(id: string): Array<string> {
   const groupOfFiles = {
     valid: [
-      'd3275f8b-686d-4980-916a-53a1fc17450b',
-      'b7db68d6-6dc5-4fd7-90b2-9077030f206d/-/resize/x800/'
+      '359f0553-5f81-4d65-a7ac-726e78010bf6',
+      '640b5b93-f27f-4833-be9d-7eaee35817ce'
     ],
     invalid: [
       '2e6b7f23-9143-4b71-94e7-338bb',
