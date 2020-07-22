@@ -157,18 +157,6 @@ export function groupId(id: string): string {
   return groupIds[id]
 }
 
-// {
-// https://ucarecdn.com/640b5b93-f27f-4833-be9d-7eaee35817ce/20200721174713.png
-// https://ucarecdn.com/359f0553-5f81-4d65-a7ac-726e78010bf6/20200721174721.png
-//   "uuid": "0b14f2f6-6d30-482b-a6d6-da2d434779d3~2",
-//   "cdnUrl": "https://ucarecdn.com/0b14f2f6-6d30-482b-a6d6-da2d434779d3~2/",
-//   "name": "2 files",
-//   "count": 2,
-//   "size": 25282,
-//   "isImage": true,
-//   "isStored": false
-// }
-
 export function groupOfFiles(id: string): Array<string> {
   const groupOfFiles = {
     valid: [
