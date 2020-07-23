@@ -13,7 +13,11 @@
       {
         "transform": "@magic-works/ttypescript-browser-like-import-transformer",
         "after": true,
-        "extName": true
+        "extName": true,
+        "folderImport": true,
+        "rules": {
+          "/(.+)/g": false
+        }
       }
   ]
   },

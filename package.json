@@ -1,6 +1,6 @@
 {
   "name": "@uploadcare/upload-client",
-  "version": "2.0.0-alpha.1",
+  "version": "2.0.0-alpha.2",
   "description": "Library for work with Uploadcare Upload API",
   "type": "module",
   "main": "lib/index.js",
