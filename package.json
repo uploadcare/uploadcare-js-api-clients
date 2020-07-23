@@ -1,6 +1,6 @@
 {
   "name": "@uploadcare/upload-client",
-  "version": "2.0.0-alpha.0",
+  "version": "2.0.0-alpha.1",
   "description": "Library for work with Uploadcare Upload API",
   "type": "module",
   "main": "lib/index.js",
@@ -35,7 +35,7 @@
     "test:jest": "jest --config=configs/jest.config.js",
     "prebuild": "npm run clean",
     "build:cjs": "tsc --build configs/tsconfig.cjs.json",
-    "build:module": "tsc --build configs/tsconfig.module.json",
+    "build:module": "ttsc --build configs/tsconfig.module.json",
     "build": "npm run build:cjs && npm run build:module",
     "release:prepare": "shipjs prepare",
     "release:trigger": "shipjs trigger"
@@ -62,14 +62,15 @@
   "devDependencies": {
     "@koa/cors": "3.1.0",
     "@koa/router": "8.0.8",
+    "@magic-works/ttypescript-browser-like-import-transformer": "2.2.0",
     "@types/form-data": "2.5.0",
     "@types/jest": "26.0.5",
     "@types/koa": "2.11.3",
     "@types/node": "12.12.51",
     "@types/promise": "7.1.30",
+    "@types/ws": "7.2.6",
     "@typescript-eslint/eslint-plugin": "2.34.0",
     "@typescript-eslint/parser": "2.34.0",
-    "@types/ws": "7.2.6",
     "chalk": "4.1.0",
     "data-uri-to-buffer": "3.0.1",
     "dataurl-to-blob": "0.0.1",
@@ -89,8 +90,9 @@
     "rimraf": "3.0.2",
     "shipjs": "0.20.1",
     "start-server-and-test": "1.11.2",
-    "ts-node": "8.10.2",
     "ts-jest": "26.1.3",
+    "ts-node": "8.10.2",
+    "ttypescript": "1.5.10",
     "typescript": "3.9.7"
   },
   "dependencies": {
