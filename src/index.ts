@@ -13,8 +13,6 @@ import multipartComplete from './api/multipartComplete'
 import uploadFile from './uploadFile'
 import uploadFileGroup from './uploadFileGroup'
 
-import CancelController from './tools/CancelController'
-
 /* Types */
 export { Settings } from './types'
 export { NodeFile, BrowserFile } from './request/types'
@@ -56,8 +54,5 @@ export {
 
 /* High-Level API */
 export { uploadFile, uploadFileGroup }
-
-/* Helpers */
-export { CancelController }
 
 export default UploadClient

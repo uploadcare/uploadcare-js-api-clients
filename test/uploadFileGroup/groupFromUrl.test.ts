@@ -1,8 +1,8 @@
+import AbortController from 'abort-controller'
 import * as factory from '../_fixtureFactory'
 import { getSettingsForTesting } from '../_helpers'
 import uploadFileGroup from '../../src/uploadFileGroup'
 import { UploadClientError } from '../../src/tools/errors'
-import CancelController from '../../src/tools/CancelController'
 
 describe('groupFrom Url[]', () => {
   const sourceUrl = factory.imageUrl('valid')
@@ -29,13 +29,13 @@ describe('groupFrom Url[]', () => {
   })
 
   it('should be able to cancel uploading', async () => {
-    const ctrl = new CancelController()
+    const ctrl = new AbortController()
     const upload = uploadFileGroup(files, {
       ...settings,
-      cancel: ctrl
+      signal: ctrl.signal
     })
 
-    ctrl.cancel()
+    ctrl.abort()
 
     await expect(upload).rejects.toThrowError(
       new UploadClientError('Request canceled')
@@ -44,23 +44,18 @@ describe('groupFrom Url[]', () => {
 
   describe('should be able to handle', () => {
     it('cancel uploading', async () => {
-      const ctrl = new CancelController()
-      const onCancel = jest.fn()
-
-      ctrl.onCancel(onCancel)
+      const ctrl = new AbortController()
 
       const upload = uploadFileGroup(files, {
         ...settings,
-        cancel: ctrl
+        signal: ctrl.signal
       })
 
-      ctrl.cancel()
+      ctrl.abort()
 
       await expect(upload).rejects.toThrowError(
         new UploadClientError('Request canceled')
       )
-
-      expect(onCancel).toHaveBeenCalled()
     })
 
     it('progress', async () => {
@@ -68,12 +63,11 @@ describe('groupFrom Url[]', () => {
       const onProgress = ({ value }): void => {
         progressValue = value
       }
-      const upload = uploadFileGroup(files, {
+
+      await uploadFileGroup(files, {
         ...settings,
         onProgress
       })
-
-      await upload
 
       expect(progressValue).toBe(1)
     })

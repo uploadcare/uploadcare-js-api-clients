@@ -1,6 +1,6 @@
+import AbortController from 'abort-controller'
 import base from '../../src/api/base'
 import * as factory from '../_fixtureFactory'
-import CancelController from '../../src/tools/CancelController'
 
 describe('API - base', () => {
   const fileToUpload = factory.image('blackSquare')
@@ -15,13 +15,13 @@ describe('API - base', () => {
   it('should be able to cancel uploading', async () => {
     const timeout = jest.fn()
     const publicKey = factory.publicKey('demo')
-    const controller = new CancelController()
+    const controller = new AbortController()
     const directUpload = base(fileToUpload.data, {
       publicKey,
-      cancel: controller
+      signal: controller.signal
     })
 
-    controller.cancel()
+    controller.abort()
 
     const timeoutId = setTimeout(timeout, 10)
 

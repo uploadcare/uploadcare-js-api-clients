@@ -79,6 +79,7 @@
     "typescript": "3.9.7"
   },
   "dependencies": {
+    "abort-controller": "^3.0.0",
     "form-data": "^3.0.0",
     "ws": "^7.2.1"
   }

@@ -1,7 +1,7 @@
+import AbortController from 'abort-controller'
 import info from '../../src/api/info'
 import * as factory from '../_fixtureFactory'
 import { getSettingsForTesting } from '../_helpers'
-import CancelController from '../../src/tools/CancelController'
 
 describe('API - info', () => {
   it('should return file info', async () => {
@@ -26,15 +26,15 @@ describe('API - info', () => {
 
   it('should be able to cancel uploading', async () => {
     const uuid = factory.uuid('image')
-    const controller = new CancelController()
+    const controller = new AbortController()
 
     const settings = getSettingsForTesting({
       publicKey: factory.publicKey('image'),
-      cancel: controller
+      signal: controller.signal
     })
 
     setTimeout(() => {
-      controller.cancel()
+      controller.abort()
     })
 
     await expect(info(uuid, settings)).rejects.toThrowError('Request canceled')
