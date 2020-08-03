@@ -42,34 +42,18 @@ describe('groupFrom Uploaded[]', () => {
     )
   })
 
-  describe('should be able to handle', () => {
-    it('cancel uploading', async () => {
-      const ctrl = new AbortController()
-
-      const upload = uploadFileGroup(files, {
-        ...settings,
-        signal: ctrl.signal
-      })
-
-      ctrl.abort()
-
-      await expect(upload).rejects.toThrowError(
-        new UploadClientError('Request canceled')
-      )
+  it('should be able to handle progress', async () => {
+    let progressValue = 0
+    const onProgress = ({ value }): void => {
+      progressValue = value
+    }
+    const upload = uploadFileGroup(files, {
+      ...settings,
+      onProgress
     })
 
-    it('progress', async () => {
-      let progressValue = 0
-      const onProgress = ({ value }): void => {
-        progressValue = value
-      }
+    await upload
 
-      await uploadFileGroup(files, {
-        ...settings,
-        onProgress
-      })
-
-      expect(progressValue).toBe(1)
-    })
+    expect(progressValue).toBe(1)
   })
 })
