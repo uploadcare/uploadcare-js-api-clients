@@ -2,15 +2,23 @@
   "name": "@uploadcare/upload-client",
   "version": "1.1.2",
   "description": "Library for work with Uploadcare Upload API",
-  "main": "lib/index.js",
-  "types": "lib/index.d.ts",
+  "type": "module",
+  "main": "dist/index.cjs",
+  "module": "dist/index.js",
+  "sideEffects": false,
   "files": [
-    "lib/**/*"
+    "dist/*"
   ],
   "browser": {
-    "./lib/request/request.node.js": "./lib/request/request.browser.js",
-    "./lib/tools/getFormData.node.js": "./lib/tools/getFormData.browser.js",
-    "./lib/tools/sockets.node.js": "./lib/tools/sockets.browser.js"
+    "./dist/index.cjs": "./dist/index.browser.cjs",
+    "./dist/index.js": "./dist/index.browser.js"
+  },
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "require": "./dist/index.cjs",
+      "import": "./dist/index.js"
+    }
   },
   "scripts": {
     "check-env-vars": "node ./checkvars.js",
@@ -47,14 +55,16 @@
   "devDependencies": {
     "@koa/cors": "3.1.0",
     "@koa/router": "8.0.8",
+    "@rollup/plugin-alias": "^3.1.1",
+    "@rollup/plugin-node-resolve": "^8.4.0",
     "@types/form-data": "2.5.0",
     "@types/jest": "26.0.8",
     "@types/koa": "2.11.3",
     "@types/node": "12.12.53",
     "@types/promise": "7.1.30",
+    "@types/ws": "7.2.6",
     "@typescript-eslint/eslint-plugin": "2.34.0",
     "@typescript-eslint/parser": "2.34.0",
-    "@types/ws": "7.2.6",
     "chalk": "4.1.0",
     "data-uri-to-buffer": "3.0.1",
     "dataurl-to-blob": "0.0.1",
@@ -72,11 +82,13 @@
     "prettier": "1.19.1",
     "prettier-config-standard": "1.0.1",
     "rimraf": "3.0.2",
+    "rollup": "^2.23.0",
+    "rollup-plugin-typescript2": "^0.27.1",
     "shipjs": "0.20.1",
     "start-server-and-test": "1.11.2",
-    "ts-node": "8.10.2",
     "ts-jest": "26.1.4",
-    "typescript": "3.9.7"
+    "ts-node": "8.10.2",
+    "typescript": "^3.9.7"
   },
   "dependencies": {
     "form-data": "^3.0.0",
