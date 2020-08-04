@@ -1,4 +1,4 @@
-import * as json from '../data/info.js'
+import json from '../data/info.js'
 import find from '../utils/find.js'
 import error from '../utils/error.js'
 

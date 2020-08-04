@@ -22,11 +22,10 @@
   },
   "scripts": {
     "check-env-vars": "node ./checkvars.js",
-    "mock:start:old": "ts-node --project ./mock-server/tsconfig.mock.json ./mock-server/server.ts --silent",
-    "mock:start": "node --loader ts-node/esm.mjs ./mock-server/server.ts",
+    "mock:start": "node --loader ts-node/esm.mjs ./mock-server/server.ts --silent",
     "clean": "rimraf lib",
     "lint": "eslint . --ext=ts",
-    "test": "start-server-and-test mock:start:old :3000 test:jest",
+    "test": "start-server-and-test mock:start :3000 test:jest",
     "test:production": "npm run check-env-vars && TEST_ENV=production jest",
     "test:jest": "jest",
     "prebuild": "npm run clean",

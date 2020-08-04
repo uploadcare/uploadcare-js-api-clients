@@ -1,5 +1,5 @@
-import * as multipartJson from '../data/multipart.js'
-import * as infoJson from '../data/info.js'
+import multipartJson from '../data/multipart.js'
+import infoJson from '../data/info.js'
 import find from '../utils/find.js'
 import error from '../utils/error.js'
 

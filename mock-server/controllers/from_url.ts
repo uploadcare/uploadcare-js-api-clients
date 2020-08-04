@@ -1,5 +1,5 @@
-import * as jsonIndex from '../data/from_url/index.js'
-import * as jsonStatus from '../data/from_url/status.js'
+import jsonIndex from '../data/from_url/index.js'
+import jsonStatus from '../data/from_url/status.js'
 import find from '../utils/find.js'
 import error from '../utils/error.js'
 
