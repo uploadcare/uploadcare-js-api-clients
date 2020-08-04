@@ -60,4 +60,4 @@ export { uploadFile, uploadFileGroup }
 /* Helpers */
 export { CancelController }
 
-export default UploadClient
+export { UploadClient }
