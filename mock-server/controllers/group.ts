@@ -1,6 +1,6 @@
-import * as json from '../data/group.json'
-import find from '../utils/find'
-import error from '../utils/error'
+import * as json from '../data/group.js'
+import find from '../utils/find.js'
+import error from '../utils/error.js'
 
 const UUID_REGEX =
   '[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}'
