@@ -45,7 +45,7 @@ const config = ({ format, browser }) => ({
       }
     })
   ],
-  external: browser ? [] : ['https', 'http', 'stream', 'url']
+  external: browser ? [] : ['https', 'http', 'stream', 'url', 'form-data', 'ws']
 })
 
 export default [
