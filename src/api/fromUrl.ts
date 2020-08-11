@@ -1,4 +1,4 @@
-import { FileInfo } from './types'
+import { FileInfo, Url } from './types'
 import { FailedResponse } from '../request/types'
 
 import request from '../request/request.node'
@@ -9,8 +9,6 @@ import { getUserAgent } from '../tools/userAgent'
 import camelizeKeys from '../tools/camelizeKeys'
 import { UploadClientError } from '../tools/errors'
 import retryIfThrottled from '../tools/retryIfThrottled'
-
-type Url = string
 
 export enum TypeEnum {
   Token = 'token',
