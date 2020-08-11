@@ -1,15 +1,16 @@
-import CancelController from '../../src/tools/CancelController'
+import AbortController from 'abort-controller'
 import { race } from '../../src/tools/race'
 import { cancelError } from '../../src/tools/errors'
+import { onCancel } from '../../src/tools/onCancel'
 
 const returnAfter = (
   value: number,
-  cancel: CancelController,
+  signal: AbortSignal,
   ms = 30
 ): Promise<number> =>
   new Promise<number>((resolve, reject) => {
     const id = setTimeout(resolve, ms, value)
-    cancel.onCancel(() => {
+    onCancel(signal, () => {
       clearTimeout(id)
       reject(cancelError('race cancel'))
     })
@@ -18,11 +19,11 @@ const returnAfter = (
 describe('race', () => {
   it('should work', async () => {
     const value = await race([
-      ({ cancel }): Promise<number> => returnAfter(1, cancel),
-      ({ cancel }): Promise<number> => returnAfter(2, cancel, 1),
-      ({ cancel }): Promise<number> => returnAfter(3, cancel),
-      ({ cancel }): Promise<number> => returnAfter(4, cancel),
-      ({ cancel }): Promise<number> => returnAfter(5, cancel)
+      ({ signal }): Promise<number> => returnAfter(1, signal),
+      ({ signal }): Promise<number> => returnAfter(2, signal, 1),
+      ({ signal }): Promise<number> => returnAfter(3, signal),
+      ({ signal }): Promise<number> => returnAfter(4, signal),
+      ({ signal }): Promise<number> => returnAfter(5, signal)
     ])
 
     expect(value).toBe(2)
@@ -33,10 +34,10 @@ describe('race', () => {
       (): Promise<number> => {
         throw new Error('test 1')
       },
-      ({ cancel }): Promise<number> => returnAfter(2, cancel, 1),
-      ({ cancel }): Promise<number> => returnAfter(3, cancel),
-      ({ cancel }): Promise<number> => returnAfter(4, cancel),
-      ({ cancel }): Promise<number> => returnAfter(5, cancel)
+      ({ signal }): Promise<number> => returnAfter(2, signal, 1),
+      ({ signal }): Promise<number> => returnAfter(3, signal),
+      ({ signal }): Promise<number> => returnAfter(4, signal),
+      ({ signal }): Promise<number> => returnAfter(5, signal)
     ])
 
     expect(value).toBe(2)
@@ -45,10 +46,10 @@ describe('race', () => {
   it('should work if first function fails async', async () => {
     const value = await race([
       (): Promise<number> => Promise.reject('test 1'),
-      ({ cancel }): Promise<number> => returnAfter(2, cancel, 1),
-      ({ cancel }): Promise<number> => returnAfter(3, cancel),
-      ({ cancel }): Promise<number> => returnAfter(4, cancel),
-      ({ cancel }): Promise<number> => returnAfter(5, cancel)
+      ({ signal }): Promise<number> => returnAfter(2, signal, 1),
+      ({ signal }): Promise<number> => returnAfter(3, signal),
+      ({ signal }): Promise<number> => returnAfter(4, signal),
+      ({ signal }): Promise<number> => returnAfter(5, signal)
     ])
 
     expect(value).toBe(2)
@@ -78,16 +79,16 @@ describe('race', () => {
     }
 
     const value = await race([
-      ({ cancel }): Promise<number> =>
-        returnAfter(1, cancel, 1).catch(createCancelHandler(0)),
-      ({ cancel }): Promise<number> =>
-        returnAfter(2, cancel).catch(createCancelHandler(1)),
-      ({ cancel }): Promise<number> =>
-        returnAfter(3, cancel).catch(createCancelHandler(2)),
-      ({ cancel }): Promise<number> =>
-        returnAfter(4, cancel).catch(createCancelHandler(3)),
-      ({ cancel }): Promise<number> =>
-        returnAfter(5, cancel).catch(createCancelHandler(4))
+      ({ signal }): Promise<number> =>
+        returnAfter(1, signal, 1).catch(createCancelHandler(0)),
+      ({ signal }): Promise<number> =>
+        returnAfter(2, signal).catch(createCancelHandler(1)),
+      ({ signal }): Promise<number> =>
+        returnAfter(3, signal).catch(createCancelHandler(2)),
+      ({ signal }): Promise<number> =>
+        returnAfter(4, signal).catch(createCancelHandler(3)),
+      ({ signal }): Promise<number> =>
+        returnAfter(5, signal).catch(createCancelHandler(4))
     ])
 
     expect(value).toBe(1)
@@ -116,14 +117,14 @@ describe('race', () => {
 
         return Promise.resolve(1)
       },
-      ({ cancel }): Promise<number> =>
-        returnAfter(2, cancel).catch(createCancelHandler(1)),
-      ({ cancel }): Promise<number> =>
-        returnAfter(3, cancel).catch(createCancelHandler(2)),
-      ({ cancel }): Promise<number> =>
-        returnAfter(4, cancel).catch(createCancelHandler(3)),
-      ({ cancel }): Promise<number> =>
-        returnAfter(5, cancel).catch(createCancelHandler(4))
+      ({ signal }): Promise<number> =>
+        returnAfter(2, signal).catch(createCancelHandler(1)),
+      ({ signal }): Promise<number> =>
+        returnAfter(3, signal).catch(createCancelHandler(2)),
+      ({ signal }): Promise<number> =>
+        returnAfter(4, signal).catch(createCancelHandler(3)),
+      ({ signal }): Promise<number> =>
+        returnAfter(5, signal).catch(createCancelHandler(4))
     ])
 
     expect(value).toBe(1)
@@ -136,7 +137,7 @@ describe('race', () => {
   })
 
   it('should be cancellable', async () => {
-    const cancel = new CancelController()
+    const controller = new AbortController()
 
     const spies = Array.from({ length: 5 }, i =>
       jasmine.createSpy('cancel for ' + i)
@@ -148,23 +149,23 @@ describe('race', () => {
       throw error
     }
 
-    setTimeout(() => cancel.cancel())
+    setTimeout(() => controller.abort())
 
     await expect(
       race(
         [
-          ({ cancel }): Promise<number> =>
-            returnAfter(1, cancel).catch(createCancelHandler(0)),
-          ({ cancel }): Promise<number> =>
-            returnAfter(2, cancel).catch(createCancelHandler(1)),
-          ({ cancel }): Promise<number> =>
-            returnAfter(3, cancel).catch(createCancelHandler(2)),
-          ({ cancel }): Promise<number> =>
-            returnAfter(4, cancel).catch(createCancelHandler(3)),
-          ({ cancel }): Promise<number> =>
-            returnAfter(5, cancel).catch(createCancelHandler(4))
+          ({ signal }): Promise<number> =>
+            returnAfter(1, signal).catch(createCancelHandler(0)),
+          ({ signal }): Promise<number> =>
+            returnAfter(2, signal).catch(createCancelHandler(1)),
+          ({ signal }): Promise<number> =>
+            returnAfter(3, signal).catch(createCancelHandler(2)),
+          ({ signal }): Promise<number> =>
+            returnAfter(4, signal).catch(createCancelHandler(3)),
+          ({ signal }): Promise<number> =>
+            returnAfter(5, signal).catch(createCancelHandler(4))
         ],
-        { cancel }
+        { signal: controller.signal }
       )
     ).rejects.toThrowError('race cancel')
 

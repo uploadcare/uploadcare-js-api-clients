@@ -9,12 +9,11 @@ import { getUserAgent } from '../tools/userAgent'
 import camelizeKeys from '../tools/camelizeKeys'
 import retryIfThrottled from '../tools/retryIfThrottled'
 import { UploadClientError } from '../tools/errors'
-import CancelController from '../tools/CancelController'
 
 export type MultipartCompleteOptions = {
   publicKey: string
   baseURL?: string
-  cancel?: CancelController
+  signal?: AbortSignal
   source?: string
   integration?: string
   retryThrottledRequestMaxTimes?: number
@@ -31,7 +30,7 @@ export default function multipartComplete(
     publicKey,
     baseURL = defaultSettings.baseURL,
     source = 'local',
-    cancel,
+    signal,
     integration,
     retryThrottledRequestMaxTimes = defaultSettings.retryThrottledRequestMaxTimes
   }: MultipartCompleteOptions
@@ -49,7 +48,7 @@ export default function multipartComplete(
           ['UPLOADCARE_PUB_KEY', publicKey],
           ['source', source]
         ]),
-        cancel
+        signal
       }).then(({ data, headers, request }) => {
         const response = camelizeKeys<Response>(JSON.parse(data))
 

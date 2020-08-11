@@ -16,7 +16,7 @@
     "check-env-vars": "node ./checkvars.js",
     "mock:start": "ts-node --project ./mock-server/tsconfig.mock.json ./mock-server/server.ts --silent",
     "clean": "rimraf lib",
-    "lint": "eslint . --ext=ts",
+    "lint": "eslint ./src ./mock-server --ext=ts",
     "test": "start-server-and-test mock:start :3000 test:jest",
     "test:production": "npm run check-env-vars && TEST_ENV=production jest",
     "test:jest": "jest",
@@ -79,6 +79,7 @@
     "typescript": "3.9.7"
   },
   "dependencies": {
+    "abort-controller": "^3.0.0",
     "form-data": "^3.0.0",
     "ws": "^7.2.1"
   }

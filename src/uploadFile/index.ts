@@ -1,7 +1,6 @@
 import uploadBase from './uploadBase'
 import uploadFromUrl from './uploadFromUrl'
 import uploadFromUploaded from './uploadFromUploaded'
-import CancelController from '../tools/CancelController'
 import defaultSettings from '../defaultSettings'
 
 /* Types */
@@ -21,7 +20,7 @@ export type FileFromOptions = {
   secureExpire?: string
   store?: boolean
 
-  cancel?: CancelController
+  signal?: AbortSignal
   onProgress?: ({ value: number }) => void
 
   source?: string
@@ -62,7 +61,7 @@ export default function uploadFile(
     secureExpire,
     store,
 
-    cancel,
+    signal,
     onProgress,
 
     source,
@@ -91,7 +90,7 @@ export default function uploadFile(
         secureExpire,
         store,
 
-        cancel,
+        signal,
         onProgress,
 
         source,
@@ -112,7 +111,7 @@ export default function uploadFile(
       secureExpire,
       store,
 
-      cancel,
+      signal,
       onProgress,
 
       source,
@@ -134,7 +133,7 @@ export default function uploadFile(
       secureExpire,
       store,
 
-      cancel,
+      signal,
       onProgress,
 
       source,
@@ -153,7 +152,7 @@ export default function uploadFile(
       fileName,
       baseURL,
 
-      cancel,
+      signal,
       onProgress,
 
       source,
