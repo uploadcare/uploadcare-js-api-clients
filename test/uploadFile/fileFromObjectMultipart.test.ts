@@ -1,7 +1,7 @@
+import AbortController from 'abort-controller'
 import * as factory from '../_fixtureFactory'
 import uploadFile from '../../src/uploadFile'
 import { getSettingsForTesting } from '../_helpers'
-import CancelController from '../../src/tools/CancelController'
 import { UploadClientError } from '../../src/tools/errors'
 
 jest.setTimeout(60000)
@@ -29,13 +29,13 @@ describe('uploadFrom Object (multipart)', () => {
   })
 
   it('should be able to cancel uploading', async () => {
-    const ctrl = new CancelController()
+    const ctrl = new AbortController()
     const upload = uploadFile(fileToUpload, {
       ...settings,
-      cancel: ctrl
+      signal: ctrl.signal
     })
 
-    ctrl.cancel()
+    ctrl.abort()
 
     await expect(upload).rejects.toThrowError(
       new UploadClientError('Request canceled')
@@ -53,40 +53,18 @@ describe('uploadFrom Object (multipart)', () => {
     expect(file.name).toEqual('newFileName.jpg')
   })
 
-  describe('should be able to handle', () => {
-    it('cancel uploading', async () => {
-      const ctrl = new CancelController()
-      const onCancel = jest.fn()
-
-      ctrl.onCancel(onCancel)
-
-      const upload = uploadFile(fileToUpload, {
-        ...settings,
-        cancel: ctrl
-      })
-
-      ctrl.cancel()
-
-      await expect(upload).rejects.toThrowError(
-        new UploadClientError('Request canceled')
-      )
-
-      expect(onCancel).toHaveBeenCalled()
+  it('should be able to handle progress', async () => {
+    let progressValue = 0
+    const onProgress = ({ value }) => {
+      progressValue = value
+    }
+    const upload = uploadFile(fileToUpload, {
+      ...settings,
+      onProgress
     })
 
-    it('progress', async () => {
-      let progressValue = 0
-      const onProgress = ({ value }) => {
-        progressValue = value
-      }
-      const upload = uploadFile(fileToUpload, {
-        ...settings,
-        onProgress
-      })
+    await upload
 
-      await upload
-
-      expect(progressValue).toBe(1)
-    })
+    expect(progressValue).toBe(1)
   })
 })

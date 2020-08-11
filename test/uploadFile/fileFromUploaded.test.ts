@@ -1,7 +1,7 @@
+import AbortController from 'abort-controller'
 import * as factory from '../_fixtureFactory'
 import uploadFile from '../../src/uploadFile'
 import { getSettingsForTesting } from '../_helpers'
-import CancelController from '../../src/tools/CancelController'
 import { UploadClientError } from '../../src/tools/errors'
 
 describe('uploadFrom Uploaded', () => {
@@ -17,13 +17,13 @@ describe('uploadFrom Uploaded', () => {
   })
 
   it('should be able to cancel uploading', async () => {
-    const ctrl = new CancelController()
+    const ctrl = new AbortController()
     const upload = uploadFile(uuid, {
       ...settings,
-      cancel: ctrl
+      signal: ctrl.signal
     })
 
-    ctrl.cancel()
+    ctrl.abort()
 
     await expect(upload).rejects.toThrowError(
       new UploadClientError('Request canceled')
@@ -41,36 +41,16 @@ describe('uploadFrom Uploaded', () => {
     expect(file.name).toEqual('newFileName.jpg')
   })
 
-  describe('should be able to handle', () => {
-    it('cancel uploading', async () => {
-      const ctrl = new CancelController()
-      const onCancel = jest.fn()
-      ctrl.onCancel(onCancel)
-      const upload = uploadFile(uuid, {
-        ...settings,
-        cancel: ctrl
-      })
-
-      ctrl.cancel()
-
-      await expect(upload).rejects.toThrowError(
-        new UploadClientError('Request canceled')
-      )
-
-      expect(onCancel).toHaveBeenCalled()
+  it('should be able to handle progress', async () => {
+    const onProgress = jest.fn()
+    const settings = getSettingsForTesting({
+      publicKey: factory.publicKey('image'),
+      onProgress
     })
 
-    it('progress', async () => {
-      const onProgress = jest.fn()
-      const settings = getSettingsForTesting({
-        publicKey: factory.publicKey('image'),
-        onProgress
-      })
+    await uploadFile(uuid, settings)
 
-      await uploadFile(uuid, settings)
-
-      expect(onProgress).toHaveBeenCalled()
-      expect(onProgress).toHaveBeenCalledWith({ value: 1 })
-    })
+    expect(onProgress).toHaveBeenCalled()
+    expect(onProgress).toHaveBeenCalledWith({ value: 1 })
   })
 })

@@ -13,7 +13,6 @@ import { getUserAgent } from '../tools/userAgent'
 import camelizeKeys from '../tools/camelizeKeys'
 import retryIfThrottled from '../tools/retryIfThrottled'
 import { UploadClientError } from '../tools/errors'
-import CancelController from '../tools/CancelController'
 
 export type MultipartStartOptions = {
   publicKey: string
@@ -24,7 +23,7 @@ export type MultipartStartOptions = {
   secureExpire?: string
   store?: boolean
   multipartChunkSize?: number
-  cancel?: CancelController
+  signal?: AbortSignal
   source?: string
   integration?: string
   retryThrottledRequestMaxTimes?: number
@@ -53,7 +52,7 @@ export default function multipartStart(
     secureSignature,
     secureExpire,
     store,
-    cancel,
+    signal,
     source = 'local',
     integration,
     retryThrottledRequestMaxTimes = defaultSettings.retryThrottledRequestMaxTimes
@@ -78,7 +77,7 @@ export default function multipartStart(
           ['expire', secureExpire],
           ['source', source]
         ]),
-        cancel
+        signal
       }).then(({ data, headers, request }) => {
         const response = camelizeKeys<Response>(JSON.parse(data))
 

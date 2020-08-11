@@ -1,10 +1,10 @@
+import AbortController from 'abort-controller'
 import multipartStart from '../../src/api/multipartStart'
 import multipartUpload from '../../src/api/multipartUpload'
 import multipartComplete from '../../src/api/multipartComplete'
 import * as factory from '../_fixtureFactory'
 import { getSettingsForTesting } from '../_helpers'
 import { UploadClientError } from '../../src/tools/errors'
-import CancelController from '../../src/tools/CancelController'
 
 const getChunk = (
   file: Buffer | Blob,
@@ -52,12 +52,12 @@ describe('API - multipartComplete', () => {
   })
 
   it('should be able to cancel uploading', async () => {
-    const ctrl = new CancelController()
+    const ctrl = new AbortController()
     const file = factory.file(11)
     const settings = getSettingsForTesting({
       publicKey: factory.publicKey('multipart'),
       contentType: 'application/octet-stream',
-      cancel: ctrl
+      signal: ctrl.signal
     })
     const { uuid: completedUuid, parts } = await multipartStart(
       file.size,
@@ -69,14 +69,14 @@ describe('API - multipartComplete', () => {
     let time
     setTimeout(() => {
       time = Date.now()
-      ctrl.cancel()
+      ctrl.abort()
     })
 
     await expect(
       multipartComplete(completedUuid, settings)
     ).rejects.toThrowError(new UploadClientError('Request canceled'))
 
-    expect(Date.now() - time).toBeLessThan(30)
+    expect(Date.now() - time).toBeLessThan(100)
   })
 
   it('should be rejected with bad options', async () => {

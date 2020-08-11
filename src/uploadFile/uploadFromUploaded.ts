@@ -1,4 +1,3 @@
-import CancelController from '../tools/CancelController'
 import { UploadcareFile } from '../tools/UploadcareFile'
 import info from '../api/info'
 
@@ -11,7 +10,7 @@ type FromUploadedOptions = {
   fileName?: string
   baseURL?: string
 
-  cancel?: CancelController
+  signal?: AbortSignal
   onProgress?: ({ value: number }) => void
 
   source?: string
@@ -28,7 +27,7 @@ const uploadFromUploaded = (
     publicKey,
     fileName,
     baseURL,
-    cancel,
+    signal,
     onProgress,
     source,
     integration,
@@ -39,7 +38,7 @@ const uploadFromUploaded = (
   return info(uuid, {
     publicKey,
     baseURL,
-    cancel,
+    signal,
     source,
     integration,
     retryThrottledRequestMaxTimes

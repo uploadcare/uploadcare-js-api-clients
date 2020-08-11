@@ -4,7 +4,6 @@ import { FailedResponse } from '../request/types'
 import request from '../request/request.node'
 import getUrl from '../tools/getUrl'
 
-import CancelController from '../tools/CancelController'
 import defaultSettings from '../defaultSettings'
 import { getUserAgent } from '../tools/userAgent'
 import camelizeKeys from '../tools/camelizeKeys'
@@ -62,7 +61,7 @@ export type FromUrlOptions = {
   secureSignature?: string
   secureExpire?: string
 
-  cancel?: CancelController
+  signal?: AbortSignal
 
   source?: string
   integration?: string
@@ -88,7 +87,7 @@ export default function fromUrl(
     secureSignature,
     secureExpire,
     source = 'url',
-    cancel,
+    signal,
     integration,
     retryThrottledRequestMaxTimes = defaultSettings.retryThrottledRequestMaxTimes
   }: FromUrlOptions
@@ -112,7 +111,7 @@ export default function fromUrl(
           expire: secureExpire,
           source: source
         }),
-        cancel
+        signal
       }).then(({ data, headers, request }) => {
         const response = camelizeKeys<Response>(JSON.parse(data))
 

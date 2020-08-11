@@ -1,7 +1,7 @@
+import AbortController from 'abort-controller'
 import * as factory from '../_fixtureFactory'
 import { getSettingsForTesting } from '../_helpers'
 import group from '../../src/api/group'
-import CancelController from '../../src/tools/CancelController'
 
 describe('API - group', () => {
   const files = factory.groupOfFiles('valid')
@@ -42,15 +42,15 @@ describe('API - group', () => {
   })
 
   it('should be able to cancel uploading', async () => {
-    const controller = new CancelController()
+    const controller = new AbortController()
 
     const settings = getSettingsForTesting({
       publicKey: factory.publicKey('image'),
-      cancel: controller
+      signal: controller.signal
     })
 
     setTimeout(() => {
-      controller.cancel()
+      controller.abort()
     })
 
     await expect(group(files, settings)).rejects.toThrowError(

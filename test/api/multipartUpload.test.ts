@@ -1,9 +1,9 @@
+import AbortController from 'abort-controller'
 import * as factory from '../_fixtureFactory'
 import multipartUpload from '../../src/api/multipartUpload'
 import { getSettingsForTesting } from '../_helpers'
 import multipartStart from '../../src/api/multipartStart'
 import { UploadClientError } from '../../src/tools/errors'
-import CancelController from '../../src/tools/CancelController'
 
 let parts: [string, Blob | Buffer][] = []
 
@@ -39,14 +39,14 @@ describe('API - multipartUpload', () => {
   it('should be able to cancel uploading', async () => {
     const [url, part] = parts[1]
 
-    const cntr = new CancelController()
+    const cntr = new AbortController()
     const options = getSettingsForTesting({
       publicKey: factory.publicKey('multipart'),
-      cancel: cntr
+      signal: cntr.signal
     })
 
     setTimeout(() => {
-      cntr.cancel()
+      cntr.abort()
     })
 
     await expect(multipartUpload(part, url, options)).rejects.toThrowError(
