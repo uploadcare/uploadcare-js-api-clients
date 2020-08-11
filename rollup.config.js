@@ -16,8 +16,6 @@ const config = ({ format, browser }) => ({
       .join('.')
   },
   plugins: [
-    nodeResolve({ browser }),
-
     browser &&
       alias({
         entries: [
@@ -32,9 +30,15 @@ const config = ({ format, browser }) => ({
           {
             find: './getFormData.node',
             replacement: './getFormData.browser'
+          },
+          {
+            find: 'abort-controller',
+            replacement: './node_modules/abort-controller/browser.mjs'
           }
         ]
       }),
+
+    nodeResolve({ browser }),
 
     typescript({
       tsconfig: 'tsconfig.build.json',
@@ -45,7 +49,9 @@ const config = ({ format, browser }) => ({
       }
     })
   ],
-  external: browser ? [] : ['https', 'http', 'stream', 'url', 'form-data', 'ws']
+  external: browser
+    ? []
+    : ['https', 'http', 'stream', 'url', 'form-data', 'ws', 'abort-controller']
 })
 
 export default [
