@@ -1,4 +1,4 @@
-import AbortController from 'abort-controller'
+import { AbortController } from 'abort-controller'
 import { onCancel } from './onCancel'
 
 type Callback = () => void

@@ -1,3 +1,5 @@
+import { AbortController } from 'abort-controller'
+
 import UploadClient from './UploadClient'
 
 import base from './api/base'
@@ -55,4 +57,7 @@ export {
 /* High-Level API */
 export { uploadFile, uploadFileGroup }
 
-export default UploadClient
+/* Helpers */
+export { AbortController }
+
+export { UploadClient }
