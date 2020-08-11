@@ -1,7 +1,7 @@
+import AbortController from 'abort-controller'
 import fromUrlStatus, { Status } from '../../src/api/fromUrlStatus'
 import * as factory from '../_fixtureFactory'
 import { getSettingsForTesting } from '../_helpers'
-import CancelController from '../../src/tools/CancelController'
 
 describe('API - from url status', () => {
   const token = factory.token('valid')
@@ -28,15 +28,15 @@ describe('API - from url status', () => {
   })
 
   it('should be able to cancel uploading', async () => {
-    const controller = new CancelController()
+    const controller = new AbortController()
 
     const settings = getSettingsForTesting({
       publicKey: factory.publicKey('demo'),
-      cancel: controller
+      signal: controller.signal
     })
 
     setTimeout(() => {
-      controller.cancel()
+      controller.abort()
     })
 
     await expect(fromUrlStatus(token, settings)).rejects.toThrowError(

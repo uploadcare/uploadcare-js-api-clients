@@ -1,7 +1,6 @@
 import request from '../request/request.node'
 import getFormData from '../tools/buildFormData'
 import getUrl from '../tools/getUrl'
-import CancelController from '../tools/CancelController'
 import { defaultSettings, defaultFilename } from '../defaultSettings'
 import { getUserAgent } from '../tools/userAgent'
 import camelizeKeys from '../tools/camelizeKeys'
@@ -27,7 +26,7 @@ export type BaseOptions = {
   secureExpire?: string
   store?: boolean
 
-  cancel?: CancelController
+  signal?: AbortSignal
   onProgress?: ({ value: number }) => void
 
   source?: string
@@ -49,7 +48,7 @@ export default function base(
     secureSignature,
     secureExpire,
     store,
-    cancel,
+    signal,
     onProgress,
     source = 'local',
     integration,
@@ -77,7 +76,7 @@ export default function base(
           ['expire', secureExpire],
           ['source', source]
         ]),
-        cancel,
+        signal,
         onProgress
       }).then(({ data, headers, request }) => {
         const response = camelizeKeys<Response>(JSON.parse(data))

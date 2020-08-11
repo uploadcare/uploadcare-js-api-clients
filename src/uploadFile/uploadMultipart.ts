@@ -2,7 +2,6 @@ import defaultSettings from '../defaultSettings'
 import multipartStart from '../api/multipartStart'
 import multipartUpload from '../api/multipartUpload'
 import multipartComplete from '../api/multipartComplete'
-import CancelController from '../tools/CancelController'
 import runWithConcurrency from '../tools/runWithConcurrency'
 import { UploadcareFile } from '../tools/UploadcareFile'
 import { getFileSize } from '../tools/isMultipart'
@@ -28,7 +27,7 @@ export type MultipartOptions = {
   secureSignature?: string
   secureExpire?: string
   store?: boolean
-  cancel?: CancelController
+  signal?: AbortSignal
   onProgress?: progressCallback
   source?: string
   integration?: string
@@ -56,7 +55,7 @@ const uploadPartWithRetry = (
   {
     publicKey,
     onProgress,
-    cancel,
+    signal,
     integration,
     multipartMaxAttempts
   }: MultipartUploadOptions & { multipartMaxAttempts: number }
@@ -65,7 +64,7 @@ const uploadPartWithRetry = (
     multipartUpload(chunk, url, {
       publicKey,
       onProgress,
-      cancel,
+      signal,
       integration
     }).catch(error => {
       if (attempt < multipartMaxAttempts) {
@@ -88,7 +87,7 @@ const uploadMultipart = (
     secureExpire,
     store,
 
-    cancel,
+    signal,
     onProgress,
 
     source,
@@ -133,7 +132,7 @@ const uploadMultipart = (
     secureSignature,
     secureExpire,
     store,
-    cancel,
+    signal,
     source,
     integration,
     retryThrottledRequestMaxTimes
@@ -150,7 +149,7 @@ const uploadMultipart = (
               {
                 publicKey,
                 onProgress: createProgressHandler(parts.length, index),
-                cancel,
+                signal,
                 integration,
                 multipartMaxAttempts
               }
@@ -180,7 +179,7 @@ const uploadMultipart = (
           integration,
           retryThrottledRequestMaxTimes,
           onProgress,
-          cancel
+          signal
         })
       }
     })

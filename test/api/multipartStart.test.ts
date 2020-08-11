@@ -2,7 +2,7 @@ import multipartStart from '../../src/api/multipartStart'
 import * as factory from '../_fixtureFactory'
 import { getSettingsForTesting } from '../_helpers'
 import { UploadClientError } from '../../src/tools/errors'
-import CancelController from '../../src/tools/CancelController'
+import AbortController from 'abort-controller'
 
 describe('API - multipartStart', () => {
   const size = factory.file(12).size
@@ -19,16 +19,16 @@ describe('API - multipartStart', () => {
   })
 
   it('should be able to cancel uploading', async () => {
-    const cntr = new CancelController()
+    const cntr = new AbortController()
     const settings = getSettingsForTesting({
       publicKey: factory.publicKey('multipart'),
       contentType: 'application/octet-stream',
-      cancel: cntr
+      signal: cntr.signal
     })
     const upload = multipartStart(size, settings)
 
     setTimeout(() => {
-      cntr.cancel()
+      cntr.abort()
     })
 
     await expect(upload).rejects.toThrowError(

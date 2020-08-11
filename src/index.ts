@@ -1,3 +1,5 @@
+import { AbortController } from 'abort-controller'
+
 import UploadClient from './UploadClient'
 
 import base from './api/base'
@@ -12,8 +14,6 @@ import multipartComplete from './api/multipartComplete'
 
 import uploadFile from './uploadFile'
 import uploadFileGroup from './uploadFileGroup'
-
-import CancelController from './tools/CancelController'
 
 /* Types */
 export { Settings } from './types'
@@ -58,6 +58,6 @@ export {
 export { uploadFile, uploadFileGroup }
 
 /* Helpers */
-export { CancelController }
+export { AbortController }
 
 export { UploadClient }

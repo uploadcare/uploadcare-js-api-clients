@@ -1,38 +1,37 @@
-import CancelController from './CancelController'
+import { AbortController } from 'abort-controller'
+import { onCancel } from './onCancel'
 
 type Callback = () => void
 type StrangeFn<T> = (args: {
   stopRace: Callback
-  cancel: CancelController
+  signal: AbortSignal
 }) => Promise<T>
 
 const race = <T>(
   fns: StrangeFn<T>[],
-  { cancel }: { cancel?: CancelController } = {}
+  { signal }: { signal?: AbortSignal } = {}
 ): Promise<T> => {
   let lastError: Error | null = null
   let winnerIndex: number | null = null
-  const controllers = fns.map(() => new CancelController())
+  const controllers = fns.map(() => new AbortController())
   const createStopRaceCallback = (i: number) => (): void => {
     winnerIndex = i
 
     controllers.forEach(
-      (controller, index) => index !== i && controller.cancel()
+      (controller, index) => index !== i && controller.abort()
     )
   }
 
-  if (cancel) {
-    cancel.onCancel(() => {
-      controllers.forEach(controller => controller.cancel())
-    })
-  }
+  onCancel(signal, () => {
+    controllers.forEach(controller => controller.abort())
+  })
 
   return Promise.all(
     fns.map((fn, i) => {
       const stopRace = createStopRaceCallback(i)
 
       return Promise.resolve()
-        .then(() => fn({ stopRace, cancel: controllers[i] }))
+        .then(() => fn({ stopRace, signal: controllers[i].signal }))
         .then(result => {
           stopRace()
 

@@ -1,8 +1,8 @@
+import AbortController from 'abort-controller'
 import * as factory from '../_fixtureFactory'
 import { getSettingsForTesting } from '../_helpers'
 
 import uploadFile from '../../src/uploadFile'
-import CancelController from '../../src/tools/CancelController'
 
 describe('uploadFrom Object', () => {
   it('should resolves when file is ready on CDN', async () => {
@@ -28,16 +28,16 @@ describe('uploadFrom Object', () => {
   })
 
   it('should be able to cancel uploading', async () => {
-    const ctrl = new CancelController()
+    const ctrl = new AbortController()
     const fileToUpload = factory.image('blackSquare').data
     const settings = getSettingsForTesting({
       publicKey: factory.publicKey('image'),
-      cancel: ctrl
+      signal: ctrl.signal
     })
     const upload = uploadFile(fileToUpload, settings)
 
     setTimeout(() => {
-      ctrl.cancel()
+      ctrl.abort()
     })
 
     await expect(upload).rejects.toThrowError('Request canceled')

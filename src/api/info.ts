@@ -1,6 +1,5 @@
 import request from '../request/request.node'
 import getUrl from '../tools/getUrl'
-import CancelController from '../tools/CancelController'
 import defaultSettings from '../defaultSettings'
 import { getUserAgent } from '../tools/userAgent'
 import camelizeKeys from '../tools/camelizeKeys'
@@ -18,7 +17,7 @@ export type InfoOptions = {
 
   baseURL?: string
 
-  cancel?: CancelController
+  signal?: AbortSignal
   onProgress?: ({ value: number }) => void
 
   source?: string
@@ -38,7 +37,7 @@ export default function info(
   {
     publicKey,
     baseURL = defaultSettings.baseURL,
-    cancel,
+    signal,
     source,
     integration,
     retryThrottledRequestMaxTimes = defaultSettings.retryThrottledRequestMaxTimes
@@ -57,7 +56,7 @@ export default function info(
           file_id: uuid,
           source
         }),
-        cancel
+        signal
       }).then(({ data, headers, request }) => {
         const response = camelizeKeys<Response>(JSON.parse(data))
 

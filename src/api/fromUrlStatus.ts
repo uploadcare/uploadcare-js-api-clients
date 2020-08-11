@@ -6,7 +6,6 @@ import getUrl from '../tools/getUrl'
 
 import defaultSettings from '../defaultSettings'
 import { getUserAgent } from '../tools/userAgent'
-import CancelController from '../tools/CancelController'
 import camelizeKeys from '../tools/camelizeKeys'
 import { UploadClientError } from '../tools/errors'
 import retryIfThrottled from '../tools/retryIfThrottled'
@@ -63,7 +62,7 @@ export type FromUrlStatusOptions = {
 
   baseURL?: string
 
-  cancel?: CancelController
+  signal?: AbortSignal
 
   integration?: string
 
@@ -78,7 +77,7 @@ export default function fromUrlStatus(
   {
     publicKey,
     baseURL = defaultSettings.baseURL,
-    cancel,
+    signal,
     integration,
     retryThrottledRequestMaxTimes = defaultSettings.retryThrottledRequestMaxTimes
   }: FromUrlStatusOptions = {}
@@ -94,7 +93,7 @@ export default function fromUrlStatus(
           jsonerrors: 1,
           token
         }),
-        cancel
+        signal
       }).then(({ data, headers, request }) => {
         const response = camelizeKeys<Response>(JSON.parse(data))
 

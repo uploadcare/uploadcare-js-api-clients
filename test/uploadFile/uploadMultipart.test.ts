@@ -1,8 +1,8 @@
+import AbortController from 'abort-controller'
 import * as factory from '../_fixtureFactory'
 import { getSettingsForTesting } from '../_helpers'
 import uploadMultipart from '../../src/uploadFile/uploadMultipart'
 import { UploadClientError } from '../../src/tools/errors'
-import CancelController from '../../src/tools/CancelController'
 
 jest.setTimeout(60000)
 
@@ -20,16 +20,16 @@ describe('API - multipart', () => {
   })
 
   it('should be able to cancel uploading', async () => {
-    const ctrl = new CancelController()
+    const ctrl = new AbortController()
     const fileToUpload = factory.file(11).data
     const settings = getSettingsForTesting({
       publicKey: factory.publicKey('multipart'),
       contentType: 'application/octet-stream',
-      cancel: ctrl
+      signal: ctrl.signal
     })
 
     setTimeout(() => {
-      ctrl.cancel()
+      ctrl.abort()
     })
 
     await expect(uploadMultipart(fileToUpload, settings)).rejects.toThrowError(

@@ -44,7 +44,7 @@ export default function uploadFileGroup(
     secureExpire,
     store,
 
-    cancel,
+    signal,
     onProgress,
 
     source,
@@ -97,7 +97,7 @@ export default function uploadFileGroup(
           secureExpire,
           store,
 
-          cancel,
+          signal,
           onProgress: createProgressHandler(filesCount, index),
 
           source,
@@ -132,7 +132,7 @@ export default function uploadFileGroup(
       jsonpCallback,
       secureSignature,
       secureExpire,
-      cancel,
+      signal,
       source,
       integration,
       retryThrottledRequestMaxTimes

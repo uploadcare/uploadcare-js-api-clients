@@ -24,7 +24,7 @@
     "check-env-vars": "node ./checkvars.js",
     "mock:start": "node --loader ts-node/esm.mjs ./mock-server/server.ts --silent",
     "clean": "rimraf dist",
-    "lint": "eslint . --ext=ts",
+    "lint": "eslint ./src ./mock-server --ext=ts",
     "test": "start-server-and-test mock:start :3000 test:jest",
     "test:production": "npm run check-env-vars && TEST_ENV=production jest",
     "test:jest": "jest",
@@ -60,9 +60,9 @@
     "@rollup/plugin-alias": "^3.1.1",
     "@rollup/plugin-node-resolve": "^8.4.0",
     "@types/form-data": "2.5.0",
-    "@types/jest": "26.0.8",
+    "@types/jest": "26.0.9",
     "@types/koa": "2.11.3",
-    "@types/node": "12.12.53",
+    "@types/node": "12.12.54",
     "@types/promise": "7.1.30",
     "@types/ws": "7.2.6",
     "@typescript-eslint/eslint-plugin": "2.34.0",
@@ -88,12 +88,13 @@
     "rollup": "^2.23.0",
     "rollup-plugin-typescript2": "^0.27.1",
     "shipjs": "0.20.1",
-    "start-server-and-test": "1.11.2",
+    "start-server-and-test": "1.11.3",
     "ts-jest": "26.1.4",
     "ts-node": "8.10.2",
     "typescript": "^3.9.7"
   },
   "dependencies": {
+    "abort-controller": "^3.0.0",
     "form-data": "^3.0.0",
     "ws": "^7.2.1"
   }
