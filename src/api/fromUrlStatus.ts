@@ -72,7 +72,7 @@ export type FromUrlStatusOptions = {
 /**
  * Checking upload status and working with file tokens.
  */
-export default function fromUrlStatus(
+function fromUrlStatus(
   token: Token,
   {
     publicKey,
@@ -111,3 +111,5 @@ export default function fromUrlStatus(
     retryThrottledRequestMaxTimes
   )
 }
+
+export default fromUrlStatus

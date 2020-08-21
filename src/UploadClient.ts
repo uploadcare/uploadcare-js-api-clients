@@ -14,7 +14,7 @@ import uploadFileGroup from './uploadFileGroup'
 import { UploadcareGroup } from './tools/UploadcareGroup'
 
 /* Types */
-import { Settings } from './types'
+import { Settings, Partial } from './types'
 import { NodeFile, BrowserFile } from './request/types'
 import { BaseOptions, BaseResponse } from './api/base'
 import { FileInfo, GroupId, GroupInfo, Token, Url, Uuid } from './api/types'
@@ -42,7 +42,10 @@ import { GroupFromOptions } from './uploadFileGroup'
 /**
  * Populate options with settings.
  */
-const populateOptionsWithSettings = <T>(options: T, settings: Settings): T => ({
+const populateOptionsWithSettings = <T>(
+  options: T,
+  settings: Settings
+): Settings & T => ({
   ...settings,
   ...options
 })
@@ -50,11 +53,11 @@ const populateOptionsWithSettings = <T>(options: T, settings: Settings): T => ({
 class UploadClient {
   private settings: Settings
 
-  constructor(settings: Settings = {}) {
+  constructor(settings: Settings) {
     this.settings = Object.assign({}, defaultSettings, settings)
   }
 
-  updateSettings(newSettings: Settings = {}): void {
+  updateSettings(newSettings: Settings): void {
     this.settings = Object.assign(this.settings, newSettings)
   }
 
@@ -64,20 +67,23 @@ class UploadClient {
 
   base(
     file: NodeFile | BrowserFile,
-    options: BaseOptions
+    options?: Partial<BaseOptions>
   ): Promise<BaseResponse> {
     const settings = this.getSettings()
 
     return base(file, populateOptionsWithSettings(options, settings))
   }
 
-  info(uuid: Uuid, options: InfoOptions): Promise<FileInfo> {
+  info(uuid: Uuid, options?: Partial<InfoOptions>): Promise<FileInfo> {
     const settings = this.getSettings()
 
     return info(uuid, populateOptionsWithSettings(options, settings))
   }
 
-  fromUrl(sourceUrl: Url, options: FromUrlOptions): Promise<FromUrlResponse> {
+  fromUrl(
+    sourceUrl: Url,
+    options?: Partial<FromUrlOptions>
+  ): Promise<FromUrlResponse> {
     const settings = this.getSettings()
 
     return fromUrl(sourceUrl, populateOptionsWithSettings(options, settings))
@@ -85,20 +91,23 @@ class UploadClient {
 
   fromUrlStatus(
     token: Token,
-    options: FromUrlStatusOptions
+    options?: Partial<FromUrlStatusOptions>
   ): Promise<FromUrlStatusResponse> {
     const settings = this.getSettings()
 
     return fromUrlStatus(token, populateOptionsWithSettings(options, settings))
   }
 
-  group(uuids: Uuid[], options: GroupOptions): Promise<GroupInfo> {
+  group(uuids: Uuid[], options?: Partial<GroupOptions>): Promise<GroupInfo> {
     const settings = this.getSettings()
 
     return group(uuids, populateOptionsWithSettings(options, settings))
   }
 
-  groupInfo(id: GroupId, options: GroupInfoOptions): Promise<GroupInfo> {
+  groupInfo(
+    id: GroupId,
+    options?: Partial<GroupInfoOptions>
+  ): Promise<GroupInfo> {
     const settings = this.getSettings()
 
     return groupInfo(id, populateOptionsWithSettings(options, settings))
@@ -106,7 +115,7 @@ class UploadClient {
 
   multipartStart(
     size: number,
-    options: MultipartStartOptions
+    options?: Partial<MultipartStartOptions>
   ): Promise<MultipartStartResponse> {
     const settings = this.getSettings()
 
@@ -116,7 +125,7 @@ class UploadClient {
   multipartUpload(
     part: Buffer | Blob,
     url: MultipartPart,
-    options: MultipartUploadOptions
+    options?: Partial<MultipartUploadOptions>
   ): Promise<MultipartUploadResponse> {
     const settings = this.getSettings()
 
@@ -129,7 +138,7 @@ class UploadClient {
 
   multipartComplete(
     uuid: Uuid,
-    options: MultipartCompleteOptions
+    options?: Partial<MultipartCompleteOptions>
   ): Promise<FileInfo> {
     const settings = this.getSettings()
 
@@ -141,7 +150,7 @@ class UploadClient {
 
   uploadFile(
     data: NodeFile | BrowserFile | Url | Uuid,
-    options: FileFromOptions
+    options?: Partial<FileFromOptions>
   ): Promise<UploadcareFile> {
     const settings = this.getSettings()
 
@@ -150,7 +159,7 @@ class UploadClient {
 
   uploadFileGroup(
     data: (NodeFile | BrowserFile)[] | Url[] | Uuid[],
-    options: FileFromOptions & GroupFromOptions
+    options?: Partial<FileFromOptions & GroupFromOptions>
   ): Promise<UploadcareGroup> {
     const settings = this.getSettings()
 

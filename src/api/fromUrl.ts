@@ -73,7 +73,7 @@ export type FromUrlOptions = {
 
 /* eslint @typescript-eslint/camelcase: [2, {allow: ["pub_key", "source_url", "check_URL_duplicates", "save_URL_duplicates"]}] */
 
-export default function fromUrl(
+function fromUrl(
   sourceUrl: Url,
   {
     publicKey,
@@ -127,3 +127,5 @@ export default function fromUrl(
     retryThrottledRequestMaxTimes
   )
 }
+
+export default fromUrl

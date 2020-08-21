@@ -32,7 +32,7 @@ export type InfoOptions = {
 
 /* eslint @typescript-eslint/camelcase: [2, {allow: ["pub_key", "file_id"]}] */
 
-export default function info(
+function info(
   uuid: Uuid,
   {
     publicKey,
@@ -74,3 +74,5 @@ export default function info(
     retryThrottledRequestMaxTimes
   )
 }
+
+export default info

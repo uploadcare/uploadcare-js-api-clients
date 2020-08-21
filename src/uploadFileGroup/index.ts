@@ -14,26 +14,7 @@ export type GroupFromOptions = {
   jsonpCallback?: string
 }
 
-/**
- * Uploads file from provided data.
- * @param data
- * @param options
- * @param [options.publicKey]
- * @param [options.fileName]
- * @param [options.baseURL]
- * @param [options.secureSignature]
- * @param [options.secureExpire]
- * @param [options.store]
- * @param [options.cancel]
- * @param [options.onProgress]
- * @param [options.source]
- * @param [options.integration]
- * @param [options.retryThrottledRequestMaxTimes]
- * @param [options.contentType]
- * @param [options.multipartChunkSize]
- * @param [options.baseCDN]
- */
-export default function uploadFileGroup(
+function uploadFileGroup(
   data: (NodeFile | BrowserFile)[] | Url[] | Uuid[],
   {
     publicKey,
@@ -139,3 +120,5 @@ export default function uploadFileGroup(
     }).then(groupInfo => new UploadcareGroup(groupInfo, filesInGroup))
   })
 }
+
+export default uploadFileGroup

@@ -8,7 +8,7 @@ import { UploadClientError } from '../tools/errors'
 import retryIfThrottled from '../tools/retryIfThrottled'
 
 /* Types */
-import { Uuid } from './types'
+import { Uuid, ProgressCallback } from './types'
 import { FailedResponse, NodeFile, BrowserFile } from '../request/types'
 
 export type BaseResponse = {
@@ -27,7 +27,7 @@ export type BaseOptions = {
   store?: boolean
 
   signal?: AbortSignal
-  onProgress?: ({ value: number }) => void
+  onProgress?: ProgressCallback
 
   source?: string
   integration?: string
@@ -39,7 +39,7 @@ export type BaseOptions = {
  * Performs file uploading request to Uploadcare Upload API.
  * Can be canceled and has progress.
  */
-export default function base(
+function base(
   file: NodeFile | BrowserFile,
   {
     publicKey,
@@ -95,3 +95,5 @@ export default function base(
     retryThrottledRequestMaxTimes
   )
 }
+
+export default base

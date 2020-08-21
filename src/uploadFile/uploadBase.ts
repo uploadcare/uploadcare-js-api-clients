@@ -1,8 +1,9 @@
 import base from '../api/base'
 import { UploadcareFile } from '../tools/UploadcareFile'
+import { isReadyPoll } from '../tools/isReadyPoll'
 
 import { NodeFile, BrowserFile } from '../request/types'
-import { isReadyPoll } from '../tools/isReadyPoll'
+import { ProgressCallback } from '../api/types'
 
 type FromObjectOptions = {
   publicKey: string
@@ -14,7 +15,7 @@ type FromObjectOptions = {
   store?: boolean
 
   signal?: AbortSignal
-  onProgress?: ({ value: number }) => void
+  onProgress?: ProgressCallback
 
   source?: string
   integration?: string
