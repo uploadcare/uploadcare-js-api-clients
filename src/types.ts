@@ -1,10 +1,3 @@
-/**
- * Make all properties in T optional
- */
-export type Partial<T> = {
-  [P in keyof T]?: T[P]
-}
-
 export interface DefaultSettings {
   baseCDN: string
   baseURL: string
@@ -21,6 +14,8 @@ export interface DefaultSettings {
 
 export interface Settings extends Partial<DefaultSettings> {
   publicKey: string
+  fileName?: string
+  contentType?: string
   store?: boolean
   secureSignature?: string
   secureExpire?: string
