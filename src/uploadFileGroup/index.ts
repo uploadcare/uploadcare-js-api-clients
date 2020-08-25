@@ -14,7 +14,7 @@ export type GroupFromOptions = {
   jsonpCallback?: string
 }
 
-function uploadFileGroup(
+export default function uploadFileGroup(
   data: (NodeFile | BrowserFile)[] | Url[] | Uuid[],
   {
     publicKey,
@@ -120,5 +120,3 @@ function uploadFileGroup(
     }).then(groupInfo => new UploadcareGroup(groupInfo, filesInGroup))
   })
 }
-
-export default uploadFileGroup

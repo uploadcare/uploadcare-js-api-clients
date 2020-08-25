@@ -21,7 +21,8 @@ export type MultipartUploadResponse = {
 /**
  * Complete multipart uploading.
  */
-function multipartUpload(
+
+export default function multipartUpload(
   part: NodeFile | BrowserFile,
   url: MultipartPart,
   { publicKey, signal, onProgress, integration }: MultipartUploadOptions
@@ -46,5 +47,3 @@ function multipartUpload(
     })
     .then(({ status }) => ({ code: status }))
 }
-
-export default multipartUpload

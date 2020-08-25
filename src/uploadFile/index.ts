@@ -37,7 +37,8 @@ export type FileFromOptions = {
 /**
  * Uploads file from provided data.
  */
-function uploadFile(
+
+export default function uploadFile(
   data: NodeFile | BrowserFile | Url | Uuid,
   {
     publicKey,
@@ -153,5 +154,3 @@ function uploadFile(
 
   throw new TypeError(`File uploading from "${data}" is not supported`)
 }
-
-export default uploadFile

@@ -18,7 +18,6 @@ export type InfoOptions = {
   baseURL?: string
 
   signal?: AbortSignal
-  onProgress?: ({ value: number }) => void
 
   source?: string
   integration?: string
@@ -32,7 +31,7 @@ export type InfoOptions = {
 
 /* eslint @typescript-eslint/camelcase: [2, {allow: ["pub_key", "file_id"]}] */
 
-function info(
+export default function info(
   uuid: Uuid,
   {
     publicKey,
@@ -74,5 +73,3 @@ function info(
     retryThrottledRequestMaxTimes
   )
 }
-
-export default info

@@ -40,7 +40,8 @@ type Response = MultipartStartResponse | FailedResponse
 
 /**
  * Start multipart uploading.
- */ function multipartStart(
+ */
+export default function multipartStart(
   size: number,
   {
     publicKey,
@@ -99,5 +100,3 @@ type Response = MultipartStartResponse | FailedResponse
     retryThrottledRequestMaxTimes
   )
 }
-
-export default multipartStart

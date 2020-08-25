@@ -24,7 +24,7 @@ type Response = FailedResponse | FileInfo
 /**
  * Complete multipart uploading.
  */
-function multipartComplete(
+export default function multipartComplete(
   uuid: Uuid,
   {
     publicKey,
@@ -66,5 +66,3 @@ function multipartComplete(
     retryThrottledRequestMaxTimes
   )
 }
-
-export default multipartComplete

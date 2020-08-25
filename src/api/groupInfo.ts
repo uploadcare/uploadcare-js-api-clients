@@ -30,7 +30,7 @@ type Response = GroupInfo | FailedResponse
 
 /* eslint @typescript-eslint/camelcase: [2, {allow: ["pub_key", "group_id"]}] */
 
-function groupInfo(
+export default function groupInfo(
   id: GroupId,
   {
     publicKey,
@@ -72,5 +72,3 @@ function groupInfo(
     retryThrottledRequestMaxTimes
   )
 }
-
-export default groupInfo

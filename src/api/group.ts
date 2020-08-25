@@ -34,7 +34,7 @@ type Response = GroupInfo | FailedResponse
 
 /* eslint @typescript-eslint/camelcase: [2, {allow: ["pub_key"]}] */
 
-function group(
+export default function group(
   uuids: Uuid[],
   {
     publicKey,
@@ -82,5 +82,3 @@ function group(
     retryThrottledRequestMaxTimes
   )
 }
-
-export default group

@@ -14,7 +14,7 @@ import uploadFileGroup from './uploadFileGroup'
 import { UploadcareGroup } from './tools/UploadcareGroup'
 
 /* Types */
-import { Settings, Partial } from './types'
+import { Settings } from './types'
 import { NodeFile, BrowserFile } from './request/types'
 import { BaseOptions, BaseResponse } from './api/base'
 import { FileInfo, GroupId, GroupInfo, Token, Url, Uuid } from './api/types'
@@ -50,7 +50,7 @@ const populateOptionsWithSettings = <T>(
   ...options
 })
 
-class UploadClient {
+export default class UploadClient {
   private settings: Settings
 
   constructor(settings: Settings) {
@@ -166,5 +166,3 @@ class UploadClient {
     return uploadFileGroup(data, populateOptionsWithSettings(options, settings))
   }
 }
-
-export default UploadClient

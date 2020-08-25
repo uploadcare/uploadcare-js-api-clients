@@ -39,7 +39,7 @@ export type BaseOptions = {
  * Performs file uploading request to Uploadcare Upload API.
  * Can be canceled and has progress.
  */
-function base(
+export default function base(
   file: NodeFile | BrowserFile,
   {
     publicKey,
@@ -95,5 +95,3 @@ function base(
     retryThrottledRequestMaxTimes
   )
 }
-
-export default base
