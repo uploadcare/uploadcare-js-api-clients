@@ -1,11 +1,11 @@
-const fs = require('fs');
-const path = require('path');
+import { writeFileSync } from 'fs';
+import { resolve } from 'path';
 
-module.exports = {
+export default {
   publishCommand: ({ defaultCommand }) => `${defaultCommand} --access public`,
   versionUpdated: ({ version, dir }) => {
-    const versionPath = path.resolve(dir, 'src/version.ts');
-    fs.writeFileSync(versionPath, `export default '${version}'\n`);
+    const versionPath = resolve(dir, 'src/version.ts');
+    writeFileSync(versionPath, `export default '${version}'\n`);
   },
   pullRequestReviewers: ['jeetiss'],
   slack: {
