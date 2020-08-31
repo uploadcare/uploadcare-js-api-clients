@@ -4,7 +4,7 @@ import uploadFromUploaded from './uploadFromUploaded'
 import defaultSettings from '../defaultSettings'
 
 /* Types */
-import { Url, Uuid } from '../api/types'
+import { Url, Uuid, ProgressCallback } from '../api/types'
 import { NodeFile, BrowserFile } from '../request/types'
 import { isFileData, isUrl, isUuid } from './types'
 import { UploadcareFile } from '../tools/UploadcareFile'
@@ -21,7 +21,7 @@ export type FileFromOptions = {
   store?: boolean
 
   signal?: AbortSignal
-  onProgress?: ({ value: number }) => void
+  onProgress?: ProgressCallback
 
   source?: string
   integration?: string
@@ -36,20 +36,8 @@ export type FileFromOptions = {
 
 /**
  * Uploads file from provided data.
- * @param data
- * @param options
- * @param [options.publicKey]
- * @param [options.fileName]
- * @param [options.baseURL]
- * @param [options.secureSignature]
- * @param [options.secureExpire]
- * @param [options.store]
- * @param [options.cancel]
- * @param [options.onProgress]
- * @param [options.source]
- * @param [options.integration]
- * @param [options.retryThrottledRequestMaxTimes]
  */
+
 export default function uploadFile(
   data: NodeFile | BrowserFile | Url | Uuid,
   {

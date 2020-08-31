@@ -13,9 +13,8 @@ import {
   MultipartUploadResponse,
   MultipartUploadOptions
 } from '../api/multipartUpload'
+import { ProgressCallback } from '../api/types'
 import { NodeFile, BrowserFile } from '../request/types'
-
-type progressCallback = ({ value: number }) => void
 
 export type MultipartOptions = {
   publicKey: string
@@ -28,7 +27,7 @@ export type MultipartOptions = {
   secureExpire?: string
   store?: boolean
   signal?: AbortSignal
-  onProgress?: progressCallback
+  onProgress?: ProgressCallback
   source?: string
   integration?: string
   retryThrottledRequestMaxTimes?: number
@@ -109,7 +108,7 @@ const uploadMultipart = (
   const createProgressHandler = (
     size: number,
     index: number
-  ): progressCallback | undefined => {
+  ): ProgressCallback | undefined => {
     if (!onProgress) return
     if (!progressValues) {
       progressValues = Array(size).fill(0)

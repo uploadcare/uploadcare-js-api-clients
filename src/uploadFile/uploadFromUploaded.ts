@@ -3,6 +3,7 @@ import info from '../api/info'
 
 /* Types */
 import { Uuid } from '..'
+import { ProgressCallback } from '../api/types'
 
 type FromUploadedOptions = {
   publicKey: string
@@ -11,7 +12,7 @@ type FromUploadedOptions = {
   baseURL?: string
 
   signal?: AbortSignal
-  onProgress?: ({ value: number }) => void
+  onProgress?: ProgressCallback
 
   source?: string
   integration?: string

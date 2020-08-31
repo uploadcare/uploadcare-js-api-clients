@@ -18,7 +18,6 @@ export type InfoOptions = {
   baseURL?: string
 
   signal?: AbortSignal
-  onProgress?: ({ value: number }) => void
 
   source?: string
   integration?: string

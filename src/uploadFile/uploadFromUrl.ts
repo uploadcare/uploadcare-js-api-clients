@@ -12,6 +12,7 @@ import { getPusher, preconnect } from './pusher'
 /* Types */
 import { FileInfo } from '../api/types'
 import { UploadcareFile } from '../tools/UploadcareFile'
+import { ProgressCallback } from '../api/types'
 
 function pollStrategy({
   token,
@@ -131,7 +132,7 @@ type FromUrlOptions = {
   secureExpire?: string
   store?: boolean
   signal?: AbortSignal
-  onProgress?: ({ value: number }) => void
+  onProgress?: ProgressCallback
   source?: string
   integration?: string
   retryThrottledRequestMaxTimes?: number

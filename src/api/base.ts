@@ -8,7 +8,7 @@ import { UploadClientError } from '../tools/errors'
 import retryIfThrottled from '../tools/retryIfThrottled'
 
 /* Types */
-import { Uuid } from './types'
+import { Uuid, ProgressCallback } from './types'
 import { FailedResponse, NodeFile, BrowserFile } from '../request/types'
 
 export type BaseResponse = {
@@ -27,7 +27,7 @@ export type BaseOptions = {
   store?: boolean
 
   signal?: AbortSignal
-  onProgress?: ({ value: number }) => void
+  onProgress?: ProgressCallback
 
   source?: string
   integration?: string

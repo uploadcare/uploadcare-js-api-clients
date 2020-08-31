@@ -3,12 +3,13 @@ import { MultipartPart } from './multipartStart'
 import request from '../request/request.node'
 import { getUserAgent } from '../tools/userAgent'
 
+import { ProgressCallback } from './types'
 import { NodeFile, BrowserFile } from '../request/types'
 
 export type MultipartUploadOptions = {
   publicKey?: string
   signal?: AbortSignal
-  onProgress?: ({ value: number }) => void
+  onProgress?: ProgressCallback
   integration?: string
   retryThrottledRequestMaxTimes?: number
 }
@@ -20,6 +21,7 @@ export type MultipartUploadResponse = {
 /**
  * Complete multipart uploading.
  */
+
 export default function multipartUpload(
   part: NodeFile | BrowserFile,
   url: MultipartPart,
