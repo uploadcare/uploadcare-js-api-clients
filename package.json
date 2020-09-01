@@ -48,7 +48,7 @@
     "@koa/cors": "3.1.0",
     "@koa/router": "8.0.8",
     "@types/form-data": "2.5.0",
-    "@types/jest": "26.0.10",
+    "@types/jest": "26.0.12",
     "@types/koa": "2.11.4",
     "@types/node": "12.12.54",
     "@types/promise": "7.1.30",
@@ -59,7 +59,7 @@
     "data-uri-to-buffer": "3.0.1",
     "dataurl-to-blob": "0.0.1",
     "dotenv": "8.2.0",
-    "eslint": "7.7.0",
+    "eslint": "7.8.0",
     "eslint-config-prettier": "6.11.0",
     "eslint-plugin-prettier": "3.1.4",
     "jest": "26.4.2",
@@ -75,7 +75,7 @@
     "shipjs": "0.21.0",
     "start-server-and-test": "1.11.3",
     "ts-node": "8.10.2",
-    "ts-jest": "26.2.0",
+    "ts-jest": "26.3.0",
     "typescript": "3.9.7"
   },
   "dependencies": {
