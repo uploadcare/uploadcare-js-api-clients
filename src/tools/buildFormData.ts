@@ -1,4 +1,4 @@
-import getFormData from './getFormData.node'
+import getFormData, { transformFile } from './getFormData.node'
 
 import * as NodeFormData from 'form-data'
 import { BrowserFile, NodeFile } from '../request/types'
@@ -9,24 +9,26 @@ import { BrowserFile, NodeFile } from '../request/types'
  * in browsers.
  */
 
-type FileTuple = ['file', BrowserFile | NodeFile, string]
+type FileTriple = ['file', BrowserFile | NodeFile, string]
 type BaseType = string | number | void
 type FormDataTuple = [string, BaseType | BaseType[]]
 
+const isFileTriple = (tuple: FormDataTuple | FileTriple): tuple is FileTriple =>
+  tuple[0] === 'file'
+
 function buildFormData(
-  body: (FormDataTuple | FileTuple)[]
+  body: (FormDataTuple | FileTriple)[]
 ): FormData | NodeFormData {
   const formData = getFormData()
-
-  const isTriple = (tuple: FormDataTuple | FileTuple): tuple is FileTuple =>
-    tuple[0] === 'file'
 
   for (const tuple of body) {
     if (Array.isArray(tuple[1])) {
       // refactor this
       tuple[1].forEach(val => val && formData.append(tuple[0] + '[]', `${val}`))
-    } else if (isTriple(tuple)) {
-      formData.append(tuple[0], tuple[1] as Blob, tuple[2])
+    } else if (isFileTriple(tuple)) {
+      const name = tuple[2]
+      const file = transformFile(tuple[1], name) as Blob
+      formData.append(tuple[0], file, name)
     } else if (tuple[1] != null) {
       formData.append(tuple[0], `${tuple[1]}`)
     }

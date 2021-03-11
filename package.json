@@ -12,6 +12,11 @@
     "./lib/tools/getFormData.node.js": "./lib/tools/getFormData.browser.js",
     "./lib/tools/sockets.node.js": "./lib/tools/sockets.browser.js"
   },
+  "react-native": {
+    "./lib/request/request.node.js": "./lib/request/request.browser.js",
+    "./lib/tools/getFormData.node.js": "./lib/tools/getFormData.react-native.js",
+    "./lib/tools/sockets.node.js": "./lib/tools/sockets.browser.js"
+  },
   "scripts": {
     "check-env-vars": "node ./checkvars.js",
     "mock:start": "ts-node --project ./mock-server/tsconfig.mock.json ./mock-server/server.ts --silent",
@@ -52,9 +57,9 @@
     "@types/koa": "2.11.4",
     "@types/node": "12.12.67",
     "@types/promise": "7.1.30",
+    "@types/ws": "7.2.7",
     "@typescript-eslint/eslint-plugin": "2.34.0",
     "@typescript-eslint/parser": "2.34.0",
-    "@types/ws": "7.2.7",
     "chalk": "4.1.0",
     "data-uri-to-buffer": "3.0.1",
     "dataurl-to-blob": "0.0.1",
@@ -74,8 +79,8 @@
     "rimraf": "3.0.2",
     "shipjs": "0.22.0",
     "start-server-and-test": "1.11.5",
-    "ts-node": "8.10.2",
     "ts-jest": "26.4.1",
+    "ts-node": "8.10.2",
     "typescript": "3.9.7"
   },
   "dependencies": {
