@@ -27,7 +27,7 @@ function buildFormData(
       tuple[1].forEach(val => val && formData.append(tuple[0] + '[]', `${val}`))
     } else if (isFileTriple(tuple)) {
       const name = tuple[2]
-      const file = transformFile(tuple[1], name) as Blob
+      const file = transformFile(tuple[1], name) as Blob // lgtm[js/superfluous-trailing-arguments]
       formData.append(tuple[0], file, name)
     } else if (tuple[1] != null) {
       formData.append(tuple[0], `${tuple[1]}`)
