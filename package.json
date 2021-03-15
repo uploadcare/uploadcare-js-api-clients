@@ -12,6 +12,11 @@
     "./lib/tools/getFormData.node.js": "./lib/tools/getFormData.browser.js",
     "./lib/tools/sockets.node.js": "./lib/tools/sockets.browser.js"
   },
+  "react-native": {
+    "./lib/request/request.node.js": "./lib/request/request.browser.js",
+    "./lib/tools/sockets.node.js": "./lib/tools/sockets.browser.js",
+    "./lib/uploadFile/prepareChunks.node.js": "./lib/uploadFile/prepareChunks.react-native.js"
+  },
   "scripts": {
     "check-env-vars": "node ./checkvars.js",
     "mock:start": "ts-node --project ./mock-server/tsconfig.mock.json ./mock-server/server.ts --silent",
