@@ -1,4 +1,5 @@
 import defaultSettings from '../defaultSettings'
+import { prepareChunks } from './prepareChunks.node'
 import multipartStart from '../api/multipartStart'
 import multipartUpload from '../api/multipartUpload'
 import multipartComplete from '../api/multipartComplete'
@@ -36,18 +37,6 @@ export type MultipartOptions = {
   maxConcurrentRequests?: number
   multipartMaxAttempts?: number
   baseCDN?: string
-}
-
-const getChunk = (
-  file: Buffer | Blob,
-  index: number,
-  fileSize: number,
-  chunkSize: number
-): Buffer | Blob => {
-  const start = chunkSize * index
-  const end = Math.min(start + chunkSize, fileSize)
-
-  return file.slice(start, end)
 }
 
 const uploadPartWithRetry = (
@@ -138,27 +127,24 @@ const uploadMultipart = (
     integration,
     retryThrottledRequestMaxTimes
   })
-    .then(({ uuid, parts }) =>
-      Promise.all([
+    .then(({ uuid, parts }) => {
+      const getChunk = prepareChunks(file, size, multipartChunkSize)
+      return Promise.all([
         uuid,
         runWithConcurrency(
           maxConcurrentRequests,
           parts.map((url, index) => (): Promise<MultipartUploadResponse> =>
-            uploadPartWithRetry(
-              getChunk(file, index, size, multipartChunkSize),
-              url,
-              {
-                publicKey,
-                onProgress: createProgressHandler(parts.length, index),
-                cancel,
-                integration,
-                multipartMaxAttempts
-              }
-            )
+            uploadPartWithRetry(getChunk(index), url, {
+              publicKey,
+              onProgress: createProgressHandler(parts.length, index),
+              cancel,
+              integration,
+              multipartMaxAttempts
+            })
           )
         )
       ])
-    )
+    })
     .then(([uuid]) =>
       multipartComplete(uuid, {
         publicKey,
