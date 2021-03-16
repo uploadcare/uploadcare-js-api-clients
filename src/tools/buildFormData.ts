@@ -9,15 +9,15 @@ import { BrowserFile, NodeFile } from '../request/types'
  * in browsers.
  */
 
-type FileTriple = ['file', BrowserFile | NodeFile, string]
+type FileTuple = ['file', BrowserFile | NodeFile, string]
 type BaseType = string | number | void
 type FormDataTuple = [string, BaseType | BaseType[]]
 
-const isFileTriple = (tuple: FormDataTuple | FileTriple): tuple is FileTriple =>
+const isFileTuple = (tuple: FormDataTuple | FileTuple): tuple is FileTuple =>
   tuple[0] === 'file'
 
 function buildFormData(
-  body: (FormDataTuple | FileTriple)[]
+  body: (FormDataTuple | FileTuple)[]
 ): FormData | NodeFormData {
   const formData = getFormData()
 
@@ -25,7 +25,7 @@ function buildFormData(
     if (Array.isArray(tuple[1])) {
       // refactor this
       tuple[1].forEach(val => val && formData.append(tuple[0] + '[]', `${val}`))
-    } else if (isFileTriple(tuple)) {
+    } else if (isFileTuple(tuple)) {
       const name = tuple[2]
       const file = transformFile(tuple[1], name) as Blob // lgtm[js/superfluous-trailing-arguments]
       formData.append(tuple[0], file, name)
