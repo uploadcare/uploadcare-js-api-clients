@@ -14,6 +14,7 @@
   },
   "react-native": {
     "./lib/request/request.node.js": "./lib/request/request.browser.js",
+    "./lib/tools/getFormData.node.js": "./lib/tools/getFormData.react-native.js",
     "./lib/tools/sockets.node.js": "./lib/tools/sockets.browser.js",
     "./lib/uploadFile/prepareChunks.node.js": "./lib/uploadFile/prepareChunks.react-native.js"
   },
@@ -57,9 +58,9 @@
     "@types/koa": "2.11.4",
     "@types/node": "12.12.67",
     "@types/promise": "7.1.30",
+    "@types/ws": "7.2.7",
     "@typescript-eslint/eslint-plugin": "2.34.0",
     "@typescript-eslint/parser": "2.34.0",
-    "@types/ws": "7.2.7",
     "chalk": "4.1.0",
     "data-uri-to-buffer": "3.0.1",
     "dataurl-to-blob": "0.0.1",
@@ -79,7 +80,7 @@
     "rimraf": "3.0.2",
     "shipjs": "0.22.0",
     "start-server-and-test": "1.11.5",
-    "ts-node": "8.10.2",
+    "ts-node": "9.1.1",
     "ts-jest": "26.4.1",
     "typescript": "3.9.7"
   },
