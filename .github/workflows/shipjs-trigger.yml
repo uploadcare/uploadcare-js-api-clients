@@ -15,12 +15,7 @@ jobs:
         with:
           registry-url: "https://registry.npmjs.org"
           node-version: '14'
-      - run: |
-          if [ -f "yarn.lock" ]; then
-            yarn install
-          else
-            npm install
-          fi
+      - run: npm ci
       - run: npm run test:production
         env:
           UC_KEY_FOR_INTEGRATION_TESTS: ${{ secrets.UC_KEY_FOR_INTEGRATION_TESTS }}
