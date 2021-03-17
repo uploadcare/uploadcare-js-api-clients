@@ -1,3 +1,13 @@
+## [1.1.3](https://github.com/uploadcare/uploadcare-upload-client/compare/v1.1.2...v1.1.3) (2021-03-17)
+
+
+### Bug Fixes
+
+* **react-native:** prevent app crashes while multipart uploading ([#308](https://github.com/uploadcare/uploadcare-upload-client/issues/308)) ([5d305e6](https://github.com/uploadcare/uploadcare-upload-client/commit/5d305e68b8026f729cb3a29d29f386fd882b4b5d))
+* **react-native:** support direct uploads through FormData ([#307](https://github.com/uploadcare/uploadcare-upload-client/issues/307)) ([428b039](https://github.com/uploadcare/uploadcare-upload-client/commit/428b039374c98ae689c6c40b3e91d25b11481849))
+
+
+
 ## [1.1.2](https://github.com/uploadcare/uploadcare-upload-client/compare/v1.1.1...v1.1.2) (2020-04-20)
 
 
