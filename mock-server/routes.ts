@@ -8,7 +8,7 @@ import * as multipart from './controllers/multipart'
 export type RouteType = {
   [path: string]: {
     method: string
-    fn: (ctx: object, next?: Function) => void
+    fn: (ctx: Record<string, unknown>, next?: () => Promise<unknown>) => void
     isProtected: boolean
     isFake?: boolean
     description?: string
@@ -16,7 +16,7 @@ export type RouteType = {
 }
 
 // this route need for health check
-const index = ctx => {
+const index = (ctx) => {
   ctx.body = 'server is up'
 }
 

@@ -72,7 +72,7 @@ const uploadFromObject = (
         cancel
       })
     })
-    .then(fileInfo => new UploadcareFile(fileInfo, { baseCDN }))
+    .then((fileInfo) => new UploadcareFile(fileInfo, { baseCDN }))
 }
 
 export default uploadFromObject

@@ -27,7 +27,7 @@ type StatusSuccessResponse = {
 
 const response = (
   type: 'progress' | 'success' | 'fail',
-  data: any
+  data: Record<string, unknown>
 ): AllStatuses => {
   if (type === 'success') {
     return { status: Status.Success, ...data } as StatusSuccessResponse
@@ -78,17 +78,17 @@ class Pusher {
 
       this.ws = new WebSocket(pusherUrl)
 
-      this.ws.addEventListener('error', error => {
+      this.ws.addEventListener('error', (error) => {
         this.emmitter.emit('error', new Error(error.message))
       })
 
       this.emmitter.on('connected', () => {
         this.isConnected = true
-        this.queue.forEach(message => this.send(message.event, message.data))
+        this.queue.forEach((message) => this.send(message.event, message.data))
         this.queue = []
       })
 
-      this.ws.addEventListener('message', e => {
+      this.ws.addEventListener('message', (e) => {
         const data = JSON.parse(e.data)
 
         switch (data.event) {
@@ -131,7 +131,7 @@ class Pusher {
     }
   }
 
-  send(event: string, data: any): void {
+  send(event: string, data: Record<string, unknown>): void {
     const str = JSON.stringify({ event, data })
     this.ws?.send(str)
   }
@@ -167,7 +167,7 @@ class Pusher {
     if (this.isConnected) {
       this.send(message.event, message.data)
     } else {
-      this.queue = this.queue.filter(msg => msg.data.channel !== channel)
+      this.queue = this.queue.filter((msg) => msg.data.channel !== channel)
     }
 
     if (this.subscribers === 0) {

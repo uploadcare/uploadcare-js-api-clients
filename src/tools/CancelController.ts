@@ -3,7 +3,7 @@ class CancelController {
   private resolve: () => void = () => void 0
 
   constructor() {
-    this.promise = new Promise<void>(resolve => {
+    this.promise = new Promise<void>((resolve) => {
       this.resolve = resolve
     })
   }

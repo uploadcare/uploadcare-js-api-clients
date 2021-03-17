@@ -56,7 +56,7 @@ const uploadPartWithRetry = (
       onProgress,
       cancel,
       integration
-    }).catch(error => {
+    }).catch((error) => {
       if (attempt < multipartMaxAttempts) {
         return retry()
       }
@@ -154,7 +154,7 @@ const uploadMultipart = (
         retryThrottledRequestMaxTimes
       })
     )
-    .then(fileInfo => {
+    .then((fileInfo) => {
       if (fileInfo.isReady) {
         return fileInfo
       } else {
@@ -170,7 +170,7 @@ const uploadMultipart = (
         })
       }
     })
-    .then(fileInfo => new UploadcareFile(fileInfo, { baseCDN }))
+    .then((fileInfo) => new UploadcareFile(fileInfo, { baseCDN }))
 }
 
 export default uploadMultipart

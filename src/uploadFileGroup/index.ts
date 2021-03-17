@@ -111,8 +111,8 @@ export default function uploadFileGroup(
           baseCDN
         })
     )
-  ).then(files => {
-    const uuids = files.map(file => file.uuid)
+  ).then((files) => {
+    const uuids = files.map((file) => file.uuid)
     const addDefaultEffects = (file): UploadcareFile => {
       const cdnUrlModifiers = defaultEffects ? `-/${defaultEffects}` : null
       const cdnUrl = `${file.urlBase}${cdnUrlModifiers || ''}`
@@ -136,6 +136,6 @@ export default function uploadFileGroup(
       source,
       integration,
       retryThrottledRequestMaxTimes
-    }).then(groupInfo => new UploadcareGroup(groupInfo, filesInGroup))
+    }).then((groupInfo) => new UploadcareGroup(groupInfo, filesInGroup))
   })
 }

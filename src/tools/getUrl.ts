@@ -14,12 +14,12 @@ const createQuery = (query: Query): string =>
       (params, [key, value]) =>
         params.concat(
           Array.isArray(value)
-            ? value.map(value => serializePair(`${key}[]`, value))
+            ? value.map((value) => serializePair(`${key}[]`, value))
             : serializePair(key, value)
         ),
       []
     )
-    .filter(x => !!x)
+    .filter((x) => !!x)
     .join('&')
 
 const getUrl = (base: string, path: string, query?: Query): string =>

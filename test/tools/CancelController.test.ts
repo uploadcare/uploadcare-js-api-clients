@@ -1,7 +1,7 @@
 import CancelController from '../../src/tools/CancelController'
 
 describe('CancelController', () => {
-  it('should work', done => {
+  it('should work', (done) => {
     const ctrl = new CancelController()
 
     ctrl.onCancel(done)

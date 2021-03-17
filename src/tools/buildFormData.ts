@@ -24,7 +24,9 @@ function buildFormData(
   for (const tuple of body) {
     if (Array.isArray(tuple[1])) {
       // refactor this
-      tuple[1].forEach(val => val && formData.append(tuple[0] + '[]', `${val}`))
+      tuple[1].forEach(
+        (val) => val && formData.append(tuple[0] + '[]', `${val}`)
+      )
     } else if (isFileTuple(tuple)) {
       const name = tuple[2]
       const file = transformFile(tuple[1], name) as Blob // lgtm[js/superfluous-trailing-arguments]

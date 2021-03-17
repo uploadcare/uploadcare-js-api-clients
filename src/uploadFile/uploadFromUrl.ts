@@ -31,14 +31,14 @@ function pollStrategy({
   cancel?: CancelController
 }): Promise<FileInfo | UploadClientError> {
   return poll<FileInfo | UploadClientError>({
-    check: cancel =>
+    check: (cancel) =>
       fromUrlStatus(token, {
         publicKey,
         baseURL,
         integration,
         retryThrottledRequestMaxTimes,
         cancel
-      }).then(response => {
+      }).then((response) => {
         switch (response.status) {
           case Status.Error: {
             return new UploadClientError(response.error)
@@ -94,7 +94,7 @@ const pushStrategy = ({
       reject(cancelError('pisher cancelled'))
     })
 
-    pusher.subscribe(token, result => {
+    pusher.subscribe(token, (result) => {
       stopRace()
 
       switch (result.status) {
@@ -175,7 +175,7 @@ const uploadFromUrl = (
         retryThrottledRequestMaxTimes
       })
     )
-    .then(urlResponse => {
+    .then((urlResponse) => {
       if (urlResponse.type === TypeEnum.FileInfo) {
         return urlResponse
       } else {
@@ -204,12 +204,12 @@ const uploadFromUrl = (
         )
       }
     })
-    .then(result => {
+    .then((result) => {
       if (result instanceof UploadClientError) throw result
 
       return result
     })
-    .then(result =>
+    .then((result) =>
       isReadyPoll({
         file: result.uuid,
         publicKey,
@@ -220,6 +220,6 @@ const uploadFromUrl = (
         cancel
       })
     )
-    .then(fileInfo => new UploadcareFile(fileInfo, { baseCDN }))
+    .then((fileInfo) => new UploadcareFile(fileInfo, { baseCDN }))
 
 export default uploadFromUrl

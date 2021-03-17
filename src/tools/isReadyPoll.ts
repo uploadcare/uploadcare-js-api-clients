@@ -25,7 +25,7 @@ function isReadyPoll({
   onProgress
 }: ArgsIsReadyPool): FileInfo | PromiseLike<FileInfo> {
   return poll<FileInfo>({
-    check: cancel =>
+    check: (cancel) =>
       info(file, {
         publicKey,
         baseURL,
@@ -33,7 +33,7 @@ function isReadyPoll({
         source,
         integration,
         retryThrottledRequestMaxTimes
-      }).then(response => {
+      }).then((response) => {
         if (response.isReady) {
           return response
         }

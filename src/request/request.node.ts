@@ -72,7 +72,7 @@ const request = (params: RequestOptions): Promise<RequestResponse> => {
       }
     })
     .then(
-      length =>
+      (length) =>
         new Promise((resolve, reject) => {
           const isFormData = !!length
           let aborted = false
@@ -102,13 +102,13 @@ const request = (params: RequestOptions): Promise<RequestResponse> => {
             })
           }
 
-          req.on('response', res => {
+          req.on('response', (res) => {
             if (aborted) return
 
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const resChunks: any[] = []
 
-            res.on('data', data => {
+            res.on('data', (data) => {
               resChunks.push(data)
             })
 
@@ -122,7 +122,7 @@ const request = (params: RequestOptions): Promise<RequestResponse> => {
             )
           })
 
-          req.on('error', err => {
+          req.on('error', (err) => {
             if (aborted) return
 
             reject(err)
