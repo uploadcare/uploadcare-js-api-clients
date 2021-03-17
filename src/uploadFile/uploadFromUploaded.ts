@@ -44,8 +44,8 @@ const uploadFromUploaded = (
     integration,
     retryThrottledRequestMaxTimes
   })
-    .then(fileInfo => new UploadcareFile(fileInfo, { baseCDN, fileName }))
-    .then(result => {
+    .then((fileInfo) => new UploadcareFile(fileInfo, { baseCDN, fileName }))
+    .then((result) => {
       // hack for node ¯\_(ツ)_/¯
       if (onProgress) onProgress({ value: 1 })
 

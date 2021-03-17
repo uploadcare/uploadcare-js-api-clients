@@ -9,7 +9,7 @@ const longJob = (attemps: number, fails: Error | null = null) => {
   const condition = jest.fn()
   const cancel = jest.fn()
 
-  const isFinish: CheckFunction<boolean> = cancelCrtl => {
+  const isFinish: CheckFunction<boolean> = (cancelCrtl) => {
     condition()
 
     if (cancelCrtl) {
@@ -28,7 +28,7 @@ const longJob = (attemps: number, fails: Error | null = null) => {
     }
   }
 
-  const asyncIsFinish: CheckFunction<boolean> = cancel =>
+  const asyncIsFinish: CheckFunction<boolean> = (cancel) =>
     new Promise<boolean>((resolve, reject) => {
       try {
         resolve(isFinish(cancel))

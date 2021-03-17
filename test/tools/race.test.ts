@@ -67,7 +67,7 @@ describe('race', () => {
   })
 
   it('should cancel all functions when first resolves', async () => {
-    const spies = Array.from({ length: 5 }, i =>
+    const spies = Array.from({ length: 5 }, (i) =>
       jasmine.createSpy('cancel for ' + i)
     )
 
@@ -100,7 +100,7 @@ describe('race', () => {
   })
 
   it('should cancel all functions after calling stopRace', async () => {
-    const spies = Array.from({ length: 5 }, i =>
+    const spies = Array.from({ length: 5 }, (i) =>
       jasmine.createSpy('cancel for ' + i)
     )
 
@@ -138,7 +138,7 @@ describe('race', () => {
   it('should be cancellable', async () => {
     const cancel = new CancelController()
 
-    const spies = Array.from({ length: 5 }, i =>
+    const spies = Array.from({ length: 5 }, (i) =>
       jasmine.createSpy('cancel for ' + i)
     )
 
@@ -168,7 +168,7 @@ describe('race', () => {
       )
     ).rejects.toThrowError('race cancel')
 
-    spies.forEach(spy => {
+    spies.forEach((spy) => {
       expect(spy).toHaveBeenCalled()
     })
   })

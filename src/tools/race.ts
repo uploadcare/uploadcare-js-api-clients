@@ -23,7 +23,7 @@ const race = <T>(
 
   if (cancel) {
     cancel.onCancel(() => {
-      controllers.forEach(controller => controller.cancel())
+      controllers.forEach((controller) => controller.cancel())
     })
   }
 
@@ -33,17 +33,17 @@ const race = <T>(
 
       return Promise.resolve()
         .then(() => fn({ stopRace, cancel: controllers[i] }))
-        .then(result => {
+        .then((result) => {
           stopRace()
 
           return result
         })
-        .catch(error => {
+        .catch((error) => {
           lastError = error
           return null
         })
     })
-  ).then(results => {
+  ).then((results) => {
     if (winnerIndex === null) {
       throw lastError
     } else {

@@ -26,11 +26,14 @@ const isProtected = (url: string) =>
 
 /**
  * Get public key value from request.
- * @param {object} source
+ * @param {Record<string, string>} source
  * @param {string} key
  */
-const getPublicKeyFromSource = (source: object, key: string): string => {
-  return typeof source[key] !== 'undefined' && source[key]
+const getPublicKeyFromSource = (
+  source: Record<string, string>,
+  key: string
+): string => {
+  return typeof source[key] !== 'undefined' ? source[key] : ''
 }
 
 type IsAuthorizedParams = {
@@ -40,7 +43,7 @@ type IsAuthorizedParams = {
 /**
  * Check auth.
  * @param {string} url
- * @param {object} publicKey
+ * @param {string} publicKey
  * @return {boolean}
  */
 const isAuthorized = ({ url, publicKey }: IsAuthorizedParams) => {

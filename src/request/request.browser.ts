@@ -17,7 +17,7 @@ const request = ({
     xhr.open(requestMethod, url)
 
     if (headers) {
-      Object.entries(headers).forEach(entry => {
+      Object.entries(headers).forEach((entry) => {
         const [key, value] = entry
         typeof value !== 'undefined' &&
           !Array.isArray(value) &&
@@ -60,7 +60,7 @@ const request = ({
         // Create a map of header names to values
         const responseHeaders = {}
 
-        headersArray.forEach(function(line) {
+        headersArray.forEach(function (line) {
           const parts = line.split(': ')
           const header = parts.shift()
           const value = parts.join(': ')

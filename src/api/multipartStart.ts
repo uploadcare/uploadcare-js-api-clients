@@ -92,7 +92,7 @@ export default function multipartStart(
         } else {
           // convert to array
           response.parts = Object.keys(response.parts).map(
-            key => response.parts[key]
+            (key) => response.parts[key]
           )
 
           return response
