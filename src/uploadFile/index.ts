@@ -32,7 +32,10 @@ export type FileFromOptions = {
   contentType?: string
   multipartChunkSize?: number
 
-  baseCDN?: string
+  baseCDN?: string,
+
+  checkForUrlDuplicates?: boolean,
+  saveUrlForRecurrentUploads?: boolean
 }
 
 /**
@@ -50,6 +53,8 @@ export type FileFromOptions = {
  * @param [options.source]
  * @param [options.integration]
  * @param [options.retryThrottledRequestMaxTimes]
+ * @param [options.checkForUrlDuplicates]
+ * @param [options.saveUrlForRecurrentUploads]
  */
 export default function uploadFile(
   data: NodeFile | BrowserFile | Url | Uuid,
@@ -73,7 +78,10 @@ export default function uploadFile(
     contentType,
     multipartChunkSize = defaultSettings.multipartChunkSize,
 
-    baseCDN = defaultSettings.baseCDN
+    baseCDN = defaultSettings.baseCDN,
+
+    checkForUrlDuplicates,
+    saveUrlForRecurrentUploads
   }: FileFromOptions
 ): Promise<UploadcareFile> {
   if (isFileData(data)) {
@@ -142,7 +150,10 @@ export default function uploadFile(
 
       retryThrottledRequestMaxTimes,
 
-      baseCDN
+      baseCDN,
+
+      checkForUrlDuplicates,
+      saveUrlForRecurrentUploads
     })
   }
 
