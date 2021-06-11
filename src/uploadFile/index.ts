@@ -32,9 +32,9 @@ export type FileFromOptions = {
   contentType?: string
   multipartChunkSize?: number
 
-  baseCDN?: string,
+  baseCDN?: string
 
-  checkForUrlDuplicates?: boolean,
+  checkForUrlDuplicates?: boolean
   saveUrlForRecurrentUploads?: boolean
 }
 
