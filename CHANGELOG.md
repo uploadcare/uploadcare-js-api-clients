@@ -1,3 +1,12 @@
+## [1.1.4](https://github.com/uploadcare/uploadcare-upload-client/compare/v1.1.3...v1.1.4) (2021-06-11)
+
+
+### Bug Fixes
+
+* checkForUrlDuplicates & saveUrlForRecurrentUploads parameters passed into common uploadFile method ([201ee07](https://github.com/uploadcare/uploadcare-upload-client/commit/201ee07587f1b2143e7685e049d031ec94a1fa3d))
+
+
+
 ## [1.1.3](https://github.com/uploadcare/uploadcare-upload-client/compare/v1.1.2...v1.1.3) (2021-03-17)
 
 
