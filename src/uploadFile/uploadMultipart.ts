@@ -14,6 +14,7 @@ import {
   MultipartUploadOptions
 } from '../api/multipartUpload'
 import { ProgressCallback } from '../api/types'
+import { CustomUserAgent } from '../types'
 import { NodeFile, BrowserFile } from '../request/types'
 
 export type MultipartOptions = {
@@ -30,6 +31,7 @@ export type MultipartOptions = {
   onProgress?: ProgressCallback
   source?: string
   integration?: string
+  userAgent?: CustomUserAgent
   retryThrottledRequestMaxTimes?: number
   maxConcurrentRequests?: number
   multipartMaxAttempts?: number
@@ -52,19 +54,15 @@ const uploadPartWithRetry = (
   chunk: Buffer | Blob,
   url: string,
   {
-    publicKey,
     onProgress,
     signal,
-    integration,
     multipartMaxAttempts
   }: MultipartUploadOptions & { multipartMaxAttempts: number }
 ): Promise<MultipartUploadResponse> =>
   retrier(({ attempt, retry }) =>
     multipartUpload(chunk, url, {
-      publicKey,
       onProgress,
-      signal,
-      integration
+      signal
     }).catch(error => {
       if (attempt < multipartMaxAttempts) {
         return retry()
@@ -91,6 +89,7 @@ const uploadMultipart = (
 
     source,
     integration,
+    userAgent,
 
     retryThrottledRequestMaxTimes,
 
@@ -134,6 +133,7 @@ const uploadMultipart = (
     signal,
     source,
     integration,
+    userAgent,
     retryThrottledRequestMaxTimes
   })
     .then(({ uuid, parts }) =>
@@ -146,10 +146,8 @@ const uploadMultipart = (
               getChunk(file, index, size, multipartChunkSize),
               url,
               {
-                publicKey,
                 onProgress: createProgressHandler(parts.length, index),
                 signal,
-                integration,
                 multipartMaxAttempts
               }
             )
@@ -163,6 +161,7 @@ const uploadMultipart = (
         baseURL,
         source,
         integration,
+        userAgent,
         retryThrottledRequestMaxTimes
       })
     )
@@ -176,6 +175,7 @@ const uploadMultipart = (
           baseURL,
           source,
           integration,
+          userAgent,
           retryThrottledRequestMaxTimes,
           onProgress,
           signal

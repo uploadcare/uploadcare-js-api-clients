@@ -1,5 +1,6 @@
 import { FailedResponse } from '../request/types'
 import { Uuid } from './types'
+import { CustomUserAgent } from '../types'
 
 import request from '../request/request.node'
 import getFormData from '../tools/buildFormData'
@@ -26,6 +27,7 @@ export type MultipartStartOptions = {
   signal?: AbortSignal
   source?: string
   integration?: string
+  userAgent?: CustomUserAgent
   retryThrottledRequestMaxTimes?: number
 }
 
@@ -55,6 +57,7 @@ export default function multipartStart(
     signal,
     source = 'local',
     integration,
+    userAgent,
     retryThrottledRequestMaxTimes = defaultSettings.retryThrottledRequestMaxTimes
   }: MultipartStartOptions
 ): Promise<MultipartStartResponse> {
@@ -64,7 +67,7 @@ export default function multipartStart(
         method: 'POST',
         url: getUrl(baseURL, '/multipart/start/', { jsonerrors: 1 }),
         headers: {
-          'X-UC-User-Agent': getUserAgent({ publicKey, integration })
+          'X-UC-User-Agent': getUserAgent({ publicKey, integration, userAgent })
         },
         data: getFormData([
           ['filename', fileName ?? defaultFilename],

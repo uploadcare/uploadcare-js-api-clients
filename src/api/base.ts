@@ -9,6 +9,7 @@ import retryIfThrottled from '../tools/retryIfThrottled'
 
 /* Types */
 import { Uuid, ProgressCallback } from './types'
+import { CustomUserAgent } from '../types'
 import { FailedResponse, NodeFile, BrowserFile } from '../request/types'
 
 export type BaseResponse = {
@@ -31,6 +32,7 @@ export type BaseOptions = {
 
   source?: string
   integration?: string
+  userAgent?: CustomUserAgent
 
   retryThrottledRequestMaxTimes?: number
 }
@@ -52,6 +54,7 @@ export default function base(
     onProgress,
     source = 'local',
     integration,
+    userAgent,
     retryThrottledRequestMaxTimes = defaultSettings.retryThrottledRequestMaxTimes
   }: BaseOptions
 ): Promise<BaseResponse> {
@@ -63,7 +66,7 @@ export default function base(
           jsonerrors: 1
         }),
         headers: {
-          'X-UC-User-Agent': getUserAgent({ publicKey, integration })
+          'X-UC-User-Agent': getUserAgent({ publicKey, integration, userAgent })
         },
         data: getFormData([
           ['file', file, fileName ?? (file as File).name ?? defaultFilename],

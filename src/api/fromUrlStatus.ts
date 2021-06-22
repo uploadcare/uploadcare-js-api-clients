@@ -1,5 +1,6 @@
 import { FileInfo, Token } from './types'
 import { FailedResponse } from '../request/types'
+import { CustomUserAgent } from '../types'
 
 import request from '../request/request.node'
 import getUrl from '../tools/getUrl'
@@ -65,6 +66,7 @@ export type FromUrlStatusOptions = {
   signal?: AbortSignal
 
   integration?: string
+  userAgent?: CustomUserAgent
 
   retryThrottledRequestMaxTimes?: number
 }
@@ -79,6 +81,7 @@ export default function fromUrlStatus(
     baseURL = defaultSettings.baseURL,
     signal,
     integration,
+    userAgent,
     retryThrottledRequestMaxTimes = defaultSettings.retryThrottledRequestMaxTimes
   }: FromUrlStatusOptions = {}
 ): Promise<FromUrlStatusResponse> {
@@ -87,7 +90,13 @@ export default function fromUrlStatus(
       request({
         method: 'GET',
         headers: publicKey
-          ? { 'X-UC-User-Agent': getUserAgent({ publicKey, integration }) }
+          ? {
+              'X-UC-User-Agent': getUserAgent({
+                publicKey,
+                integration,
+                userAgent
+              })
+            }
           : undefined,
         url: getUrl(baseURL, '/from_url/status/', {
           jsonerrors: 1,

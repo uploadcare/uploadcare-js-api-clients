@@ -4,6 +4,7 @@ import { isReadyPoll } from '../tools/isReadyPoll'
 
 import { NodeFile, BrowserFile } from '../request/types'
 import { ProgressCallback } from '../api/types'
+import { CustomUserAgent } from '../types'
 
 type FromObjectOptions = {
   publicKey: string
@@ -19,6 +20,7 @@ type FromObjectOptions = {
 
   source?: string
   integration?: string
+  userAgent?: CustomUserAgent
 
   retryThrottledRequestMaxTimes?: number
 
@@ -41,6 +43,7 @@ const uploadFromObject = (
 
     source,
     integration,
+    userAgent,
 
     retryThrottledRequestMaxTimes,
 
@@ -58,6 +61,7 @@ const uploadFromObject = (
     onProgress,
     source,
     integration,
+    userAgent,
     retryThrottledRequestMaxTimes
   })
     .then(({ file }) => {
@@ -67,6 +71,7 @@ const uploadFromObject = (
         baseURL,
         source,
         integration,
+        userAgent,
         retryThrottledRequestMaxTimes,
         onProgress,
         signal

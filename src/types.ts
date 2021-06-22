@@ -25,3 +25,15 @@ export interface Settings extends Partial<DefaultSettings> {
   source?: string
   jsonpCallback?: string
 }
+
+type CustomUserAgentOptions = {
+  publicKey: string
+  libraryName: string
+  libraryVersion: string
+  languageName: string
+  integration?: string
+}
+
+export type CustomUserAgent =
+  | string
+  | ((options: CustomUserAgentOptions) => string)

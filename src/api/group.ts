@@ -1,5 +1,6 @@
 import { Uuid, GroupInfo } from './types'
 import { FailedResponse } from '../request/types'
+import { CustomUserAgent } from '../types'
 
 import request from '../request/request.node'
 import getUrl from '../tools/getUrl'
@@ -22,6 +23,7 @@ export type GroupOptions = {
 
   source?: string // ??
   integration?: string
+  userAgent?: CustomUserAgent
 
   retryThrottledRequestMaxTimes?: number
 }
@@ -45,6 +47,7 @@ export default function group(
     signal,
     source,
     integration,
+    userAgent,
     retryThrottledRequestMaxTimes = defaultSettings.retryThrottledRequestMaxTimes
   }: GroupOptions
 ): Promise<GroupInfo> {
@@ -53,7 +56,7 @@ export default function group(
       request({
         method: 'POST',
         headers: {
-          'X-UC-User-Agent': getUserAgent({ publicKey, integration })
+          'X-UC-User-Agent': getUserAgent({ publicKey, integration, userAgent })
         },
         url: getUrl(baseURL, '/group/', {
           jsonerrors: 1,

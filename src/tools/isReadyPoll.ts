@@ -1,6 +1,7 @@
 import info from '../api/info'
 import { poll } from './poll'
 import { FileInfo } from '../api/types'
+import { CustomUserAgent } from '../types'
 
 type ArgsIsReadyPool = {
   file: string
@@ -8,6 +9,7 @@ type ArgsIsReadyPool = {
   baseURL?: string
   source?: string
   integration?: string
+  userAgent?: CustomUserAgent
   retryThrottledRequestMaxTimes?: number
   onProgress?: (args: { value: number }) => void
   signal?: AbortSignal
@@ -19,6 +21,7 @@ function isReadyPoll({
   baseURL,
   source,
   integration,
+  userAgent,
   retryThrottledRequestMaxTimes,
   signal,
   onProgress
@@ -31,6 +34,7 @@ function isReadyPoll({
         signal,
         source,
         integration,
+        userAgent,
         retryThrottledRequestMaxTimes
       }).then(response => {
         if (response.isReady) {

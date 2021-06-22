@@ -5,6 +5,7 @@ import defaultSettings from '../defaultSettings'
 
 /* Types */
 import { Url, Uuid, ProgressCallback } from '../api/types'
+import { CustomUserAgent } from '../types'
 import { NodeFile, BrowserFile } from '../request/types'
 import { isFileData, isUrl, isUuid } from './types'
 import { UploadcareFile } from '../tools/UploadcareFile'
@@ -25,6 +26,7 @@ export type FileFromOptions = {
 
   source?: string
   integration?: string
+  userAgent?: CustomUserAgent
 
   retryThrottledRequestMaxTimes?: number
 
@@ -54,6 +56,7 @@ export default function uploadFile(
 
     source,
     integration,
+    userAgent,
 
     retryThrottledRequestMaxTimes,
 
@@ -83,6 +86,7 @@ export default function uploadFile(
 
         source,
         integration,
+        userAgent,
 
         retryThrottledRequestMaxTimes,
 
@@ -104,6 +108,7 @@ export default function uploadFile(
 
       source,
       integration,
+      userAgent,
 
       retryThrottledRequestMaxTimes,
 
@@ -126,6 +131,7 @@ export default function uploadFile(
 
       source,
       integration,
+      userAgent,
 
       retryThrottledRequestMaxTimes,
 
@@ -145,6 +151,7 @@ export default function uploadFile(
 
       source,
       integration,
+      userAgent,
 
       retryThrottledRequestMaxTimes,
 

@@ -4,6 +4,7 @@ import info from '../api/info'
 /* Types */
 import { Uuid } from '..'
 import { ProgressCallback } from '../api/types'
+import { CustomUserAgent } from '../types'
 
 type FromUploadedOptions = {
   publicKey: string
@@ -16,6 +17,7 @@ type FromUploadedOptions = {
 
   source?: string
   integration?: string
+  userAgent?: CustomUserAgent
 
   retryThrottledRequestMaxTimes?: number
 
@@ -32,6 +34,7 @@ const uploadFromUploaded = (
     onProgress,
     source,
     integration,
+    userAgent,
     retryThrottledRequestMaxTimes,
     baseCDN
   }: FromUploadedOptions
@@ -42,6 +45,7 @@ const uploadFromUploaded = (
     signal,
     source,
     integration,
+    userAgent,
     retryThrottledRequestMaxTimes
   })
     .then(fileInfo => new UploadcareFile(fileInfo, { baseCDN, fileName }))

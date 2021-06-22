@@ -8,6 +8,7 @@ import retryIfThrottled from '../tools/retryIfThrottled'
 
 /* Types */
 import { Uuid, FileInfo } from './types'
+import { CustomUserAgent } from '../types'
 import { FailedResponse } from '../request/types'
 
 type Response = FileInfo | FailedResponse
@@ -21,6 +22,7 @@ export type InfoOptions = {
 
   source?: string
   integration?: string
+  userAgent?: CustomUserAgent
 
   retryThrottledRequestMaxTimes?: number
 }
@@ -39,6 +41,7 @@ export default function info(
     signal,
     source,
     integration,
+    userAgent,
     retryThrottledRequestMaxTimes = defaultSettings.retryThrottledRequestMaxTimes
   }: InfoOptions
 ): Promise<FileInfo> {
@@ -47,7 +50,7 @@ export default function info(
       request({
         method: 'GET',
         headers: {
-          'X-UC-User-Agent': getUserAgent({ publicKey, integration })
+          'X-UC-User-Agent': getUserAgent({ publicKey, integration, userAgent })
         },
         url: getUrl(baseURL, '/info/', {
           jsonerrors: 1,

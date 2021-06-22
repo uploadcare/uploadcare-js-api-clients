@@ -1,5 +1,6 @@
 import { GroupId, GroupInfo } from './types'
 import { FailedResponse } from '../request/types'
+import { CustomUserAgent } from '../types'
 
 import request from '../request/request.node'
 import getUrl from '../tools/getUrl'
@@ -18,6 +19,7 @@ export type GroupInfoOptions = {
 
   source?: string
   integration?: string
+  userAgent?: CustomUserAgent
 
   retryThrottledRequestMaxTimes?: number
 }
@@ -38,6 +40,7 @@ export default function groupInfo(
     signal,
     source,
     integration,
+    userAgent,
     retryThrottledRequestMaxTimes = defaultSettings.retryThrottledRequestMaxTimes
   }: GroupInfoOptions
 ): Promise<GroupInfo> {
@@ -46,7 +49,7 @@ export default function groupInfo(
       request({
         method: 'GET',
         headers: {
-          'X-UC-User-Agent': getUserAgent({ publicKey, integration })
+          'X-UC-User-Agent': getUserAgent({ publicKey, integration, userAgent })
         },
         url: getUrl(baseURL, '/group/info/', {
           jsonerrors: 1,

@@ -1,5 +1,6 @@
 import { FileInfo, Url } from './types'
 import { FailedResponse } from '../request/types'
+import { CustomUserAgent } from '../types'
 
 import request from '../request/request.node'
 import getUrl from '../tools/getUrl'
@@ -63,6 +64,7 @@ export type FromUrlOptions = {
 
   source?: string
   integration?: string
+  userAgent?: CustomUserAgent
 
   retryThrottledRequestMaxTimes?: number
 }
@@ -87,6 +89,7 @@ export default function fromUrl(
     source = 'url',
     signal,
     integration,
+    userAgent,
     retryThrottledRequestMaxTimes = defaultSettings.retryThrottledRequestMaxTimes
   }: FromUrlOptions
 ): Promise<FromUrlSuccessResponse> {
@@ -95,7 +98,7 @@ export default function fromUrl(
       request({
         method: 'POST',
         headers: {
-          'X-UC-User-Agent': getUserAgent({ publicKey, integration })
+          'X-UC-User-Agent': getUserAgent({ publicKey, integration, userAgent })
         },
         url: getUrl(baseURL, '/from_url/', {
           jsonerrors: 1,

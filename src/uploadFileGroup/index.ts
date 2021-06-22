@@ -30,6 +30,7 @@ export default function uploadFileGroup(
 
     source,
     integration,
+    userAgent,
 
     retryThrottledRequestMaxTimes,
 
@@ -83,6 +84,7 @@ export default function uploadFileGroup(
 
           source,
           integration,
+          userAgent,
 
           retryThrottledRequestMaxTimes,
 
@@ -116,6 +118,7 @@ export default function uploadFileGroup(
       signal,
       source,
       integration,
+      userAgent,
       retryThrottledRequestMaxTimes
     }).then(groupInfo => new UploadcareGroup(groupInfo, filesInGroup))
   })

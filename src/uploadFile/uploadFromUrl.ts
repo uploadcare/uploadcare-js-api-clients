@@ -11,6 +11,7 @@ import { getPusher, preconnect } from './pusher'
 
 /* Types */
 import { FileInfo } from '../api/types'
+import { CustomUserAgent } from '../types'
 import { UploadcareFile } from '../tools/UploadcareFile'
 import { ProgressCallback } from '../api/types'
 
@@ -19,6 +20,7 @@ function pollStrategy({
   publicKey,
   baseURL,
   integration,
+  userAgent,
   retryThrottledRequestMaxTimes,
   onProgress,
   signal
@@ -27,6 +29,7 @@ function pollStrategy({
   publicKey: string
   baseURL?: string
   integration?: string
+  userAgent?: CustomUserAgent
   retryThrottledRequestMaxTimes?: number
   onProgress?: (info: { value: number }) => void
   signal?: AbortSignal
@@ -37,6 +40,7 @@ function pollStrategy({
         publicKey,
         baseURL,
         integration,
+        userAgent,
         retryThrottledRequestMaxTimes,
         signal
       }).then(response => {
@@ -135,6 +139,7 @@ type FromUrlOptions = {
   onProgress?: ProgressCallback
   source?: string
   integration?: string
+  userAgent?: CustomUserAgent
   retryThrottledRequestMaxTimes?: number
   pusherKey?: string
 }
@@ -155,6 +160,7 @@ const uploadFromUrl = (
     onProgress,
     source,
     integration,
+    userAgent,
     retryThrottledRequestMaxTimes,
     pusherKey = defaultSettings.pusherKey
   }: FromUrlOptions
@@ -173,6 +179,7 @@ const uploadFromUrl = (
         signal,
         source,
         integration,
+        userAgent,
         retryThrottledRequestMaxTimes
       })
     )
@@ -188,6 +195,7 @@ const uploadFromUrl = (
                 publicKey,
                 baseURL,
                 integration,
+                userAgent,
                 retryThrottledRequestMaxTimes,
                 onProgress,
                 signal
@@ -216,6 +224,7 @@ const uploadFromUrl = (
         publicKey,
         baseURL,
         integration,
+        userAgent,
         retryThrottledRequestMaxTimes,
         onProgress,
         signal
