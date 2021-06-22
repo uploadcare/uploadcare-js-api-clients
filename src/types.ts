@@ -20,6 +20,7 @@ export interface Settings extends Partial<DefaultSettings> {
   secureSignature?: string
   secureExpire?: string
   integration?: string
+  userAgent?: CustomUserAgent
   checkForUrlDuplicates?: boolean
   saveUrlForRecurrentUploads?: boolean
   source?: string
