@@ -31,11 +31,14 @@ export type FileFromOptions = {
 
   contentType?: string
   multipartChunkSize?: number
+  multipartMaxAttempts?: number
+  maxConcurrentRequests?: number
 
   baseCDN?: string
 
   checkForUrlDuplicates?: boolean
   saveUrlForRecurrentUploads?: boolean
+  pusherKey?: string
 }
 
 /**
@@ -53,8 +56,13 @@ export type FileFromOptions = {
  * @param [options.source]
  * @param [options.integration]
  * @param [options.retryThrottledRequestMaxTimes]
+ * @param [options.contentType]
+ * @param [options.multipartChunkSize]
+ * @param [options.multipartMaxAttempts]
+ * @param [options.maxConcurrentRequests]
  * @param [options.checkForUrlDuplicates]
  * @param [options.saveUrlForRecurrentUploads]
+ * @param [options.pusherKey]
  */
 export default function uploadFile(
   data: NodeFile | BrowserFile | Url | Uuid,
@@ -76,12 +84,15 @@ export default function uploadFile(
     retryThrottledRequestMaxTimes,
 
     contentType,
-    multipartChunkSize = defaultSettings.multipartChunkSize,
+    multipartChunkSize,
+    multipartMaxAttempts,
+    maxConcurrentRequests,
 
     baseCDN = defaultSettings.baseCDN,
 
     checkForUrlDuplicates,
-    saveUrlForRecurrentUploads
+    saveUrlForRecurrentUploads,
+    pusherKey
   }: FileFromOptions
 ): Promise<UploadcareFile> {
   if (isFileData(data)) {
@@ -92,6 +103,7 @@ export default function uploadFile(
         publicKey,
         contentType,
         multipartChunkSize,
+        multipartMaxAttempts,
 
         fileName,
         baseURL,
@@ -105,6 +117,7 @@ export default function uploadFile(
         source,
         integration,
 
+        maxConcurrentRequests,
         retryThrottledRequestMaxTimes,
 
         baseCDN
@@ -138,6 +151,9 @@ export default function uploadFile(
 
       fileName,
       baseURL,
+      baseCDN,
+      checkForUrlDuplicates,
+      saveUrlForRecurrentUploads,
       secureSignature,
       secureExpire,
       store,
@@ -149,11 +165,7 @@ export default function uploadFile(
       integration,
 
       retryThrottledRequestMaxTimes,
-
-      baseCDN,
-
-      checkForUrlDuplicates,
-      saveUrlForRecurrentUploads
+      pusherKey
     })
   }
 
