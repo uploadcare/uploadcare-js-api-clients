@@ -1,3 +1,12 @@
+## [1.1.5](https://github.com/uploadcare/uploadcare-upload-client/compare/v1.1.4...v1.1.5) (2021-06-28)
+
+
+### Bug Fixes
+
+* pass missing props from `uploadFile` down to the upload methods ([#339](https://github.com/uploadcare/uploadcare-upload-client/issues/339)) ([e16dc73](https://github.com/uploadcare/uploadcare-upload-client/commit/e16dc732613614686048f15fb1dcc8f400663e4d))
+
+
+
 ## [1.1.4](https://github.com/uploadcare/uploadcare-upload-client/compare/v1.1.3...v1.1.4) (2021-06-11)
 
 
