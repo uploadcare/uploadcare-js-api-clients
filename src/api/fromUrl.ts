@@ -10,7 +10,6 @@ import { getUserAgent } from '../tools/userAgent'
 import camelizeKeys from '../tools/camelizeKeys'
 import { UploadClientError } from '../tools/errors'
 import retryIfThrottled from '../tools/retryIfThrottled'
-import { ProgressCallback } from '../api/types'
 
 export enum TypeEnum {
   Token = 'token',
@@ -54,7 +53,6 @@ export type FromUrlOptions = {
   publicKey: string
 
   baseURL?: string
-  baseCDN?: string
   store?: boolean
   fileName?: string
   checkForUrlDuplicates?: boolean
@@ -69,9 +67,6 @@ export type FromUrlOptions = {
   userAgent?: CustomUserAgent
 
   retryThrottledRequestMaxTimes?: number
-
-  pusherKey?: string
-  onProgress?: ProgressCallback
 }
 
 /**

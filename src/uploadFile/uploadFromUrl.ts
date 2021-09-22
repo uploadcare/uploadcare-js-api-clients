@@ -13,6 +13,7 @@ import { getPusher, preconnect } from './pusher'
 import { FileInfo } from '../api/types'
 import { CustomUserAgent } from '../types'
 import { UploadcareFile } from '../tools/UploadcareFile'
+import { ProgressCallback } from '../api/types'
 
 function pollStrategy({
   token,
@@ -71,6 +72,12 @@ function pollStrategy({
     signal
   })
 }
+
+type UploadFromUrlOptions = {
+  baseCDN?: string
+  onProgress?: ProgressCallback
+  pusherKey?: string
+} & FromUrlOptions
 
 const pushStrategy = ({
   token,
@@ -143,7 +150,7 @@ const uploadFromUrl = (
     userAgent,
     retryThrottledRequestMaxTimes,
     pusherKey = defaultSettings.pusherKey
-  }: FromUrlOptions
+  }: UploadFromUrlOptions
 ): Promise<UploadcareFile> =>
   Promise.resolve(preconnect(pusherKey))
     .then(() =>

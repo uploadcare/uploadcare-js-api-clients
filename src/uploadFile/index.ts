@@ -167,5 +167,5 @@ export {
   uploadFromUrl,
   uploadBase,
   uploadFromUploaded,
-  uploadMultipart,
+  uploadMultipart
 }
