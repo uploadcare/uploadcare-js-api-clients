@@ -1,5 +1,5 @@
 import fromUrlStatus, { Status } from '../api/fromUrlStatus'
-import fromUrl, { TypeEnum } from '../api/fromUrl'
+import fromUrl, { TypeEnum, FromUrlOptions } from '../api/fromUrl'
 import { UploadClientError, cancelError } from '../tools/errors'
 import { poll } from '../tools/poll'
 import { race } from '../tools/race'
@@ -13,7 +13,6 @@ import { getPusher, preconnect } from './pusher'
 import { FileInfo } from '../api/types'
 import { CustomUserAgent } from '../types'
 import { UploadcareFile } from '../tools/UploadcareFile'
-import { ProgressCallback } from '../api/types'
 
 function pollStrategy({
   token,
@@ -124,25 +123,6 @@ const pushStrategy = ({
       }
     })
   })
-
-type FromUrlOptions = {
-  publicKey: string
-  fileName?: string
-  baseURL?: string
-  baseCDN?: string
-  checkForUrlDuplicates?: boolean
-  saveUrlForRecurrentUploads?: boolean
-  secureSignature?: string
-  secureExpire?: string
-  store?: boolean
-  signal?: AbortSignal
-  onProgress?: ProgressCallback
-  source?: string
-  integration?: string
-  userAgent?: CustomUserAgent
-  retryThrottledRequestMaxTimes?: number
-  pusherKey?: string
-}
 
 const uploadFromUrl = (
   sourceUrl: string,

@@ -2,7 +2,7 @@ import AbortController from 'abort-controller'
 import * as factory from '../_fixtureFactory'
 import { getSettingsForTesting } from '../_helpers'
 
-import uploadFile from '../../src/uploadFile'
+import { uploadFile } from '../../src/uploadFile'
 
 describe('uploadFrom Object', () => {
   it('should resolves when file is ready on CDN', async () => {

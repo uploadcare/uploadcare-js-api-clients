@@ -10,7 +10,13 @@ export { default as multipartUpload } from './api/multipartUpload'
 export { default as multipartComplete } from './api/multipartComplete'
 
 /* High-Level API */
-export { default as uploadFile } from './uploadFile'
+export {
+  uploadFile,
+  uploadFromUrl,
+  uploadBase,
+  uploadFromUploaded,
+  uploadMultipart
+} from './uploadFile'
 export { default as uploadFileGroup } from './uploadFileGroup'
 
 /* Helpers */

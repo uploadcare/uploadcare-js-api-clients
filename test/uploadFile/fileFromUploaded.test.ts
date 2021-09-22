@@ -1,6 +1,6 @@
 import AbortController from 'abort-controller'
 import * as factory from '../_fixtureFactory'
-import uploadFile from '../../src/uploadFile'
+import { uploadFile } from '../../src/uploadFile'
 import { getSettingsForTesting } from '../_helpers'
 import { UploadClientError } from '../../src/tools/errors'
 
