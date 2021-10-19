@@ -56,7 +56,7 @@
     "@types/form-data": "2.5.0",
     "@types/jest": "26.0.14",
     "@types/koa": "2.11.4",
-    "@types/node": "12.12.67",
+    "@types/node": "14.17.27",
     "@types/promise": "7.1.30",
     "@types/ws": "7.2.7",
     "@typescript-eslint/eslint-plugin": "4.18.0",
