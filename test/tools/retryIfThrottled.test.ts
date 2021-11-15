@@ -21,8 +21,15 @@ const createRunner = ({
           ? error
           : new UploadClientError(
               'test error',
+              'RequestThrottledError',
               undefined,
-              { statusCode: 429, content: 'test' },
+              {
+                error: {
+                  statusCode: 429,
+                  content: 'test',
+                  errorCode: 'RequestThrottledError'
+                }
+              },
               { 'x-throttle-wait-seconds': '1' }
             )
       }

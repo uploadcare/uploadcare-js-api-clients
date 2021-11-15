@@ -46,7 +46,7 @@ function pollStrategy({
       }).then(response => {
         switch (response.status) {
           case Status.Error: {
-            return new UploadClientError(response.error)
+            return new UploadClientError(response.error, response.errorCode)
           }
           case Status.Waiting: {
             return false
@@ -121,7 +121,7 @@ const pushStrategy = ({
 
         case Status.Error: {
           destroy()
-          reject(new UploadClientError(result.msg))
+          reject(new UploadClientError(result.msg, result.error_code))
         }
       }
     })

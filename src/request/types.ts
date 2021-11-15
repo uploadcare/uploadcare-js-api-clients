@@ -33,6 +33,7 @@ export type FailedResponse = {
   error: {
     content: string
     statusCode: number
+    errorCode: string
   }
 }
 

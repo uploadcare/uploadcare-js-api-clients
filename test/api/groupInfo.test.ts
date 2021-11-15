@@ -22,7 +22,7 @@ describe('API - group info', () => {
     const groupId = factory.groupId('invalid')
     const upload = groupInfo(groupId, settings)
 
-    await expect(upload).rejects.toThrowError(`[404] group_id is invalid.`)
+    await expect(upload).rejects.toThrowError(`group_id is invalid.`)
   })
 
   it('should be able to cancel uploading', async () => {

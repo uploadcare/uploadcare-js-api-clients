@@ -19,6 +19,7 @@ type StatusErrorResponse = {
   status: Status.Error
   msg: string
   url: string
+  error_code: string
 }
 
 type StatusSuccessResponse = {
@@ -89,7 +90,7 @@ class Pusher {
       })
 
       this.ws.addEventListener('message', e => {
-        const data = JSON.parse(e.data)
+        const data = JSON.parse(e.data.toString())
 
         switch (data.event) {
           case 'pusher:connection_established': {

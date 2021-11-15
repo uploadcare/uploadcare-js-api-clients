@@ -21,7 +21,7 @@ describe('API - info', () => {
     })
     const upload = info(uuid, settings)
 
-    await expect(upload).rejects.toThrowError('[403] pub_key is required.')
+    await expect(upload).rejects.toThrowError('pub_key is required.')
   })
 
   it('should be able to cancel uploading', async () => {

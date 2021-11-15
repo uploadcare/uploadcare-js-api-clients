@@ -17,27 +17,27 @@ describe('API - group', () => {
     expect(data.files).toBeTruthy()
   })
 
-  it('should fail with [HTTP 400] no files[N] parameters found.', async () => {
+  it('should fail with [HTTP 400] No files[N] parameters found.', async () => {
     await expect(group([], settings)).rejects.toThrowError(
-      '[400] no files[N] parameters found.'
+      'No files[N] parameters found.'
     )
   })
 
-  it('should fail with [HTTP 400] this is not valid file url: http://invalid/url.', async () => {
+  it('should fail with [HTTP 400] This is not valid file url: http://invalid/url.', async () => {
     const files = factory.groupOfFiles('invalid')
 
     await expect(group(files, settings)).rejects.toThrowError(
-      `[400] this is not valid file url: ${files[0]}.`
+      `This is not valid file url: ${files[0]}.`
     )
   })
 
-  it('should fail with [HTTP 400] some files not found.', async () => {
+  it('should fail with [HTTP 400] Some files not found.', async () => {
     const settings = getSettingsForTesting({
       publicKey: factory.publicKey('demo')
     })
 
     await expect(group(files, settings)).rejects.toThrowError(
-      '[400] some files not found.'
+      'Some files not found.'
     )
   })
 

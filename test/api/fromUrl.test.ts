@@ -25,7 +25,7 @@ describe('API - from url', () => {
     })
 
     await expect(fromUrl(sourceUrl, settings)).rejects.toThrowError(
-      '[403] pub_key is invalid.'
+      'pub_key is invalid.'
     )
   })
 
@@ -33,7 +33,7 @@ describe('API - from url', () => {
     const sourceUrl = factory.imageUrl('doesNotExist')
 
     await expect(fromUrl(sourceUrl, settings)).rejects.toThrowError(
-      '[400] Host does not exist.'
+      'Host does not exist.'
     )
   })
 
@@ -41,7 +41,7 @@ describe('API - from url', () => {
     const sourceUrl = factory.imageUrl('privateIP')
 
     await expect(fromUrl(sourceUrl, settings)).rejects.toThrowError(
-      '[400] Only public IPs are allowed.'
+      'Only public IPs are allowed.'
     )
   })
 

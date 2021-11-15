@@ -58,7 +58,7 @@ const index = ctx => {
 
   if (!files || files.length === 0) {
     return error(ctx, {
-      statusText: 'no files[N] parameters found.'
+      statusText: 'No files[N] parameters found.'
     })
   }
 
@@ -70,14 +70,14 @@ const index = ctx => {
   for (const file of files) {
     if (!isValidFile(file)) {
       return error(ctx, {
-        statusText: `this is not valid file url: ${file}.`
+        statusText: `This is not valid file url: ${file}.`
       })
     }
   }
 
   if (publicKey === 'demopublickey' && files.length > 0) {
     return error(ctx, {
-      statusText: 'some files not found.'
+      statusText: 'Some files not found.'
     })
   }
 

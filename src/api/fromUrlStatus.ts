@@ -37,6 +37,7 @@ type StatusProgressResponse = {
 type StatusErrorResponse = {
   status: Status.Error
   error: string
+  errorCode: string
 }
 
 type StatusSuccessResponse = {
@@ -108,9 +109,10 @@ export default function fromUrlStatus(
 
         if ('error' in response && !isErrorResponse(response)) {
           throw new UploadClientError(
-            `[${response.error.statusCode}] ${response.error.content}`,
+            response.error.content,
+            undefined,
             request,
-            response.error,
+            response,
             headers
           )
         } else {

@@ -47,7 +47,7 @@ describe('API - multipartStart', () => {
 
     await expect(upload).rejects.toThrowError(
       new UploadClientError(
-        '[400] File size can not be less than 10485760 bytes. Please use direct upload instead of multipart.'
+        'File size can not be less than 10485760 bytes. Please use direct upload instead of multipart.'
       )
     )
   })

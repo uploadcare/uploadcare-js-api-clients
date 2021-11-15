@@ -87,7 +87,7 @@ describe('API - multipartComplete', () => {
     const upload = multipartComplete('', settings)
 
     await expect(upload).rejects.toThrowError(
-      new UploadClientError('[400] uuid is required.')
+      new UploadClientError('uuid is required.')
     )
   })
 })

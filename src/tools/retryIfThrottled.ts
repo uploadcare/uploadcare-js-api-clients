@@ -1,7 +1,7 @@
 import { UploadClientError } from './errors'
 import retrier from './retry'
 
-const REQUEST_WAS_THROTTLED_CODE = 429
+const REQUEST_WAS_THROTTLED_CODE = 'RequestThrottledError'
 const DEFAULT_RETRY_AFTER_TIMEOUT = 15000
 
 function getTimeoutFromThrottledRequest(error: UploadClientError): number {
@@ -22,7 +22,7 @@ function retryIfThrottled<T>(
     fn().catch((error: Error | UploadClientError) => {
       if (
         'response' in error &&
-        error?.response?.statusCode === REQUEST_WAS_THROTTLED_CODE &&
+        error?.code === REQUEST_WAS_THROTTLED_CODE &&
         attempt < retryThrottledMaxTimes
       ) {
         return retry(getTimeoutFromThrottledRequest(error))
