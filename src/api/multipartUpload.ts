@@ -1,15 +1,14 @@
 import { MultipartPart } from './multipartStart'
 
 import request from '../request/request.node'
-import { getUserAgent } from '../tools/userAgent'
-import CancelController from '../tools/CancelController'
 
+import { ProgressCallback } from './types'
 import { NodeFile, BrowserFile } from '../request/types'
 
 export type MultipartUploadOptions = {
   publicKey?: string
-  cancel?: CancelController
-  onProgress?: ({ value: number }) => void
+  signal?: AbortSignal
+  onProgress?: ProgressCallback
   integration?: string
   retryThrottledRequestMaxTimes?: number
 }
@@ -21,22 +20,18 @@ export type MultipartUploadResponse = {
 /**
  * Complete multipart uploading.
  */
+
 export default function multipartUpload(
   part: NodeFile | BrowserFile,
   url: MultipartPart,
-  { publicKey, cancel, onProgress, integration }: MultipartUploadOptions
+  { signal, onProgress }: MultipartUploadOptions
 ): Promise<MultipartUploadResponse> {
   return request({
     method: 'PUT',
     url,
-    headers: {
-      'X-UC-User-Agent': publicKey
-        ? getUserAgent({ publicKey, integration })
-        : undefined
-    },
     data: part,
     onProgress,
-    cancel
+    signal
   })
     .then((result) => {
       // hack for node ¯\_(ツ)_/¯

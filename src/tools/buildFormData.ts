@@ -1,6 +1,6 @@
 import getFormData, { transformFile } from './getFormData.node'
 
-import * as NodeFormData from 'form-data'
+import NodeFormData from 'form-data'
 import { BrowserFile, NodeFile } from '../request/types'
 
 /**

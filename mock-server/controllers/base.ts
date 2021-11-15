@@ -1,5 +1,5 @@
-import * as json from '../data/base.json'
-import find from '../utils/find'
+import json from '../data/base.js'
+import find from '../utils/find.js'
 
 /**
  * '/base/'

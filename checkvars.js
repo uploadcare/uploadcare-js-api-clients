@@ -1,5 +1,5 @@
-const { config } = require('dotenv')
-const chalk = require('chalk')
+import {config} from 'dotenv'
+import chalk from 'chalk'
 
 let VARS = ['UC_KEY_FOR_INTEGRATION_TESTS']
 

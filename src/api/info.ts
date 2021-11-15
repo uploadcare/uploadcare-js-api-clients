@@ -1,6 +1,5 @@
 import request from '../request/request.node'
 import getUrl from '../tools/getUrl'
-import CancelController from '../tools/CancelController'
 import defaultSettings from '../defaultSettings'
 import { getUserAgent } from '../tools/userAgent'
 import camelizeKeys from '../tools/camelizeKeys'
@@ -9,6 +8,7 @@ import retryIfThrottled from '../tools/retryIfThrottled'
 
 /* Types */
 import { Uuid, FileInfo } from './types'
+import { CustomUserAgent } from '../types'
 import { FailedResponse } from '../request/types'
 
 type Response = FileInfo | FailedResponse
@@ -18,11 +18,11 @@ export type InfoOptions = {
 
   baseURL?: string
 
-  cancel?: CancelController
-  onProgress?: ({ value: number }) => void
+  signal?: AbortSignal
 
   source?: string
   integration?: string
+  userAgent?: CustomUserAgent
 
   retryThrottledRequestMaxTimes?: number
 }
@@ -35,9 +35,10 @@ export default function info(
   {
     publicKey,
     baseURL = defaultSettings.baseURL,
-    cancel,
+    signal,
     source,
     integration,
+    userAgent,
     retryThrottledRequestMaxTimes = defaultSettings.retryThrottledRequestMaxTimes
   }: InfoOptions
 ): Promise<FileInfo> {
@@ -46,7 +47,7 @@ export default function info(
       request({
         method: 'GET',
         headers: {
-          'X-UC-User-Agent': getUserAgent({ publicKey, integration })
+          'X-UC-User-Agent': getUserAgent({ publicKey, integration, userAgent })
         },
         url: getUrl(baseURL, '/info/', {
           jsonerrors: 1,
@@ -54,15 +55,16 @@ export default function info(
           file_id: uuid,
           source
         }),
-        cancel
+        signal
       }).then(({ data, headers, request }) => {
         const response = camelizeKeys<Response>(JSON.parse(data))
 
         if ('error' in response) {
           throw new UploadClientError(
-            `[${response.error.statusCode}] ${response.error.content}`,
+            response.error.content,
+            response.error.errorCode,
             request,
-            response.error,
+            response,
             headers
           )
         } else {

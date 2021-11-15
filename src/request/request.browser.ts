@@ -1,4 +1,5 @@
 import { cancelError } from '../tools/errors'
+import { onCancel } from '../tools/onCancel'
 import { RequestOptions, RequestResponse } from './types'
 
 const request = ({
@@ -6,7 +7,7 @@ const request = ({
   url,
   data,
   headers = {},
-  cancel,
+  signal,
   onProgress
 }: RequestOptions): Promise<RequestResponse> =>
   new Promise((resolve, reject) => {
@@ -27,14 +28,12 @@ const request = ({
 
     xhr.responseType = 'text'
 
-    if (cancel) {
-      cancel.onCancel(() => {
-        aborted = true
-        xhr.abort()
+    onCancel(signal, () => {
+      aborted = true
+      xhr.abort()
 
-        reject(cancelError())
-      })
-    }
+      reject(cancelError())
+    })
 
     xhr.onload = (): void => {
       if (xhr.status != 200) {
@@ -46,7 +45,7 @@ const request = ({
           url,
           data,
           headers: headers || undefined,
-          cancel,
+          signal,
           onProgress
         }
 

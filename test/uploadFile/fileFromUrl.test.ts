@@ -1,10 +1,12 @@
+import AbortController from 'abort-controller'
 import * as factory from '../_fixtureFactory'
-import uploadFile from '../../src/uploadFile'
+import { uploadFile } from '../../src/uploadFile'
 import { getSettingsForTesting } from '../_helpers'
 import { UploadClientError } from '../../src/tools/errors'
-import CancelController from '../../src/tools/CancelController'
-import * as http from 'http'
-import * as https from 'https'
+import http from 'http'
+import https from 'https'
+
+jest.setTimeout(60000)
 
 describe('uploadFrom URL', () => {
   it('should resolves when file is ready on CDN', async () => {
@@ -70,15 +72,15 @@ describe('uploadFrom URL', () => {
   })
 
   it('should be able to cancel uploading', async () => {
-    const ctrl = new CancelController()
+    const ctrl = new AbortController()
     const sourceUrl = factory.imageUrl('valid')
     const settings = getSettingsForTesting({
       publicKey: factory.publicKey('image'),
-      cancel: ctrl
+      signal: ctrl.signal
     })
 
     setTimeout(() => {
-      ctrl.cancel()
+      ctrl.abort()
     })
 
     await expect(uploadFile(sourceUrl, settings)).rejects.toThrowError(
@@ -110,5 +112,23 @@ describe('uploadFrom URL', () => {
 
     expect(onProgress).toHaveBeenCalled()
     expect(onProgress).toHaveBeenCalledWith({ value: 1 })
+  })
+
+  it('should be rejected with error code if failed', async () => {
+    const sourceUrl = factory.imageUrl('valid')
+    const settings = getSettingsForTesting({
+      publicKey: factory.publicKey('invalid')
+    })
+
+    try {
+      await uploadFile(sourceUrl, settings)
+    } catch (error) {
+      expect((error as UploadClientError).message).toEqual(
+        'pub_key is invalid.'
+      )
+      expect((error as UploadClientError).code).toEqual(
+        'ProjectPublicKeyInvalidError'
+      )
+    }
   })
 })

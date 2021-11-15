@@ -3,7 +3,6 @@ import { prepareChunks } from './prepareChunks.node'
 import multipartStart from '../api/multipartStart'
 import multipartUpload from '../api/multipartUpload'
 import multipartComplete from '../api/multipartComplete'
-import CancelController from '../tools/CancelController'
 import runWithConcurrency from '../tools/runWithConcurrency'
 import { UploadcareFile } from '../tools/UploadcareFile'
 import { getFileSize } from '../tools/isMultipart'
@@ -15,9 +14,9 @@ import {
   MultipartUploadResponse,
   MultipartUploadOptions
 } from '../api/multipartUpload'
+import { ProgressCallback } from '../api/types'
+import { CustomUserAgent } from '../types'
 import { NodeFile, BrowserFile } from '../request/types'
-
-type progressCallback = ({ value: number }) => void
 
 export type MultipartOptions = {
   publicKey: string
@@ -29,10 +28,11 @@ export type MultipartOptions = {
   secureSignature?: string
   secureExpire?: string
   store?: boolean
-  cancel?: CancelController
-  onProgress?: progressCallback
+  signal?: AbortSignal
+  onProgress?: ProgressCallback
   source?: string
   integration?: string
+  userAgent?: CustomUserAgent
   retryThrottledRequestMaxTimes?: number
   maxConcurrentRequests?: number
   multipartMaxAttempts?: number
@@ -45,7 +45,7 @@ const uploadPartWithRetry = (
   {
     publicKey,
     onProgress,
-    cancel,
+    signal,
     integration,
     multipartMaxAttempts
   }: MultipartUploadOptions & { multipartMaxAttempts: number }
@@ -54,7 +54,7 @@ const uploadPartWithRetry = (
     multipartUpload(chunk, url, {
       publicKey,
       onProgress,
-      cancel,
+      signal,
       integration
     }).catch((error) => {
       if (attempt < multipartMaxAttempts) {
@@ -77,11 +77,12 @@ const uploadMultipart = (
     secureExpire,
     store,
 
-    cancel,
+    signal,
     onProgress,
 
     source,
     integration,
+    userAgent,
 
     retryThrottledRequestMaxTimes,
 
@@ -99,7 +100,7 @@ const uploadMultipart = (
   const createProgressHandler = (
     size: number,
     index: number
-  ): progressCallback | undefined => {
+  ): ProgressCallback | undefined => {
     if (!onProgress) return
     if (!progressValues) {
       progressValues = Array(size).fill(0)
@@ -122,9 +123,10 @@ const uploadMultipart = (
     secureSignature,
     secureExpire,
     store,
-    cancel,
+    signal,
     source,
     integration,
+    userAgent,
     retryThrottledRequestMaxTimes
   })
     .then(({ uuid, parts }) => {
@@ -137,7 +139,7 @@ const uploadMultipart = (
             uploadPartWithRetry(getChunk(index), url, {
               publicKey,
               onProgress: createProgressHandler(parts.length, index),
-              cancel,
+              signal,
               integration,
               multipartMaxAttempts
             })
@@ -151,6 +153,7 @@ const uploadMultipart = (
         baseURL,
         source,
         integration,
+        userAgent,
         retryThrottledRequestMaxTimes
       })
     )
@@ -164,9 +167,10 @@ const uploadMultipart = (
           baseURL,
           source,
           integration,
+          userAgent,
           retryThrottledRequestMaxTimes,
           onProgress,
-          cancel
+          signal
         })
       }
     })

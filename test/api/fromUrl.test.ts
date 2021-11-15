@@ -1,7 +1,10 @@
+import AbortController from 'abort-controller'
 import fromUrl, { TypeEnum } from '../../src/api/fromUrl'
 import * as factory from '../_fixtureFactory'
 import { getSettingsForTesting } from '../_helpers'
-import CancelController from '../../src/tools/CancelController'
+import { UploadClientError } from '../../src/tools/errors'
+
+jest.setTimeout(10000)
 
 describe('API - from url', () => {
   const sourceUrl = factory.imageUrl('valid')
@@ -25,7 +28,7 @@ describe('API - from url', () => {
     })
 
     await expect(fromUrl(sourceUrl, settings)).rejects.toThrowError(
-      '[403] pub_key is invalid.'
+      'pub_key is invalid.'
     )
   })
 
@@ -33,7 +36,7 @@ describe('API - from url', () => {
     const sourceUrl = factory.imageUrl('doesNotExist')
 
     await expect(fromUrl(sourceUrl, settings)).rejects.toThrowError(
-      '[400] Host does not exist.'
+      'Host does not exist.'
     )
   })
 
@@ -41,24 +44,39 @@ describe('API - from url', () => {
     const sourceUrl = factory.imageUrl('privateIP')
 
     await expect(fromUrl(sourceUrl, settings)).rejects.toThrowError(
-      '[400] Only public IPs are allowed.'
+      'Only public IPs are allowed.'
     )
   })
 
   it('should be able to cancel uploading', async () => {
-    const controller = new CancelController()
+    const controller = new AbortController()
 
     const settings = getSettingsForTesting({
       publicKey: factory.publicKey('demo'),
-      cancel: controller
+      signal: controller.signal
     })
 
     setTimeout(() => {
-      controller.cancel()
+      controller.abort()
     })
 
     await expect(fromUrl(sourceUrl, settings)).rejects.toThrowError(
       'Request canceled'
     )
+  })
+
+  it('should be rejected with error code if failed', async () => {
+    const publicKey = factory.publicKey('invalid')
+
+    try {
+      await fromUrl(sourceUrl, { publicKey })
+    } catch (error) {
+      expect((error as UploadClientError).message).toEqual(
+        'pub_key is invalid.'
+      )
+      expect((error as UploadClientError).code).toEqual(
+        'ProjectPublicKeyInvalidError'
+      )
+    }
   })
 })

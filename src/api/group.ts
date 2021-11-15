@@ -1,10 +1,10 @@
 import { Uuid, GroupInfo } from './types'
 import { FailedResponse } from '../request/types'
+import { CustomUserAgent } from '../types'
 
 import request from '../request/request.node'
 import getUrl from '../tools/getUrl'
 
-import CancelController from '../tools/CancelController'
 import defaultSettings from '../defaultSettings'
 import { getUserAgent } from '../tools/userAgent'
 import camelizeKeys from '../tools/camelizeKeys'
@@ -19,10 +19,11 @@ export type GroupOptions = {
   secureSignature?: string
   secureExpire?: string
 
-  cancel?: CancelController
+  signal?: AbortSignal
 
   source?: string // ??
   integration?: string
+  userAgent?: CustomUserAgent
 
   retryThrottledRequestMaxTimes?: number
 }
@@ -40,9 +41,10 @@ export default function group(
     jsonpCallback,
     secureSignature,
     secureExpire,
-    cancel,
+    signal,
     source,
     integration,
+    userAgent,
     retryThrottledRequestMaxTimes = defaultSettings.retryThrottledRequestMaxTimes
   }: GroupOptions
 ): Promise<GroupInfo> {
@@ -51,7 +53,7 @@ export default function group(
       request({
         method: 'POST',
         headers: {
-          'X-UC-User-Agent': getUserAgent({ publicKey, integration })
+          'X-UC-User-Agent': getUserAgent({ publicKey, integration, userAgent })
         },
         url: getUrl(baseURL, '/group/', {
           jsonerrors: 1,
@@ -62,15 +64,16 @@ export default function group(
           expire: secureExpire,
           source
         }),
-        cancel
+        signal
       }).then(({ data, headers, request }) => {
         const response = camelizeKeys<Response>(JSON.parse(data))
 
         if ('error' in response) {
           throw new UploadClientError(
-            `[${response.error.statusCode}] ${response.error.content}`,
+            response.error.content,
+            response.error.errorCode,
             request,
-            response.error,
+            response,
             headers
           )
         } else {

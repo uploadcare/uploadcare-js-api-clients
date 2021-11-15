@@ -1,11 +1,11 @@
 import uploadBase from './uploadBase'
 import uploadFromUrl from './uploadFromUrl'
 import uploadFromUploaded from './uploadFromUploaded'
-import CancelController from '../tools/CancelController'
 import defaultSettings from '../defaultSettings'
 
 /* Types */
-import { Url, Uuid } from '../api/types'
+import { Url, Uuid, ProgressCallback } from '../api/types'
+import { CustomUserAgent } from '../types'
 import { NodeFile, BrowserFile } from '../request/types'
 import { isFileData, isUrl, isUuid } from './types'
 import { UploadcareFile } from '../tools/UploadcareFile'
@@ -21,11 +21,12 @@ export type FileFromOptions = {
   secureExpire?: string
   store?: boolean
 
-  cancel?: CancelController
-  onProgress?: ({ value: number }) => void
+  signal?: AbortSignal
+  onProgress?: ProgressCallback
 
   source?: string
   integration?: string
+  userAgent?: CustomUserAgent
 
   retryThrottledRequestMaxTimes?: number
 
@@ -43,28 +44,9 @@ export type FileFromOptions = {
 
 /**
  * Uploads file from provided data.
- * @param data
- * @param options
- * @param [options.publicKey]
- * @param [options.fileName]
- * @param [options.baseURL]
- * @param [options.secureSignature]
- * @param [options.secureExpire]
- * @param [options.store]
- * @param [options.cancel]
- * @param [options.onProgress]
- * @param [options.source]
- * @param [options.integration]
- * @param [options.retryThrottledRequestMaxTimes]
- * @param [options.contentType]
- * @param [options.multipartChunkSize]
- * @param [options.multipartMaxAttempts]
- * @param [options.maxConcurrentRequests]
- * @param [options.checkForUrlDuplicates]
- * @param [options.saveUrlForRecurrentUploads]
- * @param [options.pusherKey]
  */
-export default function uploadFile(
+
+function uploadFile(
   data: NodeFile | BrowserFile | Url | Uuid,
   {
     publicKey,
@@ -75,11 +57,12 @@ export default function uploadFile(
     secureExpire,
     store,
 
-    cancel,
+    signal,
     onProgress,
 
     source,
     integration,
+    userAgent,
 
     retryThrottledRequestMaxTimes,
 
@@ -111,11 +94,12 @@ export default function uploadFile(
         secureExpire,
         store,
 
-        cancel,
+        signal,
         onProgress,
 
         source,
         integration,
+        userAgent,
 
         maxConcurrentRequests,
         retryThrottledRequestMaxTimes,
@@ -133,11 +117,12 @@ export default function uploadFile(
       secureExpire,
       store,
 
-      cancel,
+      signal,
       onProgress,
 
       source,
       integration,
+      userAgent,
 
       retryThrottledRequestMaxTimes,
 
@@ -158,11 +143,12 @@ export default function uploadFile(
       secureExpire,
       store,
 
-      cancel,
+      signal,
       onProgress,
 
       source,
       integration,
+      userAgent,
 
       retryThrottledRequestMaxTimes,
       pusherKey
@@ -176,11 +162,12 @@ export default function uploadFile(
       fileName,
       baseURL,
 
-      cancel,
+      signal,
       onProgress,
 
       source,
       integration,
+      userAgent,
 
       retryThrottledRequestMaxTimes,
 
@@ -189,4 +176,12 @@ export default function uploadFile(
   }
 
   throw new TypeError(`File uploading from "${data}" is not supported`)
+}
+
+export {
+  uploadFile,
+  uploadFromUrl,
+  uploadBase,
+  uploadFromUploaded,
+  uploadMultipart
 }

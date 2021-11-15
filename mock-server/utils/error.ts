@@ -1,9 +1,13 @@
 type ErrorType = {
   status?: number
   statusText: string
+  errorCode?: string
 }
 
-const error = (ctx, { status = 400, statusText }: ErrorType) => {
+const error = (
+  ctx,
+  { status = 400, statusText, errorCode }: ErrorType
+): void => {
   const isJson = !!ctx.query.jsonerrors
 
   ctx.status = status
@@ -14,7 +18,8 @@ const error = (ctx, { status = 400, statusText }: ErrorType) => {
     ctx.body = {
       error: {
         content: statusText,
-        status_code: status
+        status_code: status,
+        error_code: errorCode
       }
     }
   }

@@ -1,10 +1,10 @@
 import { GroupId, GroupInfo } from './types'
 import { FailedResponse } from '../request/types'
+import { CustomUserAgent } from '../types'
 
 import request from '../request/request.node'
 import getUrl from '../tools/getUrl'
 
-import CancelController from '../tools/CancelController'
 import defaultSettings from '../defaultSettings'
 import { getUserAgent } from '../tools/userAgent'
 import camelizeKeys from '../tools/camelizeKeys'
@@ -15,10 +15,11 @@ export type GroupInfoOptions = {
   publicKey: string
   baseURL?: string
 
-  cancel?: CancelController
+  signal?: AbortSignal
 
   source?: string
   integration?: string
+  userAgent?: CustomUserAgent
 
   retryThrottledRequestMaxTimes?: number
 }
@@ -33,9 +34,10 @@ export default function groupInfo(
   {
     publicKey,
     baseURL = defaultSettings.baseURL,
-    cancel,
+    signal,
     source,
     integration,
+    userAgent,
     retryThrottledRequestMaxTimes = defaultSettings.retryThrottledRequestMaxTimes
   }: GroupInfoOptions
 ): Promise<GroupInfo> {
@@ -44,7 +46,7 @@ export default function groupInfo(
       request({
         method: 'GET',
         headers: {
-          'X-UC-User-Agent': getUserAgent({ publicKey, integration })
+          'X-UC-User-Agent': getUserAgent({ publicKey, integration, userAgent })
         },
         url: getUrl(baseURL, '/group/info/', {
           jsonerrors: 1,
@@ -52,15 +54,16 @@ export default function groupInfo(
           group_id: id,
           source
         }),
-        cancel
+        signal
       }).then(({ data, headers, request }) => {
         const response = camelizeKeys<Response>(JSON.parse(data))
 
         if ('error' in response) {
           throw new UploadClientError(
-            `[${response.error.statusCode}] ${response.error.content}`,
+            response.error.content,
+            response.error.errorCode,
             request,
-            response.error,
+            response,
             headers
           )
         } else {

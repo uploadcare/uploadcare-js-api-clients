@@ -1,9 +1,9 @@
-import * as jsonIndex from '../data/from_url/index.json'
-import * as jsonStatus from '../data/from_url/status.json'
-import find from '../utils/find'
-import error from '../utils/error'
+import jsonIndex from '../data/from_url/index.js'
+import jsonStatus from '../data/from_url/status.js'
+import find from '../utils/find.js'
+import error from '../utils/error.js'
 
-import { PORT } from '../config'
+import { PORT } from '../config.js'
 
 /**
  * '/from_url/?pub_key=XXXXXXXXXXXXXXXXXXXX'

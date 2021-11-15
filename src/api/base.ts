@@ -1,7 +1,6 @@
 import request from '../request/request.node'
 import getFormData from '../tools/buildFormData'
 import getUrl from '../tools/getUrl'
-import CancelController from '../tools/CancelController'
 import { defaultSettings, defaultFilename } from '../defaultSettings'
 import { getUserAgent } from '../tools/userAgent'
 import camelizeKeys from '../tools/camelizeKeys'
@@ -9,7 +8,8 @@ import { UploadClientError } from '../tools/errors'
 import retryIfThrottled from '../tools/retryIfThrottled'
 
 /* Types */
-import { Uuid } from './types'
+import { Uuid, ProgressCallback } from './types'
+import { CustomUserAgent } from '../types'
 import { FailedResponse, NodeFile, BrowserFile } from '../request/types'
 
 export type BaseResponse = {
@@ -27,11 +27,12 @@ export type BaseOptions = {
   secureExpire?: string
   store?: boolean
 
-  cancel?: CancelController
-  onProgress?: ({ value: number }) => void
+  signal?: AbortSignal
+  onProgress?: ProgressCallback
 
   source?: string
   integration?: string
+  userAgent?: CustomUserAgent
 
   retryThrottledRequestMaxTimes?: number
 }
@@ -49,10 +50,11 @@ export default function base(
     secureSignature,
     secureExpire,
     store,
-    cancel,
+    signal,
     onProgress,
     source = 'local',
     integration,
+    userAgent,
     retryThrottledRequestMaxTimes = defaultSettings.retryThrottledRequestMaxTimes
   }: BaseOptions
 ): Promise<BaseResponse> {
@@ -64,7 +66,7 @@ export default function base(
           jsonerrors: 1
         }),
         headers: {
-          'X-UC-User-Agent': getUserAgent({ publicKey, integration })
+          'X-UC-User-Agent': getUserAgent({ publicKey, integration, userAgent })
         },
         data: getFormData([
           ['file', file, fileName ?? (file as File).name ?? defaultFilename],
@@ -77,16 +79,17 @@ export default function base(
           ['expire', secureExpire],
           ['source', source]
         ]),
-        cancel,
+        signal,
         onProgress
       }).then(({ data, headers, request }) => {
         const response = camelizeKeys<Response>(JSON.parse(data))
 
         if ('error' in response) {
           throw new UploadClientError(
-            `[${response.error.statusCode}] ${response.error.content}`,
+            response.error.content,
+            response.error.errorCode,
             request,
-            response.error,
+            response,
             headers
           )
         } else {

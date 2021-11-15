@@ -1,47 +1,52 @@
 import fromUrlStatus, { Status } from '../api/fromUrlStatus'
-import fromUrl, { TypeEnum } from '../api/fromUrl'
+import fromUrl, { TypeEnum, FromUrlOptions } from '../api/fromUrl'
 import { UploadClientError, cancelError } from '../tools/errors'
 import { poll } from '../tools/poll'
 import { race } from '../tools/race'
 import { isReadyPoll } from '../tools/isReadyPoll'
 import defaultSettings from '../defaultSettings'
+import { onCancel } from '../tools/onCancel'
 
 import { getPusher, preconnect } from './pusher'
 
 /* Types */
 import { FileInfo } from '../api/types'
-import CancelController from '../tools/CancelController'
+import { CustomUserAgent } from '../types'
 import { UploadcareFile } from '../tools/UploadcareFile'
+import { ProgressCallback } from '../api/types'
 
 function pollStrategy({
   token,
   publicKey,
   baseURL,
   integration,
+  userAgent,
   retryThrottledRequestMaxTimes,
   onProgress,
-  cancel
+  signal
 }: {
   token: string
   publicKey: string
   baseURL?: string
   integration?: string
+  userAgent?: CustomUserAgent
   retryThrottledRequestMaxTimes?: number
   onProgress?: (info: { value: number }) => void
-  cancel?: CancelController
+  signal?: AbortSignal
 }): Promise<FileInfo | UploadClientError> {
   return poll<FileInfo | UploadClientError>({
-    check: (cancel) =>
+    check: (signal) =>
       fromUrlStatus(token, {
         publicKey,
         baseURL,
         integration,
+        userAgent,
         retryThrottledRequestMaxTimes,
-        cancel
+        signal
       }).then((response) => {
         switch (response.status) {
           case Status.Error: {
-            return new UploadClientError(response.error)
+            return new UploadClientError(response.error, response.errorCode)
           }
           case Status.Waiting: {
             return false
@@ -64,21 +69,25 @@ function pollStrategy({
           }
         }
       }),
-    cancel
+    signal
   })
 }
+
+type UploadFromUrlOptions = {
+  baseCDN?: string
+  onProgress?: ProgressCallback
+  pusherKey?: string
+} & FromUrlOptions
 
 const pushStrategy = ({
   token,
   pusherKey,
-  cancel,
-  stopRace,
+  signal,
   onProgress
 }: {
   token: string
   pusherKey: string
-  cancel: CancelController
-  stopRace: () => void
+  signal: AbortSignal
   onProgress?: (info: { value: number }) => void
 }): Promise<FileInfo | UploadClientError> =>
   new Promise((resolve, reject) => {
@@ -89,14 +98,12 @@ const pushStrategy = ({
       pusher.unsubscribe(token)
     }
 
-    cancel.onCancel(() => {
+    onCancel(signal, () => {
       destroy()
-      reject(cancelError('pisher cancelled'))
+      reject(cancelError('pusher cancelled'))
     })
 
     pusher.subscribe(token, (result) => {
-      stopRace()
-
       switch (result.status) {
         case Status.Progress: {
           if (onProgress) {
@@ -114,29 +121,11 @@ const pushStrategy = ({
 
         case Status.Error: {
           destroy()
-          reject(new UploadClientError(result.msg))
+          reject(new UploadClientError(result.msg, result.error_code))
         }
       }
     })
   })
-
-type FromUrlOptions = {
-  publicKey: string
-  fileName?: string
-  baseURL?: string
-  baseCDN?: string
-  checkForUrlDuplicates?: boolean
-  saveUrlForRecurrentUploads?: boolean
-  secureSignature?: string
-  secureExpire?: string
-  store?: boolean
-  cancel?: CancelController
-  onProgress?: ({ value: number }) => void
-  source?: string
-  integration?: string
-  retryThrottledRequestMaxTimes?: number
-  pusherKey?: string
-}
 
 const uploadFromUrl = (
   sourceUrl: string,
@@ -150,13 +139,14 @@ const uploadFromUrl = (
     secureSignature,
     secureExpire,
     store,
-    cancel,
+    signal,
     onProgress,
     source,
     integration,
+    userAgent,
     retryThrottledRequestMaxTimes,
     pusherKey = defaultSettings.pusherKey
-  }: FromUrlOptions
+  }: UploadFromUrlOptions
 ): Promise<UploadcareFile> =>
   Promise.resolve(preconnect(pusherKey))
     .then(() =>
@@ -169,38 +159,44 @@ const uploadFromUrl = (
         secureSignature,
         secureExpire,
         store,
-        cancel,
+        signal,
         source,
         integration,
+        userAgent,
         retryThrottledRequestMaxTimes
       })
     )
+    .catch((error) => {
+      const pusher = getPusher(pusherKey)
+      pusher?.disconnect()
+      return Promise.reject(error)
+    })
     .then((urlResponse) => {
       if (urlResponse.type === TypeEnum.FileInfo) {
         return urlResponse
       } else {
         return race<FileInfo | UploadClientError>(
           [
-            ({ cancel }): Promise<FileInfo | UploadClientError> =>
+            ({ signal }): Promise<FileInfo | UploadClientError> =>
               pollStrategy({
                 token: urlResponse.token,
                 publicKey,
                 baseURL,
                 integration,
+                userAgent,
                 retryThrottledRequestMaxTimes,
                 onProgress,
-                cancel
+                signal
               }),
-            ({ stopRace, cancel }): Promise<FileInfo | UploadClientError> =>
+            ({ signal }): Promise<FileInfo | UploadClientError> =>
               pushStrategy({
                 token: urlResponse.token,
                 pusherKey,
-                stopRace,
-                cancel,
+                signal,
                 onProgress
               })
           ],
-          { cancel }
+          { signal }
         )
       }
     })
@@ -215,9 +211,10 @@ const uploadFromUrl = (
         publicKey,
         baseURL,
         integration,
+        userAgent,
         retryThrottledRequestMaxTimes,
         onProgress,
-        cancel
+        signal
       })
     )
     .then((fileInfo) => new UploadcareFile(fileInfo, { baseCDN }))

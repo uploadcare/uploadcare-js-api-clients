@@ -1,12 +1,12 @@
 import { FileInfo, Token } from './types'
 import { FailedResponse } from '../request/types'
+import { CustomUserAgent } from '../types'
 
 import request from '../request/request.node'
 import getUrl from '../tools/getUrl'
 
 import defaultSettings from '../defaultSettings'
 import { getUserAgent } from '../tools/userAgent'
-import CancelController from '../tools/CancelController'
 import camelizeKeys from '../tools/camelizeKeys'
 import { UploadClientError } from '../tools/errors'
 import retryIfThrottled from '../tools/retryIfThrottled'
@@ -37,6 +37,7 @@ type StatusProgressResponse = {
 type StatusErrorResponse = {
   status: Status.Error
   error: string
+  errorCode: string
 }
 
 type StatusSuccessResponse = {
@@ -63,9 +64,10 @@ export type FromUrlStatusOptions = {
 
   baseURL?: string
 
-  cancel?: CancelController
+  signal?: AbortSignal
 
   integration?: string
+  userAgent?: CustomUserAgent
 
   retryThrottledRequestMaxTimes?: number
 }
@@ -78,8 +80,9 @@ export default function fromUrlStatus(
   {
     publicKey,
     baseURL = defaultSettings.baseURL,
-    cancel,
+    signal,
     integration,
+    userAgent,
     retryThrottledRequestMaxTimes = defaultSettings.retryThrottledRequestMaxTimes
   }: FromUrlStatusOptions = {}
 ): Promise<FromUrlStatusResponse> {
@@ -88,21 +91,28 @@ export default function fromUrlStatus(
       request({
         method: 'GET',
         headers: publicKey
-          ? { 'X-UC-User-Agent': getUserAgent({ publicKey, integration }) }
+          ? {
+              'X-UC-User-Agent': getUserAgent({
+                publicKey,
+                integration,
+                userAgent
+              })
+            }
           : undefined,
         url: getUrl(baseURL, '/from_url/status/', {
           jsonerrors: 1,
           token
         }),
-        cancel
+        signal
       }).then(({ data, headers, request }) => {
         const response = camelizeKeys<Response>(JSON.parse(data))
 
         if ('error' in response && !isErrorResponse(response)) {
           throw new UploadClientError(
-            `[${response.error.statusCode}] ${response.error.content}`,
+            response.error.content,
+            undefined,
             request,
-            response.error,
+            response,
             headers
           )
         } else {

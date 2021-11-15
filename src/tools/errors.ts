@@ -1,17 +1,24 @@
 import { Headers, ErrorRequestInfo } from '../request/types'
 
 type ErrorResponseInfo = {
-  statusCode: number
-  content: string
+  error?: {
+    statusCode: number
+    content: string
+    errorCode: string
+  }
 }
 
 export class UploadClientError extends Error {
+  isCancel?: boolean
+
+  readonly code?: string
   readonly request?: ErrorRequestInfo
   readonly response?: ErrorResponseInfo
   readonly headers?: Headers
 
   constructor(
     message: string,
+    code?: string,
     request?: ErrorRequestInfo,
     response?: ErrorResponseInfo,
     headers?: Headers
@@ -20,6 +27,7 @@ export class UploadClientError extends Error {
 
     this.name = 'UploadClientError'
     this.message = message
+    this.code = code
     this.request = request
     this.response = response
     this.headers = headers

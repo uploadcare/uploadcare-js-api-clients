@@ -1,9 +1,10 @@
 import base from '../api/base'
 import { UploadcareFile } from '../tools/UploadcareFile'
-import CancelController from '../tools/CancelController'
+import { isReadyPoll } from '../tools/isReadyPoll'
 
 import { NodeFile, BrowserFile } from '../request/types'
-import { isReadyPoll } from '../tools/isReadyPoll'
+import { ProgressCallback } from '../api/types'
+import { CustomUserAgent } from '../types'
 
 type FromObjectOptions = {
   publicKey: string
@@ -14,11 +15,12 @@ type FromObjectOptions = {
   secureExpire?: string
   store?: boolean
 
-  cancel?: CancelController
-  onProgress?: ({ value: number }) => void
+  signal?: AbortSignal
+  onProgress?: ProgressCallback
 
   source?: string
   integration?: string
+  userAgent?: CustomUserAgent
 
   retryThrottledRequestMaxTimes?: number
 
@@ -36,11 +38,12 @@ const uploadFromObject = (
     secureExpire,
     store,
 
-    cancel,
+    signal,
     onProgress,
 
     source,
     integration,
+    userAgent,
 
     retryThrottledRequestMaxTimes,
 
@@ -54,10 +57,11 @@ const uploadFromObject = (
     secureSignature,
     secureExpire,
     store,
-    cancel,
+    signal,
     onProgress,
     source,
     integration,
+    userAgent,
     retryThrottledRequestMaxTimes
   })
     .then(({ file }) => {
@@ -67,9 +71,10 @@ const uploadFromObject = (
         baseURL,
         source,
         integration,
+        userAgent,
         retryThrottledRequestMaxTimes,
         onProgress,
-        cancel
+        signal
       })
     })
     .then((fileInfo) => new UploadcareFile(fileInfo, { baseCDN }))

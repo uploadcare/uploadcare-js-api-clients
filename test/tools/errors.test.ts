@@ -13,6 +13,13 @@ describe('UploadClientError', () => {
     expect(error.message).toBe('test error')
   })
 
+  it('should have code', () => {
+    const error = new UploadClientError('test error', 'error code')
+
+    expect(error.message).toBe('test error')
+    expect(error.code).toBe('error code')
+  })
+
   it('should have stack', () => {
     const error = new UploadClientError('test error')
 

@@ -1,6 +1,7 @@
+import AbortController from 'abort-controller'
 import base from '../../src/api/base'
 import * as factory from '../_fixtureFactory'
-import CancelController from '../../src/tools/CancelController'
+import { UploadClientError } from '../../src/tools/errors'
 
 describe('API - base', () => {
   const fileToUpload = factory.image('blackSquare')
@@ -15,13 +16,13 @@ describe('API - base', () => {
   it('should be able to cancel uploading', async () => {
     const timeout = jest.fn()
     const publicKey = factory.publicKey('demo')
-    const controller = new CancelController()
+    const controller = new AbortController()
     const directUpload = base(fileToUpload.data, {
       publicKey,
-      cancel: controller
+      signal: controller.signal
     })
 
-    controller.cancel()
+    controller.abort()
 
     const timeoutId = setTimeout(timeout, 10)
 
@@ -38,5 +39,20 @@ describe('API - base', () => {
     await base(fileToUpload.data, { publicKey, onProgress })
 
     expect(onProgress).toHaveBeenCalled()
+  })
+
+  it('should be rejected with error code if failed', async () => {
+    const publicKey = factory.publicKey('invalid')
+
+    try {
+      await base(fileToUpload.data, { publicKey })
+    } catch (error) {
+      expect((error as UploadClientError).message).toEqual(
+        'UPLOADCARE_PUB_KEY is invalid.'
+      )
+      expect((error as UploadClientError).code).toEqual(
+        'ProjectPublicKeyInvalidError'
+      )
+    }
   })
 })

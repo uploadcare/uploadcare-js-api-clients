@@ -1,4 +1,4 @@
-import uploadFile, { FileFromOptions } from '../uploadFile'
+import { uploadFile, FileFromOptions } from '../uploadFile'
 import defaultSettings from '../defaultSettings'
 import group from '../api/group'
 import { UploadcareGroup } from '../tools/UploadcareGroup'
@@ -14,25 +14,6 @@ export type GroupFromOptions = {
   jsonpCallback?: string
 }
 
-/**
- * Uploads file from provided data.
- * @param data
- * @param options
- * @param [options.publicKey]
- * @param [options.fileName]
- * @param [options.baseURL]
- * @param [options.secureSignature]
- * @param [options.secureExpire]
- * @param [options.store]
- * @param [options.cancel]
- * @param [options.onProgress]
- * @param [options.source]
- * @param [options.integration]
- * @param [options.retryThrottledRequestMaxTimes]
- * @param [options.contentType]
- * @param [options.multipartChunkSize]
- * @param [options.baseCDN]
- */
 export default function uploadFileGroup(
   data: (NodeFile | BrowserFile)[] | Url[] | Uuid[],
   {
@@ -44,11 +25,12 @@ export default function uploadFileGroup(
     secureExpire,
     store,
 
-    cancel,
+    signal,
     onProgress,
 
     source,
     integration,
+    userAgent,
 
     retryThrottledRequestMaxTimes,
 
@@ -97,11 +79,12 @@ export default function uploadFileGroup(
           secureExpire,
           store,
 
-          cancel,
+          signal,
           onProgress: createProgressHandler(filesCount, index),
 
           source,
           integration,
+          userAgent,
 
           retryThrottledRequestMaxTimes,
 
@@ -132,9 +115,10 @@ export default function uploadFileGroup(
       jsonpCallback,
       secureSignature,
       secureExpire,
-      cancel,
+      signal,
       source,
       integration,
+      userAgent,
       retryThrottledRequestMaxTimes
     }).then((groupInfo) => new UploadcareGroup(groupInfo, filesInGroup))
   })

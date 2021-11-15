@@ -1,7 +1,7 @@
 import info from '../api/info'
 import { poll } from './poll'
 import { FileInfo } from '../api/types'
-import CancelController from './CancelController'
+import { CustomUserAgent } from '../types'
 
 type ArgsIsReadyPool = {
   file: string
@@ -9,9 +9,10 @@ type ArgsIsReadyPool = {
   baseURL?: string
   source?: string
   integration?: string
+  userAgent?: CustomUserAgent
   retryThrottledRequestMaxTimes?: number
   onProgress?: (args: { value: number }) => void
-  cancel?: CancelController
+  signal?: AbortSignal
 }
 
 function isReadyPoll({
@@ -20,18 +21,20 @@ function isReadyPoll({
   baseURL,
   source,
   integration,
+  userAgent,
   retryThrottledRequestMaxTimes,
-  cancel,
+  signal,
   onProgress
 }: ArgsIsReadyPool): FileInfo | PromiseLike<FileInfo> {
   return poll<FileInfo>({
-    check: (cancel) =>
+    check: (signal) =>
       info(file, {
         publicKey,
         baseURL,
-        cancel,
+        signal,
         source,
         integration,
+        userAgent,
         retryThrottledRequestMaxTimes
       }).then((response) => {
         if (response.isReady) {
@@ -40,7 +43,7 @@ function isReadyPoll({
         onProgress && onProgress({ value: 1 })
         return false
       }),
-    cancel
+    signal
   })
 }
 

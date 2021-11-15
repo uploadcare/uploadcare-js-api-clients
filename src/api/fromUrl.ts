@@ -1,17 +1,15 @@
-import { FileInfo } from './types'
+import { FileInfo, Url } from './types'
 import { FailedResponse } from '../request/types'
+import { CustomUserAgent } from '../types'
 
 import request from '../request/request.node'
 import getUrl from '../tools/getUrl'
 
-import CancelController from '../tools/CancelController'
 import defaultSettings from '../defaultSettings'
 import { getUserAgent } from '../tools/userAgent'
 import camelizeKeys from '../tools/camelizeKeys'
 import { UploadClientError } from '../tools/errors'
 import retryIfThrottled from '../tools/retryIfThrottled'
-
-type Url = string
 
 export enum TypeEnum {
   Token = 'token',
@@ -62,10 +60,11 @@ export type FromUrlOptions = {
   secureSignature?: string
   secureExpire?: string
 
-  cancel?: CancelController
+  signal?: AbortSignal
 
   source?: string
   integration?: string
+  userAgent?: CustomUserAgent
 
   retryThrottledRequestMaxTimes?: number
 }
@@ -85,8 +84,9 @@ export default function fromUrl(
     secureSignature,
     secureExpire,
     source = 'url',
-    cancel,
+    signal,
     integration,
+    userAgent,
     retryThrottledRequestMaxTimes = defaultSettings.retryThrottledRequestMaxTimes
   }: FromUrlOptions
 ): Promise<FromUrlSuccessResponse> {
@@ -95,7 +95,7 @@ export default function fromUrl(
       request({
         method: 'POST',
         headers: {
-          'X-UC-User-Agent': getUserAgent({ publicKey, integration })
+          'X-UC-User-Agent': getUserAgent({ publicKey, integration, userAgent })
         },
         url: getUrl(baseURL, '/from_url/', {
           jsonerrors: 1,
@@ -109,15 +109,16 @@ export default function fromUrl(
           expire: secureExpire,
           source: source
         }),
-        cancel
+        signal
       }).then(({ data, headers, request }) => {
         const response = camelizeKeys<Response>(JSON.parse(data))
 
         if ('error' in response) {
           throw new UploadClientError(
-            `[${response.error.statusCode}] ${response.error.content}`,
+            response.error.content,
+            response.error.errorCode,
             request,
-            response.error,
+            response,
             headers
           )
         } else {

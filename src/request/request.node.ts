@@ -1,11 +1,12 @@
-import * as NodeFormData from 'form-data'
+import NodeFormData from 'form-data'
 
-import * as http from 'http'
-import * as https from 'https'
+import http from 'http'
+import https from 'https'
 import { parse } from 'url'
 import { Readable, Transform } from 'stream'
 
 import { cancelError } from '../tools/errors'
+import { onCancel } from '../tools/onCancel'
 import { RequestOptions, RequestResponse } from './types'
 
 // ProgressEmitter is a simple PassThrough-style transform stream which keeps
@@ -61,7 +62,7 @@ function isReadable(
 }
 
 const request = (params: RequestOptions): Promise<RequestResponse> => {
-  const { method = 'GET', url, data, headers = {}, cancel, onProgress } = params
+  const { method = 'GET', url, data, headers = {}, signal, onProgress } = params
 
   return Promise.resolve()
     .then(() => {
@@ -93,14 +94,12 @@ const request = (params: RequestOptions): Promise<RequestResponse> => {
               ? http.request(options)
               : https.request(options)
 
-          if (cancel) {
-            cancel.onCancel(() => {
-              aborted = true
-              req.abort()
+          onCancel(signal, () => {
+            aborted = true
+            req.abort()
 
-              reject(cancelError())
-            })
-          }
+            reject(cancelError())
+          })
 
           req.on('response', (res) => {
             if (aborted) return

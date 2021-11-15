@@ -1,10 +1,3 @@
-/**
- * Make all properties in T optional
- */
-type Partial<T> = {
-  [P in keyof T]?: T[P]
-}
-
 export interface DefaultSettings {
   baseCDN: string
   baseURL: string
@@ -20,15 +13,28 @@ export interface DefaultSettings {
 }
 
 export interface Settings extends Partial<DefaultSettings> {
-  publicKey?: string
+  publicKey: string
   fileName?: string
   contentType?: string
   store?: boolean
   secureSignature?: string
   secureExpire?: string
   integration?: string
+  userAgent?: CustomUserAgent
   checkForUrlDuplicates?: boolean
   saveUrlForRecurrentUploads?: boolean
   source?: string
   jsonpCallback?: string
 }
+
+type CustomUserAgentOptions = {
+  publicKey: string
+  libraryName: string
+  libraryVersion: string
+  languageName: string
+  integration?: string
+}
+
+export type CustomUserAgent =
+  | string
+  | ((options: CustomUserAgentOptions) => string)

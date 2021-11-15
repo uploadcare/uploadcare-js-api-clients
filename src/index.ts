@@ -1,19 +1,27 @@
-import UploadClient from './UploadClient'
+/* Low-Level API */
+export { default as base } from './api/base'
+export { default as fromUrl } from './api/fromUrl'
+export { default as fromUrlStatus } from './api/fromUrlStatus'
+export { default as group } from './api/group'
+export { default as groupInfo } from './api/groupInfo'
+export { default as info } from './api/info'
+export { default as multipartStart } from './api/multipartStart'
+export { default as multipartUpload } from './api/multipartUpload'
+export { default as multipartComplete } from './api/multipartComplete'
 
-import base from './api/base'
-import fromUrl from './api/fromUrl'
-import fromUrlStatus from './api/fromUrlStatus'
-import group from './api/group'
-import groupInfo from './api/groupInfo'
-import info from './api/info'
-import multipartStart from './api/multipartStart'
-import multipartUpload from './api/multipartUpload'
-import multipartComplete from './api/multipartComplete'
+/* High-Level API */
+export {
+  uploadFile,
+  uploadFromUrl,
+  uploadBase,
+  uploadFromUploaded,
+  uploadMultipart
+} from './uploadFile'
+export { default as uploadFileGroup } from './uploadFileGroup'
 
-import uploadFile from './uploadFile'
-import uploadFileGroup from './uploadFileGroup'
-
-import CancelController from './tools/CancelController'
+/* Helpers */
+export { default as UploadClient } from './UploadClient'
+export { AbortController } from 'abort-controller'
 
 /* Types */
 export { Settings } from './types'
@@ -40,24 +48,3 @@ export {
 } from './api/multipartUpload'
 export { FileFromOptions } from './uploadFile'
 export { GroupFromOptions } from './uploadFileGroup'
-
-/* Middle-Level API */
-export {
-  base,
-  fromUrl,
-  fromUrlStatus,
-  group,
-  groupInfo,
-  info,
-  multipartStart,
-  multipartUpload,
-  multipartComplete
-}
-
-/* High-Level API */
-export { uploadFile, uploadFileGroup }
-
-/* Helpers */
-export { CancelController }
-
-export default UploadClient

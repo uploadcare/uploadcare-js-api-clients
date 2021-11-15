@@ -1,5 +1,4 @@
-import * as NodeFormData from 'form-data'
-import CancelController from '../tools/CancelController'
+import NodeFormData from 'form-data'
 
 export type Headers = {
   [key: string]: string | string[] | undefined
@@ -11,7 +10,7 @@ export type RequestOptions = {
   query?: string
   data?: NodeFormData | FormData | BrowserFile | NodeFile
   headers?: Headers
-  cancel?: CancelController
+  signal?: AbortSignal
   onProgress?: ({ value: number }) => void
 }
 
@@ -34,6 +33,7 @@ export type FailedResponse = {
   error: {
     content: string
     statusCode: number
+    errorCode: string
   }
 }
 

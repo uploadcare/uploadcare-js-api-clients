@@ -1,4 +1,4 @@
-import error from '../utils/error'
+import error from '../utils/error.js'
 
 let times = 0
 
