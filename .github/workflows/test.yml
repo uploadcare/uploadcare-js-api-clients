@@ -16,3 +16,7 @@ jobs:
       - name: Run lint
         working-directory: ./
         run: npm run lint
+      - run: npm run test:production
+        env:
+          UC_KEY_FOR_INTEGRATION_TESTS: ${{ secrets.UC_KEY_FOR_INTEGRATION_TESTS }}
+
