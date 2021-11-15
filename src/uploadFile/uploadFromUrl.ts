@@ -83,13 +83,11 @@ const pushStrategy = ({
   token,
   pusherKey,
   signal,
-  stopRace,
   onProgress
 }: {
   token: string
   pusherKey: string
   signal: AbortSignal
-  stopRace: () => void
   onProgress?: (info: { value: number }) => void
 }): Promise<FileInfo | UploadClientError> =>
   new Promise((resolve, reject) => {
@@ -106,8 +104,6 @@ const pushStrategy = ({
     })
 
     pusher.subscribe(token, result => {
-      stopRace()
-
       switch (result.status) {
         case Status.Progress: {
           if (onProgress) {
@@ -187,11 +183,10 @@ const uploadFromUrl = (
                 onProgress,
                 signal
               }),
-            ({ stopRace, signal }): Promise<FileInfo | UploadClientError> =>
+            ({ signal }): Promise<FileInfo | UploadClientError> =>
               pushStrategy({
                 token: urlResponse.token,
                 pusherKey,
-                stopRace,
                 signal,
                 onProgress
               })
