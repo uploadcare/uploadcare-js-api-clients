@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/camelcase */
 export default {
   info: {
     is_stored: false,

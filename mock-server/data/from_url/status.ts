@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/camelcase */
 export default {
   progress: {
     status: 'progress',

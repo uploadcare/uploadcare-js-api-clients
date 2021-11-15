@@ -4,8 +4,6 @@ type ErrorType = {
   errorCode?: string
 }
 
-/* eslint @typescript-eslint/camelcase: [2, {allow: ["status_code", "error_code"]}] */
-
 const error = (
   ctx,
   { status = 400, statusText, errorCode }: ErrorType

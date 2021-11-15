@@ -26,14 +26,14 @@ const poll = <T>({
     const tick = (): void => {
       try {
         Promise.resolve(check(signal))
-          .then(result => {
+          .then((result) => {
             if (result) {
               resolve(result)
             } else {
               timeoutId = setTimeout(tick, interval)
             }
           })
-          .catch(error => reject(error))
+          .catch((error) => reject(error))
       } catch (error) {
         reject(error)
       }

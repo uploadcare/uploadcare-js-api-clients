@@ -35,7 +35,7 @@ function pollStrategy({
   signal?: AbortSignal
 }): Promise<FileInfo | UploadClientError> {
   return poll<FileInfo | UploadClientError>({
-    check: signal =>
+    check: (signal) =>
       fromUrlStatus(token, {
         publicKey,
         baseURL,
@@ -43,7 +43,7 @@ function pollStrategy({
         userAgent,
         retryThrottledRequestMaxTimes,
         signal
-      }).then(response => {
+      }).then((response) => {
         switch (response.status) {
           case Status.Error: {
             return new UploadClientError(response.error, response.errorCode)
@@ -103,7 +103,7 @@ const pushStrategy = ({
       reject(cancelError('pusher cancelled'))
     })
 
-    pusher.subscribe(token, result => {
+    pusher.subscribe(token, (result) => {
       switch (result.status) {
         case Status.Progress: {
           if (onProgress) {
@@ -166,12 +166,12 @@ const uploadFromUrl = (
         retryThrottledRequestMaxTimes
       })
     )
-    .catch(error => {
+    .catch((error) => {
       const pusher = getPusher(pusherKey)
       pusher?.disconnect()
       return Promise.reject(error)
     })
-    .then(urlResponse => {
+    .then((urlResponse) => {
       if (urlResponse.type === TypeEnum.FileInfo) {
         return urlResponse
       } else {

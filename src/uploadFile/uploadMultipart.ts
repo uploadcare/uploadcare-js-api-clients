@@ -39,18 +39,6 @@ export type MultipartOptions = {
   baseCDN?: string
 }
 
-const getChunk = (
-  file: Buffer | Blob,
-  index: number,
-  fileSize: number,
-  chunkSize: number
-): Buffer | Blob => {
-  const start = chunkSize * index
-  const end = Math.min(start + chunkSize, fileSize)
-
-  return file.slice(start, end)
-}
-
 const uploadPartWithRetry = (
   chunk: Buffer | Blob,
   url: string,
@@ -76,7 +64,6 @@ const uploadPartWithRetry = (
       throw error
     })
   )
-
 
 const uploadMultipart = (
   file: NodeFile | BrowserFile,

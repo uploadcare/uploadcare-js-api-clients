@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/camelcase */
 export default {
   info: {
     id: '01136e2a-7d57-4546-81be-1043e7774e70~2',

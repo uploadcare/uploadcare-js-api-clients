@@ -8,7 +8,7 @@ import { NodeFile, BrowserFile } from '../request/types'
 export type MultipartUploadOptions = {
   publicKey?: string
   signal?: AbortSignal
-  onProgress?: ({ value: number }) => void
+  onProgress?: ProgressCallback
   integration?: string
   retryThrottledRequestMaxTimes?: number
 }
