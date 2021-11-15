@@ -70,7 +70,7 @@ describe('uploadFrom Object (multipart)', () => {
 
   it('should be rejected with error code if failed', async () => {
     const settings = getSettingsForTesting({
-      publicKey: 'wrong'
+      publicKey: factory.publicKey('invalid')
     })
 
     try {

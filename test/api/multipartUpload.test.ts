@@ -70,7 +70,7 @@ describe('API - multipartUpload', () => {
 
   it('should be rejected with error code if failed', async () => {
     const options = getSettingsForTesting({
-      publicKey: 'wrong'
+      publicKey: factory.publicKey('invalid')
     })
     const [url, part] = parts[2]
 

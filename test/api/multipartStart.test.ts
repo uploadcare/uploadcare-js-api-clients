@@ -55,7 +55,7 @@ describe('API - multipartStart', () => {
   it('should be rejected with error code if failed', async () => {
     const size = factory.file(9).size
     const settings = getSettingsForTesting({
-      publicKey: 'wrong',
+      publicKey: factory.publicKey('invalid'),
       contentType: 'application/octet-stream'
     })
 

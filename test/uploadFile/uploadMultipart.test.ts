@@ -55,7 +55,7 @@ describe('API - multipart', () => {
   it('should be rejected with error code if failed', async () => {
     const fileToUpload = factory.file(11).data
     const settings = getSettingsForTesting({
-      publicKey: 'wrong',
+      publicKey: factory.publicKey('invalid'),
       contentType: 'application/octet-stream'
     })
 

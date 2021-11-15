@@ -72,7 +72,7 @@ describe('uploadFrom Object', () => {
   it('should be rejected with error code if failed', async () => {
     const fileToUpload = factory.image('blackSquare').data
     const settings = getSettingsForTesting({
-      publicKey: 'wrong'
+      publicKey: factory.publicKey('invalid')
     })
 
     try {

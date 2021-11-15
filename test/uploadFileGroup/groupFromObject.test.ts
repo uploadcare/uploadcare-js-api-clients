@@ -59,14 +59,14 @@ describe('groupFrom Object[]', () => {
 
   it('should be rejected with error code if failed', async () => {
     const settings = getSettingsForTesting({
-      publicKey: 'wrong'
+      publicKey: factory.publicKey('invalid')
     })
 
     try {
       await uploadFileGroup(files, settings)
     } catch (error) {
       expect((error as UploadClientError).message).toEqual(
-        'pub_key is invalid.'
+        'UPLOADCARE_PUB_KEY is invalid.'
       )
       expect((error as UploadClientError).code).toEqual(
         'ProjectPublicKeyInvalidError'

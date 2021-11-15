@@ -60,7 +60,7 @@ describe('API - group', () => {
   })
 
   it('should be rejected with error code if failed', async () => {
-    const publicKey = 'wrong'
+    const publicKey = factory.publicKey('invalid')
 
     try {
       await group([], { publicKey })

@@ -77,7 +77,7 @@ describe('uploadFrom URL', () => {
   it('should be rejected with error code if failed', async () => {
     const sourceUrl = factory.imageUrl('valid')
     const settings = getSettingsForTesting({
-      publicKey: 'wrong'
+      publicKey: factory.publicKey('invalid')
     })
 
     try {

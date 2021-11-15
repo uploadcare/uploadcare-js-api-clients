@@ -83,7 +83,8 @@ const auth = (ctx, next) => {
       status: 403,
       statusText: params.publicKey
         ? `${key} is invalid.`
-        : `${key} is required.`
+        : `${key} is required.`,
+      errorCode: 'ProjectPublicKeyInvalidError'
     })
   }
 }
