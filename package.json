@@ -95,7 +95,7 @@
     "mock-socket": "9.0.3",
     "prettier-config-standard": "4.0.0",
     "rimraf": "3.0.2",
-    "shipjs": "0.22.0",
+    "shipjs": "0.24.0",
     "start-server-and-test": "1.11.7",
     "ts-jest": "26.4.1",
     "ts-node": "9.1.1"
