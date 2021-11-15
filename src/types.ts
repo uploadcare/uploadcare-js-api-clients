@@ -35,6 +35,6 @@ type CustomUserAgentOptions = {
   integration?: string
 }
 
-export type CustomUserAgent =
-  | string
-  | ((options: CustomUserAgentOptions) => string)
+type CustomUserAgentFn = (options: CustomUserAgentOptions) => string
+
+export type CustomUserAgent = string | CustomUserAgentFn
