@@ -65,7 +65,7 @@
     "@types/koa": "2.11.3",
     "@types/node": "12.12.54",
     "@types/promise": "7.1.30",
-    "@types/ws": "7.2.6",
+    "@types/ws": "8.2.0",
     "@typescript-eslint/eslint-plugin": "2.34.0",
     "@typescript-eslint/parser": "2.34.0",
     "chalk": "4.1.0",
@@ -97,6 +97,6 @@
   "dependencies": {
     "abort-controller": "^3.0.0",
     "form-data": "^4.0.0",
-    "ws": "^7.2.1"
+    "ws": "^8.2.3"
   }
 }
