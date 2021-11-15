@@ -51,4 +51,23 @@ describe('API - multipart', () => {
     expect(onProgress).toHaveBeenCalled()
     expect(onProgress).toHaveBeenCalledWith({ value: 1 })
   })
+
+  it('should be rejected with error code if failed', async () => {
+    const fileToUpload = factory.file(11).data
+    const settings = getSettingsForTesting({
+      publicKey: 'wrong',
+      contentType: 'application/octet-stream'
+    })
+
+    try {
+      await uploadMultipart(fileToUpload, settings)
+    } catch (error) {
+      expect((error as UploadClientError).message).toEqual(
+        'UPLOADCARE_PUB_KEY is invalid.'
+      )
+      expect((error as UploadClientError).code).toEqual(
+        'ProjectPublicKeyInvalidError'
+      )
+    }
+  })
 })

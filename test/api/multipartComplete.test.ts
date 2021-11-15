@@ -90,4 +90,19 @@ describe('API - multipartComplete', () => {
       new UploadClientError('uuid is required.')
     )
   })
+
+  it('should be rejected with error code if failed', async () => {
+    const publicKey = 'wrong'
+
+    try {
+      await multipartComplete('', { publicKey })
+    } catch (error) {
+      expect((error as UploadClientError).message).toEqual(
+        'UPLOADCARE_PUB_KEY is invalid.'
+      )
+      expect((error as UploadClientError).code).toEqual(
+        'ProjectPublicKeyInvalidError'
+      )
+    }
+  })
 })

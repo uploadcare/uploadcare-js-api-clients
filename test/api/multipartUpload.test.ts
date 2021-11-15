@@ -67,4 +67,22 @@ describe('API - multipartUpload', () => {
     expect(onProgress).toHaveBeenCalled()
     expect(onProgress).toHaveBeenCalledWith({ value: 1 })
   })
+
+  it('should be rejected with error code if failed', async () => {
+    const options = getSettingsForTesting({
+      publicKey: 'wrong'
+    })
+    const [url, part] = parts[2]
+
+    try {
+      await multipartUpload(part, url, options)
+    } catch (error) {
+      expect((error as UploadClientError).message).toEqual(
+        'UPLOADCARE_PUB_KEY is invalid.'
+      )
+      expect((error as UploadClientError).code).toEqual(
+        'ProjectPublicKeyInvalidError'
+      )
+    }
+  })
 })

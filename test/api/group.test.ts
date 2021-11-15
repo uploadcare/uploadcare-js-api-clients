@@ -2,6 +2,7 @@ import AbortController from 'abort-controller'
 import * as factory from '../_fixtureFactory'
 import { getSettingsForTesting } from '../_helpers'
 import group from '../../src/api/group'
+import { UploadClientError } from '../../src/tools/errors'
 
 describe('API - group', () => {
   const files = factory.groupOfFiles('valid')
@@ -56,5 +57,20 @@ describe('API - group', () => {
     await expect(group(files, settings)).rejects.toThrowError(
       'Request canceled'
     )
+  })
+
+  it('should be rejected with error code if failed', async () => {
+    const publicKey = 'wrong'
+
+    try {
+      await group([], { publicKey })
+    } catch (error) {
+      expect((error as UploadClientError).message).toEqual(
+        'pub_key is invalid.'
+      )
+      expect((error as UploadClientError).code).toEqual(
+        'ProjectPublicKeyInvalidError'
+      )
+    }
   })
 })

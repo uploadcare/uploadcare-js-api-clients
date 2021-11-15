@@ -166,6 +166,11 @@ const uploadFromUrl = (
         retryThrottledRequestMaxTimes
       })
     )
+    .catch(error => {
+      const pusher = getPusher(pusherKey)
+      pusher?.disconnect()
+      return Promise.reject(error)
+    })
     .then(urlResponse => {
       if (urlResponse.type === TypeEnum.FileInfo) {
         return urlResponse

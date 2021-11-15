@@ -1,7 +1,7 @@
 import AbortController from 'abort-controller'
 import * as factory from '../_fixtureFactory'
 import { getSettingsForTesting } from '../_helpers'
-
+import { UploadClientError } from '../../src/tools/errors'
 import { uploadFile } from '../../src/uploadFile'
 
 describe('uploadFrom Object', () => {
@@ -67,5 +67,23 @@ describe('uploadFrom Object', () => {
 
     expect(onProgress).toHaveBeenCalled()
     expect(onProgress).toHaveBeenCalledWith({ value: 1 })
+  })
+
+  it('should be rejected with error code if failed', async () => {
+    const fileToUpload = factory.image('blackSquare').data
+    const settings = getSettingsForTesting({
+      publicKey: 'wrong'
+    })
+
+    try {
+      await uploadFile(fileToUpload, settings)
+    } catch (error) {
+      expect((error as UploadClientError).message).toEqual(
+        'UPLOADCARE_PUB_KEY is invalid.'
+      )
+      expect((error as UploadClientError).code).toEqual(
+        'ProjectPublicKeyInvalidError'
+      )
+    }
   })
 })

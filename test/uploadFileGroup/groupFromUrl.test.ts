@@ -56,4 +56,21 @@ describe('groupFrom Url[]', () => {
 
     expect(progressValue).toBe(1)
   })
+
+  it('should be rejected with error code if failed', async () => {
+    const settings = getSettingsForTesting({
+      publicKey: 'wrong'
+    })
+
+    try {
+      await uploadFileGroup(files, settings)
+    } catch (error) {
+      expect((error as UploadClientError).message).toEqual(
+        'pub_key is invalid.'
+      )
+      expect((error as UploadClientError).code).toEqual(
+        'ProjectPublicKeyInvalidError'
+      )
+    }
+  })
 })
