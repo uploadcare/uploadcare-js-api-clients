@@ -24,7 +24,7 @@ const runWithConcurrency = <T>(
               resolve(results)
             }
           })
-          .catch(error => {
+          .catch((error) => {
             rejected = true
             reject(error)
           })

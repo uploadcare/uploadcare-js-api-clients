@@ -6,7 +6,7 @@ let times = 0
  * '/throttle/'
  * @param {object} ctx
  */
-const index = ctx => {
+const index = (ctx) => {
   times++
 
   if (times === 2) {

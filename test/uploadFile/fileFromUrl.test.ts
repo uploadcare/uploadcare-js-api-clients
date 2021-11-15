@@ -3,6 +3,8 @@ import * as factory from '../_fixtureFactory'
 import { uploadFile } from '../../src/uploadFile'
 import { getSettingsForTesting } from '../_helpers'
 import { UploadClientError } from '../../src/tools/errors'
+import http from 'http'
+import https from 'https'
 
 jest.setTimeout(60000)
 
@@ -29,6 +31,44 @@ describe('uploadFrom URL', () => {
     const file = await uploadFile(sourceUrl, settings)
 
     expect(file.isStored).toBeFalsy()
+  })
+
+  fit('should accept checkForUrlDuplicates setting', async () => {
+    const sourceUrl = factory.imageUrl('valid')
+    const settings = getSettingsForTesting({
+      publicKey: factory.publicKey('image'),
+      checkForUrlDuplicates: true
+    })
+
+    const isHttpsProtocol = settings.baseURL.includes('https')
+    const spy = jest.spyOn(isHttpsProtocol ? https : http, 'request')
+    await uploadFile(sourceUrl, settings)
+
+    const uploadRequest = spy.mock.calls[0][0]
+    expect(uploadRequest['query']).toEqual(
+      expect.stringContaining('check_URL_duplicates=1')
+    )
+    spy.mockClear()
+  })
+
+  it('should accept saveUrlForRecurrentUploads setting', async () => {
+    const sourceUrl = factory.imageUrl('valid')
+    const settings = getSettingsForTesting({
+      publicKey: factory.publicKey('image'),
+      saveUrlForRecurrentUploads: true
+    })
+
+    const isHttpsProtocol = settings.baseURL.includes('https')
+      ? 'https'
+      : 'http'
+    const spy = jest.spyOn(isHttpsProtocol ? https : http, 'request')
+    await uploadFile(sourceUrl, settings)
+
+    const uploadRequest = spy.mock.calls[0][0]
+    expect(uploadRequest['query']).toEqual(
+      expect.stringContaining('save_URL_duplicates=1')
+    )
+    spy.mockClear()
   })
 
   it('should be able to cancel uploading', async () => {

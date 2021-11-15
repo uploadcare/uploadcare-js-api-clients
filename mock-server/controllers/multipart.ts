@@ -7,7 +7,7 @@ import error from '../utils/error.js'
  * '/multipart/start/'
  * @param {object} ctx
  */
-const start = ctx => {
+const start = (ctx) => {
   if (ctx.request.body && !ctx.request.body.filename) {
     return error(ctx, {
       statusText: 'The "filename" parameter is missing.'
@@ -44,7 +44,7 @@ const start = ctx => {
  * '/multipart/upload/'
  * @param {object} ctx
  */
-const upload = ctx => {
+const upload = (ctx) => {
   ctx.status = 200
 }
 
@@ -52,7 +52,7 @@ const upload = ctx => {
  * '/multipart/complete/'
  * @param {object} ctx
  */
-const complete = ctx => {
+const complete = (ctx) => {
   if (ctx.request.body && !ctx.request.body.uuid) {
     return error(ctx, {
       statusText: 'uuid is required.'

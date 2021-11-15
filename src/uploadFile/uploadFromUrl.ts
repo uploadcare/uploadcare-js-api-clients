@@ -200,12 +200,12 @@ const uploadFromUrl = (
         )
       }
     })
-    .then(result => {
+    .then((result) => {
       if (result instanceof UploadClientError) throw result
 
       return result
     })
-    .then(result =>
+    .then((result) =>
       isReadyPoll({
         file: result.uuid,
         publicKey,
@@ -217,6 +217,6 @@ const uploadFromUrl = (
         signal
       })
     )
-    .then(fileInfo => new UploadcareFile(fileInfo, { baseCDN }))
+    .then((fileInfo) => new UploadcareFile(fileInfo, { baseCDN }))
 
 export default uploadFromUrl

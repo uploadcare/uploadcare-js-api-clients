@@ -30,9 +30,6 @@ export type InfoOptions = {
 /**
  * Returns a JSON dictionary holding file info.
  */
-
-/* eslint @typescript-eslint/camelcase: [2, {allow: ["pub_key", "file_id"]}] */
-
 export default function info(
   uuid: Uuid,
   {

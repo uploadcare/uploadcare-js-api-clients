@@ -32,8 +32,14 @@ export type FileFromOptions = {
 
   contentType?: string
   multipartChunkSize?: number
+  multipartMaxAttempts?: number
+  maxConcurrentRequests?: number
 
   baseCDN?: string
+
+  checkForUrlDuplicates?: boolean
+  saveUrlForRecurrentUploads?: boolean
+  pusherKey?: string
 }
 
 /**
@@ -61,9 +67,15 @@ function uploadFile(
     retryThrottledRequestMaxTimes,
 
     contentType,
-    multipartChunkSize = defaultSettings.multipartChunkSize,
+    multipartChunkSize,
+    multipartMaxAttempts,
+    maxConcurrentRequests,
 
-    baseCDN = defaultSettings.baseCDN
+    baseCDN = defaultSettings.baseCDN,
+
+    checkForUrlDuplicates,
+    saveUrlForRecurrentUploads,
+    pusherKey
   }: FileFromOptions
 ): Promise<UploadcareFile> {
   if (isFileData(data)) {
@@ -74,6 +86,7 @@ function uploadFile(
         publicKey,
         contentType,
         multipartChunkSize,
+        multipartMaxAttempts,
 
         fileName,
         baseURL,
@@ -88,6 +101,7 @@ function uploadFile(
         integration,
         userAgent,
 
+        maxConcurrentRequests,
         retryThrottledRequestMaxTimes,
 
         baseCDN
@@ -122,6 +136,9 @@ function uploadFile(
 
       fileName,
       baseURL,
+      baseCDN,
+      checkForUrlDuplicates,
+      saveUrlForRecurrentUploads,
       secureSignature,
       secureExpire,
       store,
@@ -134,8 +151,7 @@ function uploadFile(
       userAgent,
 
       retryThrottledRequestMaxTimes,
-
-      baseCDN
+      pusherKey
     })
   }
 

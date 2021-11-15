@@ -77,7 +77,7 @@ const uploadFromObject = (
         signal
       })
     })
-    .then(fileInfo => new UploadcareFile(fileInfo, { baseCDN }))
+    .then((fileInfo) => new UploadcareFile(fileInfo, { baseCDN }))
 }
 
 export default uploadFromObject

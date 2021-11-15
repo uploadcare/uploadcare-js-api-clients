@@ -1,11 +1,10 @@
-/* eslint-disable @typescript-eslint/camelcase */
 import camelizeKeys, { camelize } from '../../src/tools/camelizeKeys'
 
 type Camelize = {
   fooBar: string
   fooBarBaz: string
   foo: string
-  fooBarBaz4: object
+  fooBarBaz4: Record<string, unknown>
 }
 
 describe('camelize', () => {

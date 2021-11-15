@@ -1,4 +1,5 @@
 import defaultSettings from '../defaultSettings'
+import { prepareChunks } from './prepareChunks.node'
 import multipartStart from '../api/multipartStart'
 import multipartUpload from '../api/multipartUpload'
 import multipartComplete from '../api/multipartComplete'
@@ -54,16 +55,20 @@ const uploadPartWithRetry = (
   chunk: Buffer | Blob,
   url: string,
   {
+    publicKey,
     onProgress,
     signal,
+    integration,
     multipartMaxAttempts
   }: MultipartUploadOptions & { multipartMaxAttempts: number }
 ): Promise<MultipartUploadResponse> =>
   retrier(({ attempt, retry }) =>
     multipartUpload(chunk, url, {
+      publicKey,
       onProgress,
-      signal
-    }).catch(error => {
+      signal,
+      integration
+    }).catch((error) => {
       if (attempt < multipartMaxAttempts) {
         return retry()
       }
@@ -71,6 +76,7 @@ const uploadPartWithRetry = (
       throw error
     })
   )
+
 
 const uploadMultipart = (
   file: NodeFile | BrowserFile,
@@ -136,25 +142,24 @@ const uploadMultipart = (
     userAgent,
     retryThrottledRequestMaxTimes
   })
-    .then(({ uuid, parts }) =>
-      Promise.all([
+    .then(({ uuid, parts }) => {
+      const getChunk = prepareChunks(file, size, multipartChunkSize)
+      return Promise.all([
         uuid,
         runWithConcurrency(
           maxConcurrentRequests,
           parts.map((url, index) => (): Promise<MultipartUploadResponse> =>
-            uploadPartWithRetry(
-              getChunk(file, index, size, multipartChunkSize),
-              url,
-              {
-                onProgress: createProgressHandler(parts.length, index),
-                signal,
-                multipartMaxAttempts
-              }
-            )
+            uploadPartWithRetry(getChunk(index), url, {
+              publicKey,
+              onProgress: createProgressHandler(parts.length, index),
+              signal,
+              integration,
+              multipartMaxAttempts
+            })
           )
         )
       ])
-    )
+    })
     .then(([uuid]) =>
       multipartComplete(uuid, {
         publicKey,
@@ -165,7 +170,7 @@ const uploadMultipart = (
         retryThrottledRequestMaxTimes
       })
     )
-    .then(fileInfo => {
+    .then((fileInfo) => {
       if (fileInfo.isReady) {
         return fileInfo
       } else {
@@ -182,7 +187,7 @@ const uploadMultipart = (
         })
       }
     })
-    .then(fileInfo => new UploadcareFile(fileInfo, { baseCDN }))
+    .then((fileInfo) => new UploadcareFile(fileInfo, { baseCDN }))
 }
 
 export default uploadMultipart

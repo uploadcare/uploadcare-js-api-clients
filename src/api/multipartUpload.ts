@@ -6,8 +6,10 @@ import { ProgressCallback } from './types'
 import { NodeFile, BrowserFile } from '../request/types'
 
 export type MultipartUploadOptions = {
+  publicKey?: string
   signal?: AbortSignal
-  onProgress?: ProgressCallback
+  onProgress?: ({ value: number }) => void
+  integration?: string
   retryThrottledRequestMaxTimes?: number
 }
 
@@ -31,7 +33,7 @@ export default function multipartUpload(
     onProgress,
     signal
   })
-    .then(result => {
+    .then((result) => {
       // hack for node ¯\_(ツ)_/¯
       if (onProgress) onProgress({ value: 1 })
 

@@ -33,9 +33,6 @@ type Response = GroupInfo | FailedResponse
 /**
  * Create files group.
  */
-
-/* eslint @typescript-eslint/camelcase: [2, {allow: ["pub_key"]}] */
-
 export default function group(
   uuids: Uuid[],
   {

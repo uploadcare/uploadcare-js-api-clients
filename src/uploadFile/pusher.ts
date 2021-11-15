@@ -28,7 +28,7 @@ type StatusSuccessResponse = {
 
 const response = (
   type: 'progress' | 'success' | 'fail',
-  data: any
+  data: Record<string, unknown>
 ): AllStatuses => {
   if (type === 'success') {
     return { status: Status.Success, ...data } as StatusSuccessResponse
@@ -132,7 +132,7 @@ class Pusher {
     }
   }
 
-  send(event: string, data: any): void {
+  send(event: string, data: Record<string, unknown>): void {
     const str = JSON.stringify({ event, data })
     this.ws?.send(str)
   }

@@ -1,7 +1,7 @@
 {
   "enabled": false,
   "extends": ["config:js-lib", "schedule:weekly", ":automergeMinor"],
-  "reviewers": ["jeetiss"],
+  "reviewers": ["nd0ut"],
   "timezone": "Europe/Moscow",
   "packageRules": [
     {

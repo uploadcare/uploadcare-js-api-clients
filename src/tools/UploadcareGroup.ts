@@ -20,8 +20,9 @@ export class UploadcareGroup {
       0
     )
     this.isStored = !!groupInfo.datetimeStored
-    this.isImage = !!Object.values(groupInfo.files).filter(file => file.isImage)
-      .length
+    this.isImage = !!Object.values(groupInfo.files).filter(
+      (file) => file.isImage
+    ).length
     this.cdnUrl = groupInfo.cdnUrl
     this.files = files
     this.createdAt = groupInfo.datetimeCreated

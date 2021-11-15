@@ -29,9 +29,6 @@ type Response = GroupInfo | FailedResponse
 /**
  * Get info about group.
  */
-
-/* eslint @typescript-eslint/camelcase: [2, {allow: ["pub_key", "group_id"]}] */
-
 export default function groupInfo(
   id: GroupId,
   {
