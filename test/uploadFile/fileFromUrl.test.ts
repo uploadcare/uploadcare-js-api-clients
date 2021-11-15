@@ -4,6 +4,8 @@ import { uploadFile } from '../../src/uploadFile'
 import { getSettingsForTesting } from '../_helpers'
 import { UploadClientError } from '../../src/tools/errors'
 
+jest.setTimeout(60000)
+
 describe('uploadFrom URL', () => {
   it('should resolves when file is ready on CDN', async () => {
     const sourceUrl = factory.imageUrl('valid')

@@ -1,9 +1,11 @@
-import * as dataUriToBuffer from 'data-uri-to-buffer'
+import dataUriToBuffer from 'data-uri-to-buffer'
 import dataUriToBlob from 'dataurl-to-blob'
 import defaultSettings from '../src/defaultSettings'
 import { DefaultSettings } from '../src/types'
 
-export const dataURItoBuffer: (uri: string) => Buffer = dataUriToBuffer
+export const dataURItoBuffer: (uri: string) => Buffer = dataUriToBuffer as (
+  uri: string
+) => Buffer
 export const dataURItoBlob: (uri: string) => Blob = dataUriToBlob
 
 export enum Environment {
