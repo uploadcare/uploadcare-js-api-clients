@@ -42,7 +42,7 @@ providing the necessary settings. Specifying `YOUR_PUBLIC_KEY` is mandatory: it
 points to the specific Uploadcare project:
 
 ```javascript
-import UploadClient from '@uploadcare/upload-client'
+import { UploadClient } from '@uploadcare/upload-client'
 
 const client = new UploadClient({ publicKey: 'YOUR_PUBLIC_KEY' })
 ```
@@ -94,10 +94,10 @@ You can cancel file uploading and track this event:
 
 ```javascript
 const fileUUID = 'edfdf045-34c0-4087-bbdd-e3834921f890'
-const controller = new CancelController()
+const abortController = new AbortController()
 
 client
-  .uploadFile(fileUUID, { cancel: controller })
+  .uploadFile(fileUUID, { signal: abortController })
   .then(file => console.log(file.uuid))
   .catch(error => {
     if (error.isCancel) {
@@ -106,7 +106,7 @@ client
   })
 
 // Cancel uploading
-controller.cancel()
+abortController.abort()
 ```
 
 List of all available `UploadClient` API methods:
@@ -163,17 +163,30 @@ interface UploadClient {
 }
 ```
 
+You can import only needed methods directly, without `UploadClient` wrapper:
+
+```javascript
+import {
+  uploadFile,
+  uploadFromUrl,
+  uploadBase,
+  uploadFromUploaded,
+  uploadMultipart,
+  uploadFileGroup
+} from '@uploadcare/upload-client'
+```
+
 ### Low-Level API
 
 Also, you can use low-level wrappers to call the API endpoints directly:
 
 ```javascript
-import { base, CancelController } from '@uploadcare/upload-client'
+import { base, AbortController } from '@uploadcare/upload-client'
 
 const onProgress = ({ value }) => console.log(value)
-const cancelController = new CancelController()
+const abortController = new AbortController()
 
-base(fileData, { onProgress, cancel: cancelController }) // fileData must be `Blob` or `File` or `Buffer`
+base(fileData, { onProgress, signal: abortController }) // fileData must be `Blob` or `File` or `Buffer`
   .then(data => console.log(data.file))
   .catch(error => {
     if (error.isCancel) {
@@ -182,7 +195,7 @@ base(fileData, { onProgress, cancel: cancelController }) // fileData must be `Bl
   })
 
 // Also you can cancel upload:
-cancelController.cancel()
+abortController.abort()
 ```
 
 List of all available API methods:
@@ -290,7 +303,19 @@ of `API secret key` and `secureExpire`.
 
 Stands for the Unix time to which the signature is valid, e.g., `1454902434`.
 
-#### `integration: string`
+#### `integration: string | CustomUserAgentFn`
+
+```typescript
+type CustomUserAgentOptions = {
+  publicKey: string
+  libraryName: string
+  libraryVersion: string
+  languageName: string
+  integration?: string
+}
+
+type CustomUserAgentFn = (options: CustomUserAgentOptions) => string
+```
 
 `X-UC-User-Agent` header value.
 
@@ -372,7 +397,7 @@ npm run test
 By default, tests runs with mock server, but you can run tests with
 production environment.
 
-Run test on production servers: 
+Run test on production servers:
 
 ```bash
 npm run test:production

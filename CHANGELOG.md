@@ -1,3 +1,24 @@
+# [2.0.0](https://github.com/uploadcare/uploadcare-upload-client/compare/v1.1.5...v2.0.0) (2021-11-15)
+
+
+### Features
+
+* feat!: add cjs and esm support (#283) ([081f27e](https://github.com/uploadcare/uploadcare-upload-client/commit/081f27ef6022e6bdc605bc25e18313786c3f65d0)), closes [#283](https://github.com/uploadcare/uploadcare-upload-client/issues/283)
+* feat!: replace CancelController with native AbortController (#282) ([020e1ae](https://github.com/uploadcare/uploadcare-upload-client/commit/020e1aeca1507979dbd123711a600e6692ca911f)), closes [#282](https://github.com/uploadcare/uploadcare-upload-client/issues/282)
+* add mimeType to UploadcareFile type ([33b6c58](https://github.com/uploadcare/uploadcare-upload-client/commit/33b6c586f291569ff8eabbd488d8f61bde66de4b))
+* export high-level upload methods ([1354018](https://github.com/uploadcare/uploadcare-upload-client/commit/1354018ce350895f638ba7be6ade6223193df407))
+* handle server error codes ([948c9d1](https://github.com/uploadcare/uploadcare-upload-client/commit/948c9d140685aa2d0325904220ff42c262aaae79))
+* add option `userAgent` to pass custom user agent string or function ([d74fefb](https://github.com/uploadcare/uploadcare-upload-client/commit/d74fefb18168fbfec8aa3daf2707da3305846879))
+
+
+### BREAKING CHANGES
+
+* remove default export because webpack can't handle it without bugs
+* replace `cancel` key with `signal` in all cancelable methods
+* property `response` of `UploadClientError` now contains the whole response object (`{ error: {...}}`)
+
+
+
 ## [1.1.5](https://github.com/uploadcare/uploadcare-upload-client/compare/v1.1.4...v1.1.5) (2021-06-28)
 
 
