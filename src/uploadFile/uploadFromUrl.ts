@@ -102,7 +102,7 @@ const pushStrategy = ({
 
     onCancel(signal, () => {
       destroy()
-      reject(cancelError('pisher cancelled'))
+      reject(cancelError('pusher cancelled'))
     })
 
     pusher.subscribe(token, result => {
