@@ -4,6 +4,8 @@ import { getSettingsForTesting } from '../_helpers'
 import uploadFileGroup from '../../src/uploadFileGroup'
 import { UploadClientError } from '../../src/tools/errors'
 
+jest.setTimeout(10000)
+
 describe('groupFrom Url[]', () => {
   const sourceUrl = factory.imageUrl('valid')
   const files = [sourceUrl, sourceUrl]
