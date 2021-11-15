@@ -94,10 +94,10 @@ You can cancel file uploading and track this event:
 
 ```javascript
 const fileUUID = 'edfdf045-34c0-4087-bbdd-e3834921f890'
-const controller = new CancelController()
+const abortController = new AbortController()
 
 client
-  .uploadFile(fileUUID, { cancel: controller })
+  .uploadFile(fileUUID, { signal: abortController })
   .then(file => console.log(file.uuid))
   .catch(error => {
     if (error.isCancel) {
@@ -106,7 +106,7 @@ client
   })
 
 // Cancel uploading
-controller.cancel()
+abortController.cancel()
 ```
 
 List of all available `UploadClient` API methods:
@@ -161,6 +161,19 @@ interface UploadClient {
     options: FileFromOptions & GroupFromOptions
   ): Promise<UploadcareGroup>
 }
+```
+
+You can import only needed methods directly, without `UploadClient` wrapper:
+
+```javascript
+import {
+  uploadFile,
+  uploadFromUrl,
+  uploadBase,
+  uploadFromUploaded,
+  uploadMultipart,
+  uploadFileGroup
+} from '@uploadcare/upload-client'
 ```
 
 ### Low-Level API
