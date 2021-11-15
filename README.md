@@ -106,7 +106,7 @@ client
   })
 
 // Cancel uploading
-abortController.cancel()
+abortController.abort()
 ```
 
 List of all available `UploadClient` API methods:
