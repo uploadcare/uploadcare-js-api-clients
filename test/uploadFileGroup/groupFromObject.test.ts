@@ -4,6 +4,8 @@ import uploadFileGroup from '../../src/uploadFileGroup'
 import { getSettingsForTesting } from '../_helpers'
 import { UploadClientError } from '../../src/tools/errors'
 
+jest.setTimeout(10000)
+
 describe('groupFrom Object[]', () => {
   const fileToUpload = factory.image('blackSquare').data
   const files = [fileToUpload, fileToUpload]

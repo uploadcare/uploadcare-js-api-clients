@@ -4,6 +4,8 @@ import { getSettingsForTesting } from '../_helpers'
 import { UploadClientError } from '../../src/tools/errors'
 import { uploadFile } from '../../src/uploadFile'
 
+jest.setTimeout(10000)
+
 describe('uploadFrom Object', () => {
   it('should resolves when file is ready on CDN', async () => {
     const fileToUpload = factory.image('blackSquare').data

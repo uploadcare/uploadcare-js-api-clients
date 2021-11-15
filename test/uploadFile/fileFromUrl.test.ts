@@ -33,7 +33,7 @@ describe('uploadFrom URL', () => {
     expect(file.isStored).toBeFalsy()
   })
 
-  fit('should accept checkForUrlDuplicates setting', async () => {
+  it('should accept checkForUrlDuplicates setting', async () => {
     const sourceUrl = factory.imageUrl('valid')
     const settings = getSettingsForTesting({
       publicKey: factory.publicKey('image'),
