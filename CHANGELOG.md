@@ -1,3 +1,12 @@
+# [2.1.0](https://github.com/uploadcare/uploadcare-upload-client/compare/v2.0.0...v2.1.0) (2021-12-07)
+
+
+### Features
+
+* export `UploadcareFile` and `UploadcareGroup` types ([#353](https://github.com/uploadcare/uploadcare-upload-client/issues/353)) ([29d1547](https://github.com/uploadcare/uploadcare-upload-client/commit/29d154798865f627cabd54982b213e24ac2f27d5))
+
+
+
 # [2.0.0](https://github.com/uploadcare/uploadcare-upload-client/compare/v1.1.5...v2.0.0) (2021-11-15)
 
 
