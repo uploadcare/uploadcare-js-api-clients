@@ -1,3 +1,12 @@
+# [2.2.0](https://github.com/uploadcare/uploadcare-upload-client/compare/v2.1.0...v2.2.0) (2021-12-22)
+
+
+### Features
+
+* export UploadcareClientError class ([#355](https://github.com/uploadcare/uploadcare-upload-client/issues/355)) ([848eadf](https://github.com/uploadcare/uploadcare-upload-client/commit/848eadfcdb021fd506a6d6ee2f7f6e2208804de4))
+
+
+
 # [2.1.0](https://github.com/uploadcare/uploadcare-upload-client/compare/v2.0.0...v2.1.0) (2021-12-07)
 
 
