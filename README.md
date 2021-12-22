@@ -303,7 +303,7 @@ of `API secret key` and `secureExpire`.
 
 Stands for the Unix time to which the signature is valid, e.g., `1454902434`.
 
-#### `integration: string | CustomUserAgentFn`
+#### `userAgent: string | CustomUserAgentFn`
 
 ```typescript
 type CustomUserAgentOptions = {
@@ -320,6 +320,11 @@ type CustomUserAgentFn = (options: CustomUserAgentOptions) => string
 `X-UC-User-Agent` header value.
 
 Defaults to `UploadcareUploadClient/${version}/${publicKey} (JavaScript; ${integration})`
+
+#### `integration: string`
+
+Integration value passed to the `X-UC-User-Agent` header.
+May be overrided with the custom user agent string or function.
 
 #### `checkForUrlDuplicates: boolean`
 
