@@ -26,6 +26,7 @@ export { AbortController } from 'abort-controller'
 /* Types */
 export { UploadcareFile } from './tools/UploadcareFile'
 export { UploadcareGroup } from './tools/UploadcareGroup'
+export { UploadClientError } from './tools/errors'
 export { Settings } from './types'
 export { NodeFile, BrowserFile } from './request/types'
 export { BaseOptions, BaseResponse } from './api/base'
