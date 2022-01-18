@@ -451,6 +451,6 @@ request at [hello@uploadcare.com][uc-email-hello].
 [badge-release-url]: https://github.com/uploadcare/uploadcare-upload-client/releases
 [npm-img]: http://img.shields.io/npm/v/@uploadcare/upload-client.svg
 [npm-url]: https://www.npmjs.org/package/@uploadcare/upload-client
-[badge-build]: https://img.shields.io/github/workflow/status/uploadcare/uploadcare-upload-client/Ship%20js%20trigger
-[build-url]: https://github.com/uploadcare/uploadcare-upload-client/actions?query=workflow%3A%22Ship+js+trigger%22
+[badge-build]: https://github.com/uploadcare/uploadcare-upload-client/actions/workflows/checks.yml/badge.svg
+[build-url]: https://github.com/uploadcare/uploadcare-upload-client/actions/workflows/checks.yml
 [uc-docs-upload-api]: https://uploadcare.com/docs/api_reference/upload/?utm_source=github&utm_campaign=uploadcare-upload-client
