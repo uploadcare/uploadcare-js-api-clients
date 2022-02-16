@@ -14,13 +14,6 @@
     "./dist/index.cjs": "./dist/index.browser.cjs",
     "./dist/index.js": "./dist/index.browser.js"
   },
-  "exports": {
-    "./package.json": "./package.json",
-    ".": {
-      "require": "./dist/index.cjs",
-      "import": "./dist/index.js"
-    }
-  },
   "react-native": {
     "./lib/request/request.node.js": "./lib/request/request.browser.js",
     "./lib/tools/getFormData.node.js": "./lib/tools/getFormData.react-native.js",
