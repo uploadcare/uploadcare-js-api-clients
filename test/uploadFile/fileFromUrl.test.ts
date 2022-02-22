@@ -113,6 +113,19 @@ describe('uploadFrom URL', () => {
     assertProgressMock(onProgress)
   })
 
+  it('should not call progress callback with NaN value when total size is unknown', async () => {
+    const onProgress = jest.fn()
+    const sourceUrl = factory.imageUrl('unknownSize')
+    const settings = getSettingsForTesting({
+      publicKey: factory.publicKey('image'),
+      onProgress
+    })
+
+    await uploadFile(sourceUrl, settings)
+
+    assertProgressMock(onProgress)
+  })
+
   it('should be rejected with error code if failed', async () => {
     const sourceUrl = factory.imageUrl('valid')
     const settings = getSettingsForTesting({

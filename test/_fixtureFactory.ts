@@ -133,7 +133,9 @@ export function imageUrl(id: string): string {
   const images = {
     valid: `${settings.baseCDN}/49b4c5a1-31b3-4349-ba07-d97a2d883c37/20200721174713.png`,
     doesNotExist: 'https://1.com/1.jpg',
-    privateIP: 'http://192.168.1.10/1.jpg'
+    privateIP: 'http://192.168.1.10/1.jpg',
+    unknownSize:
+      'https://www.dropbox.com/s/6bj0aky0bbrk9ln/unknown_size.MOV?dl=0'
   }
 
   return images[id]

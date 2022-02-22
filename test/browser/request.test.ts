@@ -58,7 +58,7 @@ describe('request', () => {
     ).rejects.toThrowError(new UploadClientError('Request canceled'))
   })
 
-  fit('should handle progress', async () => {
+  it('should handle progress', async () => {
     const onProgress = jest.fn()
     const response = await request({
       method: 'POST',
