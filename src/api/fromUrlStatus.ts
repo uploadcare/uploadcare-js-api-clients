@@ -31,7 +31,7 @@ type StatusProgressResponse = {
   status: Status.Progress
   size: number
   done: number
-  total: number
+  total: number | 'unknown'
 }
 
 type StatusErrorResponse = {

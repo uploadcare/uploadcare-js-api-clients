@@ -55,7 +55,7 @@ function pollStrategy({
             return new UploadClientError(`Token "${token}" was not found.`)
           }
           case Status.Progress: {
-            if (onProgress)
+            if (onProgress && response.total !== 'unknown')
               onProgress({ value: response.done / response.total })
             return false
           }
@@ -106,7 +106,7 @@ const pushStrategy = ({
     pusher.subscribe(token, (result) => {
       switch (result.status) {
         case Status.Progress: {
-          if (onProgress) {
+          if (onProgress && result.total !== 'unknown') {
             onProgress({ value: result.done / result.total })
           }
           break
