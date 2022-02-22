@@ -1,8 +1,10 @@
 import AbortController from 'abort-controller'
 import * as factory from '../_fixtureFactory'
-import { getSettingsForTesting } from '../_helpers'
+import { getSettingsForTesting, assertProgressMock } from '../_helpers'
 import uploadFileGroup from '../../src/uploadFileGroup'
 import { UploadClientError } from '../../src/tools/errors'
+
+jest.setTimeout(10000)
 
 describe('groupFrom Uploaded[]', () => {
   const uuid = factory.uuid('image')
@@ -43,10 +45,7 @@ describe('groupFrom Uploaded[]', () => {
   })
 
   it('should be able to handle progress', async () => {
-    let progressValue = 0
-    const onProgress = ({ value }): void => {
-      progressValue = value
-    }
+    const onProgress = jest.fn()
     const upload = uploadFileGroup(files, {
       ...settings,
       onProgress
@@ -54,7 +53,7 @@ describe('groupFrom Uploaded[]', () => {
 
     await upload
 
-    expect(progressValue).toBe(1)
+    assertProgressMock(onProgress)
   })
 
   it('should be rejected with error code if failed', async () => {

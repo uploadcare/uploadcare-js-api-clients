@@ -1,7 +1,7 @@
 import AbortController from 'abort-controller'
 import * as factory from '../_fixtureFactory'
 import { uploadFile } from '../../src/uploadFile'
-import { getSettingsForTesting } from '../_helpers'
+import { getSettingsForTesting, assertProgressMock } from '../_helpers'
 import { UploadClientError } from '../../src/tools/errors'
 
 jest.setTimeout(60000)
@@ -54,10 +54,7 @@ describe('uploadFrom Object (multipart)', () => {
   })
 
   it('should be able to handle progress', async () => {
-    let progressValue = 0
-    const onProgress = ({ value }) => {
-      progressValue = value
-    }
+    const onProgress = jest.fn()
     const upload = uploadFile(fileToUpload, {
       ...settings,
       onProgress
@@ -65,7 +62,7 @@ describe('uploadFrom Object (multipart)', () => {
 
     await upload
 
-    expect(progressValue).toBe(1)
+    assertProgressMock(onProgress)
   })
 
   it('should be rejected with error code if failed', async () => {

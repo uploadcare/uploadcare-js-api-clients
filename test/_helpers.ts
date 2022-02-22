@@ -35,3 +35,16 @@ export const getSettingsForTesting = <T>(options: T): T & DefaultSettings => {
 
   return allEnvironments[selectedEnvironment]
 }
+
+export function assertProgressMock(onProgress: jest.Mock): void {
+  expect(onProgress).toHaveBeenCalled()
+  expect(onProgress).toHaveBeenLastCalledWith({ value: 1 })
+
+  let lastProgressValue = -1
+  for (const [progress] of onProgress.mock.calls) {
+    const { value } = progress
+    expect(typeof value === 'number').toBeTruthy()
+    expect(value).toBeGreaterThanOrEqual(lastProgressValue)
+    lastProgressValue = value
+  }
+}

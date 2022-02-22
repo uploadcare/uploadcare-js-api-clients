@@ -58,8 +58,8 @@ describe('request', () => {
     ).rejects.toThrowError(new UploadClientError('Request canceled'))
   })
 
-  it('should handle progress', async () => {
-    const onProgress = jasmine.createSpy('progress')
+  fit('should handle progress', async () => {
+    const onProgress = jest.fn()
     const response = await request({
       method: 'POST',
       url: getUrl('https://upload.uploadcare.com', '/base/', {
@@ -71,6 +71,8 @@ describe('request', () => {
 
     expect(response.request.method).toBe('POST')
     expect(response.status).toBe(200)
+
+    // do not use assertProgressMock because progress won't work in the jsdom env
     expect(onProgress).toHaveBeenCalled()
   })
 })

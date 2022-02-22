@@ -1,7 +1,7 @@
 import AbortController from 'abort-controller'
 import * as factory from '../_fixtureFactory'
 import multipartUpload from '../../src/api/multipartUpload'
-import { getSettingsForTesting } from '../_helpers'
+import { getSettingsForTesting, assertProgressMock } from '../_helpers'
 import multipartStart from '../../src/api/multipartStart'
 import { UploadClientError } from '../../src/tools/errors'
 
@@ -64,8 +64,7 @@ describe('API - multipartUpload', () => {
     const [url, part] = parts[2]
     await multipartUpload(part, url, options)
 
-    expect(onProgress).toHaveBeenCalled()
-    expect(onProgress).toHaveBeenCalledWith({ value: 1 })
+    assertProgressMock(onProgress)
   })
 
   it('should be rejected with error code if failed', async () => {
