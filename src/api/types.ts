@@ -75,4 +75,6 @@ export type GroupId = string
 
 export type Url = string
 
-export type ProgressCallback = (arg: { value: number }) => void
+export type ProgressInfo = { value: number }
+
+export type ProgressCallback = (arg: ProgressInfo) => void

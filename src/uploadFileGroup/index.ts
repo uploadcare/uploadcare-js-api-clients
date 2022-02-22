@@ -6,7 +6,7 @@ import { UploadcareFile } from '../tools/UploadcareFile'
 
 /* Types */
 import { isFileDataArray, isUrlArray, isUuidArray } from './types'
-import { Url, Uuid } from '../api/types'
+import { ProgressInfo, Url, Uuid } from '../api/types'
 import { NodeFile, BrowserFile } from '../request/types'
 
 export type GroupFromOptions = {
@@ -52,7 +52,7 @@ export default function uploadFileGroup(
   const createProgressHandler = (
     size: number,
     index: number
-  ): (({ value: number }) => void) | undefined => {
+  ): ((info: ProgressInfo) => void) | undefined => {
     if (!onProgress) return
     if (!progressValues) {
       progressValues = Array(size).fill(0)
@@ -61,7 +61,7 @@ export default function uploadFileGroup(
     const normalize = (values: number[]): number =>
       values.reduce((sum, next) => sum + next) / size
 
-    return ({ value }: { value: number }): void => {
+    return ({ value }: ProgressInfo): void => {
       progressValues[index] = value
       onProgress({ value: normalize(progressValues) })
     }

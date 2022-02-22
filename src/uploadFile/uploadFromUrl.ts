@@ -31,7 +31,7 @@ function pollStrategy({
   integration?: string
   userAgent?: CustomUserAgent
   retryThrottledRequestMaxTimes?: number
-  onProgress?: (info: { value: number }) => void
+  onProgress?: ProgressCallback
   signal?: AbortSignal
 }): Promise<FileInfo | UploadClientError> {
   return poll<FileInfo | UploadClientError>({
@@ -88,7 +88,7 @@ const pushStrategy = ({
   token: string
   pusherKey: string
   signal: AbortSignal
-  onProgress?: (info: { value: number }) => void
+  onProgress?: ProgressCallback
 }): Promise<FileInfo | UploadClientError> =>
   new Promise((resolve, reject) => {
     const pusher = getPusher(pusherKey)

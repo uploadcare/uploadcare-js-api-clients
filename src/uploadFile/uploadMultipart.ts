@@ -14,7 +14,7 @@ import {
   MultipartUploadResponse,
   MultipartUploadOptions
 } from '../api/multipartUpload'
-import { ProgressCallback } from '../api/types'
+import { ProgressCallback, ProgressInfo } from '../api/types'
 import { CustomUserAgent } from '../types'
 import { NodeFile, BrowserFile } from '../request/types'
 
@@ -109,7 +109,7 @@ const uploadMultipart = (
     const sum = (values: number[]): number =>
       values.reduce((sum, next) => sum + next, 0)
 
-    return ({ value }: { value: number }): void => {
+    return ({ value }: ProgressInfo): void => {
       progressValues[index] = value
       onProgress({ value: sum(progressValues) / size })
     }

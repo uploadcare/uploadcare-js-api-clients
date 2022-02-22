@@ -1,6 +1,6 @@
 import info from '../api/info'
 import { poll } from './poll'
-import { FileInfo } from '../api/types'
+import { FileInfo, ProgressCallback } from '../api/types'
 import { CustomUserAgent } from '../types'
 
 type ArgsIsReadyPool = {
@@ -11,7 +11,7 @@ type ArgsIsReadyPool = {
   integration?: string
   userAgent?: CustomUserAgent
   retryThrottledRequestMaxTimes?: number
-  onProgress?: (args: { value: number }) => void
+  onProgress?: ProgressCallback
   signal?: AbortSignal
 }
 

@@ -8,16 +8,17 @@ import { Readable, Transform } from 'stream'
 import { cancelError } from '../tools/errors'
 import { onCancel } from '../tools/onCancel'
 import { RequestOptions, RequestResponse } from './types'
+import { ProgressCallback, ProgressInfo } from '../api/types'
 
 // ProgressEmitter is a simple PassThrough-style transform stream which keeps
 // track of the number of bytes which have been piped through it and will
 // invoke the `onprogress` function whenever new number are available.
 class ProgressEmitter extends Transform {
-  private readonly _onprogress: ({ value: number }) => void
+  private readonly _onprogress: (info: ProgressInfo) => void
   private _position: number
   private readonly size: number
 
-  constructor(onProgress: ({ value: number }) => void, size: number) {
+  constructor(onProgress: ProgressCallback, size: number) {
     super()
 
     this._onprogress = onProgress
