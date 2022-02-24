@@ -135,7 +135,7 @@ export function imageUrl(id: string): string {
     doesNotExist: 'https://1.com/1.jpg',
     privateIP: 'http://192.168.1.10/1.jpg',
     unknownSize:
-      'https://www.dropbox.com/s/6bj0aky0bbrk9ln/unknown_size.MOV?dl=0'
+      'https://www.dropbox.com/s/r1nue0e34qdrpkg/4895719476_bd3b6bd6fd_n.jpg?dl=1'
   }
 
   return images[id]
