@@ -76,7 +76,7 @@ describe('API - multipartComplete', () => {
       multipartComplete(completedUuid, settings)
     ).rejects.toThrowError(new UploadClientError('Request canceled'))
 
-    expect(Date.now() - time).toBeLessThan(100)
+    expect(Date.now() - time).toBeLessThan(200) // could be slow on ci
   })
 
   it('should be rejected with bad options', async () => {
