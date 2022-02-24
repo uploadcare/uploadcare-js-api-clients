@@ -52,6 +52,7 @@ export function assertComputableProgress(onProgress: jest.Mock): void {
 
 export function assertUnknownProgress(onProgress: jest.Mock): void {
   expect(onProgress).toHaveBeenCalled()
+  expect(onProgress).toHaveBeenCalledWith({ isComputable: false })
 
   const calls = onProgress.mock.calls
   let isStillComputable = true

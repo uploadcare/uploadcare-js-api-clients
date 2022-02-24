@@ -134,8 +134,9 @@ export function imageUrl(id: string): string {
     valid: `${settings.baseCDN}/49b4c5a1-31b3-4349-ba07-d97a2d883c37/20200721174713.png`,
     doesNotExist: 'https://1.com/1.jpg',
     privateIP: 'http://192.168.1.10/1.jpg',
+    // should be huge enough to acheive progress events from pusher/status
     unknownSize:
-      'https://www.dropbox.com/s/r1nue0e34qdrpkg/4895719476_bd3b6bd6fd_n.jpg?dl=1'
+      'https://www.dropbox.com/s/dzoqzjhj4kzlgwk/samsung-memory-TdszLHmRxq8-unsplash.jpg?dl=0'
   }
 
   return images[id]
