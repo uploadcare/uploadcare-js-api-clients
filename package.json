@@ -22,7 +22,7 @@
   },
   "scripts": {
     "check-env-vars": "node ./checkvars.js",
-    "mock:start": "node --loader ts-node/esm.mjs ./mock-server/server.ts --silent",
+    "mock:start": "node --loader ts-node/esm ./mock-server/server.ts --silent",
     "clean": "rimraf dist",
     "lint": "eslint ./src ./mock-server --ext=ts",
     "test": "start-server-and-test mock:start :3000 test:jest",
@@ -91,7 +91,7 @@
     "shipjs": "0.24.0",
     "start-server-and-test": "1.11.7",
     "ts-jest": "26.4.1",
-    "ts-node": "9.1.1"
+    "ts-node": "10.5.0"
   },
   "dependencies": {
     "abort-controller": "^3.0.0",
