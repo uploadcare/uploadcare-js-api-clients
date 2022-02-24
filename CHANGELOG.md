@@ -1,3 +1,20 @@
+# [3.0.0](https://github.com/uploadcare/uploadcare-upload-client/compare/v2.2.0...v3.0.0) (2022-02-24)
+
+
+### Bug Fixes
+
+* remove `exports` field at package.json ([#360](https://github.com/uploadcare/uploadcare-upload-client/issues/360)) ([1e37542](https://github.com/uploadcare/uploadcare-upload-client/commit/1e37542108258d49159a45ed80d6dc27799ad22a))
+
+
+* fix!: split progress info to computable and unknown ones (#363) ([7638284](https://github.com/uploadcare/uploadcare-upload-client/commit/7638284a8a9b14e0b10403c0496c29159d9c3b39)), closes [#363](https://github.com/uploadcare/uploadcare-upload-client/issues/363)
+
+
+### BREAKING CHANGES
+
+* `value` property of progress info can be `undefined` instead of `NaN` in case of uploading from URL. See `isComputable` flag to detect whether `value` is available.
+
+
+
 # [2.2.0](https://github.com/uploadcare/uploadcare-upload-client/compare/v2.1.0...v2.2.0) (2021-12-22)
 
 
