@@ -54,7 +54,7 @@ export function assertUnknownProgress(onProgress: jest.Mock): void {
   expect(onProgress).toHaveBeenCalled()
 
   const calls = onProgress.mock.calls
-  let isStillComputed = true
+  let isStillComputable = true
   let lastProgressValue = -1
   calls.forEach(([progress], idx) => {
     const isLastCall = idx === calls.length - 1
@@ -66,10 +66,10 @@ export function assertUnknownProgress(onProgress: jest.Mock): void {
     }
 
     if (!isComputable) {
-      isStillComputed = false
+      isStillComputable = false
     }
 
-    if (isStillComputed) {
+    if (isStillComputable) {
       expect(isComputable === true).toBeTruthy()
       expect(typeof value === 'number').toBeTruthy()
       expect(value).toBeGreaterThanOrEqual(lastProgressValue)
