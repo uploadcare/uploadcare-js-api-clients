@@ -115,12 +115,12 @@ describe('uploadFrom URL', () => {
     assertComputableProgress(onProgress)
   })
 
-  process.env.TEST_ENV === 'production' &&
+  process.env.TEST_ENV !== 'production' &&
     it('should be able to handle non-computable unknown progress', async () => {
       const onProgress = jest.fn()
-      const sourceUrl = factory.imageUrl('unknownSize')
+      const sourceUrl = factory.imageUrl('valid')
       const settings = getSettingsForTesting({
-        publicKey: factory.publicKey('image'),
+        publicKey: factory.publicKey('unknownProgress'),
         onProgress
       })
 

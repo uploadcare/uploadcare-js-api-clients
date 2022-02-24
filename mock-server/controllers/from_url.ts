@@ -5,6 +5,21 @@ import error from '../utils/error.js'
 
 import { PORT } from '../config.js'
 
+interface State {
+  isComputable: boolean
+  done: number
+  total: number
+}
+
+interface ProgressResponse {
+  done: number
+  total: number | 'unknown'
+}
+
+const state: {
+  [key: string]: State
+} = {}
+
 /**
  * '/from_url/?pub_key=XXXXXXXXXXXXXXXXXXXX'
  * @param {object} ctx
@@ -15,6 +30,7 @@ const index = (ctx) => {
     (url.includes('localhost') && !url.includes(`http://localhost:${PORT}/`))
   const doesNotExist = (url: string): boolean => url === 'https://1.com/1.jpg'
 
+  const publicKey = ctx.query && ctx.query.pub_key
   const sourceUrl = ctx.query && ctx.query.source_url
   const checkForUrlDuplicates = !!parseInt(
     ctx.query && ctx.query.check_URL_duplicates
@@ -50,9 +66,20 @@ const index = (ctx) => {
 
   if (checkForUrlDuplicates === true && saveUrlForRecurrentUploads === true) {
     ctx.body = find(jsonIndex, 'info')
-  } else {
-    ctx.body = find(jsonIndex, 'token')
+    return
   }
+
+  const token = `token-${Date.now()}`
+  state[token] = {
+    isComputable: publicKey !== 'pub_test__unknown_progress',
+    total: 100,
+    done: 0
+  }
+
+  const response = find(jsonIndex, 'token') as { [key: string]: string }
+  response.token = token
+
+  ctx.body = response
 }
 
 /**
@@ -61,14 +88,49 @@ const index = (ctx) => {
  */
 const status = (ctx) => {
   const token = ctx.query && ctx.query.token
-  const publicKey = ctx.query && ctx.query.publicKey
 
   if (token) {
-    if (publicKey !== 'demopublickey') {
-      ctx.body = find(jsonStatus, 'info')
-    } else {
+    const tokenState = state[token]
+
+    if (!tokenState) {
       ctx.body = find(jsonStatus, 'progress')
+      return
     }
+
+    if (tokenState.done === tokenState.total) {
+      ctx.body = find(jsonStatus, 'info')
+      return
+    }
+
+    const response = find(jsonStatus, 'progress') as ProgressResponse
+
+    if (tokenState.isComputable) {
+      response.total = tokenState.total
+      response.done = tokenState.done
+
+      const nextDone = Math.min(
+        tokenState.done + (tokenState.total as number) / 3,
+        tokenState.total as number
+      )
+      state[token] = {
+        ...tokenState,
+        done: nextDone
+      }
+    } else {
+      response.total = 'unknown'
+      response.done = tokenState.done
+
+      const nextDone = Math.min(
+        tokenState.done + (tokenState.total as number) / 3,
+        tokenState.total as number
+      )
+      state[token] = {
+        ...tokenState,
+        done: nextDone
+      }
+    }
+
+    ctx.body = response
   } else {
     error(ctx, {
       statusText: 'token is required.'

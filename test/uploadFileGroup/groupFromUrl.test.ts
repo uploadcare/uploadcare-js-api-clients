@@ -58,15 +58,16 @@ describe('groupFrom Url[]', () => {
     assertComputableProgress(onProgress)
   })
 
-  process.env.TEST_ENV === 'production' &&
+  process.env.TEST_ENV !== 'production' &&
     it('should be able to handle non-computable unknown progress', async () => {
       const onProgress = jest.fn()
+      const settings = getSettingsForTesting({
+        publicKey: factory.publicKey('unknownProgress'),
+        onProgress
+      })
       const upload = uploadFileGroup(
-        [...files, factory.imageUrl('unknownSize')],
-        {
-          ...settings,
-          onProgress
-        }
+        [...files, factory.imageUrl('valid')],
+        settings
       )
 
       await upload

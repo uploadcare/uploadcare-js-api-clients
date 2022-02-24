@@ -52,6 +52,10 @@ const uuids: { [key: string]: { publicKey: string; uuid: string } } = {
   multipart: {
     publicKey: 'pub_test__no_storing',
     uuid: ''
+  },
+  unknownProgress: {
+    publicKey: 'pub_test__unknown_progress',
+    uuid: '49b4c5a1-31b3-4349-ba07-d97a2d883c37'
   }
 }
 
@@ -133,10 +137,7 @@ export function imageUrl(id: string): string {
   const images = {
     valid: `${settings.baseCDN}/49b4c5a1-31b3-4349-ba07-d97a2d883c37/20200721174713.png`,
     doesNotExist: 'https://1.com/1.jpg',
-    privateIP: 'http://192.168.1.10/1.jpg',
-    // should be huge enough to acheive progress events from pusher/status
-    unknownSize:
-      'https://www.dropbox.com/s/dzoqzjhj4kzlgwk/samsung-memory-TdszLHmRxq8-unsplash.jpg?dl=0'
+    privateIP: 'http://192.168.1.10/1.jpg'
   }
 
   return images[id]
