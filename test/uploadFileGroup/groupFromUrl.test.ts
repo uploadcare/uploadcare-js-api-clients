@@ -8,8 +8,6 @@ import {
 import uploadFileGroup from '../../src/uploadFileGroup'
 import { UploadClientError } from '../../src/tools/errors'
 
-jest.setTimeout(10000)
-
 describe('groupFrom Url[]', () => {
   const sourceUrl = factory.imageUrl('valid')
   const files = [sourceUrl, sourceUrl]
@@ -60,20 +58,21 @@ describe('groupFrom Url[]', () => {
     assertComputableProgress(onProgress)
   })
 
-  it('should be able to handle non-computable unknown progress', async () => {
-    const onProgress = jest.fn()
-    const upload = uploadFileGroup(
-      [...files, factory.imageUrl('unknownSize')],
-      {
-        ...settings,
-        onProgress
-      }
-    )
+  process.env.TEST_ENV === 'production' &&
+    it('should be able to handle non-computable unknown progress', async () => {
+      const onProgress = jest.fn()
+      const upload = uploadFileGroup(
+        [...files, factory.imageUrl('unknownSize')],
+        {
+          ...settings,
+          onProgress
+        }
+      )
 
-    await upload
+      await upload
 
-    assertUnknownProgress(onProgress)
-  })
+      assertUnknownProgress(onProgress)
+    })
 
   it('should be rejected with error code if failed', async () => {
     const settings = getSettingsForTesting({

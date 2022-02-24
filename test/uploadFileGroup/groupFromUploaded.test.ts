@@ -4,8 +4,6 @@ import { getSettingsForTesting, assertComputableProgress } from '../_helpers'
 import uploadFileGroup from '../../src/uploadFileGroup'
 import { UploadClientError } from '../../src/tools/errors'
 
-jest.setTimeout(10000)
-
 describe('groupFrom Uploaded[]', () => {
   const uuid = factory.uuid('image')
   const files = [uuid, uuid]

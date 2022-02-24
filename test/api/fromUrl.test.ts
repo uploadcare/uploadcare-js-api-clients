@@ -4,8 +4,6 @@ import * as factory from '../_fixtureFactory'
 import { getSettingsForTesting } from '../_helpers'
 import { UploadClientError } from '../../src/tools/errors'
 
-jest.setTimeout(10000)
-
 describe('API - from url', () => {
   const sourceUrl = factory.imageUrl('valid')
   const settings = getSettingsForTesting({

@@ -52,7 +52,7 @@ describe('uploadFrom URL', () => {
     expect(uploadRequest['query']).toEqual(
       expect.stringContaining('check_URL_duplicates=1')
     )
-    spy.mockClear()
+    spy.mockRestore()
   })
 
   it('should accept saveUrlForRecurrentUploads setting', async () => {
@@ -63,8 +63,6 @@ describe('uploadFrom URL', () => {
     })
 
     const isHttpsProtocol = settings.baseURL.includes('https')
-      ? 'https'
-      : 'http'
     const spy = jest.spyOn(isHttpsProtocol ? https : http, 'request')
     await uploadFile(sourceUrl, settings)
 
@@ -72,7 +70,7 @@ describe('uploadFrom URL', () => {
     expect(uploadRequest['query']).toEqual(
       expect.stringContaining('save_URL_duplicates=1')
     )
-    spy.mockClear()
+    spy.mockRestore()
   })
 
   it('should be able to cancel uploading', async () => {
@@ -117,18 +115,19 @@ describe('uploadFrom URL', () => {
     assertComputableProgress(onProgress)
   })
 
-  it('should be able to handle non-computable unknown progress', async () => {
-    const onProgress = jest.fn()
-    const sourceUrl = factory.imageUrl('unknownSize')
-    const settings = getSettingsForTesting({
-      publicKey: factory.publicKey('image'),
-      onProgress
+  process.env.TEST_ENV === 'production' &&
+    it('should be able to handle non-computable unknown progress', async () => {
+      const onProgress = jest.fn()
+      const sourceUrl = factory.imageUrl('unknownSize')
+      const settings = getSettingsForTesting({
+        publicKey: factory.publicKey('image'),
+        onProgress
+      })
+
+      await uploadFile(sourceUrl, settings)
+
+      assertUnknownProgress(onProgress)
     })
-
-    await uploadFile(sourceUrl, settings)
-
-    assertUnknownProgress(onProgress)
-  })
 
   it('should be rejected with error code if failed', async () => {
     const sourceUrl = factory.imageUrl('valid')
