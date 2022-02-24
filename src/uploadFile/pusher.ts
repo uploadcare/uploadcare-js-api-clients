@@ -12,7 +12,7 @@ type AllStatuses =
 type StatusProgressResponse = {
   status: Status.Progress
   done: number
-  total: number
+  total: number | 'unknown'
 }
 
 type StatusErrorResponse = {

@@ -75,4 +75,15 @@ export type GroupId = string
 
 export type Url = string
 
-export type ProgressCallback = (arg: { value: number }) => void
+export type ComputableProgressInfo = {
+  isComputable: true
+  value: number
+}
+
+export type UnknownProgressInfo = {
+  isComputable: false
+}
+
+export type ProgressCallback<
+  T = ComputableProgressInfo | UnknownProgressInfo
+> = (arg: T) => void

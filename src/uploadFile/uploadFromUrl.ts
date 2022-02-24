@@ -31,7 +31,7 @@ function pollStrategy({
   integration?: string
   userAgent?: CustomUserAgent
   retryThrottledRequestMaxTimes?: number
-  onProgress?: (info: { value: number }) => void
+  onProgress?: ProgressCallback
   signal?: AbortSignal
 }): Promise<FileInfo | UploadClientError> {
   return poll<FileInfo | UploadClientError>({
@@ -55,13 +55,24 @@ function pollStrategy({
             return new UploadClientError(`Token "${token}" was not found.`)
           }
           case Status.Progress: {
-            if (onProgress)
-              onProgress({ value: response.done / response.total })
+            if (onProgress) {
+              if (response.total === 'unknown') {
+                onProgress({ isComputable: false })
+              } else {
+                onProgress({
+                  isComputable: true,
+                  value: response.done / response.total
+                })
+              }
+            }
             return false
           }
           case Status.Success: {
             if (onProgress)
-              onProgress({ value: response.done / response.total })
+              onProgress({
+                isComputable: true,
+                value: response.done / response.total
+              })
             return response
           }
           default: {
@@ -88,7 +99,7 @@ const pushStrategy = ({
   token: string
   pusherKey: string
   signal: AbortSignal
-  onProgress?: (info: { value: number }) => void
+  onProgress?: ProgressCallback
 }): Promise<FileInfo | UploadClientError> =>
   new Promise((resolve, reject) => {
     const pusher = getPusher(pusherKey)
@@ -107,14 +118,25 @@ const pushStrategy = ({
       switch (result.status) {
         case Status.Progress: {
           if (onProgress) {
-            onProgress({ value: result.done / result.total })
+            if (result.total === 'unknown') {
+              onProgress({ isComputable: false })
+            } else {
+              onProgress({
+                isComputable: true,
+                value: result.done / result.total
+              })
+            }
           }
           break
         }
 
         case Status.Success: {
           destroy()
-          if (onProgress) onProgress({ value: result.done / result.total })
+          if (onProgress)
+            onProgress({
+              isComputable: true,
+              value: result.done / result.total
+            })
           resolve(result)
           break
         }

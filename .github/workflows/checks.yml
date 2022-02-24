@@ -23,6 +23,8 @@ jobs:
       - name: Run build
         working-directory: ./
         run: npm run build
+      - name: Run mock tests
+        run: npm run test
       - name: Run integration tests
         run: npm run test:production
         env:

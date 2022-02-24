@@ -51,7 +51,11 @@ const uploadFromUploaded = (
     .then((fileInfo) => new UploadcareFile(fileInfo, { baseCDN, fileName }))
     .then((result) => {
       // hack for node ¯\_(ツ)_/¯
-      if (onProgress) onProgress({ value: 1 })
+      if (onProgress)
+        onProgress({
+          isComputable: true,
+          value: 1
+        })
 
       return result
     })

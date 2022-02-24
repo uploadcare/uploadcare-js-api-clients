@@ -1,10 +1,8 @@
 import AbortController from 'abort-controller'
 import * as factory from '../_fixtureFactory'
-import { getSettingsForTesting } from '../_helpers'
+import { getSettingsForTesting, assertComputableProgress } from '../_helpers'
 import { UploadClientError } from '../../src/tools/errors'
 import { uploadFile } from '../../src/uploadFile'
-
-jest.setTimeout(10000)
 
 describe('uploadFrom Object', () => {
   it('should resolves when file is ready on CDN', async () => {
@@ -67,8 +65,7 @@ describe('uploadFrom Object', () => {
 
     await uploadFile(fileToUpload, settings)
 
-    expect(onProgress).toHaveBeenCalled()
-    expect(onProgress).toHaveBeenCalledWith({ value: 1 })
+    assertComputableProgress(onProgress)
   })
 
   it('should be rejected with error code if failed', async () => {

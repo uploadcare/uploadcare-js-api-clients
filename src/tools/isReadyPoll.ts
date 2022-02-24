@@ -1,6 +1,10 @@
 import info from '../api/info'
 import { poll } from './poll'
-import { FileInfo } from '../api/types'
+import {
+  ComputableProgressInfo,
+  FileInfo,
+  ProgressCallback
+} from '../api/types'
 import { CustomUserAgent } from '../types'
 
 type ArgsIsReadyPool = {
@@ -11,7 +15,7 @@ type ArgsIsReadyPool = {
   integration?: string
   userAgent?: CustomUserAgent
   retryThrottledRequestMaxTimes?: number
-  onProgress?: (args: { value: number }) => void
+  onProgress?: ProgressCallback<ComputableProgressInfo>
   signal?: AbortSignal
 }
 
@@ -40,7 +44,7 @@ function isReadyPoll({
         if (response.isReady) {
           return response
         }
-        onProgress && onProgress({ value: 1 })
+        onProgress && onProgress({ isComputable: true, value: 1 })
         return false
       }),
     signal
