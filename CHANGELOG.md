@@ -1,3 +1,12 @@
+## [2.2.1](https://github.com/uploadcare/uploadcare-upload-client/compare/v2.2.0...v2.2.1) (2022-02-24)
+
+
+### Bug Fixes
+
+* remove `exports` field at package.json ([#360](https://github.com/uploadcare/uploadcare-upload-client/issues/360)) ([1e37542](https://github.com/uploadcare/uploadcare-upload-client/commit/1e37542108258d49159a45ed80d6dc27799ad22a))
+
+
+
 # [2.2.0](https://github.com/uploadcare/uploadcare-upload-client/compare/v2.1.0...v2.2.0) (2021-12-22)
 
 
