@@ -90,7 +90,9 @@ client
   .then(file => console.log(file.uuid))
 ```
 
-Note that `isComputable` flag can be `false` is some cases of uploading from the URL. If we can't calculate the file size, progress info will look like `{ isComputable: false }` without a `value`.
+Note that `isComputable` flag can be `false` is some cases of uploading from the URL.
+If we can't calculate the file size, progress info will look like `{ isComputable: false }` without a `value`.
+Successful uploading progress will be always `{ isComputable: true, value: 1 }`.
 
 You can cancel file uploading and track this event:
 
