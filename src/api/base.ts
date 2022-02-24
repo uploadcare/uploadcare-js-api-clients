@@ -8,12 +8,7 @@ import { UploadClientError } from '../tools/errors'
 import retryIfThrottled from '../tools/retryIfThrottled'
 
 /* Types */
-import {
-  Uuid,
-  ProgressCallback,
-  ComputableProgressInfo,
-  UnknownProgressInfo
-} from './types'
+import { Uuid, ProgressCallback } from './types'
 import { CustomUserAgent } from '../types'
 import { FailedResponse, NodeFile, BrowserFile } from '../request/types'
 
