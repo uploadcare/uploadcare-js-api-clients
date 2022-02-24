@@ -1,7 +1,7 @@
 import AbortController from 'abort-controller'
 import * as factory from '../_fixtureFactory'
 import { uploadFile } from '../../src/uploadFile'
-import { getSettingsForTesting, assertProgressMock } from '../_helpers'
+import { getSettingsForTesting, assertComputableProgress } from '../_helpers'
 import { UploadClientError } from '../../src/tools/errors'
 
 describe('uploadFrom Uploaded', () => {
@@ -50,7 +50,7 @@ describe('uploadFrom Uploaded', () => {
 
     await uploadFile(uuid, settings)
 
-    assertProgressMock(onProgress)
+    assertComputableProgress(onProgress)
   })
 
   it('should be rejected with error code if failed', async () => {

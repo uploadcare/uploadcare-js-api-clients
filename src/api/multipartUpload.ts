@@ -2,13 +2,13 @@ import { MultipartPart } from './multipartStart'
 
 import request from '../request/request.node'
 
-import { ProgressCallback } from './types'
+import { ComputableProgressInfo, ProgressCallback } from './types'
 import { NodeFile, BrowserFile } from '../request/types'
 
 export type MultipartUploadOptions = {
   publicKey?: string
   signal?: AbortSignal
-  onProgress?: ProgressCallback
+  onProgress?: ProgressCallback<ComputableProgressInfo>
   integration?: string
   retryThrottledRequestMaxTimes?: number
 }
@@ -30,12 +30,17 @@ export default function multipartUpload(
     method: 'PUT',
     url,
     data: part,
-    onProgress,
+    // Upload request can't be non-computable because we always know exact size
+    onProgress: onProgress as ProgressCallback,
     signal
   })
     .then((result) => {
       // hack for node ¯\_(ツ)_/¯
-      if (onProgress) onProgress({ value: 1 })
+      if (onProgress)
+        onProgress({
+          isComputable: true,
+          value: 1
+        })
 
       return result
     })

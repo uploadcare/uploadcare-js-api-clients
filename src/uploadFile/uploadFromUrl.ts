@@ -55,13 +55,24 @@ function pollStrategy({
             return new UploadClientError(`Token "${token}" was not found.`)
           }
           case Status.Progress: {
-            if (onProgress && response.total !== 'unknown')
-              onProgress({ value: response.done / response.total })
+            if (onProgress) {
+              if (response.total === 'unknown') {
+                onProgress({ isComputable: false })
+              } else {
+                onProgress({
+                  isComputable: true,
+                  value: response.done / response.total
+                })
+              }
+            }
             return false
           }
           case Status.Success: {
             if (onProgress)
-              onProgress({ value: response.done / response.total })
+              onProgress({
+                isComputable: true,
+                value: response.done / response.total
+              })
             return response
           }
           default: {
@@ -106,15 +117,26 @@ const pushStrategy = ({
     pusher.subscribe(token, (result) => {
       switch (result.status) {
         case Status.Progress: {
-          if (onProgress && result.total !== 'unknown') {
-            onProgress({ value: result.done / result.total })
+          if (onProgress) {
+            if (result.total === 'unknown') {
+              onProgress({ isComputable: false })
+            } else {
+              onProgress({
+                isComputable: true,
+                value: result.done / result.total
+              })
+            }
           }
           break
         }
 
         case Status.Success: {
           destroy()
-          if (onProgress) onProgress({ value: result.done / result.total })
+          if (onProgress)
+            onProgress({
+              isComputable: true,
+              value: result.done / result.total
+            })
           resolve(result)
           break
         }

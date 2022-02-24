@@ -1,5 +1,9 @@
 import NodeFormData from 'form-data'
-import { ProgressCallback } from '../api/types'
+import {
+  ComputableProgressInfo,
+  ProgressCallback,
+  UnknownProgressInfo
+} from '../api/types'
 
 export type Headers = {
   [key: string]: string | string[] | undefined
@@ -12,7 +16,7 @@ export type RequestOptions = {
   data?: NodeFormData | FormData | BrowserFile | NodeFile
   headers?: Headers
   signal?: AbortSignal
-  onProgress?: ProgressCallback
+  onProgress?: ProgressCallback<ComputableProgressInfo | UnknownProgressInfo>
 }
 
 export type ErrorRequestInfo = {

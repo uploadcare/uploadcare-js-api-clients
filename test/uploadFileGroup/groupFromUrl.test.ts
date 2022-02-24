@@ -1,6 +1,10 @@
 import AbortController from 'abort-controller'
 import * as factory from '../_fixtureFactory'
-import { getSettingsForTesting, assertProgressMock } from '../_helpers'
+import {
+  getSettingsForTesting,
+  assertComputableProgress,
+  assertUnknownProgress
+} from '../_helpers'
 import uploadFileGroup from '../../src/uploadFileGroup'
 import { UploadClientError } from '../../src/tools/errors'
 
@@ -53,7 +57,22 @@ describe('groupFrom Url[]', () => {
 
     await upload
 
-    assertProgressMock(onProgress)
+    assertComputableProgress(onProgress)
+  })
+
+  it('should be able to handle non-computable unknown progress', async () => {
+    const onProgress = jest.fn()
+    const upload = uploadFileGroup(
+      [...files, factory.imageUrl('unknownSize')],
+      {
+        ...settings,
+        onProgress
+      }
+    )
+
+    await upload
+
+    assertUnknownProgress(onProgress)
   })
 
   it('should be rejected with error code if failed', async () => {

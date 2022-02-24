@@ -14,7 +14,11 @@ import {
   MultipartUploadResponse,
   MultipartUploadOptions
 } from '../api/multipartUpload'
-import { ProgressCallback, ProgressInfo } from '../api/types'
+import {
+  ComputableProgressInfo,
+  ProgressCallback,
+  UnknownProgressInfo
+} from '../api/types'
 import { CustomUserAgent } from '../types'
 import { NodeFile, BrowserFile } from '../request/types'
 
@@ -29,7 +33,7 @@ export type MultipartOptions = {
   secureExpire?: string
   store?: boolean
   signal?: AbortSignal
-  onProgress?: ProgressCallback
+  onProgress?: ProgressCallback<ComputableProgressInfo>
   source?: string
   integration?: string
   userAgent?: CustomUserAgent
@@ -98,20 +102,26 @@ const uploadMultipart = (
 
   let progressValues: number[]
   const createProgressHandler = (
-    size: number,
-    index: number
+    totalChunks: number,
+    chunkIdx: number
   ): ProgressCallback | undefined => {
     if (!onProgress) return
     if (!progressValues) {
-      progressValues = Array(size).fill(0)
+      progressValues = Array(totalChunks).fill(0)
     }
 
     const sum = (values: number[]): number =>
       values.reduce((sum, next) => sum + next, 0)
 
-    return ({ value }: ProgressInfo): void => {
-      progressValues[index] = value
-      onProgress({ value: sum(progressValues) / size })
+    return (info: ComputableProgressInfo | UnknownProgressInfo): void => {
+      if (!info.isComputable) {
+        return
+      }
+      progressValues[chunkIdx] = info.value
+      onProgress({
+        isComputable: true,
+        value: sum(progressValues) / totalChunks
+      })
     }
   }
 

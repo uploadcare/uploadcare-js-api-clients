@@ -1,7 +1,7 @@
 import AbortController from 'abort-controller'
 import * as factory from '../_fixtureFactory'
 import uploadFileGroup from '../../src/uploadFileGroup'
-import { getSettingsForTesting, assertProgressMock } from '../_helpers'
+import { getSettingsForTesting, assertComputableProgress } from '../_helpers'
 import { UploadClientError } from '../../src/tools/errors'
 
 jest.setTimeout(15000)
@@ -53,7 +53,7 @@ describe('groupFrom Object[]', () => {
 
     await upload
 
-    assertProgressMock(onProgress)
+    assertComputableProgress(onProgress)
   })
 
   it('should be rejected with error code if failed', async () => {

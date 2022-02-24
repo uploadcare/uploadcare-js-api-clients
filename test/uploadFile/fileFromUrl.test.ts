@@ -1,7 +1,11 @@
 import AbortController from 'abort-controller'
 import * as factory from '../_fixtureFactory'
 import { uploadFile } from '../../src/uploadFile'
-import { getSettingsForTesting, assertProgressMock } from '../_helpers'
+import {
+  getSettingsForTesting,
+  assertComputableProgress,
+  assertUnknownProgress
+} from '../_helpers'
 import { UploadClientError } from '../../src/tools/errors'
 import http from 'http'
 import https from 'https'
@@ -100,7 +104,7 @@ describe('uploadFrom URL', () => {
     expect(file.name).toEqual('newFileName.jpg')
   })
 
-  it('should be able to handle progress', async () => {
+  it('should be able to handle computable progress', async () => {
     const onProgress = jest.fn()
     const sourceUrl = factory.imageUrl('valid')
     const settings = getSettingsForTesting({
@@ -110,10 +114,10 @@ describe('uploadFrom URL', () => {
 
     await uploadFile(sourceUrl, settings)
 
-    assertProgressMock(onProgress)
+    assertComputableProgress(onProgress)
   })
 
-  it('should not call progress callback with NaN value when total size is unknown', async () => {
+  it('should be able to handle non-computable unknown progress', async () => {
     const onProgress = jest.fn()
     const sourceUrl = factory.imageUrl('unknownSize')
     const settings = getSettingsForTesting({
@@ -123,7 +127,7 @@ describe('uploadFrom URL', () => {
 
     await uploadFile(sourceUrl, settings)
 
-    assertProgressMock(onProgress)
+    assertUnknownProgress(onProgress)
   })
 
   it('should be rejected with error code if failed', async () => {
