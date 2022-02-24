@@ -2,6 +2,7 @@ import AbortController from 'abort-controller'
 import base from '../../src/api/base'
 import * as factory from '../_fixtureFactory'
 import { UploadClientError } from '../../src/tools/errors'
+import { assertComputableProgress } from '../_helpers'
 
 describe('API - base', () => {
   const fileToUpload = factory.image('blackSquare')
@@ -38,7 +39,7 @@ describe('API - base', () => {
 
     await base(fileToUpload.data, { publicKey, onProgress })
 
-    expect(onProgress).toHaveBeenCalled()
+    assertComputableProgress(onProgress)
   })
 
   it('should be rejected with error code if failed', async () => {

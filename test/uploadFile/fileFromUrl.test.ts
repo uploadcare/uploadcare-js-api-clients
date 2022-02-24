@@ -1,7 +1,11 @@
 import AbortController from 'abort-controller'
 import * as factory from '../_fixtureFactory'
 import { uploadFile } from '../../src/uploadFile'
-import { getSettingsForTesting } from '../_helpers'
+import {
+  getSettingsForTesting,
+  assertComputableProgress,
+  assertUnknownProgress
+} from '../_helpers'
 import { UploadClientError } from '../../src/tools/errors'
 import http from 'http'
 import https from 'https'
@@ -48,7 +52,7 @@ describe('uploadFrom URL', () => {
     expect(uploadRequest['query']).toEqual(
       expect.stringContaining('check_URL_duplicates=1')
     )
-    spy.mockClear()
+    spy.mockRestore()
   })
 
   it('should accept saveUrlForRecurrentUploads setting', async () => {
@@ -59,8 +63,6 @@ describe('uploadFrom URL', () => {
     })
 
     const isHttpsProtocol = settings.baseURL.includes('https')
-      ? 'https'
-      : 'http'
     const spy = jest.spyOn(isHttpsProtocol ? https : http, 'request')
     await uploadFile(sourceUrl, settings)
 
@@ -68,7 +70,7 @@ describe('uploadFrom URL', () => {
     expect(uploadRequest['query']).toEqual(
       expect.stringContaining('save_URL_duplicates=1')
     )
-    spy.mockClear()
+    spy.mockRestore()
   })
 
   it('should be able to cancel uploading', async () => {
@@ -100,7 +102,7 @@ describe('uploadFrom URL', () => {
     expect(file.name).toEqual('newFileName.jpg')
   })
 
-  it('should be able to handle progress', async () => {
+  it('should be able to handle computable progress', async () => {
     const onProgress = jest.fn()
     const sourceUrl = factory.imageUrl('valid')
     const settings = getSettingsForTesting({
@@ -110,9 +112,22 @@ describe('uploadFrom URL', () => {
 
     await uploadFile(sourceUrl, settings)
 
-    expect(onProgress).toHaveBeenCalled()
-    expect(onProgress).toHaveBeenCalledWith({ value: 1 })
+    assertComputableProgress(onProgress)
   })
+
+  process.env.TEST_ENV !== 'production' &&
+    it('should be able to handle non-computable unknown progress', async () => {
+      const onProgress = jest.fn()
+      const sourceUrl = factory.imageUrl('valid')
+      const settings = getSettingsForTesting({
+        publicKey: factory.publicKey('unknownProgress'),
+        onProgress
+      })
+
+      await uploadFile(sourceUrl, settings)
+
+      assertUnknownProgress(onProgress)
+    })
 
   it('should be rejected with error code if failed', async () => {
     const sourceUrl = factory.imageUrl('valid')

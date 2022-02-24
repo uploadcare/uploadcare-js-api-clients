@@ -52,6 +52,10 @@ const uuids: { [key: string]: { publicKey: string; uuid: string } } = {
   multipart: {
     publicKey: 'pub_test__no_storing',
     uuid: ''
+  },
+  unknownProgress: {
+    publicKey: 'pub_test__unknown_progress',
+    uuid: '49b4c5a1-31b3-4349-ba07-d97a2d883c37'
   }
 }
 

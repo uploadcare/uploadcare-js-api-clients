@@ -1,10 +1,12 @@
 import AbortController from 'abort-controller'
 import * as factory from '../_fixtureFactory'
-import { getSettingsForTesting } from '../_helpers'
+import {
+  getSettingsForTesting,
+  assertComputableProgress,
+  assertUnknownProgress
+} from '../_helpers'
 import uploadFileGroup from '../../src/uploadFileGroup'
 import { UploadClientError } from '../../src/tools/errors'
-
-jest.setTimeout(10000)
 
 describe('groupFrom Url[]', () => {
   const sourceUrl = factory.imageUrl('valid')
@@ -45,10 +47,7 @@ describe('groupFrom Url[]', () => {
   })
 
   it('should be able to handle progress', async () => {
-    let progressValue = 0
-    const onProgress = ({ value }): void => {
-      progressValue = value
-    }
+    const onProgress = jest.fn()
     const upload = uploadFileGroup(files, {
       ...settings,
       onProgress
@@ -56,8 +55,25 @@ describe('groupFrom Url[]', () => {
 
     await upload
 
-    expect(progressValue).toBe(1)
+    assertComputableProgress(onProgress)
   })
+
+  process.env.TEST_ENV !== 'production' &&
+    it('should be able to handle non-computable unknown progress', async () => {
+      const onProgress = jest.fn()
+      const settings = getSettingsForTesting({
+        publicKey: factory.publicKey('unknownProgress'),
+        onProgress
+      })
+      const upload = uploadFileGroup(
+        [...files, factory.imageUrl('valid')],
+        settings
+      )
+
+      await upload
+
+      assertUnknownProgress(onProgress)
+    })
 
   it('should be rejected with error code if failed', async () => {
     const settings = getSettingsForTesting({

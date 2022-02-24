@@ -81,14 +81,18 @@ You can track uploading progress:
 
 ```javascript
 const fileUUID = 'edfdf045-34c0-4087-bbdd-e3834921f890'
-const onProgress = ({ value }) => {
-  console.log(value)
+const onProgress = ({ isComputable, value }) => {
+  console.log(isComputable, value)
 }
 
 client
   .uploadFile(fileUUID, { onProgress })
   .then(file => console.log(file.uuid))
 ```
+
+Note that `isComputable` flag can be `false` is some cases of uploading from the URL.
+If we can't calculate the file size, progress info will look like `{ isComputable: false }` without a `value`.
+Successful uploading progress will be always `{ isComputable: true, value: 1 }`.
 
 You can cancel file uploading and track this event:
 
@@ -183,7 +187,7 @@ Also, you can use low-level wrappers to call the API endpoints directly:
 ```javascript
 import { base, AbortController } from '@uploadcare/upload-client'
 
-const onProgress = ({ value }) => console.log(value)
+const onProgress = ({ isComputable, value }) => console.log(isComputable, value)
 const abortController = new AbortController()
 
 base(fileData, { onProgress, signal: abortController }) // fileData must be `Blob` or `File` or `Buffer`

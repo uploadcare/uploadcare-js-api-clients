@@ -35,3 +35,48 @@ export const getSettingsForTesting = <T>(options: T): T & DefaultSettings => {
 
   return allEnvironments[selectedEnvironment]
 }
+
+export function assertComputableProgress(onProgress: jest.Mock): void {
+  expect(onProgress).toHaveBeenCalled()
+  expect(onProgress).toHaveBeenLastCalledWith({ isComputable: true, value: 1 })
+
+  let lastProgressValue = -1
+  onProgress.mock.calls.forEach(([progress]) => {
+    const { isComputable, value } = progress
+    expect(isComputable === true).toBeTruthy()
+    expect(typeof value === 'number').toBeTruthy()
+    expect(value).toBeGreaterThanOrEqual(lastProgressValue)
+    lastProgressValue = value
+  })
+}
+
+export function assertUnknownProgress(onProgress: jest.Mock): void {
+  expect(onProgress).toHaveBeenCalled()
+  expect(onProgress).toHaveBeenCalledWith({ isComputable: false })
+
+  const calls = onProgress.mock.calls
+  let isStillComputable = true
+  let lastProgressValue = -1
+  calls.forEach(([progress], idx) => {
+    const isLastCall = idx === calls.length - 1
+    const { isComputable, value } = progress
+    if (isLastCall) {
+      expect(isComputable === true).toBeTruthy()
+      expect(typeof value === 'number').toBeTruthy()
+      return
+    }
+
+    if (!isComputable) {
+      isStillComputable = false
+    }
+
+    if (isStillComputable) {
+      expect(isComputable === true).toBeTruthy()
+      expect(typeof value === 'number').toBeTruthy()
+      expect(value).toBeGreaterThanOrEqual(lastProgressValue)
+      lastProgressValue = value
+    } else {
+      expect(isComputable === false).toBeTruthy()
+    }
+  })
+}

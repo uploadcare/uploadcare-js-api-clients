@@ -90,7 +90,14 @@ const request = ({
 
     if (onProgress && typeof onProgress === 'function') {
       xhr.upload.onprogress = (event: ProgressEvent): void => {
-        onProgress({ value: event.loaded / event.total })
+        if (event.lengthComputable) {
+          onProgress({
+            isComputable: true,
+            value: event.loaded / event.total
+          })
+        } else {
+          onProgress({ isComputable: false })
+        }
       }
     }
 

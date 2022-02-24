@@ -6,7 +6,13 @@ import { UploadcareFile } from '../tools/UploadcareFile'
 
 /* Types */
 import { isFileDataArray, isUrlArray, isUuidArray } from './types'
-import { Url, Uuid } from '../api/types'
+import {
+  ComputableProgressInfo,
+  ProgressCallback,
+  UnknownProgressInfo,
+  Url,
+  Uuid
+} from '../api/types'
 import { NodeFile, BrowserFile } from '../request/types'
 
 export type GroupFromOptions = {
@@ -48,11 +54,12 @@ export default function uploadFileGroup(
   }
 
   let progressValues: number[]
+  let isStillComputable = true
   const filesCount = data.length
   const createProgressHandler = (
     size: number,
     index: number
-  ): (({ value: number }) => void) | undefined => {
+  ): ProgressCallback | undefined => {
     if (!onProgress) return
     if (!progressValues) {
       progressValues = Array(size).fill(0)
@@ -61,9 +68,14 @@ export default function uploadFileGroup(
     const normalize = (values: number[]): number =>
       values.reduce((sum, next) => sum + next) / size
 
-    return ({ value }: { value: number }): void => {
-      progressValues[index] = value
-      onProgress({ value: normalize(progressValues) })
+    return (info: ComputableProgressInfo | UnknownProgressInfo): void => {
+      if (!info.isComputable || !isStillComputable) {
+        isStillComputable = false
+        onProgress({ isComputable: false })
+        return
+      }
+      progressValues[index] = info.value
+      onProgress({ isComputable: true, value: normalize(progressValues) })
     }
   }
 
@@ -120,6 +132,11 @@ export default function uploadFileGroup(
       integration,
       userAgent,
       retryThrottledRequestMaxTimes
-    }).then((groupInfo) => new UploadcareGroup(groupInfo, filesInGroup))
+    })
+      .then((groupInfo) => new UploadcareGroup(groupInfo, filesInGroup))
+      .then((group) => {
+        onProgress && onProgress({ isComputable: true, value: 1 })
+        return group
+      })
   })
 }
