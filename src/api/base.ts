@@ -11,6 +11,7 @@ import retryIfThrottled from '../tools/retryIfThrottled'
 import { Uuid, ProgressCallback } from './types'
 import { CustomUserAgent } from '../types'
 import { FailedResponse, NodeFile, BrowserFile } from '../request/types'
+import { getStoreValue } from '../tools/getStoreValue'
 
 export type BaseResponse = {
   file: Uuid
@@ -74,8 +75,7 @@ export default function base(
             name: fileName ?? (file as File).name ?? defaultFilename
           },
           UPLOADCARE_PUB_KEY: publicKey,
-          UPLOADCARE_STORE:
-            typeof store === 'undefined' ? 'auto' : store ? 1 : 0,
+          UPLOADCARE_STORE: getStoreValue(store),
           signature: secureSignature,
           expire: secureExpire,
           source: source

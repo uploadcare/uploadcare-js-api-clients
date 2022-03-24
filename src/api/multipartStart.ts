@@ -14,6 +14,7 @@ import { getUserAgent } from '../tools/userAgent'
 import camelizeKeys from '../tools/camelizeKeys'
 import retryIfThrottled from '../tools/retryIfThrottled'
 import { UploadClientError } from '../tools/errors'
+import { getStoreValue } from '../tools/getStoreValue'
 
 export type MultipartStartOptions = {
   publicKey: string
@@ -74,7 +75,7 @@ export default function multipartStart(
           size: size,
           content_type: contentType ?? defaultContentType,
           part_size: multipartChunkSize,
-          UPLOADCARE_STORE: store ? '' : 'auto',
+          UPLOADCARE_STORE: getStoreValue(store),
           UPLOADCARE_PUB_KEY: publicKey,
           signature: secureSignature,
           expire: secureExpire,

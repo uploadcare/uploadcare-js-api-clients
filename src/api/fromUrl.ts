@@ -10,6 +10,7 @@ import { getUserAgent } from '../tools/userAgent'
 import camelizeKeys from '../tools/camelizeKeys'
 import { UploadClientError } from '../tools/errors'
 import retryIfThrottled from '../tools/retryIfThrottled'
+import { getStoreValue } from '../tools/getStoreValue'
 
 export enum TypeEnum {
   Token = 'token',
@@ -101,7 +102,7 @@ export default function fromUrl(
           jsonerrors: 1,
           pub_key: publicKey,
           source_url: sourceUrl,
-          store: typeof store === 'undefined' ? 'auto' : store ? 1 : undefined,
+          store: getStoreValue(store),
           filename: fileName,
           check_URL_duplicates: checkForUrlDuplicates ? 1 : undefined,
           save_URL_duplicates: saveUrlForRecurrentUploads ? 1 : undefined,
