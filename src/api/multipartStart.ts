@@ -1,5 +1,5 @@
 import { FailedResponse } from '../request/types'
-import { Uuid } from './types'
+import { Metadata, Uuid } from './types'
 import { CustomUserAgent } from '../types'
 
 import request from '../request/request.node'
@@ -30,6 +30,7 @@ export type MultipartStartOptions = {
   integration?: string
   userAgent?: CustomUserAgent
   retryThrottledRequestMaxTimes?: number
+  metadata?: Metadata
 }
 
 export type MultipartPart = string
@@ -59,7 +60,8 @@ export default function multipartStart(
     source = 'local',
     integration,
     userAgent,
-    retryThrottledRequestMaxTimes = defaultSettings.retryThrottledRequestMaxTimes
+    retryThrottledRequestMaxTimes = defaultSettings.retryThrottledRequestMaxTimes,
+    metadata
   }: MultipartStartOptions
 ): Promise<MultipartStartResponse> {
   return retryIfThrottled(
@@ -79,7 +81,8 @@ export default function multipartStart(
           UPLOADCARE_PUB_KEY: publicKey,
           signature: secureSignature,
           expire: secureExpire,
-          source: source
+          source: source,
+          metadata
         }),
         signal
       }).then(({ data, headers, request }) => {

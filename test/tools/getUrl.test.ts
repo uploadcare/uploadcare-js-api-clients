@@ -29,4 +29,20 @@ describe('create URL', () => {
       })
     ).toBe('https:/github.com/base/?lol=https%3A%2Fgithub.com')
   })
+
+  it('query should accept objects', () => {
+    expect(
+      getUrl('https:/github.com', '/base/', {
+        lol: 'param',
+        kek: {
+          key1: 'value1',
+          key2: 2,
+          key3: undefined,
+          key4: null as never
+        }
+      })
+    ).toBe(
+      'https:/github.com/base/?lol=param&kek[key1]=value1&kek[key2]=2&kek[key4]=null'
+    )
+  })
 })

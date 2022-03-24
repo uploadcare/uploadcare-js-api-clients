@@ -16,6 +16,7 @@ import {
 } from '../api/multipartUpload'
 import {
   ComputableProgressInfo,
+  Metadata,
   ProgressCallback,
   UnknownProgressInfo
 } from '../api/types'
@@ -41,6 +42,7 @@ export type MultipartOptions = {
   maxConcurrentRequests?: number
   multipartMaxAttempts?: number
   baseCDN?: string
+  metadata?: Metadata
 }
 
 const uploadPartWithRetry = (
@@ -95,7 +97,8 @@ const uploadMultipart = (
     maxConcurrentRequests = defaultSettings.maxConcurrentRequests,
     multipartMaxAttempts = defaultSettings.multipartMaxAttempts,
 
-    baseCDN
+    baseCDN,
+    metadata
   }: MultipartOptions
 ): Promise<UploadcareFile> => {
   const size = fileSize || getFileSize(file)
@@ -137,7 +140,8 @@ const uploadMultipart = (
     source,
     integration,
     userAgent,
-    retryThrottledRequestMaxTimes
+    retryThrottledRequestMaxTimes,
+    metadata
   })
     .then(({ uuid, parts }) => {
       const getChunk = prepareChunks(file, size, multipartChunkSize)

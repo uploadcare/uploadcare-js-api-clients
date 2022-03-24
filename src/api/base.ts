@@ -8,7 +8,7 @@ import { UploadClientError } from '../tools/errors'
 import retryIfThrottled from '../tools/retryIfThrottled'
 
 /* Types */
-import { Uuid, ProgressCallback } from './types'
+import { Uuid, ProgressCallback, Metadata } from './types'
 import { CustomUserAgent } from '../types'
 import { FailedResponse, NodeFile, BrowserFile } from '../request/types'
 import { getStoreValue } from '../tools/getStoreValue'
@@ -36,6 +36,7 @@ export type BaseOptions = {
   userAgent?: CustomUserAgent
 
   retryThrottledRequestMaxTimes?: number
+  metadata?: Metadata
 }
 
 /**
@@ -56,7 +57,8 @@ export default function base(
     source = 'local',
     integration,
     userAgent,
-    retryThrottledRequestMaxTimes = defaultSettings.retryThrottledRequestMaxTimes
+    retryThrottledRequestMaxTimes = defaultSettings.retryThrottledRequestMaxTimes,
+    metadata
   }: BaseOptions
 ): Promise<BaseResponse> {
   return retryIfThrottled(
@@ -78,7 +80,8 @@ export default function base(
           UPLOADCARE_STORE: getStoreValue(store),
           signature: secureSignature,
           expire: secureExpire,
-          source: source
+          source: source,
+          metadata
         }),
         signal,
         onProgress

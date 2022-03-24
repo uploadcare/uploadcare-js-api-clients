@@ -4,7 +4,7 @@ import uploadFromUploaded from './uploadFromUploaded'
 import defaultSettings from '../defaultSettings'
 
 /* Types */
-import { Url, Uuid, ProgressCallback } from '../api/types'
+import { Url, Uuid, ProgressCallback, Metadata } from '../api/types'
 import { CustomUserAgent } from '../types'
 import { NodeFile, BrowserFile } from '../request/types'
 import { isFileData, isUrl, isUuid } from './types'
@@ -41,6 +41,8 @@ export type FileFromOptions = {
   checkForUrlDuplicates?: boolean
   saveUrlForRecurrentUploads?: boolean
   pusherKey?: string
+
+  metadata?: Metadata
 }
 
 /**
@@ -77,7 +79,9 @@ function uploadFile(
 
     checkForUrlDuplicates,
     saveUrlForRecurrentUploads,
-    pusherKey
+    pusherKey,
+
+    metadata
   }: FileFromOptions
 ): Promise<UploadcareFile> {
   if (isFileData(data)) {
@@ -106,7 +110,8 @@ function uploadFile(
         maxConcurrentRequests,
         retryThrottledRequestMaxTimes,
 
-        baseCDN
+        baseCDN,
+        metadata
       })
     }
 
@@ -128,7 +133,8 @@ function uploadFile(
 
       retryThrottledRequestMaxTimes,
 
-      baseCDN
+      baseCDN,
+      metadata
     })
   }
 
@@ -153,7 +159,8 @@ function uploadFile(
       userAgent,
 
       retryThrottledRequestMaxTimes,
-      pusherKey
+      pusherKey,
+      metadata
     })
   }
 

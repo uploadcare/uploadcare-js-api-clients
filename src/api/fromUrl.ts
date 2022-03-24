@@ -1,4 +1,4 @@
-import { FileInfo, Url } from './types'
+import { FileInfo, Metadata, Url } from './types'
 import { FailedResponse } from '../request/types'
 import { CustomUserAgent } from '../types'
 
@@ -68,6 +68,7 @@ export type FromUrlOptions = {
   userAgent?: CustomUserAgent
 
   retryThrottledRequestMaxTimes?: number
+  metadata?: Metadata
 }
 
 /**
@@ -88,7 +89,8 @@ export default function fromUrl(
     signal,
     integration,
     userAgent,
-    retryThrottledRequestMaxTimes = defaultSettings.retryThrottledRequestMaxTimes
+    retryThrottledRequestMaxTimes = defaultSettings.retryThrottledRequestMaxTimes,
+    metadata
   }: FromUrlOptions
 ): Promise<FromUrlSuccessResponse> {
   return retryIfThrottled(
@@ -108,7 +110,8 @@ export default function fromUrl(
           save_URL_duplicates: saveUrlForRecurrentUploads ? 1 : undefined,
           signature: secureSignature,
           expire: secureExpire,
-          source: source
+          source: source,
+          metadata
         }),
         signal
       }).then(({ data, headers, request }) => {
