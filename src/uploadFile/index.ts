@@ -31,6 +31,7 @@ export type FileFromOptions = {
   retryThrottledRequestMaxTimes?: number
 
   contentType?: string
+  multipartMinFileSize?: number
   multipartChunkSize?: number
   multipartMaxAttempts?: number
   maxConcurrentRequests?: number
@@ -67,6 +68,7 @@ function uploadFile(
     retryThrottledRequestMaxTimes,
 
     contentType,
+    multipartMinFileSize,
     multipartChunkSize,
     multipartMaxAttempts,
     maxConcurrentRequests,
@@ -81,7 +83,7 @@ function uploadFile(
   if (isFileData(data)) {
     const fileSize = getFileSize(data)
 
-    if (isMultipart(fileSize)) {
+    if (isMultipart(fileSize, multipartMinFileSize)) {
       return uploadMultipart(data, {
         publicKey,
         contentType,
