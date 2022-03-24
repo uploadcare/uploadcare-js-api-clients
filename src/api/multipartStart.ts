@@ -3,7 +3,7 @@ import { Uuid } from './types'
 import { CustomUserAgent } from '../types'
 
 import request from '../request/request.node'
-import getFormData from '../tools/buildFormData'
+import buildFormData from '../tools/buildFormData'
 import getUrl from '../tools/getUrl'
 import {
   defaultSettings,
@@ -69,17 +69,17 @@ export default function multipartStart(
         headers: {
           'X-UC-User-Agent': getUserAgent({ publicKey, integration, userAgent })
         },
-        data: getFormData([
-          ['filename', fileName ?? defaultFilename],
-          ['size', size],
-          ['content_type', contentType ?? defaultContentType],
-          ['part_size', multipartChunkSize],
-          ['UPLOADCARE_STORE', store ? '' : 'auto'],
-          ['UPLOADCARE_PUB_KEY', publicKey],
-          ['signature', secureSignature],
-          ['expire', secureExpire],
-          ['source', source]
-        ]),
+        data: buildFormData({
+          filename: fileName ?? defaultFilename,
+          size: size,
+          content_type: contentType ?? defaultContentType,
+          part_size: multipartChunkSize,
+          UPLOADCARE_STORE: store ? '' : 'auto',
+          UPLOADCARE_PUB_KEY: publicKey,
+          signature: secureSignature,
+          expire: secureExpire,
+          source: source
+        }),
         signal
       }).then(({ data, headers, request }) => {
         const response = camelizeKeys<Response>(JSON.parse(data))

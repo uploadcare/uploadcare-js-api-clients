@@ -1,5 +1,5 @@
 import request from '../request/request.node'
-import getFormData from '../tools/buildFormData'
+import buildFormData from '../tools/buildFormData'
 import getUrl from '../tools/getUrl'
 import { defaultSettings, defaultFilename } from '../defaultSettings'
 import { getUserAgent } from '../tools/userAgent'
@@ -68,17 +68,18 @@ export default function base(
         headers: {
           'X-UC-User-Agent': getUserAgent({ publicKey, integration, userAgent })
         },
-        data: getFormData([
-          ['file', file, fileName ?? (file as File).name ?? defaultFilename],
-          ['UPLOADCARE_PUB_KEY', publicKey],
-          [
-            'UPLOADCARE_STORE',
-            typeof store === 'undefined' ? 'auto' : store ? 1 : 0
-          ],
-          ['signature', secureSignature],
-          ['expire', secureExpire],
-          ['source', source]
-        ]),
+        data: buildFormData({
+          file: {
+            data: file,
+            name: fileName ?? (file as File).name ?? defaultFilename
+          },
+          UPLOADCARE_PUB_KEY: publicKey,
+          UPLOADCARE_STORE:
+            typeof store === 'undefined' ? 'auto' : store ? 1 : 0,
+          signature: secureSignature,
+          expire: secureExpire,
+          source: source
+        }),
         signal,
         onProgress
       }).then(({ data, headers, request }) => {
