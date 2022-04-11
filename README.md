@@ -403,6 +403,7 @@ Defaults to `application/octet-stream`.
 type Metadata = {
   [key: string]: string
 }
+```
 
 Metadata is additional, arbitrary data, associated with uploaded file.
 
