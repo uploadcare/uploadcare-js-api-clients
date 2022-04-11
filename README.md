@@ -409,7 +409,7 @@ Metadata is additional, arbitrary data, associated with uploaded file.
 
 Non-string values will be converted to `string`. `undefined` values will be ignored.
 
-See [https://uploadcare.com/api-refs/rest-api/v0.7.0/#tag/File-Metadata][REST API reference] for details.
+See [REST API reference](https://uploadcare.com/api-refs/rest-api/v0.7.0/#tag/File-Metadata) for details.
 
 
 ## Testing
