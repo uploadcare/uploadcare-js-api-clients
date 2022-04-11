@@ -1,3 +1,19 @@
+# [3.1.0](https://github.com/uploadcare/uploadcare-upload-client/compare/v3.0.0...v3.1.0) (2022-04-11)
+
+
+### Bug Fixes
+
+* accept option `multipartMinFileSize ([679eb8f](https://github.com/uploadcare/uploadcare-upload-client/commit/679eb8f940d00d3b1f1c96ff2966fb9512d255db))
+* calculate `store` parameter in a consistent way ([2e423d2](https://github.com/uploadcare/uploadcare-upload-client/commit/2e423d27a96be8ce59fdd4c7fc8c06edd06e6e6b))
+
+
+### Features
+
+* file metadata support ([dc9cf2d](https://github.com/uploadcare/uploadcare-upload-client/commit/dc9cf2dd831ccb19272dedd1550716d53945527e))
+* return `contentInfo` from `fileInfo` to user ([5b9b99a](https://github.com/uploadcare/uploadcare-upload-client/commit/5b9b99ab705b4489db817bc6976a6f823862b83b))
+
+
+
 # [3.0.0](https://github.com/uploadcare/uploadcare-upload-client/compare/v2.2.0...v3.0.0) (2022-02-24)
 
 
