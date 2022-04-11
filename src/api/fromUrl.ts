@@ -1,4 +1,4 @@
-import { FileInfo, Url } from './types'
+import { FileInfo, Metadata, Url } from './types'
 import { FailedResponse } from '../request/types'
 import { CustomUserAgent } from '../types'
 
@@ -10,6 +10,7 @@ import { getUserAgent } from '../tools/userAgent'
 import camelizeKeys from '../tools/camelizeKeys'
 import { UploadClientError } from '../tools/errors'
 import retryIfThrottled from '../tools/retryIfThrottled'
+import { getStoreValue } from '../tools/getStoreValue'
 
 export enum TypeEnum {
   Token = 'token',
@@ -67,6 +68,7 @@ export type FromUrlOptions = {
   userAgent?: CustomUserAgent
 
   retryThrottledRequestMaxTimes?: number
+  metadata?: Metadata
 }
 
 /**
@@ -87,7 +89,8 @@ export default function fromUrl(
     signal,
     integration,
     userAgent,
-    retryThrottledRequestMaxTimes = defaultSettings.retryThrottledRequestMaxTimes
+    retryThrottledRequestMaxTimes = defaultSettings.retryThrottledRequestMaxTimes,
+    metadata
   }: FromUrlOptions
 ): Promise<FromUrlSuccessResponse> {
   return retryIfThrottled(
@@ -101,13 +104,14 @@ export default function fromUrl(
           jsonerrors: 1,
           pub_key: publicKey,
           source_url: sourceUrl,
-          store: typeof store === 'undefined' ? 'auto' : store ? 1 : undefined,
+          store: getStoreValue(store),
           filename: fileName,
           check_URL_duplicates: checkForUrlDuplicates ? 1 : undefined,
           save_URL_duplicates: saveUrlForRecurrentUploads ? 1 : undefined,
           signature: secureSignature,
           expire: secureExpire,
-          source: source
+          source: source,
+          metadata
         }),
         signal
       }).then(({ data, headers, request }) => {

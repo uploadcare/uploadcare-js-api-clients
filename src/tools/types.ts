@@ -4,5 +4,5 @@ export type ReactNativeAsset = { name?: string; type?: string; uri: string }
 
 export type FileTransformer = (
   file: NodeFile | BrowserFile,
-  name: string
+  name?: string
 ) => NodeFile | BrowserFile | ReactNativeAsset

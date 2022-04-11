@@ -1,7 +1,14 @@
 import camelizeKeys from './camelizeKeys'
 
 /* Types */
-import { FileInfo, Uuid, ImageInfo, VideoInfo } from '../api/types'
+import {
+  FileInfo,
+  Uuid,
+  ImageInfo,
+  VideoInfo,
+  Metadata,
+  ContentInfo
+} from '../api/types'
 
 export class UploadcareFile {
   readonly uuid: Uuid
@@ -16,6 +23,8 @@ export class UploadcareFile {
   readonly originalFilename: null | string = null
   readonly imageInfo: null | ImageInfo = null
   readonly videoInfo: null | VideoInfo = null
+  readonly contentInfo: null | ContentInfo = null
+  readonly metadata: null | Metadata = null
 
   constructor(
     fileInfo: FileInfo,
@@ -50,5 +59,7 @@ export class UploadcareFile {
     this.originalFilename = fileInfo.originalFilename
     this.imageInfo = camelizeKeys(fileInfo.imageInfo)
     this.videoInfo = camelizeKeys(fileInfo.videoInfo)
+    this.contentInfo = camelizeKeys(fileInfo.contentInfo)
+    this.metadata = fileInfo.metadata || null
   }
 }

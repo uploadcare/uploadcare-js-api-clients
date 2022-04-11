@@ -2,38 +2,84 @@ import getFormData, { transformFile } from './getFormData.node'
 
 import NodeFormData from 'form-data'
 import { BrowserFile, NodeFile } from '../request/types'
+import { isFileData } from '../uploadFile/types'
 
 /**
- * Constructs FormData instance from array.
+ * Constructs FormData instance.
  * Uses 'form-data' package in node or native FormData
  * in browsers.
  */
 
-type FileTuple = ['file', BrowserFile | NodeFile, string]
-type BaseType = string | number | void
-type FormDataTuple = [string, BaseType | BaseType[]]
+type KeyValue<T> = { [key: string]: T }
 
-const isFileTuple = (tuple: FormDataTuple | FileTuple): tuple is FileTuple =>
-  tuple[0] === 'file'
+type SimpleType = string | number | undefined
+type ObjectType = KeyValue<SimpleType>
 
-function buildFormData(
-  body: (FormDataTuple | FileTuple)[]
-): FormData | NodeFormData {
+type FileType = {
+  data: BrowserFile | NodeFile
+  name?: string
+}
+
+type InputValue = FileType | SimpleType | ObjectType
+
+type FormDataOptions = {
+  [key: string]: InputValue
+}
+
+const isSimpleValue = (value: InputValue): value is SimpleType => {
+  return (
+    typeof value === 'string' ||
+    typeof value === 'number' ||
+    typeof value === 'undefined'
+  )
+}
+
+const isObjectValue = (value: InputValue): value is ObjectType => {
+  return !!value && typeof value === 'object' && !Array.isArray(value)
+}
+
+const isFileValue = (value: InputValue): value is FileType =>
+  !!value &&
+  typeof value === 'object' &&
+  'data' in value &&
+  isFileData((value as FileType).data)
+
+function collectParams(
+  params: Array<[string, string | BrowserFile | NodeFile, string?]>,
+  inputKey: string,
+  inputValue: InputValue
+): void {
+  if (isFileValue(inputValue)) {
+    const name = inputValue.name
+    const file = transformFile(inputValue.data, name) as Blob // lgtm [js/superfluous-trailing-arguments]
+    params.push(name ? [inputKey, file, name] : [inputKey, file])
+  } else if (isObjectValue(inputValue)) {
+    for (const [key, value] of Object.entries(inputValue)) {
+      if (typeof value !== 'undefined') {
+        params.push([`${inputKey}[${key}]`, String(value)])
+      }
+    }
+  } else if (isSimpleValue(inputValue) && inputValue) {
+    params.push([inputKey, inputValue.toString()])
+  }
+}
+
+export function getFormDataParams(
+  options: FormDataOptions
+): Array<[string, string | BrowserFile, string?]> {
+  const params: Array<[string, string | BrowserFile, string?]> = []
+  for (const [key, value] of Object.entries(options)) {
+    collectParams(params, key, value)
+  }
+  return params
+}
+
+function buildFormData(options: FormDataOptions): FormData | NodeFormData {
   const formData = getFormData()
 
-  for (const tuple of body) {
-    if (Array.isArray(tuple[1])) {
-      // refactor this
-      tuple[1].forEach(
-        (val) => val && formData.append(tuple[0] + '[]', `${val}`)
-      )
-    } else if (isFileTuple(tuple)) {
-      const name = tuple[2]
-      const file = transformFile(tuple[1], name) as Blob // lgtm[js/superfluous-trailing-arguments]
-      formData.append(tuple[0], file, name)
-    } else if (tuple[1] != null) {
-      formData.append(tuple[0], `${tuple[1]}`)
-    }
+  const params = getFormDataParams(options)
+  for (const param of params) {
+    formData.append(...param)
   }
 
   return formData

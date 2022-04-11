@@ -39,6 +39,14 @@ export type VideoInfo = {
   }
 }
 
+export type ContentInfo = {
+  content_info: {
+    mime?: { mime: string; type: string; subtype: string }
+    image?: ImageInfo
+    video?: VideoInfo
+  }
+}
+
 export type FileInfo = {
   size: number
   done: number
@@ -54,7 +62,9 @@ export type FileInfo = {
   isReady: string
   imageInfo: ImageInfo | null
   videoInfo: VideoInfo | null
-  s3Bucket: string | null
+  contentInfo: ContentInfo | null
+  s3Bucket?: string
+  metadata?: Metadata
 }
 
 export type GroupInfo = {
@@ -87,3 +97,7 @@ export type UnknownProgressInfo = {
 export type ProgressCallback<
   T = ComputableProgressInfo | UnknownProgressInfo
 > = (arg: T) => void
+
+export type Metadata = {
+  [key: string]: string
+}

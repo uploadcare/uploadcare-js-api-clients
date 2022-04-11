@@ -167,7 +167,8 @@ const uploadFromUrl = (
     integration,
     userAgent,
     retryThrottledRequestMaxTimes,
-    pusherKey = defaultSettings.pusherKey
+    pusherKey = defaultSettings.pusherKey,
+    metadata
   }: UploadFromUrlOptions
 ): Promise<UploadcareFile> =>
   Promise.resolve(preconnect(pusherKey))
@@ -185,7 +186,8 @@ const uploadFromUrl = (
         source,
         integration,
         userAgent,
-        retryThrottledRequestMaxTimes
+        retryThrottledRequestMaxTimes,
+        metadata
       })
     )
     .catch((error) => {

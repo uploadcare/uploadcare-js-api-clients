@@ -397,6 +397,20 @@ This setting is needed for correct multipart uploads.
 
 Defaults to `application/octet-stream`.
 
+### `metadata: Metadata`
+
+```typescript
+type Metadata = {
+  [key: string]: string
+}
+
+Metadata is additional, arbitrary data, associated with uploaded file.
+
+Non-string values will be converted to `string`. `undefined` values will be ignored.
+
+See [https://uploadcare.com/api-refs/rest-api/v0.7.0/#tag/File-Metadata][REST API reference] for details.
+
+
 ## Testing
 
 ```

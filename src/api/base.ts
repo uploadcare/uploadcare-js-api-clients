@@ -1,5 +1,5 @@
 import request from '../request/request.node'
-import getFormData from '../tools/buildFormData'
+import buildFormData from '../tools/buildFormData'
 import getUrl from '../tools/getUrl'
 import { defaultSettings, defaultFilename } from '../defaultSettings'
 import { getUserAgent } from '../tools/userAgent'
@@ -8,9 +8,10 @@ import { UploadClientError } from '../tools/errors'
 import retryIfThrottled from '../tools/retryIfThrottled'
 
 /* Types */
-import { Uuid, ProgressCallback } from './types'
+import { Uuid, ProgressCallback, Metadata } from './types'
 import { CustomUserAgent } from '../types'
 import { FailedResponse, NodeFile, BrowserFile } from '../request/types'
+import { getStoreValue } from '../tools/getStoreValue'
 
 export type BaseResponse = {
   file: Uuid
@@ -35,6 +36,7 @@ export type BaseOptions = {
   userAgent?: CustomUserAgent
 
   retryThrottledRequestMaxTimes?: number
+  metadata?: Metadata
 }
 
 /**
@@ -55,7 +57,8 @@ export default function base(
     source = 'local',
     integration,
     userAgent,
-    retryThrottledRequestMaxTimes = defaultSettings.retryThrottledRequestMaxTimes
+    retryThrottledRequestMaxTimes = defaultSettings.retryThrottledRequestMaxTimes,
+    metadata
   }: BaseOptions
 ): Promise<BaseResponse> {
   return retryIfThrottled(
@@ -68,17 +71,18 @@ export default function base(
         headers: {
           'X-UC-User-Agent': getUserAgent({ publicKey, integration, userAgent })
         },
-        data: getFormData([
-          ['file', file, fileName ?? (file as File).name ?? defaultFilename],
-          ['UPLOADCARE_PUB_KEY', publicKey],
-          [
-            'UPLOADCARE_STORE',
-            typeof store === 'undefined' ? 'auto' : store ? 1 : 0
-          ],
-          ['signature', secureSignature],
-          ['expire', secureExpire],
-          ['source', source]
-        ]),
+        data: buildFormData({
+          file: {
+            data: file,
+            name: fileName ?? (file as File).name ?? defaultFilename
+          },
+          UPLOADCARE_PUB_KEY: publicKey,
+          UPLOADCARE_STORE: getStoreValue(store),
+          signature: secureSignature,
+          expire: secureExpire,
+          source: source,
+          metadata
+        }),
         signal,
         onProgress
       }).then(({ data, headers, request }) => {

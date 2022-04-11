@@ -3,7 +3,7 @@ import { FileTransformer, ReactNativeAsset } from './types'
 
 export const transformFile: FileTransformer = (
   file: BrowserFile | NodeFile,
-  name: string
+  name?: string
 ): ReactNativeAsset => {
   if (!file) {
     return file

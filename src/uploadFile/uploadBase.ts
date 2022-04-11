@@ -3,7 +3,7 @@ import { UploadcareFile } from '../tools/UploadcareFile'
 import { isReadyPoll } from '../tools/isReadyPoll'
 
 import { NodeFile, BrowserFile } from '../request/types'
-import { ProgressCallback } from '../api/types'
+import { Metadata, ProgressCallback } from '../api/types'
 import { CustomUserAgent } from '../types'
 
 type FromObjectOptions = {
@@ -25,6 +25,7 @@ type FromObjectOptions = {
   retryThrottledRequestMaxTimes?: number
 
   baseCDN?: string
+  metadata?: Metadata
 }
 
 const uploadFromObject = (
@@ -47,7 +48,8 @@ const uploadFromObject = (
 
     retryThrottledRequestMaxTimes,
 
-    baseCDN
+    baseCDN,
+    metadata
   }: FromObjectOptions
 ): Promise<UploadcareFile> => {
   return base(file, {
@@ -62,7 +64,8 @@ const uploadFromObject = (
     source,
     integration,
     userAgent,
-    retryThrottledRequestMaxTimes
+    retryThrottledRequestMaxTimes,
+    metadata
   })
     .then(({ file }) => {
       return isReadyPoll({

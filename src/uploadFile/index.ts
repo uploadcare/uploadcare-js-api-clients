@@ -4,7 +4,7 @@ import uploadFromUploaded from './uploadFromUploaded'
 import defaultSettings from '../defaultSettings'
 
 /* Types */
-import { Url, Uuid, ProgressCallback } from '../api/types'
+import { Url, Uuid, ProgressCallback, Metadata } from '../api/types'
 import { CustomUserAgent } from '../types'
 import { NodeFile, BrowserFile } from '../request/types'
 import { isFileData, isUrl, isUuid } from './types'
@@ -31,6 +31,7 @@ export type FileFromOptions = {
   retryThrottledRequestMaxTimes?: number
 
   contentType?: string
+  multipartMinFileSize?: number
   multipartChunkSize?: number
   multipartMaxAttempts?: number
   maxConcurrentRequests?: number
@@ -40,6 +41,8 @@ export type FileFromOptions = {
   checkForUrlDuplicates?: boolean
   saveUrlForRecurrentUploads?: boolean
   pusherKey?: string
+
+  metadata?: Metadata
 }
 
 /**
@@ -67,6 +70,7 @@ function uploadFile(
     retryThrottledRequestMaxTimes,
 
     contentType,
+    multipartMinFileSize,
     multipartChunkSize,
     multipartMaxAttempts,
     maxConcurrentRequests,
@@ -75,13 +79,15 @@ function uploadFile(
 
     checkForUrlDuplicates,
     saveUrlForRecurrentUploads,
-    pusherKey
+    pusherKey,
+
+    metadata
   }: FileFromOptions
 ): Promise<UploadcareFile> {
   if (isFileData(data)) {
     const fileSize = getFileSize(data)
 
-    if (isMultipart(fileSize)) {
+    if (isMultipart(fileSize, multipartMinFileSize)) {
       return uploadMultipart(data, {
         publicKey,
         contentType,
@@ -104,7 +110,8 @@ function uploadFile(
         maxConcurrentRequests,
         retryThrottledRequestMaxTimes,
 
-        baseCDN
+        baseCDN,
+        metadata
       })
     }
 
@@ -126,7 +133,8 @@ function uploadFile(
 
       retryThrottledRequestMaxTimes,
 
-      baseCDN
+      baseCDN,
+      metadata
     })
   }
 
@@ -151,7 +159,8 @@ function uploadFile(
       userAgent,
 
       retryThrottledRequestMaxTimes,
-      pusherKey
+      pusherKey,
+      metadata
     })
   }
 
