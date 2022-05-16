@@ -67,14 +67,14 @@ export default class UploadClient {
 
   base(
     file: NodeFile | BrowserFile,
-    options?: Partial<BaseOptions>
+    options: Partial<BaseOptions> = {}
   ): Promise<BaseResponse> {
     const settings = this.getSettings()
 
     return base(file, populateOptionsWithSettings(options, settings))
   }
 
-  info(uuid: Uuid, options?: Partial<InfoOptions>): Promise<FileInfo> {
+  info(uuid: Uuid, options: Partial<InfoOptions> = {}): Promise<FileInfo> {
     const settings = this.getSettings()
 
     return info(uuid, populateOptionsWithSettings(options, settings))
@@ -82,7 +82,7 @@ export default class UploadClient {
 
   fromUrl(
     sourceUrl: Url,
-    options?: Partial<FromUrlOptions>
+    options: Partial<FromUrlOptions> = {}
   ): Promise<FromUrlResponse> {
     const settings = this.getSettings()
 
@@ -91,14 +91,17 @@ export default class UploadClient {
 
   fromUrlStatus(
     token: Token,
-    options?: Partial<FromUrlStatusOptions>
+    options: Partial<FromUrlStatusOptions> = {}
   ): Promise<FromUrlStatusResponse> {
     const settings = this.getSettings()
 
     return fromUrlStatus(token, populateOptionsWithSettings(options, settings))
   }
 
-  group(uuids: Uuid[], options?: Partial<GroupOptions>): Promise<GroupInfo> {
+  group(
+    uuids: Uuid[],
+    options: Partial<GroupOptions> = {}
+  ): Promise<GroupInfo> {
     const settings = this.getSettings()
 
     return group(uuids, populateOptionsWithSettings(options, settings))
@@ -106,7 +109,7 @@ export default class UploadClient {
 
   groupInfo(
     id: GroupId,
-    options?: Partial<GroupInfoOptions>
+    options: Partial<GroupInfoOptions> = {}
   ): Promise<GroupInfo> {
     const settings = this.getSettings()
 
@@ -115,7 +118,7 @@ export default class UploadClient {
 
   multipartStart(
     size: number,
-    options?: Partial<MultipartStartOptions>
+    options: Partial<MultipartStartOptions> = {}
   ): Promise<MultipartStartResponse> {
     const settings = this.getSettings()
 
@@ -125,7 +128,7 @@ export default class UploadClient {
   multipartUpload(
     part: Buffer | Blob,
     url: MultipartPart,
-    options?: Partial<MultipartUploadOptions>
+    options: Partial<MultipartUploadOptions> = {}
   ): Promise<MultipartUploadResponse> {
     const settings = this.getSettings()
 
@@ -138,7 +141,7 @@ export default class UploadClient {
 
   multipartComplete(
     uuid: Uuid,
-    options?: Partial<MultipartCompleteOptions>
+    options: Partial<MultipartCompleteOptions> = {}
   ): Promise<FileInfo> {
     const settings = this.getSettings()
 
@@ -150,7 +153,7 @@ export default class UploadClient {
 
   uploadFile(
     data: NodeFile | BrowserFile | Url | Uuid,
-    options?: Partial<FileFromOptions>
+    options: Partial<FileFromOptions> = {}
   ): Promise<UploadcareFile> {
     const settings = this.getSettings()
 
@@ -159,7 +162,7 @@ export default class UploadClient {
 
   uploadFileGroup(
     data: (NodeFile | BrowserFile)[] | Url[] | Uuid[],
-    options?: Partial<FileFromOptions & GroupFromOptions>
+    options: Partial<FileFromOptions & GroupFromOptions> = {}
   ): Promise<UploadcareGroup> {
     const settings = this.getSettings()
 
