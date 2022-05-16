@@ -14,6 +14,7 @@ type FromObjectOptions = {
   secureSignature?: string
   secureExpire?: string
   store?: boolean
+  contentType?: string
 
   signal?: AbortSignal
   onProgress?: ProgressCallback
@@ -38,6 +39,7 @@ const uploadFromObject = (
     secureSignature,
     secureExpire,
     store,
+    contentType,
 
     signal,
     onProgress,
@@ -55,6 +57,7 @@ const uploadFromObject = (
   return base(file, {
     publicKey,
     fileName,
+    contentType,
     baseURL,
     secureSignature,
     secureExpire,
