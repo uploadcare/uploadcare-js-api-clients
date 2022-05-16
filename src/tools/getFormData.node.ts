@@ -7,11 +7,15 @@ import { identity } from './identity'
 export const getFileOptions: GetFormDataFileAppendOptions = ({
   name,
   contentType
-}) => [
-  {
-    filename: name,
-    contentType
-  }
-]
+}) =>
+  [
+    Object.entries({
+      filename: name,
+      contentType
+    })
+      .filter(([, value]) => !!value)
+      .reduce((acc, [key, value]) => ({ ...acc, [key]: value }), {})
+  ].filter((value) => !!value)
+
 export const transformFile: FileTransformer = identity
 export default (): NodeFormData | FormData => new NodeFormData()
