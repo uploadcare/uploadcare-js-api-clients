@@ -35,13 +35,9 @@ export class UploadcareFile {
       fileName?: string
     }
   ) {
-    const { uuid, s3Bucket } = fileInfo
+    const cdnUrl = `${baseCDN}/${fileInfo.uuid}/`
 
-    const cdnUrl = s3Bucket
-      ? `https://${s3Bucket}.s3.amazonaws.com/${uuid}/${fileInfo.filename}`
-      : `${baseCDN}/${uuid}/`
-
-    this.uuid = uuid
+    this.uuid = fileInfo.uuid
     this.name = fileName || fileInfo.filename
     this.size = fileInfo.size
     this.isStored = fileInfo.isStored
