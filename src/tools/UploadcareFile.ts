@@ -23,6 +23,7 @@ export class UploadcareFile {
   readonly videoInfo: null | VideoInfo = null
   readonly contentInfo: null | ContentInfo = null
   readonly metadata: null | Metadata = null
+  readonly s3Bucket: null | string = null
 
   constructor(
     fileInfo: FileInfo,
@@ -52,5 +53,6 @@ export class UploadcareFile {
     this.videoInfo = camelizeKeys(fileInfo.videoInfo)
     this.contentInfo = camelizeKeys(fileInfo.contentInfo)
     this.metadata = fileInfo.metadata || null
+    this.s3Bucket = fileInfo.s3Bucket || null
   }
 }
