@@ -16,7 +16,6 @@ import {
 import { NodeFile, BrowserFile } from '../request/types'
 
 export type GroupFromOptions = {
-  defaultEffects?: string
   jsonpCallback?: string
 }
 
@@ -45,8 +44,7 @@ export default function uploadFileGroup(
 
     baseCDN = defaultSettings.baseCDN,
 
-    jsonpCallback,
-    defaultEffects
+    jsonpCallback
   }: FileFromOptions & GroupFromOptions
 ): Promise<UploadcareGroup> {
   if (!isFileDataArray(data) && !isUrlArray(data) && !isUuidArray(data)) {
@@ -108,18 +106,6 @@ export default function uploadFileGroup(
     )
   ).then((files) => {
     const uuids = files.map((file) => file.uuid)
-    const addDefaultEffects = (file): UploadcareFile => {
-      const cdnUrlModifiers = defaultEffects ? `-/${defaultEffects}` : null
-      const cdnUrl = `${file.urlBase}${cdnUrlModifiers || ''}`
-
-      return {
-        ...file,
-        cdnUrlModifiers,
-        cdnUrl
-      }
-    }
-
-    const filesInGroup = defaultEffects ? files.map(addDefaultEffects) : files
 
     return group(uuids, {
       publicKey,
@@ -133,7 +119,7 @@ export default function uploadFileGroup(
       userAgent,
       retryThrottledRequestMaxTimes
     })
-      .then((groupInfo) => new UploadcareGroup(groupInfo, filesInGroup))
+      .then((groupInfo) => new UploadcareGroup(groupInfo, files))
       .then((group) => {
         onProgress && onProgress({ isComputable: true, value: 1 })
         return group

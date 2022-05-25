@@ -30,11 +30,9 @@ export class UploadcareFile {
     fileInfo: FileInfo,
     {
       baseCDN,
-      defaultEffects,
       fileName
     }: {
       baseCDN?: string
-      defaultEffects?: string
       fileName?: string
     }
   ) {
@@ -43,7 +41,7 @@ export class UploadcareFile {
     const urlBase = s3Bucket
       ? `https://${s3Bucket}.s3.amazonaws.com/${uuid}/${fileInfo.filename}`
       : `${baseCDN}/${uuid}/`
-    const cdnUrlModifiers = defaultEffects ? `-/${defaultEffects}` : null
+    const cdnUrlModifiers = null
     const cdnUrl = `${urlBase}${cdnUrlModifiers || ''}`
     const originalUrl = uuid ? urlBase : null
 
