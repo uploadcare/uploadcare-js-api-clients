@@ -18,7 +18,6 @@ export class UploadcareFile {
   readonly isImage: null | boolean = null
   readonly mimeType: null | string = null
   readonly cdnUrl: null | string = null
-  readonly cdnUrlModifiers: null | string = null
   readonly originalUrl: null | string = null
   readonly originalFilename: null | string = null
   readonly imageInfo: null | ImageInfo = null
@@ -38,12 +37,10 @@ export class UploadcareFile {
   ) {
     const { uuid, s3Bucket } = fileInfo
 
-    const urlBase = s3Bucket
+    const cdnUrl = s3Bucket
       ? `https://${s3Bucket}.s3.amazonaws.com/${uuid}/${fileInfo.filename}`
       : `${baseCDN}/${uuid}/`
-    const cdnUrlModifiers = null
-    const cdnUrl = `${urlBase}${cdnUrlModifiers || ''}`
-    const originalUrl = uuid ? urlBase : null
+    const originalUrl = uuid ? cdnUrl : null
 
     this.uuid = uuid
     this.name = fileName || fileInfo.filename
@@ -52,7 +49,6 @@ export class UploadcareFile {
     this.isImage = fileInfo.isImage
     this.mimeType = fileInfo.mimeType
     this.cdnUrl = cdnUrl
-    this.cdnUrlModifiers = cdnUrlModifiers
     this.originalUrl = originalUrl
     this.originalFilename = fileInfo.originalFilename
     this.imageInfo = camelizeKeys(fileInfo.imageInfo)
