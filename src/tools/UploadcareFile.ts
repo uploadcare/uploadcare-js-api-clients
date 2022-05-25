@@ -18,7 +18,6 @@ export class UploadcareFile {
   readonly isImage: null | boolean = null
   readonly mimeType: null | string = null
   readonly cdnUrl: null | string = null
-  readonly originalUrl: null | string = null
   readonly originalFilename: null | string = null
   readonly imageInfo: null | ImageInfo = null
   readonly videoInfo: null | VideoInfo = null
@@ -40,7 +39,6 @@ export class UploadcareFile {
     const cdnUrl = s3Bucket
       ? `https://${s3Bucket}.s3.amazonaws.com/${uuid}/${fileInfo.filename}`
       : `${baseCDN}/${uuid}/`
-    const originalUrl = uuid ? cdnUrl : null
 
     this.uuid = uuid
     this.name = fileName || fileInfo.filename
@@ -49,7 +47,6 @@ export class UploadcareFile {
     this.isImage = fileInfo.isImage
     this.mimeType = fileInfo.mimeType
     this.cdnUrl = cdnUrl
-    this.originalUrl = originalUrl
     this.originalFilename = fileInfo.originalFilename
     this.imageInfo = camelizeKeys(fileInfo.imageInfo)
     this.videoInfo = camelizeKeys(fileInfo.videoInfo)
