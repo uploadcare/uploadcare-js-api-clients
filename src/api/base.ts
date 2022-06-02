@@ -27,6 +27,7 @@ export type BaseOptions = {
   secureSignature?: string
   secureExpire?: string
   store?: boolean
+  contentType?: string
 
   signal?: AbortSignal
   onProgress?: ProgressCallback
@@ -48,6 +49,7 @@ export default function base(
   {
     publicKey,
     fileName,
+    contentType,
     baseURL = defaultSettings.baseURL,
     secureSignature,
     secureExpire,
@@ -74,7 +76,8 @@ export default function base(
         data: buildFormData({
           file: {
             data: file,
-            name: fileName ?? (file as File).name ?? defaultFilename
+            name: fileName ?? (file as File).name ?? defaultFilename,
+            contentType
           },
           UPLOADCARE_PUB_KEY: publicKey,
           UPLOADCARE_STORE: getStoreValue(store),

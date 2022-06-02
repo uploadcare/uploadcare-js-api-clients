@@ -1,4 +1,4 @@
-import getFormData, { transformFile } from './getFormData.node'
+import getFormData, { getFileOptions, transformFile } from './getFormData.node'
 
 import NodeFormData from 'form-data'
 import { BrowserFile, NodeFile } from '../request/types'
@@ -15,9 +15,13 @@ type KeyValue<T> = { [key: string]: T }
 type SimpleType = string | number | undefined
 type ObjectType = KeyValue<SimpleType>
 
-type FileType = {
-  data: BrowserFile | NodeFile
+interface FileOptions {
   name?: string
+  contentType?: string
+}
+
+interface FileType extends FileOptions {
+  data: BrowserFile | NodeFile
 }
 
 type InputValue = FileType | SimpleType | ObjectType
@@ -25,6 +29,14 @@ type InputValue = FileType | SimpleType | ObjectType
 type FormDataOptions = {
   [key: string]: InputValue
 }
+
+type Params = Array<
+  [
+    string,
+    string | BrowserFile | NodeFile,
+    ...(string | { [key: string]: string | undefined })[]
+  ]
+>
 
 const isSimpleValue = (value: InputValue): value is SimpleType => {
   return (
@@ -45,14 +57,15 @@ const isFileValue = (value: InputValue): value is FileType =>
   isFileData((value as FileType).data)
 
 function collectParams(
-  params: Array<[string, string | BrowserFile | NodeFile, string?]>,
+  params: Params,
   inputKey: string,
   inputValue: InputValue
 ): void {
   if (isFileValue(inputValue)) {
-    const name = inputValue.name
+    const { name, contentType }: FileOptions = inputValue
     const file = transformFile(inputValue.data, name) as Blob // lgtm [js/superfluous-trailing-arguments]
-    params.push(name ? [inputKey, file, name] : [inputKey, file])
+    const options = getFileOptions({ name, contentType })
+    params.push([inputKey, file, ...options])
   } else if (isObjectValue(inputValue)) {
     for (const [key, value] of Object.entries(inputValue)) {
       if (typeof value !== 'undefined') {
@@ -64,10 +77,8 @@ function collectParams(
   }
 }
 
-export function getFormDataParams(
-  options: FormDataOptions
-): Array<[string, string | BrowserFile, string?]> {
-  const params: Array<[string, string | BrowserFile, string?]> = []
+export function getFormDataParams(options: FormDataOptions): Params {
+  const params: Params = []
   for (const [key, value] of Object.entries(options)) {
     collectParams(params, key, value)
   }
@@ -77,9 +88,11 @@ export function getFormDataParams(
 function buildFormData(options: FormDataOptions): FormData | NodeFormData {
   const formData = getFormData()
 
-  const params = getFormDataParams(options)
-  for (const param of params) {
-    formData.append(...param)
+  const paramsList = getFormDataParams(options)
+  for (const params of paramsList) {
+    const [key, value, ...options] = params
+    // node form-data has another signature for append
+    formData.append(key, value as Blob, ...(options as [string]))
   }
 
   return formData

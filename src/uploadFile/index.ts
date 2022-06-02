@@ -119,6 +119,7 @@ function uploadFile(
       publicKey,
 
       fileName,
+      contentType,
       baseURL,
       secureSignature,
       secureExpire,

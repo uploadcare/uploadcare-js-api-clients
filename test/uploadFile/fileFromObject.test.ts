@@ -55,6 +55,17 @@ describe('uploadFrom Object', () => {
     expect(file.name).toEqual('newFileName.jpg')
   })
 
+  it('should accept custom contenType', async () => {
+    const fileToUpload = factory.image('blackSquare').data
+    const settings = getSettingsForTesting({
+      publicKey: factory.publicKey('image'),
+      store: false,
+      contentType: 'image/jpeg'
+    })
+    const file = await uploadFile(fileToUpload, settings)
+    expect(file.mimeType).toEqual('image/jpeg')
+  })
+
   it('should be able to handle progress', async () => {
     const onProgress = jest.fn()
     const fileToUpload = factory.image('blackSquare').data

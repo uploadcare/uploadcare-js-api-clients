@@ -1,5 +1,11 @@
 import { BrowserFile, NodeFile } from '../request/types'
-import { FileTransformer, ReactNativeAsset } from './types'
+import {
+  FileTransformer,
+  GetFormDataFileAppendOptions,
+  ReactNativeAsset
+} from './types'
+
+export const getFileOptions: GetFormDataFileAppendOptions = ({ name }) => [name]
 
 export const transformFile: FileTransformer = (
   file: BrowserFile | NodeFile,
@@ -8,7 +14,7 @@ export const transformFile: FileTransformer = (
   if (!file) {
     return file
   }
-  const uri = URL.createObjectURL(file)
+  const uri = URL.createObjectURL(file as BrowserFile)
   const type = (file as BrowserFile).type
   return { uri, name, type }
 }
