@@ -1,4 +1,3 @@
-import AbortController from 'abort-controller'
 import * as factory from '../_fixtureFactory'
 import {
   getSettingsForTesting,

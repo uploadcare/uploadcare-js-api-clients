@@ -1,4 +1,3 @@
-import AbortController from 'abort-controller'
 import { onCancel } from '../../src/tools/onCancel'
 
 describe('onCancel', () => {

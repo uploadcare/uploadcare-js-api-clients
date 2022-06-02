@@ -1,4 +1,3 @@
-import AbortController from 'abort-controller'
 import multipartStart from '../../src/api/multipartStart'
 import multipartUpload from '../../src/api/multipartUpload'
 import multipartComplete from '../../src/api/multipartComplete'

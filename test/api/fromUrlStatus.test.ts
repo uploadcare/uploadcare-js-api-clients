@@ -1,4 +1,3 @@
-import AbortController from 'abort-controller'
 import fromUrlStatus, { Status } from '../../src/api/fromUrlStatus'
 import * as factory from '../_fixtureFactory'
 import { getSettingsForTesting } from '../_helpers'

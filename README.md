@@ -185,7 +185,7 @@ import {
 Also, you can use low-level wrappers to call the API endpoints directly:
 
 ```javascript
-import { base, AbortController } from '@uploadcare/upload-client'
+import { base } from '@uploadcare/upload-client'
 
 const onProgress = ({ isComputable, value }) => console.log(isComputable, value)
 const abortController = new AbortController()

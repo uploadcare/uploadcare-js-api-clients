@@ -1,4 +1,3 @@
-import AbortController from 'abort-controller'
 import * as factory from '../_fixtureFactory'
 import multipartUpload from '../../src/api/multipartUpload'
 import { getSettingsForTesting, assertComputableProgress } from '../_helpers'
