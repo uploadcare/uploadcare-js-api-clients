@@ -1,4 +1,4 @@
-import uploadBase from './uploadBase'
+import uploadDirect from './uploadDirect'
 import uploadFromUrl from './uploadFromUrl'
 import uploadFromUploaded from './uploadFromUploaded'
 import defaultSettings from '../defaultSettings'
@@ -115,7 +115,7 @@ function uploadFile(
       })
     }
 
-    return uploadBase(data, {
+    return uploadDirect(data, {
       publicKey,
 
       fileName,
@@ -191,7 +191,8 @@ function uploadFile(
 export {
   uploadFile,
   uploadFromUrl,
-  uploadBase,
+  uploadDirect,
+  uploadDirect as uploadBase, // for compatibility
   uploadFromUploaded,
   uploadMultipart
 }

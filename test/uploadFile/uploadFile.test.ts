@@ -1,23 +1,23 @@
 import { uploadFile } from '../../src/uploadFile'
 import * as factory from '../_fixtureFactory'
 import { getSettingsForTesting } from '../_helpers'
-import * as uploadFromObject from '../../src/uploadFile/uploadFromObject'
+import * as uploadDirect from '../../src/uploadFile/uploadDirect'
 import * as uploadMultipart from '../../src/uploadFile/uploadMultipart'
 import * as uploadFromUrl from '../../src/uploadFile/uploadFromUrl'
 import * as uploadFromUploaded from '../../src/uploadFile/uploadFromUploaded'
 
-describe('uploadFromObject', () => {
+describe('uploadDirect', () => {
   afterEach(() => {
     jest.clearAllMocks()
   })
 
-  it('should upload small files using `uploadFromObject`', async () => {
+  it('should upload small files using `uploadDirect`', async () => {
     const fileToUpload = factory.image('blackSquare').data
     const settings = getSettingsForTesting({
       publicKey: factory.publicKey('image')
     })
 
-    const spy = jest.spyOn(uploadFromObject, 'default')
+    const spy = jest.spyOn(uploadDirect, 'default')
     const file = await uploadFile(fileToUpload, settings)
 
     expect(spy).toHaveBeenCalled()

@@ -2,16 +2,16 @@ import AbortController from 'abort-controller'
 import * as factory from '../_fixtureFactory'
 import { getSettingsForTesting, assertComputableProgress } from '../_helpers'
 import { UploadClientError } from '../../src/tools/errors'
-import uploadFromObject from '../../src/uploadFile/uploadFromObject'
+import uploadDirect from '../../src/uploadFile/uploadDirect'
 
-describe('uploadFromObject', () => {
+describe('uploadDirect', () => {
   it('should resolves when file is ready on CDN', async () => {
     const fileToUpload = factory.image('blackSquare').data
     const settings = getSettingsForTesting({
       publicKey: factory.publicKey('image')
     })
 
-    const file = await uploadFromObject(fileToUpload, settings)
+    const file = await uploadDirect(fileToUpload, settings)
 
     expect(file.cdnUrl).toBeTruthy()
   })
@@ -22,7 +22,7 @@ describe('uploadFromObject', () => {
       publicKey: factory.publicKey('image'),
       store: false
     })
-    const file = await uploadFromObject(fileToUpload, settings)
+    const file = await uploadDirect(fileToUpload, settings)
 
     expect(file.isStored).toBeFalsy()
   })
@@ -34,7 +34,7 @@ describe('uploadFromObject', () => {
       publicKey: factory.publicKey('image'),
       signal: ctrl.signal
     })
-    const upload = uploadFromObject(fileToUpload, settings)
+    const upload = uploadDirect(fileToUpload, settings)
 
     setTimeout(() => {
       ctrl.abort()
@@ -50,7 +50,7 @@ describe('uploadFromObject', () => {
       store: false,
       fileName: 'newFileName.jpg'
     })
-    const file = await uploadFromObject(fileToUpload, settings)
+    const file = await uploadDirect(fileToUpload, settings)
 
     expect(file.name).toEqual('newFileName.jpg')
   })
@@ -62,7 +62,7 @@ describe('uploadFromObject', () => {
       store: false,
       contentType: 'image/jpeg'
     })
-    const file = await uploadFromObject(fileToUpload, settings)
+    const file = await uploadDirect(fileToUpload, settings)
     expect(file.mimeType).toEqual('image/jpeg')
   })
 
@@ -74,7 +74,7 @@ describe('uploadFromObject', () => {
       onProgress
     })
 
-    await uploadFromObject(fileToUpload, settings)
+    await uploadDirect(fileToUpload, settings)
 
     assertComputableProgress(onProgress)
   })
@@ -86,7 +86,7 @@ describe('uploadFromObject', () => {
     })
 
     try {
-      await uploadFromObject(fileToUpload, settings)
+      await uploadDirect(fileToUpload, settings)
     } catch (error) {
       expect((error as UploadClientError).message).toEqual(
         'UPLOADCARE_PUB_KEY is invalid.'
