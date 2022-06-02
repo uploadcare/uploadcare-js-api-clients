@@ -14,10 +14,7 @@
     "dist/index.js": "dist/index.browser.js"
   },
   "react-native": {
-    "./lib/request/request.node.js": "./lib/request/request.browser.js",
-    "./lib/tools/getFormData.node.js": "./lib/tools/getFormData.react-native.js",
-    "./lib/tools/sockets.node.js": "./lib/tools/sockets.browser.js",
-    "./lib/uploadFile/prepareChunks.node.js": "./lib/uploadFile/prepareChunks.react-native.js"
+    "dist/index.js": "dist/index.react-native.js"
   },
   "scripts": {
     "check-env-vars": "node ./checkvars.js",
