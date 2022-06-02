@@ -6,7 +6,7 @@ import { NodeFile, BrowserFile } from '../request/types'
 import { Metadata, ProgressCallback } from '../api/types'
 import { CustomUserAgent } from '../types'
 
-type FromObjectOptions = {
+type DirectOptions = {
   publicKey: string
 
   fileName?: string
@@ -14,6 +14,7 @@ type FromObjectOptions = {
   secureSignature?: string
   secureExpire?: string
   store?: boolean
+  contentType?: string
 
   signal?: AbortSignal
   onProgress?: ProgressCallback
@@ -28,7 +29,7 @@ type FromObjectOptions = {
   metadata?: Metadata
 }
 
-const uploadFromObject = (
+const uploadDirect = (
   file: NodeFile | BrowserFile,
   {
     publicKey,
@@ -38,6 +39,7 @@ const uploadFromObject = (
     secureSignature,
     secureExpire,
     store,
+    contentType,
 
     signal,
     onProgress,
@@ -50,11 +52,12 @@ const uploadFromObject = (
 
     baseCDN,
     metadata
-  }: FromObjectOptions
+  }: DirectOptions
 ): Promise<UploadcareFile> => {
   return base(file, {
     publicKey,
     fileName,
+    contentType,
     baseURL,
     secureSignature,
     secureExpire,
@@ -83,4 +86,4 @@ const uploadFromObject = (
     .then((fileInfo) => new UploadcareFile(fileInfo, { baseCDN }))
 }
 
-export default uploadFromObject
+export default uploadDirect

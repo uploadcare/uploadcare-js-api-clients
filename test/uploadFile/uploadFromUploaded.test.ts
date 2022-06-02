@@ -1,24 +1,24 @@
 import AbortController from 'abort-controller'
 import * as factory from '../_fixtureFactory'
-import { uploadFile } from '../../src/uploadFile'
 import { getSettingsForTesting, assertComputableProgress } from '../_helpers'
 import { UploadClientError } from '../../src/tools/errors'
+import uploadFromUploaded from '../../src/uploadFile/uploadFromUploaded'
 
-describe('uploadFrom Uploaded', () => {
+describe('uploadFromUploaded', () => {
   const uuid = factory.uuid('image')
   const settings = getSettingsForTesting({
     publicKey: factory.publicKey('image')
   })
 
   it('should resolves when file is ready on CDN', async () => {
-    const file = await uploadFile(uuid, settings)
+    const file = await uploadFromUploaded(uuid, settings)
 
     expect(file.cdnUrl).toBeTruthy()
   })
 
   it('should be able to cancel uploading', async () => {
     const ctrl = new AbortController()
-    const upload = uploadFile(uuid, {
+    const upload = uploadFromUploaded(uuid, {
       ...settings,
       signal: ctrl.signal
     })
@@ -36,7 +36,7 @@ describe('uploadFrom Uploaded', () => {
       store: true,
       fileName: 'newFileName.jpg'
     })
-    const file = await uploadFile(uuid, settings)
+    const file = await uploadFromUploaded(uuid, settings)
 
     expect(file.name).toEqual('newFileName.jpg')
   })
@@ -48,7 +48,7 @@ describe('uploadFrom Uploaded', () => {
       onProgress
     })
 
-    await uploadFile(uuid, settings)
+    await uploadFromUploaded(uuid, settings)
 
     assertComputableProgress(onProgress)
   })
@@ -59,7 +59,7 @@ describe('uploadFrom Uploaded', () => {
     })
 
     try {
-      await uploadFile(uuid, settings)
+      await uploadFromUploaded(uuid, settings)
     } catch (error) {
       expect((error as UploadClientError).message).toEqual(
         'pub_key is invalid.'

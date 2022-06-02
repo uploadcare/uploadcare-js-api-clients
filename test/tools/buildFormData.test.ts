@@ -131,7 +131,11 @@ describe('getFormDataParams', () => {
 
     expect(params.length).toEqual(2)
 
-    expect(params).toContainEqual(['file1', fileToUpload])
-    expect(params).toContainEqual(['file2', fileToUpload, 'filename'])
+    expect(params).toContainEqual(['file1', fileToUpload, {}])
+    expect(params).toContainEqual([
+      'file2',
+      fileToUpload,
+      { filename: 'filename' }
+    ])
   })
 })

@@ -173,7 +173,7 @@ You can import only needed methods directly, without `UploadClient` wrapper:
 import {
   uploadFile,
   uploadFromUrl,
-  uploadBase,
+  uploadDirect,
   uploadFromUploaded,
   uploadMultipart,
   uploadFileGroup
