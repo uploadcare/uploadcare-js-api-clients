@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
-    "declaration": false,
-    "target": "es6",
+    "declaration": true,
+    "target": "es5",
     "module": "ESNext",
     "lib": ["es2015", "dom", "es2018.promise"],
     "noImplicitAny": false,
@@ -9,8 +9,8 @@
     "strict": true,
     "moduleResolution": "node",
     "outDir": "dist",
-    "allowSyntheticDefaultImports": true,
+    "allowSyntheticDefaultImports": true
   },
   "include": ["src"],
-  "exclude": ["node_modules", "test"]
+  "exclude": ["node_modules", "test", "mock-server"]
 }
