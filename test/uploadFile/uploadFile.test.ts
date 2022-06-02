@@ -6,7 +6,7 @@ import * as uploadMultipart from '../../src/uploadFile/uploadMultipart'
 import * as uploadFromUrl from '../../src/uploadFile/uploadFromUrl'
 import * as uploadFromUploaded from '../../src/uploadFile/uploadFromUploaded'
 
-describe('uploadDirect', () => {
+describe('uploadFile', () => {
   afterEach(() => {
     jest.clearAllMocks()
   })
