@@ -14,7 +14,6 @@ export {
   uploadFile,
   uploadFromUrl,
   uploadDirect,
-  uploadDirect as uploadBase, // for compatibility
   uploadFromUploaded,
   uploadMultipart
 } from './uploadFile'
