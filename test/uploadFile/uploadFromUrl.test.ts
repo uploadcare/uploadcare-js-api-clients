@@ -1,6 +1,5 @@
 import AbortController from 'abort-controller'
 import * as factory from '../_fixtureFactory'
-import { uploadFile } from '../../src/uploadFile'
 import {
   getSettingsForTesting,
   assertComputableProgress,
@@ -9,17 +8,18 @@ import {
 import { UploadClientError } from '../../src/tools/errors'
 import http from 'http'
 import https from 'https'
+import uploadFromUrl from '../../src/uploadFile/uploadFromUrl'
 
 jest.setTimeout(60000)
 
-describe('uploadFrom URL', () => {
+describe('uploadFromUrl', () => {
   it('should resolves when file is ready on CDN', async () => {
     const sourceUrl = factory.imageUrl('valid')
     const settings = getSettingsForTesting({
       publicKey: factory.publicKey('image')
     })
 
-    const file = await uploadFile(sourceUrl, settings)
+    const file = await uploadFromUrl(sourceUrl, settings)
 
     expect(file.cdnUrl).toBeTruthy()
     expect(file.uuid).toBeTruthy()
@@ -32,7 +32,7 @@ describe('uploadFrom URL', () => {
       store: false
     })
 
-    const file = await uploadFile(sourceUrl, settings)
+    const file = await uploadFromUrl(sourceUrl, settings)
 
     expect(file.isStored).toBeFalsy()
   })
@@ -46,7 +46,7 @@ describe('uploadFrom URL', () => {
 
     const isHttpsProtocol = settings.baseURL.includes('https')
     const spy = jest.spyOn(isHttpsProtocol ? https : http, 'request')
-    await uploadFile(sourceUrl, settings)
+    await uploadFromUrl(sourceUrl, settings)
 
     const uploadRequest = spy.mock.calls[0][0]
     expect(uploadRequest['query']).toEqual(
@@ -64,7 +64,7 @@ describe('uploadFrom URL', () => {
 
     const isHttpsProtocol = settings.baseURL.includes('https')
     const spy = jest.spyOn(isHttpsProtocol ? https : http, 'request')
-    await uploadFile(sourceUrl, settings)
+    await uploadFromUrl(sourceUrl, settings)
 
     const uploadRequest = spy.mock.calls[0][0]
     expect(uploadRequest['query']).toEqual(
@@ -85,7 +85,7 @@ describe('uploadFrom URL', () => {
       ctrl.abort()
     })
 
-    await expect(uploadFile(sourceUrl, settings)).rejects.toThrowError(
+    await expect(uploadFromUrl(sourceUrl, settings)).rejects.toThrowError(
       new UploadClientError('Request canceled')
     )
   })
@@ -97,7 +97,7 @@ describe('uploadFrom URL', () => {
       store: false,
       fileName: 'newFileName.jpg'
     })
-    const file = await uploadFile(sourceUrl, settings)
+    const file = await uploadFromUrl(sourceUrl, settings)
 
     expect(file.name).toEqual('newFileName.jpg')
   })
@@ -110,7 +110,7 @@ describe('uploadFrom URL', () => {
       onProgress
     })
 
-    await uploadFile(sourceUrl, settings)
+    await uploadFromUrl(sourceUrl, settings)
 
     assertComputableProgress(onProgress)
   })
@@ -124,7 +124,7 @@ describe('uploadFrom URL', () => {
         onProgress
       })
 
-      await uploadFile(sourceUrl, settings)
+      await uploadFromUrl(sourceUrl, settings)
 
       assertUnknownProgress(onProgress)
     })
@@ -136,7 +136,7 @@ describe('uploadFrom URL', () => {
     })
 
     try {
-      await uploadFile(sourceUrl, settings)
+      await uploadFromUrl(sourceUrl, settings)
     } catch (error) {
       expect((error as UploadClientError).message).toEqual(
         'pub_key is invalid.'
