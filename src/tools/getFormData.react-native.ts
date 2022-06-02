@@ -5,7 +5,8 @@ import {
   ReactNativeAsset
 } from './types'
 
-export const getFileOptions: GetFormDataFileAppendOptions = ({ name }) => [name]
+export const getFileOptions: GetFormDataFileAppendOptions = ({ name }) =>
+  name ? [name] : []
 
 export const transformFile: FileTransformer = (
   file: BrowserFile | NodeFile,
