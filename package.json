@@ -5,17 +5,13 @@
   "type": "module",
   "main": "dist/index.node.js",
   "module": "dist/index.node.js",
+  "browser": "dist/index.browser.js",
+  "react-native": "dist/index.react-native.js",
   "types": "dist/types.d.ts",
   "sideEffects": false,
   "files": [
     "dist/*"
   ],
-  "browser": {
-    "dist/index.js": "dist/index.browser.js"
-  },
-  "react-native": {
-    "dist/index.js": "dist/index.react-native.js"
-  },
   "scripts": {
     "check-env-vars": "node ./checkvars.js",
     "mock:start": "node --loader ts-node/esm ./mock-server/server.ts --silent",
