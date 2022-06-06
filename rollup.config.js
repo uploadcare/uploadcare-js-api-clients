@@ -13,6 +13,7 @@ const config = ({ env }) => ({
   },
   plugins: [
     alias({
+      // replace `*.node.ts` imports with `*.{{env}}.ts` to create separate bundles for each environment
       entries: [
         {
           find: /(\.)(node)/,
