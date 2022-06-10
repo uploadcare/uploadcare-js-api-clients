@@ -1,6 +1,6 @@
 {
   "name": "@uploadcare/upload-client",
-  "version": "3.1.1",
+  "version": "4.0.0",
   "description": "Library for work with Uploadcare Upload API",
   "type": "module",
   "main": "dist/index.node.js",
