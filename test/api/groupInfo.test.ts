@@ -1,4 +1,3 @@
-import AbortController from 'abort-controller'
 import * as factory from '../_fixtureFactory'
 import { getSettingsForTesting } from '../_helpers'
 import group from '../../src/api/group'

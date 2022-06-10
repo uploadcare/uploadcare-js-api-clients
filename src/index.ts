@@ -21,7 +21,6 @@ export { default as uploadFileGroup } from './uploadFileGroup'
 
 /* Helpers */
 export { default as UploadClient } from './UploadClient'
-export { AbortController } from 'abort-controller'
 
 /* Types */
 export { UploadcareFile } from './tools/UploadcareFile'

@@ -1,4 +1,3 @@
-import AbortController from 'abort-controller'
 import { race } from '../../src/tools/race'
 import { cancelError } from '../../src/tools/errors'
 import { onCancel } from '../../src/tools/onCancel'

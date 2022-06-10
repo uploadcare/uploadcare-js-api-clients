@@ -1,4 +1,3 @@
-import AbortController from 'abort-controller'
 import fromUrl, { TypeEnum } from '../../src/api/fromUrl'
 import * as factory from '../_fixtureFactory'
 import { getSettingsForTesting } from '../_helpers'

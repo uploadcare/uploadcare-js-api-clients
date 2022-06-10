@@ -1,4 +1,3 @@
-import AbortController from 'abort-controller'
 import { poll, CheckFunction } from '../../src/tools/poll'
 import { onCancel } from '../../src/tools/onCancel'
 import { delay } from '../../src/tools/delay'
