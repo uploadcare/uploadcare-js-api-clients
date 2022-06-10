@@ -1,3 +1,29 @@
+# [4.0.0](https://github.com/uploadcare/uploadcare-upload-client/compare/v3.1.1...v4.0.0) (2022-06-10)
+
+
+### BREAKING CHANGES
+
+* Drop < v16 Node support due to native `AbortController` usage ([#377](https://github.com/uploadcare/uploadcare-upload-client/pull/377))
+* Removed CommonJS bundles  ([#377](https://github.com/uploadcare/uploadcare-upload-client/pull/377))
+* Removed option `defaultEffects` ([#376](https://github.com/uploadcare/uploadcare-upload-client/pull/376))
+* Removed property `cdnUrlModifiers` of `UploadcareFile` instance ([#376](https://github.com/uploadcare/uploadcare-upload-client/pull/376))
+* Removed property `originalUrl` of `UploadcareFile` instance. Use `cdnUrl` instead ([#376](https://github.com/uploadcare/uploadcare-upload-client/pull/376))
+* Exported method `uploadBase` renamed to `uploadDirect` ([#376](https://github.com/uploadcare/uploadcare-upload-client/pull/376))
+
+
+### Bug Fixes
+
+* pass `contentType` down to the node `form-data` ([465722c](https://github.com/uploadcare/uploadcare-upload-client/commit/465722c5919ebbb163cf6730e429ad5aea212593))
+* **react-native:** module entry points for react-native ([6d8a955](https://github.com/uploadcare/uploadcare-upload-client/commit/6d8a9554a62b901806684325fbd3f4052444f275))
+
+
+### Features
+
+* **UploadcareFile:** add `s3Bucket` property ([#376](https://github.com/uploadcare/uploadcare-upload-client/pull/376))
+* **UploadcareFile:** add `s3Url` property  ([#376](https://github.com/uploadcare/uploadcare-upload-client/pull/376))
+* **UploadClient:** set empty options by default for method wrappers inside client instance ([#375](https://github.com/uploadcare/uploadcare-upload-client/pull/375))
+
+
 ## [3.1.1](https://github.com/uploadcare/uploadcare-upload-client/compare/v3.1.0...v3.1.1) (2022-04-11)
 
 
