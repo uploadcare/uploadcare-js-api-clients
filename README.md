@@ -101,7 +101,7 @@ const fileUUID = 'edfdf045-34c0-4087-bbdd-e3834921f890'
 const abortController = new AbortController()
 
 client
-  .uploadFile(fileUUID, { signal: abortController })
+  .uploadFile(fileUUID, { signal: abortController.signal })
   .then(file => console.log(file.uuid))
   .catch(error => {
     if (error.isCancel) {
@@ -190,7 +190,7 @@ import { base } from '@uploadcare/upload-client'
 const onProgress = ({ isComputable, value }) => console.log(isComputable, value)
 const abortController = new AbortController()
 
-base(fileData, { onProgress, signal: abortController }) // fileData must be `Blob` or `File` or `Buffer`
+base(fileData, { onProgress, signal: abortController.signal }) // fileData must be `Blob` or `File` or `Buffer`
   .then(data => console.log(data.file))
   .catch(error => {
     if (error.isCancel) {
