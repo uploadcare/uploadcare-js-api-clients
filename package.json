@@ -24,8 +24,7 @@
     "build": "npm run build:types && npm run build:compile",
     "build:types": "dts-bundle-generator --project tsconfig.dts.json -o dist/types.d.ts src/index.ts",
     "build:compile": "rollup -c",
-    "release:prepare": "shipjs prepare",
-    "release:trigger": "shipjs trigger"
+    "release": "shipjs prepare"
   },
   "repository": {
     "type": "git",
