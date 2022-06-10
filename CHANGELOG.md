@@ -1,3 +1,21 @@
+# [3.2.0](https://github.com/uploadcare/uploadcare-upload-client/compare/v3.1.1...v3.2.0) (2022-06-10)
+
+
+### Bug Fixes
+
+* pass `contentType` down to the node `form-data` ([465722c](https://github.com/uploadcare/uploadcare-upload-client/commit/465722c5919ebbb163cf6730e429ad5aea212593))
+* **react-native:** module entry points for react-native ([6d8a955](https://github.com/uploadcare/uploadcare-upload-client/commit/6d8a9554a62b901806684325fbd3f4052444f275))
+
+
+### Features
+
+* rename `uploadBase` to `uploadDirect` (and leave `uploadBase` for compatibility) ([a9f24a5](https://github.com/uploadcare/uploadcare-upload-client/commit/a9f24a5c8f8ff8c9ad0ac4811e625af2c6987a17))
+* set empty options by default for method wrappers inside client instance ([b98b4d7](https://github.com/uploadcare/uploadcare-upload-client/commit/b98b4d782e8f0ceee09d80525af3a53b74ebef33))
+* **UploadcareFile:** add `s3Bucket` property ([2760df2](https://github.com/uploadcare/uploadcare-upload-client/commit/2760df216e0a94319c807b72dc2748aa272e7902))
+* **UploadcareFile:** add `s3Url` property ([bead2c8](https://github.com/uploadcare/uploadcare-upload-client/commit/bead2c8eaed28ea9df8d01b52a96bb4c3caade29))
+
+
+
 ## [3.1.1](https://github.com/uploadcare/uploadcare-upload-client/compare/v3.1.0...v3.1.1) (2022-04-11)
 
 
