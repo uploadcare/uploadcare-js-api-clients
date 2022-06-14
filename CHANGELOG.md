@@ -1,3 +1,7 @@
+## [4.0.1](https://github.com/uploadcare/uploadcare-upload-client/compare/v4.0.0...v4.0.1) (2022-06-10)
+
+
+
 # [4.0.0](https://github.com/uploadcare/uploadcare-upload-client/compare/v3.1.1...v4.0.0) (2022-06-10)
 
 
