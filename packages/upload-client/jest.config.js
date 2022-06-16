@@ -1,5 +1,5 @@
+import baseConfig from '../../jest.config.js'
+
 export default {
-  preset: 'ts-jest',
-  testEnvironment: 'node',
-  testTimeout: 15000
+  ...baseConfig
 }

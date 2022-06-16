@@ -8,7 +8,9 @@
   ],
   "scripts": {
     "build": "npm run build --workspaces",
-    "lint": "npm run lint --workspaces"
+    "lint": "npm run lint --workspaces",
+    "test": "npm run test --workspaces",
+    "test:production": "npm run test:production --workspaces"
   },
   "devDependencies": {
     "ts-jest": "28.0.3",
