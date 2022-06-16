@@ -12,7 +12,7 @@
     "dist/*"
   ],
   "scripts": {
-    "check-env-vars": "node ./checkvars.js",
+    "check-env-vars": "node ../../checkvars.js",
     "clean": "rimraf dist",
     "lint": "eslint ./src ./mock-server --ext=ts",
     "prebuild": "npm run clean",

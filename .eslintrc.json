@@ -13,7 +13,6 @@
         "prettier"
       ],
       "parserOptions": {
-        "ecmaVersion": 2018,
         "sourceType": "module",
         "project": "./tsconfig.json"
       },
@@ -25,10 +24,10 @@
     {
       "files": ["**/*.js"],
       "parserOptions": {
-        "ecmaVersion": 2018,
         "sourceType": "module"
       },
       "env": {
+        "es2021": true,
         "node": true
       }
     }
