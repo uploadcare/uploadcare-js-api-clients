@@ -1,7 +1,7 @@
 import alias from '@rollup/plugin-alias'
 import { nodeResolve } from '@rollup/plugin-node-resolve'
 import typescript from '@rollup/plugin-typescript'
-import nodeExtenals from 'rollup-plugin-node-externals'
+import nodeExternals from 'rollup-plugin-node-externals'
 import path from 'path'
 import fs from 'fs'
 
@@ -35,12 +35,8 @@ export const createRollupConfig = ({ targetEnv, cwd }) => ({
         }
       ]
     }),
-    targetEnv === RollupTargetEnv.NODE && nodeExtenals(),
-    nodeResolve({
-      customResolveOptions: {
-        moduleDirectory: packageJson.workspaces
-      }
-    }),
+    nodeExternals({ include: /@uploadcare/ }),
+    nodeResolve(),
     typescript({
       tsconfig: path.join(cwd, 'tsconfig.build.json')
     })
