@@ -4,8 +4,9 @@
   "version": "4.0.1",
   "license": "MIT",
   "workspaces": [
-    "packages/upload-client",
-    "packages/rest-client"
+    "@uploadcare/upload-client",
+    "@uploadcare/rest-client",
+    "@uploadcare/api-client-utils"
   ],
   "scripts": {
     "build": "npm run build --workspaces",
