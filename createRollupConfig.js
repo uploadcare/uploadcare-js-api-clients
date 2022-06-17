@@ -3,14 +3,6 @@ import { nodeResolve } from '@rollup/plugin-node-resolve'
 import typescript from '@rollup/plugin-typescript'
 import nodeExternals from 'rollup-plugin-node-externals'
 import path from 'path'
-import fs from 'fs'
-
-import * as url from 'url'
-const __dirname = url.fileURLToPath(new URL('.', import.meta.url))
-
-const packageJson = JSON.parse(
-  fs.readFileSync(path.join(__dirname, 'package.json'))
-)
 
 export const RollupTargetEnv = {
   BROWSER: 'browser',
