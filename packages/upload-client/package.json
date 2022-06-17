@@ -12,6 +12,9 @@
   "files": [
     "dist/*"
   ],
+  "engines": {
+    "node": ">=16"
+  },
   "scripts": {
     "check-env-vars": "node ../../checkvars.js",
     "mock:start": "node --loader ts-node/esm ./mock-server/server.ts --silent",
