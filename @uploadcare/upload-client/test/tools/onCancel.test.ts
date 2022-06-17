@@ -1,7 +1,8 @@
 import { onCancel } from '../../src/tools/onCancel'
+import { jest, expect } from '@jest/globals'
 
 describe('onCancel', () => {
-  it('should work', done => {
+  it('should work', (done) => {
     const ctrl = new AbortController()
 
     onCancel(ctrl.signal, done)

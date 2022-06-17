@@ -5,6 +5,7 @@
 import { UploadClientError } from '../../src/tools/errors'
 import request from '../../src/request/request.browser'
 import getUrl from '../../src/tools/getUrl'
+import { jest, expect } from '@jest/globals'
 
 describe('request', () => {
   it('should post', async () => {

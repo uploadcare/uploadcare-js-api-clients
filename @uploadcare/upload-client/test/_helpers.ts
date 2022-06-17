@@ -2,6 +2,7 @@ import dataUriToBuffer from 'data-uri-to-buffer'
 import dataUriToBlob from 'dataurl-to-blob'
 import defaultSettings from '../src/defaultSettings'
 import { DefaultSettings } from '../src/types'
+import { jest, expect } from '@jest/globals'
 
 export const dataURItoBuffer: (uri: string) => Buffer = dataUriToBuffer as (
   uri: string

@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 import retryIfThrottled from '../../src/tools/retryIfThrottled'
 import { UploadClientError } from '../../src/tools/errors'
+import { jest, expect } from '@jest/globals'
 
 const createRunner = ({
   attempts = 10,

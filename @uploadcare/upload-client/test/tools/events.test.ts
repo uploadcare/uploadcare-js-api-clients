@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/unbound-method */
 import { Events } from '../../src/uploadFile/events'
+import { jest, expect } from '@jest/globals'
 
 describe('Events', () => {
   it('should create instance', () => {

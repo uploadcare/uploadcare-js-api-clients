@@ -4,6 +4,7 @@ import multipartComplete from '../../src/api/multipartComplete'
 import * as factory from '../_fixtureFactory'
 import { getSettingsForTesting } from '../_helpers'
 import { UploadClientError } from '../../src/tools/errors'
+import { jest, expect } from '@jest/globals'
 
 const getChunk = (
   file: Buffer | Blob,

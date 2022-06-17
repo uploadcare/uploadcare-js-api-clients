@@ -2,6 +2,7 @@ import * as factory from '../_fixtureFactory'
 import { getSettingsForTesting, assertComputableProgress } from '../_helpers'
 import { UploadClientError } from '../../src/tools/errors'
 import uploadDirect from '../../src/uploadFile/uploadDirect'
+import { jest, expect } from '@jest/globals'
 
 describe('uploadDirect', () => {
   it('should resolves when file is ready on CDN', async () => {

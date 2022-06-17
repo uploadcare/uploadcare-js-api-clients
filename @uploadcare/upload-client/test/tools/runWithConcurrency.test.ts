@@ -1,5 +1,6 @@
 import { delay } from '@uploadcare/api-client-utils'
 import runWithConcurrency from '../../src/tools/runWithConcurrency'
+import { jest, expect } from '@jest/globals'
 
 const returnAfter = (value: number, ms = 10): (() => Promise<number>) => () =>
   delay(ms).then(() => value)
@@ -47,7 +48,7 @@ describe('runWithConcurrency', () => {
   it('should not run task after reject', async () => {
     const error = new Error('test')
 
-    const spy = jest.fn()
+    const spy = jest.fn() as () => Promise<number>
 
     await expect(
       runWithConcurrency(2, [returnAfter(1), rejectAfter(error, 0), spy])

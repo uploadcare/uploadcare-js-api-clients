@@ -2,6 +2,7 @@ import { poll, CheckFunction } from '../../src/tools/poll'
 import { onCancel } from '../../src/tools/onCancel'
 import { delay } from '@uploadcare/api-client-utils'
 import { UploadClientError } from '../../src/tools/errors'
+import { jest, expect } from '@jest/globals'
 
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 const longJob = (attemps: number, fails: Error | null = null) => {
@@ -9,7 +10,7 @@ const longJob = (attemps: number, fails: Error | null = null) => {
   const condition = jest.fn()
   const cancel = jest.fn()
 
-  const isFinish: CheckFunction<boolean> = signal => {
+  const isFinish: CheckFunction<boolean> = (signal) => {
     condition()
 
     onCancel(signal, cancel)
@@ -26,7 +27,7 @@ const longJob = (attemps: number, fails: Error | null = null) => {
     }
   }
 
-  const asyncIsFinish: CheckFunction<boolean> = cancel =>
+  const asyncIsFinish: CheckFunction<boolean> = (cancel) =>
     new Promise<boolean>((resolve, reject) => {
       try {
         resolve(isFinish(cancel))
