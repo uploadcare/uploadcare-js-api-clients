@@ -28,7 +28,7 @@ export const createRollupConfig = ({ targetEnv, cwd }) => ({
       ]
     }),
     // Uncomment when we will ready to use @uploadcare/api-client-utils as external dependency
-    // for browsers. Don't forget to move it to dependencies in package.json
+    // for browsers.
     // nodeExternals({ include: /@uploadcare/ }),
     nodeExternals(),
     nodeResolve(),
