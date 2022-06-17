@@ -59,10 +59,10 @@
     "koa-add-trailing-slashes": "2.0.1",
     "koa-body": "5.0.0",
     "mock-socket": "9.0.3",
-    "start-server-and-test": "1.11.7"
+    "start-server-and-test": "1.11.7",
+    "@uploadcare/api-client-utils": "^4.0.1"
   },
   "dependencies": {
-    "@uploadcare/api-client-utils": "^4.0.1",
     "form-data": "^4.0.0",
     "ws": "^8.2.3"
   }
