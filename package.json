@@ -11,7 +11,9 @@
   ],
   "scripts": {
     "build": "npm run build --workspaces",
-    "lint": "npm run lint --workspaces",
+    "lint": "eslint ./ --ext=ts,js",
+    "lint:fix": "eslint ./ --ext=ts,js --fix",
+    "format": "prettier --write './**/*.{ts,js}'",
     "test": "npm run test --workspaces",
     "test:production": "npm run test:production -w packages/upload-client",
     "release:prepare": "shipjs prepare"
@@ -27,8 +29,7 @@
     "chalk": "4.1.0",
     "dts-bundle-generator": "6.9.0",
     "eslint": "8.17.0",
-    "eslint-config-prettier": "8.5.0",
-    "eslint-plugin-prettier": "4.0.0",
+    "eslint-config-prettier": "^8.5.0",
     "jest": "^28.1.0",
     "prettier": "2.7.1",
     "prettier-config-standard": "5.0.0",

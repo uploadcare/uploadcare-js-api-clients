@@ -16,7 +16,6 @@
     "check-env-vars": "node ../../checkvars.js",
     "mock:start": "node --loader ts-node/esm ./mock-server/server.ts --silent",
     "clean": "rimraf dist",
-    "lint": "eslint ./src ./mock-server --ext=ts",
     "test": "start-server-and-test mock:start :3000 test:jest",
     "test:production": "npm run check-env-vars && TEST_ENV=production npm run test:jest",
     "test:jest": "node --experimental-vm-modules ../../node_modules/jest/bin/jest.js",
