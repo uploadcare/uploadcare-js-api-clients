@@ -6,7 +6,7 @@ import {
 } from '../_helpers'
 import { UploadClientError } from '../../src/tools/errors'
 import http from 'http'
-import https from 'https'
+import https, { RequestOptions } from 'https'
 import uploadFromUrl from '../../src/uploadFile/uploadFromUrl'
 
 jest.setTimeout(60000)
@@ -43,12 +43,15 @@ describe('uploadFromUrl', () => {
       checkForUrlDuplicates: true
     })
 
-    const isHttpsProtocol = settings.baseURL.includes('https')
+    const protocol = settings.baseURL.includes('https') ? 'https' : 'http'
+    const isHttpsProtocol = protocol === 'https'
     const spy = jest.spyOn(isHttpsProtocol ? https : http, 'request')
     await uploadFromUrl(sourceUrl, settings)
 
-    const uploadRequest = spy.mock.calls[0][0]
-    expect(uploadRequest['query']).toEqual(
+    const uploadRequest = spy.mock.calls.find(
+      (call) => (call[0] as RequestOptions).protocol === protocol + ':'
+    )?.[0]
+    expect(uploadRequest?.['query']).toEqual(
       expect.stringContaining('check_URL_duplicates=1')
     )
     spy.mockRestore()
@@ -61,12 +64,15 @@ describe('uploadFromUrl', () => {
       saveUrlForRecurrentUploads: true
     })
 
-    const isHttpsProtocol = settings.baseURL.includes('https')
+    const protocol = settings.baseURL.includes('https') ? 'https' : 'http'
+    const isHttpsProtocol = protocol === 'https'
     const spy = jest.spyOn(isHttpsProtocol ? https : http, 'request')
     await uploadFromUrl(sourceUrl, settings)
 
-    const uploadRequest = spy.mock.calls[0][0]
-    expect(uploadRequest['query']).toEqual(
+    const uploadRequest = spy.mock.calls.find(
+      (call) => (call[0] as RequestOptions).protocol === protocol + ':'
+    )?.[0]
+    expect(uploadRequest?.['query']).toEqual(
       expect.stringContaining('save_URL_duplicates=1')
     )
     spy.mockRestore()

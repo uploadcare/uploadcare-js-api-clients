@@ -1,0 +1,68 @@
+{
+  "name": "@uploadcare/upload-client",
+  "version": "4.0.1",
+  "description": "Library for work with Uploadcare Upload API",
+  "type": "module",
+  "main": "dist/index.node.js",
+  "module": "dist/index.node.js",
+  "browser": "dist/index.browser.js",
+  "react-native": "dist/index.react-native.js",
+  "types": "dist/types.d.ts",
+  "sideEffects": false,
+  "files": [
+    "dist/*"
+  ],
+  "scripts": {
+    "check-env-vars": "node ./checkvars.js",
+    "mock:start": "node --loader ts-node/esm ./mock-server/server.ts --silent",
+    "clean": "rimraf dist",
+    "lint": "eslint ./src ./mock-server --ext=ts",
+    "test": "start-server-and-test mock:start :3000 test:jest",
+    "test:production": "npm run check-env-vars && TEST_ENV=production jest",
+    "test:jest": "jest",
+    "prebuild": "npm run clean",
+    "build": "npm run build:types && npm run build:compile",
+    "build:types": "dts-bundle-generator --project tsconfig.dts.json -o dist/types.d.ts src/index.ts",
+    "build:compile": "rollup -c"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/uploadcare/uploadcare-upload-client.git"
+  },
+  "author": "Uploadcare",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/uploadcare/uploadcare-upload-client/issues"
+  },
+  "homepage": "https://github.com/uploadcare/uploadcare-upload-client#readme",
+  "keywords": [
+    "uploadcare",
+    "file",
+    "uploader",
+    "image",
+    "upload",
+    "store",
+    "cdn"
+  ],
+  "devDependencies": {
+    "@koa/cors": "3.3.0",
+    "@koa/router": "10.1.1",
+    "@types/express-serve-static-core": "^4.17.28",
+    "@types/koa": "2.13.4",
+    "@types/ws": "8.5.3",
+    "dotenv": "8.2.0",
+    "data-uri-to-buffer": "3.0.1",
+    "dataurl-to-blob": "0.0.1",
+    "jest-environment-jsdom": "28.1.0",
+    "jest-websocket-mock": "2.3.0",
+    "koa": "2.13.4",
+    "koa-add-trailing-slashes": "2.0.1",
+    "koa-body": "5.0.0",
+    "mock-socket": "9.0.3",
+    "start-server-and-test": "1.11.7"
+  },
+  "dependencies": {
+    "form-data": "^4.0.0",
+    "ws": "^8.2.3"
+  }
+}
