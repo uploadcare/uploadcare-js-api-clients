@@ -2,7 +2,7 @@ import request from '../request/request.node'
 import getUrl from '../tools/getUrl'
 import defaultSettings from '../defaultSettings'
 import { getUserAgent } from '../tools/userAgent'
-import camelizeKeys from '../tools/camelizeKeys'
+import { camelizeKeys } from '@uploadcare/api-client-utils'
 import { UploadClientError } from '../tools/errors'
 import retryIfThrottled from '../tools/retryIfThrottled'
 

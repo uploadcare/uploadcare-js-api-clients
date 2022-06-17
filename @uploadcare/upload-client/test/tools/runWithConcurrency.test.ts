@@ -1,5 +1,4 @@
-/* eslint-disable @typescript-eslint/explicit-function-return-type */
-import { delay } from '../../src/tools/delay'
+import { delay } from '@uploadcare/api-client-utils'
 import runWithConcurrency from '../../src/tools/runWithConcurrency'
 
 const returnAfter = (value: number, ms = 10): (() => Promise<number>) => () =>

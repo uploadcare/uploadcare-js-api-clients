@@ -1,4 +1,4 @@
-import { delay } from './delay'
+import { delay } from '@uploadcare/api-client-utils'
 
 type Args<T> = {
   attempt: number

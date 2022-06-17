@@ -1,6 +1,6 @@
 import { poll, CheckFunction } from '../../src/tools/poll'
 import { onCancel } from '../../src/tools/onCancel'
-import { delay } from '../../src/tools/delay'
+import { delay } from '@uploadcare/api-client-utils'
 import { UploadClientError } from '../../src/tools/errors'
 
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type

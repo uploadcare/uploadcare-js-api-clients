@@ -1,5 +1,6 @@
 {
   "name": "@uploadcare/api-clients",
+  "private": true,
   "type": "module",
   "version": "4.0.1",
   "license": "MIT",

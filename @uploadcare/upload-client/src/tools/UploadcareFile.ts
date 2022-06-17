@@ -1,4 +1,4 @@
-import camelizeKeys from './camelizeKeys'
+import { camelizeKeys } from '@uploadcare/api-client-utils'
 
 /* Types */
 import {
