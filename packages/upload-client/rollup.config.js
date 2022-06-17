@@ -1,39 +1,13 @@
-import alias from '@rollup/plugin-alias'
-import { nodeResolve } from '@rollup/plugin-node-resolve'
-import typescript from '@rollup/plugin-typescript'
+import { createRollupConfig, RollupTargetEnv } from '../../createRollupConfig'
+import * as url from 'url'
 
-const nodeResolver = nodeResolve()
+const __dirname = url.fileURLToPath(new URL('.', import.meta.url))
 
-const config = ({ env }) => ({
-  input: 'src/index.ts',
-  output: {
-    dir: `dist`,
-    format: 'esm',
-    entryFileNames: ['[name]', env, 'js'].filter(Boolean).join('.')
-  },
-  plugins: [
-    alias({
-      // replace `*.node.ts` imports with `*.{{env}}.ts` to create separate bundles for each environment
-      entries: [
-        {
-          find: /(\.)(node)/,
-          replacement: `$1${env}`,
-        }
-      ]
-    }),
-    nodeResolver,
-    typescript({
-      tsconfig: 'tsconfig.build.json'
-    })
-  ],
-  external:
-    env === 'browser' || env === 'react-native'
-      ? []
-      : ['https', 'http', 'stream', 'url', 'form-data', 'ws']
-})
+const config = ({ targetEnv }) =>
+  createRollupConfig({ targetEnv, cwd: __dirname })
 
 export default [
-  config({ env: 'node' }),
-  config({ env: 'browser' }),
-  config({ env: 'react-native' }),
+  config({ targetEnv: RollupTargetEnv.NODE }),
+  config({ targetEnv: RollupTargetEnv.BROWSER }),
+  config({ targetEnv: RollupTargetEnv.REACT_NATIVE })
 ]
