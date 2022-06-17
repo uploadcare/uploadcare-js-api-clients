@@ -68,13 +68,15 @@ describe('race', () => {
   })
 
   it('should cancel all functions when first resolves', async () => {
-    const spies = Array.from({ length: 5 }, (i) => jest.fn())
+    const spies = Array.from({ length: 5 }, () => jest.fn())
 
-    const createCancelHandler = (index: number) => (error): number => {
-      spies[index]()
+    const createCancelHandler =
+      (index: number) =>
+      (error): number => {
+        spies[index]()
 
-      throw error
-    }
+        throw error
+      }
 
     const value = await race([
       ({ signal }): Promise<number> =>
@@ -99,13 +101,15 @@ describe('race', () => {
   })
 
   it('should cancel all functions after calling stopRace', async () => {
-    const spies = Array.from({ length: 5 }, (i) => jest.fn())
+    const spies = Array.from({ length: 5 }, () => jest.fn())
 
-    const createCancelHandler = (index: number) => (error): number => {
-      spies[index]()
+    const createCancelHandler =
+      (index: number) =>
+      (error): number => {
+        spies[index]()
 
-      throw error
-    }
+        throw error
+      }
 
     const value = await race([
       ({ stopRace }): Promise<number> => {
@@ -135,13 +139,15 @@ describe('race', () => {
   it('should be cancellable', async () => {
     const controller = new AbortController()
 
-    const spies = Array.from({ length: 5 }, (i) => jest.fn())
+    const spies = Array.from({ length: 5 }, () => jest.fn())
 
-    const createCancelHandler = (index: number) => (error): number => {
-      spies[index]()
+    const createCancelHandler =
+      (index: number) =>
+      (error): number => {
+        spies[index]()
 
-      throw error
-    }
+        throw error
+      }
 
     setTimeout(() => controller.abort())
 

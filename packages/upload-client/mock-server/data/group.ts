@@ -5,8 +5,7 @@ export default {
     datetime_stored: null,
     files_count: 2,
     cdn_url: 'https://ucarecdn.com/01136e2a-7d57-4546-81be-1043e7774e70~2/',
-    url:
-      'https://api.uploadcare.com/groups/01136e2a-7d57-4546-81be-1043e7774e70~2/',
+    url: 'https://api.uploadcare.com/groups/01136e2a-7d57-4546-81be-1043e7774e70~2/',
     files: [
       {
         is_stored: false,
