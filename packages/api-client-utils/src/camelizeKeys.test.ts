@@ -1,4 +1,4 @@
-import camelizeKeys, { camelize } from '../../src/tools/camelizeKeys'
+import { camelizeKeys, camelize } from './camelizeKeys'
 
 type Camelize = {
   fooBar: string

@@ -2,6 +2,7 @@ import * as factory from '../_fixtureFactory'
 import { getSettingsForTesting, assertComputableProgress } from '../_helpers'
 import { UploadClientError } from '../../src/tools/errors'
 import uploadMultipart from '../../src/uploadFile/uploadMultipart'
+import { jest, expect } from '@jest/globals'
 
 jest.setTimeout(60000)
 

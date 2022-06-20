@@ -1,7 +1,7 @@
 import alias from '@rollup/plugin-alias'
 import { nodeResolve } from '@rollup/plugin-node-resolve'
 import typescript from '@rollup/plugin-typescript'
-import nodeExtenals from 'rollup-plugin-node-externals'
+import nodeExternals from 'rollup-plugin-node-externals'
 import path from 'path'
 
 export const RollupTargetEnv = {
@@ -27,7 +27,10 @@ export const createRollupConfig = ({ targetEnv, cwd }) => ({
         }
       ]
     }),
-    targetEnv === RollupTargetEnv.NODE && nodeExtenals(),
+    // Uncomment when we will ready to use @uploadcare/api-client-utils as external dependency
+    // for browsers.
+    // nodeExternals({ include: /@uploadcare/ }),
+    nodeExternals(),
     nodeResolve(),
     typescript({
       tsconfig: path.join(cwd, 'tsconfig.build.json')

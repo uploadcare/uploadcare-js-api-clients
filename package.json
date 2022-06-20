@@ -1,9 +1,11 @@
 {
   "name": "@uploadcare/api-clients",
+  "private": true,
   "type": "module",
   "version": "4.0.1",
   "license": "MIT",
   "workspaces": [
+    "packages/api-client-utils",
     "packages/upload-client",
     "packages/rest-client"
   ],
@@ -11,7 +13,7 @@
     "build": "npm run build --workspaces",
     "lint": "npm run lint --workspaces",
     "test": "npm run test --workspaces",
-    "test:production": "npm run test:production --workspaces",
+    "test:production": "npm run test:production -w packages/upload-client",
     "release:prepare": "shipjs prepare"
   },
   "devDependencies": {

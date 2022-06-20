@@ -18,7 +18,7 @@ export function camelize(text: string): string {
  * Transforms keys of an object to camelCased recursively.
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export default function camelizeKeys<T>(source: any): T {
+export function camelizeKeys<T>(source: any): T {
   if (!source || typeof source !== 'object') {
     return source
   }

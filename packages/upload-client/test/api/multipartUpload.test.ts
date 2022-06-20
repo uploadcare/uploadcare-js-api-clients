@@ -3,6 +3,7 @@ import multipartUpload from '../../src/api/multipartUpload'
 import { getSettingsForTesting, assertComputableProgress } from '../_helpers'
 import multipartStart from '../../src/api/multipartStart'
 import { UploadClientError } from '../../src/tools/errors'
+import { jest, expect } from '@jest/globals'
 
 let parts: [string, Blob | Buffer][] = []
 

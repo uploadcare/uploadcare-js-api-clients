@@ -2,6 +2,7 @@ import base from '../../src/api/base'
 import * as factory from '../_fixtureFactory'
 import { UploadClientError } from '../../src/tools/errors'
 import { assertComputableProgress } from '../_helpers'
+import { jest, expect } from '@jest/globals'
 
 describe('API - base', () => {
   const fileToUpload = factory.image('blackSquare')
