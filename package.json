@@ -10,6 +10,9 @@
     "packages/rest-client"
   ],
   "scripts": {
+    "build:docs:upload-client": "typedoc --out docs/upload-client packages/upload-client/src/index.ts --readme packages/upload-client/README.md",
+    "build:docs:rest-client": "typedoc --out docs/rest-client packages/rest-client/src/index.ts --readme packages/rest-client/README.md",
+    "build:docs": "rimraf docs && run-s build:docs:* && touch docs/.nojekyll",
     "build": "npm run build --workspaces",
     "lint": "run-p eslint prettier",
     "lint:fix": "run-p eslint:fix prettier:fix",
@@ -47,6 +50,7 @@
     "ts-jest": "28.0.3",
     "ts-node": "^10.8.0",
     "tslib": "^2.4.0",
+    "typedoc": "^0.22.17",
     "typescript": "^4.7.2"
   }
 }
