@@ -149,14 +149,15 @@ const uploadMultipart = (
         uuid,
         runWithConcurrency(
           maxConcurrentRequests,
-          parts.map((url, index) => (): Promise<MultipartUploadResponse> =>
-            uploadPartWithRetry(getChunk(index), url, {
-              publicKey,
-              onProgress: createProgressHandler(parts.length, index),
-              signal,
-              integration,
-              multipartMaxAttempts
-            })
+          parts.map(
+            (url, index) => (): Promise<MultipartUploadResponse> =>
+              uploadPartWithRetry(getChunk(index), url, {
+                publicKey,
+                onProgress: createProgressHandler(parts.length, index),
+                signal,
+                integration,
+                multipartMaxAttempts
+              })
           )
         )
       ])

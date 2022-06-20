@@ -1,28 +1,29 @@
 {
-  "rules": {
-    "prettier/prettier": "error"
-  },
+  "extends": [
+    "prettier"
+  ],
   "overrides": [
     {
-      "files": ["**/*.ts"],
+      "files": [
+        "**/*.ts"
+      ],
       "parser": "@typescript-eslint/parser",
-      "plugins": ["@typescript-eslint", "prettier"],
+      "plugins": [
+        "@typescript-eslint"
+      ],
       "extends": [
         "eslint:recommended",
-        "plugin:@typescript-eslint/recommended",
-        "prettier"
+        "plugin:@typescript-eslint/recommended"
       ],
       "parserOptions": {
         "sourceType": "module",
         "project": "./tsconfig.json"
-      },
-      "rules": {
-        // this rule was disabled earlier, so I didn"t update the code to match it
-        "@typescript-eslint/explicit-module-boundary-types": 0
       }
     },
     {
-      "files": ["**/*.js"],
+      "files": [
+        "**/*.js"
+      ],
       "parserOptions": {
         "sourceType": "module"
       },

@@ -12,7 +12,6 @@
   ],
   "scripts": {
     "clean": "rimraf dist",
-    "lint": "eslint ./src --ext=ts",
     "test": "node --experimental-vm-modules ../../node_modules/jest/bin/jest.js",
     "prebuild": "npm run clean",
     "build": "npm run build:types && npm run build:compile",

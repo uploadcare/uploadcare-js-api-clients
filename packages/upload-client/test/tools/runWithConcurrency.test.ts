@@ -2,11 +2,15 @@ import { delay } from '@uploadcare/api-client-utils'
 import runWithConcurrency from '../../src/tools/runWithConcurrency'
 import { jest, expect } from '@jest/globals'
 
-const returnAfter = (value: number, ms = 10): (() => Promise<number>) => () =>
-  delay(ms).then(() => value)
+const returnAfter =
+  (value: number, ms = 10): (() => Promise<number>) =>
+  () =>
+    delay(ms).then(() => value)
 
-const rejectAfter = (error: Error, ms = 10): (() => Promise<never>) => () =>
-  delay(ms).then(() => Promise.reject(error))
+const rejectAfter =
+  (error: Error, ms = 10): (() => Promise<never>) =>
+  () =>
+    delay(ms).then(() => Promise.reject(error))
 
 describe('runWithConcurrency', () => {
   it('should work', async () => {

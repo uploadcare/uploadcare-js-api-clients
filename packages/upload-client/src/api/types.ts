@@ -94,9 +94,8 @@ export type UnknownProgressInfo = {
   isComputable: false
 }
 
-export type ProgressCallback<
-  T = ComputableProgressInfo | UnknownProgressInfo
-> = (arg: T) => void
+export type ProgressCallback<T = ComputableProgressInfo | UnknownProgressInfo> =
+  (arg: T) => void
 
 export type Metadata = {
   [key: string]: string
