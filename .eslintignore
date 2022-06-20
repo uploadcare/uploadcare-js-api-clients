@@ -1,6 +1,1 @@
 dist
-lib
-coverage
-mock-server/node_modules
-karma.config.js
-rollup.config.js

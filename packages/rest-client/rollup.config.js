@@ -8,6 +8,5 @@ const config = ({ targetEnv }) =>
 
 export default [
   config({ targetEnv: RollupTargetEnv.NODE }),
-  config({ targetEnv: RollupTargetEnv.BROWSER }),
-  config({ targetEnv: RollupTargetEnv.REACT_NATIVE })
+  config({ targetEnv: RollupTargetEnv.BROWSER })
 ]
