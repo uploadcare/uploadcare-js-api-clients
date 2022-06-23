@@ -3,11 +3,16 @@ export type RestClientErrorOptions = {
   response?: Response
 }
 
+const DEFAULT_MESSAGE = 'Unknown error'
+
 export class RestClientError extends Error {
   readonly request?: Request
   readonly response?: Response
 
-  constructor(message: string, options: RestClientErrorOptions = {}) {
+  constructor(
+    message: string = DEFAULT_MESSAGE,
+    options: RestClientErrorOptions = {}
+  ) {
     super()
 
     this.name = 'RestClientError'
