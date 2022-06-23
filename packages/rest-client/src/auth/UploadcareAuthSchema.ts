@@ -2,6 +2,8 @@ import { Headers } from '../lib/fetch/fetch.node'
 import { getAcceptHeader } from './getAcceptHeader'
 import { AuthSchema, AuthSchemaOptions } from './types'
 import { Md5Function } from '../lib/md5/Md5Function'
+import { isNode } from '../tools/isNode'
+import { RestClientError } from '../tools/RestClientError'
 
 type SignStringParams = {
   method: string
@@ -13,9 +15,31 @@ type SignStringParams = {
 
 export type SignatureResolver = (signString: string) => Promise<string>
 
-export type UploadcareAuthSchemaOptions = AuthSchemaOptions & {
+export type SignatureCreator = (
+  secretKey: string,
+  signString: string
+) => Promise<string>
+
+export interface OptionsWithSignatureResolver extends AuthSchemaOptions {
   signatureResolver: SignatureResolver
   md5Loader?: () => Promise<Md5Function>
+}
+
+export interface OptionsWithSecretKey extends AuthSchemaOptions {
+  secretKey: string
+  md5Loader?: () => Promise<Md5Function>
+}
+
+function withSignatureResolver(
+  options: OptionsWithSignatureResolver | OptionsWithSecretKey
+): options is OptionsWithSignatureResolver {
+  return !!(options as OptionsWithSignatureResolver).signatureResolver
+}
+
+function withSecretKey(
+  options: OptionsWithSignatureResolver | OptionsWithSecretKey
+): options is OptionsWithSecretKey {
+  return !!(options as OptionsWithSecretKey).secretKey
 }
 
 export class UploadcareAuthSchema implements AuthSchema {
@@ -23,13 +47,27 @@ export class UploadcareAuthSchema implements AuthSchema {
   private _signatureResolver: SignatureResolver
   private _md5Loader: Promise<Md5Function>
 
-  constructor({
-    publicKey,
-    signatureResolver,
-    md5Loader
-  }: UploadcareAuthSchemaOptions) {
+  constructor(options: OptionsWithSignatureResolver | OptionsWithSecretKey) {
+    if (withSecretKey(options)) {
+      if (!isNode()) {
+        console.warn(
+          `Seems that you're using the secret key on the client-side. We're hope you know that you're doing.`
+        )
+      }
+      this._signatureResolver = (signString: string) =>
+        import('./createSignature.node').then((m) =>
+          m.createSignature(options.secretKey, signString)
+        )
+    } else if (withSignatureResolver(options)) {
+      this._signatureResolver = options.signatureResolver
+    } else {
+      throw new RestClientError(
+        `Please, provide either 'secretKey' or 'signatureResolver'`
+      )
+    }
+
+    const { publicKey, md5Loader } = options
     this._publicKey = publicKey
-    this._signatureResolver = signatureResolver
 
     if (md5Loader) {
       this._md5Loader = md5Loader()

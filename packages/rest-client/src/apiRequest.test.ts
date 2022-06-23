@@ -1,19 +1,25 @@
 import { describe, expect, it } from '@jest/globals'
 import { apiRequest } from '../src/apiRequest'
 import {
+  DEMO_PUBLIC_KEY,
+  testSettings,
   uploadcareAuthSchema,
   uploadcareSimpleAuthSchema
 } from '../test/_helpers'
+import { UploadcareAuthSchema } from './auth/UploadcareAuthSchema'
 
 describe('apiRequest', () => {
   it('should pass auth using UploadcareSimpleAuthSchema', async () => {
-    const response = await apiRequest({
-      method: 'GET',
-      path: '/files/',
-      settings: {
+    const response = await apiRequest(
+      {
+        method: 'GET',
+        path: '/files/'
+      },
+      {
+        ...testSettings,
         authSchema: uploadcareSimpleAuthSchema
       }
-    })
+    )
 
     const result = await response.json()
     expect(response.status).toBe(200)
@@ -21,13 +27,16 @@ describe('apiRequest', () => {
   })
 
   it('should pass auth using UploadcareAuthSchema', async () => {
-    const response = await apiRequest({
-      method: 'GET',
-      path: '/files/',
-      settings: {
+    const response = await apiRequest(
+      {
+        method: 'GET',
+        path: '/files/'
+      },
+      {
+        ...testSettings,
         authSchema: uploadcareAuthSchema
       }
-    })
+    )
 
     const result = await response.json()
     expect(response.status).toBe(200)
@@ -35,16 +44,16 @@ describe('apiRequest', () => {
   })
 
   it('should accept URL query', async () => {
-    const response = await apiRequest({
-      method: 'GET',
-      path: '/files/',
-      query: {
-        limit: 1
+    const response = await apiRequest(
+      {
+        method: 'GET',
+        path: '/files/',
+        query: {
+          limit: 1
+        }
       },
-      settings: {
-        authSchema: uploadcareAuthSchema
-      }
-    })
+      testSettings
+    )
 
     const result = await response.json()
     expect(response.status).toBe(200)
@@ -53,30 +62,30 @@ describe('apiRequest', () => {
 
   // TODO: find faster way to check body working
   it('should accept body', async () => {
-    const deleteResponse = await apiRequest({
-      method: 'DELETE',
-      path: '/webhooks/unsubscribe/',
-      body: {
-        target_url: 'https://ucarecdn.com'
+    const deleteResponse = await apiRequest(
+      {
+        method: 'DELETE',
+        path: '/webhooks/unsubscribe/',
+        body: {
+          target_url: 'https://ucarecdn.com'
+        }
       },
-      settings: {
-        authSchema: uploadcareAuthSchema
-      }
-    })
+      testSettings
+    )
     expect(deleteResponse.status).toEqual(204)
 
-    const createResponse = await apiRequest({
-      method: 'POST',
-      path: '/webhooks/',
-      body: {
-        target_url: 'https://ucarecdn.com',
-        event: 'file.uploaded',
-        is_active: false
+    const createResponse = await apiRequest(
+      {
+        method: 'POST',
+        path: '/webhooks/',
+        body: {
+          target_url: 'https://ucarecdn.com',
+          event: 'file.uploaded',
+          is_active: false
+        }
       },
-      settings: {
-        authSchema: uploadcareAuthSchema
-      }
-    })
+      testSettings
+    )
 
     const result = await createResponse.json()
     expect(createResponse.status).toBe(201)

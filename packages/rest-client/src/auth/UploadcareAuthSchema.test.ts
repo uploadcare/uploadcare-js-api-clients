@@ -91,6 +91,32 @@ describe('UploadcareAuthScheme', () => {
     })
   })
 
+  it('should accept secretKey instead of custom signature resolver', async () => {
+    const authScheme = new UploadcareAuthSchema({
+      publicKey: 'public-key',
+      secretKey: 'secret-key'
+    })
+
+    const body = JSON.stringify({ foo: 'bar' })
+    const request = new Request(defaultSettings.apiBaseURL, {
+      method: 'POST',
+      body
+    })
+
+    const authHeaders = await authScheme.getHeaders(request)
+    expect(
+      authHeaders.get('Authorization')?.startsWith('Uploadcare public-key:')
+    ).toBeTruthy()
+    expect(authHeaders.get('Accept')).toEqual(
+      'application/vnd.uploadcare-v0.7+json'
+    )
+
+    const date = new Date(authHeaders.get('Date') as string)
+    expect(Date.now() - date.getTime()).toBeLessThanOrEqual(
+      ALLOWED_DATE_DIFFERENCE
+    )
+  })
+
   it('should accept custom md5 function', async () => {
     const signatureResolver = jest.fn(async () => 'signature')
     const customMd5 = jest.fn(() => 'hash')

@@ -1,6 +1,7 @@
 import { getAcceptHeader } from './getAcceptHeader'
 import { AuthSchema, AuthSchemaOptions } from './types'
 import { Headers } from '../lib/fetch/fetch.node'
+import { isNode } from '../tools/isNode'
 
 export type UploadcareSimpleAuthSchemaOptions = AuthSchemaOptions & {
   secretKey: string
@@ -13,6 +14,12 @@ export class UploadcareSimpleAuthSchema implements AuthSchema {
   constructor({ publicKey, secretKey }: UploadcareSimpleAuthSchemaOptions) {
     this.publicKey = publicKey
     this.secretKey = secretKey
+
+    if (secretKey && !isNode()) {
+      console.warn(
+        `Seems that you're using the secret key on the client-side. We're hope you know that you're doing.`
+      )
+    }
   }
 
   async getHeaders(): Promise<Headers> {

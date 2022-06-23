@@ -1,5 +1,6 @@
-import { fetch, Request, Headers, Response } from './lib/fetch/fetch.node'
-import { Settings, defaultSettings } from './settings'
+import { fetch, Headers, Request } from './lib/fetch/fetch.node'
+import { defaultSettings, UserSettings } from './settings'
+import { RestClientError } from './tools/RestClientError'
 import { retryIfThrottled } from './tools/retryIfThrottled'
 
 export type ApiRequestPayload = Record<
@@ -12,11 +13,16 @@ export type ApiRequestOptions = {
   path: string
   query?: ApiRequestPayload
   body?: ApiRequestPayload
-
-  settings: Settings
 }
 
-function normalizeQuery(input: ApiRequestPayload): Record<string, string> {
+export type ApiRequestSettings = Pick<
+  UserSettings,
+  'apiBaseURL' | 'authSchema' | 'retryThrottledRequestMaxTimes'
+>
+
+function normalizeQuery(
+  input: Required<ApiRequestOptions>['query']
+): Record<string, string> {
   const output: Record<string, string> = {}
   for (const [key, value] of Object.entries(input)) {
     if (value === undefined || value === null) {
@@ -34,7 +40,7 @@ function normalizeQuery(input: ApiRequestPayload): Record<string, string> {
 function getRequestURL(
   path: ApiRequestOptions['path'],
   query: ApiRequestOptions['query'],
-  apiBaseURL: Required<ApiRequestOptions['settings']>['apiBaseURL']
+  apiBaseURL: Required<UserSettings>['apiBaseURL']
 ): string {
   const url = new URL(apiBaseURL)
   const searchParams = new URLSearchParams(query && normalizeQuery(query))
@@ -45,19 +51,19 @@ function getRequestURL(
 }
 
 export async function apiRequest(
-  options: ApiRequestOptions
+  options: ApiRequestOptions,
+  {
+    authSchema = defaultSettings.authSchema,
+    apiBaseURL = defaultSettings.apiBaseURL,
+    retryThrottledRequestMaxTimes = defaultSettings.retryThrottledRequestMaxTimes
+  }: ApiRequestSettings
 ): Promise<Response> {
   const { method, path, query, body } = options
-  // TODO: extract settings merger
-  const settings: Required<Settings> = {
-    ...defaultSettings,
-    ...options.settings
-  }
 
-  if (!settings.authSchema) {
-    throw new Error('authSchema is required')
+  if (!authSchema) {
+    throw new RestClientError('authSchema is required')
   }
-  const url = getRequestURL(path, query, settings.apiBaseURL)
+  const url = getRequestURL(path, query, apiBaseURL)
   const unsignedRequest = new Request(url, {
     method: method,
     body: body && JSON.stringify(body),
@@ -65,7 +71,7 @@ export async function apiRequest(
       'Content-Type': 'application/json'
     })
   })
-  const headers = await settings.authSchema.getHeaders(unsignedRequest)
+  const headers = await authSchema.getHeaders(unsignedRequest)
   const signedRequest = new Request(unsignedRequest, {
     headers,
     body: body && JSON.stringify(body)
@@ -73,6 +79,6 @@ export async function apiRequest(
 
   return retryIfThrottled(
     () => fetch(signedRequest),
-    settings.retryThrottledRequestMaxTimes
+    retryThrottledRequestMaxTimes
   )
 }

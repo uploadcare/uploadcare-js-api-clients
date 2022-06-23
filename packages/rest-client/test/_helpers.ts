@@ -1,13 +1,10 @@
+import { createSignature } from '../src/auth/createSignature.node'
 import { UploadcareAuthSchema } from '../src/auth/UploadcareAuthSchema'
 import { UploadcareSimpleAuthSchema } from '../src/auth/UploadcareSimpleAuthSchema'
-import crypto from 'crypto'
+import { UserSettings } from '../src/settings'
 
-const DEMO_PUBLIC_KEY = 'demopublickey'
-const DEMO_SECRET_KEY = 'demosecretkey'
-
-const hmacSha1Hex = (key: string, text: string) => {
-  return crypto.createHmac('sha1', key).update(text).digest('hex')
-}
+export const DEMO_PUBLIC_KEY = 'demopublickey'
+export const DEMO_SECRET_KEY = 'demosecretkey'
 
 export const uploadcareSimpleAuthSchema = new UploadcareSimpleAuthSchema({
   publicKey: DEMO_PUBLIC_KEY,
@@ -16,7 +13,11 @@ export const uploadcareSimpleAuthSchema = new UploadcareSimpleAuthSchema({
 
 export const uploadcareAuthSchema = new UploadcareAuthSchema({
   publicKey: DEMO_PUBLIC_KEY,
-  signatureResolver: async (signString) => {
-    return hmacSha1Hex(DEMO_SECRET_KEY, signString)
+  signatureResolver: (signString) => {
+    return createSignature(DEMO_SECRET_KEY, signString)
   }
 })
+
+export const testSettings: UserSettings = {
+  authSchema: uploadcareAuthSchema
+}

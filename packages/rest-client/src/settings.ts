@@ -1,12 +1,14 @@
 import { AuthSchema } from './auth/types'
 
-export interface Settings {
+export interface UserSettings {
   apiBaseURL?: string
   authSchema?: AuthSchema | null
   retryThrottledRequestMaxTimes?: number
 }
 
-export const defaultSettings: Required<Settings> = {
+export type Settings = Required<UserSettings>
+
+export const defaultSettings: Settings = {
   apiBaseURL: 'https://api.uploadcare.com/',
   retryThrottledRequestMaxTimes: 5,
   authSchema: null
