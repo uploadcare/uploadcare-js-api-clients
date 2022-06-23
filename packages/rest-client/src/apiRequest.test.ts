@@ -1,8 +1,8 @@
-import { jest, expect, it, describe } from '@jest/globals'
+import { describe, expect, it } from '@jest/globals'
 import { apiRequest } from '../src/apiRequest'
 import {
-  uploadcareSimpleAuthSchema,
-  uploadcareAuthSchema
+  uploadcareAuthSchema,
+  uploadcareSimpleAuthSchema
 } from '../test/_helpers'
 
 describe('apiRequest', () => {

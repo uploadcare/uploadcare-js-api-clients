@@ -1,5 +1,6 @@
 import { fetch, Request, Headers, Response } from './lib/fetch/fetch.node'
 import { Settings, defaultSettings } from './settings'
+import { retryIfThrottled } from './tools/retryIfThrottled'
 
 export type ApiRequestPayload = Record<
   string,
@@ -9,9 +10,10 @@ export type ApiRequestPayload = Record<
 export type ApiRequestOptions = {
   method: string
   path: string
-  settings: Settings
   query?: ApiRequestPayload
   body?: ApiRequestPayload
+
+  settings: Settings
 }
 
 function normalizeQuery(input: ApiRequestPayload): Record<string, string> {
@@ -46,6 +48,7 @@ export async function apiRequest(
   options: ApiRequestOptions
 ): Promise<Response> {
   const { method, path, query, body } = options
+  // TODO: extract settings merger
   const settings: Required<Settings> = {
     ...defaultSettings,
     ...options.settings
@@ -68,5 +71,8 @@ export async function apiRequest(
     body: body && JSON.stringify(body)
   })
 
-  return fetch(signedRequest)
+  return retryIfThrottled(
+    () => fetch(signedRequest),
+    settings.retryThrottledRequestMaxTimes
+  )
 }

@@ -1,4 +1,4 @@
-import { delay } from '@uploadcare/api-client-utils'
+import { delay } from './delay'
 
 type Args<T> = {
   attempt: number
@@ -17,7 +17,7 @@ const defaultOptions = {
   time: 100
 }
 
-function retrier<T>(
+export function retrier<T>(
   fn: Creator<T>,
   options: Options = defaultOptions
 ): Promise<T> {
@@ -42,5 +42,3 @@ function retrier<T>(
 
   return runAttempt(fn)
 }
-
-export default retrier

@@ -1,4 +1,4 @@
-import retrier from '../../src/tools/retry'
+import { retrier } from './retrier'
 
 describe('retrier', () => {
   test('retry function should work with delay parameter', async () => {

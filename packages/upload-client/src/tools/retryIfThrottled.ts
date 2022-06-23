@@ -1,5 +1,5 @@
 import { UploadClientError } from './errors'
-import retrier from './retry'
+import { retrier } from '@uploadcare/api-client-utils'
 
 const REQUEST_WAS_THROTTLED_CODE = 'RequestThrottledError'
 const DEFAULT_RETRY_AFTER_TIMEOUT = 15000
