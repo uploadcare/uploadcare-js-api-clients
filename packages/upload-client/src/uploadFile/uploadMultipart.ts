@@ -7,7 +7,7 @@ import runWithConcurrency from '../tools/runWithConcurrency'
 import { UploadcareFile } from '../tools/UploadcareFile'
 import { getFileSize } from '../tools/isMultipart'
 import { isReadyPoll } from '../tools/isReadyPoll'
-import retrier from '../tools/retry'
+import { retrier } from '@uploadcare/api-client-utils'
 
 /* Types */
 import {
