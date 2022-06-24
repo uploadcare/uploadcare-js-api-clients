@@ -21,7 +21,7 @@
     "clean": "rimraf dist",
     "test": "start-server-and-test mock:start :3000 test:jest",
     "test:production": "npm run check-env-vars && TEST_ENV=production npm run test:jest",
-    "test:jest": "node --experimental-vm-modules ../../node_modules/jest/bin/jest.js",
+    "test:jest": "node --experimental-vm-modules ../../node_modules/jest/bin/jest.js --runInBand",
     "prebuild": "npm run clean",
     "build": "npm run build:types && npm run build:compile",
     "build:types": "dts-bundle-generator --project tsconfig.dts.json -o dist/types.d.ts src/index.ts",
