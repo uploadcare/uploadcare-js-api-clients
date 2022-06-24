@@ -1,11 +1,5 @@
-import {
-  FileInfo,
-  Uuid,
-  ImageInfo,
-  VideoInfo,
-  Metadata,
-  ContentInfo
-} from '../api/types'
+import { FileInfo, Metadata, Uuid } from '../api/types'
+import { ContentInfo, ImageInfo, VideoInfo } from '@uploadcare/api-client-utils'
 
 export class UploadcareFile {
   readonly uuid: Uuid

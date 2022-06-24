@@ -1,7 +1,7 @@
-export interface AuthSchema {
+export type AuthSchema = {
   getHeaders(request: Request): Promise<Headers>
 }
 
-export interface AuthSchemaOptions {
+export type AuthSchemaOptions = {
   publicKey: string
 }
