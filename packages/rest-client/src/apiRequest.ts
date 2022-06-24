@@ -3,16 +3,18 @@ import { defaultSettings, UserSettings } from './settings'
 import { RestClientError } from './tools/RestClientError'
 import { retryIfThrottled } from './tools/retryIfThrottled'
 
-export type ApiRequestPayload = Record<
+export type ApiRequestQuery = Record<
   string,
   string | number | boolean | Date | undefined | null
 >
 
+export type ApiRequestBody = string[] | Record<string, unknown>
+
 export type ApiRequestOptions = {
   method: string
   path: string
-  query?: ApiRequestPayload
-  body?: ApiRequestPayload
+  query?: ApiRequestQuery
+  body?: ApiRequestBody
 }
 
 export type ApiRequestSettings = Pick<
