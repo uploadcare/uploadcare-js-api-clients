@@ -105,7 +105,7 @@ export default function fromUrlStatus(
         }),
         signal
       }).then(({ data, headers, request }) => {
-        const response = camelizeKeys<Response>(JSON.parse(data))
+        const response = camelizeKeys(JSON.parse(data)) as Response
 
         if ('error' in response && !isErrorResponse(response)) {
           throw new UploadClientError(

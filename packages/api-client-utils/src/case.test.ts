@@ -1,14 +1,7 @@
-import { camelizeKeys, camelize } from './camelizeKeys'
-
-type Camelize = {
-  fooBar: string
-  fooBarBaz: string
-  foo: string
-  fooBarBaz4: Record<string, unknown>
-}
+import { camelizeKeys, camelize } from './case'
 
 describe('camelize', () => {
-  it('should works', () => {
+  it('should work', () => {
     expect(camelize('foo_bar')).toBe('fooBar')
     expect(camelize('foo-bar')).toBe('fooBar')
     expect(camelize('foo.bar')).toBe('fooBar')
@@ -18,20 +11,23 @@ describe('camelize', () => {
 })
 
 describe('camelizeKeys', () => {
-  it('should works', () => {
-    expect(camelizeKeys<string>('foo_bar')).toBe('foo_bar')
+  it('should work', () => {
     expect(
-      camelizeKeys<Camelize>({
+      camelizeKeys({
         foo_bar: 'test1',
         foo_bar_baz: 'test2',
         foo: 'test3',
-        Foo_bar_baz_4: { one_more_thing: 'test4' }
+        Foo_bar_baz_4: { one_more_thing: 'test4' },
+        foo_bar5: [1, 2, 3, 4, 5],
+        foo_bar6: [{ foo_bar: 'baz' }]
       })
     ).toEqual({
       fooBar: 'test1',
       fooBarBaz: 'test2',
       foo: 'test3',
-      fooBarBaz4: { oneMoreThing: 'test4' }
+      fooBarBaz4: { oneMoreThing: 'test4' },
+      fooBar5: [1, 2, 3, 4, 5],
+      fooBar6: [{ fooBar: 'baz' }]
     })
   })
 })

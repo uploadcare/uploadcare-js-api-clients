@@ -1,6 +1,3 @@
-import { camelizeKeys } from '@uploadcare/api-client-utils'
-
-/* Types */
 import {
   FileInfo,
   Uuid,
@@ -50,9 +47,9 @@ export class UploadcareFile {
     this.mimeType = fileInfo.mimeType
     this.cdnUrl = cdnUrl
     this.originalFilename = fileInfo.originalFilename
-    this.imageInfo = camelizeKeys(fileInfo.imageInfo)
-    this.videoInfo = camelizeKeys(fileInfo.videoInfo)
-    this.contentInfo = camelizeKeys(fileInfo.contentInfo)
+    this.imageInfo = fileInfo.imageInfo
+    this.videoInfo = fileInfo.videoInfo
+    this.contentInfo = fileInfo.contentInfo
     this.metadata = fileInfo.metadata || null
     this.s3Bucket = s3Bucket || null
     this.s3Url = s3Url
