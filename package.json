@@ -9,6 +9,9 @@
     "packages/upload-client",
     "packages/rest-client"
   ],
+  "engines": {
+    "node": ">=16"
+  },
   "scripts": {
     "build:docs:upload-client": "typedoc --out docs/upload-client packages/upload-client/src/index.ts --readme packages/upload-client/README.md",
     "build:docs:rest-client": "typedoc --out docs/rest-client packages/rest-client/src/index.ts --readme packages/rest-client/README.md",
@@ -28,13 +31,13 @@
   "devDependencies": {
     "@rollup/plugin-alias": "^3.1.9",
     "@rollup/plugin-node-resolve": "^13.3.0",
-    "@rollup/plugin-typescript": "^8.3.2",
+    "@rollup/plugin-typescript": "^8.3.3",
     "@types/jest": "27.0.0",
-    "@types/node": "17.0.38",
-    "@typescript-eslint/eslint-plugin": "5.28.0",
-    "@typescript-eslint/parser": "5.28.0",
+    "@types/node": "16.0.0",
+    "@typescript-eslint/eslint-plugin": "5.29.0",
+    "@typescript-eslint/parser": "5.29.0",
     "chalk": "4.1.0",
-    "dts-bundle-generator": "6.9.0",
+    "dts-bundle-generator": "6.12.0",
     "eslint": "8.17.0",
     "eslint-config-prettier": "^8.5.0",
     "husky": "^8.0.0",
@@ -51,6 +54,6 @@
     "ts-node": "^10.8.0",
     "tslib": "^2.4.0",
     "typedoc": "^0.22.17",
-    "typescript": "^4.7.2"
+    "typescript": "^4.7.4"
   }
 }

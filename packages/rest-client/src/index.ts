@@ -1,5 +1,3 @@
-import version from './version'
-
-export function getVersion() {
-  return version
-}
+export * from './auth/UploadcareAuthSchema'
+export * from './auth/UploadcareSimpleAuthSchema'
+export * from './auth/types'
