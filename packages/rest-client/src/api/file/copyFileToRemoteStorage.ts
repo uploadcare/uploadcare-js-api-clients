@@ -1,4 +1,4 @@
-import { camelizeKeys } from '@uploadcare/api-client-utils'
+import { camelizeObject } from '@uploadcare/api-client-utils'
 import { apiRequest, ApiRequestSettings } from '../../apiRequest'
 import { RestClientError } from '../../tools/RestClientError'
 import { CopyResponse } from '../../types/CopyResponse'
@@ -37,5 +37,5 @@ export async function copyFileToRemoteStorage(
     throw new RestClientError((json as ServerErrorResponse).detail)
   }
 
-  return camelizeKeys(json) as CopyFileToRemoteStorageResponse
+  return camelizeObject(json) as CopyFileToRemoteStorageResponse
 }

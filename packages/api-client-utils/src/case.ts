@@ -35,16 +35,18 @@ export function camelize<T extends string>(text: T): T {
     .join('') as T
 }
 
-export function camelizeKeys<T extends Record<string, T | unknown>>(
+export function camelizeObject<T extends Record<string, T | unknown>>(
   source: T
 ): CamelCaseKeys<T> {
   const result = {}
   for (const key of Object.keys(source)) {
     let value = source[key]
     if (isObject(value)) {
-      value = camelizeKeys(value as T)
+      value = camelizeObject(value as T)
     } else if (Array.isArray(value)) {
-      value = value.map((item) => (isObject(item) ? camelizeKeys(item) : item))
+      value = value.map((item) =>
+        isObject(item) ? camelizeObject(item) : item
+      )
     }
     result[camelize(key)] = value
   }

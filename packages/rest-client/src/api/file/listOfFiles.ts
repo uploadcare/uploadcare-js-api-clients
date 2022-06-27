@@ -1,4 +1,4 @@
-import { camelizeKeys } from '@uploadcare/api-client-utils'
+import { camelizeObject } from '@uploadcare/api-client-utils'
 import { apiRequest, ApiRequestSettings } from '../../apiRequest'
 import { ServerErrorResponse } from '../../types/ServerErrorResponse'
 import { RestClientError } from '../../tools/RestClientError'
@@ -50,5 +50,5 @@ export async function listOfFiles(
     throw new RestClientError((json as ServerErrorResponse).detail)
   }
 
-  return camelizeKeys(json) as ListResponse
+  return camelizeObject(json) as ListResponse
 }

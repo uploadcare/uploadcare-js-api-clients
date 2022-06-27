@@ -1,4 +1,4 @@
-import { camelizeKeys, camelize } from './case'
+import { camelizeObject, camelize } from './case'
 
 describe('camelize', () => {
   it('should work', () => {
@@ -10,24 +10,26 @@ describe('camelize', () => {
   })
 })
 
-describe('camelizeKeys', () => {
+describe('camelizeObject', () => {
   it('should work', () => {
-    expect(
-      camelizeKeys({
-        foo_bar: 'test1',
-        foo_bar_baz: 'test2',
-        foo: 'test3',
-        Foo_bar_baz_4: { one_more_thing: 'test4' },
-        foo_bar5: [1, 2, 3, 4, 5],
-        foo_bar6: [{ foo_bar: 'baz' }]
-      })
-    ).toEqual({
+    const input = {
+      foo_bar: 'test1',
+      foo_bar_baz: 'test2',
+      foo: 'test3',
+      Foo_bar_baz_4: { one_more_thing: 'test4' },
+      foo_bar5: [1, 2, 3, 4, 5],
+      foo_bar6: [{ foo_bar: 'baz' }]
+    }
+    const expected = {
       fooBar: 'test1',
       fooBarBaz: 'test2',
       foo: 'test3',
       fooBarBaz4: { oneMoreThing: 'test4' },
       fooBar5: [1, 2, 3, 4, 5],
       fooBar6: [{ fooBar: 'baz' }]
+    }
+    expect(camelizeObject(input)).toEqual({
+      expected
     })
   })
 })

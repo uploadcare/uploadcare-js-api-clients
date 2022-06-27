@@ -2,7 +2,7 @@ export {
   CamelCase,
   CamelCaseKeys,
   camelize,
-  camelizeKeys,
+  camelizeObject,
   KebabCase,
   KebabKeys
 } from './case'
