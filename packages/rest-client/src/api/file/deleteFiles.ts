@@ -1,9 +1,7 @@
-import { camelizeObject } from '@uploadcare/api-client-utils'
 import { apiRequest, ApiRequestSettings } from '../../apiRequest'
-import { ServerErrorResponse } from '../../types/ServerErrorResponse'
-import { RestClientError } from '../../tools/RestClientError'
-import { FileInfo } from '../../types/FileInfo'
 import { BatchResponse } from '../../types/BatchResponse'
+import { FileInfo } from '../../types/FileInfo'
+import { handleResponse } from '../handleResponse'
 
 export type DeleteFilesOptions = {
   uuids: string[]
@@ -23,12 +21,5 @@ export async function deleteFiles(
     },
     userSettings
   )
-
-  const json = (await response.json()) as Record<string, unknown>
-
-  if (response.status !== 200) {
-    throw new RestClientError((json as ServerErrorResponse).detail)
-  }
-
-  return camelizeObject(json) as DeleteFilesResponse
+  return handleResponse({ response, okCodes: [200] })
 }

@@ -1,8 +1,6 @@
-import { camelizeObject } from '@uploadcare/api-client-utils'
 import { apiRequest, ApiRequestSettings } from '../../apiRequest'
-import { RestClientError } from '../../tools/RestClientError'
 import { CopyResponse } from '../../types/CopyResponse'
-import { ServerErrorResponse } from '../../types/ServerErrorResponse'
+import { handleResponse } from '../handleResponse'
 
 export type CopyFileToRemoteStorageOptions = {
   source: string
@@ -31,11 +29,5 @@ export async function copyFileToRemoteStorage(
     userSettings
   )
 
-  const json = (await response.json()) as Record<string, unknown>
-
-  if (![200, 201].includes(response.status)) {
-    throw new RestClientError((json as ServerErrorResponse).detail)
-  }
-
-  return camelizeObject(json) as CopyFileToRemoteStorageResponse
+  return handleResponse({ response, okCodes: [200, 201] })
 }

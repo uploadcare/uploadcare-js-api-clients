@@ -1,9 +1,8 @@
-import { camelizeObject, Metadata } from '@uploadcare/api-client-utils'
+import { Metadata } from '@uploadcare/api-client-utils'
 import { apiRequest, ApiRequestSettings } from '../../apiRequest'
-import { ServerErrorResponse } from '../../types/ServerErrorResponse'
-import { RestClientError } from '../../tools/RestClientError'
-import { FileInfo } from '../../types/FileInfo'
 import { CopyResponse } from '../../types/CopyResponse'
+import { FileInfo } from '../../types/FileInfo'
+import { handleResponse } from '../handleResponse'
 
 export type CopyFileToLocalStorageOptions = {
   source: string
@@ -11,6 +10,10 @@ export type CopyFileToLocalStorageOptions = {
   metadata?: Metadata
 }
 
+/**
+ * There is a bug in the API. FileInfo will be incomplete.
+ * It's better to refetch fileInfo after request in the high-level wrappers.
+ */
 export type CopyFileToLocalStorageResponse = CopyResponse<'file', FileInfo>
 
 export async function copyFileToLocalStorage(
@@ -30,11 +33,5 @@ export async function copyFileToLocalStorage(
     userSettings
   )
 
-  const json = (await response.json()) as Record<string, unknown>
-
-  if (response.status !== 201) {
-    throw new RestClientError((json as ServerErrorResponse).detail)
-  }
-
-  return camelizeObject(json) as CopyFileToLocalStorageResponse
+  return handleResponse({ response, okCodes: [201] })
 }
