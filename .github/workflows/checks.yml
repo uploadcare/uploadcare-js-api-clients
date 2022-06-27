@@ -9,6 +9,10 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      UPLOAD_CLIENT_DEFAULT_PUBLIC_KEY: ${{ secrets.UPLOAD_CLIENT_DEFAULT_PUBLIC_KEY }}
+      REST_CLIENT_DEFAULT_PUBLIC_KEY: ${{ secrets.REST_CLIENT_DEFAULT_PUBLIC_KEY }}
+      REST_CLIENT_DEFAULT_SECRET_KEY: ${{ secrets.REST_CLIENT_DEFAULT_SECRET_KEY }}
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
@@ -27,8 +31,3 @@ jobs:
         run: npm run test
       - name: Run integration tests
         run: npm run test:production
-        env:
-          UPLOAD_CLIENT_DEFAULT_PUBLIC_KEY: ${{ secrets.UPLOAD_CLIENT_DEFAULT_PUBLIC_KEY }}
-          REST_CLIENT_DEFAULT_PUBLIC_KEY: ${{ secrets.REST_CLIENT_DEFAULT_PUBLIC_KEY }}
-          REST_CLIENT_DEFAULT_SECRET_KEY: ${{ secrets.REST_CLIENT_DEFAULT_SECRET_KEY }}
-
