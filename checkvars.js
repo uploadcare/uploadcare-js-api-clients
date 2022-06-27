@@ -4,9 +4,9 @@ import * as url from 'url'
 import path from 'path'
 
 const VARS = [
-  'UPLOAD_CLIENT_PUBLIC_KEY',
-  'REST_CLIENT_PUBLIC_KEY',
-  'REST_CLIENT_SECRET_KEY'
+  'UPLOAD_CLIENT_DEFAULT_PUBLIC_KEY',
+  'REST_CLIENT_DEFAULT_PUBLIC_KEY',
+  'REST_CLIENT_DEFAULT_SECRET_KEY'
 ]
 
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url))

@@ -28,5 +28,5 @@ jobs:
       - name: Run integration tests
         run: npm run test:production
         env:
-          UPLOAD_CLIENT_PUBLIC_KEY: ${{ secrets.UPLOAD_CLIENT_PUBLIC_KEY }}
+          UPLOAD_CLIENT_DEFAULT_PUBLIC_KEY: ${{ secrets.UPLOAD_CLIENT_DEFAULT_PUBLIC_KEY }}
 

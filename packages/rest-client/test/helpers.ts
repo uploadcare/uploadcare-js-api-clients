@@ -3,8 +3,10 @@ import { UploadcareAuthSchema } from '../src/auth/UploadcareAuthSchema'
 import { UploadcareSimpleAuthSchema } from '../src/auth/UploadcareSimpleAuthSchema'
 import { UserSettings } from '../src/settings'
 
-export const TEST_PUBLIC_KEY = process.env.REST_CLIENT_PUBLIC_KEY as string
-export const TEST_SECRET_KEY = process.env.REST_CLIENT_SECRET_KEY as string
+export const TEST_PUBLIC_KEY = process.env
+  .REST_CLIENT_DEFAULT_PUBLIC_KEY as string
+export const TEST_SECRET_KEY = process.env
+  .REST_CLIENT_DEFAULT_SECRET_KEY as string
 
 export const uploadcareSimpleAuthSchema = new UploadcareSimpleAuthSchema({
   publicKey: TEST_PUBLIC_KEY,
