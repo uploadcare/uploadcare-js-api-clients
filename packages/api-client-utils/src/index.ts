@@ -1,5 +1,6 @@
-export { camelizeString, camelizeKeys } from './camelizeKeys'
+export { camelizeKeys, camelizeString } from './camelizeKeys'
 export { delay } from './delay'
+export { isObject } from './isObject'
 export { retrier } from './retrier'
 export { ContentInfo } from './types/ContentInfo'
 export { ImageInfo } from './types/ImageInfo'
