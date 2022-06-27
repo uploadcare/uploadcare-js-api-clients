@@ -11,5 +11,6 @@ export default {
   moduleNameMapper: {
     '^(\\.{1,2}/.*)\\.js$': '$1'
   },
-  setupFiles: ['../../checkvars.js']
+  setupFiles: ['../../checkvars.js'],
+  reporters: ['default', 'github-actions']
 }
