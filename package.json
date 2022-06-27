@@ -23,7 +23,7 @@
     "eslint": "eslint ./ --ext=ts,js",
     "prettier:fix": "prettier --write './**/*.{ts,js}'",
     "prettier": "prettier --check './**/*.{ts,js}'",
-    "test": "npm run test --workspaces",
+    "test": "npm run test --workspaces --if-present",
     "test:production": "npm run test:production --workspaces --if-present",
     "release:prepare": "shipjs prepare",
     "prepare": "husky install"
