@@ -10,7 +10,6 @@ const VARS = [
 ]
 
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url))
-
 const check = () => {
   config({ path: path.join(__dirname, '.env') })
 
