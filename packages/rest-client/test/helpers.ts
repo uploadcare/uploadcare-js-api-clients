@@ -1,14 +1,14 @@
+import { delay } from '@uploadcare/api-client-utils'
+import { UploadClient } from '@uploadcare/upload-client'
+import { deleteGroup } from '../src/api/group/deleteGroup'
+import { listOfGroups } from '../src/api/group/listOfGroups'
+import { deleteMetadata } from '../src/api/metadata/deleteMetadata'
+import { getMetadata } from '../src/api/metadata/getMetadata'
 import { createSignature } from '../src/auth/createSignature.node'
 import { UploadcareAuthSchema } from '../src/auth/UploadcareAuthSchema'
 import { UploadcareSimpleAuthSchema } from '../src/auth/UploadcareSimpleAuthSchema'
 import { UserSettings } from '../src/settings'
-import { UploadClient } from '@uploadcare/upload-client'
-import { listOfGroups } from '../src/api/group/listOfGroups'
-import { deleteGroup } from '../src/api/group/deleteGroup'
-import { getMetadata } from '../src/api/metadata/getMetadata'
 import { METADATA_UUID } from './fixtures'
-import { deleteMetadata } from '../src/api/metadata/deleteMetadata'
-import { delay } from '@uploadcare/api-client-utils'
 
 export const TEST_PUBLIC_KEY = process.env
   .REST_CLIENT_DEFAULT_PUBLIC_KEY as string

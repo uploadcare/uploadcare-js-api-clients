@@ -1,7 +1,6 @@
 import { describe, it } from '@jest/globals'
 import { deleteMetadata } from './deleteMetadata'
 
-import { delay } from '@uploadcare/api-client-utils'
 import { INVALID_UUID, METADATA_UUID } from '../../../test/fixtures'
 import { testSettings, waitForApiFlush } from '../../../test/helpers'
 import { getMetadataValue } from './getMetadataValue'

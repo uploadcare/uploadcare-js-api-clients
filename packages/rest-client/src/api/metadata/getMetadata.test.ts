@@ -1,7 +1,6 @@
 import { describe, it } from '@jest/globals'
 import { getMetadata } from './getMetadata'
 
-import { delay } from '@uploadcare/api-client-utils'
 import {
   DEFAULT_UUID,
   INVALID_UUID,
