@@ -3,30 +3,30 @@ import { FileInfo } from '../../types/FileInfo'
 import { PaginatedList } from '../../types/PaginatedList'
 import { handleResponse } from '../handleResponse'
 
-export type ListOrdering = 'datetime_uploaded' | '-datetime_uploaded'
+export type ListOfFilesOrdering = 'datetime_uploaded' | '-datetime_uploaded'
 
-export type ListOptions = {
+export type ListOfFilesOptions = {
   from?: Date
   removed?: boolean
   stored?: boolean
   limit?: number
-  ordering?: ListOrdering
+  ordering?: ListOfFilesOrdering
 }
 
-export type ListTotals = {
+export type ListOfFilesTotals = {
   removed: number
   stored: number
   unstored: number
 }
 
-export type ListResponse = PaginatedList<FileInfo> & {
-  totals: ListTotals
+export type ListOfFilesResponse = PaginatedList<FileInfo> & {
+  totals: ListOfFilesTotals
 }
 
 export async function listOfFiles(
-  options: ListOptions,
+  options: ListOfFilesOptions,
   userSettings: ApiRequestSettings
-): Promise<ListResponse> {
+): Promise<ListOfFilesResponse> {
   const response = await apiRequest(
     {
       method: 'GET',
