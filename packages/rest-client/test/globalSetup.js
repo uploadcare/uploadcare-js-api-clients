@@ -5,6 +5,11 @@ import { fileURLToPath } from 'url'
 
 const __dirname = fileURLToPath(new URL('.', import.meta.url))
 
+/**
+ * This is hack to run globalSetup.ts
+ * because ts-jest isn't able to run globalSetup hook written in typescript
+ * with --experimentalSpecifierResolution flag enabled
+ */
 export default () => {
   const tsNodeEsm = path.join(
     __dirname,
