@@ -1,8 +1,12 @@
-import { resetGroups, resetMetadata } from './helpers'
+import '../../../env.js'
+import { resetGroups, resetMetadata, resetWebhooks } from './helpers'
 
-async function main() {
-  await resetGroups()
-  await resetMetadata()
+function reset() {
+  return Promise.all([resetGroups(), resetMetadata(), resetWebhooks()])
 }
 
-main()
+try {
+  await reset()
+} catch (err) {
+  console.error('Failed to reset rest-client test project state', err)
+}

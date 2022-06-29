@@ -4,6 +4,8 @@ import { deleteGroup } from '../src/api/group/deleteGroup'
 import { listOfGroups } from '../src/api/group/listOfGroups'
 import { deleteMetadata } from '../src/api/metadata/deleteMetadata'
 import { getMetadata } from '../src/api/metadata/getMetadata'
+import { deleteWebhook } from '../src/api/webhooks/deleteWebhook'
+import { listOfWebhooks } from '../src/api/webhooks/listOfWebhooks'
 import { createSignature } from '../src/auth/createSignature.node'
 import { UploadcareAuthSchema } from '../src/auth/UploadcareAuthSchema'
 import { UploadcareSimpleAuthSchema } from '../src/auth/UploadcareSimpleAuthSchema'
@@ -44,29 +46,30 @@ export const uploadClient = new UploadClient({
   baseCDN: 'https://ucarecdn.com'
 })
 
+export const random = () => Math.floor(Math.random() * 1000)
+
 export const resetGroups = async () => {
-  try {
-    const groups = await listOfGroups({}, testSettings)
-    // TODO: iteration will be over first page, need to implement generator/iterator for pagination results
-    await Promise.allSettled(
-      groups.results.map((group) =>
-        deleteGroup({ uuid: group.id }, testSettings)
-      )
-    )
-  } catch (err) {
-    return
-  }
+  const groups = await listOfGroups({}, testSettings)
+  // TODO: iteration will be over first page, need to implement generator/iterator for pagination results
+  await Promise.all(
+    groups.results.map((group) => deleteGroup({ uuid: group.id }, testSettings))
+  )
 }
 
 export const resetMetadata = async () => {
-  try {
-    const metadata = await getMetadata({ uuid: METADATA_UUID }, testSettings)
-    await Promise.allSettled(
-      Object.keys(metadata).map((key) =>
-        deleteMetadata({ uuid: METADATA_UUID, key }, testSettings)
-      )
+  const metadata = await getMetadata({ uuid: METADATA_UUID }, testSettings)
+  await Promise.all(
+    Object.keys(metadata).map((key) =>
+      deleteMetadata({ uuid: METADATA_UUID, key }, testSettings)
     )
-  } catch (err) {
-    return
-  }
+  )
+}
+
+export const resetWebhooks = async () => {
+  const webhooks = await listOfWebhooks({}, testSettings)
+  await Promise.all(
+    webhooks.map((webhook) =>
+      deleteWebhook({ targetUrl: webhook.targetUrl }, testSettings)
+    )
+  )
 }
