@@ -1,3 +1,19 @@
+# [4.1.0](https://github.com/uploadcare/uploadcare-js-api-clients/compare/v4.0.1...v4.1.0) (2022-06-29)
+
+
+### Bug Fixes
+
+* handle falsy values while creating query string, use URLSearchParams to build it ([cbf5472](https://github.com/uploadcare/uploadcare-js-api-clients/commit/cbf5472507de4458fccfa98304326e6762b43171))
+
+
+### Features
+
+* implement auth schemas ([7202f9d](https://github.com/uploadcare/uploadcare-js-api-clients/commit/7202f9ddedc34d83a4960323b35cd02d4cfd03a4))
+* request throttling ([79c0267](https://github.com/uploadcare/uploadcare-js-api-clients/commit/79c0267c4647ae80a9d18325907f95980793166f))
+* RestClientError ([c0ca0fa](https://github.com/uploadcare/uploadcare-js-api-clients/commit/c0ca0fa68f2aa5fb274972f72e942e79f84b4d76))
+
+
+
 ## [4.0.1](https://github.com/uploadcare/uploadcare-upload-client/compare/v4.0.0...v4.0.1) (2022-06-10)
 
 
