@@ -4,6 +4,7 @@ import { UploadClientError } from '../../src/tools/errors'
 import uploadDirect from '../../src/uploadFile/uploadDirect'
 import { jest, expect } from '@jest/globals'
 
+// TODO: add tests for metadata
 describe('uploadDirect', () => {
   it('should resolves when file is ready on CDN', async () => {
     const fileToUpload = factory.image('blackSquare').data
