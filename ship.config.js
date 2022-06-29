@@ -5,7 +5,7 @@ export default {
   monorepo: {
     mainVersionFile: 'package.json',
     packagesToBump: ['packages/*'],
-    packagesToPublish: ['packages/*']
+    packagesToPublish: ['packages/upload-client']
   },
   publishCommand: ({ defaultCommand }) => `${defaultCommand} --access public`,
   versionUpdated: ({ version, dir }) => {
