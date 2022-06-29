@@ -17,10 +17,23 @@ type CamelizeKeysOptions = {
   ignoreKeys: string[]
 }
 
+export function camelizeArrayItems(
+  array: unknown[],
+  { ignoreKeys }: CamelizeKeysOptions = { ignoreKeys: [] }
+): unknown[] {
+  if (!Array.isArray(array)) {
+    return array
+  }
+  return array.map((item) => camelizeKeys(item, { ignoreKeys }))
+}
+
 export function camelizeKeys<T>(
   source: Record<string, unknown> | T,
   { ignoreKeys }: CamelizeKeysOptions = { ignoreKeys: [] }
 ): Record<string, unknown> | T {
+  if (Array.isArray(source)) {
+    return camelizeArrayItems(source, { ignoreKeys }) as unknown as T
+  }
   if (!isObject(source)) {
     return source
   }
@@ -34,9 +47,7 @@ export function camelizeKeys<T>(
     if (isObject(value)) {
       value = camelizeKeys(value, { ignoreKeys })
     } else if (Array.isArray(value)) {
-      value = value.map((item) =>
-        isObject(item) ? camelizeKeys(item, { ignoreKeys }) : item
-      )
+      value = camelizeArrayItems(value, { ignoreKeys })
     }
     result[camelizeString(key)] = value
   }

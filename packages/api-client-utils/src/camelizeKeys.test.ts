@@ -11,7 +11,7 @@ describe('camelizeString', () => {
 })
 
 describe('camelizeKeys', () => {
-  it('should work', () => {
+  it('should camelize objects', () => {
     expect(
       camelizeKeys({
         foo_bar: 'test1',
@@ -29,6 +29,17 @@ describe('camelizeKeys', () => {
       fooBar5: [1, 2, 3, 4, 5],
       fooBar6: [{ fooBar: 'baz' }]
     })
+  })
+
+  it('should camelize array items', () => {
+    expect(
+      camelizeKeys([
+        'foo_bar',
+        1,
+        { one_more_thing: 'test4' },
+        [{ foo_bar: 'baz' }]
+      ])
+    ).toEqual(['foo_bar', 1, { oneMoreThing: 'test4' }, [{ fooBar: 'baz' }]])
   })
 
   it('should accept ignoreKeys argument', () => {
@@ -63,7 +74,7 @@ describe('camelizeKeys', () => {
     })
   })
 
-  it('should return passed argument if it is not an object', () => {
+  it('should return passed argument if it is not an object or array', () => {
     expect(camelizeKeys('string')).toEqual('string')
     expect(camelizeKeys(100)).toEqual(100)
     expect(camelizeKeys(null)).toEqual(null)
