@@ -9,8 +9,9 @@ export default {
   },
   publishCommand: ({ defaultCommand }) => `${defaultCommand} --access public`,
   versionUpdated: ({ version, dir }) => {
-    const versionPath = resolve(dir, 'src/version.ts')
-    if(existsSync(versionPath)) {
+    const packages = ['upload-client', 'rest-client']
+    const versionPaths = packages.map(p => resolve(dir, 'packages', p, 'src/version.ts'))
+    for(const versionPath of versionPaths) {
       writeFileSync(versionPath, `export default '${version}'\n`)
     }
   },
