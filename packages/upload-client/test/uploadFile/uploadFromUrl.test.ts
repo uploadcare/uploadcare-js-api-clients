@@ -12,6 +12,7 @@ import { jest, expect } from '@jest/globals'
 
 jest.setTimeout(60000)
 
+// TODO: add tests for metadata
 describe('uploadFromUrl', () => {
   it('should resolves when file is ready on CDN', async () => {
     const sourceUrl = factory.imageUrl('valid')
