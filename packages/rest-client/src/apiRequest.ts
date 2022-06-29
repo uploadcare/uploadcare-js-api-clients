@@ -66,17 +66,18 @@ export async function apiRequest(
     throw new RestClientError('authSchema is required')
   }
   const url = getRequestURL(path, query, apiBaseURL)
+  const requestBody = body && JSON.stringify(body)
   const unsignedRequest = new Request(url, {
     method: method,
-    body: body && JSON.stringify(body),
+    body: requestBody,
     headers: new Headers({
       'Content-Type': 'application/json'
     })
   })
-  const headers = await authSchema.getHeaders(unsignedRequest)
+  const requestHeaders = await authSchema.getHeaders(unsignedRequest)
   const signedRequest = new Request(unsignedRequest, {
-    headers,
-    body: body && JSON.stringify(body)
+    headers: requestHeaders,
+    body: requestBody
   })
 
   return retryIfThrottled(
