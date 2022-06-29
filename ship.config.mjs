@@ -1,4 +1,4 @@
-import { writeFileSync } from 'fs'
+import { writeFileSync, existsSync } from 'fs'
 import { resolve } from 'path'
 
 export default {
@@ -10,7 +10,9 @@ export default {
   publishCommand: ({ defaultCommand }) => `${defaultCommand} --access public`,
   versionUpdated: ({ version, dir }) => {
     const versionPath = resolve(dir, 'src/version.ts')
-    writeFileSync(versionPath, `export default '${version}'\n`)
+    if(existsSync(versionPath)) {
+      writeFileSync(versionPath, `export default '${version}'\n`)
+    }
   },
   pullRequestReviewers: ['nd0ut']
 }
