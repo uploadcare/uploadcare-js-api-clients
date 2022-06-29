@@ -2,23 +2,19 @@ import { describe, it } from '@jest/globals'
 import { listOfGroups } from './listOfGroups'
 
 import { GROUP_FILE_UUID } from '../../../test/fixtures'
-import {
-  testSettings,
-  uploadClient,
-  waitForApiFlush
-} from '../../../test/helpers'
+import { testSettings, uploadClient } from '../../../test/helpers'
 
 describe('listOfGroups', () => {
   it('should return paginated list of groups', async () => {
-    const { id: groupId } = await uploadClient.group([GROUP_FILE_UUID])
-
-    await waitForApiFlush()
+    const group = await uploadClient.group([GROUP_FILE_UUID])
 
     const response = await listOfGroups(
       { ordering: '-datetime_created' },
       testSettings
     )
-    expect(response.results[0].id).toBe(groupId)
+    expect(response.results).toEqual(
+      expect.arrayContaining([expect.objectContaining({ id: group.id })])
+    )
   })
 
   it('should throw error if non-200 status received', async () => {
