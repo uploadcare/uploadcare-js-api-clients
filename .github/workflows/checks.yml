@@ -28,5 +28,5 @@ jobs:
       - name: Run integration tests
         run: npm run test:production
         env:
-          UC_KEY_FOR_INTEGRATION_TESTS: ${{ secrets.UC_KEY_FOR_INTEGRATION_TESTS }}
+          UC_KEY_FOR_INTEGRATION_TESTS: ${{ secrets.UPLOAD_CLIENT_DEFAULT_PUBLIC_KEY }}
 
