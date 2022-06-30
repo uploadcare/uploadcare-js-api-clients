@@ -1,6 +1,6 @@
 {
   "name": "@uploadcare/upload-client",
-  "version": "4.0.1",
+  "version": "4.1.0",
   "description": "Library for work with Uploadcare Upload API",
   "type": "module",
   "main": "dist/index.node.js",
@@ -9,9 +9,7 @@
   "react-native": "dist/index.react-native.js",
   "types": "dist/types.d.ts",
   "sideEffects": false,
-  "files": [
-    "dist/*"
-  ],
+  "files": ["dist/*"],
   "engines": {
     "node": ">=16"
   },
@@ -59,11 +57,11 @@
     "koa-add-trailing-slashes": "2.0.1",
     "koa-body": "5.0.0",
     "mock-socket": "9.0.3",
-    "start-server-and-test": "1.14.0"
+    "start-server-and-test": "1.14.0",
+    "@uploadcare/api-client-utils": "^4.1.0",
+    "chalk": "^4.1.2"
   },
   "dependencies": {
-    "@uploadcare/api-client-utils": "^4.0.1",
-    "chalk": "^4.1.2",
     "form-data": "^4.0.0",
     "ws": "^8.2.3"
   }
