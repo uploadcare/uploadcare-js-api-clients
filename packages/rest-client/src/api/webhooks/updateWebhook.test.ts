@@ -1,14 +1,14 @@
 import { describe, it } from '@jest/globals'
 import { updateWebhook } from './updateWebhook'
 
-import { random, testSettings } from '../../../test/helpers'
+import { randomTargetUrl, testSettings } from '../../../test/helpers'
 import { createWebhook } from './createWebhook'
 
 describe('updateWebhook', () => {
   it('should work', async () => {
     const webhook = await createWebhook(
       {
-        targetUrl: `https://ucarecdn.com/?q=${random()}`,
+        targetUrl: randomTargetUrl(),
         event: 'file.uploaded'
       },
       testSettings
@@ -17,7 +17,7 @@ describe('updateWebhook', () => {
     const updated = await updateWebhook(
       {
         id: webhook.id,
-        targetUrl: `https://ucarecdn.com/?q=${random()}`,
+        targetUrl: randomTargetUrl(),
         isActive: false
       },
       testSettings

@@ -46,7 +46,10 @@ export const uploadClient = new UploadClient({
   baseCDN: 'https://ucarecdn.com'
 })
 
-export const random = () => Math.floor(Math.random() * 1000)
+export const randomTargetUrl = () => {
+  const id = Math.floor(Math.random() * 1000)
+  return `https://ucarecdn.com/?id=${id}`
+}
 
 export const resetGroups = async () => {
   const groups = await listOfGroups({}, testSettings)
