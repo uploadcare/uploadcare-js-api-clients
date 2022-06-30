@@ -1,3 +1,11 @@
+# [4.1.0](https://github.com/uploadcare/uploadcare-js-api-clients/compare/v4.0.1...v4.1.0) (2022-06-29)
+
+
+### Bug Fixes
+
+* Fix crashes when `null` metadata passed to the options ([cbf5472](https://github.com/uploadcare/uploadcare-js-api-clients/commit/cbf5472507de4458fccfa98304326e6762b43171))
+
+
 ## [4.0.1](https://github.com/uploadcare/uploadcare-upload-client/compare/v4.0.0...v4.0.1) (2022-06-10)
 
 

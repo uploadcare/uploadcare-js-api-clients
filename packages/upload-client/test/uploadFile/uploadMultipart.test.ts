@@ -6,6 +6,7 @@ import { jest, expect } from '@jest/globals'
 
 jest.setTimeout(60000)
 
+// TODO: add tests for metadata
 describe('uploadMultipart', () => {
   const fileToUpload = factory.file(12).data
   const settings = getSettingsForTesting({

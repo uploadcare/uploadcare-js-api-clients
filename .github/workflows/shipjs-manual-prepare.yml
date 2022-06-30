@@ -15,6 +15,6 @@ jobs:
       - run: |
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git config --global user.name "github-actions[bot]"
-      - run: npm run release -- --yes --no-browse
+      - run: npx shipjs prepare --yes
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
