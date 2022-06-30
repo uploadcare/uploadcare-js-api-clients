@@ -37,7 +37,7 @@ describe('RestClientError', () => {
     expect(error.stack).toBeDefined()
   })
 
-  it('should copy status and statusText from response automatically', () => {
+  it('should have status and statusText from response', () => {
     const response = new Response(null, { status: 200, statusText: 'OK' })
     const error = new RestClientError('test error', { response })
 
@@ -45,13 +45,17 @@ describe('RestClientError', () => {
     expect(error.statusText).toBe('OK')
   })
 
-  it('should be serialized to string', () => {
-    const response = new Response(null, {
-      status: 404,
-      statusText: 'Not found'
-    })
+  it('should add status and statusText to the message', () => {
+    const response = new Response(null, { status: 200, statusText: 'OK' })
     const error = new RestClientError('test error', { response })
 
-    expect(error.toString()).toBe('RestClientError[404 Not found]: test error')
+    expect(error.message).toBe('[200 OK] test error')
+  })
+
+  it('should omit statusText when message equals statusText', () => {
+    const response = new Response(null, { status: 200, statusText: 'OK' })
+    const error = new RestClientError('OK', { response })
+
+    expect(error.message).toBe('[200] OK')
   })
 })

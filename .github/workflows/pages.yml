@@ -14,7 +14,7 @@ jobs:
           node-version: '16'
       - name: Install and Build 🔧
         run: |
-          npm ci
+          npm i
           npm run build:docs
       - name: Deploy 🚀
         uses: JamesIves/github-pages-deploy-action@v4.3.3

@@ -12,28 +12,25 @@ export class RestClientError extends Error {
   readonly request?: Request
   readonly response?: Response
 
-  constructor(
-    message: string = DEFAULT_MESSAGE,
-    options: RestClientErrorOptions = {}
-  ) {
+  constructor(message?: string | null, options: RestClientErrorOptions = {}) {
     super()
 
     this.name = 'RestClientError'
-    this.message = message
     this.request = options.request
     this.response = options.response
 
     this.status = options.response?.status
     this.statusText = options.response?.statusText
 
-    Object.setPrototypeOf(this, RestClientError.prototype)
-  }
-
-  toString() {
+    const msg = message ?? DEFAULT_MESSAGE
     const status =
       this.status || this.statusText
-        ? `[${[this.status, this.statusText].filter(Boolean).join(' ')}]`
+        ? `[${[this.status, msg === this.statusText ? '' : this.statusText]
+            .filter(Boolean)
+            .join(' ')}] `
         : ''
-    return `${this.name}${status}: ${this.message}`
+    this.message = status + msg
+
+    Object.setPrototypeOf(this, RestClientError.prototype)
   }
 }

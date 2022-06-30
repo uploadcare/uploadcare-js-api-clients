@@ -23,8 +23,6 @@ export default () => {
 
   return new Promise((resolve, reject) => {
     exec(cmd, (err, stdout, stderr) => {
-      console.log(`Executing "${cmd}"...`)
-
       stdout && console.log('stdout', stdout)
       stderr && console.log('stderr', stderr)
       if (err) {
