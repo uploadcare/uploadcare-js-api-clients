@@ -8,7 +8,7 @@ export type ApiRequestQuery = Record<
   string | number | boolean | Date | undefined | null
 >
 
-export type ApiRequestBody = string[] | Record<string, unknown>
+export type ApiRequestBody = string | string[] | Record<string, unknown>
 
 export type ApiRequestOptions = {
   method: string

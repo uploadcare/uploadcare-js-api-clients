@@ -39,6 +39,7 @@ type AwsRekognitionDetectLabels = {
   datetimeUpdated: string
 }
 
+// TODO: should this object be camelized?
 export type AppData = {
   ucClamavVirusScan?: ClamavVirusScan
   awsRekognitionDetectLabels?: AwsRekognitionDetectLabels
