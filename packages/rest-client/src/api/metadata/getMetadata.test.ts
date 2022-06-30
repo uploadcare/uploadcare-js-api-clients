@@ -6,30 +6,23 @@ import {
   INVALID_UUID,
   METADATA_UUID
 } from '../../../test/fixtures'
-import { testSettings } from '../../../test/helpers'
+import { testSettings, waitForApiFlush } from '../../../test/helpers'
 import { updateMetadata } from './updateMetadata'
-import { deleteMetadata } from './deleteMetadata'
-import { delay } from '@uploadcare/api-client-utils'
+
+async function prepare() {
+  await updateMetadata(
+    { uuid: METADATA_UUID, key: 'get_key', value: 'value' },
+    testSettings
+  )
+  await waitForApiFlush()
+}
 
 describe('getMetadata', () => {
-  beforeAll(async () => {
-    await updateMetadata(
-      { uuid: METADATA_UUID, key: 'kebab_key', value: 'value' },
-      testSettings
-    )
-    // metadata aren't stored immediately
-    await delay(1000)
-  })
-  afterAll(() => {
-    return deleteMetadata(
-      { uuid: METADATA_UUID, key: 'kebab_key' },
-      testSettings
-    )
-  })
-
   it('should return metadata object', async () => {
+    await prepare()
+
     const response = await getMetadata({ uuid: METADATA_UUID }, testSettings)
-    expect(response).toEqual({ kebab_key: 'value' })
+    expect(response.get_key).toBe('value')
   })
 
   it('should return empty object if no metadata', async () => {

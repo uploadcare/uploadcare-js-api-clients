@@ -34,7 +34,9 @@
     "file"
   ],
   "devDependencies": {
-    "@types/blueimp-md5": "^2.18.0"
+    "@types/blueimp-md5": "^2.18.0",
+    "@uploadcare/upload-client": "^4.0.1",
+    "ts-node": "^10.8.1"
   },
   "dependencies": {
     "blueimp-md5": "^2.19.0",

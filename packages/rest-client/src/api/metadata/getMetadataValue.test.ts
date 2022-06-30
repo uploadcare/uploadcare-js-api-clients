@@ -1,31 +1,24 @@
 import { describe, it } from '@jest/globals'
 import { getMetadataValue } from './getMetadataValue'
 
-import { delay } from '@uploadcare/api-client-utils'
 import { INVALID_UUID, METADATA_UUID } from '../../../test/fixtures'
-import { testSettings } from '../../../test/helpers'
-import { deleteMetadata } from './deleteMetadata'
+import { testSettings, waitForApiFlush } from '../../../test/helpers'
 import { updateMetadata } from './updateMetadata'
 
-describe('getMetadataValue', () => {
-  beforeAll(async () => {
-    await updateMetadata(
-      { uuid: METADATA_UUID, key: 'kebab_key', value: 'value' },
-      testSettings
-    )
-    // metadata aren't stored immediately
-    await delay(1000)
-  })
-  afterAll(() => {
-    return deleteMetadata(
-      { uuid: METADATA_UUID, key: 'kebab_key' },
-      testSettings
-    )
-  })
+async function prepare() {
+  await updateMetadata(
+    { uuid: METADATA_UUID, key: 'get_value_key', value: 'value' },
+    testSettings
+  )
+  await waitForApiFlush()
+}
 
-  it('should return metadata object', async () => {
+describe('getMetadataValue', () => {
+  it('should return metadata value', async () => {
+    await prepare()
+
     const response = await getMetadataValue(
-      { uuid: METADATA_UUID, key: 'kebab_key' },
+      { uuid: METADATA_UUID, key: 'get_value_key' },
       testSettings
     )
     expect(response).toEqual('value')

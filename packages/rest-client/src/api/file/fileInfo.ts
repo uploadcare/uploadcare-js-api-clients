@@ -2,17 +2,17 @@ import { apiRequest, ApiRequestSettings } from '../../apiRequest'
 import { FileInfo } from '../../types/FileInfo'
 import { handleResponse } from '../handleResponse'
 
-export type InfoOptions = {
+export type FileInfoOptions = {
   uuid: string
   include?: string
 }
 
-export type InfoResponse = FileInfo
+export type FileInfoResponse = FileInfo
 
 export async function fileInfo(
-  options: InfoOptions,
+  options: FileInfoOptions,
   userSettings: ApiRequestSettings
-): Promise<InfoResponse> {
+): Promise<FileInfoResponse> {
   const response = await apiRequest(
     {
       method: 'GET',

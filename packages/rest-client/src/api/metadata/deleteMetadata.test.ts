@@ -2,12 +2,29 @@ import { describe, it } from '@jest/globals'
 import { deleteMetadata } from './deleteMetadata'
 
 import { INVALID_UUID, METADATA_UUID } from '../../../test/fixtures'
-import { testSettings } from '../../../test/helpers'
+import { testSettings, waitForApiFlush } from '../../../test/helpers'
+import { getMetadataValue } from './getMetadataValue'
+import { updateMetadata } from './updateMetadata'
+
+async function prepare() {
+  await updateMetadata(
+    { uuid: METADATA_UUID, key: 'delete_key', value: 'value' },
+    testSettings
+  )
+  await waitForApiFlush()
+  const value = await getMetadataValue(
+    { uuid: METADATA_UUID, key: 'delete_key' },
+    testSettings
+  )
+  expect(value).toBe('value')
+}
 
 describe('deleteMetadata', () => {
   it('should work', async () => {
+    await prepare()
+
     const response = await deleteMetadata(
-      { uuid: METADATA_UUID, key: 'key' },
+      { uuid: METADATA_UUID, key: 'delete_key' },
       testSettings
     )
     expect(response).toBe(undefined)
