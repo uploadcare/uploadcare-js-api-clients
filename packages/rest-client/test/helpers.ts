@@ -3,18 +3,20 @@ import { UploadcareAuthSchema } from '../src/auth/UploadcareAuthSchema'
 import { UploadcareSimpleAuthSchema } from '../src/auth/UploadcareSimpleAuthSchema'
 import { UserSettings } from '../src/settings'
 
-export const DEMO_PUBLIC_KEY = 'demopublickey'
-export const DEMO_SECRET_KEY = 'demosecretkey'
+export const TEST_PUBLIC_KEY = process.env
+  .REST_CLIENT_DEFAULT_PUBLIC_KEY as string
+export const TEST_SECRET_KEY = process.env
+  .REST_CLIENT_DEFAULT_SECRET_KEY as string
 
 export const uploadcareSimpleAuthSchema = new UploadcareSimpleAuthSchema({
-  publicKey: DEMO_PUBLIC_KEY,
-  secretKey: DEMO_SECRET_KEY
+  publicKey: TEST_PUBLIC_KEY,
+  secretKey: TEST_SECRET_KEY
 })
 
 export const uploadcareAuthSchema = new UploadcareAuthSchema({
-  publicKey: DEMO_PUBLIC_KEY,
+  publicKey: TEST_PUBLIC_KEY,
   signatureResolver: (signString) => {
-    return createSignature(DEMO_SECRET_KEY, signString)
+    return createSignature(TEST_SECRET_KEY, signString)
   }
 })
 

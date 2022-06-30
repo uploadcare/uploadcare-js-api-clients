@@ -14,11 +14,10 @@
     "node": ">=16"
   },
   "scripts": {
-    "check-env-vars": "node ../../checkvars.js",
     "mock:start": "node --loader ts-node/esm ./mock-server/server.ts --silent",
     "clean": "rimraf dist",
     "test": "start-server-and-test mock:start :3000 test:jest",
-    "test:production": "npm run check-env-vars && TEST_ENV=production npm run test:jest",
+    "test:production": "TEST_ENV=production npm run test:jest",
     "test:jest": "node --experimental-vm-modules ../../node_modules/jest/bin/jest.js",
     "prebuild": "npm run clean",
     "build": "npm run build:types && npm run build:compile",
@@ -52,15 +51,15 @@
     "@types/ws": "8.5.3",
     "data-uri-to-buffer": "3.0.1",
     "dataurl-to-blob": "0.0.1",
-    "dotenv": "8.2.0",
     "jest-environment-jsdom": "28.1.0",
     "jest-websocket-mock": "2.3.0",
     "koa": "2.13.4",
     "koa-add-trailing-slashes": "2.0.1",
     "koa-body": "5.0.0",
     "mock-socket": "9.0.3",
-    "start-server-and-test": "1.11.7",
-    "@uploadcare/api-client-utils": "^4.1.0"
+    "start-server-and-test": "1.14.0",
+    "@uploadcare/api-client-utils": "^4.1.0",
+    "chalk": "^4.1.2"
   },
   "dependencies": {
     "form-data": "^4.0.0",

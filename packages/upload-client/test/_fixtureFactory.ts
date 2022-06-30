@@ -25,7 +25,7 @@ const images: { [key: string]: string } = {
 
 const pubkey = (): string =>
   (process.env.TEST_ENV === 'production'
-    ? process.env.UC_KEY_FOR_INTEGRATION_TESTS
+    ? process.env.UPLOAD_CLIENT_DEFAULT_PUBLIC_KEY
     : 'secret_public_key') || ''
 
 const uuids: { [key: string]: { publicKey: string; uuid: string } } = {

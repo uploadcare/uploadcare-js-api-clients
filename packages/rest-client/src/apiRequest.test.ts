@@ -1,12 +1,10 @@
 import { describe, expect, it } from '@jest/globals'
 import { apiRequest } from '../src/apiRequest'
 import {
-  DEMO_PUBLIC_KEY,
   testSettings,
   uploadcareAuthSchema,
   uploadcareSimpleAuthSchema
-} from '../test/_helpers'
-import { UploadcareAuthSchema } from './auth/UploadcareAuthSchema'
+} from '../test/helpers'
 
 describe('apiRequest', () => {
   it('should pass auth using UploadcareSimpleAuthSchema', async () => {

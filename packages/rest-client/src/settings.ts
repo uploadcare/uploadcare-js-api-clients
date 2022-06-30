@@ -1,6 +1,6 @@
 import { AuthSchema } from './auth/types'
 
-export interface UserSettings {
+export type UserSettings = {
   apiBaseURL?: string
   authSchema?: AuthSchema | null
   retryThrottledRequestMaxTimes?: number

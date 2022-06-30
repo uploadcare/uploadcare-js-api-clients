@@ -5,6 +5,6 @@ describe('delay', () => {
     const start = Date.now()
     await delay(100)
     const end = Date.now()
-    expect(end - start).toBeGreaterThanOrEqual(100)
+    expect(end - start).toBeGreaterThan(100 - 10)
   })
 })

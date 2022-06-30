@@ -56,7 +56,7 @@ export default function groupInfo(
         }),
         signal
       }).then(({ data, headers, request }) => {
-        const response = camelizeKeys<Response>(JSON.parse(data))
+        const response = camelizeKeys(JSON.parse(data)) as Response
 
         if ('error' in response) {
           throw new UploadClientError(

@@ -12,9 +12,8 @@
     "dist/*"
   ],
   "scripts": {
-    "check-env-vars": "node ../../checkvars.js",
     "clean": "rimraf dist",
-    "test": "node --experimental-vm-modules ../../node_modules/jest/bin/jest.js",
+    "test:production": "node --experimental-vm-modules ../../node_modules/jest/bin/jest.js",
     "prebuild": "npm run clean",
     "build": "npm run build:types && npm run build:compile",
     "build:types": "dts-bundle-generator --project tsconfig.dts.json -o dist/types.d.ts src/index.ts",
@@ -35,8 +34,7 @@
     "file"
   ],
   "devDependencies": {
-    "@types/blueimp-md5": "^2.18.0",
-    "dotenv": "8.2.0"
+    "@types/blueimp-md5": "^2.18.0"
   },
   "dependencies": {
     "blueimp-md5": "^2.19.0",

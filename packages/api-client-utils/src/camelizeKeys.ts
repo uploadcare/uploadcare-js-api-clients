@@ -1,9 +1,8 @@
+import { isObject } from './isObject'
+
 const SEPARATOR = /\W|_/g
 
-/**
- * Transforms a string to camelCased.
- */
-export function camelize(text: string): string {
+export function camelizeString<T extends string>(text: T): T {
   return text
     .split(SEPARATOR)
     .map(
@@ -11,22 +10,35 @@ export function camelize(text: string): string {
         word.charAt(0)[index > 0 ? 'toUpperCase' : 'toLowerCase']() +
         word.slice(1)
     )
-    .join('')
+    .join('') as T
 }
 
-/**
- * Transforms keys of an object to camelCased recursively.
- */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function camelizeKeys<T>(source: any): T {
-  if (!source || typeof source !== 'object') {
+type CamelizeKeysOptions = {
+  ignoreKeys: string[]
+}
+
+export function camelizeKeys<T>(
+  source: Record<string, unknown> | T,
+  { ignoreKeys }: CamelizeKeysOptions = { ignoreKeys: [] }
+): Record<string, unknown> | T {
+  if (!isObject(source)) {
     return source
   }
-
-  return Object.keys(source).reduce<T>((accumulator, key) => {
-    accumulator[camelize(key)] =
-      typeof source[key] === 'object' ? camelizeKeys(source[key]) : source[key]
-
-    return accumulator
-  }, {} as T)
+  const result = {}
+  for (const key of Object.keys(source)) {
+    let value = source[key]
+    if (ignoreKeys.includes(key)) {
+      result[key] = value
+      continue
+    }
+    if (isObject(value)) {
+      value = camelizeKeys(value, { ignoreKeys })
+    } else if (Array.isArray(value)) {
+      value = value.map((item) =>
+        isObject(item) ? camelizeKeys(item, { ignoreKeys }) : item
+      )
+    }
+    result[camelizeString(key)] = value
+  }
+  return result
 }
