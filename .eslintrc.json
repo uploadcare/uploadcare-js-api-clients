@@ -22,7 +22,8 @@
     },
     {
       "files": [
-        "**/*.js"
+        "**/*.js",
+        "**/*.mjs"
       ],
       "parserOptions": {
         "sourceType": "module"
