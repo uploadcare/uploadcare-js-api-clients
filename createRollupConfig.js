@@ -30,7 +30,7 @@ export const createRollupConfig = ({ targetEnv, cwd }) => ({
     // Uncomment when we will ready to use @uploadcare/api-client-utils as external dependency
     // for browsers.
     // nodeExternals({ include: /@uploadcare/ }),
-    nodeExternals(),
+    nodeExternals({ exclude: /@uploadcare/ }),
     nodeResolve(),
     typescript({
       tsconfig: path.join(cwd, 'tsconfig.build.json')
