@@ -4,7 +4,6 @@ import { executeAddon } from './executeAddon'
 import { testSettings } from '../../../test/helpers'
 import { AddonName } from '../../types/AddonName'
 
-// TODO: isn't enable for the project
 describe.skip('executeAddon', () => {
   it('should work', async () => {
     const response = await executeAddon(

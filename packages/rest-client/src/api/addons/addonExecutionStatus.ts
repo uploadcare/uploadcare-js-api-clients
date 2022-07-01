@@ -1,4 +1,5 @@
 import { makeApiRequest, ApiRequestSettings } from '../../makeApiRequest'
+import { AddonExecutionStatus } from '../../types/AddonExecutionStatus'
 import { AddonName } from '../../types/AddonName'
 import { handleApiRequest } from '../handleApiRequest'
 
@@ -8,7 +9,7 @@ export type AddonExecutionStatusOptions = {
 }
 
 export type AddonExecutionStatusResponse = {
-  requestId: string
+  status: AddonExecutionStatus
 }
 
 export async function addonExecutionStatus(
@@ -18,7 +19,7 @@ export async function addonExecutionStatus(
   const apiRequest = await makeApiRequest(
     {
       method: 'GET',
-      path: `/POST/${options.addonName}/execute/status/`,
+      path: `/addons/${options.addonName}/execute/status/`,
       query: {
         request_id: options.requestId
       }

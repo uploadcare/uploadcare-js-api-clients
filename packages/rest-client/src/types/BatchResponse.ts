@@ -1,6 +1,11 @@
+import { Problems } from './Problems'
+
+export enum BatchResponseStatus {
+  OK = 'ok'
+}
+
 export type BatchResponse<T> = {
-  // There is 'ok' only for now
-  status: string
-  problems: Record<string, string>
+  status: BatchResponseStatus
+  problems: Problems
   result: T[]
 }

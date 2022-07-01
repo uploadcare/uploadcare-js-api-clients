@@ -13,6 +13,9 @@ type HandleResponseOptions = {
 const CAMELIZE_IGNORE_KEYS = ['metadata', 'problems']
 const NO_CONTENT_STATUS = 204
 
+const isJsonContentType = (type: string | null) =>
+  type && ['application/json', getAcceptHeader()].includes(type)
+
 export async function handleApiRequest<ResponseType>(
   options: HandleResponseOptions
 ): Promise<ResponseType> {
@@ -22,7 +25,7 @@ export async function handleApiRequest<ResponseType>(
   if (response.status === NO_CONTENT_STATUS) {
     return undefined as unknown as ResponseType
   }
-  if (response.headers.get('content-type') !== getAcceptHeader()) {
+  if (!isJsonContentType(response.headers.get('content-type'))) {
     throw new RestClientError(undefined, {
       response,
       request
