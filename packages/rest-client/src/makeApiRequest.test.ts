@@ -5,6 +5,7 @@ import {
   uploadcareAuthSchema,
   uploadcareSimpleAuthSchema
 } from '../test/helpers'
+import { getAcceptHeader } from './tools/getAcceptHeader'
 
 describe('apiRequest', () => {
   it('should pass auth using UploadcareSimpleAuthSchema', async () => {
@@ -60,7 +61,7 @@ describe('apiRequest', () => {
 
   // TODO: find faster way to check body working
   it('should accept body', async () => {
-    const { response: deleteResponse } = await makeApiRequest(
+    const { response: deleteWebhookResponse } = await makeApiRequest(
       {
         method: 'DELETE',
         path: '/webhooks/unsubscribe/',
@@ -70,9 +71,9 @@ describe('apiRequest', () => {
       },
       testSettings
     )
-    expect(deleteResponse.status).toEqual(204)
+    expect(deleteWebhookResponse.status).toEqual(204)
 
-    const { response: createResponse } = await makeApiRequest(
+    const { response: createWebhookResponse } = await makeApiRequest(
       {
         method: 'POST',
         path: '/webhooks/',
@@ -85,10 +86,38 @@ describe('apiRequest', () => {
       testSettings
     )
 
-    const result = await createResponse.json()
-    expect(createResponse.status).toBe(201)
+    const result = await createWebhookResponse.json()
+    expect(createWebhookResponse.status).toBe(201)
     expect(typeof result.id).toBe('number')
     expect(result.target_url).toBe('https://ucarecdn.com')
     expect(result.event).toBe('file.uploaded')
+  })
+
+  it('should return request instance', async () => {
+    const { request } = await makeApiRequest(
+      {
+        method: 'POST',
+        path: '/path/',
+        query: {
+          key1: 'value1'
+        },
+        body: {
+          key2: 'value2'
+        }
+      },
+      {
+        ...testSettings
+      }
+    )
+    expect(request.method).toBe('POST')
+    expect(request.headers.get('Accept')).toBe(getAcceptHeader())
+    expect(request.headers.get('Content-Type')).toBe('application/json')
+    expect(request.headers.get('Authorization')).toBeTruthy()
+    expect(request.url.toString()).toBe(
+      'https://api.uploadcare.com/path/?key1=value1'
+    )
+    expect(await request.json()).toEqual({
+      key2: 'value2'
+    })
   })
 })
