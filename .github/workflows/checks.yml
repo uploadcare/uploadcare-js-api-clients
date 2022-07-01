@@ -21,12 +21,12 @@ jobs:
       - name: Install dependencies
         working-directory: ./
         run: npm i
-      - name: Run lint
-        working-directory: ./
-        run: npm run lint
       - name: Run build
         working-directory: ./
         run: npm run build
+      - name: Run lint
+        working-directory: ./
+        run: npm run lint
       - name: Run mock tests
         run: npm run test
       - name: Run integration tests
