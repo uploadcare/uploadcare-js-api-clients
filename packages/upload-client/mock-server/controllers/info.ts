@@ -1,6 +1,6 @@
-import json from '../data/info.js'
-import find from '../utils/find.js'
-import error from '../utils/error.js'
+import json from '../data/info'
+import find from '../utils/find'
+import error from '../utils/error'
 
 /**
  * '/info?pub_key=XXXXXXXXXXXXXXXXXXXX&file_id=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX'

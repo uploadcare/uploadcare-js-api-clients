@@ -10,15 +10,15 @@ import addTrailingSlashes from 'koa-add-trailing-slashes'
 // @ts-ignore
 import koaBody from 'koa-body'
 
-import logger from './middleware/logger.js'
-import delayer from './middleware/delayer.js'
-import auth from './middleware/auth.js'
+import logger from './middleware/logger'
+import delayer from './middleware/delayer'
+import auth from './middleware/auth'
 
 // Config
-import { PORT } from './config.js'
+import { PORT } from './config'
 
 // Routes
-import { ROUTES, RouteType } from './routes.js'
+import { ROUTES, RouteType } from './routes'
 
 const app = new Koa()
 const router = new Router()

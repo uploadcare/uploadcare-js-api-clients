@@ -1,7 +1,10 @@
 import defaultSettings from '../defaultSettings'
 import { prepareChunks } from './prepareChunks.node'
 import multipartStart from '../api/multipartStart'
-import multipartUpload from '../api/multipartUpload'
+import multipartUpload, {
+  MultipartUploadResponse,
+  MultipartUploadOptions
+} from '../api/multipartUpload'
 import multipartComplete from '../api/multipartComplete'
 import runWithConcurrency from '../tools/runWithConcurrency'
 import { UploadcareFile } from '../tools/UploadcareFile'
@@ -9,11 +12,6 @@ import { getFileSize } from '../tools/isMultipart'
 import { isReadyPoll } from '../tools/isReadyPoll'
 import { retrier } from '@uploadcare/api-client-utils'
 
-/* Types */
-import {
-  MultipartUploadResponse,
-  MultipartUploadOptions
-} from '../api/multipartUpload'
 import {
   ComputableProgressInfo,
   Metadata,
