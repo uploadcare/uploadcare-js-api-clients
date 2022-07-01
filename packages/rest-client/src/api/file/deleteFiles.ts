@@ -1,7 +1,7 @@
-import { apiRequest, ApiRequestSettings } from '../../apiRequest'
+import { makeApiRequest, ApiRequestSettings } from '../../makeApiRequest'
 import { BatchResponse } from '../../types/BatchResponse'
 import { FileInfo } from '../../types/FileInfo'
-import { handleResponse } from '../handleResponse'
+import { handleApiRequest } from '../handleApiRequest'
 
 export type DeleteFilesOptions = {
   uuids: string[]
@@ -13,7 +13,7 @@ export async function deleteFiles(
   options: DeleteFilesOptions,
   userSettings: ApiRequestSettings
 ): Promise<DeleteFilesResponse> {
-  const response = await apiRequest(
+  const apiRequest = await makeApiRequest(
     {
       method: 'DELETE',
       path: `/files/storage/`,
@@ -21,5 +21,5 @@ export async function deleteFiles(
     },
     userSettings
   )
-  return handleResponse({ response, okCodes: [200] })
+  return handleApiRequest({ apiRequest, okCodes: [200] })
 }

@@ -22,7 +22,7 @@ export class RestClientError extends Error {
     this.status = options.response?.status
     this.statusText = options.response?.statusText
 
-    const msg = message ?? DEFAULT_MESSAGE
+    const msg = message ?? this.statusText ?? DEFAULT_MESSAGE
     const status =
       this.status || this.statusText
         ? `[${[this.status, msg === this.statusText ? '' : this.statusText]

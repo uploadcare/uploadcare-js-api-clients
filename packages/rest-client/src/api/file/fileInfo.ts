@@ -1,6 +1,6 @@
-import { apiRequest, ApiRequestSettings } from '../../apiRequest'
+import { makeApiRequest, ApiRequestSettings } from '../../makeApiRequest'
 import { FileInfo } from '../../types/FileInfo'
-import { handleResponse } from '../handleResponse'
+import { handleApiRequest } from '../handleApiRequest'
 
 export type FileInfoOptions = {
   uuid: string
@@ -13,7 +13,7 @@ export async function fileInfo(
   options: FileInfoOptions,
   userSettings: ApiRequestSettings
 ): Promise<FileInfoResponse> {
-  const response = await apiRequest(
+  const apiRequest = await makeApiRequest(
     {
       method: 'GET',
       path: `/files/${options.uuid}/`,
@@ -24,5 +24,5 @@ export async function fileInfo(
     userSettings
   )
 
-  return handleResponse({ response, okCodes: [200] })
+  return handleApiRequest({ apiRequest, okCodes: [200] })
 }

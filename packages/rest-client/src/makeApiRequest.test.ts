@@ -1,5 +1,5 @@
 import { describe, expect, it } from '@jest/globals'
-import { apiRequest } from '../src/apiRequest'
+import { makeApiRequest } from './makeApiRequest'
 import {
   testSettings,
   uploadcareAuthSchema,
@@ -8,7 +8,7 @@ import {
 
 describe('apiRequest', () => {
   it('should pass auth using UploadcareSimpleAuthSchema', async () => {
-    const response = await apiRequest(
+    const { response } = await makeApiRequest(
       {
         method: 'GET',
         path: '/files/'
@@ -25,7 +25,7 @@ describe('apiRequest', () => {
   })
 
   it('should pass auth using UploadcareAuthSchema', async () => {
-    const response = await apiRequest(
+    const { response } = await makeApiRequest(
       {
         method: 'GET',
         path: '/files/'
@@ -42,7 +42,7 @@ describe('apiRequest', () => {
   })
 
   it('should accept URL query', async () => {
-    const response = await apiRequest(
+    const { response } = await makeApiRequest(
       {
         method: 'GET',
         path: '/files/',
@@ -60,7 +60,7 @@ describe('apiRequest', () => {
 
   // TODO: find faster way to check body working
   it('should accept body', async () => {
-    const deleteResponse = await apiRequest(
+    const { response: deleteResponse } = await makeApiRequest(
       {
         method: 'DELETE',
         path: '/webhooks/unsubscribe/',
@@ -72,7 +72,7 @@ describe('apiRequest', () => {
     )
     expect(deleteResponse.status).toEqual(204)
 
-    const createResponse = await apiRequest(
+    const { response: createResponse } = await makeApiRequest(
       {
         method: 'POST',
         path: '/webhooks/',

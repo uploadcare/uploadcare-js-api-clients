@@ -1,6 +1,6 @@
-import { apiRequest, ApiRequestSettings } from '../../apiRequest'
+import { makeApiRequest, ApiRequestSettings } from '../../makeApiRequest'
 import { Webhook } from '../../types/Webhook'
-import { handleResponse } from '../handleResponse'
+import { handleApiRequest } from '../handleApiRequest'
 
 export type UpdateWebhookOptions = Pick<Webhook, 'id'> &
   Partial<Pick<Webhook, 'targetUrl' | 'event' | 'isActive' | 'signingSecret'>>
@@ -10,7 +10,7 @@ export async function updateWebhook(
   options: UpdateWebhookOptions,
   userSettings: ApiRequestSettings
 ): Promise<UpdateWebhookResponse> {
-  const response = await apiRequest(
+  const apiRequest = await makeApiRequest(
     {
       method: 'PUT',
       path: `/webhooks/${options.id}/`,
@@ -23,5 +23,5 @@ export async function updateWebhook(
     },
     userSettings
   )
-  return handleResponse({ response, okCodes: [200] })
+  return handleApiRequest({ apiRequest, okCodes: [200] })
 }

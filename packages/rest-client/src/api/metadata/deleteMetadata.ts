@@ -1,5 +1,5 @@
-import { apiRequest, ApiRequestSettings } from '../../apiRequest'
-import { handleResponse } from '../handleResponse'
+import { makeApiRequest, ApiRequestSettings } from '../../makeApiRequest'
+import { handleApiRequest } from '../handleApiRequest'
 
 export type DeleteMetadataOptions = {
   uuid: string
@@ -12,12 +12,12 @@ export async function deleteMetadata(
   options: DeleteMetadataOptions,
   userSettings: ApiRequestSettings
 ): Promise<DeleteMetadataResponse> {
-  const response = await apiRequest(
+  const apiRequest = await makeApiRequest(
     {
       method: 'DELETE',
       path: `/files/${options.uuid}/metadata/${options.key}/`
     },
     userSettings
   )
-  return handleResponse({ response, okCodes: [204] })
+  return handleApiRequest({ apiRequest, okCodes: [204] })
 }

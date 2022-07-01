@@ -1,5 +1,5 @@
-import { apiRequest, ApiRequestSettings } from '../../apiRequest'
-import { handleResponse } from '../handleResponse'
+import { makeApiRequest, ApiRequestSettings } from '../../makeApiRequest'
+import { handleApiRequest } from '../handleApiRequest'
 
 export type UpdateMetadataOptions = {
   uuid: string
@@ -13,7 +13,7 @@ export async function updateMetadata(
   options: UpdateMetadataOptions,
   userSettings: ApiRequestSettings
 ): Promise<UpdateMetadataResponse> {
-  const response = await apiRequest(
+  const apiRequest = await makeApiRequest(
     {
       method: 'PUT',
       path: `/files/${options.uuid}/metadata/${options.key}/`,
@@ -21,5 +21,5 @@ export async function updateMetadata(
     },
     userSettings
   )
-  return handleResponse({ response, okCodes: [200, 201] })
+  return handleApiRequest({ apiRequest, okCodes: [200, 201] })
 }
