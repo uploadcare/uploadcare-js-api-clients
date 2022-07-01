@@ -2,8 +2,8 @@ import { Headers } from '../lib/fetch/fetch.node'
 import { getAcceptHeader } from '../tools/getAcceptHeader'
 import { AuthSchema, AuthSchemaOptions } from './types'
 import { Md5Function } from '../lib/md5/Md5Function'
-import { isNode } from '../tools/isNode'
 import { RestClientError } from '../tools/RestClientError'
+import { isNode } from '@uploadcare/api-client-utils'
 
 type SignStringParams = {
   method: string
