@@ -1,0 +1,6 @@
+{
+  "env": {"es6": true, "node": true, "browser": true},
+  "rules": {
+    "import/no-unused-modules": [1, {"unusedExports": true, "ignoreExports": ["packages/api-client-utils/src/index.ts"]}]
+  }
+}
