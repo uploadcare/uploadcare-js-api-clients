@@ -14,6 +14,18 @@ jobs:
       REST_CLIENT_DEFAULT_PUBLIC_KEY: ${{ secrets.REST_CLIENT_DEFAULT_PUBLIC_KEY }}
       REST_CLIENT_DEFAULT_SECRET_KEY: ${{ secrets.REST_CLIENT_DEFAULT_SECRET_KEY }}
     steps:
+      - uses: dorny/paths-filter@v2
+        id: changes
+        with:
+          filters: |
+            rest-client:
+              - 'packages/rest-client/**'
+              - 'packages/api-client-utils/**'
+            upload-client:
+              - 'packages/upload-client/**'
+              - 'packages/api-client-utils/**'
+            utils:
+              - 'packages/api-client-utils/**'
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
         with:
@@ -27,7 +39,23 @@ jobs:
       - name: Run lint
         working-directory: ./
         run: npm run lint
-      - name: Run mock tests
-        run: npm run test
-      - name: Run integration tests
-        run: npm run test:production
+
+      - name: Run `rest-client` local tests
+        if: steps.changes.outputs.rest-client == 'true'
+        run: npm run test -w packages/rest-client
+
+      - name: Run `upload-client` local tests
+        if: steps.changes.outputs.upload-client == 'true'
+        run: npm run test -w packages/upload-client
+
+      - name: Run `api-client-utils` local tests
+        if: steps.changes.outputs.api-client-utils == 'true'
+        run: npm run test -w packages/api-client-utils
+
+      - name: Run `rest-client` integration tests
+        if: steps.changes.outputs.rest-client == 'true'
+        run: npm run test:production -w packages/rest-client
+
+      - name: Run `upload-client` integration tests
+        if: steps.changes.outputs.upload-client == 'true'
+        run: npm run test:production -w packages/upload-client
