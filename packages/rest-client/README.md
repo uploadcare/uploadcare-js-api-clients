@@ -6,7 +6,7 @@
       alt="">
 </a>
 
-This is an Uploadcare [Upload API][uc-docs-upload-api] wrapper to work with
+This is an Uploadcare [REST API][uc-docs-rest-api] wrapper to work with
 Node.js and browser.
 
 [![Build Status][badge-build]][build-url]
@@ -15,7 +15,6 @@ Node.js and browser.
 [![Uploadcare stack on StackShare][badge-stack-img]][badge-stack-url]
 
 <!-- toc -->
-
 - [Install](#install)
 - [Usage](#usage)
   - [High-Level API](#high-level-api)
@@ -30,419 +29,107 @@ Node.js and browser.
 ## Install
 
 ```bash
-npm install @uploadcare/upload-client
+npm install @uploadcare/rest-client
 ```
 
 ## Usage
 
-### High-Level API
+### Authentication
 
-To access the High-Level API, you need to create an instance of `UploadClient`
-providing the necessary settings. Specifying `YOUR_PUBLIC_KEY` is mandatory: it
-points to the specific Uploadcare project:
+Every REST API request should be authenticated using your secret key.
 
-```javascript
-import { UploadClient } from '@uploadcare/upload-client'
+According to the [spec](https://uploadcare.com/api-refs/rest-api/v0.7.0/#section/Authentication), there are two available authentication methods:
 
-const client = new UploadClient({ publicKey: 'YOUR_PUBLIC_KEY' })
-```
+1. `Uploadcare.Simple`
+2. `Uploadcare`
 
-Once the UploadClient instance is created, you can start using the wrapper to
-upload files from binary data:
+#### `Uploadcare.Simple` authentication method
 
-```javascript
-client
-  .uploadFile(fileData)
-  .then(file => console.log(file.uuid))
-```
+With the [`Uploadcare.Simple`](https://uploadcare.com/api-refs/rest-api/v0.7.0/#section/Authentication/Uploadcare.Simple) authentication method, your secret key gets included in every request. This method isn't secure enough because secret key is exposed to the runtime and will be transmitted over the network.
 
-Another option is uploading files from URL, via the `uploadFile` method:
+**We strongly recommend not to use this method on the client-side.**
 
-```javascript
-const fileURL = 'https://example.com/file.jpg'
-
-client
-  .uploadFile(fileURL)
-  .then(file => console.log(file.uuid))
-```
-
-You can also use the `uploadFile` method to get previously uploaded files via
-their UUIDs:
-
-```javascript
-const fileUUID = 'edfdf045-34c0-4087-bbdd-e3834921f890'
-
-client
-  .uploadFile(fileUUID)
-  .then(file => console.log(file.uuid))
-```
-
-You can track uploading progress:
-
-```javascript
-const fileUUID = 'edfdf045-34c0-4087-bbdd-e3834921f890'
-const onProgress = ({ isComputable, value }) => {
-  console.log(isComputable, value)
-}
-
-client
-  .uploadFile(fileUUID, { onProgress })
-  .then(file => console.log(file.uuid))
-```
-
-Note that `isComputable` flag can be `false` is some cases of uploading from the URL.
-If we can't calculate the file size, progress info will look like `{ isComputable: false }` without a `value`.
-Successful uploading progress will be always `{ isComputable: true, value: 1 }`.
-
-You can cancel file uploading and track this event:
-
-```javascript
-const fileUUID = 'edfdf045-34c0-4087-bbdd-e3834921f890'
-const abortController = new AbortController()
-
-client
-  .uploadFile(fileUUID, { signal: abortController.signal })
-  .then(file => console.log(file.uuid))
-  .catch(error => {
-    if (error.isCancel) {
-      console.log(`File uploading was canceled.`)
-    }
-  })
-
-// Cancel uploading
-abortController.abort()
-```
-
-List of all available `UploadClient` API methods:
+Example:
 
 ```typescript
-interface UploadClient {
-  updateSettings(newSettings: Settings = {}): void
+import { listOfFiles, UploadcareSimpleAuthSchema } from '@uploadcare/rest-client';
 
-  getSettings(): Settings
+const uploadcareSimpleAuthSchema = new UploadcareSimpleAuthSchema({
+  publicKey: 'YOUR_PUBLIC_KEY',
+  secretKey: 'YOUR_SECRET_KEY',
+});
 
-  base(
-    file: NodeFile | BrowserFile,
-    options: BaseOptions
-  ): Promise<BaseResponse>
-
-  info(uuid: Uuid, options: InfoOptions): Promise<FileInfo>
-
-  fromUrl(sourceUrl: Url, options: FromUrlOptions): Promise<FromUrlResponse>
-
-  fromUrlStatus(
-    token: Token,
-    options: FromUrlStatusOptions
-  ): Promise<FromUrlStatusResponse>
-
-  group(uuids: Uuid[], options: GroupOptions): Promise<GroupInfo>
-
-  groupInfo(id: GroupId, options: GroupInfoOptions): Promise<GroupInfo>
-
-  multipartStart(
-    size: number,
-    options: MultipartStartOptions
-  ): Promise<MultipartStartResponse>
-
-  multipartUpload(
-    part: Buffer | Blob,
-    url: MultipartPart,
-    options: MultipartUploadOptions
-  ): Promise<MultipartUploadResponse>
-
-  multipartComplete(
-    uuid: Uuid,
-    options: MultipartCompleteOptions
-  ): Promise<FileInfo>
-
-  uploadFile(
-    data: NodeFile | BrowserFile | Url | Uuid,
-    options: FileFromOptions
-  ): Promise<UploadcareFile>
-
-  uploadFileGroup(
-    data: (NodeFile | BrowserFile)[] | Url[] | Uuid[],
-    options: FileFromOptions & GroupFromOptions
-  ): Promise<UploadcareGroup>
-}
+const result = await listOfFiles({}, { authSchema: uploadcareSimpleAuthSchema })
 ```
 
-You can import only needed methods directly, without `UploadClient` wrapper:
+#### `Uploadcare` authentication method
 
-```javascript
-import {
-  uploadFile,
-  uploadFromUrl,
-  uploadDirect,
-  uploadFromUploaded,
-  uploadMultipart,
-  uploadFileGroup
-} from '@uploadcare/upload-client'
+With the [`Uploadcare`](https://uploadcare.com/api-refs/rest-api/v0.7.0/#section/Authentication/Uploadcare) authentication method, your secret key is used to derive signature but isn't included in every request itself.
+
+**Builtin signature resolver**
+
+You can use the builtin signature resolver, which automatically generates signature in-place using `crypto` module at Node.js or Web Crypto API at browsers.
+
+```typescript
+import { UploadcareAuthSchema } from '@uploadcare/rest-client';
+
+new UploadcareAuthSchema({
+  publicKey: 'YOUR_PUBLIC_KEY',
+  secretKey: 'YOUR_SECRET_KEY',
+})
 ```
+
+**We strongly recommend not to use builtin signature resolver on the client-side.**
+
+**Custom signature resolver**
+
+This option is useful on the client-side to avoid secret key leak. You need to implement some backend endpoint, which will generate signature. In this case, secret key will be stored on your server only and will not be disclosed.
+
+```typescript
+import { UploadcareAuthSchema } from '@uploadcare/rest-client';
+
+new UploadcareAuthSchema({
+  publicKey: 'YOUR_PUBLIC_KEY',
+  signatureResolver: async (signString) => {
+    /**
+     * You need to make HTTPS request to your backend endpoint,
+     * which should sign the `signString` using secret key.
+     */
+    const signature = await yourBackendApi.getSignature(signString)
+    return signature
+  }
+})
+```
+
+### High-Level API
+
+At the current stage, there are no any high-level wrappers here. Only low-level typed wrappers over API methods are available. It means, that there are no pagination and no conversion job status polling, just bare request wrappers.
 
 ### Low-Level API
 
-Also, you can use low-level wrappers to call the API endpoints directly:
-
-```javascript
-import { base } from '@uploadcare/upload-client'
-
-const onProgress = ({ isComputable, value }) => console.log(isComputable, value)
-const abortController = new AbortController()
-
-base(fileData, { onProgress, signal: abortController.signal }) // fileData must be `Blob` or `File` or `Buffer`
-  .then(data => console.log(data.file))
-  .catch(error => {
-    if (error.isCancel) {
-      console.log(`File uploading was canceled.`)
-    }
-  })
-
-// Also you can cancel upload:
-abortController.abort()
-```
-
-List of all available API methods:
+You can use low-level wrappers to call the API endpoints directly:
 
 ```typescript
-base(
-  file: NodeFile | BrowserFile,
-  options: BaseOptions
-): Promise<BaseResponse>
+import { listOfFiles, UploadcareSimpleAuthSchema } from '@uploadcare/rest-client';
+
+const uploadcareSimpleAuthSchema = new UploadcareSimpleAuthSchema({
+  publicKey: 'YOUR_PUBLIC_KEY',
+  secretKey: 'YOUR_SECRET_KEY',
+});
+
+const result = await listOfFiles({}, { authSchema: uploadcareSimpleAuthSchema })
 ```
 
-```typescript
-info(uuid: Uuid, options: InfoOptions): Promise<FileInfo>
-```
-
-```typescript
-fromUrl(sourceUrl: Url, options: FromUrlOptions): Promise<FromUrlResponse>
-```
-
-```typescript
-fromUrlStatus(
-  token: Token,
-  options: FromUrlStatusOptions
-): Promise<FromUrlStatusResponse>
-```
-
-```typescript
-  group(uuids: Uuid[], options: GroupOptions): Promise<GroupInfo>
-```
-
-```typescript
-  groupInfo(id: GroupId, options: GroupInfoOptions): Promise<GroupInfo>
-```
-
-```typescript
-multipartStart(
-  size: number,
-  options: MultipartStartOptions
-): Promise<MultipartStartResponse>
-```
-
-```typescript
-multipartUpload(
-  part: Buffer | Blob,
-  url: MultipartPart,
-  options: MultipartUploadOptions
-): Promise<MultipartUploadResponse>
-```
-
-```typescript
-multipartComplete(
-  uuid: Uuid,
-  options: MultipartCompleteOptions
-): Promise<FileInfo>
-```
-
-```typescript
-multipart(
-  file: File | Buffer | Blob,
-  options: MultipartOptions
-): Promise<FileInfo>
-```
+List of all available API methods is available at the [API Reference](https://uploadcare.github.io/uploadcare-js-api-clients/rest-client/).
 
 ### Settings
 
-#### `publicKey: string`
-
-The main use of a `publicKey` is to identify a target project for your uploads.
-It is required when using Upload API.
-
-#### `baseCDN: string`
-
-Defines your schema and CDN domain. Can be changed to one of the predefined
-values (`https://ucarecdn.com/`) or your custom CNAME.
-
-Defaults to `https://ucarecdn.com/`.
-
-#### `baseURL: string`
-
-API base URL.
-
-Defaults to `https://upload.uploadcare.com`
-
-#### `fileName: string`
-
-You can specify an original filename.
-
-Defaults to `original`.
-
-#### `store: boolean`
-
-Forces files uploaded with `UploadClient` to be stored or not. For instance,
-you might want to turn this off when automatic file storing is enabled in your
-project, but you do not want to store files uploaded with a particular instance.
-
-#### `secureSignature: string`
-
-In case you enable signed uploads for your project, you’d need to provide
-the client with `secureSignature` and `secureExpire` params.
-
-The `secureSignature` is an MD5 hex-encoded hash from a concatenation
-of `API secret key` and `secureExpire`.
-
-#### `secureExpire: string`
-
-Stands for the Unix time to which the signature is valid, e.g., `1454902434`.
-
-#### `userAgent: string | CustomUserAgentFn`
-
-```typescript
-type CustomUserAgentOptions = {
-  publicKey: string
-  libraryName: string
-  libraryVersion: string
-  languageName: string
-  integration?: string
-}
-
-type CustomUserAgentFn = (options: CustomUserAgentOptions) => string
-```
-
-`X-UC-User-Agent` header value.
-
-Defaults to `UploadcareUploadClient/${version}/${publicKey} (JavaScript; ${integration})`
-
-#### `integration: string`
-
-Integration value passed to the `X-UC-User-Agent` header.
-May be overrided with the custom user agent string or function.
-
-#### `checkForUrlDuplicates: boolean`
-
-Runs the duplicate check and provides the immediate-download behavior.
-
-#### `saveUrlForRecurrentUploads: boolean`
-
-Provides the save/update URL behavior. The parameter can be used if you believe
-that the `sourceUrl` will be used more than once. Using the parameter also
-updates an existing reference with a new `sourceUrl` content.
-
-#### `source: string`
-
-Defines the upload source to use, can be set to local, url, etc.
-
-#### `jsonpCallback: string`
-
-Sets the name of your JSONP callback function to create files group from a set
-of files by using their UUIDs.
-
-#### `maxContentLength: number`
-
-`maxContentLength` defines the maximum allowed size (in bytes) of the HTTP
-response content.
-
-Defaults to `52428800` bytes (50 MB).
-
-#### `retryThrottledRequestMaxTimes: number`
-
-Sets the maximum number of attempts to retry throttled requests.
-
-Defaults to `1`.
-
-#### `multipartChunkSize: number`
-
-This option is only applicable when handling local files.
-Sets the multipart chunk size.
-
-Defaults to `5242880` bytes (5 MB).
-
-#### `multipartMinFileSize: number`
-
-This option is only applicable when handling local files.
-Sets the multipart uploading file size threshold: larger files
-will be uploaded in the Multipart mode rather than via Direct Upload.
-The value is limited to the range from `10485760` (10 MB) to `104857600` (100 MB).
-
-Defaults to `26214400` (25 MB).
-
-#### `multipartMinLastPartSize: number`
-
-This option is only applicable when handling local files. Set the minimum size
-of the last multipart part.
-
-Defaults to `1048576` bytes (1 MB).
-
-#### `maxConcurrentRequests: number`
-
-Allows specifying the number of concurrent requests.
-
-Defaults to `4`.
-
-### `contentType: string`
-
-This setting is needed for correct multipart uploads.
-
-Defaults to `application/octet-stream`.
-
-### `metadata: Metadata`
-
-```typescript
-type Metadata = {
-  [key: string]: string
-}
-```
-
-Metadata is additional, arbitrary data, associated with uploaded file.
-
-Non-string values will be converted to `string`. `undefined` values will be ignored.
-
-See [REST API reference][uc-docs-metadata] for details.
-
+List of all available Settings is available at the [API Reference](https://uploadcare.github.io/uploadcare-js-api-clients/rest-client/modules#UserSettings).
 
 ## Testing
 
-```
-npm run test
-```
-
-By default, tests runs with mock server, but you can run tests with
-production environment.
-
-Run test on production servers:
-
 ```bash
 npm run test:production
-```
-
-Run test with mock server (mock server starts automaticaly):
-
-```bash
-npm run test
-```
-
-Run mock server:
-
-```
-npm run mock:start
-```
-
-And then you can run test:
-
-```
-npm run test:jest
 ```
 
 ## Security issues
@@ -461,16 +148,12 @@ request at [hello@uploadcare.com][uc-email-hello].
 
 [uc-email-bounty]: mailto:bugbounty@uploadcare.com
 [uc-email-hello]: mailto:hello@uploadcare.com
-[github-releases]: https://github.com/uploadcare/uploadcare-js-api-clients/releases
-[github-branch-release]: https://github.com/uploadcare/uploadcare-js-api-clients/tree/release
-[github-contributors]: https://github.com/uploadcare/uploadcare-js-api-clients/graphs/contributors
 [badge-stack-img]: https://img.shields.io/badge/tech-stack-0690fa.svg?style=flat
 [badge-stack-url]: https://stackshare.io/uploadcare/stacks/
 [badge-release-img]: https://img.shields.io/github/release/uploadcare/uploadcare-js-api-clients.svg
 [badge-release-url]: https://github.com/uploadcare/uploadcare-js-api-clients/releases
-[npm-img]: http://img.shields.io/npm/v/@uploadcare/upload-client.svg
-[npm-url]: https://www.npmjs.org/package/@uploadcare/upload-client
+[npm-img]: http://img.shields.io/npm/v/@uploadcare/rest-client.svg
+[npm-url]: https://www.npmjs.org/package/@uploadcare/rest-client
 [badge-build]: https://github.com/uploadcare/uploadcare-js-api-clients/actions/workflows/checks.yml/badge.svg
 [build-url]: https://github.com/uploadcare/uploadcare-js-api-clients/actions/workflows/checks.yml
-[uc-docs-upload-api]: https://uploadcare.com/docs/api_reference/upload/?utm_source=github&utm_campaign=uploadcare-js-api-clients
-[uc-docs-metadata]: https://uploadcare.com/api-refs/rest-api/v0.7.0/#tag/File-Metadata
+[uc-docs-rest-api]: https://uploadcare.com/api-refs/rest-api/v0.7.0/?utm_source=github&utm_campaign=uploadcare-js-api-clients
