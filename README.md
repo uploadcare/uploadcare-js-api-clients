@@ -13,15 +13,6 @@ Uploadcare JavaScript/TypeScript API clients for Node.js and browsers. Handles u
 [![GitHub release][badge-release-img]][badge-release-url]&nbsp;
 [![Uploadcare stack on StackShare][badge-stack-img]][badge-stack-url]
 
-<!-- toc -->
-
-- [Packages](#packages)
-- [Testing](#testing)
-- [Security issues](#security-issues)
-- [Feedback](#feedback)
-
-<!-- tocstop -->
-
 ## Packages
 
 * [**@uploadcare/upload-client**](./packages/upload-client/README.md)
