@@ -2,16 +2,16 @@ import { makeApiRequest, ApiRequestSettings } from '../../makeApiRequest'
 import { FileInfo } from '../../types/FileInfo'
 import { handleApiRequest } from '../handleApiRequest'
 
-export type StoreOptions = {
+export type StoreFileOptions = {
   uuid: string
 }
 
-export type StoreResponse = FileInfo
+export type StoreFileResponse = FileInfo
 
 export async function storeFile(
-  options: StoreOptions,
+  options: StoreFileOptions,
   userSettings: ApiRequestSettings
-): Promise<StoreResponse> {
+): Promise<StoreFileResponse> {
   const apiRequest = await makeApiRequest(
     {
       method: 'PUT',

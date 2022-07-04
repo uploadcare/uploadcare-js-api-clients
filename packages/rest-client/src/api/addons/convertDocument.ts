@@ -1,7 +1,7 @@
 import { ApiRequestSettings, makeApiRequest } from '../../makeApiRequest'
 import { Problems } from '../../types/Problems'
 import { handleApiRequest } from '../handleApiRequest'
-import { StoreValue } from './types/StoreValue'
+import { StoreValue } from '../../types/StoreValue'
 
 export type ConvertDocumentOptions = {
   paths: string[]
@@ -17,6 +17,9 @@ export type ConvertDocumentResponse = {
   }[]
 }
 
+/**
+ * @group Addons API
+ */
 export async function convertDocument(
   options: ConvertDocumentOptions,
   userSettings: ApiRequestSettings

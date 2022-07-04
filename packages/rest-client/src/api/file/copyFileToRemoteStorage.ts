@@ -1,5 +1,4 @@
 import { makeApiRequest, ApiRequestSettings } from '../../makeApiRequest'
-import { CopyResponse } from '../../types/CopyResponse'
 import { handleApiRequest } from '../handleApiRequest'
 
 export type CopyFileToRemoteStorageOptions = {
@@ -9,7 +8,10 @@ export type CopyFileToRemoteStorageOptions = {
   pattern?: string
 }
 
-export type CopyFileToRemoteStorageResponse = CopyResponse<'url', string>
+export type CopyFileToRemoteStorageResponse = {
+  type: 'url'
+  result: string
+}
 
 export async function copyFileToRemoteStorage(
   options: CopyFileToRemoteStorageOptions,

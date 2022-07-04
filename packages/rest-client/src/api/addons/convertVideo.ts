@@ -1,7 +1,7 @@
 import { ApiRequestSettings, makeApiRequest } from '../../makeApiRequest'
 import { Problems } from '../../types/Problems'
 import { handleApiRequest } from '../handleApiRequest'
-import { StoreValue } from './types/StoreValue'
+import { StoreValue } from '../../types/StoreValue'
 
 export type ConvertVideoOptions = {
   paths: string[]
@@ -18,6 +18,9 @@ export type ConvertVideoResponse = {
   }[]
 }
 
+/**
+ * @group Addons API
+ */
 export async function convertVideo(
   options: ConvertVideoOptions,
   userSettings: ApiRequestSettings

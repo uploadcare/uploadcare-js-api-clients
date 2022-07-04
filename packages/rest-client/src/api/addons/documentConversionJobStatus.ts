@@ -14,6 +14,9 @@ export type DocumentConversionJobStatusResponse = {
   }
 }
 
+/**
+ * @group Addons API
+ */
 export async function documentConversionJobStatus(
   options: DocumentConversionJobStatusOptions,
   userSettings: ApiRequestSettings
