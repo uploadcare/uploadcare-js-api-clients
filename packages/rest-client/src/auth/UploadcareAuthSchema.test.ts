@@ -16,6 +16,7 @@ describe('UploadcareAuthScheme', () => {
       publicKey: 'public-key',
       signatureResolver
     })
+    expect(authScheme.publicKey).toBe('public-key')
 
     const headers = new Headers({
       'Content-Type': 'application/json'
