@@ -47,7 +47,7 @@ According to the [spec](https://uploadcare.com/api-refs/rest-api/v0.7.0/#section
 
 With the [`Uploadcare.Simple`](https://uploadcare.com/api-refs/rest-api/v0.7.0/#section/Authentication/Uploadcare.Simple) authentication method, your secret key gets included in every request. This method isn't secure enough because secret key is exposed to the runtime and will be transmitted over the network.
 
-**We strongly recommend not to use this method on the client-side.**
+⚠️**We strongly recommend not to use this method on the client-side.**⚠️
 
 Example:
 
@@ -79,7 +79,7 @@ new UploadcareAuthSchema({
 })
 ```
 
-**We strongly recommend not to use builtin signature resolver on the client-side.**
+⚠️**We strongly recommend not to use builtin signature resolver on the client-side.**⚠️
 
 **Custom signature resolver**
 
