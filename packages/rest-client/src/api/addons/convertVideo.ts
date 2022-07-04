@@ -18,9 +18,6 @@ export type ConvertVideoResponse = {
   }[]
 }
 
-/**
- * @group Addons API
- */
 export async function convertVideo(
   options: ConvertVideoOptions,
   userSettings: ApiRequestSettings

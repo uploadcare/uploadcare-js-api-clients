@@ -14,9 +14,6 @@ export type VideoConversionJobStatusResponse = {
   }
 }
 
-/**
- * @group Addons API
- */
 export async function videoConversionJobStatus(
   options: VideoConversionJobStatusOptions,
   userSettings: ApiRequestSettings

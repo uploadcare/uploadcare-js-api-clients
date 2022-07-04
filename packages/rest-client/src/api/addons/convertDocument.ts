@@ -17,9 +17,6 @@ export type ConvertDocumentResponse = {
   }[]
 }
 
-/**
- * @group Addons API
- */
 export async function convertDocument(
   options: ConvertDocumentOptions,
   userSettings: ApiRequestSettings
