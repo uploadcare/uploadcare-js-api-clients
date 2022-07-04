@@ -12,9 +12,6 @@ type SignStringParams = {
   date: string
   uri: string
 }
-
-export type { Md5Function }
-
 export type UploadcareAuthSchemaSignatureResolver = (
   signString: string
 ) => Promise<string>

@@ -23,6 +23,7 @@ export { ServerErrorResponse } from './types/ServerErrorResponse'
 export { Webhook } from './types/Webhook'
 export { WebhookEvent } from './types/WebhookEvent'
 export { StoreValue } from './types/StoreValue'
+export { Md5Function } from './lib/md5/Md5Function'
 export {
   Metadata,
   ContentInfo,
@@ -40,8 +41,7 @@ export {
   UploadcareAuthSchema,
   UploadcareAuthSchemaOptionsWithSecretKey,
   UploadcareAuthSchemaOptionsWithSignatureResolver,
-  UploadcareAuthSchemaSignatureResolver,
-  Md5Function
+  UploadcareAuthSchemaSignatureResolver
 } from './auth/UploadcareAuthSchema'
 export {
   UploadcareSimpleAuthSchema,
