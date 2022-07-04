@@ -7,7 +7,7 @@ import { sliceChunk } from './sliceChunk'
  * being deallocated until uploading complete. Access to deallocated blob
  * causes app crash.
  *
- * See https://github.com/uploadcare/uploadcare-upload-client/issues/306
+ * See https://github.com/uploadcare/uploadcare-js-api-clients/issues/306
  * and https://github.com/facebook/react-native/issues/27543
  */
 export function prepareChunks(

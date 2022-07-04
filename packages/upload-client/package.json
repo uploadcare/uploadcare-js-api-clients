@@ -26,14 +26,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/uploadcare/uploadcare-upload-client.git"
+    "url": "git+https://github.com/uploadcare/uploadcare-js-api-clients.git"
   },
   "author": "Uploadcare",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/uploadcare/uploadcare-upload-client/issues"
+    "url": "https://github.com/uploadcare/uploadcare-js-api-clients/issues"
   },
-  "homepage": "https://github.com/uploadcare/uploadcare-upload-client#readme",
+  "homepage": "https://github.com/uploadcare/uploadcare-js-api-clients#readme",
   "keywords": [
     "uploadcare",
     "file",
