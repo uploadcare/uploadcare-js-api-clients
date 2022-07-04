@@ -4,7 +4,7 @@ import info from '../api/info'
 /* Types */
 import { Uuid } from '..'
 import { ProgressCallback } from '../api/types'
-import { CustomUserAgent } from '../types'
+import { CustomUserAgent } from '@uploadcare/api-client-utils'
 
 type FromUploadedOptions = {
   publicKey: string

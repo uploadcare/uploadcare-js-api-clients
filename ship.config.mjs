@@ -1,4 +1,4 @@
-import { writeFileSync, existsSync } from 'fs'
+import { writeFileSync } from 'fs'
 import { resolve } from 'path'
 
 export default {
@@ -9,7 +9,7 @@ export default {
   },
   publishCommand: ({ defaultCommand }) => `${defaultCommand} --access public`,
   versionUpdated: ({ version, dir }) => {
-    const packages = ['upload-client', 'rest-client']
+    const packages = ['upload-client', 'rest-client', 'api-client-utils']
     const versionPaths = packages.map(p => resolve(dir, 'packages', p, 'src/version.ts'))
     for(const versionPath of versionPaths) {
       writeFileSync(versionPath, `export default '${version}'\n`)

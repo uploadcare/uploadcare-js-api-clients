@@ -1,20 +1,30 @@
-import version from '../version'
-import { CustomUserAgent } from '../types'
+export type CustomUserAgentOptions = {
+  publicKey: string
+  libraryName: string
+  libraryVersion: string
+  languageName: string
+  integration?: string
+}
 
-/**
- * Returns User Agent based on version and settings.
- */
+export type CustomUserAgentFn = (options: CustomUserAgentOptions) => string
+
+export type CustomUserAgent = string | CustomUserAgentFn
+
+export type GetUserAgentOptions = {
+  libraryName: string
+  libraryVersion: string
+  publicKey?: string
+  integration?: string
+  userAgent?: CustomUserAgent | null
+}
+
 export function getUserAgent({
+  libraryName,
+  libraryVersion,
   userAgent,
   publicKey = '',
   integration = ''
-}: {
-  publicKey?: string
-  integration?: string
-  userAgent?: CustomUserAgent
-} = {}): string {
-  const libraryName = 'UploadcareUploadClient'
-  const libraryVersion = version
+}: GetUserAgentOptions): string {
   const languageName = 'JavaScript'
 
   if (typeof userAgent === 'string') {

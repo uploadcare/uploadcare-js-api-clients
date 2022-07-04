@@ -1,34 +1,41 @@
-import version from '../../src/version'
-import { getUserAgent } from '../../src/tools/userAgent'
-import { CustomUserAgent } from '../../src/types'
+import version from './version'
+import { getUserAgent, CustomUserAgent } from './getUserAgent'
+
+const TEST_LIBRARY_NAME = 'UploadcareUploadClient'
+const TEST_VERSION = version
+
+const BASE_PARAMS = {
+  libraryName: TEST_LIBRARY_NAME,
+  libraryVersion: TEST_VERSION
+}
 
 describe('getUserAgent', () => {
-  it('should generate user agent without params', () => {
-    expect(getUserAgent()).toBe(
+  it('should generate user agent', () => {
+    expect(getUserAgent({ ...BASE_PARAMS })).toBe(
       `UploadcareUploadClient/${version} (JavaScript)`
     )
   })
 
   it('should generate user agent with integration', () => {
-    expect(getUserAgent({ integration: 'test' })).toBe(
+    expect(getUserAgent({ ...BASE_PARAMS, integration: 'test' })).toBe(
       `UploadcareUploadClient/${version} (JavaScript; test)`
     )
   })
 
   it('should generate user agent with pub-key', () => {
-    expect(getUserAgent({ publicKey: 'test' })).toBe(
+    expect(getUserAgent({ ...BASE_PARAMS, publicKey: 'test' })).toBe(
       `UploadcareUploadClient/${version}/test (JavaScript)`
     )
   })
 
   it('should generate user agent with integration and pub-key', () => {
-    expect(getUserAgent({ publicKey: 'test', integration: 'test' })).toBe(
-      `UploadcareUploadClient/${version}/test (JavaScript; test)`
-    )
+    expect(
+      getUserAgent({ ...BASE_PARAMS, publicKey: 'test', integration: 'test' })
+    ).toBe(`UploadcareUploadClient/${version}/test (JavaScript; test)`)
   })
 
   it('should be able to pass custom user agent string', () => {
-    expect(getUserAgent({ userAgent: 'test' })).toBe('test')
+    expect(getUserAgent({ ...BASE_PARAMS, userAgent: 'test' })).toBe('test')
   })
 
   it('should be able to pass custom user agent function', () => {
@@ -48,7 +55,12 @@ describe('getUserAgent', () => {
     }
 
     expect(
-      getUserAgent({ publicKey: 'test', userAgent, integration: 'integration' })
+      getUserAgent({
+        ...BASE_PARAMS,
+        publicKey: 'test',
+        userAgent,
+        integration: 'integration'
+      })
     ).toBe('test')
   })
 })

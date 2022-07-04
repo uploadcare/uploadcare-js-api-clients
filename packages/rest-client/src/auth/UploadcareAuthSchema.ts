@@ -91,6 +91,10 @@ export class UploadcareAuthSchema implements AuthSchema {
     ].join('\n')
   }
 
+  get publicKey() {
+    return this._publicKey
+  }
+
   async getHeaders(request: Request): Promise<Headers> {
     const body = await request.text()
     const contentHash = await this.md5(body || '')

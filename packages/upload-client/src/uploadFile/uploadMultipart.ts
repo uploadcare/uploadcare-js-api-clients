@@ -10,7 +10,7 @@ import runWithConcurrency from '../tools/runWithConcurrency'
 import { UploadcareFile } from '../tools/UploadcareFile'
 import { getFileSize } from '../tools/isMultipart'
 import { isReadyPoll } from '../tools/isReadyPoll'
-import { retrier } from '@uploadcare/api-client-utils'
+import { retrier, CustomUserAgent } from '@uploadcare/api-client-utils'
 
 import {
   ComputableProgressInfo,
@@ -18,7 +18,6 @@ import {
   ProgressCallback,
   UnknownProgressInfo
 } from '../api/types'
-import { CustomUserAgent } from '../types'
 import { NodeFile, BrowserFile } from '../request/types'
 
 export type MultipartOptions = {

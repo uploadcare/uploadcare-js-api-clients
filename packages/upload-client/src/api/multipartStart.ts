@@ -1,6 +1,6 @@
 import { FailedResponse } from '../request/types'
 import { Metadata, Uuid } from './types'
-import { CustomUserAgent } from '../types'
+import { CustomUserAgent, camelizeKeys } from '@uploadcare/api-client-utils'
 
 import request from '../request/request.node'
 import buildFormData from '../tools/buildFormData'
@@ -10,8 +10,7 @@ import {
   defaultFilename,
   defaultContentType
 } from '../defaultSettings'
-import { getUserAgent } from '../tools/userAgent'
-import { camelizeKeys } from '@uploadcare/api-client-utils'
+import { getUserAgent } from '../tools/getUserAgent'
 import retryIfThrottled from '../tools/retryIfThrottled'
 import { UploadClientError } from '../tools/errors'
 import { getStoreValue } from '../tools/getStoreValue'

@@ -2,14 +2,13 @@ import request from '../request/request.node'
 import buildFormData from '../tools/buildFormData'
 import getUrl from '../tools/getUrl'
 import { defaultSettings, defaultFilename } from '../defaultSettings'
-import { getUserAgent } from '../tools/userAgent'
-import { camelizeKeys } from '@uploadcare/api-client-utils'
+import { getUserAgent } from '../tools/getUserAgent'
+import { camelizeKeys, CustomUserAgent } from '@uploadcare/api-client-utils'
 import { UploadClientError } from '../tools/errors'
 import retryIfThrottled from '../tools/retryIfThrottled'
 
 /* Types */
 import { Uuid, ProgressCallback, Metadata } from './types'
-import { CustomUserAgent } from '../types'
 import { FailedResponse, NodeFile, BrowserFile } from '../request/types'
 import { getStoreValue } from '../tools/getStoreValue'
 
