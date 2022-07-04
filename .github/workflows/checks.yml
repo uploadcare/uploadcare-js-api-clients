@@ -24,7 +24,7 @@ jobs:
             upload-client:
               - 'packages/upload-client/**'
               - 'packages/api-client-utils/**'
-            utils:
+            api-client-utils:
               - 'packages/api-client-utils/**'
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
@@ -40,11 +40,7 @@ jobs:
         working-directory: ./
         run: npm run lint
 
-      - name: Run `rest-client` local tests
-        if: steps.changes.outputs.rest-client == 'true'
-        run: npm run test -w packages/rest-client
-
-      - name: Run `upload-client` local tests
+      - name: Run `upload-client` mock tests
         if: steps.changes.outputs.upload-client == 'true'
         run: npm run test -w packages/upload-client
 
