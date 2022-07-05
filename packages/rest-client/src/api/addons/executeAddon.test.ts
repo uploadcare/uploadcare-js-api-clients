@@ -8,7 +8,7 @@ describe.skip('executeAddon', () => {
   it('should work', async () => {
     const response = await executeAddon(
       {
-        addonName: 'uc_clamav_virus_scan'
+        addonName: AddonName.UC_CLAMAV_VIRUS_SCAN
       },
       testSettings
     )

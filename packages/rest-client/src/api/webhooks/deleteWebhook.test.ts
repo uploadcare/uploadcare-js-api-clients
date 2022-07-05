@@ -1,6 +1,7 @@
 import { describe, it } from '@jest/globals'
 
 import { randomTargetUrl, testSettings } from '../../../test/helpers'
+import { WebhookEvent } from '../../types/WebhookEvent'
 import { createWebhook } from './createWebhook'
 import { deleteWebhook } from './deleteWebhook'
 
@@ -9,7 +10,7 @@ describe('deleteWebhook', () => {
     const webhook = await createWebhook(
       {
         targetUrl: randomTargetUrl(),
-        event: 'file.uploaded'
+        event: WebhookEvent.FILE_UPLOADED
       },
       testSettings
     )
