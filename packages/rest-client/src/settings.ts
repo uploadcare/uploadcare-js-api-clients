@@ -2,19 +2,28 @@ import { CustomUserAgent } from '@uploadcare/api-client-utils'
 import { AuthSchema } from './auth/types'
 
 export type UserSettings = {
+  authSchema: AuthSchema
   apiBaseURL?: string
-  authSchema?: AuthSchema | null
   retryThrottledRequestMaxTimes?: number
   integration?: string
-  userAgent?: CustomUserAgent | null
+  userAgent?: CustomUserAgent
 }
 
-export type Settings = Required<UserSettings>
+export type DefaultSettings = Required<
+  Pick<UserSettings, 'apiBaseURL' | 'retryThrottledRequestMaxTimes'>
+>
 
-export const defaultSettings: Settings = {
+export const defaultSettings: DefaultSettings = {
   apiBaseURL: 'https://api.uploadcare.com/',
-  retryThrottledRequestMaxTimes: 5,
-  authSchema: null,
-  integration: '',
-  userAgent: null
+  retryThrottledRequestMaxTimes: 5
+}
+
+export const applyDefaultSettings = (
+  userSettings: UserSettings
+): UserSettings & DefaultSettings => {
+  const settings = {
+    ...defaultSettings,
+    ...userSettings
+  }
+  return settings
 }

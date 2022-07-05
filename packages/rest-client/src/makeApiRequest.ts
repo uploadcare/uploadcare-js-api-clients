@@ -1,5 +1,5 @@
 import { fetch, Headers, Request } from './lib/fetch/fetch.node'
-import { defaultSettings, UserSettings } from './settings'
+import { applyDefaultSettings, UserSettings } from './settings'
 import { getUserAgent } from './tools/getUserAgent'
 import { RestClientError } from './tools/RestClientError'
 import { retryIfThrottled } from './tools/retryIfThrottled'
@@ -18,14 +18,7 @@ export type ApiRequestOptions = {
   body?: ApiRequestBody
 }
 
-export type ApiRequestSettings = Pick<
-  UserSettings,
-  | 'apiBaseURL'
-  | 'authSchema'
-  | 'retryThrottledRequestMaxTimes'
-  | 'integration'
-  | 'userAgent'
->
+export type ApiRequestSettings = UserSettings
 
 export type ApiRequest = {
   request: Request
@@ -64,20 +57,15 @@ function getRequestURL(
 
 export async function makeApiRequest(
   options: ApiRequestOptions,
-  {
-    authSchema = defaultSettings.authSchema,
-    apiBaseURL = defaultSettings.apiBaseURL,
-    retryThrottledRequestMaxTimes = defaultSettings.retryThrottledRequestMaxTimes,
-    integration = defaultSettings.integration,
-    userAgent = defaultSettings.userAgent
-  }: ApiRequestSettings
+  userSettings: ApiRequestSettings
 ): Promise<ApiRequest> {
   const { method, path, query, body } = options
+  const settings = applyDefaultSettings(userSettings)
 
-  if (!authSchema) {
+  if (!settings.authSchema) {
     throw new RestClientError('authSchema is required')
   }
-  const url = getRequestURL(path, query, apiBaseURL)
+  const url = getRequestURL(path, query, settings.apiBaseURL)
   const requestBody = body && JSON.stringify(body)
   const unsignedRequest = new Request(url, {
     method: method,
@@ -85,13 +73,13 @@ export async function makeApiRequest(
     headers: new Headers({
       'Content-Type': 'application/json',
       'X-UC-User-Agent': getUserAgent({
-        publicKey: authSchema.publicKey,
-        integration,
-        userAgent
+        publicKey: settings.authSchema.publicKey,
+        integration: settings.integration,
+        userAgent: settings.userAgent
       })
     })
   })
-  const requestHeaders = await authSchema.getHeaders(unsignedRequest)
+  const requestHeaders = await settings.authSchema.getHeaders(unsignedRequest)
   const signedRequest = new Request(unsignedRequest, {
     headers: requestHeaders,
     body: requestBody
@@ -99,7 +87,7 @@ export async function makeApiRequest(
 
   const response = await retryIfThrottled(
     () => fetch(signedRequest),
-    retryThrottledRequestMaxTimes
+    settings.retryThrottledRequestMaxTimes
   )
 
   return {
