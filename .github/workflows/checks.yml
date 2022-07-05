@@ -14,6 +14,10 @@ jobs:
       REST_CLIENT_DEFAULT_PUBLIC_KEY: ${{ secrets.REST_CLIENT_DEFAULT_PUBLIC_KEY }}
       REST_CLIENT_DEFAULT_SECRET_KEY: ${{ secrets.REST_CLIENT_DEFAULT_SECRET_KEY }}
     steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '16'
       - uses: dorny/paths-filter@v2
         id: changes
         with:
@@ -26,10 +30,6 @@ jobs:
               - 'packages/api-client-utils/**'
             api-client-utils:
               - 'packages/api-client-utils/**'
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
-        with:
-          node-version: '16'
       - name: Install dependencies
         working-directory: ./
         run: npm i
