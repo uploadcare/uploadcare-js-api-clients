@@ -227,11 +227,11 @@ fromUrlStatus(
 ```
 
 ```typescript
-  group(uuids: Uuid[], options: GroupOptions): Promise<GroupInfo>
+group(uuids: Uuid[], options: GroupOptions): Promise<GroupInfo>
 ```
 
 ```typescript
-  groupInfo(id: GroupId, options: GroupInfoOptions): Promise<GroupInfo>
+groupInfo(id: GroupId, options: GroupInfoOptions): Promise<GroupInfo>
 ```
 
 ```typescript
