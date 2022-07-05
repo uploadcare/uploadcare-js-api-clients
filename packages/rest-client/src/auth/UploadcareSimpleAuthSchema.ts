@@ -1,7 +1,7 @@
 import { getAcceptHeader } from '../tools/getAcceptHeader'
 import { AuthSchema, AuthSchemaOptions } from './types'
 import { Headers } from '../lib/fetch/fetch.node'
-import { isNode } from '../tools/isNode'
+import { isNode } from '@uploadcare/api-client-utils'
 
 export type UploadcareSimpleAuthSchemaOptions = AuthSchemaOptions & {
   secretKey: string

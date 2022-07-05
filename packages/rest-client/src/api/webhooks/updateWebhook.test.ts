@@ -3,13 +3,14 @@ import { updateWebhook } from './updateWebhook'
 
 import { randomTargetUrl, testSettings } from '../../../test/helpers'
 import { createWebhook } from './createWebhook'
+import { WebhookEvent } from '../../types/WebhookEvent'
 
 describe('updateWebhook', () => {
   it('should work', async () => {
     const webhook = await createWebhook(
       {
         targetUrl: randomTargetUrl(),
-        event: 'file.uploaded'
+        event: WebhookEvent.FILE_UPLOADED
       },
       testSettings
     )
