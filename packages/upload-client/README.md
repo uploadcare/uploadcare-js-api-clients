@@ -9,6 +9,8 @@
 This is an Uploadcare [Upload API][uc-docs-upload-api] wrapper to work with
 Node.js and browser.
 
+[API Reference](https://uploadcare.github.io/uploadcare-js-api-clients/upload-client/)
+
 [![Build Status][badge-build]][build-url]
 [![NPM version][npm-img]][npm-url]
 [![GitHub release][badge-release-img]][badge-release-url]&nbsp;

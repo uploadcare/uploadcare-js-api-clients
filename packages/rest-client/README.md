@@ -9,6 +9,8 @@
 This is an Uploadcare [REST API][uc-docs-rest-api] wrapper to work with
 Node.js and browser.
 
+[API Reference](https://uploadcare.github.io/uploadcare-js-api-clients/rest-client/)
+
 [![Build Status][badge-build]][build-url]
 [![NPM version][npm-img]][npm-url]
 [![GitHub release][badge-release-img]][badge-release-url]&nbsp;
@@ -120,11 +122,11 @@ const uploadcareSimpleAuthSchema = new UploadcareSimpleAuthSchema({
 const result = await listOfFiles({}, { authSchema: uploadcareSimpleAuthSchema })
 ```
 
-List of all available API methods is available at the [API Reference](https://uploadcare.github.io/uploadcare-js-api-clients/rest-client/).
+List of all available API methods is available at the [rest-client API Reference](https://uploadcare.github.io/uploadcare-js-api-clients/rest-client/).
 
 ### Settings
 
-List of all available Settings is available at the [API Reference](https://uploadcare.github.io/uploadcare-js-api-clients/rest-client/modules#UserSettings).
+List of all available Settings is available at the [rest-client API Reference](https://uploadcare.github.io/uploadcare-js-api-clients/rest-client/modules#UserSettings).
 
 ## Testing
 
