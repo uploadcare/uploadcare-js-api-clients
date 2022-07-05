@@ -1,6 +1,6 @@
 {
   "name": "@uploadcare/rest-client",
-  "version": "4.1.0",
+  "version": "4.2.0",
   "description": "Library for work with Uploadcare Rest API",
   "type": "module",
   "main": "dist/index.node.js",
@@ -8,9 +8,7 @@
   "browser": "dist/index.browser.js",
   "types": "dist/types.d.ts",
   "sideEffects": false,
-  "files": [
-    "dist/*"
-  ],
+  "files": ["dist/*"],
   "scripts": {
     "clean": "rimraf dist",
     "test:production": "node --experimental-vm-modules ../../node_modules/jest/bin/jest.js",
@@ -31,11 +29,13 @@
   "homepage": "https://github.com/uploadcare/uploadcare-js-api-clients#readme",
   "keywords": [
     "uploadcare",
-    "file"
+    "file",
+    "rest",
+    "api"
   ],
   "devDependencies": {
     "@types/blueimp-md5": "^2.18.0",
-    "@uploadcare/upload-client": "^4.0.1",
+    "@uploadcare/upload-client": "^4.2.0",
     "ts-node": "^10.8.1"
   },
   "dependencies": {
