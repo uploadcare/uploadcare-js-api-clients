@@ -10,6 +10,7 @@
 
 <p>This is an Uploadcare <a href="https://uploadcare.com/api-refs/rest-api/v0.7.0/?utm_source=github&amp;utm_campaign=uploadcare-js-api-clients">REST API</a> wrapper to work with
 Node.js and browser.</p>
+<p><a href="https://uploadcare.github.io/uploadcare-js-api-clients/rest-client/">API Reference</a></p>
 <p><a href="https://github.com/uploadcare/uploadcare-js-api-clients/actions/workflows/checks.yml"><img src="https://github.com/uploadcare/uploadcare-js-api-clients/actions/workflows/checks.yml/badge.svg" alt="Build Status"></a>
 <a href="https://www.npmjs.org/package/@uploadcare/rest-client"><img src="http://img.shields.io/npm/v/@uploadcare/rest-client.svg" alt="NPM version"></a>
 <a href="https://github.com/uploadcare/uploadcare-js-api-clients/releases"><img src="https://img.shields.io/github/release/uploadcare/uploadcare-js-api-clients.svg" alt="GitHub release"></a>&nbsp;
@@ -84,12 +85,12 @@ Node.js and browser.</p>
 <p>You can use low-level wrappers to call the API endpoints directly:</p>
 <pre><code class="language-typescript"><span class="hl-1">import</span><span class="hl-0"> { </span><span class="hl-2">listOfFiles</span><span class="hl-0">, </span><span class="hl-2">UploadcareSimpleAuthSchema</span><span class="hl-0"> } </span><span class="hl-1">from</span><span class="hl-0"> </span><span class="hl-3">&#39;@uploadcare/rest-client&#39;</span><span class="hl-0">;</span><br/><br/><span class="hl-4">const</span><span class="hl-0"> </span><span class="hl-5">uploadcareSimpleAuthSchema</span><span class="hl-0"> = </span><span class="hl-4">new</span><span class="hl-0"> </span><span class="hl-6">UploadcareSimpleAuthSchema</span><span class="hl-0">({</span><br/><span class="hl-0">  </span><span class="hl-2">publicKey:</span><span class="hl-0"> </span><span class="hl-3">&#39;YOUR_PUBLIC_KEY&#39;</span><span class="hl-0">,</span><br/><span class="hl-0">  </span><span class="hl-2">secretKey:</span><span class="hl-0"> </span><span class="hl-3">&#39;YOUR_SECRET_KEY&#39;</span><span class="hl-0">,</span><br/><span class="hl-0">});</span><br/><br/><span class="hl-4">const</span><span class="hl-0"> </span><span class="hl-5">result</span><span class="hl-0"> = </span><span class="hl-1">await</span><span class="hl-0"> </span><span class="hl-6">listOfFiles</span><span class="hl-0">({}, { </span><span class="hl-2">authSchema:</span><span class="hl-0"> </span><span class="hl-2">uploadcareSimpleAuthSchema</span><span class="hl-0"> })</span>
 </code></pre>
-<p>List of all available API methods is available at the <a href="https://uploadcare.github.io/uploadcare-js-api-clients/rest-client/">API Reference</a>.</p>
+<p>List of all available API methods is available at the <a href="https://uploadcare.github.io/uploadcare-js-api-clients/rest-client/">rest-client API Reference</a>.</p>
 
 <a href="#settings" id="settings" style="color: inherit; text-decoration: none;">
   <h3>Settings</h3>
 </a>
-<p>List of all available Settings is available at the <a href="https://uploadcare.github.io/uploadcare-js-api-clients/rest-client/modules#UserSettings">API Reference</a>.</p>
+<p>List of all available Settings is available at the <a href="https://uploadcare.github.io/uploadcare-js-api-clients/rest-client/modules#UserSettings">rest-client API Reference</a>.</p>
 
 <a href="#testing" id="testing" style="color: inherit; text-decoration: none;">
   <h2>Testing</h2>
