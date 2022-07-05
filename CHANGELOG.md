@@ -1,3 +1,18 @@
+# [4.2.0](https://github.com/uploadcare/uploadcare-js-api-clients/compare/v4.1.0...v4.2.0) (2022-07-05)
+
+
+### Features
+
+* add `integration` and `userAgent` settings, send `X-UC-User-Agent` ([949dce5](https://github.com/uploadcare/uploadcare-js-api-clients/commit/949dce5f30e2f5ae164e7ce5ad5522bcb3c5770c))
+* add all the low-level methods from File API ([f0a72ca](https://github.com/uploadcare/uploadcare-js-api-clients/commit/f0a72cade4029f97e728e5e7de066ee4b02b2e9b))
+* add low-level addons api methods ([d2f3577](https://github.com/uploadcare/uploadcare-js-api-clients/commit/d2f357761b1abd4495773d0852d06fc1ad82364b))
+* add low-level conversion api methods ([f79842d](https://github.com/uploadcare/uploadcare-js-api-clients/commit/f79842d6aeefc1f85448f9ed95d5968b9fd3e59e))
+* add low-level methods for group api ([410d12a](https://github.com/uploadcare/uploadcare-js-api-clients/commit/410d12ad525f6bb99cc3e4aa040f42424ab2e58f))
+* add low-level methods for Metadata API ([f4800fa](https://github.com/uploadcare/uploadcare-js-api-clients/commit/f4800fa7072943a88474dbecedf34953c9afef54))
+* add low-level methods for webhooks api ([68b82ac](https://github.com/uploadcare/uploadcare-js-api-clients/commit/68b82acbc762a361662cefa7c5e6d5781aff59b9))
+
+
+
 # [4.1.0](https://github.com/uploadcare/uploadcare-js-api-clients/compare/v4.0.1...v4.1.0) (2022-06-29)
 
 

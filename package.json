@@ -2,7 +2,7 @@
   "name": "@uploadcare/api-clients",
   "private": true,
   "type": "module",
-  "version": "4.1.0",
+  "version": "4.2.0",
   "license": "MIT",
   "workspaces": [
     "packages/api-client-utils",
