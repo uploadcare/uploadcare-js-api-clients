@@ -1,43 +1,33 @@
-import defaultSettings from './defaultSettings'
-import base from './api/base'
-import info from './api/info'
-import fromUrl from './api/fromUrl'
-import fromUrlStatus from './api/fromUrlStatus'
-import group from './api/group'
-import groupInfo from './api/groupInfo'
-import multipartStart from './api/multipartStart'
-import multipartComplete from './api/multipartComplete'
-import multipartUpload from './api/multipartUpload'
-import { uploadFile } from './uploadFile'
-import { UploadcareFile } from './tools/UploadcareFile'
-import uploadFileGroup from './uploadFileGroup'
-import { UploadcareGroup } from './tools/UploadcareGroup'
-
-/* Types */
-import { Settings } from './types'
-import { NodeFile, BrowserFile } from './request/types'
-import { BaseOptions, BaseResponse } from './api/base'
-import { FileInfo, GroupId, GroupInfo, Token, Url, Uuid } from './api/types'
-import { InfoOptions } from './api/info'
-import { FromUrlOptions, FromUrlResponse } from './api/fromUrl'
-import {
+import base, { BaseOptions, BaseResponse } from './api/base'
+import fromUrl, { FromUrlOptions, FromUrlResponse } from './api/fromUrl'
+import fromUrlStatus, {
   FromUrlStatusOptions,
   FromUrlStatusResponse
 } from './api/fromUrlStatus'
-import { GroupOptions } from './api/group'
-import { GroupInfoOptions } from './api/groupInfo'
-import {
+import group, { GroupOptions } from './api/group'
+import groupInfo, { GroupInfoOptions } from './api/groupInfo'
+import info, { InfoOptions } from './api/info'
+import multipartComplete, {
+  MultipartCompleteOptions
+} from './api/multipartComplete'
+import multipartStart, {
+  MultipartPart,
   MultipartStartOptions,
-  MultipartStartResponse,
-  MultipartPart
+  MultipartStartResponse
 } from './api/multipartStart'
-import { MultipartCompleteOptions } from './api/multipartComplete'
-import {
+import multipartUpload, {
   MultipartUploadOptions,
   MultipartUploadResponse
 } from './api/multipartUpload'
-import { FileFromOptions } from './uploadFile'
-import { GroupFromOptions } from './uploadFileGroup'
+import defaultSettings from './defaultSettings'
+import { UploadcareFile } from './tools/UploadcareFile'
+import { UploadcareGroup } from './tools/UploadcareGroup'
+import { FileFromOptions, uploadFile } from './uploadFile'
+
+import { FileInfo, GroupId, GroupInfo, Token, Url, Uuid } from './api/types'
+import { BrowserFile, NodeFile } from './request/types'
+import { Settings } from './types'
+import uploadFileGroup, { GroupFromOptions } from './uploadFileGroup'
 
 /**
  * Populate options with settings.

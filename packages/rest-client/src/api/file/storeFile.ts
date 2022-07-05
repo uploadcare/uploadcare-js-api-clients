@@ -1,6 +1,6 @@
-import { apiRequest, ApiRequestSettings } from '../../apiRequest'
+import { makeApiRequest, ApiRequestSettings } from '../../makeApiRequest'
 import { FileInfo } from '../../types/FileInfo'
-import { handleResponse } from '../handleResponse'
+import { handleApiRequest } from '../handleApiRequest'
 
 export type StoreOptions = {
   uuid: string
@@ -12,12 +12,12 @@ export async function storeFile(
   options: StoreOptions,
   userSettings: ApiRequestSettings
 ): Promise<StoreResponse> {
-  const response = await apiRequest(
+  const apiRequest = await makeApiRequest(
     {
       method: 'PUT',
       path: `/files/${options.uuid}/storage/`
     },
     userSettings
   )
-  return handleResponse({ response, okCodes: [200] })
+  return handleApiRequest({ apiRequest, okCodes: [200] })
 }

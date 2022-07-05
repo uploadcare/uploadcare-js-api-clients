@@ -58,4 +58,11 @@ describe('RestClientError', () => {
 
     expect(error.message).toBe('[200] OK')
   })
+
+  it('should set statusText to message by default', () => {
+    const response = new Response(null, { status: 200, statusText: 'OK' })
+    const error = new RestClientError(null, { response })
+
+    expect(error.message).toBe('[200] OK')
+  })
 })

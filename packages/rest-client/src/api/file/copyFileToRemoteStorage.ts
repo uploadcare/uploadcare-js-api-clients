@@ -1,6 +1,6 @@
-import { apiRequest, ApiRequestSettings } from '../../apiRequest'
+import { makeApiRequest, ApiRequestSettings } from '../../makeApiRequest'
 import { CopyResponse } from '../../types/CopyResponse'
-import { handleResponse } from '../handleResponse'
+import { handleApiRequest } from '../handleApiRequest'
 
 export type CopyFileToRemoteStorageOptions = {
   source: string
@@ -15,7 +15,7 @@ export async function copyFileToRemoteStorage(
   options: CopyFileToRemoteStorageOptions,
   userSettings: ApiRequestSettings
 ): Promise<CopyFileToRemoteStorageResponse> {
-  const response = await apiRequest(
+  const apiRequest = await makeApiRequest(
     {
       method: 'POST',
       path: `/files/remote_copy/`,
@@ -29,5 +29,5 @@ export async function copyFileToRemoteStorage(
     userSettings
   )
 
-  return handleResponse({ response, okCodes: [200, 201] })
+  return handleApiRequest({ apiRequest, okCodes: [200, 201] })
 }

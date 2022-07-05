@@ -1,5 +1,6 @@
 {
   "extends": [
+    "eslint:recommended",
     "prettier"
   ],
   "overrides": [
@@ -9,15 +10,27 @@
       ],
       "parser": "@typescript-eslint/parser",
       "plugins": [
-        "@typescript-eslint"
+        "@typescript-eslint",
+        "import"
       ],
       "extends": [
-        "eslint:recommended",
-        "plugin:@typescript-eslint/recommended"
+        "plugin:import/recommended",
+        "plugin:@typescript-eslint/recommended",
+        "plugin:import/typescript"
       ],
       "parserOptions": {
         "sourceType": "module",
         "project": "./tsconfig.json"
+      },
+      "rules": {
+        "import/no-named-as-default": "off"
+      },
+      "settings": {
+        "import/internal-regex": "^@uploadcare/",
+        "import/extensions": [".ts", ".js"],
+        "import/parsers": {
+          "@typescript-eslint/parser": [".ts", ".js"]
+        }
       }
     },
     {

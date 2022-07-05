@@ -1,3 +1,6 @@
 {
-  "env": {"es6": true, "node": true, "browser": true}
+  "env": {"es6": true, "node": true, "browser": true},
+  "rules": {
+    "import/no-unused-modules": [1, {"unusedExports": true, "ignoreExports": ["packages/rest-client/src/index.ts"]}]
+  }
 }

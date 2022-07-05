@@ -1,6 +1,6 @@
-import { apiRequest, ApiRequestSettings } from '../../apiRequest'
+import { makeApiRequest, ApiRequestSettings } from '../../makeApiRequest'
 import { Webhook } from '../../types/Webhook'
-import { handleResponse } from '../handleResponse'
+import { handleApiRequest } from '../handleApiRequest'
 
 export type DeleteWebhookOptions = Pick<Webhook, 'targetUrl'>
 
@@ -10,7 +10,7 @@ export async function deleteWebhook(
   options: DeleteWebhookOptions,
   userSettings: ApiRequestSettings
 ): Promise<DeleteWebhookResponse> {
-  const response = await apiRequest(
+  const apiRequest = await makeApiRequest(
     {
       method: 'DELETE',
       path: `/webhooks/unsubscribe/`,
@@ -21,5 +21,5 @@ export async function deleteWebhook(
     userSettings
   )
 
-  return handleResponse({ response, okCodes: [204] })
+  return handleApiRequest({ apiRequest, okCodes: [204] })
 }

@@ -1,6 +1,6 @@
-import { apiRequest, ApiRequestSettings } from '../../apiRequest'
+import { makeApiRequest, ApiRequestSettings } from '../../makeApiRequest'
 import { Webhook } from '../../types/Webhook'
-import { handleResponse } from '../handleResponse'
+import { handleApiRequest } from '../handleApiRequest'
 
 export type CreateWebhookOptions = Pick<Webhook, 'targetUrl' | 'event'> &
   Partial<Pick<Webhook, 'isActive' | 'signingSecret' | 'version'>>
@@ -11,7 +11,7 @@ export async function createWebhook(
   options: CreateWebhookOptions,
   userSettings: ApiRequestSettings
 ): Promise<CreateWebhookResponse> {
-  const response = await apiRequest(
+  const apiRequest = await makeApiRequest(
     {
       method: 'POST',
       path: `/webhooks/`,
@@ -24,5 +24,5 @@ export async function createWebhook(
     },
     userSettings
   )
-  return handleResponse({ response, okCodes: [201] })
+  return handleApiRequest({ apiRequest, okCodes: [201] })
 }

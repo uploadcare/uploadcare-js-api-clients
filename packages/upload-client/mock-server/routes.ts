@@ -1,9 +1,9 @@
-import * as base from './controllers/base.js'
-import * as fromUrl from './controllers/from_url.js'
-import * as info from './controllers/info.js'
-import * as group from './controllers/group.js'
-import * as throttle from './controllers/throttle.js'
-import * as multipart from './controllers/multipart.js'
+import * as base from './controllers/base'
+import * as fromUrl from './controllers/from_url'
+import * as info from './controllers/info'
+import * as group from './controllers/group'
+import * as throttle from './controllers/throttle'
+import * as multipart from './controllers/multipart'
 
 export type RouteType = {
   [path: string]: {

@@ -1,7 +1,7 @@
-import { apiRequest, ApiRequestSettings } from '../../apiRequest'
+import { makeApiRequest, ApiRequestSettings } from '../../makeApiRequest'
 import { GroupInfoShort } from '../../types/GroupInfo'
 import { PaginatedList } from '../../types/PaginatedList'
-import { handleResponse } from '../handleResponse'
+import { handleApiRequest } from '../handleApiRequest'
 
 export type ListOfGroupsOrdering = 'datetime_created' | '-datetime_created'
 
@@ -17,7 +17,7 @@ export async function listOfGroups(
   options: ListOfGroupsOptions,
   userSettings: ApiRequestSettings
 ): Promise<ListOfGroupsResponse> {
-  const response = await apiRequest(
+  const apiRequest = await makeApiRequest(
     {
       method: 'GET',
       path: '/groups/',
@@ -29,5 +29,5 @@ export async function listOfGroups(
     },
     userSettings
   )
-  return handleResponse({ response, okCodes: [200] })
+  return handleApiRequest({ apiRequest, okCodes: [200] })
 }
