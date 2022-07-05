@@ -34,7 +34,7 @@ describe('UploadcareAuthScheme', () => {
       'application/vnd.uploadcare-v0.7+json'
     )
 
-    const date = new Date(authHeaders.get('Date') as string)
+    const date = new Date(authHeaders.get('X-Uploadcare-Date') as string)
     expect(Date.now() - date.getTime()).toBeLessThanOrEqual(
       ALLOWED_DATE_DIFFERENCE
     )
@@ -112,7 +112,7 @@ describe('UploadcareAuthScheme', () => {
       'application/vnd.uploadcare-v0.7+json'
     )
 
-    const date = new Date(authHeaders.get('Date') as string)
+    const date = new Date(authHeaders.get('X-Uploadcare-Date') as string)
     expect(Date.now() - date.getTime()).toBeLessThanOrEqual(
       ALLOWED_DATE_DIFFERENCE
     )

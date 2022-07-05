@@ -124,7 +124,7 @@ export class UploadcareAuthSchema implements AuthSchema {
     const signature = await this._signatureResolver(signString)
     const headers = new Headers({
       ...Object.fromEntries(request.headers.entries()),
-      Date: date,
+      'X-Uploadcare-Date': date,
       Accept: getAcceptHeader(),
       Authorization: `Uploadcare ${this._publicKey}:${signature}`
     })
