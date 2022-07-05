@@ -13,8 +13,8 @@
     "node": ">=16"
   },
   "scripts": {
-    "build:docs:upload-client": "typedoc --out docs/upload-client packages/upload-client/src/index.ts --readme packages/upload-client/README.md",
-    "build:docs:rest-client": "typedoc --out docs/rest-client packages/rest-client/src/index.ts --readme packages/rest-client/README.md",
+    "build:docs:upload-client": "typedoc --out docs/upload-client packages/upload-client/src/index.ts --readme packages/upload-client/README.md --options ./typedoc.json",
+    "build:docs:rest-client": "typedoc --out docs/rest-client packages/rest-client/src/index.ts --readme packages/rest-client/README.md  --options ./typedoc.json",
     "build:docs": "rimraf docs && run-s build:docs:* && touch docs/.nojekyll",
     "build": "npm run build --workspaces",
     "lint": "run-s eslint prettier",

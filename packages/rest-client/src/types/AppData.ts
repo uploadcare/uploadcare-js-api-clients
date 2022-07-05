@@ -1,4 +1,4 @@
-type ClamavVirusScan = {
+export type ClamavVirusScan = {
   data: {
     infected: boolean
     infectedWith: string
@@ -8,11 +8,11 @@ type ClamavVirusScan = {
   datetimeUpdated: string
 }
 
-type AwsRekognitionDetectLabelParent = {
+export type AwsRekognitionDetectLabelParent = {
   Name: string
 }
 
-type AwsRekognitionDetectLabelInstance = {
+export type AwsRekognitionDetectLabelInstance = {
   Confidence: number
   BoundingBox: {
     Height: number
@@ -22,14 +22,14 @@ type AwsRekognitionDetectLabelInstance = {
   }
 }
 
-type AwsRekognitionDetectLabel = {
+export type AwsRekognitionDetectLabel = {
   Confidence: number
   Name: string
   Parents: AwsRekognitionDetectLabelParent[]
   Instances: AwsRekognitionDetectLabelInstance[]
 }
 
-type AwsRekognitionDetectLabels = {
+export type AwsRekognitionDetectLabels = {
   data: {
     LabelModelVersion: string
     Labels: AwsRekognitionDetectLabel[]

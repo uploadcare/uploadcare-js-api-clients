@@ -1,6 +1,6 @@
 import { Headers } from '../lib/fetch/fetch.node'
 import { getAcceptHeader } from '../tools/getAcceptHeader'
-import { AuthSchema, AuthSchemaOptions } from './types'
+import { AuthSchema } from './types'
 import { Md5Function } from '../lib/md5/Md5Function'
 import { RestClientError } from '../tools/RestClientError'
 import { isNode } from '@uploadcare/api-client-utils'
@@ -12,53 +12,65 @@ type SignStringParams = {
   date: string
   uri: string
 }
-
-export type SignatureResolver = (signString: string) => Promise<string>
+export type UploadcareAuthSchemaSignatureResolver = (
+  signString: string
+) => Promise<string>
 
 export type SignatureCreator = (
   secretKey: string,
   signString: string
 ) => Promise<string>
 
-export interface OptionsWithSignatureResolver extends AuthSchemaOptions {
-  signatureResolver: SignatureResolver
+export type UploadcareAuthSchemaOptionsWithSignatureResolver = {
+  publicKey: string
+  signatureResolver: UploadcareAuthSchemaSignatureResolver
   md5Loader?: () => Promise<Md5Function>
 }
 
-export interface OptionsWithSecretKey extends AuthSchemaOptions {
+export type UploadcareAuthSchemaOptionsWithSecretKey = {
+  publicKey: string
   secretKey: string
   md5Loader?: () => Promise<Md5Function>
 }
 
-function withSignatureResolver(
-  options: OptionsWithSignatureResolver | OptionsWithSecretKey
-): options is OptionsWithSignatureResolver {
-  return !!(options as OptionsWithSignatureResolver).signatureResolver
+function hasSignatureResolver(
+  options:
+    | UploadcareAuthSchemaOptionsWithSignatureResolver
+    | UploadcareAuthSchemaOptionsWithSecretKey
+): options is UploadcareAuthSchemaOptionsWithSignatureResolver {
+  return !!(options as UploadcareAuthSchemaOptionsWithSignatureResolver)
+    .signatureResolver
 }
 
-function withSecretKey(
-  options: OptionsWithSignatureResolver | OptionsWithSecretKey
-): options is OptionsWithSecretKey {
-  return !!(options as OptionsWithSecretKey).secretKey
+function hasSecretKey(
+  options:
+    | UploadcareAuthSchemaOptionsWithSignatureResolver
+    | UploadcareAuthSchemaOptionsWithSecretKey
+): options is UploadcareAuthSchemaOptionsWithSecretKey {
+  return !!(options as UploadcareAuthSchemaOptionsWithSecretKey).secretKey
 }
 
 export class UploadcareAuthSchema implements AuthSchema {
   private _publicKey: string
-  private _signatureResolver: SignatureResolver
+  private _signatureResolver: UploadcareAuthSchemaSignatureResolver
   private _md5Loader: Promise<Md5Function>
 
-  constructor(options: OptionsWithSignatureResolver | OptionsWithSecretKey) {
-    if (withSecretKey(options)) {
+  constructor(
+    options:
+      | UploadcareAuthSchemaOptionsWithSignatureResolver
+      | UploadcareAuthSchemaOptionsWithSecretKey
+  ) {
+    if (hasSecretKey(options)) {
       if (!isNode()) {
         console.warn(
-          `Seems that you're using the secret key on the client-side. We're hope you know that you're doing.`
+          `Seems that you're using the secret key on the client-side. We're hope you know what you're doing.`
         )
       }
       this._signatureResolver = (signString: string) =>
         import('./createSignature.node').then((m) =>
           m.createSignature(options.secretKey, signString)
         )
-    } else if (withSignatureResolver(options)) {
+    } else if (hasSignatureResolver(options)) {
       this._signatureResolver = options.signatureResolver
     } else {
       throw new RestClientError(
