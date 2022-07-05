@@ -9,11 +9,9 @@ import { onCancel } from '../tools/onCancel'
 
 import { getPusher, preconnect } from './pusher'
 
-/* Types */
-import { FileInfo } from '../api/types'
 import { CustomUserAgent } from '../types'
 import { UploadcareFile } from '../tools/UploadcareFile'
-import { ProgressCallback } from '../api/types'
+import { FileInfo, ProgressCallback } from '../api/types'
 
 function pollStrategy({
   token,

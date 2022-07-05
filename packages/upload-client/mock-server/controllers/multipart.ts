@@ -1,7 +1,7 @@
-import multipartJson from '../data/multipart.js'
-import infoJson from '../data/info.js'
-import find from '../utils/find.js'
-import error from '../utils/error.js'
+import multipartJson from '../data/multipart'
+import infoJson from '../data/info'
+import find from '../utils/find'
+import error from '../utils/error'
 
 /**
  * '/multipart/start/'

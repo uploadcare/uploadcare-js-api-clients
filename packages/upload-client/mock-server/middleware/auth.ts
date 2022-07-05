@@ -1,6 +1,6 @@
-import { ROUTES, RouteType } from '../routes.js'
-import { ALLOWED_PUBLIC_KEYS } from '../config.js'
-import error from '../utils/error.js'
+import { ROUTES, RouteType } from '../routes'
+import { ALLOWED_PUBLIC_KEYS } from '../config'
+import error from '../utils/error'
 
 /**
  * Routes protected by auth.
