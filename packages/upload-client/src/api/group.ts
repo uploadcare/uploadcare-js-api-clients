@@ -1,13 +1,12 @@
 import { Uuid, GroupInfo } from './types'
 import { FailedResponse } from '../request/types'
-import { CustomUserAgent } from '../types'
+import { CustomUserAgent, camelizeKeys } from '@uploadcare/api-client-utils'
 
 import request from '../request/request.node'
 import getUrl from '../tools/getUrl'
 
 import defaultSettings from '../defaultSettings'
-import { getUserAgent } from '../tools/userAgent'
-import { camelizeKeys } from '@uploadcare/api-client-utils'
+import { getUserAgent } from '../tools/getUserAgent'
 import { UploadClientError } from '../tools/errors'
 import retryIfThrottled from '../tools/retryIfThrottled'
 

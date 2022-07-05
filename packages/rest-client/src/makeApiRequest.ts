@@ -1,5 +1,6 @@
 import { fetch, Headers, Request } from './lib/fetch/fetch.node'
 import { defaultSettings, UserSettings } from './settings'
+import { getUserAgent } from './tools/getUserAgent'
 import { RestClientError } from './tools/RestClientError'
 import { retryIfThrottled } from './tools/retryIfThrottled'
 
@@ -19,7 +20,11 @@ export type ApiRequestOptions = {
 
 export type ApiRequestSettings = Pick<
   UserSettings,
-  'apiBaseURL' | 'authSchema' | 'retryThrottledRequestMaxTimes'
+  | 'apiBaseURL'
+  | 'authSchema'
+  | 'retryThrottledRequestMaxTimes'
+  | 'integration'
+  | 'userAgent'
 >
 
 export type ApiRequest = {
@@ -62,7 +67,9 @@ export async function makeApiRequest(
   {
     authSchema = defaultSettings.authSchema,
     apiBaseURL = defaultSettings.apiBaseURL,
-    retryThrottledRequestMaxTimes = defaultSettings.retryThrottledRequestMaxTimes
+    retryThrottledRequestMaxTimes = defaultSettings.retryThrottledRequestMaxTimes,
+    integration = defaultSettings.integration,
+    userAgent = defaultSettings.userAgent
   }: ApiRequestSettings
 ): Promise<ApiRequest> {
   const { method, path, query, body } = options
@@ -76,7 +83,12 @@ export async function makeApiRequest(
     method: method,
     body: requestBody,
     headers: new Headers({
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
+      'X-UC-User-Agent': getUserAgent({
+        publicKey: authSchema.publicKey,
+        integration,
+        userAgent
+      })
     })
   })
   const requestHeaders = await authSchema.getHeaders(unsignedRequest)

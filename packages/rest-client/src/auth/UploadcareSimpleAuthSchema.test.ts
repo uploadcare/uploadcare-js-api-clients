@@ -7,6 +7,8 @@ describe('UploadcareSimpleAuthScheme', () => {
       publicKey: 'public-key',
       secretKey: 'secret-key'
     })
+    expect(authScheme.publicKey).toBe('public-key')
+
     const authHeaders = await authScheme.getHeaders()
 
     expect(authHeaders.get('Authorization')).toEqual(

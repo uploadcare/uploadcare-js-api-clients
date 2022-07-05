@@ -1,3 +1,5 @@
+import { CustomUserAgent } from '@uploadcare/api-client-utils'
+
 export interface DefaultSettings {
   baseCDN: string
   baseURL: string
@@ -26,15 +28,3 @@ export interface Settings extends Partial<DefaultSettings> {
   source?: string
   jsonpCallback?: string
 }
-
-type CustomUserAgentOptions = {
-  publicKey: string
-  libraryName: string
-  libraryVersion: string
-  languageName: string
-  integration?: string
-}
-
-type CustomUserAgentFn = (options: CustomUserAgentOptions) => string
-
-export type CustomUserAgent = string | CustomUserAgentFn

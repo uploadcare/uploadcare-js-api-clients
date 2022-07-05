@@ -3,9 +3,11 @@ import { makeApiRequest } from './makeApiRequest'
 import {
   testSettings,
   uploadcareAuthSchema,
-  uploadcareSimpleAuthSchema
+  uploadcareSimpleAuthSchema,
+  TEST_PUBLIC_KEY
 } from '../test/helpers'
 import { getAcceptHeader } from './tools/getAcceptHeader'
+import version from './version'
 import { WebhookEvent } from './types/WebhookEvent'
 
 describe('apiRequest', () => {
@@ -114,6 +116,9 @@ describe('apiRequest', () => {
     expect(request.headers.get('Accept')).toBe(getAcceptHeader())
     expect(request.headers.get('Content-Type')).toBe('application/json')
     expect(request.headers.get('Authorization')).toBeTruthy()
+    expect(request.headers.get('X-UC-User-Agent')).toBe(
+      `UploadcareRestClient/${version}/${TEST_PUBLIC_KEY} (JavaScript)`
+    )
     expect(request.url.toString()).toBe(
       'https://api.uploadcare.com/path/?key1=value1'
     )

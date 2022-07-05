@@ -5,7 +5,7 @@ import {
   FileInfo,
   ProgressCallback
 } from '../api/types'
-import { CustomUserAgent } from '../types'
+import { CustomUserAgent } from '@uploadcare/api-client-utils'
 
 type ArgsIsReadyPool = {
   file: string

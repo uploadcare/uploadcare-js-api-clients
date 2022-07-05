@@ -8,12 +8,12 @@ export type UploadcareSimpleAuthSchemaOptions = AuthSchemaOptions & {
 }
 
 export class UploadcareSimpleAuthSchema implements AuthSchema {
-  private publicKey: string
-  private secretKey: string
+  private _publicKey: string
+  private _secretKey: string
 
   constructor({ publicKey, secretKey }: UploadcareSimpleAuthSchemaOptions) {
-    this.publicKey = publicKey
-    this.secretKey = secretKey
+    this._publicKey = publicKey
+    this._secretKey = secretKey
 
     if (secretKey && !isNode()) {
       console.warn(
@@ -22,10 +22,14 @@ export class UploadcareSimpleAuthSchema implements AuthSchema {
     }
   }
 
+  get publicKey() {
+    return this._publicKey
+  }
+
   async getHeaders(): Promise<Headers> {
     return new Headers({
       Accept: getAcceptHeader(),
-      Authorization: `Uploadcare.Simple ${this.publicKey}:${this.secretKey}`
+      Authorization: `Uploadcare.Simple ${this._publicKey}:${this._secretKey}`
     })
   }
 }

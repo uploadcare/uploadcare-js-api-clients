@@ -9,7 +9,7 @@ import { onCancel } from '../tools/onCancel'
 
 import { getPusher, preconnect } from './pusher'
 
-import { CustomUserAgent } from '../types'
+import { CustomUserAgent } from '@uploadcare/api-client-utils'
 import { UploadcareFile } from '../tools/UploadcareFile'
 import { FileInfo, ProgressCallback } from '../api/types'
 

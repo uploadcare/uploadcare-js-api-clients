@@ -5,7 +5,7 @@ import defaultSettings from '../defaultSettings'
 
 /* Types */
 import { Url, Uuid, ProgressCallback, Metadata } from '../api/types'
-import { CustomUserAgent } from '../types'
+import { CustomUserAgent } from '@uploadcare/api-client-utils'
 import { NodeFile, BrowserFile } from '../request/types'
 import { isFileData, isUrl, isUuid } from './types'
 import { UploadcareFile } from '../tools/UploadcareFile'
