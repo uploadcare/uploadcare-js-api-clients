@@ -31,7 +31,10 @@ export {
   MimeInfo,
   VideoInfo,
   GeoLocation,
-  AudioInfo
+  AudioInfo,
+  CustomUserAgent,
+  CustomUserAgentFn,
+  CustomUserAgentOptions
 } from '@uploadcare/api-client-utils'
 
 /**
