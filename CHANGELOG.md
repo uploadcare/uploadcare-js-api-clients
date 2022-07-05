@@ -1,3 +1,16 @@
+# [4.2.0](https://github.com/uploadcare/uploadcare-js-api-clients/compare/v4.1.0...v4.2.0) (2022-07-05)
+
+Repository was transformed into the monorepo. Now there are two packages:
+`@uploadcare/upload-client` and `@uploadcare/rest-client`.
+
+They have locked versioning. So `@uploadcare/rest-client` is started from `4.2.0`,
+and `@uploadcare/upload-client` has no any visible changes (except for the internal ones).
+
+At the current stage, there are no any high-level wrappers at `@uploadcare/rest-client`.
+Only low-level typed wrappers over API methods are available.
+It means, that there are no pagination and no conversion job status polling,
+just bare request wrappers.
+
 # [4.1.0](https://github.com/uploadcare/uploadcare-js-api-clients/compare/v4.0.1...v4.1.0) (2022-06-29)
 
 
