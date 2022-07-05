@@ -1,5 +1,5 @@
-import { apiRequest, ApiRequestSettings } from '../../apiRequest'
-import { handleResponse } from '../handleResponse'
+import { makeApiRequest, ApiRequestSettings } from '../../makeApiRequest'
+import { handleApiRequest } from '../handleApiRequest'
 
 export type DeleteGroupOptions = {
   uuid: string
@@ -11,7 +11,7 @@ export async function deleteGroup(
   options: DeleteGroupOptions,
   userSettings: ApiRequestSettings
 ): Promise<DeleteGroupResponse> {
-  const response = await apiRequest(
+  const apiRequest = await makeApiRequest(
     {
       method: 'DELETE',
       path: `/groups/${options.uuid}/`
@@ -19,5 +19,5 @@ export async function deleteGroup(
     userSettings
   )
 
-  return handleResponse({ response, okCodes: [204] })
+  return handleApiRequest({ apiRequest, okCodes: [204] })
 }

@@ -1,6 +1,6 @@
-import { apiRequest, ApiRequestSettings } from '../../apiRequest'
+import { makeApiRequest, ApiRequestSettings } from '../../makeApiRequest'
 import { GroupInfo } from '../../types/GroupInfo'
-import { handleResponse } from '../handleResponse'
+import { handleApiRequest } from '../handleApiRequest'
 
 export type GroupInfoOptions = {
   uuid: string
@@ -12,7 +12,7 @@ export async function groupInfo(
   options: GroupInfoOptions,
   userSettings: ApiRequestSettings
 ): Promise<GroupInfoResponse> {
-  const response = await apiRequest(
+  const apiRequest = await makeApiRequest(
     {
       method: 'GET',
       path: `/groups/${options.uuid}/`
@@ -20,5 +20,5 @@ export async function groupInfo(
     userSettings
   )
 
-  return handleResponse({ response, okCodes: [200] })
+  return handleApiRequest({ apiRequest, okCodes: [200] })
 }

@@ -1,9 +1,11 @@
+import { WebhookEvent } from './WebhookEvent'
+
 export type Webhook = {
   id: number
   project: number
   created: string
   updated: string
-  event: 'file.uploaded' | string
+  event: WebhookEvent
   targetUrl: string
   isActive: boolean
   signingSecret: string

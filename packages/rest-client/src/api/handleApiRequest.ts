@@ -1,9 +1,11 @@
 import { camelizeKeys } from '@uploadcare/api-client-utils'
+import { ApiRequest } from '../makeApiRequest'
+import { getAcceptHeader } from '../tools/getAcceptHeader'
 import { RestClientError } from '../tools/RestClientError'
 import { ServerErrorResponse } from '../types/ServerErrorResponse'
 
 type HandleResponseOptions = {
-  response: Response
+  apiRequest: ApiRequest
   okCodes: number[]
   camelize?: boolean
 }
@@ -11,17 +13,26 @@ type HandleResponseOptions = {
 const CAMELIZE_IGNORE_KEYS = ['metadata', 'problems']
 const NO_CONTENT_STATUS = 204
 
-export async function handleResponse<ResponseType>(
+export async function handleApiRequest<ResponseType>(
   options: HandleResponseOptions
 ): Promise<ResponseType> {
-  const { response, okCodes, camelize = true } = options
+  const { apiRequest, okCodes, camelize = true } = options
+  const { request, response } = apiRequest
+
   if (response.status === NO_CONTENT_STATUS) {
     return undefined as unknown as ResponseType
+  }
+  if (response.headers.get('content-type') !== getAcceptHeader()) {
+    throw new RestClientError(undefined, {
+      response,
+      request
+    })
   }
   const json: unknown = await response.json()
   if (!okCodes.includes(response.status)) {
     throw new RestClientError((json as ServerErrorResponse).detail, {
-      response
+      response,
+      request
     })
   }
 

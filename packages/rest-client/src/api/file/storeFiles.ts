@@ -1,7 +1,7 @@
-import { apiRequest, ApiRequestSettings } from '../../apiRequest'
+import { makeApiRequest, ApiRequestSettings } from '../../makeApiRequest'
 import { BatchResponse } from '../../types/BatchResponse'
 import { FileInfo } from '../../types/FileInfo'
-import { handleResponse } from '../handleResponse'
+import { handleApiRequest } from '../handleApiRequest'
 
 export type StoreFilesOptions = {
   uuids: string[]
@@ -13,7 +13,7 @@ export async function storeFiles(
   options: StoreFilesOptions,
   userSettings: ApiRequestSettings
 ): Promise<StoreFilesResponse> {
-  const response = await apiRequest(
+  const apiRequest = await makeApiRequest(
     {
       method: 'PUT',
       path: `/files/storage/`,
@@ -21,5 +21,5 @@ export async function storeFiles(
     },
     userSettings
   )
-  return handleResponse({ response, okCodes: [200] })
+  return handleApiRequest({ apiRequest, okCodes: [200] })
 }

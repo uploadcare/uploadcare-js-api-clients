@@ -1,8 +1,8 @@
 import { Metadata } from '@uploadcare/api-client-utils'
-import { apiRequest, ApiRequestSettings } from '../../apiRequest'
+import { makeApiRequest, ApiRequestSettings } from '../../makeApiRequest'
 import { CopyResponse } from '../../types/CopyResponse'
 import { FileInfo } from '../../types/FileInfo'
-import { handleResponse } from '../handleResponse'
+import { handleApiRequest } from '../handleApiRequest'
 
 export type CopyFileToLocalStorageOptions = {
   source: string
@@ -20,7 +20,7 @@ export async function copyFileToLocalStorage(
   options: CopyFileToLocalStorageOptions,
   userSettings: ApiRequestSettings
 ): Promise<CopyFileToLocalStorageResponse> {
-  const response = await apiRequest(
+  const apiRequest = await makeApiRequest(
     {
       method: 'POST',
       path: `/files/local_copy/`,
@@ -33,5 +33,5 @@ export async function copyFileToLocalStorage(
     userSettings
   )
 
-  return handleResponse({ response, okCodes: [201] })
+  return handleApiRequest({ apiRequest, okCodes: [201] })
 }

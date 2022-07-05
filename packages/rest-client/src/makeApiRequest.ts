@@ -22,6 +22,11 @@ export type ApiRequestSettings = Pick<
   'apiBaseURL' | 'authSchema' | 'retryThrottledRequestMaxTimes'
 >
 
+export type ApiRequest = {
+  request: Request
+  response: Response
+}
+
 function normalizeQuery(
   input: Required<ApiRequestOptions>['query']
 ): Record<string, string> {
@@ -52,14 +57,14 @@ function getRequestURL(
   return url.toString()
 }
 
-export async function apiRequest(
+export async function makeApiRequest(
   options: ApiRequestOptions,
   {
     authSchema = defaultSettings.authSchema,
     apiBaseURL = defaultSettings.apiBaseURL,
     retryThrottledRequestMaxTimes = defaultSettings.retryThrottledRequestMaxTimes
   }: ApiRequestSettings
-): Promise<Response> {
+): Promise<ApiRequest> {
   const { method, path, query, body } = options
 
   if (!authSchema) {
@@ -80,8 +85,13 @@ export async function apiRequest(
     body: requestBody
   })
 
-  return retryIfThrottled(
+  const response = await retryIfThrottled(
     () => fetch(signedRequest),
     retryThrottledRequestMaxTimes
   )
+
+  return {
+    request: signedRequest,
+    response
+  }
 }

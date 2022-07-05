@@ -1,4 +1,4 @@
-import { getAcceptHeader } from './getAcceptHeader'
+import { getAcceptHeader } from '../tools/getAcceptHeader'
 import { AuthSchema, AuthSchemaOptions } from './types'
 import { Headers } from '../lib/fetch/fetch.node'
 import { isNode } from '../tools/isNode'

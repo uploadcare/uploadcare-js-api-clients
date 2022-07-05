@@ -1,7 +1,7 @@
-import { apiRequest, ApiRequestSettings } from '../../apiRequest'
+import { makeApiRequest, ApiRequestSettings } from '../../makeApiRequest'
 import { FileInfo } from '../../types/FileInfo'
 import { PaginatedList } from '../../types/PaginatedList'
-import { handleResponse } from '../handleResponse'
+import { handleApiRequest } from '../handleApiRequest'
 
 export type ListOfFilesOrdering = 'datetime_uploaded' | '-datetime_uploaded'
 
@@ -27,7 +27,7 @@ export async function listOfFiles(
   options: ListOfFilesOptions,
   userSettings: ApiRequestSettings
 ): Promise<ListOfFilesResponse> {
-  const response = await apiRequest(
+  const apiRequest = await makeApiRequest(
     {
       method: 'GET',
       path: '/files/',
@@ -41,5 +41,5 @@ export async function listOfFiles(
     },
     userSettings
   )
-  return handleResponse({ response, okCodes: [200] })
+  return handleApiRequest({ apiRequest, okCodes: [200] })
 }

@@ -1,6 +1,6 @@
 import { Metadata } from '@uploadcare/api-client-utils'
-import { apiRequest, ApiRequestSettings } from '../../apiRequest'
-import { handleResponse } from '../handleResponse'
+import { makeApiRequest, ApiRequestSettings } from '../../makeApiRequest'
+import { handleApiRequest } from '../handleApiRequest'
 
 export type GetMetadataValueOptions = {
   uuid: string
@@ -13,12 +13,12 @@ export async function getMetadataValue(
   options: GetMetadataValueOptions,
   userSettings: ApiRequestSettings
 ): Promise<GetMetadataValueResponse> {
-  const response = await apiRequest(
+  const apiRequest = await makeApiRequest(
     {
       method: 'GET',
       path: `/files/${options.uuid}/metadata/${options.key}/`
     },
     userSettings
   )
-  return handleResponse({ response, okCodes: [200] })
+  return handleApiRequest({ apiRequest, okCodes: [200] })
 }
