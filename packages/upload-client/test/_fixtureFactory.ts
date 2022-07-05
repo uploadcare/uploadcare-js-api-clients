@@ -5,14 +5,7 @@ import {
   dataURItoBuffer,
   getSettingsForTesting
 } from './_helpers'
-
-const isNode = (): boolean => {
-  try {
-    return Object.prototype.toString.call(global.process) === '[object process]'
-  } catch (e) {
-    return false
-  }
-}
+import { isNode } from '@uploadcare/api-client-utils'
 
 const settings = getSettingsForTesting({})
 

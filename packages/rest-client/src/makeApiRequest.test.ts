@@ -6,6 +6,7 @@ import {
   uploadcareSimpleAuthSchema
 } from '../test/helpers'
 import { getAcceptHeader } from './tools/getAcceptHeader'
+import { WebhookEvent } from './types/WebhookEvent'
 
 describe('apiRequest', () => {
   it('should pass auth using UploadcareSimpleAuthSchema', async () => {
@@ -79,7 +80,7 @@ describe('apiRequest', () => {
         path: '/webhooks/',
         body: {
           target_url: 'https://ucarecdn.com',
-          event: 'file.uploaded',
+          event: WebhookEvent.FILE_UPLOADED,
           is_active: false
         }
       },
@@ -90,7 +91,7 @@ describe('apiRequest', () => {
     expect(createWebhookResponse.status).toBe(201)
     expect(typeof result.id).toBe('number')
     expect(result.target_url).toBe('https://ucarecdn.com')
-    expect(result.event).toBe('file.uploaded')
+    expect(result.event).toBe(WebhookEvent.FILE_UPLOADED)
   })
 
   it('should return request instance', async () => {

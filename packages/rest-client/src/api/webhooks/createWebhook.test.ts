@@ -9,7 +9,7 @@ describe('createWebhook', () => {
     const response = await createWebhook(
       {
         targetUrl: randomTargetUrl(),
-        event: 'file.uploaded'
+        event: WebhookEvent.FILE_UPLOADED
       },
       testSettings
     )
