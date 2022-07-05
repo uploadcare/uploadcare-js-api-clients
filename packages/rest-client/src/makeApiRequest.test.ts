@@ -7,7 +7,7 @@ import {
   TEST_PUBLIC_KEY
 } from '../test/helpers'
 import { getAcceptHeader } from './tools/getAcceptHeader'
-import { WebhookEvent } from './types/WebhookEvent'
+import { WebhookEvent, WebhookEvent } from './types/WebhookEvent'
 import version from './version'
 
 describe('apiRequest', () => {
