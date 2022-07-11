@@ -1,3 +1,7 @@
+## [4.2.1](https://github.com/uploadcare/uploadcare-js-api-clients/compare/v4.2.0...v4.2.1) (2022-07-11)
+
+
+
 # [4.2.0](https://github.com/uploadcare/uploadcare-js-api-clients/compare/v4.1.0...v4.2.0) (2022-07-05)
 
 Repository was transformed into the monorepo. Now there are two packages:
