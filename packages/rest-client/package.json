@@ -1,6 +1,6 @@
 {
   "name": "@uploadcare/rest-client",
-  "version": "4.2.0",
+  "version": "4.2.1",
   "description": "Library for work with Uploadcare Rest API",
   "type": "module",
   "main": "./dist/index.node.js",
@@ -34,15 +34,10 @@
     "url": "https://github.com/uploadcare/uploadcare-js-api-clients/issues"
   },
   "homepage": "https://github.com/uploadcare/uploadcare-js-api-clients#readme",
-  "keywords": [
-    "uploadcare",
-    "file",
-    "rest",
-    "api"
-  ],
+  "keywords": ["uploadcare", "file", "rest", "api"],
   "devDependencies": {
     "@types/blueimp-md5": "^2.18.0",
-    "@uploadcare/upload-client": "^4.2.0",
+    "@uploadcare/upload-client": "^4.2.1",
     "ts-node": "^10.8.1"
   },
   "dependencies": {
