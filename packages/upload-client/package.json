@@ -9,11 +9,12 @@
   "react-native": "dist/index.react-native.js",
   "types": "dist/types.d.ts",
   "sideEffects": false,
-  "files": ["dist/*"],
+  "files": ["dist/*", "README.md", "LICENSE"],
   "engines": {
     "node": ">=16"
   },
   "scripts": {
+    "prepack": "cp ../../LICENSE ./LICENSE",
     "mock:start": "ts-node-esm --experimentalSpecifierResolution node ./mock-server/server.ts --silent",
     "clean": "rimraf dist",
     "test": "start-server-and-test mock:start :3000 test:jest",
