@@ -1,3 +1,12 @@
+# [4.3.0](https://github.com/uploadcare/uploadcare-js-api-clients/compare/v4.2.1...v4.3.0) (2022-07-20)
+
+
+### Features
+
+* export `getUserAgent` method from `@uploadcare/api-client-utils` package ([78da195](https://github.com/uploadcare/uploadcare-js-api-clients/commit/78da1954313ac0a85c265d83ae900640bad88d38))
+
+
+
 ## [4.2.1](https://github.com/uploadcare/uploadcare-js-api-clients/compare/v4.2.0...v4.2.1) (2022-07-11)
 
 * Add `exports` field to the `package.json` ([#415](https://github.com/uploadcare/uploadcare-js-api-clients/pull/415))
