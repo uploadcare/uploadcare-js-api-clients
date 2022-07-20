@@ -38,6 +38,11 @@ export {
 } from '@uploadcare/api-client-utils'
 
 /**
+ * Helpers from `@uploadcare/api-client-utils`
+ */
+export { getUserAgent } from '@uploadcare/api-client-utils'
+
+/**
  * Auth
  */
 export {
