@@ -6,6 +6,7 @@ import { testSettings } from '../../../test/helpers'
 import { ConversionStatus } from '../../types/ConversionStatus'
 import { convertDocument } from './convertDocument'
 import { copyFileToLocalStorage } from '../file/copyFileToLocalStorage'
+import { delay } from '@uploadcare/api-client-utils'
 
 describe('documentConversionJobStatus', () => {
   it('should work', async () => {
@@ -23,6 +24,7 @@ describe('documentConversionJobStatus', () => {
     )
 
     const { token } = result[0]
+    await delay(1000)
     const response = await documentConversionJobStatus(
       {
         token

@@ -6,6 +6,7 @@ import { testSettings } from '../../../test/helpers'
 import { ConversionStatus } from '../../types/ConversionStatus'
 import { copyFileToLocalStorage } from '../file/copyFileToLocalStorage'
 import { convertVideo } from './convertVideo'
+import { delay } from '@uploadcare/api-client-utils'
 
 describe('videoConversionJobStatus', () => {
   it('should work', async () => {
@@ -23,6 +24,7 @@ describe('videoConversionJobStatus', () => {
     )
 
     const { token } = result[0]
+    await delay(1000)
     const response = await videoConversionJobStatus(
       {
         token
