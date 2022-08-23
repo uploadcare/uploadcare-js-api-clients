@@ -26,7 +26,7 @@ const buildSearchParams = (query: Query): string => {
 
 const getUrl = (base: string, path: string, query?: Query): string => {
   const url = new URL(base)
-  url.pathname = path
+  url.pathname = (url.pathname + path).replace('//', '/')
   if (query) {
     url.search = buildSearchParams(query)
   }
