@@ -1,3 +1,14 @@
+## [4.3.1](https://github.com/uploadcare/uploadcare-js-api-clients/compare/v4.3.0...v4.3.1) (2022-08-24)
+
+
+### Bug Fixes
+
+* force disable XHR sync mode ([#420](https://github.com/uploadcare/uploadcare-js-api-clients/issues/420)) ([4dd9ecf](https://github.com/uploadcare/uploadcare-js-api-clients/commit/4dd9ecfa174c584cd2631ac34393c9917d1c70cf))
+* leave pathname from baseURL ([#421](https://github.com/uploadcare/uploadcare-js-api-clients/issues/421)) ([58166d8](https://github.com/uploadcare/uploadcare-js-api-clients/commit/58166d806e1a16c90ccd048fe52e633851ae8dd2))
+* **package.json:** add default exports field ([#419](https://github.com/uploadcare/uploadcare-js-api-clients/issues/419)) ([e9cf28f](https://github.com/uploadcare/uploadcare-js-api-clients/commit/e9cf28ffd141d9d07450887042167636cb2eb76c))
+
+
+
 # [4.3.0](https://github.com/uploadcare/uploadcare-js-api-clients/compare/v4.2.1...v4.3.0) (2022-07-20)
 
 
