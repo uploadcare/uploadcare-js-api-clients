@@ -15,7 +15,13 @@ const request = ({
     const requestMethod = method?.toUpperCase() || 'GET'
     let aborted = false
 
-    xhr.open(requestMethod, url)
+    /**
+     * Force synchronous flag to be off
+     * Some chrome versions gets `InvalidAccessError` error when we set `responseType`
+     * See https://xhr.spec.whatwg.org/#synchronous-flag
+     * and https://bugs.chromium.org/p/chromium/issues/detail?id=1346628
+     */
+    xhr.open(requestMethod, url, true)
 
     if (headers) {
       Object.entries(headers).forEach((entry) => {
