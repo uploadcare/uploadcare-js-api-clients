@@ -40,7 +40,8 @@ export {
   AudioInfo,
   CustomUserAgent,
   CustomUserAgentFn,
-  CustomUserAgentOptions
+  CustomUserAgentOptions,
+  GetUserAgentOptions
 } from '@uploadcare/api-client-utils'
 
 /**
