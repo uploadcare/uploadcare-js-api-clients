@@ -178,19 +178,19 @@ export {
   convertVideo,
   ConvertVideoResponse,
   ConvertVideoOptions
-} from './api/addons/convertVideo'
+} from './api/conversion/convertVideo'
 export {
   convertDocument,
   ConvertDocumentResponse,
   ConvertDocumentOptions
-} from './api/addons/convertDocument'
+} from './api/conversion/convertDocument'
 export {
   documentConversionJobStatus,
   DocumentConversionJobStatusResponse,
   DocumentConversionJobStatusOptions
-} from './api/addons/documentConversionJobStatus'
+} from './api/conversion/documentConversionJobStatus'
 export {
   videoConversionJobStatus,
   VideoConversionJobStatusResponse,
   VideoConversionJobStatusOptions
-} from './api/addons/videoConversionJobStatus'
+} from './api/conversion/videoConversionJobStatus'
