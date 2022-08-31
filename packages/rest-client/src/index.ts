@@ -6,6 +6,12 @@ export { UserSettings } from './settings'
 export { AddonExecutionStatus } from './types/AddonExecutionStatus'
 export { AddonName } from './types/AddonName'
 export {
+  AddonParams,
+  AddonUcClamavVirusScanParams,
+  AddonAwsRekognitionDetectLabelsParams,
+  AddonRemoveBgParams
+} from './types/AddonParams'
+export {
   AppData,
   ClamavVirusScan,
   AwsRekognitionDetectLabelParent,
@@ -194,3 +200,17 @@ export {
   VideoConversionJobStatusResponse,
   VideoConversionJobStatusOptions
 } from './api/conversion/videoConversionJobStatus'
+
+/**
+ * Low-level Addons API
+ */
+export {
+  executeAddon,
+  ExecuteAddonResponse,
+  ExecuteAddonOptions
+} from './api/addons/executeAddon'
+export {
+  addonExecutionStatus,
+  AddonExecutionStatusResponse,
+  AddonExecutionStatusOptions
+} from './api/addons/addonExecutionStatus'

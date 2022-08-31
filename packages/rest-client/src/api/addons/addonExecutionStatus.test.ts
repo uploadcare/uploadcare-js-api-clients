@@ -3,13 +3,29 @@ import { addonExecutionStatus } from './addonExecutionStatus'
 
 import { testSettings } from '../../../test/helpers'
 import { AddonName } from '../../types/AddonName'
+import { executeAddon } from './executeAddon'
+import { ADDONS_UUID } from '../../../test/fixtures'
+import { copyFileToLocalStorage } from '../file/copyFileToLocalStorage'
 
-describe.skip('addonExecutionStatus', () => {
+describe('addonExecutionStatus', () => {
   it('should work', async () => {
+    const copy = await copyFileToLocalStorage(
+      { source: ADDONS_UUID, store: false },
+      testSettings
+    )
+
+    const { requestId } = await executeAddon(
+      {
+        addonName: AddonName.AWS_REKOGNITION_DETECT_LABELS,
+        target: copy.result.uuid
+      },
+      testSettings
+    )
+
     const response = await addonExecutionStatus(
       {
-        addonName: AddonName.UC_CLAMAV_VIRUS_SCAN,
-        requestId: 'requestId'
+        addonName: AddonName.AWS_REKOGNITION_DETECT_LABELS,
+        requestId: requestId
       },
       testSettings
     )
