@@ -21,7 +21,10 @@ export { default as uploadFileGroup } from './uploadFileGroup'
 
 /* Helpers */
 export { default as UploadClient } from './UploadClient'
-export { getUserAgent } from '@uploadcare/api-client-utils'
+export {
+  getUserAgent,
+  UploadcareNetworkError
+} from '@uploadcare/api-client-utils'
 
 /* Types */
 export { UploadcareFile } from './tools/UploadcareFile'
