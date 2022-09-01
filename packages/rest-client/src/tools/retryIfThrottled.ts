@@ -14,6 +14,7 @@ function getTimeoutFromThrottledRequest(response: Response): number {
   return retryAfterSeconds * 1000
 }
 
+// TODO: implement NetworkError retry
 export function retryIfThrottled(
   fn: () => Promise<Response>,
   retryThrottledMaxTimes: number

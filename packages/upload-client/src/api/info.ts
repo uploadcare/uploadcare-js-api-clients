@@ -4,7 +4,7 @@ import defaultSettings from '../defaultSettings'
 import { getUserAgent } from '../tools/getUserAgent'
 import { camelizeKeys, CustomUserAgent } from '@uploadcare/api-client-utils'
 import { UploadClientError } from '../tools/errors'
-import retryIfThrottled from '../tools/retryIfThrottled'
+import { retryIfFailed } from '../tools/retryIfFailed'
 
 /* Types */
 import { Uuid, FileInfo } from './types'
@@ -24,6 +24,7 @@ export type InfoOptions = {
   userAgent?: CustomUserAgent
 
   retryThrottledRequestMaxTimes?: number
+  retryNetworkErrorMaxTimes?: number
 }
 
 /**
@@ -38,10 +39,11 @@ export default function info(
     source,
     integration,
     userAgent,
-    retryThrottledRequestMaxTimes = defaultSettings.retryThrottledRequestMaxTimes
+    retryThrottledRequestMaxTimes = defaultSettings.retryThrottledRequestMaxTimes,
+    retryNetworkErrorMaxTimes = defaultSettings.retryNetworkErrorMaxTimes
   }: InfoOptions
 ): Promise<FileInfo> {
-  return retryIfThrottled(
+  return retryIfFailed(
     () =>
       request({
         method: 'GET',
@@ -70,6 +72,6 @@ export default function info(
           return response
         }
       }),
-    retryThrottledRequestMaxTimes
+    { retryThrottledRequestMaxTimes, retryNetworkErrorMaxTimes }
   )
 }

@@ -36,6 +36,7 @@ export type MultipartOptions = {
   integration?: string
   userAgent?: CustomUserAgent
   retryThrottledRequestMaxTimes?: number
+  retryNetworkErrorMaxTimes?: number
   maxConcurrentRequests?: number
   multipartMaxAttempts?: number
   baseCDN?: string
@@ -50,7 +51,9 @@ const uploadPartWithRetry = (
     onProgress,
     signal,
     integration,
-    multipartMaxAttempts
+    multipartMaxAttempts,
+    retryThrottledRequestMaxTimes,
+    retryNetworkErrorMaxTimes
   }: MultipartUploadOptions & { multipartMaxAttempts: number }
 ): Promise<MultipartUploadResponse> =>
   retrier(({ attempt, retry }) =>
@@ -58,7 +61,9 @@ const uploadPartWithRetry = (
       publicKey,
       onProgress,
       signal,
-      integration
+      integration,
+      retryThrottledRequestMaxTimes,
+      retryNetworkErrorMaxTimes
     }).catch((error) => {
       if (attempt < multipartMaxAttempts) {
         return retry()
@@ -88,6 +93,7 @@ const uploadMultipart = (
     userAgent,
 
     retryThrottledRequestMaxTimes,
+    retryNetworkErrorMaxTimes,
 
     contentType,
     multipartChunkSize = defaultSettings.multipartChunkSize,
@@ -138,6 +144,7 @@ const uploadMultipart = (
     integration,
     userAgent,
     retryThrottledRequestMaxTimes,
+    retryNetworkErrorMaxTimes,
     metadata
   })
     .then(({ uuid, parts }) => {
@@ -153,7 +160,9 @@ const uploadMultipart = (
                 onProgress: createProgressHandler(parts.length, index),
                 signal,
                 integration,
-                multipartMaxAttempts
+                multipartMaxAttempts,
+                retryThrottledRequestMaxTimes,
+                retryNetworkErrorMaxTimes
               })
           )
         )
@@ -166,7 +175,8 @@ const uploadMultipart = (
         source,
         integration,
         userAgent,
-        retryThrottledRequestMaxTimes
+        retryThrottledRequestMaxTimes,
+        retryNetworkErrorMaxTimes
       })
     )
     .then((fileInfo) => {
@@ -181,6 +191,7 @@ const uploadMultipart = (
           integration,
           userAgent,
           retryThrottledRequestMaxTimes,
+          retryNetworkErrorMaxTimes,
           onProgress,
           signal
         })
