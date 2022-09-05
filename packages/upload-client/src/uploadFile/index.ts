@@ -34,7 +34,6 @@ export type FileFromOptions = {
   contentType?: string
   multipartMinFileSize?: number
   multipartChunkSize?: number
-  multipartMaxAttempts?: number
   maxConcurrentRequests?: number
 
   baseCDN?: string
@@ -74,7 +73,6 @@ function uploadFile(
     contentType,
     multipartMinFileSize,
     multipartChunkSize,
-    multipartMaxAttempts,
     maxConcurrentRequests,
 
     baseCDN = defaultSettings.baseCDN,
@@ -94,7 +92,6 @@ function uploadFile(
         publicKey,
         contentType,
         multipartChunkSize,
-        multipartMaxAttempts,
 
         fileName,
         baseURL,
