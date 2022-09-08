@@ -411,8 +411,7 @@ Metadata is additional, arbitrary data, associated with uploaded file.
 
 Non-string values will be converted to `string`. `undefined` values will be ignored.
 
-See [REST API reference][uc-docs-metadata] for details.
-
+See [docs][uc-file-metadata] and [REST API][uc-docs-metadata] for details.
 
 ## Testing
 
@@ -476,3 +475,4 @@ request at [hello@uploadcare.com][uc-email-hello].
 [build-url]: https://github.com/uploadcare/uploadcare-js-api-clients/actions/workflows/checks.yml
 [uc-docs-upload-api]: https://uploadcare.com/docs/api_reference/upload/?utm_source=github&utm_campaign=uploadcare-js-api-clients
 [uc-docs-metadata]: https://uploadcare.com/api-refs/rest-api/v0.7.0/#tag/File-Metadata
+[uc-file-metadata]: https://uploadcare.com/docs/file-metadata/
