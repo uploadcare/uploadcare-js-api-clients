@@ -1,6 +1,7 @@
 import { cancelError } from '../tools/errors'
 import { onCancel } from '../tools/onCancel'
 import { RequestOptions, RequestResponse } from './types'
+import { UploadcareNetworkError } from '@uploadcare/api-client-utils'
 
 const request = ({
   method,
@@ -87,11 +88,11 @@ const request = ({
       }
     }
 
-    xhr.onerror = (): void => {
+    xhr.onerror = (progressEvent): void => {
       if (aborted) return
 
       // only triggers if the request couldn't be made at all
-      reject(new Error('Network error'))
+      reject(new UploadcareNetworkError(progressEvent))
     }
 
     if (onProgress && typeof onProgress === 'function') {

@@ -364,6 +364,19 @@ Sets the maximum number of attempts to retry throttled requests.
 
 Defaults to `1`.
 
+#### `retryNetworkErrorMaxTimes: number`
+
+Sets the maximum number of attempts to retry requests that failed with a network error.
+
+Defaults to `3`.
+
+The delay between attempts equals attempt number, i.e.
+
+- first attempt - 1 second delay
+- second attempt - 2 seconds delay
+- third attempt - 3 seconds delay
+- ...
+
 #### `multipartChunkSize: number`
 
 This option is only applicable when handling local files.

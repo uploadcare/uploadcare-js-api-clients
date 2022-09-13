@@ -15,6 +15,7 @@ type ArgsIsReadyPool = {
   integration?: string
   userAgent?: CustomUserAgent
   retryThrottledRequestMaxTimes?: number
+  retryNetworkErrorMaxTimes?: number
   onProgress?: ProgressCallback<ComputableProgressInfo>
   signal?: AbortSignal
 }
@@ -27,6 +28,7 @@ function isReadyPoll({
   integration,
   userAgent,
   retryThrottledRequestMaxTimes,
+  retryNetworkErrorMaxTimes,
   signal,
   onProgress
 }: ArgsIsReadyPool): FileInfo | PromiseLike<FileInfo> {
@@ -39,7 +41,8 @@ function isReadyPoll({
         source,
         integration,
         userAgent,
-        retryThrottledRequestMaxTimes
+        retryThrottledRequestMaxTimes,
+        retryNetworkErrorMaxTimes
       }).then((response) => {
         if (response.isReady) {
           return response

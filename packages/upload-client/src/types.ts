@@ -5,11 +5,11 @@ export interface DefaultSettings {
   baseURL: string
   maxContentLength: number
   retryThrottledRequestMaxTimes: number
+  retryNetworkErrorMaxTimes: number
   multipartMinFileSize: number
   multipartChunkSize: number
   multipartMinLastPartSize: number
   maxConcurrentRequests: number
-  multipartMaxAttempts: number
   pollingTimeoutMilliseconds: number
   pusherKey: string
 }

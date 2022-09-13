@@ -8,7 +8,7 @@ import getUrl from '../tools/getUrl'
 import defaultSettings from '../defaultSettings'
 import { getUserAgent } from '../tools/getUserAgent'
 import { UploadClientError } from '../tools/errors'
-import retryIfThrottled from '../tools/retryIfThrottled'
+import { retryIfFailed } from '../tools/retryIfFailed'
 
 export type GroupInfoOptions = {
   publicKey: string
@@ -21,6 +21,7 @@ export type GroupInfoOptions = {
   userAgent?: CustomUserAgent
 
   retryThrottledRequestMaxTimes?: number
+  retryNetworkErrorMaxTimes?: number
 }
 
 type Response = GroupInfo | FailedResponse
@@ -37,10 +38,11 @@ export default function groupInfo(
     source,
     integration,
     userAgent,
-    retryThrottledRequestMaxTimes = defaultSettings.retryThrottledRequestMaxTimes
+    retryThrottledRequestMaxTimes = defaultSettings.retryThrottledRequestMaxTimes,
+    retryNetworkErrorMaxTimes = defaultSettings.retryNetworkErrorMaxTimes
   }: GroupInfoOptions
 ): Promise<GroupInfo> {
-  return retryIfThrottled(
+  return retryIfFailed(
     () =>
       request({
         method: 'GET',
@@ -69,6 +71,6 @@ export default function groupInfo(
           return response
         }
       }),
-    retryThrottledRequestMaxTimes
+    { retryThrottledRequestMaxTimes, retryNetworkErrorMaxTimes }
   )
 }

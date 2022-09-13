@@ -10,7 +10,7 @@ import runWithConcurrency from '../tools/runWithConcurrency'
 import { UploadcareFile } from '../tools/UploadcareFile'
 import { getFileSize } from '../tools/isMultipart'
 import { isReadyPoll } from '../tools/isReadyPoll'
-import { retrier, CustomUserAgent } from '@uploadcare/api-client-utils'
+import { CustomUserAgent } from '@uploadcare/api-client-utils'
 
 import {
   ComputableProgressInfo,
@@ -36,13 +36,13 @@ export type MultipartOptions = {
   integration?: string
   userAgent?: CustomUserAgent
   retryThrottledRequestMaxTimes?: number
+  retryNetworkErrorMaxTimes?: number
   maxConcurrentRequests?: number
-  multipartMaxAttempts?: number
   baseCDN?: string
   metadata?: Metadata
 }
 
-const uploadPartWithRetry = (
+const uploadPart = (
   chunk: Buffer | Blob,
   url: string,
   {
@@ -50,23 +50,18 @@ const uploadPartWithRetry = (
     onProgress,
     signal,
     integration,
-    multipartMaxAttempts
-  }: MultipartUploadOptions & { multipartMaxAttempts: number }
+    retryThrottledRequestMaxTimes,
+    retryNetworkErrorMaxTimes
+  }: MultipartUploadOptions
 ): Promise<MultipartUploadResponse> =>
-  retrier(({ attempt, retry }) =>
-    multipartUpload(chunk, url, {
-      publicKey,
-      onProgress,
-      signal,
-      integration
-    }).catch((error) => {
-      if (attempt < multipartMaxAttempts) {
-        return retry()
-      }
-
-      throw error
-    })
-  )
+  multipartUpload(chunk, url, {
+    publicKey,
+    onProgress,
+    signal,
+    integration,
+    retryThrottledRequestMaxTimes,
+    retryNetworkErrorMaxTimes
+  })
 
 const uploadMultipart = (
   file: NodeFile | BrowserFile,
@@ -88,11 +83,11 @@ const uploadMultipart = (
     userAgent,
 
     retryThrottledRequestMaxTimes,
+    retryNetworkErrorMaxTimes,
 
     contentType,
     multipartChunkSize = defaultSettings.multipartChunkSize,
     maxConcurrentRequests = defaultSettings.maxConcurrentRequests,
-    multipartMaxAttempts = defaultSettings.multipartMaxAttempts,
 
     baseCDN,
     metadata
@@ -138,6 +133,7 @@ const uploadMultipart = (
     integration,
     userAgent,
     retryThrottledRequestMaxTimes,
+    retryNetworkErrorMaxTimes,
     metadata
   })
     .then(({ uuid, parts }) => {
@@ -148,12 +144,13 @@ const uploadMultipart = (
           maxConcurrentRequests,
           parts.map(
             (url, index) => (): Promise<MultipartUploadResponse> =>
-              uploadPartWithRetry(getChunk(index), url, {
+              uploadPart(getChunk(index), url, {
                 publicKey,
                 onProgress: createProgressHandler(parts.length, index),
                 signal,
                 integration,
-                multipartMaxAttempts
+                retryThrottledRequestMaxTimes,
+                retryNetworkErrorMaxTimes
               })
           )
         )
@@ -166,7 +163,8 @@ const uploadMultipart = (
         source,
         integration,
         userAgent,
-        retryThrottledRequestMaxTimes
+        retryThrottledRequestMaxTimes,
+        retryNetworkErrorMaxTimes
       })
     )
     .then((fileInfo) => {
@@ -181,6 +179,7 @@ const uploadMultipart = (
           integration,
           userAgent,
           retryThrottledRequestMaxTimes,
+          retryNetworkErrorMaxTimes,
           onProgress,
           signal
         })
