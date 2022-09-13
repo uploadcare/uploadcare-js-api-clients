@@ -1,3 +1,22 @@
+# [5.0.0](https://github.com/uploadcare/uploadcare-js-api-clients/compare/v4.3.1...v5.0.0) (2022-09-13)
+
+
+* refactor!(upload-client): drop `multipartMaxAttempts` option ([178436e](https://github.com/uploadcare/uploadcare-js-api-clients/commit/178436e83c956a2b428e11bc4d76af27b627bcdb))
+
+
+### Features
+
+* **api-client-utils:** add `UploadcareNetworkError` ([0e917d2](https://github.com/uploadcare/uploadcare-js-api-clients/commit/0e917d29cfeb151c2484d89d5b69ba9eafaf31e9))
+* **upload-client:** add `retryNetworkErrorMaxTimes` option to specify retries count on network errors ([400fedd](https://github.com/uploadcare/uploadcare-js-api-clients/commit/400fedd0e4a143ca4a18cf79d7b1385e797396a8))
+* **upload-client:** throw `UploadcareNetworkError` instead of `Error` ([f7e3f55](https://github.com/uploadcare/uploadcare-js-api-clients/commit/f7e3f55626e047e214bce0d18e4ff34fc7445509))
+
+
+### BREAKING CHANGES
+
+* option `multipartMaxAttempts` is dropped. Use `retryNetworkErrorMaxTimes` instead. It will affect all the requests, not only multipart uploads.
+
+
+
 ## [4.3.1](https://github.com/uploadcare/uploadcare-js-api-clients/compare/v4.3.0...v4.3.1) (2022-08-24)
 
 
