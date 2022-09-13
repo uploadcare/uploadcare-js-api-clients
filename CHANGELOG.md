@@ -3,7 +3,7 @@
 
 ### Features
 
-* add `executeAddon` and `addonExecutionStatus` ([5b7123f](https://github.com/uploadcare/uploadcare-js-api-clients/commit/5b7123f2997a05e0b1a3b8fee81bfeea9457ae6a))
+* **rest-client:** add `executeAddon` and `addonExecutionStatus` ([5b7123f](https://github.com/uploadcare/uploadcare-js-api-clients/commit/5b7123f2997a05e0b1a3b8fee81bfeea9457ae6a))
 
 
 
