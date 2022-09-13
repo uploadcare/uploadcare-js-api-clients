@@ -1,17 +1,17 @@
 import { AddonName } from './AddonName'
 
 export type AddonUcClamavVirusScanParams = {
-  purgeInfected: boolean
+  purge_infected: boolean
 }
 
 export type AddonAwsRekognitionDetectLabelsParams = undefined
 
 export type AddonRemoveBgParams = {
   crop?: boolean
-  cropMargin?: string
+  crop_margin?: string
   scale?: string
-  addShadow?: boolean
-  typeLevel?: 'none' | '1' | '2' | 'latest'
+  add_shadow?: boolean
+  type_level?: 'none' | '1' | '2' | 'latest'
   type?: 'auto' | 'person' | 'product' | 'car'
   semitransparency?: boolean
   channels?: 'rgba' | 'alpha'

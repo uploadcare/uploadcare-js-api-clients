@@ -15,9 +15,11 @@ describe('executeAddon', () => {
 
     const response = await executeAddon(
       {
-        addonName: AddonName.AWS_REKOGNITION_DETECT_LABELS,
+        addonName: AddonName.UC_CLAMAV_VIRUS_SCAN,
         target: copy.result.uuid,
-        params: undefined
+        params: {
+          purge_infected: false
+        }
       },
       testSettings
     )
