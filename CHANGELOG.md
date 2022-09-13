@@ -1,7 +1,7 @@
 # [5.0.0](https://github.com/uploadcare/uploadcare-js-api-clients/compare/v4.3.1...v5.0.0) (2022-09-13)
 
 
-* refactor!(upload-client): drop `multipartMaxAttempts` option ([178436e](https://github.com/uploadcare/uploadcare-js-api-clients/commit/178436e83c956a2b428e11bc4d76af27b627bcdb))
+* refactor(upload-client)!: drop `multipartMaxAttempts` option ([178436e](https://github.com/uploadcare/uploadcare-js-api-clients/commit/178436e83c956a2b428e11bc4d76af27b627bcdb))
 
 
 ### Features
