@@ -20,6 +20,7 @@ function pollStrategy({
   integration,
   userAgent,
   retryThrottledRequestMaxTimes,
+  retryNetworkErrorMaxTimes,
   onProgress,
   signal
 }: {
@@ -29,6 +30,7 @@ function pollStrategy({
   integration?: string
   userAgent?: CustomUserAgent
   retryThrottledRequestMaxTimes?: number
+  retryNetworkErrorMaxTimes?: number
   onProgress?: ProgressCallback
   signal?: AbortSignal
 }): Promise<FileInfo | UploadClientError> {
@@ -40,6 +42,7 @@ function pollStrategy({
         integration,
         userAgent,
         retryThrottledRequestMaxTimes,
+        retryNetworkErrorMaxTimes,
         signal
       }).then((response) => {
         switch (response.status) {

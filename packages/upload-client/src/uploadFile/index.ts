@@ -29,11 +29,11 @@ export type FileFromOptions = {
   userAgent?: CustomUserAgent
 
   retryThrottledRequestMaxTimes?: number
+  retryNetworkErrorMaxTimes?: number
 
   contentType?: string
   multipartMinFileSize?: number
   multipartChunkSize?: number
-  multipartMaxAttempts?: number
   maxConcurrentRequests?: number
 
   baseCDN?: string
@@ -68,11 +68,11 @@ function uploadFile(
     userAgent,
 
     retryThrottledRequestMaxTimes,
+    retryNetworkErrorMaxTimes,
 
     contentType,
     multipartMinFileSize,
     multipartChunkSize,
-    multipartMaxAttempts,
     maxConcurrentRequests,
 
     baseCDN = defaultSettings.baseCDN,
@@ -92,7 +92,6 @@ function uploadFile(
         publicKey,
         contentType,
         multipartChunkSize,
-        multipartMaxAttempts,
 
         fileName,
         baseURL,
@@ -109,6 +108,7 @@ function uploadFile(
 
         maxConcurrentRequests,
         retryThrottledRequestMaxTimes,
+        retryNetworkErrorMaxTimes,
 
         baseCDN,
         metadata
@@ -133,6 +133,7 @@ function uploadFile(
       userAgent,
 
       retryThrottledRequestMaxTimes,
+      retryNetworkErrorMaxTimes,
 
       baseCDN,
       metadata
@@ -160,6 +161,7 @@ function uploadFile(
       userAgent,
 
       retryThrottledRequestMaxTimes,
+      retryNetworkErrorMaxTimes,
       pusherKey,
       metadata
     })
@@ -180,6 +182,7 @@ function uploadFile(
       userAgent,
 
       retryThrottledRequestMaxTimes,
+      retryNetworkErrorMaxTimes,
 
       baseCDN
     })

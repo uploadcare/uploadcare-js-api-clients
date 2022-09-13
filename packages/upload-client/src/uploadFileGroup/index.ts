@@ -38,6 +38,7 @@ export default function uploadFileGroup(
     userAgent,
 
     retryThrottledRequestMaxTimes,
+    retryNetworkErrorMaxTimes,
 
     contentType,
     multipartChunkSize = defaultSettings.multipartChunkSize,
@@ -97,6 +98,7 @@ export default function uploadFileGroup(
           userAgent,
 
           retryThrottledRequestMaxTimes,
+          retryNetworkErrorMaxTimes,
 
           contentType,
           multipartChunkSize,
@@ -117,7 +119,8 @@ export default function uploadFileGroup(
       source,
       integration,
       userAgent,
-      retryThrottledRequestMaxTimes
+      retryThrottledRequestMaxTimes,
+      retryNetworkErrorMaxTimes
     })
       .then((groupInfo) => new UploadcareGroup(groupInfo, files))
       .then((group) => {

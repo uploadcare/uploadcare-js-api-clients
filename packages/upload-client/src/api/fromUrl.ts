@@ -8,7 +8,7 @@ import getUrl from '../tools/getUrl'
 import defaultSettings from '../defaultSettings'
 import { getUserAgent } from '../tools/getUserAgent'
 import { UploadClientError } from '../tools/errors'
-import retryIfThrottled from '../tools/retryIfThrottled'
+import { retryIfFailed } from '../tools/retryIfFailed'
 import { getStoreValue } from '../tools/getStoreValue'
 
 export enum TypeEnum {
@@ -67,6 +67,7 @@ export type FromUrlOptions = {
   userAgent?: CustomUserAgent
 
   retryThrottledRequestMaxTimes?: number
+  retryNetworkErrorMaxTimes?: number
   metadata?: Metadata
 }
 
@@ -89,10 +90,11 @@ export default function fromUrl(
     integration,
     userAgent,
     retryThrottledRequestMaxTimes = defaultSettings.retryThrottledRequestMaxTimes,
+    retryNetworkErrorMaxTimes = defaultSettings.retryNetworkErrorMaxTimes,
     metadata
   }: FromUrlOptions
 ): Promise<FromUrlSuccessResponse> {
-  return retryIfThrottled(
+  return retryIfFailed(
     () =>
       request({
         method: 'POST',
@@ -128,6 +130,6 @@ export default function fromUrl(
           return response
         }
       }),
-    retryThrottledRequestMaxTimes
+    { retryNetworkErrorMaxTimes, retryThrottledRequestMaxTimes }
   )
 }

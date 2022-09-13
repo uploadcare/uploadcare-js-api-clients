@@ -24,6 +24,7 @@ type DirectOptions = {
   userAgent?: CustomUserAgent
 
   retryThrottledRequestMaxTimes?: number
+  retryNetworkErrorMaxTimes?: number
 
   baseCDN?: string
   metadata?: Metadata
@@ -49,6 +50,7 @@ const uploadDirect = (
     userAgent,
 
     retryThrottledRequestMaxTimes,
+    retryNetworkErrorMaxTimes,
 
     baseCDN,
     metadata
@@ -68,6 +70,7 @@ const uploadDirect = (
     integration,
     userAgent,
     retryThrottledRequestMaxTimes,
+    retryNetworkErrorMaxTimes,
     metadata
   })
     .then(({ file }) => {
@@ -79,6 +82,7 @@ const uploadDirect = (
         integration,
         userAgent,
         retryThrottledRequestMaxTimes,
+        retryNetworkErrorMaxTimes,
         onProgress,
         signal
       })

@@ -11,7 +11,7 @@ import {
   defaultContentType
 } from '../defaultSettings'
 import { getUserAgent } from '../tools/getUserAgent'
-import retryIfThrottled from '../tools/retryIfThrottled'
+import { retryIfFailed } from '../tools/retryIfFailed'
 import { UploadClientError } from '../tools/errors'
 import { getStoreValue } from '../tools/getStoreValue'
 
@@ -29,6 +29,7 @@ export type MultipartStartOptions = {
   integration?: string
   userAgent?: CustomUserAgent
   retryThrottledRequestMaxTimes?: number
+  retryNetworkErrorMaxTimes?: number
   metadata?: Metadata
 }
 
@@ -60,10 +61,12 @@ export default function multipartStart(
     integration,
     userAgent,
     retryThrottledRequestMaxTimes = defaultSettings.retryThrottledRequestMaxTimes,
+    retryNetworkErrorMaxTimes = defaultSettings.retryNetworkErrorMaxTimes,
+
     metadata
   }: MultipartStartOptions
 ): Promise<MultipartStartResponse> {
-  return retryIfThrottled(
+  return retryIfFailed(
     () =>
       request({
         method: 'POST',
@@ -104,6 +107,6 @@ export default function multipartStart(
           return response
         }
       }),
-    retryThrottledRequestMaxTimes
+    { retryThrottledRequestMaxTimes, retryNetworkErrorMaxTimes }
   )
 }

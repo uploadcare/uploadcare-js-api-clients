@@ -20,6 +20,7 @@ type FromUploadedOptions = {
   userAgent?: CustomUserAgent
 
   retryThrottledRequestMaxTimes?: number
+  retryNetworkErrorMaxTimes?: number
 
   baseCDN?: string
 }
@@ -36,6 +37,7 @@ const uploadFromUploaded = (
     integration,
     userAgent,
     retryThrottledRequestMaxTimes,
+    retryNetworkErrorMaxTimes,
     baseCDN
   }: FromUploadedOptions
 ): Promise<UploadcareFile> => {
@@ -46,7 +48,8 @@ const uploadFromUploaded = (
     source,
     integration,
     userAgent,
-    retryThrottledRequestMaxTimes
+    retryThrottledRequestMaxTimes,
+    retryNetworkErrorMaxTimes
   })
     .then((fileInfo) => new UploadcareFile(fileInfo, { baseCDN, fileName }))
     .then((result) => {

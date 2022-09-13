@@ -7,7 +7,7 @@ import buildFormData from '../tools/buildFormData'
 import getUrl from '../tools/getUrl'
 import defaultSettings from '../defaultSettings'
 import { getUserAgent } from '../tools/getUserAgent'
-import retryIfThrottled from '../tools/retryIfThrottled'
+import { retryIfFailed } from '../tools/retryIfFailed'
 import { UploadClientError } from '../tools/errors'
 
 export type MultipartCompleteOptions = {
@@ -18,6 +18,7 @@ export type MultipartCompleteOptions = {
   integration?: string
   userAgent?: CustomUserAgent
   retryThrottledRequestMaxTimes?: number
+  retryNetworkErrorMaxTimes?: number
 }
 
 type Response = FailedResponse | FileInfo
@@ -34,10 +35,11 @@ export default function multipartComplete(
     signal,
     integration,
     userAgent,
-    retryThrottledRequestMaxTimes = defaultSettings.retryThrottledRequestMaxTimes
+    retryThrottledRequestMaxTimes = defaultSettings.retryThrottledRequestMaxTimes,
+    retryNetworkErrorMaxTimes = defaultSettings.retryNetworkErrorMaxTimes
   }: MultipartCompleteOptions
 ): Promise<FileInfo> {
-  return retryIfThrottled(
+  return retryIfFailed(
     () =>
       request({
         method: 'POST',
@@ -66,6 +68,6 @@ export default function multipartComplete(
           return response
         }
       }),
-    retryThrottledRequestMaxTimes
+    { retryThrottledRequestMaxTimes, retryNetworkErrorMaxTimes }
   )
 }

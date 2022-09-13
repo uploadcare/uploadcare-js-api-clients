@@ -10,6 +10,7 @@ export {
 export { isNode } from './isNode'
 export { isObject } from './isObject'
 export { retrier } from './retrier'
+export { UploadcareNetworkError } from './UploadcareNetworkError'
 export { ContentInfo } from './types/ContentInfo'
 export { ImageInfo } from './types/ImageInfo'
 export { Metadata } from './types/Metadata'
