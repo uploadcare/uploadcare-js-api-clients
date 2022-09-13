@@ -23,6 +23,7 @@ export { default as uploadFileGroup } from './uploadFileGroup'
 export { default as UploadClient } from './UploadClient'
 export {
   getUserAgent,
+  GetUserAgentOptions,
   UploadcareNetworkError
 } from '@uploadcare/api-client-utils'
 

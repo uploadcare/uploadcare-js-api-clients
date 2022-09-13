@@ -6,6 +6,12 @@ export { UserSettings } from './settings'
 export { AddonExecutionStatus } from './types/AddonExecutionStatus'
 export { AddonName } from './types/AddonName'
 export {
+  AddonParams,
+  AddonUcClamavVirusScanParams,
+  AddonAwsRekognitionDetectLabelsParams,
+  AddonRemoveBgParams
+} from './types/AddonParams'
+export {
   AppData,
   ClamavVirusScan,
   AwsRekognitionDetectLabelParent,
@@ -34,7 +40,8 @@ export {
   AudioInfo,
   CustomUserAgent,
   CustomUserAgentFn,
-  CustomUserAgentOptions
+  CustomUserAgentOptions,
+  GetUserAgentOptions
 } from '@uploadcare/api-client-utils'
 
 /**
@@ -178,19 +185,33 @@ export {
   convertVideo,
   ConvertVideoResponse,
   ConvertVideoOptions
-} from './api/addons/convertVideo'
+} from './api/conversion/convertVideo'
 export {
   convertDocument,
   ConvertDocumentResponse,
   ConvertDocumentOptions
-} from './api/addons/convertDocument'
+} from './api/conversion/convertDocument'
 export {
   documentConversionJobStatus,
   DocumentConversionJobStatusResponse,
   DocumentConversionJobStatusOptions
-} from './api/addons/documentConversionJobStatus'
+} from './api/conversion/documentConversionJobStatus'
 export {
   videoConversionJobStatus,
   VideoConversionJobStatusResponse,
   VideoConversionJobStatusOptions
-} from './api/addons/videoConversionJobStatus'
+} from './api/conversion/videoConversionJobStatus'
+
+/**
+ * Low-level Addons API
+ */
+export {
+  executeAddon,
+  ExecuteAddonResponse,
+  ExecuteAddonOptions
+} from './api/addons/executeAddon'
+export {
+  addonExecutionStatus,
+  AddonExecutionStatusResponse,
+  AddonExecutionStatusOptions
+} from './api/addons/addonExecutionStatus'
