@@ -1,3 +1,12 @@
+# [5.1.0](https://github.com/uploadcare/uploadcare-js-api-clients/compare/v5.0.0...v5.1.0) (2022-09-13)
+
+
+### Features
+
+* add `executeAddon` and `addonExecutionStatus` ([5b7123f](https://github.com/uploadcare/uploadcare-js-api-clients/commit/5b7123f2997a05e0b1a3b8fee81bfeea9457ae6a))
+
+
+
 # [5.0.0](https://github.com/uploadcare/uploadcare-js-api-clients/compare/v4.3.1...v5.0.0) (2022-09-13)
 
 
