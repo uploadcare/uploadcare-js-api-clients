@@ -3,7 +3,7 @@
   "version": "5.1.0",
   "description": "Library for work with Uploadcare Upload API",
   "type": "module",
-  "module": "./dist/index.node.js",
+  "module": "./dist/index.browser.js",
   "browser": "./dist/index.browser.js",
   "react-native": "./dist/index.react-native.js",
   "types": "./dist/types.d.ts",
