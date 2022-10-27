@@ -5,13 +5,25 @@
   "type": "module",
   "module": "./dist/index.node.js",
   "browser": "./dist/index.browser.js",
-  "react-native": "./dist/index.react-native.js",
   "types": "./dist/types.d.ts",
   "exports": {
     ".": {
+      "types": "./dist/types.d.ts",
       "node": "./dist/index.node.js",
       "browser": "./dist/index.browser.js",
       "default": "./dist/index.browser.js"
+    },
+    "./browser": {
+      "types": "./dist/types.d.ts",
+      "default": "./dist/index.browser.js"
+    },
+    "./node": {
+      "types": "./dist/types.d.ts",
+      "default": "./dist/index.node.js"
+    },
+    "./react-native": {
+      "types": "./dist/types.d.ts",
+      "default": "./dist/index.react-native.js"
     }
   },
   "sideEffects": false,
