@@ -3,7 +3,11 @@
 
 ### Bug Fixes
 
-* **upload-client:** revert back missing react-native export field ([699426d](https://github.com/uploadcare/uploadcare-js-api-clients/commit/699426da2e034e228c4e2b4f10b95c23e453a31d))
+* specify `types` path for the root export, fixes [#436](https://github.com/uploadcare/uploadcare-js-api-clients/issues/436) (see PR [#437](https://github.com/uploadcare/uploadcare-js-api-clients/pull/437))
+
+### Features
+
+* add separate exports for `node`, `browser` and `react-native` bundles. It's useful when you wanna explicitly import needed bundle instead of relying the bundler's choice (see PR [#437](https://github.com/uploadcare/uploadcare-js-api-clients/pull/437))
 
 
 
