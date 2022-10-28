@@ -5,20 +5,20 @@
   "type": "module",
   "module": "./dist/index.node.js",
   "browser": "./dist/index.browser.js",
-  "types": "./dist/types.d.ts",
+  "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "types": "./dist/types.d.ts",
+      "types": "./dist/index.d.ts",
       "node": "./dist/index.node.js",
       "browser": "./dist/index.browser.js",
       "default": "./dist/index.browser.js"
     },
     "./browser": {
-      "types": "./dist/types.d.ts",
+      "types": "./dist/index.d.ts",
       "default": "./dist/index.browser.js"
     },
     "./node": {
-      "types": "./dist/types.d.ts",
+      "types": "./dist/index.d.ts",
       "default": "./dist/index.node.js"
     }
   },
@@ -30,7 +30,7 @@
     "test:production": "node --experimental-vm-modules ../../node_modules/jest/bin/jest.js",
     "prebuild": "npm run clean",
     "build": "npm run build:types && npm run build:compile",
-    "build:types": "dts-bundle-generator --project tsconfig.dts.json -o dist/types.d.ts src/index.ts",
+    "build:types": "dts-bundle-generator --project tsconfig.dts.json -o dist/index.d.ts src/index.ts",
     "build:compile": "rollup -c"
   },
   "repository": {

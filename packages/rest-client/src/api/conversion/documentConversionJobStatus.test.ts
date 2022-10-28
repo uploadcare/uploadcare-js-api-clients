@@ -31,13 +31,11 @@ describe('documentConversionJobStatus', () => {
       },
       testSettings
     )
-    expect(
-      [
-        ConversionStatus.PENDING,
-        ConversionStatus.PROCESSING,
-        ConversionStatus.FINISHED
-      ].includes(response.status)
-    ).toBeTruthy()
+    expect([
+      ConversionStatus.PENDING,
+      ConversionStatus.PROCESSING,
+      ConversionStatus.FINISHED
+    ]).toContain(response.status)
   })
 
   it('should throw error if non-200 status received', async () => {

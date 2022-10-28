@@ -5,7 +5,7 @@
   "main": "dist/index.browser.js",
   "module": "dist/index.browser.js",
   "browser": "dist/index.browser.js",
-  "types": "dist/types.d.ts",
+  "types": "dist/index.d.ts",
   "sideEffects": false,
   "files": [
     "dist/*"
@@ -15,7 +15,7 @@
     "test": "node --experimental-vm-modules ../../node_modules/jest/bin/jest.js",
     "prebuild": "npm run clean",
     "build": "npm run build:types && npm run build:compile",
-    "build:types": "dts-bundle-generator --project tsconfig.dts.json -o dist/types.d.ts src/index.ts",
+    "build:types": "dts-bundle-generator --project tsconfig.dts.json -o dist/index.d.ts src/index.ts",
     "build:compile": "rollup -c"
   },
   "repository": {
