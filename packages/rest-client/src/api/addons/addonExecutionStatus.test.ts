@@ -6,6 +6,7 @@ import { AddonName } from '../../types/AddonName'
 import { executeAddon } from './executeAddon'
 import { ADDONS_UUID } from '../../../test/fixtures'
 import { copyFileToLocalStorage } from '../file/copyFileToLocalStorage'
+import { delay } from '@uploadcare/api-client-utils'
 
 describe('addonExecutionStatus', () => {
   it('should work', async () => {
@@ -13,7 +14,7 @@ describe('addonExecutionStatus', () => {
       { source: ADDONS_UUID, store: false },
       testSettings
     )
-
+    await delay(1000)
     const { requestId } = await executeAddon(
       {
         addonName: AddonName.AWS_REKOGNITION_DETECT_LABELS,
@@ -21,7 +22,7 @@ describe('addonExecutionStatus', () => {
       },
       testSettings
     )
-
+    await delay(1000)
     const response = await addonExecutionStatus(
       {
         addonName: AddonName.AWS_REKOGNITION_DETECT_LABELS,
