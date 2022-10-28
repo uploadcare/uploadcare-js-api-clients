@@ -1,3 +1,12 @@
+## [5.1.1](https://github.com/uploadcare/uploadcare-js-api-clients/compare/v5.1.0...v5.1.1) (2022-10-28)
+
+
+### Bug Fixes
+
+* **upload-client:** revert back missing react-native export field ([699426d](https://github.com/uploadcare/uploadcare-js-api-clients/commit/699426da2e034e228c4e2b4f10b95c23e453a31d))
+
+
+
 # [5.1.0](https://github.com/uploadcare/uploadcare-js-api-clients/compare/v5.0.0...v5.1.0) (2022-09-13)
 
 
