@@ -1,3 +1,16 @@
+## [5.1.1](https://github.com/uploadcare/uploadcare-js-api-clients/compare/v5.1.0...v5.1.1) (2022-10-28)
+
+
+### Bug Fixes
+
+* specify `types` path for the root export, fixes [#436](https://github.com/uploadcare/uploadcare-js-api-clients/issues/436) (see PR [#437](https://github.com/uploadcare/uploadcare-js-api-clients/pull/437))
+
+### Features
+
+* add separate exports for `node`, `browser` and `react-native` bundles. It's useful when you wanna explicitly import needed bundle instead of relying the bundler's choice (see PR [#437](https://github.com/uploadcare/uploadcare-js-api-clients/pull/437))
+
+
+
 # [5.1.0](https://github.com/uploadcare/uploadcare-js-api-clients/compare/v5.0.0...v5.1.0) (2022-09-13)
 
 
