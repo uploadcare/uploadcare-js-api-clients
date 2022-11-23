@@ -19,7 +19,8 @@ describe('UploadcareAuthScheme', () => {
     expect(authScheme.publicKey).toBe('public-key')
 
     const headers = new Headers({
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
+      'X-Test-Header': 'header-value'
     })
     const request = new Request(defaultSettings.apiBaseURL, {
       method: 'POST',
@@ -33,6 +34,7 @@ describe('UploadcareAuthScheme', () => {
     expect(authHeaders.get('Accept')).toEqual(
       'application/vnd.uploadcare-v0.7+json'
     )
+    expect(authHeaders.get('X-Test-Header')).toEqual('header-value')
 
     const date = new Date(authHeaders.get('X-Uploadcare-Date') as string)
     expect(Date.now() - date.getTime()).toBeLessThanOrEqual(
