@@ -1,6 +1,6 @@
 {
   "name": "@uploadcare/rest-client",
-  "version": "5.1.1",
+  "version": "5.1.2",
   "description": "Library for work with Uploadcare Rest API",
   "type": "module",
   "module": "./dist/index.node.js",
@@ -46,7 +46,7 @@
   "keywords": ["uploadcare", "file", "rest", "api"],
   "devDependencies": {
     "@types/blueimp-md5": "^2.18.0",
-    "@uploadcare/upload-client": "^5.1.1",
+    "@uploadcare/upload-client": "^5.1.2",
     "ts-node": "^10.8.1"
   },
   "dependencies": {

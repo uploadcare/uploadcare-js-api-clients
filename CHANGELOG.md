@@ -1,3 +1,12 @@
+## [5.1.2](https://github.com/uploadcare/uploadcare-js-api-clients/compare/v5.1.1...v5.1.2) (2022-11-24)
+
+
+### Bug Fixes
+
+* **rest-client:** pass-through outer headers when signing request with `UploadcareSimpleAuthSchema` ([0c912e1](https://github.com/uploadcare/uploadcare-js-api-clients/commit/0c912e1a6cbbd04e2447c74669a208512ee1e01b))
+
+
+
 ## [5.1.1](https://github.com/uploadcare/uploadcare-js-api-clients/compare/v5.1.0...v5.1.1) (2022-10-28)
 
 
