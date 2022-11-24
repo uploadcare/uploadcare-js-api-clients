@@ -10,5 +10,6 @@ export default {
     }
   },
   setupFiles: ['../../env.js'],
-  reporters: ['default', 'github-actions']
+  reporters: ['default', 'github-actions'],
+  setupFilesAfterEnv: ['jest-extended/all']
 }
