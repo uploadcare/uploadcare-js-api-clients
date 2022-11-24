@@ -1,6 +1,9 @@
+import { expect, jest } from '@jest/globals'
 import { uploadFile } from '../../src/uploadFile'
 import * as factory from '../_fixtureFactory'
 import { getSettingsForTesting } from '../_helpers'
+
+jest.setTimeout(60000)
 
 /**
  * Those spying tests are commented because jest isn't able to mock statically imported ESM modules
