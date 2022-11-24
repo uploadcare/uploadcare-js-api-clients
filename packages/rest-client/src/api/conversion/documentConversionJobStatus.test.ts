@@ -24,18 +24,18 @@ describe('documentConversionJobStatus', () => {
     )
 
     const { token } = result[0]
-    await delay(1000)
     const response = await documentConversionJobStatus(
       {
         token
       },
       testSettings
     )
-    expect([
+    expect(response.status).toBeOneOf([
       ConversionStatus.PENDING,
       ConversionStatus.PROCESSING,
-      ConversionStatus.FINISHED
-    ]).toContain(response.status)
+      ConversionStatus.FINISHED,
+      ConversionStatus.FAILED
+    ])
   })
 
   it('should throw error if non-200 status received', async () => {

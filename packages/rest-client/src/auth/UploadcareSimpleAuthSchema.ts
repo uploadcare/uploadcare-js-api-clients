@@ -27,8 +27,9 @@ export class UploadcareSimpleAuthSchema implements AuthSchema {
     return this._publicKey
   }
 
-  async getHeaders(): Promise<Headers> {
+  async getHeaders(request: Request): Promise<Headers> {
     return new Headers({
+      ...Object.fromEntries(request.headers.entries()),
       Accept: getAcceptHeader(),
       Authorization: `Uploadcare.Simple ${this._publicKey}:${this._secretKey}`
     })
