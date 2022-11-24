@@ -1,22 +1,18 @@
 import { describe, it } from '@jest/globals'
 import { addonExecutionStatus } from './addonExecutionStatus'
 
+import { ADDONS_UUID } from '../../../test/fixtures'
 import { testSettings } from '../../../test/helpers'
 import { AddonName } from '../../types/AddonName'
 import { executeAddon } from './executeAddon'
-import { ADDONS_UUID } from '../../../test/fixtures'
-import { copyFileToLocalStorage } from '../file/copyFileToLocalStorage'
+import { AddonExecutionStatus } from '../../types/AddonExecutionStatus'
 
 describe('addonExecutionStatus', () => {
   it('should work', async () => {
-    const copy = await copyFileToLocalStorage(
-      { source: ADDONS_UUID, store: false },
-      testSettings
-    )
     const { requestId } = await executeAddon(
       {
         addonName: AddonName.AWS_REKOGNITION_DETECT_LABELS,
-        target: copy.result.uuid
+        target: ADDONS_UUID
       },
       testSettings
     )
@@ -27,7 +23,12 @@ describe('addonExecutionStatus', () => {
       },
       testSettings
     )
-    expect(response.status).toBeTruthy()
+    expect(response.status).toBeOneOf([
+      AddonExecutionStatus.DONE,
+      AddonExecutionStatus.ERROR,
+      AddonExecutionStatus.IN_PROGRESS,
+      AddonExecutionStatus.UNKNOWN
+    ])
   })
 
   it('should throw error if non-200 status received', async () => {

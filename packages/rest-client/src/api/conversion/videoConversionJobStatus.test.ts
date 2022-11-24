@@ -4,19 +4,13 @@ import { videoConversionJobStatus } from './videoConversionJobStatus'
 import { VIDEO_UUID } from '../../../test/fixtures'
 import { testSettings } from '../../../test/helpers'
 import { ConversionStatus } from '../../types/ConversionStatus'
-import { copyFileToLocalStorage } from '../file/copyFileToLocalStorage'
 import { convertVideo } from './convertVideo'
 
 describe('videoConversionJobStatus', () => {
   it('should work', async () => {
-    const copy = await copyFileToLocalStorage(
-      { source: VIDEO_UUID, store: false },
-      testSettings
-    )
-
     const { result } = await convertVideo(
       {
-        paths: [`${copy.result.uuid}/video/-/format/mp4/`],
+        paths: [`${VIDEO_UUID}/video/-/format/mp4/`],
         store: 'false'
       },
       testSettings
