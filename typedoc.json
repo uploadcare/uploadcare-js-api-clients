@@ -1,5 +1,7 @@
 {
   "$schema": "https://typedoc.org/schema.json",
   "out": "docs",
-  "excludePrivate": true
+  "excludePrivate": true,
+  "exclude": ["**/*.test.ts"],
+  "tsconfig": "./tsconfig.typedoc.json"
 }
