@@ -116,7 +116,7 @@ describe('apiRequest', () => {
     expect(request.headers.get('Accept')).toBe(getAcceptHeader())
     expect(request.headers.get('Content-Type')).toBe('application/json')
     expect(request.headers.get('Authorization')).toBeTruthy()
-    expect(request.headers.get('X-UC-User-Agent')).toBe(
+    expect(request.headers.get('User-Agent')).toBe(
       `UploadcareRestClient/${version}/${TEST_PUBLIC_KEY} (JavaScript)`
     )
     expect(request.url.toString()).toBe(
