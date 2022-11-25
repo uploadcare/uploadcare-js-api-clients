@@ -2,17 +2,19 @@ import { UploadClientError } from './errors'
 import { retrier, UploadcareNetworkError } from '@uploadcare/api-client-utils'
 
 const REQUEST_WAS_THROTTLED_CODE = 'RequestThrottledError'
-const DEFAULT_THROTTLED_TIMEOUT = 15000
+const DEFAULT_RETRY_AFTER_TIMEOUT = 15000
 const DEFAULT_NETWORK_ERROR_TIMEOUT = 1000
 
 function getTimeoutFromThrottledRequest(error: UploadClientError): number {
   const { headers } = error || {}
-
-  return (
-    (headers &&
-      Number.parseInt(headers['x-throttle-wait-seconds'] as string) * 1000) ||
-    DEFAULT_THROTTLED_TIMEOUT
-  )
+  if (!headers || typeof headers['retry-after'] !== 'string') {
+    return DEFAULT_RETRY_AFTER_TIMEOUT
+  }
+  const seconds = parseInt(headers['retry-after'], 10)
+  if (!Number.isFinite(seconds)) {
+    return DEFAULT_RETRY_AFTER_TIMEOUT
+  }
+  return seconds * 1000
 }
 
 type RetryIfFailedOptions = {
