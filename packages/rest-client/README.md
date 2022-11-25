@@ -19,10 +19,10 @@ Node.js and browser.
 <!-- toc -->
 - [Install](#install)
 - [Usage](#usage)
-  - [High-Level API](#high-level-api)
-  - [Low-Level API](#low-level-api)
+  - [API](#api)
   - [Settings](#settings)
-- [Testing](#testing)
+  - [Pagination](#pagination)
+  - [Job status polling](#job-status-polling)
 - [Security issues](#security-issues)
 - [Feedback](#feedback)
 
@@ -49,7 +49,7 @@ According to the [spec](https://uploadcare.com/api-refs/rest-api/v0.7.0/#section
 
 With the [`Uploadcare.Simple`](https://uploadcare.com/api-refs/rest-api/v0.7.0/#section/Authentication/Uploadcare.Simple) authentication method, your secret key gets included in every request. This method isn't secure enough because secret key is exposed to the runtime and will be transmitted over the network.
 
-**⚠️We strongly recommend not to use this method on the client-side.⚠️**
+**⚠️We strongly recommend not to use this method in production, especially on the client-side.⚠️**
 
 Example:
 
@@ -103,11 +103,7 @@ new UploadcareAuthSchema({
 })
 ```
 
-### High-Level API
-
-At the current stage, there are no any high-level wrappers here. Only low-level typed wrappers over API methods are available. It means, that there are no pagination and no conversion job status polling, just bare request wrappers.
-
-### Low-Level API
+### API
 
 You can use low-level wrappers to call the API endpoints directly:
 
@@ -128,11 +124,58 @@ List of all available API methods is available at the [rest-client API Reference
 
 List of all available Settings is available at the [rest-client API Reference](https://uploadcare.github.io/uploadcare-js-api-clients/rest-client/modules#UserSettings).
 
-## Testing
+### Pagination
 
-```bash
-npm run test:production
+We have the only two paginatable API methods - `listOfFiles` and `listOfGroups`. You can use one of those methods below to paginate over.
+
+#### Using async generator and `paginate()` helper
+
+```typescript
+import { listOfFiles, paginate } from '@uploadcare/rest-client'
+
+const uploadcareSimpleAuthSchema = new UploadcareSimpleAuthSchema({
+  publicKey: 'YOUR_PUBLIC_KEY',
+  secretKey: 'YOUR_SECRET_KEY',
+});
+
+const paginatedListOfFiles = paginate(listOfFiles)
+const pages = paginatedListOfFiles({}, { authSchema: uploadcareSimpleAuthSchema })
+
+for await (const page of pages) {
+  console.log(page)
+}
 ```
+
+#### Using `Paginator` class
+
+```typescript
+import { listOfFiles, Paginator } from '@uploadcare/rest-client'
+
+const uploadcareSimpleAuthSchema = new UploadcareSimpleAuthSchema({
+  publicKey: 'YOUR_PUBLIC_KEY',
+  secretKey: 'YOUR_SECRET_KEY',
+});
+
+const paginator = new Paginator(listOfFiles, {}, { authSchema: uploadcareSimpleAuthSchema })
+
+while(paginator.hasNextPage()) {
+  const page = await paginator.next()
+  console.log(page)
+}
+
+while(paginator.hasPrevPage()) {
+  const page = await paginator.prev()
+  console.log(page)
+}
+
+console.log(paginator.getCurrentPage())
+```
+
+Check out the [rest-client API Reference](https://uploadcare.github.io/uploadcare-js-api-clients/rest-client/classes/Paginator) for the `Paginator`.
+
+#### Job status polling
+
+There are no helpers for the job status polling yet. Stay tuned.
 
 ## Security issues
 
