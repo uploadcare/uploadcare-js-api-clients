@@ -2,7 +2,7 @@ import { fetch, Headers, Request } from './lib/fetch/fetch.node'
 import { applyDefaultSettings, UserSettings } from './settings'
 import { getUserAgent } from './tools/getUserAgent'
 import { RestClientError } from './tools/RestClientError'
-import { retryIfThrottled } from './tools/retryIfThrottled'
+import { retryIfFailed } from './tools/retryIfFailed'
 
 export type ApiRequestQuery = Record<
   string,
@@ -85,10 +85,10 @@ export async function makeApiRequest(
     body: requestBody
   })
 
-  const response = await retryIfThrottled(
-    () => fetch(signedRequest),
-    settings.retryThrottledRequestMaxTimes
-  )
+  const response = await retryIfFailed(() => fetch(signedRequest), {
+    retryThrottledRequestMaxTimes: settings.retryThrottledRequestMaxTimes,
+    retryNetworkErrorMaxTimes: settings.retryNetworkErrorMaxTimes
+  })
 
   return {
     request: signedRequest,

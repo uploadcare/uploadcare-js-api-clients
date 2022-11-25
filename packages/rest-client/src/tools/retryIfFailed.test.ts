@@ -1,7 +1,7 @@
 import { expect, jest } from '@jest/globals'
 import { Headers, Response } from '../lib/fetch/fetch.node'
 import { RestClientError } from './RestClientError'
-import { retryIfThrottled } from './retryIfThrottled'
+import { retryIfFailed } from './retryIfFailed'
 
 const THROTTLED_RESPONSE = new Response(
   JSON.stringify({
@@ -16,12 +16,12 @@ const THROTTLED_RESPONSE = new Response(
   }
 )
 
-const createRequestMock = ({
-  throttledAttempts,
+const createRunner = ({
   error,
+  attempts,
   response = new Response()
 }: {
-  throttledAttempts: number
+  attempts: number
   error?: Error
   response?: Response
 }) => {
@@ -29,11 +29,10 @@ const createRequestMock = ({
   const mock = jest.fn(async () => {
     ++runs
 
-    if (error) {
-      throw error
-    }
-
-    if (runs <= throttledAttempts) {
+    if (runs <= attempts) {
+      if (error) {
+        throw error
+      }
       return THROTTLED_RESPONSE
     }
 
@@ -43,37 +42,73 @@ const createRequestMock = ({
   return mock
 }
 
-describe('retryIfThrottled', () => {
-  it("should be rejected with tasks's error", async () => {
-    const error = new Error()
-    const mock = createRequestMock({ throttledAttempts: 10, error })
+describe('retryIfFailed', () => {
+  it("should be resolved with task's resolvee if was nor throttled nor failed", async () => {
+    const response = new Response()
+    const mock = createRunner({ attempts: 0, response })
 
-    await expect(retryIfThrottled(mock, 5)).rejects.toThrowError(error)
+    await expect(
+      retryIfFailed(mock, {
+        retryThrottledRequestMaxTimes: 5,
+        retryNetworkErrorMaxTimes: 5
+      })
+    ).resolves.toEqual(response)
     expect(mock).toHaveBeenCalledTimes(1)
   })
 
-  it('should be rejected with RestClientError if was throttled and limit was left', async () => {
-    const mock = createRequestMock({ throttledAttempts: 10 })
+  describe('throttling', () => {
+    it('should be rejected with RestClientError if was throttled and limit was left', async () => {
+      const mock = createRunner({ attempts: 10 })
 
-    await expect(retryIfThrottled(mock, 5)).rejects.toThrowError(
-      RestClientError
-    )
-    expect(mock).toHaveBeenCalledTimes(6)
+      await expect(
+        retryIfFailed(mock, {
+          retryThrottledRequestMaxTimes: 5,
+          retryNetworkErrorMaxTimes: 0
+        })
+      ).rejects.toThrowError(RestClientError)
+      expect(mock).toHaveBeenCalledTimes(6)
+    })
+
+    it("should be resolved with task's resolvee if was throttled and limit was not left", async () => {
+      const response = new Response()
+      const mock = createRunner({ attempts: 3, response })
+
+      await expect(
+        retryIfFailed(mock, {
+          retryThrottledRequestMaxTimes: 10,
+          retryNetworkErrorMaxTimes: 0
+        })
+      ).resolves.toEqual(response)
+      expect(mock).toHaveBeenCalledTimes(4)
+    })
   })
 
-  it("should be resolved with task's resolvee if was throttled and limit is not left", async () => {
-    const response = new Response()
-    const mock = createRequestMock({ throttledAttempts: 3, response })
+  describe('network errors', () => {
+    it("should be rejected with tasks's error if limit was left", async () => {
+      const error = new Error()
+      const mock = createRunner({ attempts: 5, error })
 
-    await expect(retryIfThrottled(mock, 10)).resolves.toEqual(response)
-    expect(mock).toHaveBeenCalledTimes(4)
-  })
+      await expect(
+        retryIfFailed(mock, {
+          retryThrottledRequestMaxTimes: 0,
+          retryNetworkErrorMaxTimes: 2
+        })
+      ).rejects.toThrowError(error)
+      expect(mock).toHaveBeenCalledTimes(3)
+    })
 
-  it("should be resolved with task's resolvee if was not throttled", async () => {
-    const response = new Response()
-    const mock = createRequestMock({ throttledAttempts: 0, response })
+    it("should be resolved with tasks's resolvee if limit was not left", async () => {
+      const error = new Error()
+      const response = new Response()
+      const mock = createRunner({ attempts: 2, error, response })
 
-    await expect(retryIfThrottled(mock, 0)).resolves.toEqual(response)
-    expect(mock).toHaveBeenCalledTimes(1)
+      await expect(
+        retryIfFailed(mock, {
+          retryThrottledRequestMaxTimes: 0,
+          retryNetworkErrorMaxTimes: 5
+        })
+      ).resolves.toEqual(response)
+      expect(mock).toHaveBeenCalledTimes(3)
+    })
   })
 })
