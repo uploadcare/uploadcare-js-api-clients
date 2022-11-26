@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/explicit-function-return-type */
 import { retryIfFailed } from '../../src/tools/retryIfFailed'
 import { UploadClientError } from '../../src/tools/errors'
 import { jest, expect } from '@jest/globals'
@@ -43,7 +42,7 @@ const throttledError = new UploadClientError(
       errorCode: 'RequestThrottledError'
     }
   },
-  { 'x-throttle-wait-seconds': '1' }
+  { 'retry-after': '1' }
 )
 
 const networkError = new UploadcareNetworkError(
