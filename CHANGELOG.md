@@ -1,3 +1,19 @@
+# [5.2.0](https://github.com/uploadcare/uploadcare-js-api-clients/compare/v5.1.2...v5.2.0) (2022-11-26)
+
+
+### Bug Fixes
+
+* **rest-client:** send `user-agent` instead of `x-uc-user-agent` header ([#447](https://github.com/uploadcare/uploadcare-js-api-clients/issues/447)) ([759768a](https://github.com/uploadcare/uploadcare-js-api-clients/commit/759768a20e05eec82377a16bb4289cf9a5f769dc))
+* **upload-client:** read `retry-after` header instead of `x-throttle-wait-seconds` ([81698df](https://github.com/uploadcare/uploadcare-js-api-clients/commit/81698df92b68548c56573f6330e3c53079d431e6))
+
+
+### Features
+
+* **rest-client:** add pagination helpers ([#450](https://github.com/uploadcare/uploadcare-js-api-clients/issues/450)) ([19f6d8f](https://github.com/uploadcare/uploadcare-js-api-clients/commit/19f6d8f7196700f257d2d2b248d28252d9faad8f))
+* **rest-client:** retry requests on network errors ([#449](https://github.com/uploadcare/uploadcare-js-api-clients/issues/449)) ([846d8fd](https://github.com/uploadcare/uploadcare-js-api-clients/commit/846d8fd717390ce9f68d1c38472e8bc2d089d7c6))
+
+
+
 ## [5.1.2](https://github.com/uploadcare/uploadcare-js-api-clients/compare/v5.1.1...v5.1.2) (2022-11-24)
 
 
