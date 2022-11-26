@@ -72,7 +72,7 @@ export async function makeApiRequest(
     body: requestBody,
     headers: new Headers({
       'Content-Type': 'application/json',
-      'X-UC-User-Agent': getUserAgent({
+      'User-Agent': getUserAgent({
         publicKey: settings.authSchema.publicKey,
         integration: settings.integration,
         userAgent: settings.userAgent
