@@ -19,9 +19,12 @@ export type ListOfFilesTotals = {
   unstored: number
 }
 
-export type ListOfFilesResponse = PaginatedList<FileInfo> & {
-  totals: ListOfFilesTotals
-}
+export type ListOfFilesResponse = PaginatedList<
+  FileInfo,
+  {
+    totals: ListOfFilesTotals
+  }
+>
 
 export async function listOfFiles(
   options: ListOfFilesOptions,
