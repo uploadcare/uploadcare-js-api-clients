@@ -1,7 +1,7 @@
-export type PaginatedList<T> = {
-  next: string
-  previous: string
+export type PaginatedList<PageItem, PageExtra = Record<string, never>> = {
+  next: string | null
+  previous: string | null
   total: number
   perPage: number
-  results: T[]
-}
+  results: PageItem[]
+} & PageExtra
