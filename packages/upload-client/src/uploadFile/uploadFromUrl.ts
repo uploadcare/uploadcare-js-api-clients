@@ -1,15 +1,17 @@
 import fromUrlStatus, { Status } from '../api/fromUrlStatus'
 import fromUrl, { TypeEnum, FromUrlOptions } from '../api/fromUrl'
-import { UploadClientError, cancelError } from '../tools/errors'
-import { poll } from '../tools/poll'
+import { UploadClientError } from '../tools/errors'
 import { race } from '../tools/race'
 import { isReadyPoll } from '../tools/isReadyPoll'
 import defaultSettings from '../defaultSettings'
-import { onCancel } from '../tools/onCancel'
-
 import { getPusher, preconnect } from './pusher'
 
-import { CustomUserAgent } from '@uploadcare/api-client-utils'
+import {
+  CustomUserAgent,
+  onCancel,
+  CancelError,
+  poll
+} from '@uploadcare/api-client-utils'
 import { UploadcareFile } from '../tools/UploadcareFile'
 import { FileInfo, ProgressCallback } from '../api/types'
 
@@ -112,7 +114,7 @@ const pushStrategy = ({
 
     onCancel(signal, () => {
       destroy()
-      reject(cancelError('pusher cancelled'))
+      reject(new CancelError('pusher cancelled'))
     })
 
     pusher.subscribe(token, (result) => {

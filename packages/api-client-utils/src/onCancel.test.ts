@@ -1,4 +1,4 @@
-import { onCancel } from '../../src/tools/onCancel'
+import { onCancel } from '@uploadcare/api-client-utils'
 import { jest, expect } from '@jest/globals'
 
 describe('onCancel', () => {

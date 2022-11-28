@@ -1,7 +1,9 @@
-import { cancelError } from './errors'
-import { onCancel } from '../tools/onCancel'
+import { onCancel } from './onCancel'
+import { CancelError } from './CancelError'
 
-type CheckFunction<T> = (signal?: AbortSignal) => Promise<false | T> | false | T
+type PollCheckFunction<T> = (
+  signal?: AbortSignal
+) => Promise<false | T> | false | T
 
 const DEFAULT_INTERVAL = 500
 
@@ -10,7 +12,7 @@ const poll = <T>({
   interval = DEFAULT_INTERVAL,
   signal
 }: {
-  check: CheckFunction<T>
+  check: PollCheckFunction<T>
   timeout?: number
   interval?: number
   signal?: AbortSignal
@@ -20,7 +22,7 @@ const poll = <T>({
 
     onCancel(signal, () => {
       timeoutId && clearTimeout(timeoutId)
-      reject(cancelError('Poll cancelled'))
+      reject(new CancelError('Poll cancelled'))
     })
 
     const tick = (): void => {
@@ -42,4 +44,4 @@ const poll = <T>({
     timeoutId = setTimeout(tick, 0)
   })
 
-export { poll, CheckFunction }
+export { poll, PollCheckFunction as CheckFunction }

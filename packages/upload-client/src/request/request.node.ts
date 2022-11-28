@@ -5,8 +5,7 @@ import https from 'https'
 import { parse } from 'url'
 import { Readable, Transform } from 'stream'
 
-import { cancelError } from '../tools/errors'
-import { onCancel } from '../tools/onCancel'
+import { onCancel, CancelError } from '@uploadcare/api-client-utils'
 import { RequestOptions, RequestResponse } from './types'
 import { ProgressCallback } from '../api/types'
 
@@ -102,7 +101,7 @@ const request = (params: RequestOptions): Promise<RequestResponse> => {
             aborted = true
             req.abort()
 
-            reject(cancelError())
+            reject(new CancelError())
           })
 
           req.on('response', (res) => {

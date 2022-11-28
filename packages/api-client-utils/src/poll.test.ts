@@ -1,7 +1,7 @@
-import { poll, CheckFunction } from '../../src/tools/poll'
-import { onCancel } from '../../src/tools/onCancel'
-import { delay } from '@uploadcare/api-client-utils'
-import { UploadClientError } from '../../src/tools/errors'
+import { poll, CheckFunction } from './poll'
+import { onCancel } from './onCancel'
+import { CancelError } from './CancelError'
+import { delay } from './delay'
 import { jest, expect } from '@jest/globals'
 
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
@@ -64,7 +64,7 @@ describe('poll', () => {
 
     await expect(
       poll({ check: job.isFinish, interval: 20, signal: ctrl.signal })
-    ).rejects.toThrowError(new UploadClientError('Poll cancelled'))
+    ).rejects.toThrowError(new CancelError('Poll cancelled'))
 
     expect(job.spy.condition).not.toHaveBeenCalled()
     expect(job.spy.cancel).not.toHaveBeenCalled()
@@ -78,7 +78,7 @@ describe('poll', () => {
 
     await expect(
       poll({ check: job.isFinish, interval: 20, signal: ctrl.signal })
-    ).rejects.toThrowError(new UploadClientError('Poll cancelled'))
+    ).rejects.toThrowError(new CancelError('Poll cancelled'))
 
     const conditionCallsCount = job.spy.condition.mock.calls.length
     const cancelCallsCount = job.spy.cancel.mock.calls.length
@@ -99,7 +99,7 @@ describe('poll', () => {
 
     await expect(
       poll({ check: job.isFinish, interval: 60, signal: ctrl.signal })
-    ).rejects.toThrowError(new UploadClientError('Poll cancelled'))
+    ).rejects.toThrowError(new CancelError('Poll cancelled'))
 
     expect(job.spy.condition).toHaveBeenCalledTimes(2)
     expect(job.spy.cancel).toHaveBeenCalledTimes(2)
@@ -115,7 +115,7 @@ describe('poll', () => {
 
     await expect(
       poll({ check: job.isFinish, interval: 10, signal: ctrl.signal })
-    ).rejects.toThrowError(new UploadClientError('Poll cancelled'))
+    ).rejects.toThrowError(new CancelError('Poll cancelled'))
 
     const conditionCallsCount = job.spy.condition.mock.calls.length
 

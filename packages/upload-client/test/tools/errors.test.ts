@@ -1,4 +1,4 @@
-import { UploadClientError, cancelError } from '../../src/tools/errors'
+import { UploadClientError } from '../../src/tools/errors'
 
 describe('UploadClientError', () => {
   it('should work', () => {
@@ -24,20 +24,5 @@ describe('UploadClientError', () => {
     const error = new UploadClientError('test error')
 
     expect(error.stack).toBeDefined()
-  })
-})
-
-describe('CancelError', () => {
-  it('should work', () => {
-    const error = cancelError() // dumb api :sad:
-
-    expect(error instanceof UploadClientError).toBeTruthy()
-    expect(error.isCancel).toBeTruthy()
-  })
-
-  it('should have default message', () => {
-    const error = cancelError()
-
-    expect(error.message).toBe('Request canceled')
   })
 })

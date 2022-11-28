@@ -1,6 +1,5 @@
 import { race } from '../../src/tools/race'
-import { cancelError } from '../../src/tools/errors'
-import { onCancel } from '../../src/tools/onCancel'
+import { onCancel, CancelError } from '@uploadcare/api-client-utils'
 import { jest, expect } from '@jest/globals'
 
 const returnAfter = (
@@ -12,7 +11,7 @@ const returnAfter = (
     const id = setTimeout(resolve, ms, value)
     onCancel(signal, () => {
       clearTimeout(id)
-      reject(cancelError('race cancel'))
+      reject(new CancelError('race cancel'))
     })
   })
 

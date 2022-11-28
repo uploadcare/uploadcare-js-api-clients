@@ -35,19 +35,3 @@ export class UploadClientError extends Error {
     Object.setPrototypeOf(this, UploadClientError.prototype)
   }
 }
-
-type CancelError = {
-  message: string
-  request?: ErrorRequestInfo
-  response?: ErrorResponseInfo
-  headers?: Headers
-  isCancel?: boolean
-}
-
-export const cancelError = (message = 'Request canceled'): CancelError => {
-  const error: CancelError = new UploadClientError(message) as CancelError
-
-  error.isCancel = true
-
-  return error
-}
