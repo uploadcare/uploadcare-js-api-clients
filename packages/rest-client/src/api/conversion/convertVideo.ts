@@ -1,22 +1,14 @@
 import { ApiRequestSettings, makeApiRequest } from '../../makeApiRequest'
-import { Problems } from '../../types/Problems'
+import { ConversionOptions } from '../../types/ConversionOptions'
+import { ConversionResponse } from '../../types/ConversionResponse'
+import { ConversionResult } from '../../types/ConversionResult'
 import { handleApiRequest } from '../handleApiRequest'
-import { StoreValue } from '../../types/StoreValue'
 
-export type ConvertVideoOptions = {
-  paths: string[]
-  store?: StoreValue
+export type ConvertVideoOptions = ConversionOptions
+export interface ConvertVideoResult extends ConversionResult {
+  thumbnailsGroupUuid: string
 }
-
-export type ConvertVideoResponse = {
-  problems: Problems
-  result: {
-    originalSource: string
-    uuid: string
-    token: number
-    thumbnailsGroupUuid: string
-  }[]
-}
+export type ConvertVideoResponse = ConversionResponse<ConvertVideoResult>
 
 export async function convertVideo(
   options: ConvertVideoOptions,

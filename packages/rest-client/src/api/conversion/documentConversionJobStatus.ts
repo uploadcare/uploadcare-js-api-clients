@@ -1,18 +1,13 @@
 import { ApiRequestSettings, makeApiRequest } from '../../makeApiRequest'
-import { ConversionStatus } from '../../types/ConversionStatus'
+import { ConversionStatusOptions } from '../../types/ConversionStatusOptions'
+import { ConversionStatusResponse } from '../../types/ConversionStatusResponse'
+import { ConversionStatusResult } from '../../types/ConversionStatusResult'
 import { handleApiRequest } from '../handleApiRequest'
 
-export type DocumentConversionJobStatusOptions = {
-  token: number
-}
-
-export type DocumentConversionJobStatusResponse = {
-  status: ConversionStatus
-  error: string | null
-  result: {
-    uuid: string
-  }
-}
+export type DocumentConversionJobStatusOptions = ConversionStatusOptions
+export type DocumentConversionJobStatusResult = ConversionStatusResult
+export type DocumentConversionJobStatusResponse =
+  ConversionStatusResponse<DocumentConversionJobStatusResult>
 
 export async function documentConversionJobStatus(
   options: DocumentConversionJobStatusOptions,

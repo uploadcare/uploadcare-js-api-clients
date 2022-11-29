@@ -1,21 +1,12 @@
 import { ApiRequestSettings, makeApiRequest } from '../../makeApiRequest'
-import { Problems } from '../../types/Problems'
+import { ConversionOptions } from '../../types/ConversionOptions'
+import { ConversionResponse } from '../../types/ConversionResponse'
+import { ConversionResult } from '../../types/ConversionResult'
 import { handleApiRequest } from '../handleApiRequest'
-import { StoreValue } from '../../types/StoreValue'
 
-export type ConvertDocumentOptions = {
-  paths: string[]
-  store?: StoreValue
-}
-
-export type ConvertDocumentResponse = {
-  problems: Problems
-  result: {
-    originalSource: string
-    uuid: string
-    token: number
-  }[]
-}
+export type ConvertDocumentOptions = ConversionOptions
+export type ConvertDocumentResult = ConversionResult
+export type ConvertDocumentResponse = ConversionResponse<ConvertDocumentResult>
 
 export async function convertDocument(
   options: ConvertDocumentOptions,

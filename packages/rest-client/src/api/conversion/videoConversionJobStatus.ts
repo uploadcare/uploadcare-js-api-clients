@@ -1,18 +1,15 @@
 import { ApiRequestSettings, makeApiRequest } from '../../makeApiRequest'
-import { ConversionStatus } from '../../types/ConversionStatus'
+import { ConversionStatusOptions } from '../../types/ConversionStatusOptions'
+import { ConversionStatusResponse } from '../../types/ConversionStatusResponse'
+import { ConversionStatusResult } from '../../types/ConversionStatusResult'
 import { handleApiRequest } from '../handleApiRequest'
 
-export type VideoConversionJobStatusOptions = {
-  token: number
+export type VideoConversionJobStatusOptions = ConversionStatusOptions
+export type VideoConversionJobStatusResult = ConversionStatusResult & {
+  thumbnailsGroupUuid: string
 }
-
-export type VideoConversionJobStatusResponse = {
-  status: ConversionStatus
-  error: string | null
-  result: {
-    uuid: string
-  }
-}
+export type VideoConversionJobStatusResponse =
+  ConversionStatusResponse<VideoConversionJobStatusResult>
 
 export async function videoConversionJobStatus(
   options: VideoConversionJobStatusOptions,
