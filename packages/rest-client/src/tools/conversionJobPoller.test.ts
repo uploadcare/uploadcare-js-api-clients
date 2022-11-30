@@ -1,27 +1,21 @@
 import { jest } from '@jest/globals'
 import { DOCUMENT_UUID, VIDEO_UUID } from '../../test/fixtures'
 import { testSettings } from '../../test/helpers'
-import { convertDocument } from '../api/conversion/convertDocument'
-import { convertVideo } from '../api/conversion/convertVideo'
-import { documentConversionJobStatus } from '../api/conversion/documentConversionJobStatus'
-import { videoConversionJobStatus } from '../api/conversion/videoConversionJobStatus'
 import { ConversionStatus } from '../types/ConversionStatus'
-import { createConversionJobPoller } from './createConversionJobPoller'
+import { ConversionType } from '../types/ConversionType'
+import { conversionJobPoller } from './conversionJobPoller'
 
 jest.setTimeout(60 * 1000)
 
-describe('createConversionJobPoller', () => {
+describe('conversionJobPoller', () => {
   it('should work with video conversion', async () => {
     const paths = [
       `${VIDEO_UUID}/video/-/invalid/`,
       `${VIDEO_UUID}/video/-/size/x20/`
     ]
-    const videoPoller = createConversionJobPoller(
-      convertVideo,
-      videoConversionJobStatus
-    )
-    const promises = await videoPoller(
+    const promises = await conversionJobPoller(
       {
+        type: ConversionType.VIDEO,
         paths,
         store: false
       },
@@ -55,12 +49,9 @@ describe('createConversionJobPoller', () => {
       `${DOCUMENT_UUID}/document/-/invalid/`,
       `${DOCUMENT_UUID}/document/-/format/pdf/`
     ]
-    const documentPoller = createConversionJobPoller(
-      convertDocument,
-      documentConversionJobStatus
-    )
-    const promises = await documentPoller(
+    const promises = await conversionJobPoller(
       {
+        type: ConversionType.DOCUMENT,
         paths,
         store: false
       },

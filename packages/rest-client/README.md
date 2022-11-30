@@ -19,6 +19,7 @@ Node.js and browser.
 <!-- toc -->
 - [Install](#install)
 - [Usage](#usage)
+  - [Authentication](#authentication)
   - [API](#api)
   - [Settings](#settings)
   - [Pagination](#pagination)
@@ -175,7 +176,69 @@ Check out the [rest-client API Reference](https://uploadcare.github.io/uploadcar
 
 #### Job status polling
 
-There are no helpers for the job status polling yet. Stay tuned.
+##### Conversion API
+
+###### Video conversion
+
+```ts
+ import {
+  conversionJobPoller,
+  ConversionType,
+  videoConversionJobStatus,
+  UploadcareSimpleAuthSchema
+} from '@uploadcare/rest-client'
+
+const uploadcareSimpleAuthSchema = new UploadcareSimpleAuthSchema({
+  publicKey: 'YOUR_PUBLIC_KEY',
+  secretKey: 'YOUR_SECRET_KEY'
+})
+
+const jobs = await conversionJobPoller(
+  {
+    type: ConversionType.VIDEO,
+    paths: [':uuid/video/-/size/x720/', ':uuid/video/-/size/x360/'],
+    store: false
+  },
+  { authSchema: uploadcareSimpleAuthSchema }
+)
+
+const results = Promise.allSettled(jobs)
+
+console.log(results)
+```
+
+###### Document conversion
+
+```ts
+ import {
+  conversionJobPoller,
+  ConversionType,
+  documentConversionJobStatus,
+  UploadcareSimpleAuthSchema
+} from '@uploadcare/rest-client'
+
+const uploadcareSimpleAuthSchema = new UploadcareSimpleAuthSchema({
+  publicKey: 'YOUR_PUBLIC_KEY',
+  secretKey: 'YOUR_SECRET_KEY'
+})
+
+const jobs = await conversionJobPoller(
+  {
+    type: ConversionType.DOCUMENT,
+    paths: [':uuid/document/-/format/pdf/', ':uuid/document/-/format/docx/'],
+    store: false
+  },
+  { authSchema: uploadcareSimpleAuthSchema }
+)
+
+const results = Promise.allSettled(jobs)
+
+console.log(results)
+```
+
+##### Addons API
+
+There are no helpers for the addons API status polling yet. Stay tuned.
 
 ## Security issues
 

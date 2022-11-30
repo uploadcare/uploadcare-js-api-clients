@@ -44,4 +44,4 @@ const poll = <T>({
     timeoutId = setTimeout(tick, 0)
   })
 
-export { poll, PollCheckFunction as CheckFunction }
+export { poll, PollCheckFunction }

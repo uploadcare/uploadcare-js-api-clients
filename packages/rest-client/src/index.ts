@@ -31,6 +31,13 @@ export { WebhookEvent } from './types/WebhookEvent'
 export { StoreValue } from './types/StoreValue'
 export { Paginatable } from './types/Paginatable'
 export { Md5Function } from './lib/md5/Md5Function'
+export { ConversionOptions } from './types/ConversionOptions'
+export { ConversionResponse } from './types/ConversionResponse'
+export { ConversionStatusOptions } from './types/ConversionStatusOptions'
+export { ConversionStatusResponse } from './types/ConversionStatusResponse'
+export { ConversionResult } from './types/ConversionResult'
+export { ConversionStatusResult } from './types/ConversionStatusResult'
+export { ApiMethod } from './types/ApiMethod'
 export {
   Metadata,
   ContentInfo,
@@ -54,6 +61,9 @@ export { getUserAgent } from '@uploadcare/api-client-utils'
  * Tools
  */
 export { paginate, Paginator } from './tools/paginate'
+export { addonJobPoller } from './tools/addonJobPoller'
+export { conversionJobPoller } from './tools/conversionJobPoller'
+export { CreateJobPollerPollOptions } from './tools/createJobPoller'
 
 /**
  * Auth
@@ -187,26 +197,8 @@ export {
 /**
  * Low-level Conversion API
  */
-export {
-  convertVideo,
-  ConvertVideoResponse,
-  ConvertVideoOptions
-} from './api/conversion/convertVideo'
-export {
-  convertDocument,
-  ConvertDocumentResponse,
-  ConvertDocumentOptions
-} from './api/conversion/convertDocument'
-export {
-  documentConversionJobStatus,
-  DocumentConversionJobStatusResponse,
-  DocumentConversionJobStatusOptions
-} from './api/conversion/documentConversionJobStatus'
-export {
-  videoConversionJobStatus,
-  VideoConversionJobStatusResponse,
-  VideoConversionJobStatusOptions
-} from './api/conversion/videoConversionJobStatus'
+export { convert } from './api/conversion/convert'
+export { conversionJobStatus } from './api/conversion/conversionJobStatus'
 
 /**
  * Low-level Addons API

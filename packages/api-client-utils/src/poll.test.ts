@@ -1,4 +1,4 @@
-import { poll, CheckFunction } from './poll'
+import { poll, PollCheckFunction } from './poll'
 import { onCancel } from './onCancel'
 import { CancelError } from './CancelError'
 import { delay } from './delay'
@@ -10,7 +10,7 @@ const longJob = (attemps: number, fails: Error | null = null) => {
   const condition = jest.fn()
   const cancel = jest.fn()
 
-  const isFinish: CheckFunction<boolean> = (signal) => {
+  const isFinish: PollCheckFunction<boolean> = (signal) => {
     condition()
 
     onCancel(signal, cancel)
@@ -27,7 +27,7 @@ const longJob = (attemps: number, fails: Error | null = null) => {
     }
   }
 
-  const asyncIsFinish: CheckFunction<boolean> = (cancel) =>
+  const asyncIsFinish: PollCheckFunction<boolean> = (cancel) =>
     new Promise<boolean>((resolve, reject) => {
       try {
         resolve(isFinish(cancel))
