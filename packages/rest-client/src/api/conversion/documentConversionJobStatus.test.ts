@@ -1,6 +1,7 @@
 import { describe, it } from '@jest/globals'
 import { documentConversionJobStatus } from './documentConversionJobStatus'
 
+import 'jest-extended'
 import { DOCUMENT_UUID } from '../../../test/fixtures'
 import { testSettings } from '../../../test/helpers'
 import { ConversionStatus } from '../../types/ConversionStatus'

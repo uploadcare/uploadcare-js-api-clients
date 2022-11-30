@@ -1,6 +1,7 @@
 import { describe, it } from '@jest/globals'
 import { videoConversionJobStatus } from './videoConversionJobStatus'
 
+import 'jest-extended'
 import { VIDEO_UUID } from '../../../test/fixtures'
 import { testSettings } from '../../../test/helpers'
 import { ConversionStatus } from '../../types/ConversionStatus'

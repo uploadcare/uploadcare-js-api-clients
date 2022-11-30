@@ -1,11 +1,11 @@
 import { describe, it } from '@jest/globals'
-import { addonExecutionStatus } from './addonExecutionStatus'
-
+import 'jest-extended'
 import { ADDONS_UUID } from '../../../test/fixtures'
 import { testSettings } from '../../../test/helpers'
-import { AddonName } from '../../types/AddonName'
-import { executeAddon } from './executeAddon'
 import { AddonExecutionStatus } from '../../types/AddonExecutionStatus'
+import { AddonName } from '../../types/AddonName'
+import { addonExecutionStatus } from './addonExecutionStatus'
+import { executeAddon } from './executeAddon'
 
 describe('addonExecutionStatus', () => {
   it('should work', async () => {
