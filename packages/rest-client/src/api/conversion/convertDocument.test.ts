@@ -8,7 +8,7 @@ describe('convertDocument', () => {
   it('should work', async () => {
     const response = await convertDocument(
       {
-        paths: [`${DOCUMENT_UUID}/document/-/format/docx/`, 'invalid'],
+        paths: [`${DOCUMENT_UUID}/document/-/format/pdf/`, 'invalid'],
         store: 'false'
       },
       testSettings
@@ -17,7 +17,7 @@ describe('convertDocument', () => {
 
     expect(response.result.length).toBe(1)
     expect(response.result[0].originalSource).toBe(
-      `${DOCUMENT_UUID}/document/-/format/docx/`
+      `${DOCUMENT_UUID}/document/-/format/pdf/`
     )
     expect(response.result[0].token).toBeTruthy()
     expect(response.result[0].uuid).toBeTruthy()
