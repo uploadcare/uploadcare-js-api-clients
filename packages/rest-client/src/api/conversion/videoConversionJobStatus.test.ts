@@ -12,7 +12,7 @@ describe('videoConversionJobStatus', () => {
     const { result } = await convertVideo(
       {
         paths: [`${VIDEO_UUID}/video/-/format/mp4/`],
-        store: 'false'
+        store: false
       },
       testSettings
     )

@@ -9,7 +9,7 @@ describe('convertDocument', () => {
     const response = await convertDocument(
       {
         paths: [`${DOCUMENT_UUID}/document/-/format/pdf/`, 'invalid'],
-        store: 'false'
+        store: false
       },
       testSettings
     )

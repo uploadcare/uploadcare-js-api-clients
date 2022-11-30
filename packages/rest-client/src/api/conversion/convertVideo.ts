@@ -1,4 +1,5 @@
 import { ApiRequestSettings, makeApiRequest } from '../../makeApiRequest'
+import { storeValueToString } from '../../tools/storeValueToString'
 import { ConversionOptions } from '../../types/ConversionOptions'
 import { ConversionResponse } from '../../types/ConversionResponse'
 import { ConversionResult } from '../../types/ConversionResult'
@@ -20,7 +21,7 @@ export async function convertVideo(
       path: `/convert/video/`,
       body: {
         paths: options.paths,
-        store: options.store
+        store: storeValueToString(options.store)
       }
     },
     userSettings

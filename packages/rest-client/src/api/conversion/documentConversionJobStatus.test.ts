@@ -12,7 +12,7 @@ describe('documentConversionJobStatus', () => {
     const { result } = await convertDocument(
       {
         paths: [`${DOCUMENT_UUID}/document/-/format/pdf/`],
-        store: 'false'
+        store: false
       },
       testSettings
     )

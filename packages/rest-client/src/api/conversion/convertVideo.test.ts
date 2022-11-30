@@ -9,7 +9,7 @@ describe('convertVideo', () => {
     const response = await convertVideo(
       {
         paths: [`${VIDEO_UUID}/video/-/format/mp4/`, 'invalid'],
-        store: 'false'
+        store: false
       },
       testSettings
     )
