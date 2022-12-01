@@ -8,12 +8,10 @@ import { ConversionStatusResponse } from '../types/ConversionStatusResponse'
 import { ConversionStatusResult } from '../types/ConversionStatusResult'
 import { ConversionType } from '../types/ConversionType'
 import { ValueOf } from '../types/ValueOf'
-import { createJobPoller } from './createJobPoller'
+import { createJobPoller, CreateJobPollerPollOptions } from './createJobPoller'
 
-export const conversionJobPoller = async <
-  T extends ValueOf<typeof ConversionType>
->(
-  options: ConversionOptions<T>,
+export const conversionJobPoller = <T extends ValueOf<typeof ConversionType>>(
+  options: ConversionOptions<T> & CreateJobPollerPollOptions,
   settings: ApiRequestSettings
 ) => {
   const poller = createJobPoller({

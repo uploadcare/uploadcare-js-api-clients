@@ -43,15 +43,13 @@ describe('createJobPoller', () => {
     expect(resolveJobs.mock.calls.length).toBe(1)
     expect(resolveJobs.mock.lastCall).toEqual([
       { result: ['finished', 'failed'] },
+      options,
       settings
     ])
 
     expect(getJobStatus.mock.calls.length).toBe(2)
-    expect(getJobStatus.mock.calls[0]).toEqual([
-      { status: 'finished' },
-      settings
-    ])
-    expect(getJobStatus.mock.calls[1]).toEqual([{ status: 'failed' }, settings])
+    expect(getJobStatus.mock.calls[0]).toEqual([{ status: 'finished' }])
+    expect(getJobStatus.mock.calls[1]).toEqual([{ status: 'failed' }])
 
     expect(isJobFinished.mock.calls.length).toBe(2)
     expect(isJobFinished.mock.calls[0]).toEqual(['finished'])
@@ -63,16 +61,11 @@ describe('createJobPoller', () => {
     expect(getResult.mock.calls.length).toBe(1)
     expect(getResult.mock.calls[0]).toEqual([
       { status: 'finished' },
-      'finished',
-      settings
+      'finished'
     ])
 
     expect(getError.mock.calls.length).toBe(1)
-    expect(getError.mock.calls[0]).toEqual([
-      { status: 'failed' },
-      'failed',
-      settings
-    ])
+    expect(getError.mock.calls[0]).toEqual([{ status: 'failed' }, 'failed'])
 
     expect(results).toEqual(['result', 'error'])
   })

@@ -17,7 +17,8 @@ export {
   AwsRekognitionDetectLabelParent,
   AwsRekognitionDetectLabelInstance,
   AwsRekognitionDetectLabel,
-  AwsRekognitionDetectLabels
+  AwsRekognitionDetectLabels,
+  RemoveBg
 } from './types/AppData'
 export { BatchResponse, BatchResponseStatus } from './types/BatchResponse'
 export { ConversionStatus } from './types/ConversionStatus'
@@ -35,9 +36,21 @@ export { ConversionOptions } from './types/ConversionOptions'
 export { ConversionResponse } from './types/ConversionResponse'
 export { ConversionStatusOptions } from './types/ConversionStatusOptions'
 export { ConversionStatusResponse } from './types/ConversionStatusResponse'
-export { ConversionResult } from './types/ConversionResult'
-export { ConversionStatusResult } from './types/ConversionStatusResult'
+export {
+  ConversionResult,
+  ConversionResultDocument,
+  ConversionResultVideo,
+  ConversionResultBase
+} from './types/ConversionResult'
+export {
+  ConversionStatusResult,
+  ConversionStatusResultVideo,
+  ConversionStatusResultDocument,
+  ConversionStatusResultBase
+} from './types/ConversionStatusResult'
 export { ApiMethod } from './types/ApiMethod'
+export { ValueOf } from './types/ValueOf'
+export { ConversionType } from './types/ConversionType'
 export {
   Metadata,
   ContentInfo,

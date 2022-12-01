@@ -178,13 +178,10 @@ Check out the [rest-client API Reference](https://uploadcare.github.io/uploadcar
 
 ##### Conversion API
 
-###### Video conversion
-
 ```ts
- import {
+import {
   conversionJobPoller,
   ConversionType,
-  videoConversionJobStatus,
   UploadcareSimpleAuthSchema
 } from '@uploadcare/rest-client'
 
@@ -196,36 +193,8 @@ const uploadcareSimpleAuthSchema = new UploadcareSimpleAuthSchema({
 const jobs = await conversionJobPoller(
   {
     type: ConversionType.VIDEO,
+    // type: ConversionType.DOCUMENT,
     paths: [':uuid/video/-/size/x720/', ':uuid/video/-/size/x360/'],
-    store: false
-  },
-  { authSchema: uploadcareSimpleAuthSchema }
-)
-
-const results = Promise.allSettled(jobs)
-
-console.log(results)
-```
-
-###### Document conversion
-
-```ts
- import {
-  conversionJobPoller,
-  ConversionType,
-  documentConversionJobStatus,
-  UploadcareSimpleAuthSchema
-} from '@uploadcare/rest-client'
-
-const uploadcareSimpleAuthSchema = new UploadcareSimpleAuthSchema({
-  publicKey: 'YOUR_PUBLIC_KEY',
-  secretKey: 'YOUR_SECRET_KEY'
-})
-
-const jobs = await conversionJobPoller(
-  {
-    type: ConversionType.DOCUMENT,
-    paths: [':uuid/document/-/format/pdf/', ':uuid/document/-/format/docx/'],
     store: false
   },
   { authSchema: uploadcareSimpleAuthSchema }
@@ -238,7 +207,33 @@ console.log(results)
 
 ##### Addons API
 
-There are no helpers for the addons API status polling yet. Stay tuned.
+```ts
+import {
+  addonJobPoller,
+  AddonName,
+  UploadcareSimpleAuthSchema
+} from '@uploadcare/rest-client'
+
+const uploadcareSimpleAuthSchema = new UploadcareSimpleAuthSchema({
+  publicKey: 'YOUR_PUBLIC_KEY',
+  secretKey: 'YOUR_SECRET_KEY'
+})
+
+const result = await addonJobPoller(
+  {
+    addonName: AddonName.UC_CLAMAV_VIRUS_SCAN,
+    // addonName: AddonName.AWS_REKOGNITION_DETECT_LABELS,
+    // addonName: AddonName.REMOVE_BG,
+    target: ':uuid',
+    params: {
+      purge_infected: false
+    }
+  },
+  testSettings
+)
+
+console.log(result)
+```
 
 ## Security issues
 
