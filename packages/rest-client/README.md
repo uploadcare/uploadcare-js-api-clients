@@ -176,6 +176,8 @@ Check out the [rest-client API Reference](https://uploadcare.github.io/uploadcar
 
 #### Job status polling
 
+There are two helpers to do job status polling using Conversion API or Addons API: `conversionJobPoller` and `addonJobPoller`.
+
 ##### Conversion API
 
 ```ts
@@ -190,6 +192,9 @@ const uploadcareSimpleAuthSchema = new UploadcareSimpleAuthSchema({
   secretKey: 'YOUR_SECRET_KEY'
 })
 
+const abortController = new AbortController()
+// abortController.abort()
+
 const jobs = await conversionJobPoller(
   {
     type: ConversionType.VIDEO,
@@ -197,7 +202,10 @@ const jobs = await conversionJobPoller(
     onRun: response => console.log(response), // called when job is started
     onStatus: response => console.log(response), // called on every job status request
     paths: [':uuid/video/-/size/x720/', ':uuid/video/-/size/x360/'],
-    store: false
+    store: false,
+    pollOptions: {
+      signal: abortController.signal
+    }
   },
   { authSchema: uploadcareSimpleAuthSchema }
 )
@@ -221,6 +229,9 @@ const uploadcareSimpleAuthSchema = new UploadcareSimpleAuthSchema({
   secretKey: 'YOUR_SECRET_KEY'
 })
 
+const abortController = new AbortController()
+// abortController.abort()
+
 const result = await addonJobPoller(
   {
     addonName: AddonName.UC_CLAMAV_VIRUS_SCAN,
@@ -231,6 +242,9 @@ const result = await addonJobPoller(
     target: ':uuid',
     params: {
       purge_infected: false
+    },
+    pollOptions: {
+      signal: abortController.signal
     }
   },
   testSettings
