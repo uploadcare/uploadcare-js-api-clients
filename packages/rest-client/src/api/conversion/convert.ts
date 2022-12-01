@@ -3,20 +3,18 @@ import { storeValueToString } from '../../tools/storeValueToString'
 import { ConversionOptions } from '../../types/ConversionOptions'
 import { ConversionResponse } from '../../types/ConversionResponse'
 import { ConversionResult } from '../../types/ConversionResult'
+import { ConversionType } from '../../types/ConversionType'
+import { ValueOf } from '../../types/ValueOf'
 import { handleApiRequest } from '../handleApiRequest'
 
-export type ConvertDocumentOptions = ConversionOptions
-export type ConvertDocumentResult = ConversionResult
-export type ConvertDocumentResponse = ConversionResponse<ConvertDocumentResult>
-
-export async function convertDocument(
-  options: ConvertDocumentOptions,
+export async function convert<T extends ValueOf<typeof ConversionType>>(
+  options: ConversionOptions<T>,
   userSettings: ApiRequestSettings
-): Promise<ConvertDocumentResponse> {
+): Promise<ConversionResponse<ConversionResult[T]>> {
   const apiRequest = await makeApiRequest(
     {
       method: 'POST',
-      path: `/convert/document/`,
+      path: `/convert/${options.type}/`,
       body: {
         paths: options.paths,
         store: storeValueToString(options.store)
