@@ -1,5 +1,12 @@
-import { addonExecutionStatus } from '../api/addons/addonExecutionStatus'
-import { executeAddon, ExecuteAddonOptions } from '../api/addons/executeAddon'
+import {
+  addonExecutionStatus,
+  AddonExecutionStatusResponse
+} from '../api/addons/addonExecutionStatus'
+import {
+  executeAddon,
+  ExecuteAddonOptions,
+  ExecuteAddonResponse
+} from '../api/addons/executeAddon'
 import { fileInfo } from '../api/file/fileInfo'
 import { ApiRequestSettings } from '../makeApiRequest'
 import { AddonExecutionStatus } from '../types/AddonExecutionStatus'
@@ -8,28 +15,42 @@ import { AppData } from '../types/AppData'
 import { ValueOf } from '../types/ValueOf'
 import { createJobPoller, CreateJobPollerPollOptions } from './createJobPoller'
 
+export type AddonJobPollerOptions = {
+  onRun?: (response: ExecuteAddonResponse) => void
+  onStatus?: (response: AddonExecutionStatusResponse) => void
+}
+
 export const addonJobPoller = async <T extends ValueOf<typeof AddonName>>(
-  options: ExecuteAddonOptions<T> & CreateJobPollerPollOptions,
+  options: ExecuteAddonOptions<T> &
+    CreateJobPollerPollOptions &
+    AddonJobPollerOptions,
   settings: ApiRequestSettings
 ) => {
+  const { onRun, onStatus, ...pollerOptions } = options
+
   const poller = createJobPoller({
     runner: executeAddon,
-    resolveJobs: (response, runnerOptions, runnerSettings) => [
-      {
-        target: runnerOptions.target,
-        requestId: response.requestId,
-        addonName: runnerOptions.addonName,
-        runnerSettings
-      }
-    ],
-    getJobStatus: (job) => {
-      return addonExecutionStatus(
+    resolveJobs: (response, runnerOptions, runnerSettings) => {
+      onRun && onRun(response)
+      return [
+        {
+          target: runnerOptions.target,
+          requestId: response.requestId,
+          addonName: runnerOptions.addonName,
+          runnerSettings
+        }
+      ]
+    },
+    getJobStatus: async (job) => {
+      const response = await addonExecutionStatus(
         {
           addonName: job.addonName,
           requestId: job.requestId
         },
         job.runnerSettings
       )
+      onStatus && onStatus(response)
+      return response
     },
     isJobFinished: (statusResponse) =>
       statusResponse.status === AddonExecutionStatus.DONE,
@@ -52,6 +73,6 @@ export const addonJobPoller = async <T extends ValueOf<typeof AddonName>>(
       result: null
     })
   })
-  const promises = await poller(options, settings)
+  const promises = await poller(pollerOptions, settings)
   return promises[0]
 }

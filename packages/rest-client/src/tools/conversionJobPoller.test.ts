@@ -76,4 +76,51 @@ describe('conversionJobPoller', () => {
       })
     )
   })
+
+  it('should accept onRun and onStatus callbacks', async () => {
+    const path = `${DOCUMENT_UUID}/document/-/format/pdf/`
+
+    const onRun = jest.fn()
+    const onStatus = jest.fn()
+
+    const promises = await conversionJobPoller(
+      {
+        type: ConversionType.DOCUMENT,
+        onRun,
+        onStatus,
+        paths: [path],
+        store: false
+      },
+      testSettings
+    )
+
+    expect(promises.length).toBe(1)
+    await promises[0]
+
+    expect(onRun.mock.calls.length).toBe(1)
+    expect(onRun.mock.calls[0]).toEqual([
+      expect.objectContaining({
+        problems: {},
+        result: [
+          expect.objectContaining({
+            originalSource: expect.toBeString(),
+            token: expect.toBeNumber(),
+            uuid: expect.toBeString()
+          })
+        ]
+      })
+    ])
+
+    expect(onStatus.mock.calls.length).toBeGreaterThanOrEqual(1)
+    expect(onStatus.mock.lastCall).toEqual([
+      expect.objectContaining({
+        error: null,
+        path,
+        status: ConversionStatus.FINISHED,
+        result: expect.objectContaining({
+          uuid: expect.toBeString()
+        })
+      })
+    ])
+  })
 })

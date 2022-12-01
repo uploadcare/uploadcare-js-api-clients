@@ -194,6 +194,8 @@ const jobs = await conversionJobPoller(
   {
     type: ConversionType.VIDEO,
     // type: ConversionType.DOCUMENT,
+    onRun: response => console.log(response), // called when job is started
+    onStatus: response => console.log(response), // called on every job status request
     paths: [':uuid/video/-/size/x720/', ':uuid/video/-/size/x360/'],
     store: false
   },
@@ -224,6 +226,8 @@ const result = await addonJobPoller(
     addonName: AddonName.UC_CLAMAV_VIRUS_SCAN,
     // addonName: AddonName.AWS_REKOGNITION_DETECT_LABELS,
     // addonName: AddonName.REMOVE_BG,
+    onRun: response => console.log(response), // called when job is started
+    onStatus: response => console.log(response), // called on every job status request
     target: ':uuid',
     params: {
       purge_infected: false
