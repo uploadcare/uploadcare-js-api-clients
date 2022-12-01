@@ -70,6 +70,30 @@ describe('poll', () => {
     expect(job.spy.cancel).not.toHaveBeenCalled()
   })
 
+  it('should be cancelled after timeout', async () => {
+    const job = longJob(10)
+
+    await expect(
+      poll({ check: job.isFinish, interval: 20, timeout: 100 })
+    ).rejects.toThrowError(new CancelError('Timed out'))
+  })
+
+  it('should not run any logic after timeout', async () => {
+    const job = longJob(10)
+
+    await expect(
+      poll({ check: job.isFinish, interval: 20, timeout: 100 })
+    ).rejects.toThrowError(new CancelError('Timed out'))
+
+    const conditionCallsCount = job.spy.condition.mock.calls.length
+    const cancelCallsCount = job.spy.cancel.mock.calls.length
+
+    await delay(50)
+
+    expect(job.spy.condition).toHaveBeenCalledTimes(conditionCallsCount)
+    expect(job.spy.cancel).toHaveBeenCalledTimes(cancelCallsCount)
+  })
+
   it('should not run any logic after cancel', async () => {
     const job = longJob(10)
     const ctrl = new AbortController()

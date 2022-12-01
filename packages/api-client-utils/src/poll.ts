@@ -10,6 +10,7 @@ const DEFAULT_INTERVAL = 500
 const poll = <T>({
   check,
   interval = DEFAULT_INTERVAL,
+  timeout,
   signal
 }: {
   check: PollCheckFunction<T>
@@ -18,30 +19,43 @@ const poll = <T>({
   signal?: AbortSignal
 }): Promise<T> =>
   new Promise((resolve, reject) => {
+    let tickTimeoutId: NodeJS.Timeout
     let timeoutId: NodeJS.Timeout
 
     onCancel(signal, () => {
-      timeoutId && clearTimeout(timeoutId)
+      tickTimeoutId && clearTimeout(tickTimeoutId)
       reject(new CancelError('Poll cancelled'))
     })
+
+    if (timeout) {
+      timeoutId = setTimeout(() => {
+        tickTimeoutId && clearTimeout(tickTimeoutId)
+        reject(new CancelError('Timed out'))
+      }, timeout)
+    }
 
     const tick = (): void => {
       try {
         Promise.resolve(check(signal))
           .then((result) => {
             if (result) {
+              timeoutId && clearTimeout(timeoutId)
               resolve(result)
             } else {
-              timeoutId = setTimeout(tick, interval)
+              tickTimeoutId = setTimeout(tick, interval)
             }
           })
-          .catch((error) => reject(error))
+          .catch((error) => {
+            timeoutId && clearTimeout(timeoutId)
+            reject(error)
+          })
       } catch (error) {
+        timeoutId && clearTimeout(timeoutId)
         reject(error)
       }
     }
 
-    timeoutId = setTimeout(tick, 0)
+    tickTimeoutId = setTimeout(tick, 0)
   })
 
 export { poll, PollCheckFunction }
