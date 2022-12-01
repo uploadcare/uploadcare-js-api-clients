@@ -26,7 +26,8 @@ describe('conversionJobPoller', () => {
     await expect(promises[0]).resolves.toEqual({
       status: ConversionStatus.FAILED,
       error: 'CDN Path error: Cannot parse url part: invalid',
-      path: paths[0]
+      path: paths[0],
+      result: null
     })
     const finishedJob = await promises[1]
     // test types for `thumbnailsGroupUuid` presence
@@ -62,7 +63,8 @@ describe('conversionJobPoller', () => {
     await expect(promises[0]).resolves.toEqual({
       status: ConversionStatus.FAILED,
       error: 'CDN Path error: Cannot parse url part: invalid',
-      path: paths[0]
+      path: paths[0],
+      result: null
     })
     const finishedJob = await promises[1]
     expect(finishedJob).toEqual(
