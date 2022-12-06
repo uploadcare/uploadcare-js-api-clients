@@ -1,4 +1,4 @@
-import { onCancel } from './onCancel'
+import { onCancel } from '@uploadcare/api-client-utils'
 
 type Callback = () => void
 type StrangeFn<T> = (args: {

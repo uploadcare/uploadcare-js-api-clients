@@ -19,6 +19,7 @@ Node.js and browser.
 <!-- toc -->
 - [Install](#install)
 - [Usage](#usage)
+  - [Authentication](#authentication)
   - [API](#api)
   - [Settings](#settings)
   - [Pagination](#pagination)
@@ -175,7 +176,82 @@ Check out the [rest-client API Reference](https://uploadcare.github.io/uploadcar
 
 #### Job status polling
 
-There are no helpers for the job status polling yet. Stay tuned.
+There are two helpers to do job status polling using Conversion API or Addons API: `conversionJobPoller` and `addonJobPoller`.
+
+##### Conversion API
+
+```ts
+import {
+  conversionJobPoller,
+  ConversionType,
+  UploadcareSimpleAuthSchema
+} from '@uploadcare/rest-client'
+
+const uploadcareSimpleAuthSchema = new UploadcareSimpleAuthSchema({
+  publicKey: 'YOUR_PUBLIC_KEY',
+  secretKey: 'YOUR_SECRET_KEY'
+})
+
+const abortController = new AbortController()
+// abortController.abort()
+
+const jobs = await conversionJobPoller(
+  {
+    type: ConversionType.VIDEO,
+    // type: ConversionType.DOCUMENT,
+    onRun: response => console.log(response), // called when job is started
+    onStatus: response => console.log(response), // called on every job status request
+    paths: [':uuid/video/-/size/x720/', ':uuid/video/-/size/x360/'],
+    store: false,
+    pollOptions: {
+      signal: abortController.signal
+    }
+  },
+  { authSchema: uploadcareSimpleAuthSchema }
+)
+
+const results = Promise.allSettled(jobs)
+
+console.log(results)
+```
+
+##### Addons API
+
+```ts
+import {
+  addonJobPoller,
+  AddonName,
+  UploadcareSimpleAuthSchema
+} from '@uploadcare/rest-client'
+
+const uploadcareSimpleAuthSchema = new UploadcareSimpleAuthSchema({
+  publicKey: 'YOUR_PUBLIC_KEY',
+  secretKey: 'YOUR_SECRET_KEY'
+})
+
+const abortController = new AbortController()
+// abortController.abort()
+
+const result = await addonJobPoller(
+  {
+    addonName: AddonName.UC_CLAMAV_VIRUS_SCAN,
+    // addonName: AddonName.AWS_REKOGNITION_DETECT_LABELS,
+    // addonName: AddonName.REMOVE_BG,
+    onRun: response => console.log(response), // called when job is started
+    onStatus: response => console.log(response), // called on every job status request
+    target: ':uuid',
+    params: {
+      purge_infected: false
+    },
+    pollOptions: {
+      signal: abortController.signal
+    }
+  },
+  testSettings
+)
+
+console.log(result)
+```
 
 ## Security issues
 

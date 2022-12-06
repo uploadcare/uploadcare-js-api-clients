@@ -1,7 +1,9 @@
-import { cancelError } from '../tools/errors'
-import { onCancel } from '../tools/onCancel'
 import { RequestOptions, RequestResponse } from './types'
-import { UploadcareNetworkError } from '@uploadcare/api-client-utils'
+import {
+  UploadcareNetworkError,
+  onCancel,
+  CancelError
+} from '@uploadcare/api-client-utils'
 
 const request = ({
   method,
@@ -39,7 +41,7 @@ const request = ({
       aborted = true
       xhr.abort()
 
-      reject(cancelError())
+      reject(new CancelError())
     })
 
     xhr.onload = (): void => {

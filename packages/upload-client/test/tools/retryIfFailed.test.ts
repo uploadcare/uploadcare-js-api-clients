@@ -197,7 +197,7 @@ describe('retryIfFailed', () => {
       const diff = end - start
 
       // 1+2+3+4=10
-      expect(diff).toBeGreaterThan(10000)
+      expect(diff).toBeGreaterThanOrEqual(10000)
       // expect max ~4s spent on doing requests, it could be slow on CI and needs to be tested
       expect(diff).toBeLessThan(14000)
     })

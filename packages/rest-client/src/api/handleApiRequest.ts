@@ -10,7 +10,7 @@ type HandleResponseOptions = {
   camelize?: boolean
 }
 
-const CAMELIZE_IGNORE_KEYS = ['metadata', 'problems']
+const CAMELIZE_IGNORE_KEYS = ['metadata', 'problems', 'appdata']
 const NO_CONTENT_STATUS = 204
 
 const isJsonContentType = (type: string | null) =>

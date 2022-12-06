@@ -1,7 +1,7 @@
-import { poll, CheckFunction } from '../../src/tools/poll'
-import { onCancel } from '../../src/tools/onCancel'
-import { delay } from '@uploadcare/api-client-utils'
-import { UploadClientError } from '../../src/tools/errors'
+import { poll, PollCheckFunction } from './poll'
+import { onCancel } from './onCancel'
+import { CancelError } from './CancelError'
+import { delay } from './delay'
 import { jest, expect } from '@jest/globals'
 
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
@@ -10,7 +10,7 @@ const longJob = (attemps: number, fails: Error | null = null) => {
   const condition = jest.fn()
   const cancel = jest.fn()
 
-  const isFinish: CheckFunction<boolean> = (signal) => {
+  const isFinish: PollCheckFunction<boolean> = (signal) => {
     condition()
 
     onCancel(signal, cancel)
@@ -27,7 +27,7 @@ const longJob = (attemps: number, fails: Error | null = null) => {
     }
   }
 
-  const asyncIsFinish: CheckFunction<boolean> = (cancel) =>
+  const asyncIsFinish: PollCheckFunction<boolean> = (cancel) =>
     new Promise<boolean>((resolve, reject) => {
       try {
         resolve(isFinish(cancel))
@@ -64,10 +64,34 @@ describe('poll', () => {
 
     await expect(
       poll({ check: job.isFinish, interval: 20, signal: ctrl.signal })
-    ).rejects.toThrowError(new UploadClientError('Poll cancelled'))
+    ).rejects.toThrowError(new CancelError('Poll cancelled'))
 
     expect(job.spy.condition).not.toHaveBeenCalled()
     expect(job.spy.cancel).not.toHaveBeenCalled()
+  })
+
+  it('should be cancelled after timeout', async () => {
+    const job = longJob(10)
+
+    await expect(
+      poll({ check: job.isFinish, interval: 20, timeout: 100 })
+    ).rejects.toThrowError(new CancelError('Timed out'))
+  })
+
+  it('should not run any logic after timeout', async () => {
+    const job = longJob(10)
+
+    await expect(
+      poll({ check: job.isFinish, interval: 20, timeout: 100 })
+    ).rejects.toThrowError(new CancelError('Timed out'))
+
+    const conditionCallsCount = job.spy.condition.mock.calls.length
+    const cancelCallsCount = job.spy.cancel.mock.calls.length
+
+    await delay(50)
+
+    expect(job.spy.condition).toHaveBeenCalledTimes(conditionCallsCount)
+    expect(job.spy.cancel).toHaveBeenCalledTimes(cancelCallsCount)
   })
 
   it('should not run any logic after cancel', async () => {
@@ -78,7 +102,7 @@ describe('poll', () => {
 
     await expect(
       poll({ check: job.isFinish, interval: 20, signal: ctrl.signal })
-    ).rejects.toThrowError(new UploadClientError('Poll cancelled'))
+    ).rejects.toThrowError(new CancelError('Poll cancelled'))
 
     const conditionCallsCount = job.spy.condition.mock.calls.length
     const cancelCallsCount = job.spy.cancel.mock.calls.length
@@ -99,7 +123,7 @@ describe('poll', () => {
 
     await expect(
       poll({ check: job.isFinish, interval: 60, signal: ctrl.signal })
-    ).rejects.toThrowError(new UploadClientError('Poll cancelled'))
+    ).rejects.toThrowError(new CancelError('Poll cancelled'))
 
     expect(job.spy.condition).toHaveBeenCalledTimes(2)
     expect(job.spy.cancel).toHaveBeenCalledTimes(2)
@@ -115,7 +139,7 @@ describe('poll', () => {
 
     await expect(
       poll({ check: job.isFinish, interval: 10, signal: ctrl.signal })
-    ).rejects.toThrowError(new UploadClientError('Poll cancelled'))
+    ).rejects.toThrowError(new CancelError('Poll cancelled'))
 
     const conditionCallsCount = job.spy.condition.mock.calls.length
 

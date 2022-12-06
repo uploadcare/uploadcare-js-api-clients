@@ -1,11 +1,13 @@
+import { AddonName } from './AddonName'
+
 export type ClamavVirusScan = {
   data: {
     infected: boolean
-    infectedWith: string
+    infected_with: string
   }
   version: string
-  datetimeCreated: string
-  datetimeUpdated: string
+  datetime_created: string
+  datetime_updated: string
 }
 
 export type AwsRekognitionDetectLabelParent = {
@@ -35,12 +37,21 @@ export type AwsRekognitionDetectLabels = {
     Labels: AwsRekognitionDetectLabel[]
   }
   version: string
-  datetimeCreated: string
-  datetimeUpdated: string
+  datetime_created: string
+  datetime_updated: string
 }
 
-// TODO: should this object be camelized?
+export type RemoveBg = {
+  data: {
+    foreground_type: string
+  }
+  version: string
+  datetime_created: string
+  datetime_updated: string
+}
+
 export type AppData = {
-  ucClamavVirusScan?: ClamavVirusScan
-  awsRekognitionDetectLabels?: AwsRekognitionDetectLabels
+  [AddonName.UC_CLAMAV_VIRUS_SCAN]?: ClamavVirusScan
+  [AddonName.AWS_REKOGNITION_DETECT_LABELS]?: AwsRekognitionDetectLabels
+  [AddonName.REMOVE_BG]?: RemoveBg
 }
