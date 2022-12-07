@@ -1,3 +1,26 @@
+# [6.0.0](https://github.com/uploadcare/uploadcare-js-api-clients/compare/v5.2.0...v6.0.0) (2022-12-07)
+
+
+* refactor(rest-client)!: merge document and video conversion methods into the two common ones - `convert` and `conversionJobStatus` ([beb2bb6](https://github.com/uploadcare/uploadcare-js-api-clients/commit/beb2bb660d1fee000701d680e879c6f67bc25805))
+* fix(rest-client)!: do not change case of the `appdata` field and its content ([92d785d](https://github.com/uploadcare/uploadcare-js-api-clients/commit/92d785def83859a1eef3496b016ed766268eb362))
+* feat(rest-client)!: accept boolean or "auto" for the `store` option ([440e228](https://github.com/uploadcare/uploadcare-js-api-clients/commit/440e228aab817386aa0308d66a9e0ab56e0c7355))
+
+
+### Features
+
+* **api-client-utils:** add `timeout` option to the `poll` ([f27f25a](https://github.com/uploadcare/uploadcare-js-api-clients/commit/f27f25a177a300a8f12694f3b5a5c94f224e8bec))
+* **rest-client:** add addon job status polling ([8f2aec7](https://github.com/uploadcare/uploadcare-js-api-clients/commit/8f2aec78d514b0591a1fbef938cd92fd79c9ac17))
+* **rest-client:** add conversion api polling ([41c6aa5](https://github.com/uploadcare/uploadcare-js-api-clients/commit/41c6aa5b13b6e6d750f5edd83b456282033f2c1e))
+
+
+### BREAKING CHANGES
+
+* Methods `convertVideo`, `convertDocument`, `videoConversionJobStatus` and `documentConversionJobStatus` are removed. Please use `convert` and `conversionJobStatus` methods. Type of conversion (video or document) passed as `type` option.
+* Now `appdata` field is returned as-is, without kebab -> camel case conversion
+* string ("true", "false", "1", "0") values for the `store` option of `convertVideo` and `convertDocument` aren't accepted anymore. Please use `boolean` value or "auto". It's "auto" by default"
+
+
+
 # [5.2.0](https://github.com/uploadcare/uploadcare-js-api-clients/compare/v5.1.2...v5.2.0) (2022-11-26)
 
 
