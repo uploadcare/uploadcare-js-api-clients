@@ -74,8 +74,11 @@ export { getUserAgent } from '@uploadcare/api-client-utils'
  * Tools
  */
 export { paginate, Paginator } from './tools/paginate'
-export { addonJobPoller } from './tools/addonJobPoller'
-export { conversionJobPoller } from './tools/conversionJobPoller'
+export { addonJobPoller, AddonJobPollerOptions } from './tools/addonJobPoller'
+export {
+  conversionJobPoller,
+  ConversionJobPollerOptions
+} from './tools/conversionJobPoller'
 export { CreateJobPollerPollOptions } from './tools/createJobPoller'
 
 /**
