@@ -90,9 +90,9 @@ function buildFormData(options: FormDataOptions): FormData | NodeFormData {
 
   const paramsList = getFormDataParams(options)
   for (const params of paramsList) {
-    const [key, value, ...options] = params
+    const [key, value, ...rest] = params
     // node form-data has another signature for append
-    formData.append(key, value as Blob, ...(options as [string]))
+    formData.append(key, value as Blob, ...(rest as [string]))
   }
 
   return formData
