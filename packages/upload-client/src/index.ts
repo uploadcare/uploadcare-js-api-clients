@@ -83,8 +83,12 @@ export { Headers, ErrorRequestInfo } from './request/types'
 export { UploadcareFile } from './tools/UploadcareFile'
 export { UploadcareGroup } from './tools/UploadcareGroup'
 export { UploadClientError, ErrorResponseInfo } from './tools/errors'
-export { Settings, SupportedFileInput, ReactNativeFile } from './types'
-export { NodeFile, BrowserFile, ReactNativeAsset } from './types'
+export { Settings, SupportedFileInput as SupportedFileInput } from './types'
+export {
+  NodeFile as NodeFile,
+  BrowserFile as BrowserFile,
+  ReactNativeAsset
+} from './types'
 export {
   FileInfo,
   GroupId,

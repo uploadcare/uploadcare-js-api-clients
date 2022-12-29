@@ -36,7 +36,6 @@ export type ReactNativeAsset = {
   uri: string
   name?: string
 }
-export type ReactNativeFile = ReactNativeAsset | Blob
 
-export type SupportedFileInput = BrowserFile | NodeFile | ReactNativeFile
-export type AnySlicable = BrowserFile | NodeFile
+export type SupportedFileInput = BrowserFile | NodeFile | ReactNativeAsset
+export type Sliceable = BrowserFile | NodeFile

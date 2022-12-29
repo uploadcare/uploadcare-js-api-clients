@@ -1,5 +1,5 @@
 import { Url, Uuid } from '..'
-import { SupportedFileInput, AnySlicable } from '../types'
+import { SupportedFileInput, Sliceable } from '../types'
 import { isFileData } from '../tools/isFileData'
 
 /**
@@ -30,4 +30,4 @@ export type PrepareChunks = (
   file: SupportedFileInput,
   fileSize: number,
   chunkSize: number
-) => Promise<(index: number) => AnySlicable>
+) => Promise<(index: number) => Sliceable>
