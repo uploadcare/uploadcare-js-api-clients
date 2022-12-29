@@ -13,7 +13,8 @@ import { retryIfFailed } from '../tools/retryIfFailed'
 
 /* Types */
 import { Uuid, ProgressCallback, Metadata } from './types'
-import { FailedResponse, NodeFile, BrowserFile } from '../request/types'
+import { FailedResponse } from '../request/types'
+import { NodeFile, BrowserFile } from '../types'
 import { getStoreValue } from '../tools/getStoreValue'
 
 export type BaseResponse = {

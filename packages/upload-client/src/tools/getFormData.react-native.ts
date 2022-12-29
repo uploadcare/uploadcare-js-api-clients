@@ -1,4 +1,4 @@
-import { BrowserFile, NodeFile } from '../request/types'
+import { BrowserFile, NodeFile } from '../types'
 import {
   FileTransformer,
   GetFormDataFileAppendOptions,

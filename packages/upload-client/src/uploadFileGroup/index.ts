@@ -13,7 +13,7 @@ import {
   Url,
   Uuid
 } from '../api/types'
-import { NodeFile, BrowserFile } from '../request/types'
+import { NodeFile, BrowserFile } from '../types'
 
 export type GroupFromOptions = {
   jsonpCallback?: string

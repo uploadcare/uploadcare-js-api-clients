@@ -1,5 +1,5 @@
 import { Url, Uuid } from '..'
-import { NodeFile, BrowserFile } from '../request/types'
+import { NodeFile, BrowserFile } from '../types'
 
 /**
  * FileData type guard.

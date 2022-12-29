@@ -1,7 +1,7 @@
 import defaultSettings from '../defaultSettings'
 
 /* Types */
-import { NodeFile, BrowserFile } from '../request/types'
+import { NodeFile, BrowserFile } from '../types'
 
 /**
  * Get file size.

@@ -1,6 +1,6 @@
 import { isFileData, isUrl, isUuid } from '../uploadFile/types'
 import { Url, Uuid } from '../api/types'
-import { NodeFile, BrowserFile } from '../request/types'
+import { NodeFile, BrowserFile } from '../types'
 
 /**
  * FileData type guard.

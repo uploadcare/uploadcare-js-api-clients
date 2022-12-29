@@ -28,3 +28,6 @@ export interface Settings extends Partial<DefaultSettings> {
   source?: string
   jsonpCallback?: string
 }
+
+export type BrowserFile = Blob | File
+export type NodeFile = Buffer // | NodeJS.ReadableStream

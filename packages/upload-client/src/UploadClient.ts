@@ -25,8 +25,7 @@ import { UploadcareGroup } from './tools/UploadcareGroup'
 import { FileFromOptions, uploadFile } from './uploadFile'
 
 import { FileInfo, GroupId, GroupInfo, Token, Url, Uuid } from './api/types'
-import { BrowserFile, NodeFile } from './request/types'
-import { Settings } from './types'
+import { Settings, BrowserFile, NodeFile } from './types'
 import uploadFileGroup, { GroupFromOptions } from './uploadFileGroup'
 
 /**

@@ -4,6 +4,7 @@ import {
   ProgressCallback,
   UnknownProgressInfo
 } from '../api/types'
+import { BrowserFile, NodeFile } from '../types'
 
 export type Headers = {
   [key: string]: string | string[] | undefined
@@ -41,6 +42,3 @@ export type FailedResponse = {
     errorCode: string
   }
 }
-
-export type BrowserFile = Blob | File
-export type NodeFile = Buffer // | NodeJS.ReadableStream

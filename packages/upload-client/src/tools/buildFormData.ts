@@ -1,7 +1,7 @@
 import getFormData, { getFileOptions, transformFile } from './getFormData.node'
 
 import NodeFormData from 'form-data'
-import { BrowserFile, NodeFile } from '../request/types'
+import { BrowserFile, NodeFile } from '../types'
 import { isFileData } from '../uploadFile/types'
 
 /**

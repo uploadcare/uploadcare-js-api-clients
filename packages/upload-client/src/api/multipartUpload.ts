@@ -3,7 +3,7 @@ import { MultipartPart } from './multipartStart'
 import request from '../request/request.node'
 
 import { ComputableProgressInfo, ProgressCallback } from './types'
-import { NodeFile, BrowserFile } from '../request/types'
+import { NodeFile, BrowserFile } from '../types'
 import { retryIfFailed } from '../tools/retryIfFailed'
 import defaultSettings from '../defaultSettings'
 

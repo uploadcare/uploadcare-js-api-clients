@@ -21,7 +21,7 @@ import {
   ProgressCallback,
   UnknownProgressInfo
 } from '../api/types'
-import { NodeFile, BrowserFile } from '../request/types'
+import { NodeFile, BrowserFile } from '../types'
 
 export type MultipartOptions = {
   publicKey: string

@@ -2,7 +2,7 @@ import base from '../api/base'
 import { UploadcareFile } from '../tools/UploadcareFile'
 import { isReadyPoll } from '../tools/isReadyPoll'
 
-import { NodeFile, BrowserFile } from '../request/types'
+import { NodeFile, BrowserFile } from '../types'
 import { Metadata, ProgressCallback } from '../api/types'
 import { CustomUserAgent } from '@uploadcare/api-client-utils'
 

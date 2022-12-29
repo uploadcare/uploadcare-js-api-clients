@@ -1,4 +1,4 @@
-import { BrowserFile, NodeFile } from '../request/types'
+import { BrowserFile, NodeFile } from '../types'
 
 export type ReactNativeAsset = { type: string; uri: string; name?: string }
 
