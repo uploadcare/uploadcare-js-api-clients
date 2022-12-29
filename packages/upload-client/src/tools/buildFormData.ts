@@ -63,7 +63,7 @@ function collectParams(
 ): void {
   if (isFileValue(inputValue)) {
     const { name, contentType }: FileOptions = inputValue
-    const file = transformFile(inputValue.data, name, contentType) as Blob // lgtm [js/superfluous-trailing-arguments]
+    const file = transformFile(inputValue.data, name, contentType)
     const options = getFileOptions({ name, contentType })
     params.push([inputKey, file, ...options])
   } else if (isObjectValue(inputValue)) {
