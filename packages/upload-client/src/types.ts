@@ -30,4 +30,13 @@ export interface Settings extends Partial<DefaultSettings> {
 }
 
 export type BrowserFile = Blob | File
-export type NodeFile = Buffer // | NodeJS.ReadableStream
+export type NodeFile = Buffer
+export type ReactNativeAsset = {
+  type: string
+  uri: string
+  name?: string
+}
+export type ReactNativeFile = ReactNativeAsset | Blob
+
+export type SupportedFileInput = BrowserFile | NodeFile | ReactNativeFile
+export type AnySlicable = BrowserFile | NodeFile

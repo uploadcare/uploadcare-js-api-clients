@@ -1,8 +1,8 @@
 import getFormData, { getFileOptions, transformFile } from './getFormData.node'
 
 import NodeFormData from 'form-data'
-import { BrowserFile, NodeFile } from '../types'
-import { isFileData } from '../uploadFile/types'
+import { SupportedFileInput } from '../types'
+import { isFileData } from './isFileData'
 
 /**
  * Constructs FormData instance.
@@ -21,7 +21,7 @@ interface FileOptions {
 }
 
 interface FileType extends FileOptions {
-  data: BrowserFile | NodeFile
+  data: SupportedFileInput
 }
 
 type InputValue = FileType | SimpleType | ObjectType
@@ -33,7 +33,7 @@ type FormDataOptions = {
 type Params = Array<
   [
     string,
-    string | BrowserFile | NodeFile,
+    string | SupportedFileInput,
     ...(string | { [key: string]: string | undefined })[]
   ]
 >

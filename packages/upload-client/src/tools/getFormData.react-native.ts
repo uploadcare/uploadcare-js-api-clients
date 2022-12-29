@@ -1,19 +1,26 @@
-import { BrowserFile, NodeFile } from '../types'
-import {
-  FileTransformer,
-  GetFormDataFileAppendOptions,
-  ReactNativeAsset
-} from './types'
+import { SupportedFileInput, ReactNativeAsset } from '../types'
+import { isBlob, isReactNativeAsset } from './isFileData'
+import { FileTransformer, GetFormDataFileAppendOptions } from './types'
 
 export const getFileOptions: GetFormDataFileAppendOptions = () => []
 
 export const transformFile: FileTransformer = (
-  file: BrowserFile | NodeFile,
+  file: SupportedFileInput,
   name: string,
   contentType: string
 ): ReactNativeAsset => {
-  const uri = URL.createObjectURL(file as BrowserFile)
-  return { uri, name, type: contentType }
+  if (isReactNativeAsset(file)) {
+    return {
+      uri: file.uri,
+      name: file.name || name,
+      type: file.type || contentType
+    }
+  }
+  if (isBlob(file)) {
+    const uri = URL.createObjectURL(file)
+    return { uri, name: name, type: file.type || contentType }
+  }
+  throw new Error(`Unsupported file type.`)
 }
 
 export default (): FormData => new FormData()

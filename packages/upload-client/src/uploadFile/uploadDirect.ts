@@ -1,10 +1,10 @@
 import base from '../api/base'
-import { UploadcareFile } from '../tools/UploadcareFile'
 import { isReadyPoll } from '../tools/isReadyPoll'
+import { UploadcareFile } from '../tools/UploadcareFile'
 
-import { NodeFile, BrowserFile } from '../types'
-import { Metadata, ProgressCallback } from '../api/types'
 import { CustomUserAgent } from '@uploadcare/api-client-utils'
+import { Metadata, ProgressCallback } from '../api/types'
+import { SupportedFileInput } from '../types'
 
 type DirectOptions = {
   publicKey: string
@@ -31,7 +31,7 @@ type DirectOptions = {
 }
 
 const uploadDirect = (
-  file: NodeFile | BrowserFile,
+  file: SupportedFileInput,
   {
     publicKey,
 

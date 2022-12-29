@@ -1,19 +1,15 @@
-import defaultSettings, {
-  defaultContentType,
-  defaultFilename
-} from '../defaultSettings'
-import { prepareChunks } from './prepareChunks.node'
+import { CustomUserAgent } from '@uploadcare/api-client-utils'
+import multipartComplete from '../api/multipartComplete'
 import multipartStart from '../api/multipartStart'
 import multipartUpload, {
-  MultipartUploadResponse,
-  MultipartUploadOptions
+  MultipartUploadOptions,
+  MultipartUploadResponse
 } from '../api/multipartUpload'
-import multipartComplete from '../api/multipartComplete'
+import defaultSettings from '../defaultSettings'
+import { isReadyPoll } from '../tools/isReadyPoll'
 import runWithConcurrency from '../tools/runWithConcurrency'
 import { UploadcareFile } from '../tools/UploadcareFile'
-import { getFileSize } from '../tools/isMultipart'
-import { isReadyPoll } from '../tools/isReadyPoll'
-import { CustomUserAgent } from '@uploadcare/api-client-utils'
+import { prepareChunks } from './prepareChunks.node'
 
 import {
   ComputableProgressInfo,
@@ -21,7 +17,10 @@ import {
   ProgressCallback,
   UnknownProgressInfo
 } from '../api/types'
-import { NodeFile, BrowserFile } from '../types'
+import { getContentType } from '../tools/getContentType'
+import { getFileName } from '../tools/getFileName'
+import { getFileSize } from '../tools/getFileSize'
+import { SupportedFileInput } from '../types'
 
 export type MultipartOptions = {
   publicKey: string
@@ -66,8 +65,8 @@ const uploadPart = (
     retryNetworkErrorMaxTimes
   })
 
-const uploadMultipart = (
-  file: NodeFile | BrowserFile,
+const uploadMultipart = async (
+  file: SupportedFileInput,
   {
     publicKey,
 
@@ -96,7 +95,7 @@ const uploadMultipart = (
     metadata
   }: MultipartOptions
 ): Promise<UploadcareFile> => {
-  const size = fileSize || getFileSize(file)
+  const size = fileSize ?? (await getFileSize(file))
 
   let progressValues: number[]
   const createProgressHandler = (
@@ -125,8 +124,8 @@ const uploadMultipart = (
 
   return multipartStart(size, {
     publicKey,
-    contentType: contentType || (file as File).type || defaultContentType,
-    fileName: fileName || (file as File).name || defaultFilename,
+    contentType: contentType || getContentType(file),
+    fileName: fileName || getFileName(file),
     baseURL,
     secureSignature,
     secureExpire,
@@ -139,8 +138,8 @@ const uploadMultipart = (
     retryNetworkErrorMaxTimes,
     metadata
   })
-    .then(({ uuid, parts }) => {
-      const getChunk = prepareChunks(file, size, multipartChunkSize)
+    .then(async ({ uuid, parts }) => {
+      const getChunk = await prepareChunks(file, size, multipartChunkSize)
       return Promise.all([
         uuid,
         runWithConcurrency(

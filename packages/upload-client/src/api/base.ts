@@ -1,21 +1,19 @@
+import { camelizeKeys, CustomUserAgent } from '@uploadcare/api-client-utils'
+import { defaultSettings } from '../defaultSettings'
 import request from '../request/request.node'
 import buildFormData from '../tools/buildFormData'
-import getUrl from '../tools/getUrl'
-import {
-  defaultSettings,
-  defaultFilename,
-  defaultContentType
-} from '../defaultSettings'
-import { getUserAgent } from '../tools/getUserAgent'
-import { camelizeKeys, CustomUserAgent } from '@uploadcare/api-client-utils'
 import { UploadClientError } from '../tools/errors'
+import getUrl from '../tools/getUrl'
+import { getUserAgent } from '../tools/getUserAgent'
 import { retryIfFailed } from '../tools/retryIfFailed'
 
 /* Types */
-import { Uuid, ProgressCallback, Metadata } from './types'
 import { FailedResponse } from '../request/types'
-import { NodeFile, BrowserFile } from '../types'
+import { getContentType } from '../tools/getContentType'
+import { getFileName } from '../tools/getFileName'
 import { getStoreValue } from '../tools/getStoreValue'
+import { SupportedFileInput } from '../types'
+import { Metadata, ProgressCallback, Uuid } from './types'
 
 export type BaseResponse = {
   file: Uuid
@@ -50,7 +48,7 @@ export type BaseOptions = {
  * Can be canceled and has progress.
  */
 export default function base(
-  file: NodeFile | BrowserFile,
+  file: SupportedFileInput,
   {
     publicKey,
     fileName,
@@ -82,9 +80,8 @@ export default function base(
         data: buildFormData({
           file: {
             data: file,
-            name: fileName || (file as File)?.name || defaultFilename,
-            contentType:
-              contentType || (file as File)?.type || defaultContentType
+            name: fileName || getFileName(file),
+            contentType: contentType || getContentType(file)
           },
           UPLOADCARE_PUB_KEY: publicKey,
           UPLOADCARE_STORE: getStoreValue(store),

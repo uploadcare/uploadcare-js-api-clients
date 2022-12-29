@@ -1,12 +1,10 @@
-import { BrowserFile, NodeFile } from '../types'
-
-export type ReactNativeAsset = { type: string; uri: string; name?: string }
+import { SupportedFileInput } from '../types'
 
 export type FileTransformer = (
-  file: NodeFile | BrowserFile,
+  file: SupportedFileInput,
   name: string,
   contentType: string
-) => NodeFile | BrowserFile | ReactNativeAsset
+) => SupportedFileInput
 
 export type GetFormDataFileAppendOptions = (options: {
   [key: string]: string | undefined

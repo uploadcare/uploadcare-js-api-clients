@@ -1,11 +1,10 @@
-import { uploadFile, FileFromOptions } from '../uploadFile'
-import defaultSettings from '../defaultSettings'
 import group from '../api/group'
-import { UploadcareGroup } from '../tools/UploadcareGroup'
+import defaultSettings from '../defaultSettings'
 import { UploadcareFile } from '../tools/UploadcareFile'
+import { UploadcareGroup } from '../tools/UploadcareGroup'
+import { FileFromOptions, uploadFile } from '../uploadFile'
 
 /* Types */
-import { isFileDataArray, isUrlArray, isUuidArray } from './types'
 import {
   ComputableProgressInfo,
   ProgressCallback,
@@ -13,14 +12,15 @@ import {
   Url,
   Uuid
 } from '../api/types'
-import { NodeFile, BrowserFile } from '../types'
+import { SupportedFileInput } from '../types'
+import { isFileDataArray, isUrlArray, isUuidArray } from './types'
 
 export type GroupFromOptions = {
   jsonpCallback?: string
 }
 
 export default function uploadFileGroup(
-  data: (NodeFile | BrowserFile)[] | Url[] | Uuid[],
+  data: SupportedFileInput[] | Url[] | Uuid[],
   {
     publicKey,
 
@@ -79,8 +79,8 @@ export default function uploadFileGroup(
   }
 
   return Promise.all<UploadcareFile>(
-    (data as (NodeFile | BrowserFile)[]).map(
-      (file: NodeFile | BrowserFile | Url | Uuid, index: number) =>
+    (data as SupportedFileInput[]).map(
+      (file: SupportedFileInput | Url | Uuid, index: number) =>
         uploadFile(file, {
           publicKey,
 

@@ -1,15 +1,17 @@
-import uploadDirect from './uploadDirect'
-import uploadFromUrl from './uploadFromUrl'
-import uploadFromUploaded from './uploadFromUploaded'
 import defaultSettings from '../defaultSettings'
+import uploadDirect from './uploadDirect'
+import uploadFromUploaded from './uploadFromUploaded'
+import uploadFromUrl from './uploadFromUrl'
 
 /* Types */
-import { Url, Uuid, ProgressCallback, Metadata } from '../api/types'
 import { CustomUserAgent } from '@uploadcare/api-client-utils'
-import { NodeFile, BrowserFile } from '../types'
-import { isFileData, isUrl, isUuid } from './types'
+import { Metadata, ProgressCallback, Url, Uuid } from '../api/types'
+import { getFileSize } from '../tools/getFileSize'
+import { isFileData } from '../tools/isFileData'
+import { isMultipart } from '../tools/isMultipart'
 import { UploadcareFile } from '../tools/UploadcareFile'
-import { isMultipart, getFileSize } from '../tools/isMultipart'
+import { SupportedFileInput } from '../types'
+import { isUrl, isUuid } from './types'
 import uploadMultipart from './uploadMultipart'
 
 export type FileFromOptions = {
@@ -49,8 +51,8 @@ export type FileFromOptions = {
  * Uploads file from provided data.
  */
 
-function uploadFile(
-  data: NodeFile | BrowserFile | Url | Uuid,
+async function uploadFile(
+  data: SupportedFileInput | Url | Uuid,
   {
     publicKey,
 
@@ -85,7 +87,7 @@ function uploadFile(
   }: FileFromOptions
 ): Promise<UploadcareFile> {
   if (isFileData(data)) {
-    const fileSize = getFileSize(data)
+    const fileSize = await getFileSize(data)
 
     if (isMultipart(fileSize, multipartMinFileSize)) {
       return uploadMultipart(data, {
@@ -93,6 +95,7 @@ function uploadFile(
         contentType,
         multipartChunkSize,
 
+        fileSize,
         fileName,
         baseURL,
         secureSignature,
