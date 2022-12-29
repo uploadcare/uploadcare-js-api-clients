@@ -1,1 +1,1 @@
-export { uploadFileGroup, GroupFromOptions } from './uploadFileGroup'
+export { uploadFileGroup, type GroupFromOptions } from './uploadFileGroup'

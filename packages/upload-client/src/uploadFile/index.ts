@@ -1,1 +1,1 @@
-export { uploadFile, FileFromOptions } from './uploadFile'
+export { uploadFile, type FileFromOptions } from './uploadFile'
