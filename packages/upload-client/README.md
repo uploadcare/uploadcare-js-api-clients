@@ -23,6 +23,7 @@ Node.js and browser.
   - [High-Level API](#high-level-api)
   - [Low-Level API](#low-level-api)
   - [Settings](#settings)
+- [React Native](#react-native)
 - [Testing](#testing)
 - [Security issues](#security-issues)
 - [Feedback](#feedback)
@@ -124,7 +125,7 @@ interface UploadClient {
   getSettings(): Settings
 
   base(
-    file: NodeFile | BrowserFile,
+    file: Blob | File | Buffer | ReactNativeAsset,
     options: BaseOptions
   ): Promise<BaseResponse>
 
@@ -158,12 +159,12 @@ interface UploadClient {
   ): Promise<FileInfo>
 
   uploadFile(
-    data: NodeFile | BrowserFile | Url | Uuid,
+    data: Blob | File | Buffer | ReactNativeAsset | Url | Uuid,
     options: FileFromOptions
   ): Promise<UploadcareFile>
 
   uploadFileGroup(
-    data: (NodeFile | BrowserFile)[] | Url[] | Uuid[],
+    data: (Blob | File | Buffer | ReactNativeAsset)[] | Url[] | Uuid[],
     options: FileFromOptions & GroupFromOptions
   ): Promise<UploadcareGroup>
 }
@@ -208,7 +209,7 @@ List of all available API methods:
 
 ```typescript
 base(
-  file: NodeFile | BrowserFile,
+  file: Blob | File | Buffer | ReactNativeAsset,
   options: BaseOptions
 ): Promise<BaseResponse>
 ```
@@ -245,7 +246,7 @@ multipartStart(
 
 ```typescript
 multipartUpload(
-  part: Buffer | Blob,
+  part: Buffer | Blob | File,
   url: MultipartPart,
   options: MultipartUploadOptions
 ): Promise<MultipartUploadResponse>
@@ -288,6 +289,7 @@ Defaults to `https://upload.uploadcare.com`
 #### `fileName: string`
 
 You can specify an original filename.
+It could useful when file input does not contain filename.
 
 Defaults to `original`.
 
@@ -408,7 +410,7 @@ Defaults to `4`.
 
 ### `contentType: string`
 
-This setting is needed for correct multipart uploads.
+This option is useful when file input does not contain content type.
 
 Defaults to `application/octet-stream`.
 
@@ -426,6 +428,37 @@ Non-string values will be converted to `string`. `undefined` values will be igno
 
 See [docs][uc-file-metadata] and [REST API][uc-docs-metadata] for details.
 
+## React Native
+
+To be able to use `@uploadcare/upload-client` with React Native, you need to
+install [react-native-url-polyfill][react-native-url-polyfill].
+
+To prevent [`Error: Cannot create URL for blob`][react-native-url-polyfill-issue]
+errors you need to configure your Android app schema to accept blobs -
+have a look at this pull request for an example: [5985d7e][react-native-url-polyfill-example].
+
+You can use `ReactNativeAsset` as an input to the `@uploadcare/upload-client` like this:
+
+```ts
+type ReactNativeAsset = {
+  uri: string
+  type: string
+  name?: string
+}
+```
+
+```ts
+const asset = { uri: 'URI_TO_FILE', name: 'file.txt', type: 'text/plain' }
+uploadFile(asset, { publicKey: 'YOUR_PUBLIC_KEY' })
+```
+
+Or `Blob` like this:
+
+```ts
+const uri = 'URI_TO_FILE'
+const blob = await fetch(uri).then((res) => res.blob())
+uploadFile(blob, { publicKey: 'YOUR_PUBLIC_KEY' })
+```
 
 ## Testing
 
@@ -490,3 +523,6 @@ request at [hello@uploadcare.com][uc-email-hello].
 [uc-docs-upload-api]: https://uploadcare.com/docs/api_reference/upload/?utm_source=github&utm_campaign=uploadcare-js-api-clients
 [uc-docs-metadata]: https://uploadcare.com/api-refs/rest-api/v0.7.0/#tag/File-Metadata
 [uc-file-metadata]: https://uploadcare.com/docs/file-metadata/
+[react-native-url-polyfill]: https://github.com/charpeni/react-native-url-polyfill
+[react-native-url-polyfill-issue]: https://github.com/charpeni/react-native-url-polyfill/issues/284
+[react-native-url-polyfill-example]: https://github.com/charpeni/react-native-url-polyfill/commit/5985d7efc07b496b829883540d09c6f0be384387
