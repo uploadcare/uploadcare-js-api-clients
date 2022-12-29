@@ -7,12 +7,5 @@ export const getContentType = (file: SupportedFileInput): string => {
   if (isBlob(file) || isFile(file) || isReactNativeAsset(file)) {
     contentType = file.type
   }
-  if (contentType) {
-    return contentType
-  }
-  console.warn(
-    `Cannot determine content type. Using default content type: ${defaultContentType}`,
-    file
-  )
-  return defaultContentType
+  return contentType || defaultContentType
 }

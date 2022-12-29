@@ -12,12 +12,6 @@ export const getFileName = (file: SupportedFileInput): string => {
   } else if (isReactNativeAsset(file) && file.name) {
     filename = file.name
   }
-  if (filename) {
-    return filename
-  }
-  console.warn(
-    `Cannot determine filename. Using default filename: ${defaultFilename}`,
-    file
-  )
-  return defaultFilename
+
+  return filename || defaultFilename
 }

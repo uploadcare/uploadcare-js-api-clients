@@ -16,8 +16,6 @@ describe('getFileName', () => {
   })
 
   it('should return fallback value if no filename found', () => {
-    const spy = jest.spyOn(console, 'warn').mockImplementation(() => ({}))
-
     const blob = new Blob([''])
     expect(getFileName(blob)).toEqual('original')
 
@@ -29,7 +27,5 @@ describe('getFileName', () => {
 
     const asset = { uri: 'file://data', name: '', type: 'text/plain' }
     expect(getFileName(asset)).toEqual('original')
-
-    expect(spy).toBeCalledTimes(4)
   })
 })
