@@ -25,14 +25,8 @@ import { UploadcareGroup } from './tools/UploadcareGroup'
 import { FileFromOptions, uploadFile } from './uploadFile'
 
 import { FileInfo, GroupId, GroupInfo, Token, Url, Uuid } from './api/types'
-import {
-  SupportedFileInput,
-  BrowserFile,
-  NodeFile,
-  Settings,
-  Sliceable
-} from './types'
-import { uploadFileGroup, GroupFromOptions } from './uploadFileGroup'
+import { Settings, Sliceable, SupportedFileInput } from './types'
+import { GroupFromOptions, uploadFileGroup } from './uploadFileGroup'
 
 /**
  * Populate options with settings.
