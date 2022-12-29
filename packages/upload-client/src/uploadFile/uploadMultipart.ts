@@ -1,4 +1,4 @@
-import { CustomUserAgent } from '@uploadcare/api-client-utils'
+import { CustomUserAgent, Metadata } from '@uploadcare/api-client-utils'
 import multipartComplete from '../api/multipartComplete'
 import multipartStart from '../api/multipartStart'
 import multipartUpload, {
@@ -13,7 +13,6 @@ import { prepareChunks } from './prepareChunks.node'
 
 import {
   ComputableProgressInfo,
-  Metadata,
   ProgressCallback,
   UnknownProgressInfo
 } from '../api/types'
@@ -65,7 +64,7 @@ const uploadPart = (
     retryNetworkErrorMaxTimes
   })
 
-const uploadMultipart = async (
+export const uploadMultipart = async (
   file: SupportedFileInput,
   {
     publicKey,
@@ -189,5 +188,3 @@ const uploadMultipart = async (
     })
     .then((fileInfo) => new UploadcareFile(fileInfo, { baseCDN }))
 }
-
-export default uploadMultipart

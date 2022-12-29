@@ -10,36 +10,71 @@ export { default as multipartUpload } from './api/multipartUpload'
 export { default as multipartComplete } from './api/multipartComplete'
 
 /* High-Level API */
+export { uploadFile, FileFromOptions } from './uploadFile'
+export { uploadDirect, DirectOptions } from './uploadFile/uploadDirect'
 export {
-  uploadFile,
-  uploadFromUrl,
-  uploadDirect,
   uploadFromUploaded,
-  uploadMultipart
-} from './uploadFile'
-export { default as uploadFileGroup } from './uploadFileGroup'
+  FromUploadedOptions
+} from './uploadFile/uploadFromUploaded'
+export { uploadFromUrl, UploadFromUrlOptions } from './uploadFile/uploadFromUrl'
+export { uploadMultipart, MultipartOptions } from './uploadFile/uploadMultipart'
+export { uploadFileGroup, GroupFromOptions } from './uploadFileGroup'
 
 /* Helpers */
 export { default as UploadClient } from './UploadClient'
 export {
   getUserAgent,
-  GetUserAgentOptions,
-  UploadcareNetworkError
+  UploadcareNetworkError,
+  Metadata,
+  ContentInfo,
+  ImageInfo,
+  MimeInfo,
+  VideoInfo,
+  GeoLocation,
+  AudioInfo,
+  CustomUserAgent,
+  CustomUserAgentFn,
+  CustomUserAgentOptions,
+  GetUserAgentOptions
 } from '@uploadcare/api-client-utils'
 
 /* Types */
+export { Headers, ErrorRequestInfo } from './request/types'
 export { UploadcareFile } from './tools/UploadcareFile'
 export { UploadcareGroup } from './tools/UploadcareGroup'
-export { UploadClientError } from './tools/errors'
-export { Settings } from './types'
+export { UploadClientError, ErrorResponseInfo } from './tools/errors'
+export { Settings, SupportedFileInput, ReactNativeFile } from './types'
 export { NodeFile, BrowserFile, ReactNativeAsset } from './types'
 export { BaseOptions, BaseResponse } from './api/base'
-export { FileInfo, GroupId, GroupInfo, Token, Url, Uuid } from './api/types'
+export {
+  FileInfo,
+  GroupId,
+  GroupInfo,
+  Token,
+  Url,
+  Uuid,
+  ProgressCallback,
+  ComputableProgressInfo,
+  UnknownProgressInfo
+} from './api/types'
 export { InfoOptions } from './api/info'
-export { FromUrlOptions, FromUrlResponse } from './api/fromUrl'
+export {
+  FromUrlOptions,
+  FromUrlResponse,
+  FromUrlSuccessResponse,
+  FileInfoResponse,
+  TokenResponse,
+  TypeEnum
+} from './api/fromUrl'
 export {
   FromUrlStatusOptions,
-  FromUrlStatusResponse
+  FromUrlStatusResponse,
+  StatusUnknownResponse,
+  StatusWaitingResponse,
+  StatusProgressResponse,
+  StatusErrorResponse,
+  StatusSuccessResponse,
+  Status
 } from './api/fromUrlStatus'
 export { GroupOptions } from './api/group'
 export { GroupInfoOptions } from './api/groupInfo'
@@ -53,5 +88,3 @@ export {
   MultipartUploadOptions,
   MultipartUploadResponse
 } from './api/multipartUpload'
-export { FileFromOptions } from './uploadFile'
-export { GroupFromOptions } from './uploadFileGroup'

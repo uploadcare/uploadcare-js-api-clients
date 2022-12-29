@@ -1,5 +1,5 @@
 import * as factory from '../_fixtureFactory'
-import uploadFileGroup from '../../src/uploadFileGroup'
+import { uploadFileGroup } from '../../src/uploadFileGroup'
 import { getSettingsForTesting, assertComputableProgress } from '../_helpers'
 import { UploadClientError } from '../../src/tools/errors'
 import { jest, expect } from '@jest/globals'

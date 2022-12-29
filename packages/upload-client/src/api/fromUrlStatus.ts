@@ -18,28 +18,28 @@ export enum Status {
   Success = 'success'
 }
 
-type StatusUnknownResponse = {
+export type StatusUnknownResponse = {
   status: Status.Unknown
 }
 
-type StatusWaitingResponse = {
+export type StatusWaitingResponse = {
   status: Status.Waiting
 }
 
-type StatusProgressResponse = {
+export type StatusProgressResponse = {
   status: Status.Progress
   size: number
   done: number
   total: number | 'unknown'
 }
 
-type StatusErrorResponse = {
+export type StatusErrorResponse = {
   status: Status.Error
   error: string
   errorCode: string
 }
 
-type StatusSuccessResponse = {
+export type StatusSuccessResponse = {
   status: Status.Success
 } & FileInfo
 

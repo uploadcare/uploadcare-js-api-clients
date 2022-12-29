@@ -26,7 +26,7 @@ import { FileFromOptions, uploadFile } from './uploadFile'
 
 import { FileInfo, GroupId, GroupInfo, Token, Url, Uuid } from './api/types'
 import { SupportedFileInput, BrowserFile, NodeFile, Settings } from './types'
-import uploadFileGroup, { GroupFromOptions } from './uploadFileGroup'
+import { uploadFileGroup, GroupFromOptions } from './uploadFileGroup'
 
 /**
  * Populate options with settings.

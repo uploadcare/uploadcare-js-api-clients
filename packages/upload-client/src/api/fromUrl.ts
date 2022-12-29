@@ -1,6 +1,10 @@
-import { FileInfo, Metadata, Url } from './types'
+import { FileInfo, Url } from './types'
 import { FailedResponse } from '../request/types'
-import { CustomUserAgent, camelizeKeys } from '@uploadcare/api-client-utils'
+import {
+  CustomUserAgent,
+  camelizeKeys,
+  Metadata
+} from '@uploadcare/api-client-utils'
 
 import request from '../request/request.node'
 import getUrl from '../tools/getUrl'
@@ -16,16 +20,16 @@ export enum TypeEnum {
   FileInfo = 'file_info'
 }
 
-type TokenResponse = {
+export type TokenResponse = {
   type: TypeEnum.Token
   token: string
 }
 
-type FileInfoResponse = {
+export type FileInfoResponse = {
   type: TypeEnum.FileInfo
 } & FileInfo
 
-type FromUrlSuccessResponse = FileInfoResponse | TokenResponse
+export type FromUrlSuccessResponse = FileInfoResponse | TokenResponse
 
 type Response = FailedResponse | FromUrlSuccessResponse
 

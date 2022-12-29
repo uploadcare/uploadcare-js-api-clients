@@ -1,4 +1,8 @@
-import { camelizeKeys, CustomUserAgent } from '@uploadcare/api-client-utils'
+import {
+  camelizeKeys,
+  CustomUserAgent,
+  Metadata
+} from '@uploadcare/api-client-utils'
 import { defaultSettings } from '../defaultSettings'
 import request from '../request/request.node'
 import buildFormData from '../tools/buildFormData'
@@ -13,7 +17,7 @@ import { getContentType } from '../tools/getContentType'
 import { getFileName } from '../tools/getFileName'
 import { getStoreValue } from '../tools/getStoreValue'
 import { SupportedFileInput } from '../types'
-import { Metadata, ProgressCallback, Uuid } from './types'
+import { ProgressCallback, Uuid } from './types'
 
 export type BaseResponse = {
   file: Uuid

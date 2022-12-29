@@ -1,12 +1,12 @@
 /**
  * @jest-environment jsdom
  */
-import { expect, jest } from '@jest/globals'
+import { expect } from '@jest/globals'
 import {
-  isFileData,
   isBlob,
-  isFile,
   isBuffer,
+  isFile,
+  isFileData,
   isReactNativeAsset
 } from '../../src/tools/isFileData'
 

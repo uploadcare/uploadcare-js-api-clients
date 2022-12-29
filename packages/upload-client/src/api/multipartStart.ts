@@ -1,6 +1,10 @@
 import { FailedResponse } from '../request/types'
-import { Metadata, Uuid } from './types'
-import { CustomUserAgent, camelizeKeys } from '@uploadcare/api-client-utils'
+import { Uuid } from './types'
+import {
+  CustomUserAgent,
+  camelizeKeys,
+  Metadata
+} from '@uploadcare/api-client-utils'
 
 import request from '../request/request.node'
 import buildFormData from '../tools/buildFormData'

@@ -10,9 +10,7 @@ global.fetch = jest.fn(() =>
   })
 ) as unknown as typeof fetch
 
-beforeEach(() => {
-  ;(fetch as jest.Mock).mockClear()
-})
+beforeEach(() => (fetch as jest.Mock).mockClear())
 
 describe('getFileSize', () => {
   it('should return size of File', async () => {
