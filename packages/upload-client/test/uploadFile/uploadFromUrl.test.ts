@@ -7,7 +7,7 @@ import {
 import { UploadClientError } from '../../src/tools/errors'
 import http from 'http'
 import https, { RequestOptions } from 'https'
-import uploadFromUrl from '../../src/uploadFile/uploadFromUrl'
+import { uploadFromUrl } from '../../src/uploadFile/uploadFromUrl'
 import { jest, expect } from '@jest/globals'
 
 jest.setTimeout(60000)

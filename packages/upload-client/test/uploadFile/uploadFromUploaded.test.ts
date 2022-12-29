@@ -1,7 +1,7 @@
 import * as factory from '../_fixtureFactory'
 import { getSettingsForTesting, assertComputableProgress } from '../_helpers'
 import { UploadClientError } from '../../src/tools/errors'
-import uploadFromUploaded from '../../src/uploadFile/uploadFromUploaded'
+import { uploadFromUploaded } from '../../src/uploadFile/uploadFromUploaded'
 import { jest, expect } from '@jest/globals'
 
 describe('uploadFromUploaded', () => {
