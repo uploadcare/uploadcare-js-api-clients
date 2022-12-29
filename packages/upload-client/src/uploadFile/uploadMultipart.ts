@@ -1,4 +1,7 @@
-import defaultSettings from '../defaultSettings'
+import defaultSettings, {
+  defaultContentType,
+  defaultFilename
+} from '../defaultSettings'
 import { prepareChunks } from './prepareChunks.node'
 import multipartStart from '../api/multipartStart'
 import multipartUpload, {
@@ -122,8 +125,8 @@ const uploadMultipart = (
 
   return multipartStart(size, {
     publicKey,
-    contentType,
-    fileName: fileName ?? (file as File).name,
+    contentType: contentType || (file as File).type || defaultContentType,
+    fileName: fileName || (file as File).name || defaultFilename,
     baseURL,
     secureSignature,
     secureExpire,

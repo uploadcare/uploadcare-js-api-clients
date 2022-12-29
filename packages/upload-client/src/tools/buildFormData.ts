@@ -16,8 +16,8 @@ type SimpleType = string | number | undefined
 type ObjectType = KeyValue<SimpleType>
 
 interface FileOptions {
-  name?: string
-  contentType?: string
+  name: string
+  contentType: string
 }
 
 interface FileType extends FileOptions {
@@ -63,7 +63,7 @@ function collectParams(
 ): void {
   if (isFileValue(inputValue)) {
     const { name, contentType }: FileOptions = inputValue
-    const file = transformFile(inputValue.data, name) as Blob // lgtm [js/superfluous-trailing-arguments]
+    const file = transformFile(inputValue.data, name, contentType) as Blob // lgtm [js/superfluous-trailing-arguments]
     const options = getFileOptions({ name, contentType })
     params.push([inputKey, file, ...options])
   } else if (isObjectValue(inputValue)) {

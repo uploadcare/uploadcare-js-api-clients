@@ -1,7 +1,11 @@
 import request from '../request/request.node'
 import buildFormData from '../tools/buildFormData'
 import getUrl from '../tools/getUrl'
-import { defaultSettings, defaultFilename } from '../defaultSettings'
+import {
+  defaultSettings,
+  defaultFilename,
+  defaultContentType
+} from '../defaultSettings'
 import { getUserAgent } from '../tools/getUserAgent'
 import { camelizeKeys, CustomUserAgent } from '@uploadcare/api-client-utils'
 import { UploadClientError } from '../tools/errors'
@@ -77,8 +81,9 @@ export default function base(
         data: buildFormData({
           file: {
             data: file,
-            name: fileName ?? (file as File).name ?? defaultFilename,
-            contentType
+            name: fileName || (file as File)?.name || defaultFilename,
+            contentType:
+              contentType || (file as File)?.type || defaultContentType
           },
           UPLOADCARE_PUB_KEY: publicKey,
           UPLOADCARE_STORE: getStoreValue(store),

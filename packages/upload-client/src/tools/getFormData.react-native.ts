@@ -5,19 +5,15 @@ import {
   ReactNativeAsset
 } from './types'
 
-export const getFileOptions: GetFormDataFileAppendOptions = ({ name }) =>
-  name ? [name] : []
+export const getFileOptions: GetFormDataFileAppendOptions = () => []
 
 export const transformFile: FileTransformer = (
   file: BrowserFile | NodeFile,
-  name?: string
+  name: string,
+  contentType: string
 ): ReactNativeAsset => {
-  if (!file) {
-    return file
-  }
   const uri = URL.createObjectURL(file as BrowserFile)
-  const type = (file as BrowserFile).type
-  return { uri, name, type }
+  return { uri, name, type: contentType }
 }
 
 export default (): FormData => new FormData()

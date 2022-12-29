@@ -75,9 +75,9 @@ export default function multipartStart(
           'X-UC-User-Agent': getUserAgent({ publicKey, integration, userAgent })
         },
         data: buildFormData({
-          filename: fileName ?? defaultFilename,
+          filename: fileName || defaultFilename,
           size: size,
-          content_type: contentType ?? defaultContentType,
+          content_type: contentType || defaultContentType,
           part_size: multipartChunkSize,
           UPLOADCARE_STORE: getStoreValue(store),
           UPLOADCARE_PUB_KEY: publicKey,
