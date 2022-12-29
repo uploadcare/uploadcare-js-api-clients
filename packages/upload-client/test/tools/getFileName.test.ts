@@ -1,7 +1,7 @@
 /**
  * @jest-environment jsdom
  */
-import { expect, jest } from '@jest/globals'
+import { expect } from '@jest/globals'
 import { getFileName } from '../../src/tools/getFileName'
 
 describe('getFileName', () => {
