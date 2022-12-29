@@ -430,12 +430,35 @@ See [docs][uc-file-metadata] and [REST API][uc-docs-metadata] for details.
 
 ## React Native
 
+### Prepare
+
 To be able to use `@uploadcare/upload-client` with React Native, you need to
 install [react-native-url-polyfill][react-native-url-polyfill].
 
 To prevent [`Error: Cannot create URL for blob`][react-native-url-polyfill-issue]
 errors you need to configure your Android app schema to accept blobs -
 have a look at this pull request for an example: [5985d7e][react-native-url-polyfill-example].
+
+1. Add the following code to the `application` section of your `AndroidManifest.xml`:
+
+```xml
+<provider
+  android:name="com.facebook.react.modules.blob.BlobProvider"
+  android:authorities="@string/blob_provider_authority"
+  android:exported="false"
+/>
+```
+
+2. Add the following code to the `android/app/src/main/res/values/strings.xml`:
+
+```xml
+<resources>
+  <string name="app_name">MY_REACT_NATIVE_APP_NAME</string>
+  <string name="blob_provider_authority">com.detox.blob</string>
+</resources>
+```
+
+### Usage
 
 You can use `ReactNativeAsset` as an input to the `@uploadcare/upload-client` like this:
 
@@ -457,7 +480,11 @@ Or `Blob` like this:
 ```ts
 const uri = 'URI_TO_FILE'
 const blob = await fetch(uri).then((res) => res.blob())
-uploadFile(blob, { publicKey: 'YOUR_PUBLIC_KEY' })
+uploadFile(blob, {
+  publicKey: 'YOUR_PUBLIC_KEY',
+  fileName: 'file.txt',
+  contentType: 'text/plain'
+})
 ```
 
 ## Testing
