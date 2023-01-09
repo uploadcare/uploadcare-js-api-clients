@@ -98,7 +98,7 @@ const request = ({
     }
 
     if (onProgress && typeof onProgress === 'function') {
-      xhr.upload.onprogress = (event: ProgressEvent): void => {
+      xhr.upload.addEventListener('progress', (event: ProgressEvent): void => {
         if (event.lengthComputable) {
           onProgress({
             isComputable: true,
@@ -107,7 +107,7 @@ const request = ({
         } else {
           onProgress({ isComputable: false })
         }
-      }
+      })
     }
 
     if (data) {
