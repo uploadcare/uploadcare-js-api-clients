@@ -1,3 +1,17 @@
+# [6.1.0](https://github.com/uploadcare/uploadcare-js-api-clients/compare/v6.0.0...v6.1.0) (2023-01-10)
+
+
+### Bug Fixes
+
+* **upload-client:** ensure that file name and type passed to the FormData ([fe63607](https://github.com/uploadcare/uploadcare-js-api-clients/commit/fe6360739f1ffb67f1f163b33ed3a594c55f6ac3))
+
+
+### Features
+
+* **upload-client:** export all the types ([d2bbd76](https://github.com/uploadcare/uploadcare-js-api-clients/commit/d2bbd760da65692b8e3a3526199d29b6cc080841))
+* **upload-client:** support react-native asset file input ([f586f84](https://github.com/uploadcare/uploadcare-js-api-clients/commit/f586f847aca842a4f4fdb0d292172f996230a159))
+
+
 # [6.0.0](https://github.com/uploadcare/uploadcare-js-api-clients/compare/v5.2.0...v6.0.0) (2022-12-07)
 
 
