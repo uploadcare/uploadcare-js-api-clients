@@ -1,6 +1,10 @@
 import { FailedResponse } from '../request/types'
-import { Metadata, Uuid } from './types'
-import { CustomUserAgent, camelizeKeys } from '@uploadcare/api-client-utils'
+import { Uuid } from './types'
+import {
+  CustomUserAgent,
+  camelizeKeys,
+  Metadata
+} from '@uploadcare/api-client-utils'
 
 import request from '../request/request.node'
 import buildFormData from '../tools/buildFormData'
@@ -75,9 +79,9 @@ export default function multipartStart(
           'X-UC-User-Agent': getUserAgent({ publicKey, integration, userAgent })
         },
         data: buildFormData({
-          filename: fileName ?? defaultFilename,
+          filename: fileName || defaultFilename,
           size: size,
-          content_type: contentType ?? defaultContentType,
+          content_type: contentType || defaultContentType,
           part_size: multipartChunkSize,
           UPLOADCARE_STORE: getStoreValue(store),
           UPLOADCARE_PUB_KEY: publicKey,

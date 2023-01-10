@@ -1,8 +1,8 @@
 import getFormData, { getFileOptions, transformFile } from './getFormData.node'
 
 import NodeFormData from 'form-data'
-import { BrowserFile, NodeFile } from '../request/types'
-import { isFileData } from '../uploadFile/types'
+import { SupportedFileInput } from '../types'
+import { isFileData } from './isFileData'
 
 /**
  * Constructs FormData instance.
@@ -16,12 +16,12 @@ type SimpleType = string | number | undefined
 type ObjectType = KeyValue<SimpleType>
 
 interface FileOptions {
-  name?: string
-  contentType?: string
+  name: string
+  contentType: string
 }
 
 interface FileType extends FileOptions {
-  data: BrowserFile | NodeFile
+  data: SupportedFileInput
 }
 
 type InputValue = FileType | SimpleType | ObjectType
@@ -33,7 +33,7 @@ type FormDataOptions = {
 type Params = Array<
   [
     string,
-    string | BrowserFile | NodeFile,
+    string | SupportedFileInput,
     ...(string | { [key: string]: string | undefined })[]
   ]
 >
@@ -63,7 +63,7 @@ function collectParams(
 ): void {
   if (isFileValue(inputValue)) {
     const { name, contentType }: FileOptions = inputValue
-    const file = transformFile(inputValue.data, name) as Blob // lgtm [js/superfluous-trailing-arguments]
+    const file = transformFile(inputValue.data, name, contentType)
     const options = getFileOptions({ name, contentType })
     params.push([inputKey, file, ...options])
   } else if (isObjectValue(inputValue)) {
@@ -90,9 +90,9 @@ function buildFormData(options: FormDataOptions): FormData | NodeFormData {
 
   const paramsList = getFormDataParams(options)
   for (const params of paramsList) {
-    const [key, value, ...options] = params
+    const [key, value, ...rest] = params
     // node form-data has another signature for append
-    formData.append(key, value as Blob, ...(options as [string]))
+    formData.append(key, value as Blob, ...(rest as [string]))
   }
 
   return formData

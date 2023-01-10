@@ -2,12 +2,13 @@ import NodeFormData from 'form-data'
 
 import http from 'http'
 import https from 'https'
-import { parse } from 'url'
 import { Readable, Transform } from 'stream'
+import { parse } from 'url'
 
-import { onCancel, CancelError } from '@uploadcare/api-client-utils'
-import { RequestOptions, RequestResponse } from './types'
+import { CancelError, onCancel } from '@uploadcare/api-client-utils'
 import { ProgressCallback } from '../api/types'
+import { SupportedFileInput } from '../types'
+import { RequestOptions, RequestResponse } from './types'
 
 // ProgressEmitter is a simple PassThrough-style transform stream which keeps
 // track of the number of bytes which have been piped through it and will
@@ -44,7 +45,7 @@ const getLength = (formData: NodeFormData): Promise<number> =>
   })
 
 function isFormData(
-  formData?: NodeFormData | FormData | Buffer | Blob
+  formData?: NodeFormData | FormData | SupportedFileInput
 ): formData is NodeFormData {
   if (formData && formData.toString() === '[object FormData]') {
     return true
@@ -54,7 +55,7 @@ function isFormData(
 }
 
 function isReadable(
-  data?: Readable | NodeFormData | FormData | Buffer | Blob,
+  data?: Readable | NodeFormData | FormData | SupportedFileInput,
   isFormData?: boolean
 ): data is Readable {
   if (data && (data instanceof Readable || isFormData)) {

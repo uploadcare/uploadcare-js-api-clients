@@ -1,4 +1,8 @@
+import { isReactNativeAsset } from '../tools/isFileData'
+import { SupportedFileInput } from '../types'
+import { getBlobFromReactNativeAsset } from '../tools/getBlobFromReactNativeAsset'
 import { sliceChunk } from './sliceChunk'
+import { PrepareChunks } from './types'
 
 /**
  * React-native hack for blob slicing
@@ -10,14 +14,21 @@ import { sliceChunk } from './sliceChunk'
  * See https://github.com/uploadcare/uploadcare-js-api-clients/issues/306
  * and https://github.com/facebook/react-native/issues/27543
  */
-export function prepareChunks(
-  file: Buffer | Blob,
+export const prepareChunks: PrepareChunks = async (
+  file: SupportedFileInput,
   fileSize: number,
   chunkSize: number
-): (index: number) => Buffer | Blob {
-  const chunks: (Buffer | Blob)[] = []
-  return (index: number): Buffer | Blob => {
-    const chunk = sliceChunk(file, index, fileSize, chunkSize)
+) => {
+  let blob: Blob
+  if (isReactNativeAsset(file)) {
+    blob = await getBlobFromReactNativeAsset(file)
+  } else {
+    blob = file as Blob
+  }
+
+  const chunks: Blob[] = []
+  return (index: number): Blob => {
+    const chunk = sliceChunk(blob, index, fileSize, chunkSize)
     chunks.push(chunk)
     return chunk
   }

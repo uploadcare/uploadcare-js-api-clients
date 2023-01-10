@@ -4,6 +4,7 @@ import {
   ProgressCallback,
   UnknownProgressInfo
 } from '../api/types'
+import { SupportedFileInput } from '../types'
 
 export type Headers = {
   [key: string]: string | string[] | undefined
@@ -13,7 +14,7 @@ export type RequestOptions = {
   method?: string
   url: string
   query?: string
-  data?: NodeFormData | FormData | BrowserFile | NodeFile
+  data?: NodeFormData | FormData | SupportedFileInput
   headers?: Headers
   signal?: AbortSignal
   onProgress?: ProgressCallback<ComputableProgressInfo | UnknownProgressInfo>
@@ -23,7 +24,7 @@ export type ErrorRequestInfo = {
   method?: string
   url: string
   query?: string
-  data?: NodeFormData | FormData | BrowserFile | NodeFile
+  data?: NodeFormData | FormData | SupportedFileInput
   headers?: Headers
 }
 
@@ -41,6 +42,3 @@ export type FailedResponse = {
     errorCode: string
   }
 }
-
-export type BrowserFile = Blob | File
-export type NodeFile = Buffer // | NodeJS.ReadableStream

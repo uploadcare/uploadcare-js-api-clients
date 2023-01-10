@@ -1,12 +1,12 @@
 import base from '../api/base'
-import { UploadcareFile } from '../tools/UploadcareFile'
 import { isReadyPoll } from '../tools/isReadyPoll'
+import { UploadcareFile } from '../tools/UploadcareFile'
 
-import { NodeFile, BrowserFile } from '../request/types'
-import { Metadata, ProgressCallback } from '../api/types'
-import { CustomUserAgent } from '@uploadcare/api-client-utils'
+import { CustomUserAgent, Metadata } from '@uploadcare/api-client-utils'
+import { ProgressCallback } from '../api/types'
+import { SupportedFileInput } from '../types'
 
-type DirectOptions = {
+export type DirectOptions = {
   publicKey: string
 
   fileName?: string
@@ -30,8 +30,8 @@ type DirectOptions = {
   metadata?: Metadata
 }
 
-const uploadDirect = (
-  file: NodeFile | BrowserFile,
+export const uploadDirect = (
+  file: SupportedFileInput,
   {
     publicKey,
 
@@ -89,5 +89,3 @@ const uploadDirect = (
     })
     .then((fileInfo) => new UploadcareFile(fileInfo, { baseCDN }))
 }
-
-export default uploadDirect

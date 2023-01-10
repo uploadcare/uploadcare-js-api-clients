@@ -87,7 +87,7 @@ function pollStrategy({
   })
 }
 
-type UploadFromUrlOptions = {
+export type UploadFromUrlOptions = {
   baseCDN?: string
   onProgress?: ProgressCallback
   pusherKey?: string
@@ -152,7 +152,7 @@ const pushStrategy = ({
     })
   })
 
-const uploadFromUrl = (
+export const uploadFromUrl = (
   sourceUrl: string,
   {
     publicKey,
@@ -245,5 +245,3 @@ const uploadFromUrl = (
       })
     )
     .then((fileInfo) => new UploadcareFile(fileInfo, { baseCDN }))
-
-export default uploadFromUrl

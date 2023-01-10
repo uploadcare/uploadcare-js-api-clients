@@ -1,10 +1,12 @@
+import { SupportedFileInput, BrowserFile } from '../types'
 import { sliceChunk } from './sliceChunk'
+import { PrepareChunks } from './types'
 
-export function prepareChunks(
-  file: Buffer | Blob,
+export const prepareChunks: PrepareChunks = async (
+  file: SupportedFileInput,
   fileSize: number,
   chunkSize: number
-): (index: number) => Buffer | Blob {
-  return (index: number): Buffer | Blob =>
-    sliceChunk(file, index, fileSize, chunkSize)
+) => {
+  return (index: number): BrowserFile =>
+    sliceChunk(file as BrowserFile, index, fileSize, chunkSize)
 }

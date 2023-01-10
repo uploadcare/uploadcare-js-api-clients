@@ -25,9 +25,8 @@ import { UploadcareGroup } from './tools/UploadcareGroup'
 import { FileFromOptions, uploadFile } from './uploadFile'
 
 import { FileInfo, GroupId, GroupInfo, Token, Url, Uuid } from './api/types'
-import { BrowserFile, NodeFile } from './request/types'
-import { Settings } from './types'
-import uploadFileGroup, { GroupFromOptions } from './uploadFileGroup'
+import { Settings, Sliceable, SupportedFileInput } from './types'
+import { GroupFromOptions, uploadFileGroup } from './uploadFileGroup'
 
 /**
  * Populate options with settings.
@@ -56,7 +55,7 @@ export default class UploadClient {
   }
 
   base(
-    file: NodeFile | BrowserFile,
+    file: SupportedFileInput,
     options: Partial<BaseOptions> = {}
   ): Promise<BaseResponse> {
     const settings = this.getSettings()
@@ -116,7 +115,7 @@ export default class UploadClient {
   }
 
   multipartUpload(
-    part: Buffer | Blob,
+    part: Sliceable,
     url: MultipartPart,
     options: Partial<MultipartUploadOptions> = {}
   ): Promise<MultipartUploadResponse> {
@@ -142,7 +141,7 @@ export default class UploadClient {
   }
 
   uploadFile(
-    data: NodeFile | BrowserFile | Url | Uuid,
+    data: SupportedFileInput | Url | Uuid,
     options: Partial<FileFromOptions> = {}
   ): Promise<UploadcareFile> {
     const settings = this.getSettings()
@@ -151,7 +150,7 @@ export default class UploadClient {
   }
 
   uploadFileGroup(
-    data: (NodeFile | BrowserFile)[] | Url[] | Uuid[],
+    data: SupportedFileInput[] | Url[] | Uuid[],
     options: Partial<FileFromOptions & GroupFromOptions> = {}
   ): Promise<UploadcareGroup> {
     const settings = this.getSettings()

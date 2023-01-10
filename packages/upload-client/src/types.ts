@@ -28,3 +28,14 @@ export interface Settings extends Partial<DefaultSettings> {
   source?: string
   jsonpCallback?: string
 }
+
+export type BrowserFile = Blob | File
+export type NodeFile = Buffer
+export type ReactNativeAsset = {
+  type: string
+  uri: string
+  name?: string
+}
+
+export type SupportedFileInput = BrowserFile | NodeFile | ReactNativeAsset
+export type Sliceable = BrowserFile | NodeFile

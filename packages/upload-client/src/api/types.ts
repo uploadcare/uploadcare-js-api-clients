@@ -1,4 +1,9 @@
-import { ContentInfo, ImageInfo, VideoInfo } from '@uploadcare/api-client-utils'
+import {
+  ContentInfo,
+  ImageInfo,
+  VideoInfo,
+  Metadata
+} from '@uploadcare/api-client-utils'
 
 export type FileInfo = {
   size: number
@@ -49,7 +54,3 @@ export type UnknownProgressInfo = {
 
 export type ProgressCallback<T = ComputableProgressInfo | UnknownProgressInfo> =
   (arg: T) => void
-
-export type Metadata = {
-  [key: string]: string
-}

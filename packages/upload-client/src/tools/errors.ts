@@ -1,6 +1,6 @@
 import { Headers, ErrorRequestInfo } from '../request/types'
 
-type ErrorResponseInfo = {
+export type ErrorResponseInfo = {
   error?: {
     statusCode: number
     content: string

@@ -1,5 +1,5 @@
 import { expect, jest } from '@jest/globals'
-import { uploadFile } from '../../src/uploadFile'
+import { uploadFile } from '../../src/uploadFile/uploadFile'
 import * as factory from '../_fixtureFactory'
 import { getSettingsForTesting } from '../_helpers'
 

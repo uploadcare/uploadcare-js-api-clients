@@ -2,10 +2,10 @@ import { MultipartPart } from './multipartStart'
 
 import request from '../request/request.node'
 
-import { ComputableProgressInfo, ProgressCallback } from './types'
-import { NodeFile, BrowserFile } from '../request/types'
-import { retryIfFailed } from '../tools/retryIfFailed'
 import defaultSettings from '../defaultSettings'
+import { retryIfFailed } from '../tools/retryIfFailed'
+import { SupportedFileInput } from '../types'
+import { ComputableProgressInfo, ProgressCallback } from './types'
 
 export type MultipartUploadOptions = {
   publicKey?: string
@@ -25,7 +25,7 @@ export type MultipartUploadResponse = {
  */
 
 export default function multipartUpload(
-  part: NodeFile | BrowserFile,
+  part: SupportedFileInput,
   url: MultipartPart,
   {
     signal,

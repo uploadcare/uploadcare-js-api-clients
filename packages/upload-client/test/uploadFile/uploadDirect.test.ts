@@ -1,7 +1,7 @@
 import * as factory from '../_fixtureFactory'
 import { getSettingsForTesting, assertComputableProgress } from '../_helpers'
 import { UploadClientError } from '../../src/tools/errors'
-import uploadDirect from '../../src/uploadFile/uploadDirect'
+import { uploadDirect } from '../../src/uploadFile/uploadDirect'
 import { jest, expect } from '@jest/globals'
 
 // TODO: add tests for metadata

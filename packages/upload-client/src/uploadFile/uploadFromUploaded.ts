@@ -6,7 +6,7 @@ import { Uuid } from '..'
 import { ProgressCallback } from '../api/types'
 import { CustomUserAgent } from '@uploadcare/api-client-utils'
 
-type FromUploadedOptions = {
+export type FromUploadedOptions = {
   publicKey: string
 
   fileName?: string
@@ -25,7 +25,7 @@ type FromUploadedOptions = {
   baseCDN?: string
 }
 
-const uploadFromUploaded = (
+export const uploadFromUploaded = (
   uuid: Uuid,
   {
     publicKey,
@@ -63,5 +63,3 @@ const uploadFromUploaded = (
       return result
     })
 }
-
-export default uploadFromUploaded
