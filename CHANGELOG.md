@@ -12,7 +12,6 @@
 * **upload-client:** support react-native asset file input ([f586f84](https://github.com/uploadcare/uploadcare-js-api-clients/commit/f586f847aca842a4f4fdb0d292172f996230a159))
 
 
-
 # [6.0.0](https://github.com/uploadcare/uploadcare-js-api-clients/compare/v5.2.0...v6.0.0) (2022-12-07)
 
 
