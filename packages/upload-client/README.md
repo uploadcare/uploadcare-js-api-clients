@@ -259,13 +259,6 @@ multipartComplete(
 ): Promise<FileInfo>
 ```
 
-```typescript
-multipart(
-  file: File | Buffer | Blob,
-  options: MultipartOptions
-): Promise<FileInfo>
-```
-
 ### Settings
 
 #### `publicKey: string`
