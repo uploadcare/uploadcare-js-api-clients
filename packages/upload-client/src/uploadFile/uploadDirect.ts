@@ -4,7 +4,7 @@ import { UploadcareFile } from '../tools/UploadcareFile'
 
 import { CustomUserAgent, Metadata } from '@uploadcare/api-client-utils'
 import { ProgressCallback } from '../api/types'
-import { SupportedFileInput } from '../types'
+import { StoreValue, SupportedFileInput } from '../types'
 
 export type DirectOptions = {
   publicKey: string
@@ -13,7 +13,7 @@ export type DirectOptions = {
   baseURL?: string
   secureSignature?: string
   secureExpire?: string
-  store?: boolean
+  store?: StoreValue
   contentType?: string
 
   signal?: AbortSignal

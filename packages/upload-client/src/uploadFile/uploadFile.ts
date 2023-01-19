@@ -10,7 +10,7 @@ import { getFileSize } from '../tools/getFileSize'
 import { isFileData } from '../tools/isFileData'
 import { isMultipart } from '../tools/isMultipart'
 import { UploadcareFile } from '../tools/UploadcareFile'
-import { SupportedFileInput } from '../types'
+import { StoreValue, SupportedFileInput } from '../types'
 import { isUrl, isUuid } from './types'
 import { uploadMultipart } from './uploadMultipart'
 
@@ -21,7 +21,7 @@ export type FileFromOptions = {
   baseURL?: string
   secureSignature?: string
   secureExpire?: string
-  store?: boolean
+  store?: StoreValue
 
   signal?: AbortSignal
   onProgress?: ProgressCallback
