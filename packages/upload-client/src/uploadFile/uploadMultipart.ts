@@ -48,6 +48,7 @@ const uploadPart = (
   url: string,
   {
     publicKey,
+    contentType,
     onProgress,
     signal,
     integration,
@@ -57,6 +58,7 @@ const uploadPart = (
 ): Promise<MultipartUploadResponse> =>
   multipartUpload(chunk, url, {
     publicKey,
+    contentType,
     onProgress,
     signal,
     integration,
@@ -121,9 +123,11 @@ export const uploadMultipart = async (
     }
   }
 
+  contentType = contentType || getContentType(file)
+
   return multipartStart(size, {
     publicKey,
-    contentType: contentType || getContentType(file),
+    contentType,
     fileName: fileName || getFileName(file),
     baseURL,
     secureSignature,
@@ -147,6 +151,7 @@ export const uploadMultipart = async (
             (url, index) => (): Promise<MultipartUploadResponse> =>
               uploadPart(getChunk(index), url, {
                 publicKey,
+                contentType,
                 onProgress: createProgressHandler(parts.length, index),
                 signal,
                 integration,

@@ -2,13 +2,14 @@ import { MultipartPart } from './multipartStart'
 
 import request from '../request/request.node'
 
-import defaultSettings from '../defaultSettings'
+import defaultSettings, { defaultContentType } from '../defaultSettings'
 import { retryIfFailed } from '../tools/retryIfFailed'
 import { SupportedFileInput } from '../types'
 import { ComputableProgressInfo, ProgressCallback } from './types'
 
 export type MultipartUploadOptions = {
   publicKey?: string
+  contentType?: string
   signal?: AbortSignal
   onProgress?: ProgressCallback<ComputableProgressInfo>
   integration?: string
@@ -28,6 +29,7 @@ export default function multipartUpload(
   part: SupportedFileInput,
   url: MultipartPart,
   {
+    contentType,
     signal,
     onProgress,
     retryThrottledRequestMaxTimes = defaultSettings.retryThrottledRequestMaxTimes,
@@ -42,7 +44,10 @@ export default function multipartUpload(
         data: part,
         // Upload request can't be non-computable because we always know exact size
         onProgress: onProgress as ProgressCallback,
-        signal
+        signal,
+        headers: {
+          'Content-Type': contentType || defaultContentType
+        }
       })
         .then((result) => {
           // hack for node ¯\_(ツ)_/¯
