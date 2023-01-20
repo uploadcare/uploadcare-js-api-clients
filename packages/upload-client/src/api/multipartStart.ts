@@ -18,6 +18,7 @@ import { getUserAgent } from '../tools/getUserAgent'
 import { retryIfFailed } from '../tools/retryIfFailed'
 import { UploadClientError } from '../tools/errors'
 import { getStoreValue } from '../tools/getStoreValue'
+import { StoreValue } from '../types'
 
 export type MultipartStartOptions = {
   publicKey: string
@@ -26,7 +27,7 @@ export type MultipartStartOptions = {
   baseURL?: string
   secureSignature?: string
   secureExpire?: string
-  store?: boolean
+  store?: StoreValue
   multipartChunkSize?: number
   signal?: AbortSignal
   source?: string

@@ -14,6 +14,7 @@ import { getUserAgent } from '../tools/getUserAgent'
 import { UploadClientError } from '../tools/errors'
 import { retryIfFailed } from '../tools/retryIfFailed'
 import { getStoreValue } from '../tools/getStoreValue'
+import { StoreValue } from '../types'
 
 export enum TypeEnum {
   Token = 'token',
@@ -57,7 +58,7 @@ export type FromUrlOptions = {
   publicKey: string
 
   baseURL?: string
-  store?: boolean
+  store?: StoreValue
   fileName?: string
   checkForUrlDuplicates?: boolean
   saveUrlForRecurrentUploads?: boolean
