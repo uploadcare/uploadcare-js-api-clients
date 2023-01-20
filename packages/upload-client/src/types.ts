@@ -1,5 +1,7 @@
 import { CustomUserAgent } from '@uploadcare/api-client-utils'
 
+export type StoreValue = 'auto' | boolean
+
 export interface DefaultSettings {
   baseCDN: string
   baseURL: string
@@ -18,7 +20,7 @@ export interface Settings extends Partial<DefaultSettings> {
   publicKey: string
   fileName?: string
   contentType?: string
-  store?: boolean
+  store?: StoreValue
   secureSignature?: string
   secureExpire?: string
   integration?: string

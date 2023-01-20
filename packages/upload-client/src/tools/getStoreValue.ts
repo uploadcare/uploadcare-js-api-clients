@@ -1,3 +1,8 @@
-export function getStoreValue(store?: 'auto' | boolean): 'auto' | '0' | '1' {
-  return typeof store === 'undefined' ? 'auto' : store ? '1' : '0'
+import { StoreValue } from '../types'
+
+export function getStoreValue(store?: StoreValue): 'auto' | '0' | '1' {
+  if (typeof store === 'undefined' || store === 'auto') {
+    return 'auto'
+  }
+  return store ? '1' : '0'
 }

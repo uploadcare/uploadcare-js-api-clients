@@ -19,7 +19,7 @@ import {
 import { getContentType } from '../tools/getContentType'
 import { getFileName } from '../tools/getFileName'
 import { getFileSize } from '../tools/getFileSize'
-import { SupportedFileInput } from '../types'
+import { StoreValue, SupportedFileInput } from '../types'
 
 export type MultipartOptions = {
   publicKey: string
@@ -30,7 +30,7 @@ export type MultipartOptions = {
   baseURL?: string
   secureSignature?: string
   secureExpire?: string
-  store?: boolean
+  store?: StoreValue
   signal?: AbortSignal
   onProgress?: ProgressCallback<ComputableProgressInfo>
   source?: string

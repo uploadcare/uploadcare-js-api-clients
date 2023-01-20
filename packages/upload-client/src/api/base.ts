@@ -16,7 +16,7 @@ import { FailedResponse } from '../request/types'
 import { getContentType } from '../tools/getContentType'
 import { getFileName } from '../tools/getFileName'
 import { getStoreValue } from '../tools/getStoreValue'
-import { SupportedFileInput } from '../types'
+import { StoreValue, SupportedFileInput } from '../types'
 import { ProgressCallback, Uuid } from './types'
 
 export type BaseResponse = {
@@ -32,7 +32,7 @@ export type BaseOptions = {
   baseURL?: string
   secureSignature?: string
   secureExpire?: string
-  store?: boolean
+  store?: StoreValue
   contentType?: string
 
   signal?: AbortSignal
