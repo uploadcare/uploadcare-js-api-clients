@@ -123,7 +123,7 @@ export const uploadMultipart = async (
     }
   }
 
-  contentType = contentType || getContentType(file)
+  contentType ||= getContentType(file)
 
   return multipartStart(size, {
     publicKey,
