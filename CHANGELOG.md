@@ -11,7 +11,6 @@
 * **upload-client:** accept `auto` as `store` value ([#460](https://github.com/uploadcare/uploadcare-js-api-clients/issues/460)) ([e140644](https://github.com/uploadcare/uploadcare-js-api-clients/commit/e140644df4e86341a8ee387cc4add8308f9b3aac))
 
 
-
 # [6.1.0](https://github.com/uploadcare/uploadcare-js-api-clients/compare/v6.0.0...v6.1.0) (2023-01-10)
 
 
