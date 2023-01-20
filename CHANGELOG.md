@@ -1,3 +1,16 @@
+# [6.2.0](https://github.com/uploadcare/uploadcare-js-api-clients/compare/v6.1.0...v6.2.0) (2023-01-20)
+
+
+### Bug Fixes
+
+* **upload-client:** send `content-type` header when uploading multipart ([#461](https://github.com/uploadcare/uploadcare-js-api-clients/issues/461)) ([3a402a3](https://github.com/uploadcare/uploadcare-js-api-clients/commit/3a402a3cc344af8d08260ae6a876641e779744d3))
+
+
+### Features
+
+* **upload-client:** accept `auto` as `store` value ([#460](https://github.com/uploadcare/uploadcare-js-api-clients/issues/460)) ([e140644](https://github.com/uploadcare/uploadcare-js-api-clients/commit/e140644df4e86341a8ee387cc4add8308f9b3aac))
+
+
 # [6.1.0](https://github.com/uploadcare/uploadcare-js-api-clients/compare/v6.0.0...v6.1.0) (2023-01-10)
 
 
