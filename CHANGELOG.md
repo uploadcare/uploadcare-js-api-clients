@@ -1,3 +1,12 @@
+## [6.2.1](https://github.com/uploadcare/uploadcare-js-api-clients/compare/v6.2.0...v6.2.1) (2023-01-23)
+
+
+### Bug Fixes
+
+* **upload-client:** normalize output cdn url ([#463](https://github.com/uploadcare/uploadcare-js-api-clients/issues/463)) ([cd37f4d](https://github.com/uploadcare/uploadcare-js-api-clients/commit/cd37f4dda21c01aec7fdc817bd98364cf6ce7dbd))
+
+
+
 # [6.2.0](https://github.com/uploadcare/uploadcare-js-api-clients/compare/v6.1.0...v6.2.0) (2023-01-20)
 
 
