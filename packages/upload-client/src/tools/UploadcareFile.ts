@@ -5,6 +5,8 @@ import {
   VideoInfo,
   Metadata
 } from '@uploadcare/api-client-utils'
+import getUrl from './getUrl'
+import defaultSettings from '../defaultSettings'
 
 export class UploadcareFile {
   readonly uuid: Uuid
@@ -25,17 +27,20 @@ export class UploadcareFile {
   constructor(
     fileInfo: FileInfo,
     {
-      baseCDN,
+      baseCDN = defaultSettings.baseCDN,
       fileName
     }: {
       baseCDN?: string
       fileName?: string
-    }
+    } = {}
   ) {
     const { uuid, s3Bucket } = fileInfo
-    const cdnUrl = `${baseCDN}/${uuid}/`
+    const cdnUrl = getUrl(baseCDN, `${uuid}/`)
     const s3Url = s3Bucket
-      ? `https://${s3Bucket}.s3.amazonaws.com/${uuid}/${fileInfo.filename}`
+      ? getUrl(
+          `https://${s3Bucket}.s3.amazonaws.com/`,
+          `${uuid}/${fileInfo.filename}`
+        )
       : null
 
     this.uuid = uuid
