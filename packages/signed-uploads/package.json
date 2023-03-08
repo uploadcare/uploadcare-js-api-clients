@@ -13,7 +13,11 @@
     }
   },
   "sideEffects": false,
-  "files": ["dist/*", "README.md", "LICENSE"],
+  "files": [
+    "dist/*",
+    "README.md",
+    "LICENSE"
+  ],
   "scripts": {
     "prepack": "cp ../../LICENSE ./LICENSE",
     "clean": "rimraf dist",
@@ -33,10 +37,15 @@
     "url": "https://github.com/uploadcare/uploadcare-js-api-clients/issues"
   },
   "homepage": "https://github.com/uploadcare/uploadcare-js-api-clients#readme",
-  "keywords": ["uploadcare", "file", "rest", "api"],
+  "keywords": [
+    "uploadcare",
+    "signed",
+    "uploads",
+    "secure",
+    "signature"
+  ],
   "devDependencies": {
     "ts-node": "^10.8.1"
   },
-  "dependencies": {
-  }
+  "dependencies": {}
 }
