@@ -14,7 +14,7 @@ export const generateSecureSignature = (
 ) => {
   if (typeof window !== 'undefined') {
     throw new Error(
-      'Your should not use `generateSecureSignature` in the browser! It is not secure!'
+      "Your shouldn't use `generateSecureSignature` in the browser! It's not secure!"
     )
   }
   const expire =

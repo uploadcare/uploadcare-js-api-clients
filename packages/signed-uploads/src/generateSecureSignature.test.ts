@@ -35,10 +35,11 @@ describe('generateSecureSignature', () => {
 
   it('should throw a Error if called inside browser-like env', () => {
     globalThis.window = {} as Window & typeof globalThis
-    const signature = generateSecureSignature(FIXTURE_SECRET, {
-      lifetime: FIXTURE_LIFETIME
-    })
-    expect(signature).toBe(EXPECTED_SIGNATURE)
+    expect(() =>
+      generateSecureSignature(FIXTURE_SECRET, {
+        lifetime: FIXTURE_LIFETIME
+      })
+    ).toThrowError()
     globalThis.window = undefined as unknown as Window & typeof globalThis
   })
 })
