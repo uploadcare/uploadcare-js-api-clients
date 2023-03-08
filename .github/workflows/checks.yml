@@ -30,6 +30,8 @@ jobs:
               - 'packages/api-client-utils/**'
             api-client-utils:
               - 'packages/api-client-utils/**'
+            signed-uploads:
+              - 'packages/signed-uploads/**'
       - name: Install dependencies
         working-directory: ./
         run: npm i
@@ -43,6 +45,10 @@ jobs:
       - name: Run `upload-client` mock tests
         if: steps.changes.outputs.upload-client == 'true'
         run: npm run test -w packages/upload-client
+
+      - name: Run `signed-uploads` local tests
+        if: steps.changes.outputs.signed-uploads == 'true'
+        run: npm run test -w packages/signed-uploads
 
       - name: Run `api-client-utils` local tests
         if: steps.changes.outputs.api-client-utils == 'true'

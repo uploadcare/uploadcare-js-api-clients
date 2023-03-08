@@ -1,0 +1,42 @@
+{
+  "name": "@uploadcare/signed-uploads",
+  "version": "6.2.1",
+  "description": "Library for work with Uploadcare Signed Uploads",
+  "type": "module",
+  "module": "./dist/index.node.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "node": "./dist/index.node.js",
+      "default": "./dist/index.node.js"
+    }
+  },
+  "sideEffects": false,
+  "files": ["dist/*", "README.md", "LICENSE"],
+  "scripts": {
+    "prepack": "cp ../../LICENSE ./LICENSE",
+    "clean": "rimraf dist",
+    "test": "node --experimental-vm-modules ../../node_modules/jest/bin/jest.js",
+    "prebuild": "npm run clean",
+    "build": "npm run build:types && npm run build:compile",
+    "build:types": "dts-bundle-generator --project tsconfig.dts.json -o dist/index.d.ts src/index.ts",
+    "build:compile": "rollup -c"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/uploadcare/uploadcare-js-api-clients.git"
+  },
+  "author": "Uploadcare",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/uploadcare/uploadcare-js-api-clients/issues"
+  },
+  "homepage": "https://github.com/uploadcare/uploadcare-js-api-clients#readme",
+  "keywords": ["uploadcare", "file", "rest", "api"],
+  "devDependencies": {
+    "ts-node": "^10.8.1"
+  },
+  "dependencies": {
+  }
+}

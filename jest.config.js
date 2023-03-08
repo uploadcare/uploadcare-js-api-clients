@@ -9,7 +9,6 @@ export default {
       isolatedModules: true
     }
   },
-  setupFiles: ['../../env.js'],
   reporters: ['default', 'github-actions'],
   setupFilesAfterEnv: ['jest-extended/all']
 }

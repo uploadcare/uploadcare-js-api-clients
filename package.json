@@ -7,7 +7,8 @@
   "workspaces": [
     "packages/api-client-utils",
     "packages/upload-client",
-    "packages/rest-client"
+    "packages/rest-client",
+    "packages/signed-uploads"
   ],
   "engines": {
     "node": ">=16"
@@ -15,6 +16,7 @@
   "scripts": {
     "build:docs:upload-client": "typedoc --out docs/upload-client packages/upload-client/src/index.ts --readme packages/upload-client/README.md --options ./typedoc.json",
     "build:docs:rest-client": "typedoc --out docs/rest-client packages/rest-client/src/index.ts --readme packages/rest-client/README.md  --options ./typedoc.json",
+    "build:docs:signed-uploads": "typedoc --out docs/signed-uploads packages/signed-uploads/src/index.ts --readme packages/signed-uploads/README.md  --options ./typedoc.json",
     "build:docs": "rimraf docs && run-s build:docs:* && touch docs/.nojekyll",
     "build": "npm run build --workspaces",
     "lint": "run-s eslint prettier",
