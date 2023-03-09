@@ -1,6 +1,6 @@
 {
   "name": "@uploadcare/signed-uploads",
-  "version": "6.2.1",
+  "version": "6.3.0",
   "description": "Library for work with Uploadcare Signed Uploads",
   "type": "module",
   "module": "./dist/index.node.js",
