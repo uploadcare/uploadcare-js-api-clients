@@ -6,7 +6,7 @@
       alt="">
 </a>
 
-This is an Uploadcare [Signed Uploads][uc-docs-signed-uploads] wrapper to work with
+This is Uploadcare [Signed Uploads][uc-docs-signed-uploads] wrapper to work with
 Node.js.
 
 [API Reference](https://uploadcare.github.io/uploadcare-js-api-clients/signed-uploads/)
