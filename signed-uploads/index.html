@@ -1,0 +1,56 @@
+<!DOCTYPE html><html class="default"><head><meta charSet="utf-8"/><meta http-equiv="x-ua-compatible" content="IE=edge"/><title>@uploadcare/signed-uploads</title><meta name="description" content="Documentation for @uploadcare/signed-uploads"/><meta name="viewport" content="width=device-width, initial-scale=1"/><link rel="stylesheet" href="assets/style.css"/><link rel="stylesheet" href="assets/highlight.css"/><script async src="assets/search.js" id="search-script"></script></head><body><script>document.body.classList.add(localStorage.getItem("tsd-theme") || "os")</script><header><div class="tsd-page-toolbar"><div class="container"><div class="table-wrap"><div class="table-cell" id="tsd-search" data-base="."><div class="field"><label for="tsd-search-field" class="tsd-widget search no-caption">Search</label><input type="text" id="tsd-search-field"/></div><ul class="results"><li class="state loading">Preparing search index...</li><li class="state failure">The search index is not available</li></ul><a href="index.html" class="title">@uploadcare/signed-uploads</a></div><div class="table-cell" id="tsd-widgets"><div id="tsd-filter"><a href="#" class="tsd-widget options no-caption" data-toggle="options">Options</a><div class="tsd-filter-group"><div class="tsd-select" id="tsd-filter-visibility"><span class="tsd-select-label">All</span><ul class="tsd-select-list"><li data-value="public">Public</li><li data-value="protected">Public/Protected</li><li data-value="private" class="selected">All</li></ul></div> <input type="checkbox" id="tsd-filter-inherited" checked/><label class="tsd-widget" for="tsd-filter-inherited">Inherited</label><input type="checkbox" id="tsd-filter-externals" checked/><label class="tsd-widget" for="tsd-filter-externals">Externals</label></div></div><a href="#" class="tsd-widget menu no-caption" data-toggle="menu">Menu</a></div></div></div></div><div class="tsd-page-title"><div class="container"><h1>@uploadcare/signed-uploads </h1></div></div></header><div class="container container-main"><div class="row"><div class="col-8 col-content"><div class="tsd-panel tsd-typography">
+<a href="#uploadcare-signed-uploads-client" id="uploadcare-signed-uploads-client" style="color: inherit; text-decoration: none;">
+  <h1>Uploadcare Signed Uploads Client</h1>
+</a>
+<a href="https://uploadcare.com/?utm_source=github&utm_campaign=uploadcare-js-api-clients">
+    <img align="right" width="64" height="64"
+      src="https://ucarecdn.com/edfdf045-34c0-4087-bbdd-e3834921f890/userpiccircletransparent.svg"
+      alt="">
+</a>
+
+<p>This is Uploadcare <a href="https://uploadcare.com/docs/security/secure-uploads/#signed-uploads?utm_source=github&amp;utm_campaign=uploadcare-js-api-clients">Signed Uploads</a> wrapper to work with
+Node.js.</p>
+<p><a href="https://uploadcare.github.io/uploadcare-js-api-clients/signed-uploads/">API Reference</a></p>
+<p><a href="https://github.com/uploadcare/uploadcare-js-api-clients/actions/workflows/checks.yml"><img src="https://github.com/uploadcare/uploadcare-js-api-clients/actions/workflows/checks.yml/badge.svg" alt="Build Status"></a>
+<a href="https://www.npmjs.org/package/@uploadcare/signed-uploads"><img src="http://img.shields.io/npm/v/@uploadcare/signed-uploads.svg" alt="NPM version"></a>
+<a href="https://github.com/uploadcare/uploadcare-js-api-clients/releases"><img src="https://img.shields.io/github/release/uploadcare/uploadcare-js-api-clients.svg" alt="GitHub release"></a>
+<a href="https://stackshare.io/uploadcare/stacks/"><img src="https://img.shields.io/badge/tech-stack-0690fa.svg?style=flat" alt="Uploadcare stack on StackShare"></a></p>
+<!-- toc -->
+
+<ul>
+<li><a href="#install">Install</a></li>
+<li><a href="#usage">Usage</a></li>
+<li><a href="#security-issues">Security issues</a></li>
+<li><a href="#feedback">Feedback</a></li>
+</ul>
+<!-- tocstop -->
+
+
+<a href="#install" id="install" style="color: inherit; text-decoration: none;">
+  <h2>Install</h2>
+</a>
+<pre><code class="language-bash"><span class="hl-0">npm install @uploadcare/signed-uploads</span>
+</code></pre>
+
+<a href="#usage" id="usage" style="color: inherit; text-decoration: none;">
+  <h2>Usage</h2>
+</a>
+<p><strong>NOTE</strong>: The Uploadcare API accepts <code>expire</code> as unix time in seconds. However, this library accepts time in milliseconds, as per the Node.js standard.</p>
+<pre><code class="language-typescript"><span class="hl-1">import</span><span class="hl-0"> { </span><span class="hl-2">generateSecureSignature</span><span class="hl-0"> } </span><span class="hl-1">from</span><span class="hl-0"> </span><span class="hl-3">&#39;@uploadcare/signed-uploads&#39;</span><br/><br/><span class="hl-4">// by the expiration timestamp in milliseconds since the epoch</span><br/><span class="hl-5">const</span><span class="hl-0"> </span><span class="hl-6">signature</span><span class="hl-0"> = </span><span class="hl-7">generateSecureSignature</span><span class="hl-0">(</span><span class="hl-3">&#39;YOUR_SECRET_KEY&#39;</span><span class="hl-0">, {</span><br/><span class="hl-0">  </span><span class="hl-2">expire:</span><span class="hl-0"> </span><span class="hl-8">Date</span><span class="hl-0">.</span><span class="hl-7">now</span><span class="hl-0">() + </span><span class="hl-9">60</span><span class="hl-0"> * </span><span class="hl-9">30</span><span class="hl-0"> * </span><span class="hl-9">1000</span><span class="hl-0"> </span><span class="hl-4">// 30 minutes</span><br/><span class="hl-0">})</span><br/><br/><span class="hl-4">// by the lifetime in milliseconds</span><br/><span class="hl-5">const</span><span class="hl-0"> </span><span class="hl-6">signature</span><span class="hl-0"> = </span><span class="hl-7">generateSecureSignature</span><span class="hl-0">(</span><span class="hl-3">&#39;YOUR_SECRET_KEY&#39;</span><span class="hl-0">, {</span><br/><span class="hl-0">  </span><span class="hl-2">lifetime:</span><span class="hl-0"> </span><span class="hl-9">60</span><span class="hl-0"> * </span><span class="hl-9">30</span><span class="hl-0"> * </span><span class="hl-9">1000</span><span class="hl-0"> </span><span class="hl-4">// 30 minutes</span><br/><span class="hl-0">})</span>
+</code></pre>
+
+<a href="#security-issues" id="security-issues" style="color: inherit; text-decoration: none;">
+  <h2>Security issues</h2>
+</a>
+<p>If you think you ran into something in Uploadcare libraries that might have
+security implications, please hit us up at
+<a href="mailto:bugbounty@uploadcare.com">bugbounty@uploadcare.com</a> or Hackerone.</p>
+<p>We&#39;ll contact you personally in a short time to fix an issue through co-op and
+prior to any public disclosure.</p>
+
+<a href="#feedback" id="feedback" style="color: inherit; text-decoration: none;">
+  <h2>Feedback</h2>
+</a>
+<p>Issues and PRs are welcome. You can provide your feedback or drop us a support
+request at <a href="mailto:hello@uploadcare.com">hello@uploadcare.com</a>.</p>
+</div></div><div class="col-4 col-menu menu-sticky-wrap menu-highlight"><nav class="tsd-navigation primary"><ul><li class="current"><a href="modules.html">Exports</a></li></ul></nav><nav class="tsd-navigation secondary menu-sticky"><ul><li class="tsd-kind-type-alias"><a href="modules.html#GenerateSecureSignatureOptions" class="tsd-kind-icon">Generate<wbr/>Secure<wbr/>Signature<wbr/>Options</a></li><li class="tsd-kind-function"><a href="modules.html#generateSecureSignature" class="tsd-kind-icon">generate<wbr/>Secure<wbr/>Signature</a></li></ul></nav></div></div></div><footer class="with-border-bottom"><div class="container"><h2>Settings</h2><p>Theme <select id="theme"><option value="os">OS</option><option value="light">Light</option><option value="dark">Dark</option></select></p></div></footer><div class="container tsd-generator"><p>Generated using <a href="https://typedoc.org/" target="_blank">TypeDoc</a></p></div><div class="overlay"></div><script src="assets/main.js"></script></body></html>
