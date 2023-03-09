@@ -34,19 +34,14 @@ npm install @uploadcare/signed-uploads
 ## Usage
 
 ```typescript
-// using expire as number
+// by the expiration timestamp in milliseconds since the epoch
 const signature = generateSecureSignature('YOUR_SECRET_KEY', {
-  expire: Date.now() + 60 * 30 // 30 minutes
+  expire: Date.now() + 60 * 30 * 1000 // 30 minutes
 })
 
-// using expire as Date
+// by the lifetime in milliseconds since the epoch
 const signature = generateSecureSignature('YOUR_SECRET_KEY', {
-  expire: new Date(Date.now() + 60 * 30) // 30 minutes
-})
-
-// using lifetime
-const signature = generateSecureSignature('YOUR_SECRET_KEY', {
-  lifetime: 60 * 30 // 30 minutes
+  lifetime: 60 * 30 * 1000 // 30 minutes
 })
 ```
 
