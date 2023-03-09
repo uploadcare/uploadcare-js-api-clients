@@ -3,9 +3,7 @@ import { SupportedFileInput } from '../types'
 import { isFileData } from '../tools/isFileData'
 import { isUrl, isUuid } from '../uploadFile/types'
 
-/**
- * FileData type guard.
- */
+/** FileData type guard. */
 export const isFileDataArray = (
   data: SupportedFileInput[] | Url[] | Uuid[]
 ): data is SupportedFileInput[] => {
@@ -18,9 +16,7 @@ export const isFileDataArray = (
   return true
 }
 
-/**
- * Uuid type guard.
- */
+/** Uuid type guard. */
 export const isUuidArray = (
   data: SupportedFileInput[] | Url[] | Uuid[]
 ): data is Uuid[] => {
@@ -33,9 +29,7 @@ export const isUuidArray = (
   return true
 }
 
-/**
- * Url type guard.
- */
+/** Url type guard. */
 export const isUrlArray = (
   data: SupportedFileInput[] | Url[] | Uuid[]
 ): data is Url[] => {

@@ -1,8 +1,6 @@
 import { isNode } from './isNode'
 
-/**
- * TODO: add test inside playwright
- */
+/** TODO: add test inside playwright */
 
 describe('isNode', () => {
   it('should return true', () => {

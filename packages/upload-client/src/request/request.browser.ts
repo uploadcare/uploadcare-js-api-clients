@@ -19,10 +19,10 @@ const request = ({
     let aborted = false
 
     /**
-     * Force synchronous flag to be off
-     * Some chrome versions gets `InvalidAccessError` error when we set `responseType`
-     * See https://xhr.spec.whatwg.org/#synchronous-flag
-     * and https://bugs.chromium.org/p/chromium/issues/detail?id=1346628
+     * Force synchronous flag to be off Some chrome versions gets
+     * `InvalidAccessError` error when we set `responseType` See
+     * https://xhr.spec.whatwg.org/#synchronous-flag and
+     * https://bugs.chromium.org/p/chromium/issues/detail?id=1346628
      */
     xhr.open(requestMethod, url, true)
 

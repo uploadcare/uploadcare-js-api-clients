@@ -47,9 +47,7 @@ export type FileFromOptions = {
   metadata?: Metadata
 }
 
-/**
- * Uploads file from provided data.
- */
+/** Uploads file from provided data. */
 
 export async function uploadFile(
   data: SupportedFileInput | Url | Uuid,

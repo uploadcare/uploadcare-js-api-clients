@@ -10,8 +10,8 @@ export type CopyFileToLocalStorageOptions = {
 }
 
 /**
- * There is a bug in the API. FileInfo will be incomplete.
- * It's better to refetch fileInfo after request in the high-level wrappers.
+ * There is a bug in the API. FileInfo will be incomplete. It's better to
+ * refetch fileInfo after request in the high-level wrappers.
  */
 export type CopyFileToLocalStorageResponse = {
   type: 'file'

@@ -1,5 +1,5 @@
 /**
- * setTimeout as Promise.
+ * SetTimeout as Promise.
  *
  * @param {number} ms Timeout in milliseconds.
  */

@@ -26,9 +26,7 @@ export type GroupInfoOptions = {
 
 type Response = GroupInfo | FailedResponse
 
-/**
- * Get info about group.
- */
+/** Get info about group. */
 export default function groupInfo(
   id: GroupId,
   {

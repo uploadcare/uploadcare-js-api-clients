@@ -48,8 +48,8 @@ export type BaseOptions = {
 }
 
 /**
- * Performs file uploading request to Uploadcare Upload API.
- * Can be canceled and has progress.
+ * Performs file uploading request to Uploadcare Upload API. Can be canceled and
+ * has progress.
  */
 export default function base(
   file: SupportedFileInput,

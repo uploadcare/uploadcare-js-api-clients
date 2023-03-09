@@ -28,9 +28,7 @@ import { FileInfo, GroupId, GroupInfo, Token, Url, Uuid } from './api/types'
 import { Settings, Sliceable, SupportedFileInput } from './types'
 import { GroupFromOptions, uploadFileGroup } from './uploadFileGroup'
 
-/**
- * Populate options with settings.
- */
+/** Populate options with settings. */
 const populateOptionsWithSettings = <T>(
   options: T,
   settings: Settings

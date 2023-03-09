@@ -2,9 +2,7 @@ import { Url, Uuid } from '..'
 import { SupportedFileInput, Sliceable } from '../types'
 import { isFileData } from '../tools/isFileData'
 
-/**
- * Uuid type guard.
- */
+/** Uuid type guard. */
 export const isUuid = (data: SupportedFileInput | Url | Uuid): data is Uuid => {
   const UUID_REGEX =
     '[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}'

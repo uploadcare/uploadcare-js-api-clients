@@ -2,22 +2,25 @@ import chalk from 'chalk'
 
 /**
  * Pretty print for JSON.
+ *
  * @param {Record<string, unknown>} json
- * @return {string}
+ * @returns {string}
  */
 const pretty = (json: Record<string, unknown>): string =>
   JSON.stringify(json, null, 2)
 
 /**
  * Check is empty object.
+ *
  * @param {Record<string, unknown>} object
- * @return {boolean}
+ * @returns {boolean}
  */
 const isEmptyObject = (object: Record<string, unknown>): boolean =>
   Object.keys(object).length === 0 && object.constructor === Object
 
 /**
  * Logger for requests and responses.
+ *
  * @param {object} ctx
  * @param {function} next
  */

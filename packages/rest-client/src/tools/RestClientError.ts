@@ -6,8 +6,8 @@ export type RestClientErrorOptions = {
 const DEFAULT_MESSAGE = 'Unknown error'
 
 /**
- * TODO: it's better to split errors into something like
- * Runtime error and ServerError (RestApiError)
+ * TODO: it's better to split errors into something like Runtime error and
+ * ServerError (RestApiError)
  */
 export class RestClientError extends Error {
   readonly status?: number

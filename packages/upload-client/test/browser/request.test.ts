@@ -1,6 +1,4 @@
-/**
- * @jest-environment jsdom
- */
+/** @jest-environment jsdom */
 
 import { UploadClientError } from '../../src/tools/errors'
 import request from '../../src/request/request.browser'

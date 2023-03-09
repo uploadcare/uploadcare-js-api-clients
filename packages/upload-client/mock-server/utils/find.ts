@@ -1,5 +1,6 @@
 /**
  * Safely get json value.
+ *
  * @param {Record<string, unknown>} json
  * @param {string} key
  */

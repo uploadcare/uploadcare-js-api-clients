@@ -27,9 +27,7 @@ export type InfoOptions = {
   retryNetworkErrorMaxTimes?: number
 }
 
-/**
- * Returns a JSON dictionary holding file info.
- */
+/** Returns a JSON dictionary holding file info. */
 export default function info(
   uuid: Uuid,
   {

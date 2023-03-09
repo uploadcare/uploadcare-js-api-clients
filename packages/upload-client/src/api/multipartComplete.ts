@@ -23,9 +23,7 @@ export type MultipartCompleteOptions = {
 
 type Response = FailedResponse | FileInfo
 
-/**
- * Complete multipart uploading.
- */
+/** Complete multipart uploading. */
 export default function multipartComplete(
   uuid: Uuid,
   {

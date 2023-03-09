@@ -30,9 +30,7 @@ export type GroupOptions = {
 
 type Response = GroupInfo | FailedResponse
 
-/**
- * Create files group.
- */
+/** Create files group. */
 export default function group(
   uuids: Uuid[],
   {

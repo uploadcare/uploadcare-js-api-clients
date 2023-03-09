@@ -72,9 +72,7 @@ export type FromUrlStatusOptions = {
   retryNetworkErrorMaxTimes?: number
 }
 
-/**
- * Checking upload status and working with file tokens.
- */
+/** Checking upload status and working with file tokens. */
 export default function fromUrlStatus(
   token: Token,
   {
