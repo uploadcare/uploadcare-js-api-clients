@@ -2,9 +2,7 @@ import { ROUTES, RouteType } from '../routes'
 import { ALLOWED_PUBLIC_KEYS } from '../config'
 import error from '../utils/error'
 
-/**
- * Routes protected by auth.
- */
+/** Routes protected by auth. */
 const protectedRoutes: Array<string> = ROUTES.filter((route: RouteType) => {
   const keys = Object.keys(route)
   const path = keys[0]
@@ -18,14 +16,16 @@ const protectedRoutes: Array<string> = ROUTES.filter((route: RouteType) => {
 
 /**
  * Check is url protected by auth.
+ *
  * @param {string} url
- * @return {boolean}
+ * @returns {boolean}
  */
 const isProtected = (url: string) =>
   !!protectedRoutes.filter((path: string) => url === path).length
 
 /**
  * Get public key value from request.
+ *
  * @param {Record<string, string>} source
  * @param {string} key
  */
@@ -42,9 +42,10 @@ type IsAuthorizedParams = {
 }
 /**
  * Check auth.
+ *
  * @param {string} url
  * @param {string} publicKey
- * @return {boolean}
+ * @returns {boolean}
  */
 const isAuthorized = ({ url, publicKey }: IsAuthorizedParams) => {
   if (!isProtected(url)) {
@@ -56,6 +57,7 @@ const isAuthorized = ({ url, publicKey }: IsAuthorizedParams) => {
 
 /**
  * Uploadcare Auth middleware.
+ *
  * @param {object} ctx
  * @param {function} next
  */

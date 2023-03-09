@@ -5,9 +5,8 @@ import { SupportedFileInput } from '../types'
 import { isFileData } from './isFileData'
 
 /**
- * Constructs FormData instance.
- * Uses 'form-data' package in node or native FormData
- * in browsers.
+ * Constructs FormData instance. Uses 'form-data' package in node or native
+ * FormData in browsers.
  */
 
 type KeyValue<T> = { [key: string]: T }

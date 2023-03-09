@@ -4,6 +4,7 @@ let times = 0
 
 /**
  * '/throttle/'
+ *
  * @param {object} ctx
  */
 const index = (ctx) => {

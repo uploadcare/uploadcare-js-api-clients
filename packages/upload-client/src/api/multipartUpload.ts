@@ -21,9 +21,7 @@ export type MultipartUploadResponse = {
   code?: number
 }
 
-/**
- * Complete multipart uploading.
- */
+/** Complete multipart uploading. */
 
 export default function multipartUpload(
   part: SupportedFileInput,

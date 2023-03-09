@@ -1,4 +1,4 @@
-# Uploadcare JS API Clients
+# Uploadcare Signed Uploads Client
 
 <a href="https://uploadcare.com/?utm_source=github&utm_campaign=uploadcare-js-api-clients">
     <img align="right" width="64" height="64"
@@ -6,18 +6,48 @@
       alt="">
 </a>
 
-Uploadcare JavaScript/TypeScript API clients for Node.js and browsers. Handles uploads and further operations with files by wrapping Uploadcare Upload and REST APIs.
+This is Uploadcare [Signed Uploads][uc-docs-signed-uploads] wrapper to work with
+Node.js.
+
+[API Reference](https://uploadcare.github.io/uploadcare-js-api-clients/signed-uploads/)
 
 [![Build Status][badge-build]][build-url]
 [![NPM version][npm-img]][npm-url]
-[![GitHub release][badge-release-img]][badge-release-url]&nbsp;
+[![GitHub release][badge-release-img]][badge-release-url]
 [![Uploadcare stack on StackShare][badge-stack-img]][badge-stack-url]
 
-## Packages
+<!-- toc -->
 
-* [**@uploadcare/upload-client**](./packages/upload-client/README.md)
-* [**@uploadcare/rest-client**](./packages/rest-client/README.md)
-* [**@uploadcare/signed-uploads**](./packages/signed-uploads/README.md)
+- [Install](#install)
+- [Usage](#usage)
+- [Security issues](#security-issues)
+- [Feedback](#feedback)
+
+<!-- tocstop -->
+
+## Install
+
+```bash
+npm install @uploadcare/signed-uploads
+```
+
+## Usage
+
+**NOTE**: The Uploadcare API accepts `expire` as unix time in seconds. However, this library accepts time in milliseconds, as per the Node.js standard.
+
+```typescript
+import { generateSecureSignature } from '@uploadcare/signed-uploads'
+
+// by the expiration timestamp in milliseconds since the epoch
+const signature = generateSecureSignature('YOUR_SECRET_KEY', {
+  expire: Date.now() + 60 * 30 * 1000 // 30 minutes
+})
+
+// by the lifetime in milliseconds
+const signature = generateSecureSignature('YOUR_SECRET_KEY', {
+  lifetime: 60 * 30 * 1000 // 30 minutes
+})
+```
 
 ## Security issues
 
@@ -35,16 +65,12 @@ request at [hello@uploadcare.com][uc-email-hello].
 
 [uc-email-bounty]: mailto:bugbounty@uploadcare.com
 [uc-email-hello]: mailto:hello@uploadcare.com
-[github-releases]: https://github.com/uploadcare/uploadcare-js-api-clients/releases
-[github-branch-release]: https://github.com/uploadcare/uploadcare-js-api-clients/tree/release
-[github-contributors]: https://github.com/uploadcare/uploadcare-js-api-clients/graphs/contributors
 [badge-stack-img]: https://img.shields.io/badge/tech-stack-0690fa.svg?style=flat
 [badge-stack-url]: https://stackshare.io/uploadcare/stacks/
 [badge-release-img]: https://img.shields.io/github/release/uploadcare/uploadcare-js-api-clients.svg
 [badge-release-url]: https://github.com/uploadcare/uploadcare-js-api-clients/releases
-[npm-img]: http://img.shields.io/npm/v/@uploadcare/upload-client.svg
-[npm-url]: https://www.npmjs.org/package/@uploadcare/upload-client
+[npm-img]: http://img.shields.io/npm/v/@uploadcare/signed-uploads.svg
+[npm-url]: https://www.npmjs.org/package/@uploadcare/signed-uploads
 [badge-build]: https://github.com/uploadcare/uploadcare-js-api-clients/actions/workflows/checks.yml/badge.svg
 [build-url]: https://github.com/uploadcare/uploadcare-js-api-clients/actions/workflows/checks.yml
-[uc-docs-upload-api]: https://uploadcare.com/docs/api_reference/upload/?utm_source=github&utm_campaign=uploadcare-js-api-clients
-[uc-docs-metadata]: https://uploadcare.com/api-refs/rest-api/v0.7.0/#tag/File-Metadata
+[uc-docs-signed-uploads]: https://uploadcare.com/docs/security/secure-uploads/#signed-uploads?utm_source=github&utm_campaign=uploadcare-js-api-clients

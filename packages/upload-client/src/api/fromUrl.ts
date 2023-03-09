@@ -36,18 +36,14 @@ type Response = FailedResponse | FromUrlSuccessResponse
 
 export type FromUrlResponse = FromUrlSuccessResponse
 
-/**
- * TokenResponse Type Guard.
- */
+/** TokenResponse Type Guard. */
 export const isTokenResponse = (
   response: FromUrlSuccessResponse
 ): response is TokenResponse => {
   return response.type !== undefined && response.type === TypeEnum.Token
 }
 
-/**
- * FileInfoResponse Type Guard.
- */
+/** FileInfoResponse Type Guard. */
 export const isFileInfoResponse = (
   response: FromUrlSuccessResponse
 ): response is FileInfoResponse => {
@@ -76,9 +72,7 @@ export type FromUrlOptions = {
   metadata?: Metadata
 }
 
-/**
- * Uploading files from URL.
- */
+/** Uploading files from URL. */
 export default function fromUrl(
   sourceUrl: Url,
   {

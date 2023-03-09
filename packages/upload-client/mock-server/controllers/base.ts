@@ -3,6 +3,7 @@ import find from '../utils/find'
 
 /**
  * '/base/'
+ *
  * @param {object} ctx
  */
 const index = (ctx) => {

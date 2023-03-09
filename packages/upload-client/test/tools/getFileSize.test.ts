@@ -1,6 +1,4 @@
-/**
- * @jest-environment jsdom
- */
+/** @jest-environment jsdom */
 import { expect, jest } from '@jest/globals'
 import { getFileSize } from '../../src/tools/getFileSize'
 

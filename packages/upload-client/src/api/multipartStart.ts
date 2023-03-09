@@ -47,9 +47,7 @@ export type MultipartStartResponse = {
 
 type Response = MultipartStartResponse | FailedResponse
 
-/**
- * Start multipart uploading.
- */
+/** Start multipart uploading. */
 export default function multipartStart(
   size: number,
   {

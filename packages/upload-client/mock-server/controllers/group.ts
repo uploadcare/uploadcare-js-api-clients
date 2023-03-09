@@ -8,23 +8,26 @@ const GROUP_ID_REGEX = `${UUID_REGEX}~[1-9][0-9]*$`
 
 /**
  * Check file UUID.
+ *
  * @param {string} uuid
- * @return {boolean}
+ * @returns {boolean}
  */
 const isValidUuid = (uuid: string): boolean => new RegExp(UUID_REGEX).test(uuid)
 
 /**
  * Check group id.
+ *
  * @param {string} groupId
- * @return {boolean}
+ * @returns {boolean}
  */
 const isValidGroupId = (groupId: string): boolean =>
   new RegExp(GROUP_ID_REGEX).test(groupId)
 
 /**
  * Get UUID from file
+ *
  * @param {string} file
- * @return {string}
+ * @returns {string}
  */
 const getFileUuid = (file: string): string => {
   // If file contains CDN operations
@@ -39,8 +42,9 @@ const getFileUuid = (file: string): string => {
 
 /**
  * Is valid file?
+ *
  * @param {string} file
- * @return {boolean}
+ * @returns {boolean}
  */
 const isValidFile = (file: string): boolean => {
   const uuid = getFileUuid(file)
@@ -50,6 +54,7 @@ const isValidFile = (file: string): boolean => {
 
 /**
  * '/group/'
+ *
  * @param {object} ctx
  */
 const index = (ctx) => {
@@ -86,6 +91,7 @@ const index = (ctx) => {
 
 /**
  * '/group/info/?pub_key=XXXXXXXXXXXXXXXXXXXX&group_id=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX~N'
+ *
  * @param {object} ctx
  */
 const info = (ctx) => {

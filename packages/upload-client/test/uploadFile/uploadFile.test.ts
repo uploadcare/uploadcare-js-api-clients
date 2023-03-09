@@ -6,8 +6,8 @@ import { getSettingsForTesting } from '../_helpers'
 jest.setTimeout(60000)
 
 /**
- * Those spying tests are commented because jest isn't able to mock statically imported ESM modules
- * So we just ensure that `uploadFile` is working at all
+ * Those spying tests are commented because jest isn't able to mock statically
+ * imported ESM modules So we just ensure that `uploadFile` is working at all
  * Without checking for actual upload method used
  */
 describe('uploadFile', () => {

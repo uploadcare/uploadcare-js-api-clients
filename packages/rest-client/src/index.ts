@@ -1,6 +1,4 @@
-/**
- * Common types
- */
+/** Common types */
 export { ApiRequestSettings } from './makeApiRequest'
 export { UserSettings } from './settings'
 export { AddonExecutionStatus } from './types/AddonExecutionStatus'
@@ -65,14 +63,10 @@ export {
   GetUserAgentOptions
 } from '@uploadcare/api-client-utils'
 
-/**
- * Helpers from `@uploadcare/api-client-utils`
- */
+/** Helpers from `@uploadcare/api-client-utils` */
 export { getUserAgent } from '@uploadcare/api-client-utils'
 
-/**
- * Tools
- */
+/** Tools */
 export { paginate, Paginator } from './tools/paginate'
 export { addonJobPoller, AddonJobPollerOptions } from './tools/addonJobPoller'
 export {
@@ -81,9 +75,7 @@ export {
 } from './tools/conversionJobPoller'
 export { CreateJobPollerPollOptions } from './tools/createJobPoller'
 
-/**
- * Auth
- */
+/** Auth */
 export {
   UploadcareAuthSchema,
   UploadcareAuthSchemaOptionsWithSecretKey,
@@ -96,9 +88,7 @@ export {
 } from './auth/UploadcareSimpleAuthSchema'
 export { AuthSchema } from './auth/types'
 
-/**
- * Low-level File API
- */
+/** Low-level File API */
 export {
   copyFileToLocalStorage,
   CopyFileToLocalStorageResponse,
@@ -142,9 +132,7 @@ export {
   StoreFilesOptions
 } from './api/file/storeFiles'
 
-/**
- * Low-level Group API
- */
+/** Low-level Group API */
 export {
   deleteGroup,
   DeleteGroupResponse,
@@ -162,9 +150,7 @@ export {
   ListOfGroupsOrdering
 } from './api/group/listOfGroups'
 
-/**
- * Low-level Metadata API
- */
+/** Low-level Metadata API */
 export {
   deleteMetadata,
   DeleteMetadataResponse,
@@ -186,9 +172,7 @@ export {
   UpdateMetadataOptions
 } from './api/metadata/updateMetadata'
 
-/**
- * Low-level Webhooks API
- */
+/** Low-level Webhooks API */
 export {
   createWebhook,
   CreateWebhookResponse,
@@ -210,15 +194,11 @@ export {
   UpdateWebhookOptions
 } from './api/webhooks/updateWebhook'
 
-/**
- * Low-level Conversion API
- */
+/** Low-level Conversion API */
 export { convert } from './api/conversion/convert'
 export { conversionJobStatus } from './api/conversion/conversionJobStatus'
 
-/**
- * Low-level Addons API
- */
+/** Low-level Addons API */
 export {
   executeAddon,
   ExecuteAddonResponse,

@@ -36,7 +36,8 @@
     {
       "files": [
         "**/*.js",
-        "**/*.mjs"
+        "**/*.mjs",
+        "**/*.cjs"
       ],
       "parserOptions": {
         "sourceType": "module"

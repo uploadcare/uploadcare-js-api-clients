@@ -1,6 +1,4 @@
-/**
- * @jest-environment jsdom
- */
+/** @jest-environment jsdom */
 import { getBlobFromReactNativeAsset } from '../../src/tools/getBlobFromReactNativeAsset'
 import { expect, jest } from '@jest/globals'
 

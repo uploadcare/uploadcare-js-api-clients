@@ -18,8 +18,8 @@ export const TEST_SECRET_KEY = process.env
   .REST_CLIENT_DEFAULT_SECRET_KEY as string
 
 /**
- * When we create something (groups/metadata), it won't be available through the API immediately
- * So we need to wait a few seconds to use it in the tests
+ * When we create something (groups/metadata), it won't be available through the
+ * API immediately So we need to wait a few seconds to use it in the tests
  */
 export const waitForApiFlush = () => delay(2000)
 

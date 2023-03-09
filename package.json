@@ -7,7 +7,8 @@
   "workspaces": [
     "packages/api-client-utils",
     "packages/upload-client",
-    "packages/rest-client"
+    "packages/rest-client",
+    "packages/signed-uploads"
   ],
   "engines": {
     "node": ">=16"
@@ -15,6 +16,7 @@
   "scripts": {
     "build:docs:upload-client": "typedoc --out docs/upload-client packages/upload-client/src/index.ts --readme packages/upload-client/README.md --options ./typedoc.json",
     "build:docs:rest-client": "typedoc --out docs/rest-client packages/rest-client/src/index.ts --readme packages/rest-client/README.md  --options ./typedoc.json",
+    "build:docs:signed-uploads": "typedoc --out docs/signed-uploads packages/signed-uploads/src/index.ts --readme packages/signed-uploads/README.md  --options ./typedoc.json",
     "build:docs": "rimraf docs && run-s build:docs:* && touch docs/.nojekyll",
     "build": "npm run build --workspaces",
     "lint": "run-s eslint prettier",
@@ -40,7 +42,7 @@
     "dotenv": "^16.0.1",
     "dts-bundle-generator": "6.12.0",
     "eslint": "8.18.0",
-    "eslint-config-prettier": "^8.5.0",
+    "eslint-config-prettier": "^8.7.0",
     "eslint-import-resolver-typescript": "^3.1.3",
     "eslint-plugin-import": "^2.26.0",
     "husky": "^8.0.0",
@@ -48,8 +50,9 @@
     "jest-extended": "^3.1.0",
     "lint-staged": "^13.0.3",
     "npm-run-all": "^4.1.5",
-    "prettier": "2.7.1",
+    "prettier": "2.8.4",
     "prettier-config-standard": "5.0.0",
+    "prettier-plugin-jsdoc": "^0.4.2",
     "rimraf": "3.0.2",
     "rollup": "^2.75.5",
     "rollup-plugin-node-externals": "^4.0.0",

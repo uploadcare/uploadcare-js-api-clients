@@ -1,6 +1,4 @@
-/**
- * @jest-environment jsdom
- */
+/** @jest-environment jsdom */
 import { expect } from '@jest/globals'
 import {
   isBlob,
