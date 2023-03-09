@@ -36,6 +36,8 @@ npm install @uploadcare/signed-uploads
 **NOTE**: The Uploadcare API accepts `expire` as unix time in seconds. However, this library accepts time in milliseconds, as per the Node.js standard.
 
 ```typescript
+import { generateSecureSignature } from '@uploadcare/signed-uploads'
+
 // by the expiration timestamp in milliseconds since the epoch
 const signature = generateSecureSignature('YOUR_SECRET_KEY', {
   expire: Date.now() + 60 * 30 * 1000 // 30 minutes
