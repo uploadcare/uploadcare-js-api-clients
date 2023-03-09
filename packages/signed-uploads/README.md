@@ -13,7 +13,7 @@ Node.js.
 
 [![Build Status][badge-build]][build-url]
 [![NPM version][npm-img]][npm-url]
-[![GitHub release][badge-release-img]][badge-release-url]&nbsp;
+[![GitHub release][badge-release-img]][badge-release-url]
 [![Uploadcare stack on StackShare][badge-stack-img]][badge-stack-url]
 
 <!-- toc -->
