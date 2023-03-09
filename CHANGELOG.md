@@ -6,7 +6,6 @@
 * add `@uploadcare/signed-uploads` package containing helper to generate signature for signed uploads ([#466](https://github.com/uploadcare/uploadcare-js-api-clients/issues/466)) ([dd48ee4](https://github.com/uploadcare/uploadcare-js-api-clients/commit/dd48ee4213ad6e85fff83e0b83e5c9bd41ff7121))
 
 
-
 ## [6.2.1](https://github.com/uploadcare/uploadcare-js-api-clients/compare/v6.2.0...v6.2.1) (2023-01-23)
 
 
