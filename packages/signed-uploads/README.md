@@ -6,14 +6,14 @@
       alt="">
 </a>
 
-This is an Uploadcare [Signed Uploads][uc-docs-signed-uploads] wrapper to work with
+This is Uploadcare [Signed Uploads][uc-docs-signed-uploads] wrapper to work with
 Node.js.
 
 [API Reference](https://uploadcare.github.io/uploadcare-js-api-clients/signed-uploads/)
 
 [![Build Status][badge-build]][build-url]
 [![NPM version][npm-img]][npm-url]
-[![GitHub release][badge-release-img]][badge-release-url]&nbsp;
+[![GitHub release][badge-release-img]][badge-release-url]
 [![Uploadcare stack on StackShare][badge-stack-img]][badge-stack-url]
 
 <!-- toc -->
