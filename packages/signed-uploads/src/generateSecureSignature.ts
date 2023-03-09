@@ -12,11 +12,6 @@ export const generateSecureSignature = (
   secret: string,
   options: GenerateSecureSignatureOptions
 ) => {
-  if (typeof window !== 'undefined') {
-    throw new Error(
-      "Your shouldn't use `generateSecureSignature` in the browser! It's not secure!"
-    )
-  }
   const expire =
     'expire' in options
       ? new Date(options.expire).getTime()
