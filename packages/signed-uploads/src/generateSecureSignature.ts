@@ -4,16 +4,23 @@ export type GenerateSecureSignatureOptions =
   | {
       /**
        * The expiration timestamp of the signature in milliseconds since the
-       * epoch
+       * epoch or just Date object.
        */
-      expire: number
+      expire: number | Date
     }
   | {
       /** The lifetime of the signature in milliseconds */
       lifetime: number
     }
 
-const msToUnixTimestamp = (ms: number) => Math.floor(ms / 1000)
+const msToUnixTimestamp = (ms: number) => Math.floor(ms / 1000).toString()
+const getSecureExpire = (options: GenerateSecureSignatureOptions) => {
+  if ('expire' in options) {
+    return msToUnixTimestamp(new Date(options.expire).getTime())
+  }
+
+  return msToUnixTimestamp(Date.now() + options.lifetime)
+}
 
 /**
  * Generate a secure signature for signing the upload request to Uploadcare.
@@ -26,12 +33,9 @@ export const generateSecureSignature = (
   secret: string,
   options: GenerateSecureSignatureOptions
 ) => {
-  const expire =
-    'expire' in options
-      ? msToUnixTimestamp(new Date(options.expire).getTime())
-      : msToUnixTimestamp(Date.now() + options.lifetime)
-
   const hmac = createHmac('sha256', secret)
-  hmac.update(expire.toString())
-  return hmac.digest('hex')
+  const secureExpire = getSecureExpire(options)
+  hmac.update(secureExpire)
+  const secureSignature = hmac.digest('hex')
+  return { secureSignature, secureExpire }
 }

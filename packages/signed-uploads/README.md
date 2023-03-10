@@ -39,15 +39,22 @@ npm install @uploadcare/signed-uploads
 import { generateSecureSignature } from '@uploadcare/signed-uploads'
 
 // by the expiration timestamp in milliseconds since the epoch
-const signature = generateSecureSignature('YOUR_SECRET_KEY', {
-  expire: Date.now() + 60 * 30 * 1000 // 30 minutes
+const { secureSignature, secureExpire } = generateSecureSignature('YOUR_SECRET_KEY', {
+  expire: Date.now() + 60 * 30 * 1000 // expire in 30 minutes
+})
+
+// by the expiration date
+const { secureSignature, secureExpire } = generateSecureSignature('YOUR_SECRET_KEY', {
+  expire: new Date("2099-01-01") // expire on 2099-01-01
 })
 
 // by the lifetime in milliseconds
-const signature = generateSecureSignature('YOUR_SECRET_KEY', {
-  lifetime: 60 * 30 * 1000 // 30 minutes
+const { secureSignature, secureExpire } = generateSecureSignature('YOUR_SECRET_KEY', {
+  lifetime: 60 * 30 * 1000 // expire in 30 minutes
 })
 ```
+
+A pair of `secureSignature` and `secureExpire` (string with a unixtime in seconds) can be passed directly to the [corresponding options][upload-client-secure-options] of `@uploadcare/upload-client`.
 
 ## Security issues
 
@@ -74,3 +81,4 @@ request at [hello@uploadcare.com][uc-email-hello].
 [badge-build]: https://github.com/uploadcare/uploadcare-js-api-clients/actions/workflows/checks.yml/badge.svg
 [build-url]: https://github.com/uploadcare/uploadcare-js-api-clients/actions/workflows/checks.yml
 [uc-docs-signed-uploads]: https://uploadcare.com/docs/security/secure-uploads/#signed-uploads?utm_source=github&utm_campaign=uploadcare-js-api-clients
+[upload-client-secure-options]: https://github.com/uploadcare/uploadcare-js-api-clients/blob/master/packages/upload-client/README.md#securesignature-string
