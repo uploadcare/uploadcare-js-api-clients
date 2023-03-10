@@ -1,3 +1,14 @@
+# [6.4.0](https://github.com/uploadcare/uploadcare-js-api-clients/compare/v6.3.0...v6.4.0) (2023-03-10)
+
+
+### BREAKING CHANGE without major bump
+
+There will be no impact unless you are using the `@uploadcare/signed-uploads` package.
+
+* **@uploadcare/signed-uploads:** update `generateSecureSignature` signature - BREAKING CHANGE without major bump ([97f7ebb](https://github.com/uploadcare/uploadcare-js-api-clients/commit/97f7ebb796b3c2d38ca9ddbccb07fb706ed75eba))
+
+
+
 # [6.3.0](https://github.com/uploadcare/uploadcare-js-api-clients/compare/v6.2.1...v6.3.0) (2023-03-09)
 
 
