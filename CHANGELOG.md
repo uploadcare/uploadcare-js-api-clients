@@ -6,7 +6,6 @@
 * **upload-client/uploadFileGroup:** accept `checkForUrlDuplicates` and `saveUrlForRecurrentUploads` ([#470](https://github.com/uploadcare/uploadcare-js-api-clients/issues/470)) ([43e0ba9](https://github.com/uploadcare/uploadcare-js-api-clients/commit/43e0ba92e5ca3e377b2cb129daedb8c63af64787))
 
 
-
 # [6.4.0](https://github.com/uploadcare/uploadcare-js-api-clients/compare/v6.3.0...v6.4.0) (2023-03-10)
 
 
