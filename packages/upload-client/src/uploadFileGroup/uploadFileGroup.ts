@@ -44,6 +44,8 @@ export function uploadFileGroup(
     multipartChunkSize = defaultSettings.multipartChunkSize,
 
     baseCDN = defaultSettings.baseCDN,
+    checkForUrlDuplicates,
+    saveUrlForRecurrentUploads,
 
     jsonpCallback
   }: FileFromOptions & GroupFromOptions
@@ -103,7 +105,9 @@ export function uploadFileGroup(
           contentType,
           multipartChunkSize,
 
-          baseCDN
+          baseCDN,
+          checkForUrlDuplicates,
+          saveUrlForRecurrentUploads
         })
     )
   ).then((files) => {
