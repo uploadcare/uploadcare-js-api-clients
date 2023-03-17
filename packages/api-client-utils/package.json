@@ -1,6 +1,6 @@
 {
   "name": "@uploadcare/api-client-utils",
-  "version": "6.4.0",
+  "version": "6.4.1",
   "type": "module",
   "main": "dist/index.browser.js",
   "module": "dist/index.browser.js",
