@@ -4,6 +4,7 @@ import { AuthSchema } from './types'
 import { Md5Function } from '../lib/md5/Md5Function'
 import { RestClientError } from '../tools/RestClientError'
 import { isNode } from '@uploadcare/api-client-utils'
+import { createSignature } from './createSignature'
 
 type SignStringParams = {
   method: string
@@ -67,9 +68,7 @@ export class UploadcareAuthSchema implements AuthSchema {
         )
       }
       this._signatureResolver = (signString: string) =>
-        import('./createSignature.node').then((m) =>
-          m.createSignature(options.secretKey, signString)
-        )
+        createSignature(options.secretKey, signString)
     } else if (hasSignatureResolver(options)) {
       this._signatureResolver = options.signatureResolver
     } else {

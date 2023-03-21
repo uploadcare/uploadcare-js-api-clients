@@ -98,10 +98,23 @@ new UploadcareAuthSchema({
      * You need to make HTTPS request to your backend endpoint,
      * which should sign the `signString` using secret key.
      */
-    const signature = await yourBackendApi.getSignature(signString)
-    return signature
+    const response = await fetch(`/sign-request?signString=${encodeURIComponent(signString)}`);
+    const signature = await response.text();
+    return signature;
   }
 })
+```
+
+And then somewhere on your backend:
+
+```javascript
+import { createSignature } from '@uploadcare/rest-client';
+
+app.get('/sign-request', async (req, res) => {
+  const signature = await createSignature('YOUR_SECREY_KEY', req.query.signString);
+  res.send(signature);
+})
+
 ```
 
 ### API
