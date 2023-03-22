@@ -1,9 +1,4 @@
 {
-  "extends": "./tsconfig.json",
-  "compilerOptions": {
-    "declaration": true,
-    "outDir": "dist",
-  },
+  "extends": "../../tsconfig.dts.json",
   "include": ["src"],
-  "exclude": ["node_modules"]
 }
