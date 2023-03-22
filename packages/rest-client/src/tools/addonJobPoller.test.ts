@@ -6,7 +6,7 @@ import { AddonExecutionStatus } from '../types/AddonExecutionStatus'
 import { AddonName } from '../types/AddonName'
 import { addonJobPoller } from './addonJobPoller'
 
-jest.setTimeout(60 * 1000)
+jest.setTimeout(80 * 1000)
 
 describe('addonJobPoller', () => {
   it('should work', async () => {

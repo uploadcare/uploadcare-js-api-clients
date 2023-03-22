@@ -1,8 +1,8 @@
 {
   "compilerOptions": {
-    "target": "es2020",
-    "module": "es2022",
-    "lib": ["es2020", "DOM.Iterable"],
+    "target": "ESNext",
+    "module": "ESNext",
+    "lib": ["DOM", "DOM.Iterable"],
     "noImplicitAny": false,
     "strictNullChecks": true,
     "strict": true,
@@ -10,6 +10,7 @@
     "moduleResolution": "node",
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
+    "types": ["jest-extended", "jest", "node"]
   },
-  "exclude": ["node_modules"],
+  "exclude": ["node_modules"]
 }

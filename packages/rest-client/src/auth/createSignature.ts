@@ -1,8 +1,9 @@
 import { type createSignature as createSignatureFn } from './createSignature.node'
 
-export const createSignature = async (
+export const createSignature = (
   ...args: Parameters<typeof createSignatureFn>
 ) => {
-  const { createSignature } = await import('./createSignature.node')
-  return createSignature(...args)
+  return import('./createSignature.node').then((m) =>
+    m.createSignature(...args)
+  )
 }

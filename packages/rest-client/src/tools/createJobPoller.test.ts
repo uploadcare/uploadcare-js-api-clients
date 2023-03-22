@@ -4,22 +4,20 @@ import { createJobPoller } from './createJobPoller'
 
 describe('createJobPoller', () => {
   it('should pass proper objects in the all callbacks', async () => {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const runner = jest.fn(async (options, settings) => ({
+    const runner = jest.fn(async () => ({
       result: ['finished', 'failed']
     }))
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const resolveJobs = jest.fn((response, runnerOptions, runnerSettings) =>
-      response.result.map((r) => ({ status: r }))
+    const resolveJobs = jest.fn(
+      (response: Awaited<ReturnType<typeof runner>>) =>
+        response.result.map((r) => ({ status: r }))
     )
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const getJobStatus = jest.fn(async (job) => job.status)
+    const getJobStatus = jest.fn(
+      async (job: ReturnType<typeof resolveJobs>[number]) => job.status
+    )
     const isJobFinished = jest.fn((response) => response === 'finished')
     const isJobFailed = jest.fn((response) => response === 'failed')
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const getResult = jest.fn(async (job, statusResponse) => 'result')
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const getError = jest.fn(async (job, statusResponse) => 'error')
+    const getResult = jest.fn(async () => 'result')
+    const getError = jest.fn(async () => 'error')
     const poller = createJobPoller({
       runner,
       resolveJobs,
@@ -30,7 +28,7 @@ describe('createJobPoller', () => {
       getError
     })
 
-    const options = { option: 'foo' }
+    const options = {}
     const settings = { setting: 'foo' }
 
     const promises = await poller(options, settings)

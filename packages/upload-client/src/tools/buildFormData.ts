@@ -3,6 +3,7 @@ import getFormData, { getFileOptions, transformFile } from './getFormData.node'
 import NodeFormData from 'form-data'
 import { SupportedFileInput } from '../types'
 import { isFileData } from './isFileData'
+import { defaultContentType } from '../defaultSettings'
 
 /**
  * Constructs FormData instance. Uses 'form-data' package in node or native
@@ -16,7 +17,7 @@ type ObjectType = KeyValue<SimpleType>
 
 interface FileOptions {
   name: string
-  contentType: string
+  contentType?: string
 }
 
 interface FileType extends FileOptions {
@@ -62,7 +63,11 @@ function collectParams(
 ): void {
   if (isFileValue(inputValue)) {
     const { name, contentType }: FileOptions = inputValue
-    const file = transformFile(inputValue.data, name, contentType)
+    const file = transformFile(
+      inputValue.data,
+      name,
+      contentType ?? defaultContentType
+    )
     const options = getFileOptions({ name, contentType })
     params.push([inputKey, file, ...options])
   } else if (isObjectValue(inputValue)) {

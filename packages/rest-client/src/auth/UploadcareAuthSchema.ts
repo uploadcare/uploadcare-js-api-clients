@@ -1,4 +1,4 @@
-import { Headers } from '../lib/fetch/fetch.node'
+import { Headers, Request } from '../lib/fetch/fetch.node'
 import { getAcceptHeader } from '../tools/getAcceptHeader'
 import { AuthSchema } from './types'
 import { Md5Function } from '../lib/md5/Md5Function'
