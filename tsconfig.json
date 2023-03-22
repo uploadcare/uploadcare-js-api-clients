@@ -7,7 +7,7 @@
     "strictNullChecks": true,
     "strict": true,
     "resolveJsonModule": true,
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
   },

@@ -3,27 +3,36 @@
   "version": "6.4.1",
   "description": "Library for work with Uploadcare Rest API",
   "type": "module",
-  "module": "./dist/index.node.js",
-  "browser": "./dist/index.browser.js",
+  "main": "./dist/cjs/index.node.cjs",
+  "module": "./dist/esm/index.node.mjs",
+  "browser": "./dist/esm/index.browser.mjs",
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "node": "./dist/index.node.js",
-      "browser": "./dist/index.browser.js",
-      "default": "./dist/index.browser.js"
+      "node": {
+        "import": "./dist/esm/index.node.mjs",
+        "require": "./dist/cjs/index.node.cjs"
+      },
+      "browser": {
+        "import": "./dist/esm/index.browser.mjs",
+        "require": "./dist/cjs/index.browser.cjs"
+      }
     },
     "./browser": {
-      "types": "./dist/index.d.ts",
-      "default": "./dist/index.browser.js"
+      "import": "./dist/esm/index.browser.mjs",
+      "require": "./dist/cjs/index.browser.cjs"
     },
     "./node": {
-      "types": "./dist/index.d.ts",
-      "default": "./dist/index.node.js"
+      "import": "./dist/esm/index.node.mjs",
+      "require": "./dist/cjs/index.node.cjs"
     }
   },
   "sideEffects": false,
-  "files": ["dist/*", "README.md", "LICENSE"],
+  "files": [
+    "dist/*",
+    "README.md",
+    "LICENSE"
+  ],
   "scripts": {
     "prepack": "cp ../../LICENSE ./LICENSE",
     "clean": "rimraf dist",
@@ -43,7 +52,12 @@
     "url": "https://github.com/uploadcare/uploadcare-js-api-clients/issues"
   },
   "homepage": "https://github.com/uploadcare/uploadcare-js-api-clients#readme",
-  "keywords": ["uploadcare", "file", "rest", "api"],
+  "keywords": [
+    "uploadcare",
+    "file",
+    "rest",
+    "api"
+  ],
   "devDependencies": {
     "@types/blueimp-md5": "^2.18.0",
     "@uploadcare/upload-client": "^6.4.1",
@@ -51,6 +65,6 @@
   },
   "dependencies": {
     "blueimp-md5": "^2.19.0",
-    "node-fetch": "^3.2.6"
+    "node-fetch": "^2.6.9"
   }
 }
