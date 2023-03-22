@@ -74,6 +74,7 @@ export {
   ConversionJobPollerOptions
 } from './tools/conversionJobPoller'
 export { CreateJobPollerPollOptions } from './tools/createJobPoller'
+export { createSignature } from './auth/createSignature'
 
 /** Auth */
 export {
