@@ -77,6 +77,7 @@ export {
   CustomUserAgentOptions,
   GetUserAgentOptions
 } from '@uploadcare/api-client-utils'
+export { Queue } from './tools/Queue'
 
 /* Types */
 export { Headers, ErrorRequestInfo } from './request/types'
