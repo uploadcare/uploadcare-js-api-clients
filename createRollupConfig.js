@@ -26,7 +26,8 @@ export const createRollupConfig = ({ targetEnv, cwd }) =>
         format: format,
         entryFileNames: ['[name]', targetEnv, extension]
           .filter(Boolean)
-          .join('.')
+          .join('.'),
+        chunkFileNames: () => `[name].[hash].${extension}`
       },
       plugins: [
         alias({
