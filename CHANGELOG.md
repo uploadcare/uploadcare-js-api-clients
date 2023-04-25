@@ -1,3 +1,13 @@
+# [6.5.0](https://github.com/uploadcare/uploadcare-js-api-clients/compare/v6.4.1...v6.5.0) (2023-04-25)
+
+
+### Features
+
+* add CommonJS bundles ([4aff9bc](https://github.com/uploadcare/uploadcare-js-api-clients/commit/4aff9bcb9d5901bb0b444c91cd0bd78eff0ff2b3))
+* **rest-client:** export `createSignature` method ([#472](https://github.com/uploadcare/uploadcare-js-api-clients/issues/472)) ([ccbb97a](https://github.com/uploadcare/uploadcare-js-api-clients/commit/ccbb97a0e1e05ce74b51e7437332a55f2a8c6807))
+
+
+
 ## [6.4.1](https://github.com/uploadcare/uploadcare-js-api-clients/compare/v6.4.0...v6.4.1) (2023-03-17)
 
 

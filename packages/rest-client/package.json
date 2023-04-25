@@ -1,6 +1,6 @@
 {
   "name": "@uploadcare/rest-client",
-  "version": "6.4.1",
+  "version": "6.5.0",
   "description": "Library for work with Uploadcare Rest API",
   "type": "module",
   "main": "./dist/cjs/index.node.cjs",
@@ -32,11 +32,7 @@
     }
   },
   "sideEffects": false,
-  "files": [
-    "dist/*",
-    "README.md",
-    "LICENSE"
-  ],
+  "files": ["dist/*", "README.md", "LICENSE"],
   "scripts": {
     "prepack": "cp ../../LICENSE ./LICENSE",
     "clean": "rimraf dist",
@@ -56,16 +52,11 @@
     "url": "https://github.com/uploadcare/uploadcare-js-api-clients/issues"
   },
   "homepage": "https://github.com/uploadcare/uploadcare-js-api-clients#readme",
-  "keywords": [
-    "uploadcare",
-    "file",
-    "rest",
-    "api"
-  ],
+  "keywords": ["uploadcare", "file", "rest", "api"],
   "devDependencies": {
     "@types/blueimp-md5": "^2.18.0",
     "@types/node-fetch": "^2.6.2",
-    "@uploadcare/upload-client": "^6.4.1",
+    "@uploadcare/upload-client": "^6.5.0",
     "ts-node": "^10.8.1"
   },
   "dependencies": {
