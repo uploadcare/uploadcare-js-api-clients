@@ -3,7 +3,8 @@ import { Uuid } from './types'
 import {
   CustomUserAgent,
   camelizeKeys,
-  Metadata
+  Metadata,
+  StoreValue
 } from '@uploadcare/api-client-utils'
 
 import request from '../request/request.node'
@@ -18,7 +19,6 @@ import { getUserAgent } from '../tools/getUserAgent'
 import { retryIfFailed } from '../tools/retryIfFailed'
 import { UploadClientError } from '../tools/errors'
 import { getStoreValue } from '../tools/getStoreValue'
-import { StoreValue } from '../types'
 
 export type MultipartStartOptions = {
   publicKey: string

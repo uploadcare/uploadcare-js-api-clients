@@ -10,9 +10,10 @@ import { getFileSize } from '../tools/getFileSize'
 import { isFileData } from '../tools/isFileData'
 import { isMultipart } from '../tools/isMultipart'
 import { UploadcareFile } from '../tools/UploadcareFile'
-import { StoreValue, SupportedFileInput } from '../types'
+import { SupportedFileInput } from '../types'
 import { isUrl, isUuid } from './types'
 import { uploadMultipart } from './uploadMultipart'
+import { StoreValue } from '@uploadcare/api-client-utils'
 
 export type FileFromOptions = {
   publicKey: string
