@@ -1,7 +1,6 @@
 ## [6.5.1](https://github.com/uploadcare/uploadcare-js-api-clients/compare/v6.5.0...v6.5.1) (2023-04-25)
 
 
-
 # [6.5.0](https://github.com/uploadcare/uploadcare-js-api-clients/compare/v6.4.1...v6.5.0) (2023-04-25)
 
 ### Bug Fixes
