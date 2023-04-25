@@ -1,6 +1,5 @@
 # [6.5.0](https://github.com/uploadcare/uploadcare-js-api-clients/compare/v6.4.1...v6.5.0) (2023-04-25)
 
-
 ### Bug Fixes
 
 * set corresponding extension for the dynamic chunks ([882741f](https://github.com/uploadcare/uploadcare-js-api-clients/commit/882741ffdfd7e54e43c7d05c6fb953d0fcfaed97))
