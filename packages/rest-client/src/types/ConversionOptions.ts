@@ -1,5 +1,5 @@
 import { ConversionType } from './ConversionType'
-import { StoreValue } from './StoreValue'
+import { StoreValue } from '@uploadcare/api-client-utils'
 import { ValueOf } from './ValueOf'
 
 export type ConversionOptions<T extends ValueOf<typeof ConversionType>> = {

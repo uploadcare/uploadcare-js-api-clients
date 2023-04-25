@@ -1,6 +1,4 @@
-import { CustomUserAgent } from '@uploadcare/api-client-utils'
-
-export type StoreValue = 'auto' | boolean
+import { CustomUserAgent, StoreValue } from '@uploadcare/api-client-utils'
 
 export interface DefaultSettings {
   baseCDN: string

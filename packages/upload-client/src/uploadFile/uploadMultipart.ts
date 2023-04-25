@@ -1,4 +1,8 @@
-import { CustomUserAgent, Metadata } from '@uploadcare/api-client-utils'
+import {
+  CustomUserAgent,
+  Metadata,
+  StoreValue
+} from '@uploadcare/api-client-utils'
 import multipartComplete from '../api/multipartComplete'
 import multipartStart from '../api/multipartStart'
 import multipartUpload, {
@@ -19,7 +23,7 @@ import {
 import { getContentType } from '../tools/getContentType'
 import { getFileName } from '../tools/getFileName'
 import { getFileSize } from '../tools/getFileSize'
-import { StoreValue, SupportedFileInput } from '../types'
+import { SupportedFileInput } from '../types'
 
 export type MultipartOptions = {
   publicKey: string

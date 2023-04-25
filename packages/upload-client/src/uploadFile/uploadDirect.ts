@@ -2,9 +2,13 @@ import base from '../api/base'
 import { isReadyPoll } from '../tools/isReadyPoll'
 import { UploadcareFile } from '../tools/UploadcareFile'
 
-import { CustomUserAgent, Metadata } from '@uploadcare/api-client-utils'
+import {
+  CustomUserAgent,
+  Metadata,
+  StoreValue
+} from '@uploadcare/api-client-utils'
 import { ProgressCallback } from '../api/types'
-import { StoreValue, SupportedFileInput } from '../types'
+import { SupportedFileInput } from '../types'
 
 export type DirectOptions = {
   publicKey: string

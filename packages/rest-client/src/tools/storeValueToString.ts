@@ -1,4 +1,4 @@
-import { StoreValue } from '../types/StoreValue'
+import { StoreValue } from '@uploadcare/api-client-utils'
 import { RestClientError } from './RestClientError'
 
 export const storeValueToString = (store?: StoreValue): string | undefined => {

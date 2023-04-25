@@ -87,7 +87,8 @@ export { Settings, SupportedFileInput as SupportedFileInput } from './types'
 export {
   NodeFile as NodeFile,
   BrowserFile as BrowserFile,
-  ReactNativeAsset
+  ReactNativeAsset,
+  Sliceable
 } from './types'
 export {
   FileInfo,

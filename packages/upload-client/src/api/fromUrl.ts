@@ -3,7 +3,8 @@ import { FailedResponse } from '../request/types'
 import {
   CustomUserAgent,
   camelizeKeys,
-  Metadata
+  Metadata,
+  StoreValue
 } from '@uploadcare/api-client-utils'
 
 import request from '../request/request.node'
@@ -14,7 +15,6 @@ import { getUserAgent } from '../tools/getUserAgent'
 import { UploadClientError } from '../tools/errors'
 import { retryIfFailed } from '../tools/retryIfFailed'
 import { getStoreValue } from '../tools/getStoreValue'
-import { StoreValue } from '../types'
 
 export enum TypeEnum {
   Token = 'token',

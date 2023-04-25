@@ -1,7 +1,8 @@
 import {
   camelizeKeys,
   CustomUserAgent,
-  Metadata
+  Metadata,
+  StoreValue
 } from '@uploadcare/api-client-utils'
 import { defaultSettings } from '../defaultSettings'
 import request from '../request/request.node'
@@ -16,7 +17,7 @@ import { FailedResponse } from '../request/types'
 import { getContentType } from '../tools/getContentType'
 import { getFileName } from '../tools/getFileName'
 import { getStoreValue } from '../tools/getStoreValue'
-import { StoreValue, SupportedFileInput } from '../types'
+import { SupportedFileInput } from '../types'
 import { ProgressCallback, Uuid } from './types'
 
 export type BaseResponse = {
