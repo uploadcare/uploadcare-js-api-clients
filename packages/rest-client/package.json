@@ -16,6 +16,10 @@
       "browser": {
         "import": "./dist/esm/index.browser.mjs",
         "require": "./dist/cjs/index.browser.cjs"
+      },
+      "default": {
+        "import": "./dist/esm/index.browser.mjs",
+        "require": "./dist/cjs/index.browser.cjs"
       }
     },
     "./browser": {

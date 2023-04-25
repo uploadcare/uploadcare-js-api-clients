@@ -20,6 +20,10 @@
       "react-native": {
         "import": "./dist/esm/index.react-native.mjs",
         "require": "./dist/cjs/index.react-native.cjs"
+      },
+      "default": {
+        "import": "./dist/esm/index.browser.mjs",
+        "require": "./dist/cjs/index.browser.cjs"
       }
     },
     "./browser": {
