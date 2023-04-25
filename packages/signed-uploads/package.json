@@ -3,13 +3,13 @@
   "version": "6.4.1",
   "description": "Library for work with Uploadcare Signed Uploads",
   "type": "module",
-  "module": "./dist/index.node.js",
+  "main": "./dist/cjs/index.node.cjs",
+  "module": "./dist/esm/index.node.mjs",
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "node": "./dist/index.node.js",
-      "default": "./dist/index.node.js"
+      "import": "./dist/esm/index.node.mjs",
+      "require": "./dist/cjs/index.node.cjs"
     }
   },
   "sideEffects": false,

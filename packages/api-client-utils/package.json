@@ -2,10 +2,15 @@
   "name": "@uploadcare/api-client-utils",
   "version": "6.4.1",
   "type": "module",
-  "main": "dist/index.browser.js",
-  "module": "dist/index.browser.js",
-  "browser": "dist/index.browser.js",
-  "types": "dist/index.d.ts",
+  "main": "./dist/cjs/index.browser.cjs",
+  "module": "./dist/esm/index.browser.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/esm/index.browser.mjs",
+      "require": "./dist/cjs/index.browser.cjs"
+    }
+  },
   "sideEffects": false,
   "files": [
     "dist/*"

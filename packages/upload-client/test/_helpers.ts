@@ -3,6 +3,7 @@ import dataUriToBlob from 'dataurl-to-blob'
 import defaultSettings from '../src/defaultSettings'
 import { DefaultSettings } from '../src/types'
 import { jest, expect } from '@jest/globals'
+import { ProgressCallback, ComputableProgressInfo } from '../src/api/types'
 
 export const dataURItoBuffer: (uri: string) => Buffer = dataUriToBuffer as (
   uri: string
@@ -37,7 +38,9 @@ export const getSettingsForTesting = <T>(options: T): T & DefaultSettings => {
   return allEnvironments[selectedEnvironment]
 }
 
-export function assertComputableProgress(onProgress: jest.Mock): void {
+export function assertComputableProgress(
+  onProgress: jest.Mock<ProgressCallback<ComputableProgressInfo>>
+): void {
   expect(onProgress).toHaveBeenCalled()
   expect(onProgress).toHaveBeenLastCalledWith({ isComputable: true, value: 1 })
 
@@ -51,16 +54,19 @@ export function assertComputableProgress(onProgress: jest.Mock): void {
   })
 }
 
-export function assertUnknownProgress(onProgress: jest.Mock): void {
+export function assertUnknownProgress(
+  onProgress: jest.Mock<ProgressCallback>
+): void {
   expect(onProgress).toHaveBeenCalled()
   expect(onProgress).toHaveBeenCalledWith({ isComputable: false })
 
   const calls = onProgress.mock.calls
   let isStillComputable = true
-  let lastProgressValue = -1
+  let lastProgressValue: number | undefined = -1
   calls.forEach(([progress], idx) => {
     const isLastCall = idx === calls.length - 1
-    const { isComputable, value } = progress
+    const { isComputable } = progress
+    const value = progress.isComputable ? progress.value : undefined
     if (isLastCall) {
       expect(isComputable === true).toBeTruthy()
       expect(typeof value === 'number').toBeTruthy()
@@ -74,7 +80,7 @@ export function assertUnknownProgress(onProgress: jest.Mock): void {
     if (isStillComputable) {
       expect(isComputable === true).toBeTruthy()
       expect(typeof value === 'number').toBeTruthy()
-      expect(value).toBeGreaterThanOrEqual(lastProgressValue)
+      expect(value).toBeGreaterThanOrEqual(lastProgressValue as number)
       lastProgressValue = value
     } else {
       expect(isComputable === false).toBeTruthy()
