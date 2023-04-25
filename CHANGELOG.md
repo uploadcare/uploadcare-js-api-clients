@@ -1,6 +1,5 @@
 # [6.5.0](https://github.com/uploadcare/uploadcare-js-api-clients/compare/v6.4.1...v6.5.0) (2023-04-25)
 
-
 ### Features
 
 * add CommonJS bundles ([4aff9bc](https://github.com/uploadcare/uploadcare-js-api-clients/commit/4aff9bcb9d5901bb0b444c91cd0bd78eff0ff2b3))
