@@ -1,21 +1,21 @@
-type Task<T> = () => Promise<T>
+type Task<T = unknown> = () => Promise<T>
 type Resolver = (value: unknown) => void
 type Rejector = (error: unknown) => void
 
 export class Queue {
   #concurrency = 1
-  #pending: Task<unknown>[] = []
+  #pending: Task[] = []
   #running = 0
-  #resolvers: WeakMap<Task<unknown>, Resolver> = new WeakMap()
-  #rejectors: WeakMap<Task<unknown>, Rejector> = new WeakMap()
+  #resolvers: WeakMap<Task, Resolver> = new WeakMap()
+  #rejectors: WeakMap<Task, Rejector> = new WeakMap()
 
   constructor(concurrency: number) {
     this.#concurrency = concurrency
   }
 
   #run() {
-    const left = this.#concurrency - this.#running
-    for (let i = 0; i < left; i++) {
+    const tasksLeft = this.#concurrency - this.#running
+    for (let i = 0; i < tasksLeft; i++) {
       const task = this.#pending.shift()
       if (!task) {
         return
