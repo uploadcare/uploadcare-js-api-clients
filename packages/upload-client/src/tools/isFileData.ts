@@ -1,4 +1,7 @@
-import { SupportedFileInput, ReactNativeAsset } from '../types'
+import { ReactNativeAsset, SupportedFileInput } from '../types'
+import { isBuffer } from './isBuffer.node'
+
+export { isBuffer }
 
 export const isBlob = (data: unknown): data is Blob => {
   return typeof Blob !== 'undefined' && data instanceof Blob
@@ -6,10 +9,6 @@ export const isBlob = (data: unknown): data is Blob => {
 
 export const isFile = (data: unknown): data is File => {
   return typeof File !== 'undefined' && data instanceof File
-}
-
-export const isBuffer = (data: unknown): data is Buffer => {
-  return typeof Buffer !== 'undefined' && data instanceof Buffer
 }
 
 export const isReactNativeAsset = (data: unknown): data is ReactNativeAsset => {
