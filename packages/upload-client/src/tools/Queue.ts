@@ -6,8 +6,8 @@ export class Queue {
   private _concurrency = 1
   private _pending: Task[] = []
   private _running = 0
-  private _resolvers: WeakMap<Task, Resolver> = new WeakMap()
-  private _rejectors: WeakMap<Task, Rejector> = new WeakMap()
+  private _resolvers: Map<Task, Resolver> = new Map()
+  private _rejectors: Map<Task, Rejector> = new Map()
 
   constructor(concurrency: number) {
     this._concurrency = concurrency
