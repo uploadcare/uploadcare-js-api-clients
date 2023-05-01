@@ -4,7 +4,11 @@ import { uploadFromUploaded } from './uploadFromUploaded'
 import { uploadFromUrl } from './uploadFromUrl'
 
 /* Types */
-import { CustomUserAgent, Metadata } from '@uploadcare/api-client-utils'
+import {
+  CustomUserAgent,
+  Metadata,
+  StoreValue
+} from '@uploadcare/api-client-utils'
 import { ProgressCallback, Url, Uuid } from '../api/types'
 import { getFileSize } from '../tools/getFileSize'
 import { isFileData } from '../tools/isFileData'
@@ -13,7 +17,6 @@ import { UploadcareFile } from '../tools/UploadcareFile'
 import { SupportedFileInput } from '../types'
 import { isUrl, isUuid } from './types'
 import { uploadMultipart } from './uploadMultipart'
-import { StoreValue } from '@uploadcare/api-client-utils'
 
 export type FileFromOptions = {
   publicKey: string

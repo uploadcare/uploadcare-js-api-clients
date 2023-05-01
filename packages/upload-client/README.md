@@ -23,6 +23,7 @@ Node.js and browser.
   - [High-Level API](#high-level-api)
   - [Low-Level API](#low-level-api)
   - [Settings](#settings)
+  - [Uploading queue](#uploading-queue)
 - [React Native](#react-native)
 - [Testing](#testing)
 - [Security issues](#security-issues)
@@ -54,9 +55,7 @@ Once the UploadClient instance is created, you can start using the wrapper to
 upload files from binary data:
 
 ```javascript
-client
-  .uploadFile(fileData)
-  .then(file => console.log(file.uuid))
+client.uploadFile(fileData).then((file) => console.log(file.uuid))
 ```
 
 Another option is uploading files from URL, via the `uploadFile` method:
@@ -64,9 +63,7 @@ Another option is uploading files from URL, via the `uploadFile` method:
 ```javascript
 const fileURL = 'https://example.com/file.jpg'
 
-client
-  .uploadFile(fileURL)
-  .then(file => console.log(file.uuid))
+client.uploadFile(fileURL).then((file) => console.log(file.uuid))
 ```
 
 You can also use the `uploadFile` method to get previously uploaded files via
@@ -75,9 +72,7 @@ their UUIDs:
 ```javascript
 const fileUUID = 'edfdf045-34c0-4087-bbdd-e3834921f890'
 
-client
-  .uploadFile(fileUUID)
-  .then(file => console.log(file.uuid))
+client.uploadFile(fileUUID).then((file) => console.log(file.uuid))
 ```
 
 You can track uploading progress:
@@ -90,7 +85,7 @@ const onProgress = ({ isComputable, value }) => {
 
 client
   .uploadFile(fileUUID, { onProgress })
-  .then(file => console.log(file.uuid))
+  .then((file) => console.log(file.uuid))
 ```
 
 Note that `isComputable` flag can be `false` is some cases of uploading from the URL.
@@ -105,8 +100,8 @@ const abortController = new AbortController()
 
 client
   .uploadFile(fileUUID, { signal: abortController.signal })
-  .then(file => console.log(file.uuid))
-  .catch(error => {
+  .then((file) => console.log(file.uuid))
+  .catch((error) => {
     if (error.isCancel) {
       console.log(`File uploading was canceled.`)
     }
@@ -194,8 +189,8 @@ const onProgress = ({ isComputable, value }) => console.log(isComputable, value)
 const abortController = new AbortController()
 
 base(fileData, { onProgress, signal: abortController.signal }) // fileData must be `Blob` or `File` or `Buffer`
-  .then(data => console.log(data.file))
-  .catch(error => {
+  .then((data) => console.log(data.file))
+  .catch((error) => {
     if (error.isCancel) {
       console.log(`File uploading was canceled.`)
     }
@@ -420,6 +415,55 @@ Metadata is additional, arbitrary data, associated with uploaded file.
 Non-string values will be converted to `string`. `undefined` values will be ignored.
 
 See [docs][uc-file-metadata] and [REST API][uc-docs-metadata] for details.
+
+### Uploading queue
+
+If you're going to upload a lot of files at once, it's useful to do it in a queue. Otherwise, a large number of simultaneous requests can clog the internet channel and slow down the process.
+
+To solve this problem, we provide a simple helper called `Queue`.
+
+Here is an example of how to use it:
+
+```typescript
+import { Queue, uploadFile } from '@uploadcare/upload-client'
+
+// Create a queue with a limit of 10 concurrent requests.
+const queue = new Queue(10)
+
+// Create an array containing 50 files.
+const files = [
+  ...Array(50)
+    .fill(0)
+    .map((_, idx) => Buffer.from(`content-${idx}`))
+]
+const promises = files.map((file, idx) => {
+  const fileName = `file-${idx}.txt`
+  return queue
+    .add(() =>
+      uploadFile(file, {
+        publicKey: 'YOUR_PUBLIC_KEY',
+        contentType: 'plain/text',
+        fileName
+      })
+    )
+    .then((fileInfo) =>
+      console.log(
+        `"File "${fileName}" has been successfully uploaded! You can access it at the following URL: "${fileInfo.cdnUrl}"`
+      )
+    )
+})
+
+await Promise.all(promises)
+
+console.log('Files have been successfully uploaded')
+```
+
+You can pass any function that returns a promise to `queue.add`, and it will be executed concurrently.
+
+`queue.add` returns a promise that mimics the one passed in, meaning it will resolve or reject with the corresponding values.
+
+If the functionality of the built-in `Queue` is not sufficient for you, you can use any other third-party, more functional solution.
+
 
 ## React Native
 
