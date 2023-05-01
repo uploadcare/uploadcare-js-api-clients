@@ -1,3 +1,12 @@
+# [6.6.0](https://github.com/uploadcare/uploadcare-js-api-clients/compare/v6.5.1...v6.6.0) (2023-05-01)
+
+
+### Features
+
+* **upload-client:** add `Queue` helper to make queued uploads ([#481](https://github.com/uploadcare/uploadcare-js-api-clients/issues/481)) ([aea890c](https://github.com/uploadcare/uploadcare-js-api-clients/commit/aea890ce29610e71a2867d07cff5558db73d590d))
+
+
+
 ## [6.5.1](https://github.com/uploadcare/uploadcare-js-api-clients/compare/v6.5.0...v6.5.1) (2023-04-25)
 
 
