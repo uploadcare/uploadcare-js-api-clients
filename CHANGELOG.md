@@ -1,3 +1,7 @@
+## [6.6.1](https://github.com/uploadcare/uploadcare-js-api-clients/compare/v6.6.0...v6.6.1) (2023-05-01)
+
+
+
 # [6.6.0](https://github.com/uploadcare/uploadcare-js-api-clients/compare/v6.5.1...v6.6.0) (2023-05-01)
 
 
