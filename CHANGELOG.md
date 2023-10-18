@@ -1,3 +1,9 @@
+## [6.6.1](https://github.com/uploadcare/uploadcare-js-api-clients/compare/v6.6.0...v6.6.1) (2023-05-01)
+
+### Bug Fixes
+
+* **upload-client**: do not use buffer for browser-like bundles to prevent polyfilling by cdn ([#484](https://github.com/uploadcare/uploadcare-js-api-clients/pull/484))
+
 # [6.6.0](https://github.com/uploadcare/uploadcare-js-api-clients/compare/v6.5.1...v6.6.0) (2023-05-01)
 
 

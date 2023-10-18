@@ -86,7 +86,17 @@ const index = (ctx) => {
     })
   }
 
-  ctx.body = find(json, 'info')
+  const response = find(json, 'info') as (typeof json)['info']
+  response.files = files.map((file) => {
+    const uuid = file.split('/')[0]
+    const effects = file.split('/-/')[1] ?? ''
+    return {
+      ...response.files[0],
+      uuid,
+      default_effects: effects.replace(/^-\//, '')
+    }
+  })
+  ctx.body = response
 }
 
 /**
