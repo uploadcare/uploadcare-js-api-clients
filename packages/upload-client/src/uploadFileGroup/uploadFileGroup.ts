@@ -14,6 +14,8 @@ import {
 } from '../api/types'
 import { SupportedFileInput } from '../types'
 import { isFileDataArray, isUrlArray, isUuidArray } from './types'
+import { isFileData } from '../tools/isFileData'
+import { isUrl } from '../uploadFile/types'
 
 export type GroupFromOptions = {
   jsonpCallback?: string
@@ -80,39 +82,43 @@ export function uploadFileGroup(
     }
   }
 
-  return Promise.all<UploadcareFile>(
+  return Promise.all<Uuid>(
     (data as SupportedFileInput[]).map(
-      (file: SupportedFileInput | Url | Uuid, index: number) =>
-        uploadFile(file, {
-          publicKey,
+      (file: SupportedFileInput | Url | Uuid, index: number) => {
+        if (isFileData(file) || isUrl(file)) {
+          return uploadFile(file, {
+            publicKey,
 
-          fileName,
-          baseURL,
-          secureSignature,
-          secureExpire,
-          store,
+            fileName,
+            baseURL,
+            secureSignature,
+            secureExpire,
+            store,
 
-          signal,
-          onProgress: createProgressHandler(filesCount, index),
+            signal,
+            onProgress: createProgressHandler(filesCount, index),
 
-          source,
-          integration,
-          userAgent,
+            source,
+            integration,
+            userAgent,
 
-          retryThrottledRequestMaxTimes,
-          retryNetworkErrorMaxTimes,
+            retryThrottledRequestMaxTimes,
+            retryNetworkErrorMaxTimes,
 
-          contentType,
-          multipartChunkSize,
+            contentType,
+            multipartChunkSize,
 
-          baseCDN,
-          checkForUrlDuplicates,
-          saveUrlForRecurrentUploads
-        })
+            baseCDN,
+            checkForUrlDuplicates,
+            saveUrlForRecurrentUploads
+          }).then((fileInfo) => fileInfo.uuid)
+        } else {
+          // Do not request file info by uuid before creating group because this isn't necessary
+          return file
+        }
+      }
     )
-  ).then((files) => {
-    const uuids = files.map((file) => file.uuid)
-
+  ).then((uuids) => {
     return group(uuids, {
       publicKey,
       baseURL,
@@ -126,7 +132,7 @@ export function uploadFileGroup(
       retryThrottledRequestMaxTimes,
       retryNetworkErrorMaxTimes
     })
-      .then((groupInfo) => new UploadcareGroup(groupInfo, files))
+      .then((groupInfo) => new UploadcareGroup(groupInfo, { baseCDN }))
       .then((group) => {
         onProgress && onProgress({ isComputable: true, value: 1 })
         return group

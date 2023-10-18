@@ -25,12 +25,16 @@ export type FileInfo = {
   metadata?: Metadata
 }
 
+export type GroupFileInfo = FileInfo & {
+  defaultEffects: string
+}
+
 export type GroupInfo = {
   datetimeCreated: string
   datetimeStored: string | null
   filesCount: string
   cdnUrl: string
-  files: FileInfo[]
+  files: GroupFileInfo[]
   url: string
   id: GroupId
 }

@@ -9,12 +9,17 @@ describe('API - group', () => {
     publicKey: factory.publicKey('image')
   })
 
-  it('should upload group of files', async () => {
+  it('should create group of files', async () => {
     const data = await group(files, settings)
 
     expect(data).toBeTruthy()
+    console.log(data.id)
     expect(data.id).toBeTruthy()
     expect(data.files).toBeTruthy()
+    expect(data.files[0].uuid).toBe(files[0])
+    expect(data.files[0].defaultEffects).toBe('')
+    expect(data.files[1].uuid).toBe(files[1].split('/')[0])
+    expect(data.files[1].defaultEffects).toBe('resize/x800/')
   })
 
   it('should fail with [HTTP 400] No files[N] parameters found.', async () => {
