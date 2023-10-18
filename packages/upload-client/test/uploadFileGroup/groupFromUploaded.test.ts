@@ -5,16 +5,21 @@ import { UploadClientError } from '../../src/tools/errors'
 import { jest, expect } from '@jest/globals'
 
 describe('groupFrom Uploaded[]', () => {
-  const uuid = factory.uuid('image')
-  const files = [uuid, uuid]
+  const files = factory.groupOfFiles('valid')
   const settings = getSettingsForTesting({
     publicKey: factory.publicKey('image')
   })
 
   it('should resolves when file is ready on CDN', async () => {
-    const { cdnUrl } = await uploadFileGroup(files, settings)
+    const data = await uploadFileGroup(files, settings)
 
-    expect(cdnUrl).toBeTruthy()
+    expect(data).toBeTruthy()
+    expect(data.uuid).toBeTruthy()
+    expect(data.files).toBeTruthy()
+    expect(data.files[0].uuid).toBe(files[0])
+    expect(data.files[0].defaultEffects).toBe('')
+    expect(data.files[1].uuid).toBe(files[1].split('/')[0])
+    expect(data.files[1].defaultEffects).toBe('resize/x800/')
   })
 
   it('should accept store setting', async () => {

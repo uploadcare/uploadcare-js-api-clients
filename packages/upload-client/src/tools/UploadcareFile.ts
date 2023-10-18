@@ -1,4 +1,4 @@
-import { FileInfo, Uuid } from '../api/types'
+import { FileInfo, GroupFileInfo, Uuid } from '../api/types'
 import {
   ContentInfo,
   ImageInfo,
@@ -8,6 +8,11 @@ import {
 import getUrl from './getUrl'
 import defaultSettings from '../defaultSettings'
 
+function isGroupFileInfo(
+  fileInfo: FileInfo | GroupFileInfo
+): fileInfo is GroupFileInfo {
+  return 'defaultEffects' in fileInfo
+}
 export class UploadcareFile {
   readonly uuid: Uuid
   readonly name: null | string = null
@@ -23,9 +28,10 @@ export class UploadcareFile {
   readonly contentInfo: null | ContentInfo = null
   readonly metadata: null | Metadata = null
   readonly s3Bucket: null | string = null
+  readonly defaultEffects: null | string = null
 
   constructor(
-    fileInfo: FileInfo,
+    fileInfo: FileInfo | GroupFileInfo,
     {
       baseCDN = defaultSettings.baseCDN,
       fileName
@@ -57,5 +63,9 @@ export class UploadcareFile {
     this.metadata = fileInfo.metadata || null
     this.s3Bucket = s3Bucket || null
     this.s3Url = s3Url
+
+    if (isGroupFileInfo(fileInfo)) {
+      this.defaultEffects = fileInfo.defaultEffects
+    }
   }
 }

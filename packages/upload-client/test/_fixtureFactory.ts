@@ -158,7 +158,7 @@ export function groupOfFiles(id: string): Array<string> {
   const groupOfFiles = {
     valid: [
       '392e3aa3-5ed6-4ad6-a67e-b3a7c1d5b9e9',
-      '49b4c5a1-31b3-4349-ba07-d97a2d883c37'
+      '49b4c5a1-31b3-4349-ba07-d97a2d883c37/-/resize/x800/'
     ],
     invalid: [
       '2e6b7f23-9143-4b71-94e7-338bb',

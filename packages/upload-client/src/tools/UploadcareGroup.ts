@@ -1,4 +1,5 @@
-import { GroupId, GroupInfo } from '../api/types'
+import { GroupFileInfo, GroupId, GroupInfo } from '../api/types'
+import defaultSettings from '../defaultSettings'
 import { UploadcareFile } from './UploadcareFile'
 
 export class UploadcareGroup {
@@ -12,19 +13,28 @@ export class UploadcareGroup {
   readonly createdAt: string
   readonly storedAt: string | null = null
 
-  constructor(groupInfo: GroupInfo, files: UploadcareFile[]) {
+  constructor(
+    groupInfo: GroupInfo,
+    {
+      baseCDN = defaultSettings.baseCDN
+    }: {
+      baseCDN?: string
+    } = {}
+  ) {
     this.uuid = groupInfo.id
     this.filesCount = groupInfo.filesCount
-    this.totalSize = Object.values(groupInfo.files).reduce(
+    const groupFiles = groupInfo.files.filter(Boolean) as GroupFileInfo[]
+    this.totalSize = Object.values(groupFiles).reduce(
       (acc, file) => acc + file.size,
       0
     )
     this.isStored = !!groupInfo.datetimeStored
-    this.isImage = !!Object.values(groupInfo.files).filter(
-      (file) => file.isImage
-    ).length
+    this.isImage = !!Object.values(groupFiles).filter((file) => file.isImage)
+      .length
     this.cdnUrl = groupInfo.cdnUrl
-    this.files = files
+    this.files = groupFiles.map(
+      (fileInfo) => new UploadcareFile(fileInfo, { baseCDN })
+    )
     this.createdAt = groupInfo.datetimeCreated
     this.storedAt = groupInfo.datetimeStored
   }

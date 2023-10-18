@@ -95,6 +95,7 @@ export {
   FileInfo,
   GroupId,
   GroupInfo,
+  GroupFileInfo,
   Token,
   Url,
   Uuid,
