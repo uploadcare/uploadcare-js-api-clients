@@ -2,6 +2,7 @@ import * as factory from '../_fixtureFactory'
 import { getSettingsForTesting } from '../_helpers'
 import group from '../../src/api/group'
 import { UploadClientError } from '../../src/tools/errors'
+import { GroupFileInfo } from '../../src'
 
 describe('API - group', () => {
   const files = factory.groupOfFiles('valid')
@@ -11,15 +12,14 @@ describe('API - group', () => {
 
   it('should create group of files', async () => {
     const data = await group(files, settings)
-
+    const groupFiles = data.files.filter(Boolean) as GroupFileInfo[]
     expect(data).toBeTruthy()
-    console.log(data.id)
     expect(data.id).toBeTruthy()
     expect(data.files).toBeTruthy()
-    expect(data.files[0].uuid).toBe(files[0])
-    expect(data.files[0].defaultEffects).toBe('')
-    expect(data.files[1].uuid).toBe(files[1].split('/')[0])
-    expect(data.files[1].defaultEffects).toBe('resize/x800/')
+    expect(groupFiles[0].uuid).toBe(files[0])
+    expect(groupFiles[0].defaultEffects).toBe('')
+    expect(groupFiles[1].uuid).toBe(files[1].split('/')[0])
+    expect(groupFiles[1].defaultEffects).toBe('resize/x800/')
   })
 
   it('should fail with [HTTP 400] No files[N] parameters found.', async () => {
