@@ -4,8 +4,9 @@
 ### Bug Fixes
 
 * **upload-client/queue:** don't use private class fields due to bad support of bundling tools ([d61dc47](https://github.com/uploadcare/uploadcare-js-api-clients/commit/d61dc479fa1055f7c5fca74e5c92690252e7a72e))
-* **upload-client:** do not request fileInfo before creating group from uuid ([c3c8245](https://github.com/uploadcare/uploadcare-js-api-clients/commit/c3c82453eff1f13fc9210d3e3f5856f8821b86f6))
-* **upload-client:** filter `null` values from the `files` property of group info ([83c0b6c](https://github.com/uploadcare/uploadcare-js-api-clients/commit/83c0b6c7ef4b6e467795cf280dea67bb9608605b))
+* **upload-client/uploadFileGroup:** do not request `fileInfo` before creating group from uuid ([c3c8245](https://github.com/uploadcare/uploadcare-js-api-clients/commit/c3c82453eff1f13fc9210d3e3f5856f8821b86f6))
+* **upload-client/uploadFileGroup:** support for the uuids with inline operations ([c3c8245](https://github.com/uploadcare/uploadcare-js-api-clients/commit/c3c82453eff1f13fc9210d3e3f5856f8821b86f6))
+* **upload-client/UploadcareGroup:** filter `null` values from the `files` property of group info ([83c0b6c](https://github.com/uploadcare/uploadcare-js-api-clients/commit/83c0b6c7ef4b6e467795cf280dea67bb9608605b))
 * **upload-client:** fix package.json `react-native` field path ([beee9c1](https://github.com/uploadcare/uploadcare-js-api-clients/commit/beee9c185823ade2bb9a1e8a48b4f63fd9990cdb))
 
 
