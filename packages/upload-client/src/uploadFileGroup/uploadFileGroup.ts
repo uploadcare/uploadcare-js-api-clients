@@ -1,8 +1,7 @@
 import group from '../api/group'
 import defaultSettings from '../defaultSettings'
-import { UploadcareFile } from '../tools/UploadcareFile'
 import { UploadcareGroup } from '../tools/UploadcareGroup'
-import { uploadFile, FileFromOptions } from '../uploadFile'
+import { FileFromOptions, uploadFile } from '../uploadFile'
 
 /* Types */
 import {
@@ -12,10 +11,10 @@ import {
   Url,
   Uuid
 } from '../api/types'
-import { SupportedFileInput } from '../types'
-import { isFileDataArray, isUrlArray, isUuidArray } from './types'
 import { isFileData } from '../tools/isFileData'
+import { SupportedFileInput } from '../types'
 import { isUrl } from '../uploadFile/types'
+import { isFileDataArray, isUrlArray, isUuidArray } from './types'
 
 export type GroupFromOptions = {
   jsonpCallback?: string
