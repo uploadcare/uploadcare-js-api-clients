@@ -34,7 +34,8 @@ export type GroupInfo = {
   datetimeStored: string | null
   filesCount: string
   cdnUrl: string
-  files: GroupFileInfo[]
+  // An array may contain null values if a file has been removed.
+  files: (GroupFileInfo | null)[]
   url: string
   id: GroupId
 }
