@@ -149,6 +149,7 @@ describe('Paginator', () => {
       const firstPage = (await paginator.next()) as Awaited<
         ReturnType<typeof listOfFiles>
       >
+      console.log(JSON.stringify(firstPage))
       expect(firstPage.results[0].datetimeRemoved).toBeTruthy()
       expect(firstPage.results[0].datetimeStored).toBeFalsy()
 
