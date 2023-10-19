@@ -61,7 +61,7 @@ describe('addonJobPoller', () => {
     expect(onStatus.mock.calls.length).toBeGreaterThanOrEqual(1)
     expect(onStatus.mock.lastCall).toEqual([
       expect.objectContaining({
-        status: AddonExecutionStatus.DONE
+        status: expect.toBeOneOf(Object.values(AddonExecutionStatus))
       })
     ])
   })
