@@ -233,8 +233,7 @@ export const uploadFromUrl = (
       return result
     })
     .then((result) =>
-      isReadyPoll({
-        file: result.uuid,
+      isReadyPoll(result.uuid, {
         publicKey,
         baseURL,
         integration,

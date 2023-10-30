@@ -27,6 +27,7 @@ import { FileFromOptions, uploadFile } from './uploadFile'
 import { FileInfo, GroupId, GroupInfo, Token, Url, Uuid } from './api/types'
 import { Settings, Sliceable, SupportedFileInput } from './types'
 import { GroupFromOptions, uploadFileGroup } from './uploadFileGroup'
+import { IsReadyPoolOptions, isReadyPoll } from './tools/isReadyPoll'
 
 /** Populate options with settings. */
 const populateOptionsWithSettings = <T>(
@@ -154,5 +155,14 @@ export default class UploadClient {
     const settings = this.getSettings()
 
     return uploadFileGroup(data, populateOptionsWithSettings(options, settings))
+  }
+
+  isReadyPoll(
+    uuid: Uuid,
+    options: Partial<IsReadyPoolOptions> = {}
+  ): Promise<FileInfo> {
+    const settings = this.getSettings()
+
+    return isReadyPoll(uuid, populateOptionsWithSettings(options, settings))
   }
 }

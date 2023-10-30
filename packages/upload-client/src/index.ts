@@ -103,3 +103,4 @@ export {
   ComputableProgressInfo,
   UnknownProgressInfo
 } from './api/types'
+export { isReadyPoll } from './tools/isReadyPoll'

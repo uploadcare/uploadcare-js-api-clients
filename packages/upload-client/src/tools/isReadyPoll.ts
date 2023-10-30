@@ -2,12 +2,12 @@ import info from '../api/info'
 import {
   ComputableProgressInfo,
   FileInfo,
-  ProgressCallback
+  ProgressCallback,
+  Uuid
 } from '../api/types'
 import { CustomUserAgent, poll } from '@uploadcare/api-client-utils'
 
-type ArgsIsReadyPool = {
-  file: string
+export type IsReadyPoolOptions = {
   publicKey: string
   baseURL?: string
   source?: string
@@ -19,21 +19,23 @@ type ArgsIsReadyPool = {
   signal?: AbortSignal
 }
 
-function isReadyPoll({
-  file,
-  publicKey,
-  baseURL,
-  source,
-  integration,
-  userAgent,
-  retryThrottledRequestMaxTimes,
-  retryNetworkErrorMaxTimes,
-  signal,
-  onProgress
-}: ArgsIsReadyPool): FileInfo | PromiseLike<FileInfo> {
+function isReadyPoll(
+  uuid: Uuid,
+  {
+    publicKey,
+    baseURL,
+    source,
+    integration,
+    userAgent,
+    retryThrottledRequestMaxTimes,
+    retryNetworkErrorMaxTimes,
+    signal,
+    onProgress
+  }: IsReadyPoolOptions
+): Promise<FileInfo> {
   return poll<FileInfo>({
     check: (signal) =>
-      info(file, {
+      info(uuid, {
         publicKey,
         baseURL,
         signal,

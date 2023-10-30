@@ -78,8 +78,7 @@ export const uploadDirect = (
     metadata
   })
     .then(({ file }) => {
-      return isReadyPoll({
-        file,
+      return isReadyPoll(file, {
         publicKey,
         baseURL,
         source,
