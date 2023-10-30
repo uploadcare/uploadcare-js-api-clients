@@ -1,6 +1,6 @@
 {
   "name": "@uploadcare/upload-client",
-  "version": "6.7.0",
+  "version": "6.8.0",
   "description": "Library for work with Uploadcare Upload API",
   "type": "module",
   "module": "./dist/esm/index.node.mjs",
@@ -90,7 +90,7 @@
     "koa-body": "5.0.0",
     "mock-socket": "9.0.3",
     "start-server-and-test": "1.14.0",
-    "@uploadcare/api-client-utils": "^6.7.0",
+    "@uploadcare/api-client-utils": "^6.8.0",
     "chalk": "^4.1.2"
   },
   "dependencies": {

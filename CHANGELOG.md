@@ -1,3 +1,16 @@
+# [6.8.0](https://github.com/uploadcare/uploadcare-js-api-clients/compare/v6.7.0...v6.8.0) (2023-10-30)
+
+
+### Bug Fixes
+
+* **types:** `imageInfo.datetimeOriginal` could be null or string ([#489](https://github.com/uploadcare/uploadcare-js-api-clients/issues/489)) ([4a717e1](https://github.com/uploadcare/uploadcare-js-api-clients/commit/4a717e10e53c012932f888e7e693706611efa1c4))
+
+
+### Features
+
+* **upload-client:** export `isReadyPoll` helper to wait for the file readiness ([12cf9b1](https://github.com/uploadcare/uploadcare-js-api-clients/commit/12cf9b13675806b18b76dfffc6c23537e5b53846))
+
+
 # [6.7.0](https://github.com/uploadcare/uploadcare-js-api-clients/compare/v6.6.1...v6.7.0) (2023-10-18)
 
 
