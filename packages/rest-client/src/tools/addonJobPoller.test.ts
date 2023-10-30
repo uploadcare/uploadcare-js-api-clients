@@ -1,6 +1,6 @@
 import { jest } from '@jest/globals'
 import { ADDONS_UUID } from '../../test/fixtures'
-import { testSettings } from '../../test/helpers'
+import { testSettings, uploadClient } from '../../test/helpers'
 import { copyFileToLocalStorage } from '../api/file/copyFileToLocalStorage'
 import { AddonExecutionStatus } from '../types/AddonExecutionStatus'
 import { AddonName } from '../types/AddonName'
@@ -14,6 +14,8 @@ describe('addonJobPoller', () => {
       { source: ADDONS_UUID, store: false },
       testSettings
     )
+
+    await uploadClient.isReadyPoll(copy.result.uuid, testSettings)
 
     const result = await addonJobPoller(
       {
