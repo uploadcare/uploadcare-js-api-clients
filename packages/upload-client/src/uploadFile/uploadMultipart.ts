@@ -181,8 +181,7 @@ export const uploadMultipart = async (
       if (fileInfo.isReady) {
         return fileInfo
       } else {
-        return isReadyPoll({
-          file: fileInfo.uuid,
+        return isReadyPoll(fileInfo.uuid, {
           publicKey,
           baseURL,
           source,
