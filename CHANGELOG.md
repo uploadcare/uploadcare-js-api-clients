@@ -11,7 +11,6 @@
 * **upload-client:** export `isReadyPoll` helper to wait for the file readiness ([12cf9b1](https://github.com/uploadcare/uploadcare-js-api-clients/commit/12cf9b13675806b18b76dfffc6c23537e5b53846))
 
 
-
 # [6.7.0](https://github.com/uploadcare/uploadcare-js-api-clients/compare/v6.6.1...v6.7.0) (2023-10-18)
 
 
