@@ -7,7 +7,7 @@ export type ImageInfo = {
   height: number
   width: number
   geoLocation: GeoLocation | null
-  datetimeOriginal: string
+  datetimeOriginal: string | null
   format: string
   colorMode: string
   dpi: {
