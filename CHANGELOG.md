@@ -1,3 +1,12 @@
+## [6.7.1](https://github.com/uploadcare/uploadcare-js-api-clients/compare/v6.7.0...v6.7.1) (2023-10-30)
+
+
+### Bug Fixes
+
+* **types:** `imageInfo.datetimeOriginal` could be null or string ([#489](https://github.com/uploadcare/uploadcare-js-api-clients/issues/489)) ([4a717e1](https://github.com/uploadcare/uploadcare-js-api-clients/commit/4a717e10e53c012932f888e7e693706611efa1c4))
+
+
+
 # [6.7.0](https://github.com/uploadcare/uploadcare-js-api-clients/compare/v6.6.1...v6.7.0) (2023-10-18)
 
 
