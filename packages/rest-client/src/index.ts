@@ -197,7 +197,11 @@ export {
 
 /** Low-level Conversion API */
 export { convert } from './api/conversion/convert'
-export { conversionInfo } from './api/conversion/conversionInfo'
+export {
+  conversionInfo,
+  ConversionInfoOptions,
+  ConversionInfoResponse
+} from './api/conversion/conversionInfo'
 export { conversionJobStatus } from './api/conversion/conversionJobStatus'
 
 /** Low-level Addons API */
