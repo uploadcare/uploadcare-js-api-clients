@@ -1,3 +1,11 @@
+# [6.9.0](https://github.com/uploadcare/uploadcare-js-api-clients/compare/v6.8.0...v6.9.0) (2023-11-14)
+
+
+### Features
+
+* **rest-client:** add Document Info endpoint ([7f0c528](https://github.com/uploadcare/uploadcare-js-api-clients/commit/7f0c5280108426e95664c1fb9ae4ec429b9a8c97))
+
+
 # [6.8.0](https://github.com/uploadcare/uploadcare-js-api-clients/compare/v6.7.0...v6.8.0) (2023-10-30)
 
 
