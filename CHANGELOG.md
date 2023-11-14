@@ -6,7 +6,6 @@
 * **rest-client/convert:** add `saveInGroup` option to document conversion method ([#499](https://github.com/uploadcare/uploadcare-js-api-clients/issues/499)) ([50720b7](https://github.com/uploadcare/uploadcare-js-api-clients/commit/50720b7a5c9cf606b5ed9c4ba28d8038c8034cbf))
 
 
-
 # [6.9.0](https://github.com/uploadcare/uploadcare-js-api-clients/compare/v6.8.0...v6.9.0) (2023-11-14)
 
 
