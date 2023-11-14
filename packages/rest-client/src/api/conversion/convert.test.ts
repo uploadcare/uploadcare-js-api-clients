@@ -30,7 +30,8 @@ describe('convert', () => {
       {
         type: ConversionType.DOCUMENT,
         paths: [`${DOCUMENT_UUID}/document/-/format/pdf/`, 'invalid'],
-        store: false
+        store: false,
+        saveInGroup: false
       },
       testSettings
     )
