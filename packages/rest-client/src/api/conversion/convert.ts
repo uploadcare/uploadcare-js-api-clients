@@ -11,14 +11,22 @@ export async function convert<T extends ValueOf<typeof ConversionType>>(
   options: ConversionOptions<T>,
   userSettings: ApiRequestSettings
 ): Promise<ConversionResponse<ConversionResult[T]>> {
+  const isDocument = options.type === ConversionType.DOCUMENT
+
+  const body = {
+    paths: options.paths,
+    store: storeValueToString(options.store)
+  }
+
+  if (isDocument) {
+    body['save_in_group'] = options?.saveInGroup?.toString()
+  }
+
   const apiRequest = await makeApiRequest(
     {
       method: 'POST',
       path: `/convert/${options.type}/`,
-      body: {
-        paths: options.paths,
-        store: storeValueToString(options.store)
-      }
+      body
     },
     userSettings
   )

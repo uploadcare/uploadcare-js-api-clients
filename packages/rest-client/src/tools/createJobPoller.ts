@@ -1,6 +1,6 @@
 import { CancelError, poll } from '@uploadcare/api-client-utils'
 
-export type CrateJobPollerRunner<Options, Settings, ReturnType> = (
+export type CreateJobPollerRunner<Options, Settings, ReturnType> = (
   options: Options,
   settings: Settings
 ) => ReturnType
@@ -41,7 +41,7 @@ type CrateJobPollerOptions<
   ResultType,
   ErrorType
 > = {
-  runner: CrateJobPollerRunner<RunnerOptions, RunnerSettings, RunnerReturnType>
+  runner: CreateJobPollerRunner<RunnerOptions, RunnerSettings, RunnerReturnType>
   resolveJobs: CreateJobPollerJobResolver<
     RunnerReturnType,
     JobType,

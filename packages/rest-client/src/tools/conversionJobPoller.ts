@@ -26,10 +26,13 @@ export const conversionJobPoller = <T extends ValueOf<typeof ConversionType>>(
     ConversionJobPollerOptions<T>,
   settings: ApiRequestSettings
 ) => {
-  const { onRun, onStatus, ...pollerOptions } = options
+  const { onRun, onStatus, ...rest } = options
+
+  const pollerOptions = rest as ConversionOptions<T> &
+    CreateJobPollerPollOptions
 
   const poller = createJobPoller({
-    runner: convert,
+    runner: convert<T>,
     resolveJobs: (response, runnerOptions, runnerSettings) => {
       onRun && onRun(response as ConversionResponse<ConversionResult[T]>)
       return runnerOptions.paths.map((path) => {
