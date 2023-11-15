@@ -2,7 +2,7 @@ import { ConversionType } from './ConversionType'
 import { StoreValue } from '@uploadcare/api-client-utils'
 import { ValueOf } from './ValueOf'
 
-type BaseConversionOption<T> = {
+export type BaseConversionOption<T> = {
   type: T
   paths: string[]
   store?: StoreValue

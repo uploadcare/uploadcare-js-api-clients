@@ -6,12 +6,12 @@ export type TechFieldsAppData = {
   datetime_updated: string
 }
 
-export type ClamavVirusScan = {
-  data: {
-    infected: boolean
-    infected_with: string
-  }
-} & TechFieldsAppData
+export type AddonData<T> = TechFieldsAppData & { data: T }
+
+export type ClamavVirusScan = AddonData<{
+  infected: boolean
+  infected_with: string
+}>
 
 export type AwsRekognitionDetectLabelParent = {
   Name: string
@@ -27,41 +27,34 @@ export type AwsRekognitionDetectLabelInstance = {
   }
 }
 
-export type AwsRekognitionDetectLabel = {
-  Confidence: number
-  Name: string
+export type AwsLabel<T> = T & { Confidence: number; Name: string }
+
+export type AwsRekognitionDetectLabel = AwsLabel<{
   Parents: AwsRekognitionDetectLabelParent[]
   Instances: AwsRekognitionDetectLabelInstance[]
-}
+}>
 
-export type AwsRekognitionDetectLabels = {
-  data: {
-    LabelModelVersion: string
-    Labels: AwsRekognitionDetectLabel[]
-  }
-} & TechFieldsAppData
+export type AwsRekognitionDetectLabels = AddonData<{
+  LabelModelVersion: string
+  Labels: AwsRekognitionDetectLabel[]
+}>
 
-export type AwsRekognitionDetectModerationLabel = Pick<
-  AwsRekognitionDetectLabel,
-  'Confidence' | 'Name'
-> & { ParentName: string }
+export type AwsRekognitionDetectModerationLabel = AwsLabel<{
+  ParentName: string
+}>
 
-export type AwsRekognitionDetectModerationLabels = {
-  data: {
-    ModerationModelVersion: string
-    ModerationLabels: AwsRekognitionDetectModerationLabel[]
-  }
-} & TechFieldsAppData
+export type AwsRekognitionDetectModerationLabels = AddonData<{
+  ModerationModelVersion: string
+  ModerationLabels: AwsRekognitionDetectModerationLabel[]
+}>
 
-export type RemoveBg = {
-  data: {
-    foreground_type: string
-  }
-} & TechFieldsAppData
+export type RemoveBg = AddonData<{
+  foreground_type: string
+}>
 
 export type AppData = {
   [AddonName.UC_CLAMAV_VIRUS_SCAN]?: ClamavVirusScan
   [AddonName.AWS_REKOGNITION_DETECT_LABELS]?: AwsRekognitionDetectLabels
-  [AddonName.AWS_REKOGNITION_DETECT_MODERATION_LABELS]: AwsRekognitionDetectModerationLabels
+  [AddonName.AWS_REKOGNITION_DETECT_MODERATION_LABELS]?: AwsRekognitionDetectModerationLabels
   [AddonName.REMOVE_BG]?: RemoveBg
 }
