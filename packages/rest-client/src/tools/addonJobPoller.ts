@@ -54,6 +54,7 @@ export const addonJobPoller = async <T extends ValueOf<typeof AddonName>>(
     },
     isJobFinished: (statusResponse) =>
       statusResponse.status === AddonExecutionStatus.DONE,
+    // TODO: handle unknown status
     isJobFailed: (statusResponse) =>
       statusResponse.status === AddonExecutionStatus.ERROR,
     getResult: async (job) => {
