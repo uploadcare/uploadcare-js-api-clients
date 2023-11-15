@@ -7,16 +7,22 @@ export {
   AddonParams,
   AddonUcClamavVirusScanParams,
   AddonAwsRekognitionDetectLabelsParams,
+  AddonAwsRekognitionModerationLabelsParams,
   AddonRemoveBgParams
 } from './types/AddonParams'
 export {
+  AddonData,
+  AwsLabel,
   AppData,
   ClamavVirusScan,
   AwsRekognitionDetectLabelParent,
   AwsRekognitionDetectLabelInstance,
   AwsRekognitionDetectLabel,
   AwsRekognitionDetectLabels,
-  RemoveBg
+  AwsRekognitionDetectModerationLabels,
+  AwsRekognitionDetectModerationLabel,
+  RemoveBg,
+  TechFieldsAppData
 } from './types/AppData'
 export { BatchResponse, BatchResponseStatus } from './types/BatchResponse'
 export { ConversionStatus } from './types/ConversionStatus'
@@ -30,7 +36,10 @@ export { WebhookEvent } from './types/WebhookEvent'
 export { StoreValue } from '@uploadcare/api-client-utils'
 export { Paginatable } from './types/Paginatable'
 export { Md5Function } from './lib/md5/Md5Function'
-export { ConversionOptions } from './types/ConversionOptions'
+export {
+  ConversionOptions,
+  BaseConversionOption
+} from './types/ConversionOptions'
 export { ConversionResponse } from './types/ConversionResponse'
 export { ConversionStatusOptions } from './types/ConversionStatusOptions'
 export { ConversionStatusResponse } from './types/ConversionStatusResponse'
