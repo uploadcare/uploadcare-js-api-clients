@@ -6,6 +6,8 @@ export type AddonUcClamavVirusScanParams = {
 
 export type AddonAwsRekognitionDetectLabelsParams = undefined
 
+export type AddonAwsRekognitionModerationLabelsParams = undefined
+
 export type AddonRemoveBgParams = {
   crop?: boolean
   crop_margin?: string
@@ -22,5 +24,6 @@ export type AddonRemoveBgParams = {
 export type AddonParams = {
   [AddonName.UC_CLAMAV_VIRUS_SCAN]: AddonUcClamavVirusScanParams
   [AddonName.AWS_REKOGNITION_DETECT_LABELS]: AddonAwsRekognitionDetectLabelsParams
+  [AddonName.AWS_REKOGNITION_DETECT_MODERATION_LABELS]: AddonAwsRekognitionModerationLabelsParams
   [AddonName.REMOVE_BG]: AddonRemoveBgParams
 }
