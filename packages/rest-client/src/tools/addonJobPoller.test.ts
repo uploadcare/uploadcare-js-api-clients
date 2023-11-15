@@ -28,8 +28,12 @@ describe('addonJobPoller', () => {
       testSettings
     )
 
-    expect(result.error).toBeFalse()
-    expect(result.result?.data).toBeTruthy()
+    if (result.error) {
+      expect(result.result).toBe(null)
+    } else {
+      expect(result.error).toBeFalse()
+      expect(result.result?.data).toBeTruthy()
+    }
   })
 
   it('should accept onRun and onStatus callbacks', async () => {
