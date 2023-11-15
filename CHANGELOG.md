@@ -6,7 +6,6 @@
 * **rest-client:** add AWS Rekognition Moderation addon ([67a01dc](https://github.com/uploadcare/uploadcare-js-api-clients/commit/67a01dcd759509261180d01cc938e71021971a8d))
 
 
-
 # [6.10.0](https://github.com/uploadcare/uploadcare-js-api-clients/compare/v6.9.0...v6.10.0) (2023-11-14)
 
 
