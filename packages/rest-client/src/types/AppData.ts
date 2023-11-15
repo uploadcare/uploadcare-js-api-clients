@@ -1,14 +1,17 @@
 import { AddonName } from './AddonName'
 
+export type TechFieldsAppData = {
+  version: string
+  datetime_created: string
+  datetime_updated: string
+}
+
 export type ClamavVirusScan = {
   data: {
     infected: boolean
     infected_with: string
   }
-  version: string
-  datetime_created: string
-  datetime_updated: string
-}
+} & TechFieldsAppData
 
 export type AwsRekognitionDetectLabelParent = {
   Name: string
@@ -36,22 +39,29 @@ export type AwsRekognitionDetectLabels = {
     LabelModelVersion: string
     Labels: AwsRekognitionDetectLabel[]
   }
-  version: string
-  datetime_created: string
-  datetime_updated: string
-}
+} & TechFieldsAppData
+
+export type AwsRekognitionDetectModerationLabel = Pick<
+  AwsRekognitionDetectLabel,
+  'Confidence' | 'Name'
+> & { ParentName: string }
+
+export type AwsRekognitionDetectModerationLabels = {
+  data: {
+    ModerationModelVersion: string
+    ModerationLabels: AwsRekognitionDetectModerationLabel[]
+  }
+} & TechFieldsAppData
 
 export type RemoveBg = {
   data: {
     foreground_type: string
   }
-  version: string
-  datetime_created: string
-  datetime_updated: string
-}
+} & TechFieldsAppData
 
 export type AppData = {
   [AddonName.UC_CLAMAV_VIRUS_SCAN]?: ClamavVirusScan
   [AddonName.AWS_REKOGNITION_DETECT_LABELS]?: AwsRekognitionDetectLabels
+  [AddonName.AWS_REKOGNITION_DETECT_MODERATION_LABELS]: AwsRekognitionDetectModerationLabels
   [AddonName.REMOVE_BG]?: RemoveBg
 }
