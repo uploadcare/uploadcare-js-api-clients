@@ -1,3 +1,12 @@
+## [6.11.1](https://github.com/uploadcare/uploadcare-js-api-clients/compare/v6.11.0...v6.11.1) (2023-12-19)
+
+
+### Bug Fixes
+
+* **upload-client/react-native:** update bundle path ([#504](https://github.com/uploadcare/uploadcare-js-api-clients/issues/504)) ([a0668c4](https://github.com/uploadcare/uploadcare-js-api-clients/commit/a0668c40b190035c6ef7aea50a41877e7b018c6e))
+
+
+
 # [6.11.0](https://github.com/uploadcare/uploadcare-js-api-clients/compare/v6.10.0...v6.11.0) (2023-11-15)
 
 
