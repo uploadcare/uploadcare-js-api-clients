@@ -5,7 +5,7 @@
   "type": "module",
   "module": "./dist/esm/index.node.mjs",
   "browser": "./dist/esm/index.browser.mjs",
-  "react-native": "./dist/index.react-native.mjs",
+  "react-native": "./dist/esm/index.react-native.mjs",
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
