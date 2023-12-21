@@ -1,7 +1,7 @@
 import * as factory from '../_fixtureFactory'
 import { getSettingsForTesting, assertComputableProgress } from '../_helpers'
 import { uploadFileGroup } from '../../src/uploadFileGroup'
-import { UploadClientError } from '../../src/tools/errors'
+import { UploadError } from '../../src/tools/UploadError'
 import { jest, expect } from '@jest/globals'
 
 describe('groupFrom Uploaded[]', () => {
@@ -43,7 +43,7 @@ describe('groupFrom Uploaded[]', () => {
     ctrl.abort()
 
     await expect(upload).rejects.toThrowError(
-      new UploadClientError('Request canceled')
+      new UploadError('Request canceled')
     )
   })
 
@@ -67,10 +67,8 @@ describe('groupFrom Uploaded[]', () => {
     try {
       await uploadFileGroup(files, settings)
     } catch (error) {
-      expect((error as UploadClientError).message).toEqual(
-        'pub_key is invalid.'
-      )
-      expect((error as UploadClientError).code).toEqual(
+      expect((error as UploadError).message).toEqual('pub_key is invalid.')
+      expect((error as UploadError).code).toEqual(
         'ProjectPublicKeyInvalidError'
       )
     }

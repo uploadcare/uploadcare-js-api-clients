@@ -1,11 +1,11 @@
-import { UploadClientError } from './errors'
+import { UploadError } from './UploadError'
 import { retrier, NetworkError } from '@uploadcare/api-client-utils'
 
 const REQUEST_WAS_THROTTLED_CODE = 'RequestThrottledError'
 const DEFAULT_RETRY_AFTER_TIMEOUT = 15000
 const DEFAULT_NETWORK_ERROR_TIMEOUT = 1000
 
-function getTimeoutFromThrottledRequest(error: UploadClientError): number {
+function getTimeoutFromThrottledRequest(error: UploadError): number {
   const { headers } = error || {}
   if (!headers || typeof headers['retry-after'] !== 'string') {
     return DEFAULT_RETRY_AFTER_TIMEOUT
@@ -28,7 +28,7 @@ export function retryIfFailed<T>(
 ): Promise<T> {
   const { retryThrottledRequestMaxTimes, retryNetworkErrorMaxTimes } = options
   return retrier(({ attempt, retry }) =>
-    fn().catch((error: Error | UploadClientError | NetworkError) => {
+    fn().catch((error: Error | UploadError | NetworkError) => {
       if (
         'response' in error &&
         error?.code === REQUEST_WAS_THROTTLED_CODE &&

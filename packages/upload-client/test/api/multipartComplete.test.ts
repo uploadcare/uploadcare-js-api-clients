@@ -3,7 +3,7 @@ import multipartUpload from '../../src/api/multipartUpload'
 import multipartComplete from '../../src/api/multipartComplete'
 import * as factory from '../_fixtureFactory'
 import { getSettingsForTesting } from '../_helpers'
-import { UploadClientError } from '../../src/tools/errors'
+import { UploadError } from '../../src/tools/UploadError'
 import { jest, expect } from '@jest/globals'
 
 const getChunk = (
@@ -74,7 +74,7 @@ describe('API - multipartComplete', () => {
 
     await expect(
       multipartComplete(completedUuid, settings)
-    ).rejects.toThrowError(new UploadClientError('Request canceled'))
+    ).rejects.toThrowError(new UploadError('Request canceled'))
 
     expect(Date.now() - time).toBeLessThan(200) // could be slow on ci
   })
@@ -87,7 +87,7 @@ describe('API - multipartComplete', () => {
     const upload = multipartComplete('', settings)
 
     await expect(upload).rejects.toThrowError(
-      new UploadClientError('uuid is required.')
+      new UploadError('uuid is required.')
     )
   })
 
@@ -97,10 +97,10 @@ describe('API - multipartComplete', () => {
     try {
       await multipartComplete('', { publicKey })
     } catch (error) {
-      expect((error as UploadClientError).message).toEqual(
+      expect((error as UploadError).message).toEqual(
         'UPLOADCARE_PUB_KEY is invalid.'
       )
-      expect((error as UploadClientError).code).toEqual(
+      expect((error as UploadError).code).toEqual(
         'ProjectPublicKeyInvalidError'
       )
     }

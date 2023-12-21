@@ -7,7 +7,7 @@ import {
 import { defaultSettings } from '../defaultSettings'
 import request from '../request/request.node'
 import buildFormData from '../tools/buildFormData'
-import { UploadClientError } from '../tools/errors'
+import { UploadError } from '../tools/UploadError'
 import getUrl from '../tools/getUrl'
 import { getUserAgent } from '../tools/getUserAgent'
 import { retryIfFailed } from '../tools/retryIfFailed'
@@ -100,7 +100,7 @@ export default function base(
       }).then(({ data, headers, request }) => {
         const response = camelizeKeys(JSON.parse(data)) as Response
         if ('error' in response) {
-          throw new UploadClientError(
+          throw new UploadError(
             response.error.content,
             response.error.errorCode,
             request,

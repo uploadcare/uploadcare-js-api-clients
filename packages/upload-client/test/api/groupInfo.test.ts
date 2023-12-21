@@ -2,7 +2,7 @@ import * as factory from '../_fixtureFactory'
 import { getSettingsForTesting } from '../_helpers'
 import group from '../../src/api/group'
 import groupInfo from '../../src/api/groupInfo'
-import { UploadClientError } from '../../src/tools/errors'
+import { UploadError } from '../../src/tools/UploadError'
 
 describe('API - group info', () => {
   const files = factory.groupOfFiles('valid')
@@ -50,10 +50,8 @@ describe('API - group info', () => {
     try {
       await groupInfo('id', { publicKey })
     } catch (error) {
-      expect((error as UploadClientError).message).toEqual(
-        'pub_key is invalid.'
-      )
-      expect((error as UploadClientError).code).toEqual(
+      expect((error as UploadError).message).toEqual('pub_key is invalid.')
+      expect((error as UploadError).code).toEqual(
         'ProjectPublicKeyInvalidError'
       )
     }

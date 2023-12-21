@@ -1,6 +1,6 @@
 import fromUrlStatus, { Status } from '../api/fromUrlStatus'
 import fromUrl, { TypeEnum, FromUrlOptions } from '../api/fromUrl'
-import { UploadClientError } from '../tools/errors'
+import { UploadError } from '../tools/UploadError'
 import { race } from '../tools/race'
 import { isReadyPoll } from '../tools/isReadyPoll'
 import defaultSettings from '../defaultSettings'
@@ -35,8 +35,8 @@ function pollStrategy({
   retryNetworkErrorMaxTimes?: number
   onProgress?: ProgressCallback
   signal?: AbortSignal
-}): Promise<FileInfo | UploadClientError> {
-  return poll<FileInfo | UploadClientError>({
+}): Promise<FileInfo | UploadError> {
+  return poll<FileInfo | UploadError>({
     check: (signal) =>
       fromUrlStatus(token, {
         publicKey,
@@ -49,13 +49,13 @@ function pollStrategy({
       }).then((response) => {
         switch (response.status) {
           case Status.Error: {
-            return new UploadClientError(response.error, response.errorCode)
+            return new UploadError(response.error, response.errorCode)
           }
           case Status.Waiting: {
             return false
           }
           case Status.Unknown: {
-            return new UploadClientError(`Token "${token}" was not found.`)
+            return new UploadError(`Token "${token}" was not found.`)
           }
           case Status.Progress: {
             if (onProgress) {
@@ -103,7 +103,7 @@ const pushStrategy = ({
   pusherKey: string
   signal: AbortSignal
   onProgress?: ProgressCallback
-}): Promise<FileInfo | UploadClientError> =>
+}): Promise<FileInfo | UploadError> =>
   new Promise((resolve, reject) => {
     const pusher = getPusher(pusherKey)
     const unsubErrorHandler = pusher.onError(reject)
@@ -146,7 +146,7 @@ const pushStrategy = ({
 
         case Status.Error: {
           destroy()
-          reject(new UploadClientError(result.msg, result.error_code))
+          reject(new UploadError(result.msg, result.error_code))
         }
       }
     })
@@ -202,9 +202,9 @@ export const uploadFromUrl = (
       if (urlResponse.type === TypeEnum.FileInfo) {
         return urlResponse
       } else {
-        return race<FileInfo | UploadClientError>(
+        return race<FileInfo | UploadError>(
           [
-            ({ signal }): Promise<FileInfo | UploadClientError> =>
+            ({ signal }): Promise<FileInfo | UploadError> =>
               pollStrategy({
                 token: urlResponse.token,
                 publicKey,
@@ -215,7 +215,7 @@ export const uploadFromUrl = (
                 onProgress,
                 signal
               }),
-            ({ signal }): Promise<FileInfo | UploadClientError> =>
+            ({ signal }): Promise<FileInfo | UploadError> =>
               pushStrategy({
                 token: urlResponse.token,
                 pusherKey,
@@ -228,7 +228,7 @@ export const uploadFromUrl = (
       }
     })
     .then((result) => {
-      if (result instanceof UploadClientError) throw result
+      if (result instanceof UploadError) throw result
 
       return result
     })

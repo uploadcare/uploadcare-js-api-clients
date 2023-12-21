@@ -89,7 +89,12 @@ export const UploadcareNetworkError = NetworkError
 export { Headers, ErrorRequestInfo } from './request/types'
 export { UploadcareFile } from './tools/UploadcareFile'
 export { UploadcareGroup } from './tools/UploadcareGroup'
-export { UploadClientError, ErrorResponseInfo } from './tools/errors'
+export { UploadError, ErrorResponseInfo } from './tools/UploadError'
+
+import { UploadError } from './tools/UploadError'
+/** @deprecated Please use UploadError instead. */
+export const UploadClientError = UploadError
+
 export { Settings, SupportedFileInput as SupportedFileInput } from './types'
 export {
   NodeFile as NodeFile,

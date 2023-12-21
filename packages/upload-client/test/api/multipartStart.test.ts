@@ -1,7 +1,7 @@
 import multipartStart from '../../src/api/multipartStart'
 import * as factory from '../_fixtureFactory'
 import { getSettingsForTesting } from '../_helpers'
-import { UploadClientError } from '../../src/tools/errors'
+import { UploadError } from '../../src/tools/UploadError'
 
 describe('API - multipartStart', () => {
   const size = factory.file(12).size
@@ -31,7 +31,7 @@ describe('API - multipartStart', () => {
     })
 
     await expect(upload).rejects.toThrowError(
-      new UploadClientError('Request canceled')
+      new UploadError('Request canceled')
     )
   })
 
@@ -45,7 +45,7 @@ describe('API - multipartStart', () => {
     const upload = multipartStart(size, settings)
 
     await expect(upload).rejects.toThrowError(
-      new UploadClientError(
+      new UploadError(
         'File size can not be less than 10485760 bytes. Please use direct upload instead of multipart.'
       )
     )
@@ -61,10 +61,10 @@ describe('API - multipartStart', () => {
     try {
       await multipartStart(size, settings)
     } catch (error) {
-      expect((error as UploadClientError).message).toEqual(
+      expect((error as UploadError).message).toEqual(
         'UPLOADCARE_PUB_KEY is invalid.'
       )
-      expect((error as UploadClientError).code).toEqual(
+      expect((error as UploadError).code).toEqual(
         'ProjectPublicKeyInvalidError'
       )
     }

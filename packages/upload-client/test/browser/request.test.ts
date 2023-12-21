@@ -1,6 +1,6 @@
 /** @jest-environment jsdom */
 
-import { UploadClientError } from '../../src/tools/errors'
+import { UploadError } from '../../src/tools/UploadError'
 import request from '../../src/request/request.browser'
 import getUrl from '../../src/tools/getUrl'
 import { jest, expect } from '@jest/globals'
@@ -53,7 +53,7 @@ describe('request', () => {
         }),
         signal: cntr.signal
       })
-    ).rejects.toThrowError(new UploadClientError('Request canceled'))
+    ).rejects.toThrowError(new UploadError('Request canceled'))
   })
 
   it('should handle progress', async () => {

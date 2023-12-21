@@ -17,7 +17,7 @@ import {
 } from '../defaultSettings'
 import { getUserAgent } from '../tools/getUserAgent'
 import { retryIfFailed } from '../tools/retryIfFailed'
-import { UploadClientError } from '../tools/errors'
+import { UploadError } from '../tools/UploadError'
 import { getStoreValue } from '../tools/getStoreValue'
 
 export type MultipartStartOptions = {
@@ -94,7 +94,7 @@ export default function multipartStart(
         const response = camelizeKeys(JSON.parse(data)) as Response
 
         if ('error' in response) {
-          throw new UploadClientError(
+          throw new UploadError(
             response.error.content,
             response.error.errorCode,
             request,

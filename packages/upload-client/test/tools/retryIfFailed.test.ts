@@ -1,5 +1,5 @@
 import { retryIfFailed } from '../../src/tools/retryIfFailed'
-import { UploadClientError } from '../../src/tools/errors'
+import { UploadError } from '../../src/tools/UploadError'
 import { jest, expect } from '@jest/globals'
 import { NetworkError } from '@uploadcare/api-client-utils'
 
@@ -31,7 +31,7 @@ const createRunner = ({
   return { spy, task }
 }
 
-const throttledError = new UploadClientError(
+const throttledError = new UploadError(
   'test error',
   'RequestThrottledError',
   undefined,
@@ -76,7 +76,7 @@ describe('retryIfFailed', () => {
       expect(spy).toHaveBeenCalledTimes(1)
     })
 
-    it('should be rejected with UploadClientError if MaxTimes = 0', async () => {
+    it('should be rejected with UploadError if MaxTimes = 0', async () => {
       const { spy, task } = createRunner({ error: throttledError })
 
       await expect(
@@ -84,7 +84,7 @@ describe('retryIfFailed', () => {
           retryThrottledRequestMaxTimes: 0,
           retryNetworkErrorMaxTimes: 0
         })
-      ).rejects.toThrowError(UploadClientError)
+      ).rejects.toThrowError(UploadError)
       expect(spy).toHaveBeenCalledTimes(1)
     })
 

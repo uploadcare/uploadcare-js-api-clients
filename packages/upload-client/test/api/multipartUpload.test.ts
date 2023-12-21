@@ -2,7 +2,7 @@ import * as factory from '../_fixtureFactory'
 import multipartUpload from '../../src/api/multipartUpload'
 import { getSettingsForTesting, assertComputableProgress } from '../_helpers'
 import multipartStart from '../../src/api/multipartStart'
-import { UploadClientError } from '../../src/tools/errors'
+import { UploadError } from '../../src/tools/UploadError'
 import { jest, expect } from '@jest/globals'
 
 let parts: [string, Blob | Buffer][] = []
@@ -50,7 +50,7 @@ describe('API - multipartUpload', () => {
     })
 
     await expect(multipartUpload(part, url, options)).rejects.toThrowError(
-      new UploadClientError('Request canceled')
+      new UploadError('Request canceled')
     )
   })
 
@@ -76,10 +76,10 @@ describe('API - multipartUpload', () => {
     try {
       await multipartUpload(part, url, options)
     } catch (error) {
-      expect((error as UploadClientError).message).toEqual(
+      expect((error as UploadError).message).toEqual(
         'UPLOADCARE_PUB_KEY is invalid.'
       )
-      expect((error as UploadClientError).code).toEqual(
+      expect((error as UploadError).code).toEqual(
         'ProjectPublicKeyInvalidError'
       )
     }
