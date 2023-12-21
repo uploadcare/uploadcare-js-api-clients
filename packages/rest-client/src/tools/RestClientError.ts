@@ -1,3 +1,5 @@
+import { UploadcareError } from '@uploadcare/api-client-utils'
+
 export type RestClientErrorOptions = {
   request?: Request
   response?: Response
@@ -9,7 +11,7 @@ const DEFAULT_MESSAGE = 'Unknown error'
  * TODO: it's better to split errors into something like Runtime error and
  * ServerError (RestApiError)
  */
-export class RestClientError extends Error {
+export class RestClientError extends UploadcareError {
   readonly status?: number
   readonly statusText?: string
 

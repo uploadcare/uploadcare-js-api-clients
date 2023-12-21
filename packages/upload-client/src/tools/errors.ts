@@ -1,3 +1,4 @@
+import { UploadcareError } from '@uploadcare/api-client-utils'
 import { Headers, ErrorRequestInfo } from '../request/types'
 
 export type ErrorResponseInfo = {
@@ -8,7 +9,7 @@ export type ErrorResponseInfo = {
   }
 }
 
-export class UploadClientError extends Error {
+export class UploadClientError extends UploadcareError {
   isCancel?: boolean
 
   readonly code?: string

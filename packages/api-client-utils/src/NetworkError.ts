@@ -1,4 +1,6 @@
-export class NetworkError extends Error {
+import { UploadcareError } from './UploadcareError'
+
+export class NetworkError extends UploadcareError {
   originalProgressEvent: ProgressEvent
 
   constructor(progressEvent: ProgressEvent) {

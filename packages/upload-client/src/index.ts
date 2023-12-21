@@ -76,7 +76,8 @@ export {
   CustomUserAgentFn,
   CustomUserAgentOptions,
   GetUserAgentOptions,
-  CancelError
+  CancelError,
+  UploadcareError
 } from '@uploadcare/api-client-utils'
 export { Queue } from './tools/Queue'
 
