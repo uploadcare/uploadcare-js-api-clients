@@ -64,7 +64,7 @@ export { uploadFileGroup, type GroupFromOptions } from './uploadFileGroup'
 export { default as UploadClient } from './UploadClient'
 export {
   getUserAgent,
-  UploadcareNetworkError,
+  NetworkError,
   Metadata,
   ContentInfo,
   ImageInfo,
@@ -78,6 +78,10 @@ export {
   GetUserAgentOptions
 } from '@uploadcare/api-client-utils'
 export { Queue } from './tools/Queue'
+
+import { NetworkError } from '@uploadcare/api-client-utils'
+/** @deprecated Please use NetworkError instead. */
+export const UploadcareNetworkError = NetworkError
 
 /* Types */
 export { Headers, ErrorRequestInfo } from './request/types'
