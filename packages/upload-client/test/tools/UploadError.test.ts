@@ -1,3 +1,4 @@
+import { UploadcareError } from '@uploadcare/api-client-utils'
 import { UploadError } from '../../src/tools/UploadError'
 
 describe('UploadError', () => {
@@ -24,5 +25,10 @@ describe('UploadError', () => {
     const error = new UploadError('test error')
 
     expect(error.stack).toBeDefined()
+  })
+
+  it('should be instanceof UploadcareError', () => {
+    const error = new UploadError('test error')
+    expect(error).toBeInstanceOf(UploadcareError)
   })
 })
