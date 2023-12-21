@@ -1,7 +1,8 @@
 import WebSocket from '../tools/sockets.node'
 
-import { FileInfo } from '../api/types'
 import { Status } from '../api/fromUrlStatus'
+import { FileInfo } from '../api/types'
+import { ServerErrorCode } from '../tools/ServerErrorCode'
 import { Events } from './events'
 
 type AllStatuses =
@@ -19,7 +20,7 @@ type StatusErrorResponse = {
   status: Status.Error
   msg: string
   url: string
-  error_code: string
+  error_code: ServerErrorCode
 }
 
 type StatusSuccessResponse = {

@@ -5,6 +5,7 @@ import {
   UnknownProgressInfo
 } from '../api/types'
 import { SupportedFileInput } from '../types'
+import { ServerErrorCode } from '../tools/ServerErrorCode'
 
 export type Headers = {
   [key: string]: string | string[] | undefined
@@ -39,6 +40,6 @@ export type FailedResponse = {
   error: {
     content: string
     statusCode: number
-    errorCode: string
+    errorCode: ServerErrorCode
   }
 }

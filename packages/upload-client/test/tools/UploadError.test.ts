@@ -15,10 +15,10 @@ describe('UploadError', () => {
   })
 
   it('should have code', () => {
-    const error = new UploadError('test error', 'error code')
+    const error = new UploadError('test error', 'AccountBlockedError')
 
     expect(error.message).toBe('test error')
-    expect(error.code).toBe('error code')
+    expect(error.code).toBe('AccountBlockedError')
   })
 
   it('should have stack', () => {
