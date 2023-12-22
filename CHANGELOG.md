@@ -1,13 +1,17 @@
 # [6.12.0](https://github.com/uploadcare/uploadcare-js-api-clients/compare/v6.11.1...v6.12.0) (2023-12-22)
 
+### Deprecations
+
+* `UploadcareNetworkError` is deprecated. Please use `NetworkError` instead.
+* `UploadClientError` is deprecated. Please use `UploadError` instead.
 
 ### Features
 
 * **api-client-utils:** add base class `UploadcareError` for the errors ([766586a](https://github.com/uploadcare/uploadcare-js-api-clients/commit/766586a0df8cdae367c74a14cceb9ae3c34dcc35))
 * **rest-client:** export `UploadcareError` and `RestClientError` from the package module ([6432653](https://github.com/uploadcare/uploadcare-js-api-clients/commit/643265303f097c3fb74d5a5733908d149ccdea6c))
 * **upload-client:** export `CancelError` from the package ([7adf799](https://github.com/uploadcare/uploadcare-js-api-clients/commit/7adf799e967c92d6421ad18341d4ca758ad45276))
-* **upload-client:** export `UploadcareNetworkError` was renamed to the `NetworkError` ([62cc416](https://github.com/uploadcare/uploadcare-js-api-clients/commit/62cc416a09554df9dc2df3c1f0256959ccf263c9))
-* **upload-client:** rename `UploadClientError` export to the `UploadError`. ([7c03c3d](https://github.com/uploadcare/uploadcare-js-api-clients/commit/7c03c3d7311e9c43b360861f736dda27c1e1f140))
+* **upload-client:** rename `UploadcareNetworkError` export to the `NetworkError`. `UploadcareNetworkError` is deprecated but still exported. ([62cc416](https://github.com/uploadcare/uploadcare-js-api-clients/commit/62cc416a09554df9dc2df3c1f0256959ccf263c9))
+* **upload-client:** rename `UploadClientError` export to the `UploadError`. `UploadClientError` is deprecated but still exported. ([7c03c3d](https://github.com/uploadcare/uploadcare-js-api-clients/commit/7c03c3d7311e9c43b360861f736dda27c1e1f140))
 
 
 
