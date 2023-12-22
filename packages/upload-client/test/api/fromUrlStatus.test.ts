@@ -1,7 +1,7 @@
 import fromUrlStatus, { Status } from '../../src/api/fromUrlStatus'
 import * as factory from '../_fixtureFactory'
 import { getSettingsForTesting } from '../_helpers'
-import { UploadClientError } from '../../src/tools/errors'
+import { UploadError } from '../../src/tools/UploadError'
 
 describe('API - from url status', () => {
   const token = factory.token('valid')
@@ -50,10 +50,10 @@ describe('API - from url status', () => {
     try {
       await fromUrlStatus('token', { publicKey })
     } catch (error) {
-      expect((error as UploadClientError).message).toEqual(
+      expect((error as UploadError).message).toEqual(
         'UPLOADCARE_PUB_KEY is invalid.'
       )
-      expect((error as UploadClientError).code).toEqual(
+      expect((error as UploadError).code).toEqual(
         'ProjectPublicKeyInvalidError'
       )
     }

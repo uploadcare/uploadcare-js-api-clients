@@ -7,7 +7,7 @@ import getUrl from '../tools/getUrl'
 
 import defaultSettings from '../defaultSettings'
 import { getUserAgent } from '../tools/getUserAgent'
-import { UploadClientError } from '../tools/errors'
+import { UploadError } from '../tools/UploadError'
 import { retryIfFailed } from '../tools/retryIfFailed'
 
 export type GroupInfoOptions = {
@@ -58,7 +58,7 @@ export default function groupInfo(
         const response = camelizeKeys(JSON.parse(data)) as Response
 
         if ('error' in response) {
-          throw new UploadClientError(
+          throw new UploadError(
             response.error.content,
             response.error.errorCode,
             request,

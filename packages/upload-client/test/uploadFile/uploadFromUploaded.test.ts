@@ -1,6 +1,6 @@
 import * as factory from '../_fixtureFactory'
 import { getSettingsForTesting, assertComputableProgress } from '../_helpers'
-import { UploadClientError } from '../../src/tools/errors'
+import { UploadError } from '../../src/tools/UploadError'
 import { uploadFromUploaded } from '../../src/uploadFile/uploadFromUploaded'
 import { jest, expect } from '@jest/globals'
 
@@ -26,7 +26,7 @@ describe('uploadFromUploaded', () => {
     ctrl.abort()
 
     await expect(upload).rejects.toThrowError(
-      new UploadClientError('Request canceled')
+      new UploadError('Request canceled')
     )
   })
 
@@ -61,10 +61,8 @@ describe('uploadFromUploaded', () => {
     try {
       await uploadFromUploaded(uuid, settings)
     } catch (error) {
-      expect((error as UploadClientError).message).toEqual(
-        'pub_key is invalid.'
-      )
-      expect((error as UploadClientError).code).toEqual(
+      expect((error as UploadError).message).toEqual('pub_key is invalid.')
+      expect((error as UploadError).code).toEqual(
         'ProjectPublicKeyInvalidError'
       )
     }

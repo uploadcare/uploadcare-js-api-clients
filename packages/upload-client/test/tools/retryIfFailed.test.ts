@@ -1,7 +1,7 @@
 import { retryIfFailed } from '../../src/tools/retryIfFailed'
-import { UploadClientError } from '../../src/tools/errors'
+import { UploadError } from '../../src/tools/UploadError'
 import { jest, expect } from '@jest/globals'
-import { UploadcareNetworkError } from '@uploadcare/api-client-utils'
+import { NetworkError } from '@uploadcare/api-client-utils'
 
 const createRunner = ({
   attempts = 10,
@@ -31,7 +31,7 @@ const createRunner = ({
   return { spy, task }
 }
 
-const throttledError = new UploadClientError(
+const throttledError = new UploadError(
   'test error',
   'RequestThrottledError',
   undefined,
@@ -45,7 +45,7 @@ const throttledError = new UploadClientError(
   { 'retry-after': '1' }
 )
 
-const networkError = new UploadcareNetworkError(
+const networkError = new NetworkError(
   new Event('ProgressEvent') as ProgressEvent
 )
 
@@ -76,7 +76,7 @@ describe('retryIfFailed', () => {
       expect(spy).toHaveBeenCalledTimes(1)
     })
 
-    it('should be rejected with UploadClientError if MaxTimes = 0', async () => {
+    it('should be rejected with UploadError if MaxTimes = 0', async () => {
       const { spy, task } = createRunner({ error: throttledError })
 
       await expect(
@@ -84,7 +84,7 @@ describe('retryIfFailed', () => {
           retryThrottledRequestMaxTimes: 0,
           retryNetworkErrorMaxTimes: 0
         })
-      ).rejects.toThrowError(UploadClientError)
+      ).rejects.toThrowError(UploadError)
       expect(spy).toHaveBeenCalledTimes(1)
     })
 
@@ -143,7 +143,7 @@ describe('retryIfFailed', () => {
       expect(spy).toHaveBeenCalledTimes(1)
     })
 
-    it('should be rejected with UploadcareNetworkError if MaxTimes = 0', async () => {
+    it('should be rejected with NetworkError if MaxTimes = 0', async () => {
       const { spy, task } = createRunner({ error: networkError })
 
       await expect(
@@ -151,7 +151,7 @@ describe('retryIfFailed', () => {
           retryNetworkErrorMaxTimes: 0,
           retryThrottledRequestMaxTimes: 0
         })
-      ).rejects.toThrowError(UploadcareNetworkError)
+      ).rejects.toThrowError(NetworkError)
       expect(spy).toHaveBeenCalledTimes(1)
     })
 

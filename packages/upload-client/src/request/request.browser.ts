@@ -1,6 +1,6 @@
 import { RequestOptions, RequestResponse } from './types'
 import {
-  UploadcareNetworkError,
+  NetworkError,
   onCancel,
   CancelError
 } from '@uploadcare/api-client-utils'
@@ -94,7 +94,7 @@ const request = ({
       if (aborted) return
 
       // only triggers if the request couldn't be made at all
-      reject(new UploadcareNetworkError(progressEvent))
+      reject(new NetworkError(progressEvent))
     }
 
     if (onProgress && typeof onProgress === 'function') {

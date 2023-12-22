@@ -7,8 +7,9 @@ import getUrl from '../tools/getUrl'
 
 import defaultSettings from '../defaultSettings'
 import { getUserAgent } from '../tools/getUserAgent'
-import { UploadClientError } from '../tools/errors'
+import { UploadError } from '../tools/UploadError'
 import { retryIfFailed } from '../tools/retryIfFailed'
+import { ServerErrorCode } from '../tools/ServerErrorCode'
 
 export enum Status {
   Unknown = 'unknown',
@@ -36,7 +37,7 @@ export type StatusProgressResponse = {
 export type StatusErrorResponse = {
   status: Status.Error
   error: string
-  errorCode: string
+  errorCode: ServerErrorCode
 }
 
 export type StatusSuccessResponse = {
@@ -107,9 +108,9 @@ export default function fromUrlStatus(
         const response = camelizeKeys(JSON.parse(data)) as Response
 
         if ('error' in response && !isErrorResponse(response)) {
-          throw new UploadClientError(
+          throw new UploadError(
             response.error.content,
-            undefined,
+            response.error.errorCode,
             request,
             response,
             headers

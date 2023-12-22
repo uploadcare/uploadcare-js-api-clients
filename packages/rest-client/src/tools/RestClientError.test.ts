@@ -1,5 +1,6 @@
 import { RestClientError } from './RestClientError'
 import { Request, Response } from '../lib/fetch/fetch.node'
+import { UploadcareError } from '@uploadcare/api-client-utils'
 
 describe('RestClientError', () => {
   it('should work', () => {
@@ -64,5 +65,10 @@ describe('RestClientError', () => {
     const error = new RestClientError(null, { response })
 
     expect(error.message).toBe('[200] OK')
+  })
+
+  it('should be instanceof UploadcareError', () => {
+    const error = new RestClientError()
+    expect(error).toBeInstanceOf(UploadcareError)
   })
 })

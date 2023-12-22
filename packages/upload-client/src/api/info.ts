@@ -3,7 +3,7 @@ import getUrl from '../tools/getUrl'
 import defaultSettings from '../defaultSettings'
 import { getUserAgent } from '../tools/getUserAgent'
 import { camelizeKeys, CustomUserAgent } from '@uploadcare/api-client-utils'
-import { UploadClientError } from '../tools/errors'
+import { UploadError } from '../tools/UploadError'
 import { retryIfFailed } from '../tools/retryIfFailed'
 
 /* Types */
@@ -59,7 +59,7 @@ export default function info(
         const response = camelizeKeys(JSON.parse(data)) as Response
 
         if ('error' in response) {
-          throw new UploadClientError(
+          throw new UploadError(
             response.error.content,
             response.error.errorCode,
             request,

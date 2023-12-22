@@ -1,7 +1,7 @@
 import fromUrl, { TypeEnum } from '../../src/api/fromUrl'
 import * as factory from '../_fixtureFactory'
 import { getSettingsForTesting } from '../_helpers'
-import { UploadClientError } from '../../src/tools/errors'
+import { UploadError } from '../../src/tools/UploadError'
 
 describe('API - from url', () => {
   const sourceUrl = factory.imageUrl('valid')
@@ -68,10 +68,8 @@ describe('API - from url', () => {
     try {
       await fromUrl(sourceUrl, { publicKey })
     } catch (error) {
-      expect((error as UploadClientError).message).toEqual(
-        'pub_key is invalid.'
-      )
-      expect((error as UploadClientError).code).toEqual(
+      expect((error as UploadError).message).toEqual('pub_key is invalid.')
+      expect((error as UploadError).code).toEqual(
         'ProjectPublicKeyInvalidError'
       )
     }

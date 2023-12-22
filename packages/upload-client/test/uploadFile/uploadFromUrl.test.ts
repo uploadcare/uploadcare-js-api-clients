@@ -4,7 +4,7 @@ import {
   assertComputableProgress,
   assertUnknownProgress
 } from '../_helpers'
-import { UploadClientError } from '../../src/tools/errors'
+import { UploadError } from '../../src/tools/UploadError'
 import http from 'http'
 import https, { RequestOptions } from 'https'
 import { uploadFromUrl } from '../../src/uploadFile/uploadFromUrl'
@@ -93,7 +93,7 @@ describe('uploadFromUrl', () => {
     })
 
     await expect(uploadFromUrl(sourceUrl, settings)).rejects.toThrowError(
-      new UploadClientError('Request canceled')
+      new UploadError('Request canceled')
     )
   })
 
@@ -145,10 +145,8 @@ describe('uploadFromUrl', () => {
     try {
       await uploadFromUrl(sourceUrl, settings)
     } catch (error) {
-      expect((error as UploadClientError).message).toEqual(
-        'pub_key is invalid.'
-      )
-      expect((error as UploadClientError).code).toEqual(
+      expect((error as UploadError).message).toEqual('pub_key is invalid.')
+      expect((error as UploadError).code).toEqual(
         'ProjectPublicKeyInvalidError'
       )
     }

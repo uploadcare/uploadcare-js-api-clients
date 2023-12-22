@@ -69,13 +69,15 @@ export {
   CustomUserAgent,
   CustomUserAgentFn,
   CustomUserAgentOptions,
-  GetUserAgentOptions
+  GetUserAgentOptions,
+  UploadcareError
 } from '@uploadcare/api-client-utils'
 
 /** Helpers from `@uploadcare/api-client-utils` */
 export { getUserAgent } from '@uploadcare/api-client-utils'
 
 /** Tools */
+export { RestClientError } from './tools/RestClientError'
 export { paginate, Paginator } from './tools/paginate'
 export { addonJobPoller, AddonJobPollerOptions } from './tools/addonJobPoller'
 export {

@@ -64,7 +64,7 @@ export { uploadFileGroup, type GroupFromOptions } from './uploadFileGroup'
 export { default as UploadClient } from './UploadClient'
 export {
   getUserAgent,
-  UploadcareNetworkError,
+  NetworkError,
   Metadata,
   ContentInfo,
   ImageInfo,
@@ -75,15 +75,26 @@ export {
   CustomUserAgent,
   CustomUserAgentFn,
   CustomUserAgentOptions,
-  GetUserAgentOptions
+  GetUserAgentOptions,
+  CancelError,
+  UploadcareError
 } from '@uploadcare/api-client-utils'
 export { Queue } from './tools/Queue'
+
+import { NetworkError } from '@uploadcare/api-client-utils'
+/** @deprecated Please use NetworkError instead. */
+export const UploadcareNetworkError = NetworkError
 
 /* Types */
 export { Headers, ErrorRequestInfo } from './request/types'
 export { UploadcareFile } from './tools/UploadcareFile'
 export { UploadcareGroup } from './tools/UploadcareGroup'
-export { UploadClientError, ErrorResponseInfo } from './tools/errors'
+export { UploadError, ErrorResponseInfo } from './tools/UploadError'
+
+import { UploadError } from './tools/UploadError'
+/** @deprecated Please use UploadError instead. */
+export const UploadClientError = UploadError
+
 export { Settings, SupportedFileInput as SupportedFileInput } from './types'
 export {
   NodeFile as NodeFile,
