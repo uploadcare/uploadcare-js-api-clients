@@ -14,7 +14,6 @@
 * **upload-client:** rename `UploadClientError` export to the `UploadError`. `UploadClientError` is deprecated but still exported. ([7c03c3d](https://github.com/uploadcare/uploadcare-js-api-clients/commit/7c03c3d7311e9c43b360861f736dda27c1e1f140))
 
 
-
 ## [6.11.1](https://github.com/uploadcare/uploadcare-js-api-clients/compare/v6.11.0...v6.11.1) (2023-12-19)
 
 
