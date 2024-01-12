@@ -65,6 +65,7 @@ export async function makeApiRequest(
   if (!settings.authSchema) {
     throw new RestClientError('authSchema is required')
   }
+
   const url = getRequestURL(path, query, settings.apiBaseURL)
   const requestBody = body && JSON.stringify(body)
   const unsignedRequest = new Request(url, {
@@ -79,10 +80,12 @@ export async function makeApiRequest(
       })
     })
   })
+
   const requestHeaders = await settings.authSchema.getHeaders(unsignedRequest)
-  const signedRequest = new Request(unsignedRequest, {
-    headers: requestHeaders,
-    body: requestBody
+  const signedRequest = new Request(url, {
+    method: method,
+    body: requestBody,
+    headers: requestHeaders
   })
 
   const response = await retryIfFailed(() => fetch(signedRequest), {
