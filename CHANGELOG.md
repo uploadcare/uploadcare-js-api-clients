@@ -6,7 +6,6 @@
 * **rest-client:** send signed API requests with body in Firefox ([#508](https://github.com/uploadcare/uploadcare-js-api-clients/issues/508)) ([6705984](https://github.com/uploadcare/uploadcare-js-api-clients/commit/6705984b4b7b56db4086a7bcfe0e6bc4e2cf97de))
 
 
-
 # [6.12.0](https://github.com/uploadcare/uploadcare-js-api-clients/compare/v6.11.1...v6.12.0) (2023-12-22)
 
 ### Deprecations
