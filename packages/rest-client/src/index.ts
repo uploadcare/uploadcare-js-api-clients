@@ -33,7 +33,7 @@ export { Problems } from './types/Problems'
 export { ServerErrorResponse } from './types/ServerErrorResponse'
 export { Webhook } from './types/Webhook'
 export { WebhookEvent } from './types/WebhookEvent'
-export { StoreValue } from '@uploadcare/api-client-utils'
+export { StoreValue, CancelError } from '@uploadcare/api-client-utils'
 export { Paginatable } from './types/Paginatable'
 export { Md5Function } from './lib/md5/Md5Function'
 export {
