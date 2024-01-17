@@ -4,6 +4,7 @@ import { testSettings } from '../../test/helpers'
 import { ConversionStatus } from '../types/ConversionStatus'
 import { ConversionType } from '../types/ConversionType'
 import { conversionJobPoller } from './conversionJobPoller'
+import { delay } from '@uploadcare/api-client-utils'
 
 jest.setTimeout(60 * 1000)
 
@@ -124,5 +125,32 @@ describe('conversionJobPoller', () => {
         })
       })
     ])
+  })
+
+  it('should be able to catch CancelError', async () => {
+    const path = `${DOCUMENT_UUID}/document/-/format/pdf/`
+
+    const abortController = new AbortController()
+
+    const promises = await conversionJobPoller(
+      {
+        type: ConversionType.DOCUMENT,
+        paths: [path],
+        store: false,
+        pollOptions: {
+          signal: abortController.signal
+        }
+      },
+      testSettings
+    )
+    await delay(0)
+    abortController.abort()
+
+    expect.assertions(3)
+    expect(promises.length).toBe(1)
+    await promises[0].catch((err) => {
+      expect(err.name).toBe('CancelError')
+      expect(err.isCancel).toBeTrue()
+    })
   })
 })
