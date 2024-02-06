@@ -24,7 +24,7 @@ interface FileType extends FileOptions {
   data: SupportedFileInput
 }
 
-type InputValue = FileType | SimpleType | ObjectType
+type InputValue = FileType | SimpleType | ObjectType | SimpleType[]
 
 type FormDataOptions = {
   [key: string]: InputValue
@@ -61,7 +61,11 @@ function collectParams(
   inputKey: string,
   inputValue: InputValue
 ): void {
-  if (isFileValue(inputValue)) {
+  if (Array.isArray(inputValue)) {
+    for (const value of inputValue) {
+      collectParams(params, `${inputKey}[]`, value)
+    }
+  } else if (isFileValue(inputValue)) {
     const { name, contentType }: FileOptions = inputValue
     const file = transformFile(
       inputValue.data,

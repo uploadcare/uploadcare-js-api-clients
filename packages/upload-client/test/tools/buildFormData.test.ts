@@ -37,6 +37,19 @@ describe('getFormDataParams', () => {
     expect(params).toContainEqual(['key', 'value'])
   })
 
+  it('should accept array parameters with simple types - string, number, undefined', () => {
+    const params = getFormDataParams({
+      key: ['string', 100, undefined]
+    })
+
+    expect(params).toEqual(
+      expect.objectContaining([
+        ['key[]', 'string'],
+        ['key[]', '100']
+      ])
+    )
+  })
+
   it('should convert numbers to strings', () => {
     const params = getFormDataParams({
       key: '1234'
@@ -61,14 +74,6 @@ describe('getFormDataParams', () => {
     const params = getFormDataParams({
       key1: true as never,
       key2: false as never
-    })
-
-    expect(params.length).toEqual(0)
-  })
-
-  it('should not process arrays', () => {
-    const params = getFormDataParams({
-      key1: ['1', 2, '3'] as never
     })
 
     expect(params.length).toEqual(0)

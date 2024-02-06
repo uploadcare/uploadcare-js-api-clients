@@ -71,6 +71,11 @@ const auth = (ctx, next) => {
     publicKey: getPublicKeyFromSource(ctx.query, key)
   }
 
+  // pub_key in body
+  if (url.includes('group') && !url.includes('group/info')) {
+    params.publicKey = getPublicKeyFromSource(ctx.request.body, key)
+  }
+
   // UPLOADCARE_PUB_KEY in body
   if (
     url.includes('base') ||
