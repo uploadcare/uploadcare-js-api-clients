@@ -11,7 +11,6 @@
 * **rest-client:** export `CancelError` from the package ([83f10c6](https://github.com/uploadcare/uploadcare-js-api-clients/commit/83f10c6879b0537a365018b904d0ebd53bedf9ef))
 
 
-
 ## [6.12.1](https://github.com/uploadcare/uploadcare-js-api-clients/compare/v6.12.0...v6.12.1) (2024-01-12)
 
 
