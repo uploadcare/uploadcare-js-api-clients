@@ -1,3 +1,17 @@
+# [6.13.0](https://github.com/uploadcare/uploadcare-js-api-clients/compare/v6.12.1...v6.13.0) (2024-02-06)
+
+
+### Bug Fixes
+
+* **upload-client/group:** use body to send query parameters ([#511](https://github.com/uploadcare/uploadcare-js-api-clients/issues/511)) ([16f36f7](https://github.com/uploadcare/uploadcare-js-api-clients/commit/16f36f782dcf2cb048527c5c4261450f3d91e371))
+
+
+### Features
+
+* **rest-client:** export `CancelError` from the package ([83f10c6](https://github.com/uploadcare/uploadcare-js-api-clients/commit/83f10c6879b0537a365018b904d0ebd53bedf9ef))
+
+
+
 ## [6.12.1](https://github.com/uploadcare/uploadcare-js-api-clients/compare/v6.12.0...v6.12.1) (2024-01-12)
 
 
