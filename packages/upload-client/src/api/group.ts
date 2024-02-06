@@ -9,6 +9,7 @@ import defaultSettings from '../defaultSettings'
 import { getUserAgent } from '../tools/getUserAgent'
 import { UploadError } from '../tools/UploadError'
 import { retryIfFailed } from '../tools/retryIfFailed'
+import buildFormData from '../tools/buildFormData'
 
 export type GroupOptions = {
   publicKey: string
@@ -55,10 +56,12 @@ export default function group(
           'X-UC-User-Agent': getUserAgent({ publicKey, integration, userAgent })
         },
         url: getUrl(baseURL, '/group/', {
-          jsonerrors: 1,
-          pub_key: publicKey,
+          jsonerrors: 1
+        }),
+        data: buildFormData({
           files: uuids,
           callback: jsonpCallback,
+          pub_key: publicKey,
           signature: secureSignature,
           expire: secureExpire,
           source

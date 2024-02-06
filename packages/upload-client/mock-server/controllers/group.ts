@@ -58,8 +58,8 @@ const isValidFile = (file: string): boolean => {
  * @param {object} ctx
  */
 const index = (ctx) => {
-  let files = ctx.query && ctx.query['files[]']
-  const publicKey = ctx.query && ctx.query.pub_key
+  let files = ctx.request.body && ctx.request.body['files[]']
+  const publicKey = ctx.request.body && ctx.request.body.pub_key
 
   if (!files || files.length === 0) {
     return error(ctx, {
