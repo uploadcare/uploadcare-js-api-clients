@@ -1,0 +1,15 @@
+export const markers = [
+  0xc0, // ("SOF0", "Baseline DCT", SOF)
+  0xc1, // ("SOF1", "Extended Sequential DCT", SOF)
+  0xc2, // ("SOF2", "Progressive DCT", SOF)
+  0xc3, // ("SOF3", "Spatial lossless", SOF)
+  0xc5, // ("SOF5", "Differential sequential DCT", SOF)
+  0xc6, // ("SOF6", "Differential progressive DCT", SOF)
+  0xc7, // ("SOF7", "Differential spatial", SOF)
+  0xc9, // ("SOF9", "Extended sequential DCT (AC)", SOF)
+  0xca, // ("SOF10", "Progressive DCT (AC)", SOF)
+  0xcb, // ("SOF11", "Spatial lossless DCT (AC)", SOF)
+  0xcd, // ("SOF13", "Differential sequential DCT (AC)", SOF)
+  0xce, // ("SOF14", "Differential progressive DCT (AC)", SOF)
+  0xcf // ("SOF15", "Differential spatial (AC)", SOF)
+]

@@ -32,6 +32,8 @@ jobs:
               - 'packages/api-client-utils/**'
             signed-uploads:
               - 'packages/signed-uploads/**'
+            image-shrink:
+              - 'packages/image-shrink/**'
       - name: Install dependencies
         working-directory: ./
         run: npm i
