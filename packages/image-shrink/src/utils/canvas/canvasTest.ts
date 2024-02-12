@@ -11,9 +11,11 @@ const TestPixel = {
 const FILL_STYLE = `rgba(${TestPixel.R}, ${TestPixel.G}, ${TestPixel.B}, ${
   TestPixel.A / 255
 })`
+
+type TFillRect = [number, number, number, number]
 export const canvasTest = (width, height) => {
   try {
-    const fill = [width - 1, height - 1, 1, 1] // x, y, width, height
+    const fill: TFillRect = [width - 1, height - 1, 1, 1] // x, y, width, height
 
     const { canvas: cropCvs, ctx: cropCtx } = createCanvas()
     cropCvs.width = 1

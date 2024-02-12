@@ -4,7 +4,7 @@ export const MARKER = 0xe2
 export const replaceIccProfile = (
   blob: Blob | File,
   iccProfiles: DataView[]
-) => {
+): Promise<Blob> => {
   return replaceJpegChunk(
     blob,
     MARKER,

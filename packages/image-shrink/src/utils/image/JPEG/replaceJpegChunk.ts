@@ -1,7 +1,7 @@
 // @ts-nocheck
 import { readJpegChunks } from './readJpegChunks'
 
-export const replaceJpegChunk = (blob, marker, chunks) => {
+export const replaceJpegChunk = (blob, marker, chunks): Promise<Blob> => {
   return new Promise(async (resolve, reject) => {
     const oldChunkPos = []
     const oldChunkLength = []
@@ -38,11 +38,11 @@ export const replaceJpegChunk = (blob, marker, chunks) => {
 
         newChunks.push(blob.slice(pos, blob.size))
 
-        const newBlob = new Blob(newChunks, {
-          type: blob.type
-        })
-
-        resolve(newBlob)
+        resolve(
+          new Blob(newChunks, {
+            type: blob.type
+          })
+        )
       })
       .catch(() => reject(blob))
   }).catch(() => blob)

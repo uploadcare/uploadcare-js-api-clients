@@ -1,5 +1,9 @@
 // @ts-nocheck
-export const processImage = (image: HTMLImageElement, src?: string) => {
+
+export const processImage = (
+  image: HTMLImageElement,
+  src?: string
+): Promise<HTMLImageElement> => {
   return new Promise((resolve, reject) => {
     if (src) {
       image.src = src
@@ -18,7 +22,9 @@ export const processImage = (image: HTMLImageElement, src?: string) => {
   })
 }
 
-export const imageLoader = (image: unknown) => {
+export const imageLoader = (
+  image: File | Blob | string
+): Promise<HTMLImageElement> => {
   if (image.src) {
     return processImage(image)
   }

@@ -4,7 +4,8 @@ import { imageLoader } from '../image/imageLoader'
 export const stripIccProfile = (inputFile: File): Promise<HTMLImageElement> => {
   return new Promise((resolve, reject) => {
     replaceIccProfile(inputFile, [])
-      .then((file: File) => {
+      .then((file: Blob) => {
+        console.log({ file }, typeof file)
         imageLoader(URL.createObjectURL(file))
           .then((img) => {
             resolve(img)
