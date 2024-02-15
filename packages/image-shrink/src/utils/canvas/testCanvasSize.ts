@@ -1,4 +1,4 @@
-import { sizes } from '../../constans'
+import { sizes } from '../../constants'
 import { memoize, memoKeySerializer } from '../../helper/memoize'
 import { canvasTest } from './canvasTest'
 

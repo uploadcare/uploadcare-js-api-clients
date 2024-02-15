@@ -1,5 +1,5 @@
 import { readJpegChunks } from './image/JPEG/readJpegChunks'
-import { allowLayers, markers } from '../constans'
+import { allowLayers, markers } from '../constants'
 
 export const shouldSkipShrink = async (file: File) => {
   let skip = false

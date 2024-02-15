@@ -1,6 +1,6 @@
 import { createCanvas } from './createCanvas'
 
-// add constans
+// add constants
 const TestPixel = {
   R: 55,
   G: 110,
