@@ -1,3 +1,11 @@
+# [6.14.0](https://github.com/uploadcare/uploadcare-js-api-clients/compare/v6.13.0...v6.14.0) (2024-02-15)
+
+
+### Features
+
+* New package `@uploadcare/image-shrink` to reduce image size in the browser. See docs [here](./packages/image-shrink/README.md).
+
+
 # [6.13.0](https://github.com/uploadcare/uploadcare-js-api-clients/compare/v6.12.1...v6.13.0) (2024-02-06)
 
 
