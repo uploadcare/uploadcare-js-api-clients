@@ -1,0 +1,49 @@
+{
+  "name": "@uploadcare/image-shrink",
+  "version": "6.10.0",
+  "description": "Library for work with Uploadcare image shrink",
+  "type": "module",
+  "main": "./dist/cjs/index.browser.cjs",
+  "module": "./dist/esm/index.browser.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/esm/index.browser.mjs",
+      "require": "./dist/cjs/index.browser.cjs"
+    }
+  },
+  "sideEffects": false,
+  "files": [
+    "dist/*"
+  ],
+  "scripts": {
+    "prepack": "cp ../../LICENSE ./LICENSE",
+    "clean": "rimraf dist",
+    "test": "node --experimental-vm-modules ../../node_modules/jest/bin/jest.js",
+    "prebuild": "npm run clean",
+    "build": "npm run build:types && npm run build:compile",
+    "build:types": "dts-bundle-generator --project tsconfig.dts.json -o dist/index.d.ts src/index.ts",
+    "build:compile": "rollup -c"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/uploadcare/uploadcare-js-api-clients.git"
+  },
+  "author": "Uploadcare",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/uploadcare/uploadcare-js-api-clients/issues"
+  },
+  "homepage": "https://github.com/uploadcare/uploadcare-js-api-clients#readme",
+  "keywords": [
+    "uploadcare",
+    "signed",
+    "uploads",
+    "secure",
+    "signature"
+  ],
+  "devDependencies": {
+    "ts-node": "^10.8.1"
+  },
+  "dependencies": {}
+}
