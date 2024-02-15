@@ -8,7 +8,8 @@ export default {
     packagesToPublish: [
       'packages/upload-client',
       'packages/rest-client',
-      'packages/signed-uploads'
+      'packages/signed-uploads',
+      'packages/image-shrink'
     ]
   },
   publishCommand: ({ defaultCommand }) => `${defaultCommand} --access public`,

@@ -18,6 +18,7 @@ Uploadcare JavaScript/TypeScript API clients for Node.js and browsers. Handles u
 * [**@uploadcare/upload-client**](./packages/upload-client/README.md)
 * [**@uploadcare/rest-client**](./packages/rest-client/README.md)
 * [**@uploadcare/signed-uploads**](./packages/signed-uploads/README.md)
+* [**@uploadcare/image-shrink**](./packages/image-shrink/README.md)
 
 ## Security issues
 
