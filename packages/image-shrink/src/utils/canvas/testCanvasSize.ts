@@ -17,7 +17,7 @@ const squareTest = wrapAsync(memoize(canvasTest, memoKeySerializer))
 const dimensionTest = wrapAsync(memoize(canvasTest, memoKeySerializer))
 
 export const testCanvasSize = (w, h) => {
-  return new Promise(async (resolve, reject) => {
+  return new Promise((resolve, reject) => {
     const testSquareSide = sizes.squareSide.find((side) => side * side >= w * h)
     const testDimension = sizes.dimension.find((side) => side >= w && side >= h)
 
@@ -26,13 +26,15 @@ export const testCanvasSize = (w, h) => {
       return
     }
 
-    const squareSupported = await squareTest(testSquareSide, testSquareSide)
-    const dimensionSupported = await dimensionTest(testDimension, 1)
-
-    if (squareSupported && dimensionSupported) {
-      resolve(true)
-    } else {
-      reject()
-    }
+    Promise.all([
+      squareTest(testSquareSide, testSquareSide),
+      dimensionTest(testDimension, 1)
+    ]).then(([squareSupported, dimensionSupported]) => {
+      if (squareSupported && dimensionSupported) {
+        resolve(true)
+      } else {
+        reject()
+      }
+    })
   })
 }

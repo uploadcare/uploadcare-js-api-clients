@@ -6,7 +6,7 @@ type TChunk = {
 }
 
 export const readJpegChunks = () => {
-  let stack: TChunk[] = []
+  const stack: TChunk[] = []
   const promiseReadJpegChunks = (file) =>
     new Promise((resolve, reject) => {
       let pos

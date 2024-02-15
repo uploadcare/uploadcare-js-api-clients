@@ -7,7 +7,7 @@ const base64ImageSrc =
 
 let isApplied
 export const isBrowserApplyExif = () => {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     if (isApplied !== undefined) {
       resolve(isApplied)
     } else {

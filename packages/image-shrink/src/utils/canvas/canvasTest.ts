@@ -27,7 +27,7 @@ export const canvasTest = (width, height) => {
 
     if (testCtx) {
       testCtx.fillStyle = FILL_STYLE
-      testCtx.fillRect.apply(testCtx, fill)
+      testCtx.fillRect(...fill)
 
       // Render the test pixel in the bottom-right corner of the
       // test canvas in the top-left of the 1x1 crop canvas. This
