@@ -1,13 +1,13 @@
 import { readJpegChunks } from './readJpegChunks'
 
 export const replaceJpegChunk = (blob, marker, chunks) => {
-  return new Promise(async (resolve, reject) => {
+  return new Promise((resolve, reject) => {
     const oldChunkPos: number[] = []
     const oldChunkLength: number[] = []
 
     const { promiseReadJpegChunks, stack } = readJpegChunks()
 
-    return await promiseReadJpegChunks(blob)
+    return promiseReadJpegChunks(blob)
       .then(() => {
         stack.forEach((chunk) => {
           if (chunk.marker === marker) {
