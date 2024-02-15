@@ -1,3 +1,23 @@
+# [6.14.0](https://github.com/uploadcare/uploadcare-js-api-clients/compare/v6.13.0...v6.14.0) (2024-02-15)
+
+
+### Bug Fixes
+
+* rename folder constants ([5e9223e](https://github.com/uploadcare/uploadcare-js-api-clients/commit/5e9223efbcac376f61445b29561936ff3e7802f4))
+
+
+### Features
+
+* add import/export for docs ([03ac600](https://github.com/uploadcare/uploadcare-js-api-clients/commit/03ac60056270f948cbfcb27aa61208256a7c225f))
+* implemented stable image shrink ([a95adc4](https://github.com/uploadcare/uploadcare-js-api-clients/commit/a95adc4c899534ccaefad21f1ecf4758bdc52852))
+
+
+### Performance Improvements
+
+* replace let to const ([5888ef9](https://github.com/uploadcare/uploadcare-js-api-clients/commit/5888ef9ca4c84c91f6377c0e502769a960c66542))
+
+
+
 # [6.13.0](https://github.com/uploadcare/uploadcare-js-api-clients/compare/v6.12.1...v6.13.0) (2024-02-06)
 
 
