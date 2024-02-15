@@ -15,6 +15,7 @@ export type TSetting = {
 }
 
 export const shrinkFile = (file: File, settings: TSetting): Promise<Blob> => {
+  /*eslint no-async-promise-executor: "off"*/
   return new Promise(async (resolve, reject) => {
     if (!(URL && DataView && Blob)) {
       reject('Not support')

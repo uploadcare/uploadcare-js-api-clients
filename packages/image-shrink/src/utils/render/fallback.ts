@@ -1,11 +1,10 @@
-// @ts-nocheck
 import { testCanvasSize } from '../canvas/testCanvasSize'
 import { canvasResize } from '../canvas/canvasResize'
 
 const calcShrinkSteps = function (sourceW, targetW, targetH, step) {
-  const steps = []
-  let sW = targetW
-  let sH = targetH
+  const steps: Array<[number, number]> = []
+  let sW: number = targetW
+  let sH: number = targetH
 
   // result should include at least one target step,
   // even if abs(source - target) < step * source
