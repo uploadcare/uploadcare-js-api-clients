@@ -53,7 +53,7 @@ export const canvasTest = (width, height) => {
 
     return isTestPass
   } catch (e) {
-    new Error(`Failed to test for max canvas size of ${width}x${height}.`)
+    console.error(`Failed to test for max canvas size of ${width}x${height}.`)
     return false
   }
 }

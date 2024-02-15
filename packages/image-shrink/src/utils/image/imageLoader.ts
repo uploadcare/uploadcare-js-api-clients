@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 export const processImage = (
   image: HTMLImageElement,
   src?: string
@@ -22,12 +20,6 @@ export const processImage = (
   })
 }
 
-export const imageLoader = (
-  image: File | Blob | string
-): Promise<HTMLImageElement> => {
-  if (image.src) {
-    return processImage(image)
-  }
-
+export const imageLoader = (image: string): Promise<HTMLImageElement> => {
   return processImage(new Image(), image)
 }
