@@ -6,7 +6,7 @@ export const stripIccProfile = async (
 ): Promise<HTMLImageElement> => {
   try {
     const file = await replaceIccProfile(inputFile, [])
-    const image = await imageLoader(URL.createObjectURL(file))
+    const image = await imageLoader(URL.createObjectURL(file as Blob))
 
     URL.revokeObjectURL(image.src)
 

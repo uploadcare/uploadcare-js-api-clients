@@ -1,5 +1,5 @@
 export const findExifOrientation = (exif: DataView, exifCallback) => {
-  let count, j, little, offset, ref
+  let j, little, offset, ref
   if (
     !exif ||
     exif.byteLength < 14 ||
@@ -19,7 +19,7 @@ export const findExifOrientation = (exif: DataView, exifCallback) => {
     return null
   }
   offset = 8 + exif.getUint32(10, little)
-  count = exif.getUint16(offset - 2, little)
+  const count = exif.getUint16(offset - 2, little)
   for (j = 0, ref = count; ref >= 0 ? j < ref : j > ref; ref >= 0 ? ++j : --j) {
     if (exif.byteLength < offset + 10) {
       return null

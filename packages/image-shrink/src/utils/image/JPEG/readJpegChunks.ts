@@ -42,22 +42,20 @@ export const readJpegChunks = () => {
         })
 
       const readNextChunk = () => {
-        let startPos = pos
+        const startPos = pos
 
         return readToView(file.slice(pos, (pos += 4)), (view) => {
-          let length, marker
-
           if (view.byteLength !== 4 || view.getUint8(0) !== 0xff) {
             return reject('Corrupted')
           }
 
-          marker = view?.getUint8(1)
+          const marker = view?.getUint8(1)
 
           if (marker === 0xda) {
             return resolve(true)
           }
 
-          length = view.getUint16(2) - 2
+          const length = view.getUint16(2) - 2
           return readToView(file.slice(pos, (pos += length)), (view) => {
             if (view.byteLength !== length) {
               return reject('Corrupted')

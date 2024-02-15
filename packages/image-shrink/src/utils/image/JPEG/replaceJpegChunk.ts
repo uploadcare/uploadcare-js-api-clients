@@ -1,10 +1,9 @@
-// @ts-nocheck
 import { readJpegChunks } from './readJpegChunks'
 
-export const replaceJpegChunk = (blob, marker, chunks): Promise<Blob> => {
+export const replaceJpegChunk = (blob, marker, chunks) => {
   return new Promise(async (resolve, reject) => {
-    const oldChunkPos = []
-    const oldChunkLength = []
+    const oldChunkPos: number[] = []
+    const oldChunkLength: number[] = []
 
     const { promiseReadJpegChunks, stack } = readJpegChunks()
 
