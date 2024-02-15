@@ -3,7 +3,7 @@
 
 ### Features
 
-* Implemented image shrink package. Connects to uploadcare blocks ([a95adc4](https://github.com/uploadcare/uploadcare-js-api-clients/commit/a95adc4c899534ccaefad21f1ecf4758bdc52852))
+* New package `@uploadcare/image-shrink` to reduce image size in the browser. See docs [here](./packages/image-shrink/README.md).
 
 
 # [6.13.0](https://github.com/uploadcare/uploadcare-js-api-clients/compare/v6.12.1...v6.13.0) (2024-02-06)
