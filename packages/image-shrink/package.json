@@ -20,6 +20,7 @@
     "prepack": "cp ../../LICENSE ./LICENSE",
     "clean": "rimraf dist",
     "test": "npx playwright install-deps chromium && vitest --run",
+    "test:watch": "npx playwright install-deps chromium && vitest",
     "prebuild": "npm run clean",
     "build": "npm run build:types && npm run build:compile",
     "build:types": "dts-bundle-generator --project tsconfig.dts.json -o dist/index.d.ts src/index.ts",
@@ -44,8 +45,10 @@
   ],
   "devDependencies": {
     "@imagemagick/magick-wasm": "^0.0.28",
+    "@types/content-type": "^1.1.8",
     "@vitest/browser": "^1.2.2",
     "playwright": "^1.41.2",
+    "raw-body": "^2.5.2",
     "ts-node": "^10.8.1",
     "vitest": "^1.2.2"
   }

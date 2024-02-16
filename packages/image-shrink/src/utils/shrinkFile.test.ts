@@ -1,28 +1,35 @@
 /// <reference types="vite/client" />
 import { describe, expect, it } from 'vitest'
 import { getImageAttributes } from '../test/helpers/getImageAttributes'
-import { readMagickImage } from '../test/helpers/readMagickImage'
 import { loadImageAsBlob } from '../test/helpers/loadImageAsBlob'
+import { readMagickImage } from '../test/helpers/readMagickImage'
+import { uploadImage } from '../test/helpers/uploadImage'
 import { shrinkFile } from './shrinkFile'
-import { type IMagickImage } from '@imagemagick/magick-wasm'
 
 describe('shrinkFile', () => {
-  it('should shrink the image', async () => {
+  it('should shrink the image', async (ctx) => {
     const originalFile = await loadImageAsBlob(
       () => import('../test/samples/2000x2000.jpeg')
     )
     const shrinkedBlob = await shrinkFile(originalFile, {
-      size: 100
+      size: 500 * 500,
+      quality: 0.1
     })
+
+    await Promise.all([
+      uploadImage(originalFile, 'original', ctx),
+      uploadImage(shrinkedBlob, 'shrinked', ctx)
+    ])
+
     expect(shrinkedBlob.size).toBeLessThan(originalFile.size)
-    expect(shrinkedBlob.size).toBeLessThan(1000)
+    expect(shrinkedBlob.size).toBeLessThan(5000)
 
     const { width, height } = await readMagickImage(shrinkedBlob, (image) => ({
       width: image.width,
       height: image.height
     }))
-    expect(width).toBe(10)
-    expect(height).toBe(10)
+    expect(width).toBe(500)
+    expect(height).toBe(500)
   })
 
   it("should skip shrink if it's not required", async () => {
@@ -35,13 +42,18 @@ describe('shrinkFile', () => {
     expect(promise).rejects.toThrowError('Not required')
   })
 
-  it('should keep transparent PNG as PNG', async () => {
+  it('should keep transparent PNG as PNG', async (ctx) => {
     const originalFile = await loadImageAsBlob(
       () => import('../test/samples/transparent.png')
     )
     const shrinkedBlob = await shrinkFile(originalFile, {
-      size: 100
+      size: 100 * 100
     })
+
+    await Promise.all([
+      uploadImage(originalFile, 'original', ctx),
+      uploadImage(shrinkedBlob, 'shrinked', ctx)
+    ])
 
     const { hasAlpha, format } = await readMagickImage(
       shrinkedBlob,
@@ -54,13 +66,18 @@ describe('shrinkFile', () => {
     expect(format).toBe('PNG')
   })
 
-  it('should convert non-transparent PNG to JPEG', async () => {
+  it('should convert non-transparent PNG to JPEG', async (ctx) => {
     const originalFile = await loadImageAsBlob(
       () => import('../test/samples/not-transparent.png')
     )
     const shrinkedBlob = await shrinkFile(originalFile, {
-      size: 100
+      size: 100 * 100
     })
+
+    await Promise.all([
+      uploadImage(originalFile, 'original', ctx),
+      uploadImage(shrinkedBlob, 'shrinked', ctx)
+    ])
 
     const { hasAlpha, format } = await readMagickImage(
       shrinkedBlob,
@@ -73,13 +90,19 @@ describe('shrinkFile', () => {
     expect(format).toBe('JPEG')
   })
 
-  it('should keep EXIF', async () => {
+  it('should keep EXIF', async (ctx) => {
     const originalFile = await loadImageAsBlob(
       () => import('../test/samples/exif-without-orientation.jpg')
     )
     const shrinkedBlob = await shrinkFile(originalFile, {
-      size: 2
+      size: 50 * 50
     })
+
+    await Promise.all([
+      uploadImage(originalFile, 'original', ctx),
+      uploadImage(shrinkedBlob, 'shrinked', ctx)
+    ])
+
     const filterExifAttributes = (attrs: Record<string, string>) =>
       Object.fromEntries(
         Object.entries(attrs).filter(([key]) => key.startsWith('exif:'))
@@ -92,13 +115,18 @@ describe('shrinkFile', () => {
     expect(originalExif).toEqual(shrinkedExif)
   })
 
-  it('should keep ICC', async () => {
+  it('should keep ICC', async (ctx) => {
     const originalFile = await loadImageAsBlob(
       () => import('../test/samples/with-icc-profile.jpg')
     )
     const shrinkedBlob = await shrinkFile(originalFile, {
-      size: 2
+      size: 100 * 100
     })
+
+    await Promise.all([
+      uploadImage(originalFile, 'original', ctx),
+      uploadImage(shrinkedBlob, 'shrinked', ctx)
+    ])
 
     const filterIccAttributes = (attrs: Record<string, string>) =>
       Object.fromEntries(
@@ -110,29 +138,5 @@ describe('shrinkFile', () => {
       await getImageAttributes(shrinkedBlob).then(filterIccAttributes)
 
     expect(originalIccAttributes).toEqual(shrinkedIccAttributes)
-  })
-
-  it.skip('should not apply existing ICC when shrinking image', async () => {
-    const originalFile = await loadImageAsBlob(
-      () => import('../test/samples/icc-strip-test.jpg')
-    )
-    const shrinkedBlob = await shrinkFile(originalFile, {
-      size: 300 * 300,
-      quality: 1
-    })
-
-    const readTopLeftPixel = (image: IMagickImage) => {
-      return new Promise((resolve) => {
-        image.getPixels((pixelsCollection) => {
-          resolve(pixelsCollection.getPixel(0, 0))
-          pixelsCollection.dispose()
-        })
-      })
-    }
-
-    const originalPixel = await readMagickImage(originalFile, readTopLeftPixel)
-    const shrinkedPixel = await readMagickImage(shrinkedBlob, readTopLeftPixel)
-
-    expect(originalPixel).toEqual(shrinkedPixel)
   })
 })

@@ -1,14 +1,14 @@
-import { shrinkImage } from './shrinkImage'
+import { getIccProfile } from './IccProfile/getIccProfile'
+import { replaceIccProfile } from './IccProfile/replaceIccProfile'
 import { stripIccProfile } from './IccProfile/stripIccProfile'
-import { shouldSkipShrink } from './shouldSkipShrink'
 import { canvasToBlob } from './canvas/canvasToBlob'
 import { hasTransparency } from './canvas/hasTransparency'
-import { isBrowserApplyExifOrientation } from './exif/isBrowserApplyExif'
 import { getExif } from './exif/getExif'
-import { getIccProfile } from './IccProfile/getIccProfile'
+import { isBrowserApplyExifOrientation } from './exif/isBrowserApplyExif'
 import { replaceExif } from './exif/replaceExif'
-import { replaceIccProfile } from './IccProfile/replaceIccProfile'
 import { imageLoader } from './image/imageLoader'
+import { shouldSkipShrink } from './shouldSkipShrink'
+import { shrinkImage } from './shrinkImage'
 
 export type TSetting = {
   size: number
@@ -45,6 +45,7 @@ export const shrinkFile = async (
     const inputBlobWithoutIcc = await stripIccProfile(inputBlob).catch(
       () => inputBlob
     )
+
     const image = await imageLoader(URL.createObjectURL(inputBlobWithoutIcc))
     URL.revokeObjectURL(image.src)
 
