@@ -5,7 +5,7 @@ export const replaceJpegChunk = (
   marker: number,
   chunks: ArrayBuffer[]
 ) => {
-  return new Promise((resolve, reject) => {
+  return new Promise<Blob>((resolve, reject) => {
     const oldChunkPos: number[] = []
     const oldChunkLength: number[] = []
 

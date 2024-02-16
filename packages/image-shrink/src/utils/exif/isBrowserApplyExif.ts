@@ -1,3 +1,4 @@
+// 2x1 pixel image 90CW rotated with orientation header
 const base64ImageSrc =
   'data:image/jpg;base64,' +
   '/9j/4AAQSkZJRgABAQEASABIAAD/4QA6RXhpZgAATU0AKgAAAAgAAwESAAMAAAABAAYAAAEo' +
@@ -7,7 +8,7 @@ const base64ImageSrc =
 
 let isApplied: boolean | undefined = undefined
 
-export const isBrowserApplyExif = () => {
+export const isBrowserApplyExifOrientation = () => {
   return new Promise<boolean>((resolve) => {
     if (isApplied !== undefined) {
       resolve(isApplied)
