@@ -19,7 +19,7 @@
   "scripts": {
     "prepack": "cp ../../LICENSE ./LICENSE",
     "clean": "rimraf dist",
-    "test": "node --experimental-vm-modules ../../node_modules/jest/bin/jest.js",
+    "test": "npx playwright install-deps chromium && vitest --run",
     "prebuild": "npm run clean",
     "build": "npm run build:types && npm run build:compile",
     "build:types": "dts-bundle-generator --project tsconfig.dts.json -o dist/index.d.ts src/index.ts",
@@ -43,7 +43,9 @@
     "signature"
   ],
   "devDependencies": {
-    "ts-node": "^10.8.1"
-  },
-  "dependencies": {}
+    "@vitest/browser": "^1.2.2",
+    "playwright": "^1.41.2",
+    "ts-node": "^10.8.1",
+    "vitest": "^1.2.2"
+  }
 }
