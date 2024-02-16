@@ -43,6 +43,7 @@
     "signature"
   ],
   "devDependencies": {
+    "@imagemagick/magick-wasm": "^0.0.28",
     "@vitest/browser": "^1.2.2",
     "playwright": "^1.41.2",
     "ts-node": "^10.8.1",

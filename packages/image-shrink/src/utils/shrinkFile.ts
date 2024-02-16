@@ -24,7 +24,6 @@ export const shrinkFile = async (
     if (shouldSkip) {
       throw new Error('Should skipped')
     }
-    inputBlob = await stripIccProfile(inputBlob)
 
     // Try to extract EXIF and ICC profile
     const exifResults = await Promise.allSettled([
@@ -43,7 +42,10 @@ export const shrinkFile = async (
       exifResults
 
     // Load blob into the image
-    const image = await imageLoader(URL.createObjectURL(inputBlob))
+    const inputBlobWithoutIcc = await stripIccProfile(inputBlob).catch(
+      () => inputBlob
+    )
+    const image = await imageLoader(URL.createObjectURL(inputBlobWithoutIcc))
     URL.revokeObjectURL(image.src)
 
     // Shrink the image
@@ -58,33 +60,32 @@ export const shrinkFile = async (
     }
 
     // Convert canvas to blob
-    const newBlob = await canvasToBlob(canvas, format, quality)
-
-    const replaceChain = Promise.resolve(newBlob)
+    let newBlob = await canvasToBlob(canvas, format, quality)
 
     // Set EXIF for the new blob
-    if (exifResult.status === 'fulfilled' && exifResult.value) {
+    if (isJPEG && exifResult.status === 'fulfilled' && exifResult.value) {
       const exif = exifResult.value
       const isExifOrientationApplied =
         isExifOrientationAppliedResult.status === 'fulfilled'
           ? isExifOrientationAppliedResult.value
           : false
-      replaceChain
-        .then((blob) => replaceExif(blob, exif, isExifOrientationApplied))
-        .catch(() => newBlob)
+      newBlob = await replaceExif(newBlob, exif, isExifOrientationApplied)
+      // TODO: should we continue shrink if failed to replace EXIF?
+      // .catch(() => newBlob)
     }
 
     // Set ICC profile for the new blob
     if (
+      isJPEG &&
       iccProfileResult.status === 'fulfilled' &&
       iccProfileResult.value.length > 0
     ) {
-      replaceChain
-        .then((blob) => replaceIccProfile(blob, iccProfileResult.value))
-        .catch(() => newBlob)
+      newBlob = await replaceIccProfile(newBlob, iccProfileResult.value)
+      // TODO: should we continue shrink if failed to replace ICC?
+      // .catch(() => newBlob)
     }
 
-    return replaceChain
+    return newBlob
   } catch (e) {
     let message: string | undefined
     if (e instanceof Error) {
