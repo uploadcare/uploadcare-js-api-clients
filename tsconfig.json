@@ -3,14 +3,16 @@
     "target": "ESNext",
     "module": "ESNext",
     "lib": ["DOM", "DOM.Iterable"],
-    "noImplicitAny": false,
+    "noImplicitAny": true,
     "strictNullChecks": true,
     "strict": true,
     "resolveJsonModule": true,
     "moduleResolution": "node",
     "allowSyntheticDefaultImports": true,
-    "esModuleInterop": true,
-    "types": ["jest-extended", "jest", "node"]
+    "esModuleInterop": true
   },
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules", "**/*.test.ts"],
+  "references": [
+    { "path": "./tsconfig.test-override.json" },
+  ]
 }

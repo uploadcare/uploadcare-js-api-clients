@@ -2,7 +2,7 @@ import NodeFormData from 'form-data'
 
 import http from 'http'
 import https from 'https'
-import { Readable, Transform } from 'stream'
+import { Readable, Transform, TransformCallback } from 'stream'
 import { parse } from 'url'
 
 import { CancelError, onCancel } from '@uploadcare/api-client-utils'
@@ -26,7 +26,11 @@ class ProgressEmitter extends Transform {
     this.size = size
   }
 
-  _transform(chunk, encoding, callback): void {
+  _transform(
+    chunk: Buffer,
+    encoding: BufferEncoding,
+    callback: TransformCallback
+  ): void {
     this._position += chunk.length
     this._onprogress({
       isComputable: true,
@@ -108,8 +112,7 @@ const request = (params: RequestOptions): Promise<RequestResponse> => {
           req.on('response', (res) => {
             if (aborted) return
 
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const resChunks: any[] = []
+            const resChunks: Uint8Array[] = []
 
             res.on('data', (data) => {
               resChunks.push(data)

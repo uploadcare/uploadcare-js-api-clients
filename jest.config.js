@@ -1,3 +1,8 @@
+import path from 'path'
+import url from 'url'
+
+const __dirname = url.fileURLToPath(new URL('.', import.meta.url))
+
 export default {
   testEnvironment: 'node',
   testTimeout: 15000,
@@ -9,7 +14,8 @@ export default {
     '^.+\\.ts$': [
       'ts-jest',
       {
-        useESM: true
+        useESM: true,
+        tsconfig: path.resolve(__dirname, './tsconfig.test.json')
       }
     ]
   },

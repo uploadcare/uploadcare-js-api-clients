@@ -46,6 +46,8 @@ export const shrinkFile = (file: File, settings: TSetting): Promise<Blob> => {
         )
 
         const [exif, isExifApplied, iccProfile] = results as {
+          // TODO: fix this
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           value: any
           status: string
         }[]
@@ -67,19 +69,24 @@ export const shrinkFile = (file: File, settings: TSetting): Promise<Blob> => {
               let replaceChain = Promise.resolve(blob)
 
               if (exif.value) {
+                // @ts-expect-error TODO: fix this
                 replaceChain = replaceChain
                   .then((blob) =>
+                    // @ts-expect-error TODO: fix this
                     replaceExif(blob, exif.value, isExifApplied.value)
                   )
                   .catch(() => blob)
               }
 
               if (iccProfile?.value?.length > 0) {
+                // @ts-expect-error TODO: fix this
                 replaceChain = replaceChain
+                  // @ts-expect-error TODO: fix this
                   .then((blob) => replaceIccProfile(blob, iccProfile.value))
                   .catch(() => blob)
               }
 
+              // @ts-expect-error TODO: fix this
               replaceChain.then(resolve).catch(() => resolve(blob))
             })
           })

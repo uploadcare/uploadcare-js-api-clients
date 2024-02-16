@@ -1,13 +1,10 @@
 import error from '../utils/error'
+import { type Middleware } from 'koa'
 
 let times = 0
 
-/**
- * '/throttle/'
- *
- * @param {object} ctx
- */
-const index = (ctx) => {
+/** '/throttle/' */
+const index: Middleware = (ctx) => {
   times++
 
   if (times === 2) {

@@ -1,4 +1,8 @@
-export const findExifOrientation = (exif: DataView, exifCallback) => {
+// TODO: rename to littleEndian
+export const findExifOrientation = (
+  exif: DataView,
+  exifCallback: (offset: number, little: boolean) => void
+) => {
   let j, little, offset, ref
   if (
     !exif ||

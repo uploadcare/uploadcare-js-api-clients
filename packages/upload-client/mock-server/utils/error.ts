@@ -1,3 +1,5 @@
+import { type Context } from 'koa'
+
 type ErrorType = {
   status?: number
   statusText: string
@@ -5,7 +7,7 @@ type ErrorType = {
 }
 
 const error = (
-  ctx,
+  ctx: Context,
   { status = 400, statusText, errorCode }: ErrorType
 ): void => {
   const isJson = !!ctx.query.jsonerrors

@@ -35,6 +35,32 @@
     },
     {
       "files": [
+        "**/*.test.ts"
+      ],
+      "parser": "@typescript-eslint/parser",
+      "plugins": [
+        "@typescript-eslint",
+        "import"
+      ],
+      "extends": [
+        "plugin:import/recommended",
+        "plugin:@typescript-eslint/recommended",
+        "plugin:import/typescript"
+      ],
+      "parserOptions": {
+        "sourceType": "module",
+        "project": "./tsconfig.test.json"
+      },
+      "settings": {
+        "import/internal-regex": "^@uploadcare/",
+        "import/extensions": [".ts", ".js"],
+        "import/parsers": {
+          "@typescript-eslint/parser": [".ts", ".js"]
+        }
+      }
+    },
+    {
+      "files": [
         "**/*.js",
         "**/*.mjs",
         "**/*.cjs"

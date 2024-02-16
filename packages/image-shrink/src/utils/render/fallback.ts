@@ -1,7 +1,12 @@
 import { testCanvasSize } from '../canvas/testCanvasSize'
 import { canvasResize } from '../canvas/canvasResize'
 
-const calcShrinkSteps = function (sourceW, targetW, targetH, step) {
+const calcShrinkSteps = function (
+  sourceW: number,
+  targetW: number,
+  targetH: number,
+  step: number
+) {
   const steps: Array<[number, number]> = []
   let sW: number = targetW
   let sH: number = targetH
@@ -19,22 +24,39 @@ const calcShrinkSteps = function (sourceW, targetW, targetH, step) {
   return steps.reverse()
 }
 
-export const fallback = ({ img, sourceW, targetW, targetH, step }) => {
+export const fallback = ({
+  img,
+  sourceW,
+  targetW,
+  targetH,
+  step
+}: {
+  img: HTMLImageElement
+  sourceW: number
+  targetW: number
+  targetH: number
+  step: number
+}): Promise<HTMLCanvasElement> => {
   const steps = calcShrinkSteps(sourceW, targetW, targetH, step)
 
-  return steps
-    .reduce((chain, [w, h]) => {
-      return chain
-        .then((canvas) => {
-          return testCanvasSize(w, h)
-            .then(() => canvas)
-            .catch(() => canvasResize(canvas, w, h))
-        })
-        .then((canvas) => {
-          const progress = (sourceW - w) / (sourceW - targetW)
-          return { canvas, progress }
-        })
-    }, Promise.resolve(img))
-    .then(({ canvas }) => canvas)
-    .catch((error) => Promise.reject(error))
+  return (
+    steps
+      // @ts-expect-error TODO: fix this
+      .reduce((chain, [w, h]) => {
+        return chain
+          .then((canvas) => {
+            return testCanvasSize(w, h)
+              .then(() => canvas)
+              .catch(() => canvasResize(canvas, w, h))
+          })
+          .then((canvas) => {
+            const progress = (sourceW - w) / (sourceW - targetW)
+            return { canvas, progress }
+          })
+      }, Promise.resolve(img))
+      // @ts-expect-error TODO: fix this
+      .then(({ canvas }) => canvas)
+      // @ts-expect-error TODO: remove this
+      .catch((error) => Promise.reject(error))
+  )
 }

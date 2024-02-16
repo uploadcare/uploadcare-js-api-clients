@@ -1,6 +1,7 @@
 import json from '../data/group'
 import find from '../utils/find'
 import error from '../utils/error'
+import { type Middleware } from 'koa'
 
 const UUID_REGEX =
   '[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}'
@@ -52,13 +53,9 @@ const isValidFile = (file: string): boolean => {
   return isValidUuid(uuid)
 }
 
-/**
- * '/group/'
- *
- * @param {object} ctx
- */
-const index = (ctx) => {
-  let files = ctx.request.body && ctx.request.body['files[]']
+/** '/group/' */
+const index: Middleware = (ctx) => {
+  let files = (ctx.request.body && ctx.request.body['files[]']) as string[]
   const publicKey = ctx.request.body && ctx.request.body.pub_key
 
   if (!files || files.length === 0) {
@@ -99,13 +96,9 @@ const index = (ctx) => {
   ctx.body = response
 }
 
-/**
- * '/group/info/?pub_key=XXXXXXXXXXXXXXXXXXXX&group_id=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX~N'
- *
- * @param {object} ctx
- */
-const info = (ctx) => {
-  const groupId = ctx.query && ctx.query.group_id
+/** '/group/info/?pub_key=XXXXXXXXXXXXXXXXXXXX&group_id=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX~N' */
+const info: Middleware = (ctx) => {
+  const groupId = ctx.query && (ctx.query.group_id as string)
 
   if (!groupId) {
     return error(ctx, {

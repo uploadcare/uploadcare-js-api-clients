@@ -1,3 +1,4 @@
+/// <reference types="jest-extended" />
 import { jest } from '@jest/globals'
 import { ADDONS_UUID } from '../../test/fixtures'
 import { testSettings, uploadClient } from '../../test/helpers'

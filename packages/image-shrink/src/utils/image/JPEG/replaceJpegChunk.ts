@@ -1,6 +1,10 @@
 import { readJpegChunks } from './readJpegChunks'
 
-export const replaceJpegChunk = (blob, marker, chunks) => {
+export const replaceJpegChunk = (
+  blob: Blob,
+  marker: number,
+  chunks: ArrayBuffer[]
+) => {
   return new Promise((resolve, reject) => {
     const oldChunkPos: number[] = []
     const oldChunkLength: number[] = []
@@ -17,7 +21,7 @@ export const replaceJpegChunk = (blob, marker, chunks) => {
         })
       })
       .then(() => {
-        const newChunks = [blob.slice(0, 2)]
+        const newChunks: (ArrayBuffer | Blob)[] = [blob.slice(0, 2)]
 
         for (const chunk of chunks) {
           const intro = new DataView(new ArrayBuffer(4))

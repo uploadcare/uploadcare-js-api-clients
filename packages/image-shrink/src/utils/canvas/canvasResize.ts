@@ -1,7 +1,7 @@
 import { createCanvas } from './createCanvas'
 
-export const canvasResize = (img, w, h) => {
-  return new Promise((resolve, reject) => {
+export const canvasResize = (img: CanvasImageSource, w: number, h: number) => {
+  return new Promise<HTMLCanvasElement>((resolve, reject) => {
     try {
       const { ctx, canvas } = createCanvas()
 
@@ -11,7 +11,9 @@ export const canvasResize = (img, w, h) => {
       ctx.imageSmoothingQuality = 'high'
       ctx.drawImage(img, 0, 0, w, h)
 
+      // @ts-expect-error TODO: fix this
       img.src = '//:0' // for image
+      // @ts-expect-error TODO: fix this
       img.width = img.height = 1 // for canvas
 
       resolve(canvas)

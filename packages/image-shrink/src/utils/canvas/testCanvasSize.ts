@@ -2,8 +2,8 @@ import { sizes } from '../../constants'
 import { memoize, memoKeySerializer } from '../../helper/memoize'
 import { canvasTest } from './canvasTest'
 
-function wrapAsync(fn) {
-  return (...args) => {
+function wrapAsync<A extends unknown[], R>(fn: (...args: A) => R) {
+  return (...args: A) => {
     return new Promise((resolve) => {
       setTimeout(() => {
         const result = fn(...args)
@@ -16,7 +16,7 @@ function wrapAsync(fn) {
 const squareTest = wrapAsync(memoize(canvasTest, memoKeySerializer))
 const dimensionTest = wrapAsync(memoize(canvasTest, memoKeySerializer))
 
-export const testCanvasSize = (w, h) => {
+export const testCanvasSize = (w: number, h: number) => {
   return new Promise((resolve, reject) => {
     const testSquareSide = sizes.squareSide.find((side) => side * side >= w * h)
     const testDimension = sizes.dimension.find((side) => side >= w && side >= h)

@@ -7,10 +7,11 @@ type TChunk = {
 
 export const readJpegChunks = () => {
   const stack: TChunk[] = []
-  const promiseReadJpegChunks = (file) =>
+  // TODO: rename to blob
+  const promiseReadJpegChunks = (file: Blob) =>
     new Promise((resolve, reject) => {
-      let pos
-      const readToView = (file, cb) => {
+      let pos: number
+      const readToView = (file: Blob, cb: (view: DataView) => void) => {
         const reader = new FileReader()
 
         reader.addEventListener('load', () => {
@@ -24,8 +25,9 @@ export const readJpegChunks = () => {
         reader.readAsArrayBuffer(file)
       }
 
+      // @ts-expect-error TODO: fix this
       const readNext = () =>
-        readToView(file.slice(pos, pos + 128), (view) => {
+        readToView(file.slice(pos, pos + 128), (view: DataView) => {
           let i, j, ref
           for (
             i = j = 0, ref = view.byteLength;
@@ -41,10 +43,11 @@ export const readJpegChunks = () => {
           return readNextChunk()
         })
 
+      // @ts-expect-error TODO: fix this
       const readNextChunk = () => {
         const startPos = pos
 
-        return readToView(file.slice(pos, (pos += 4)), (view) => {
+        return readToView(file.slice(pos, (pos += 4)), (view: DataView) => {
           if (view.byteLength !== 4 || view.getUint8(0) !== 0xff) {
             return reject('Corrupted')
           }
@@ -56,14 +59,17 @@ export const readJpegChunks = () => {
           }
 
           const length = view.getUint16(2) - 2
-          return readToView(file.slice(pos, (pos += length)), (view) => {
-            if (view.byteLength !== length) {
-              return reject('Corrupted')
-            }
+          return readToView(
+            file.slice(pos, (pos += length)),
+            (view: DataView) => {
+              if (view.byteLength !== length) {
+                return reject('Corrupted')
+              }
 
-            stack.push({ startPos, length, marker, view })
-            return readNext()
-          })
+              stack.push({ startPos, length, marker, view })
+              return readNext()
+            }
+          )
         })
       }
 
@@ -72,7 +78,7 @@ export const readJpegChunks = () => {
       }
 
       pos = 2
-      readToView(file.slice(0, 2), function (view) {
+      readToView(file.slice(0, 2), function (view: DataView) {
         if (view.getUint16(0) !== 0xffd8) {
           reject('Not jpeg')
         }

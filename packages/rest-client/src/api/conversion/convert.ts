@@ -1,4 +1,8 @@
-import { ApiRequestSettings, makeApiRequest } from '../../makeApiRequest'
+import {
+  ApiRequestBody,
+  ApiRequestSettings,
+  makeApiRequest
+} from '../../makeApiRequest'
 import { storeValueToString } from '../../tools/storeValueToString'
 import { ConversionOptions } from '../../types/ConversionOptions'
 import { ConversionResponse } from '../../types/ConversionResponse'
@@ -13,7 +17,7 @@ export async function convert<T extends ValueOf<typeof ConversionType>>(
 ): Promise<ConversionResponse<ConversionResult[T]>> {
   const isDocument = options.type === ConversionType.DOCUMENT
 
-  const body = {
+  const body: ApiRequestBody = {
     paths: options.paths,
     store: storeValueToString(options.store)
   }

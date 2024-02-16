@@ -5,9 +5,10 @@ const base64ImageSrc =
   '////////////////////////////////////////////////////////wAALCAABAAIBASIA' +
   '/8QAJgABAAAAAAAAAAAAAAAAAAAAAxABAAAAAAAAAAAAAAAAAAAAAP/aAAgBAQAAPwBH/9k='
 
-let isApplied
+let isApplied: boolean | undefined = undefined
+
 export const isBrowserApplyExif = () => {
-  return new Promise((resolve) => {
+  return new Promise<boolean>((resolve) => {
     if (isApplied !== undefined) {
       resolve(isApplied)
     } else {

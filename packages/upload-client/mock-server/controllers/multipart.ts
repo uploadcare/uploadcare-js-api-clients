@@ -2,13 +2,10 @@ import multipartJson from '../data/multipart'
 import infoJson from '../data/info'
 import find from '../utils/find'
 import error from '../utils/error'
+import { type Middleware } from 'koa'
 
-/**
- * '/multipart/start/'
- *
- * @param {object} ctx
- */
-const start = (ctx) => {
+/** '/multipart/start/' */
+const start: Middleware = (ctx) => {
   if (ctx.request.body && !ctx.request.body.filename) {
     return error(ctx, {
       statusText: 'The "filename" parameter is missing.'
@@ -41,21 +38,13 @@ const start = (ctx) => {
   ctx.body = find(multipartJson, 'start')
 }
 
-/**
- * '/multipart/upload/'
- *
- * @param {object} ctx
- */
-const upload = (ctx) => {
+/** '/multipart/upload/' */
+const upload: Middleware = (ctx) => {
   ctx.status = 200
 }
 
-/**
- * '/multipart/complete/'
- *
- * @param {object} ctx
- */
-const complete = (ctx) => {
+/** '/multipart/complete/' */
+const complete: Middleware = (ctx) => {
   if (ctx.request.body && !ctx.request.body.uuid) {
     return error(ctx, {
       statusText: 'uuid is required.'

@@ -4,6 +4,7 @@ import find from '../utils/find'
 import error from '../utils/error'
 
 import { PORT } from '../config'
+import { type Middleware } from 'koa'
 
 interface State {
   isComputable: boolean
@@ -20,24 +21,20 @@ const state: {
   [key: string]: State
 } = {}
 
-/**
- * '/from_url/?pub_key=XXXXXXXXXXXXXXXXXXXX'
- *
- * @param {object} ctx
- */
-const index = (ctx) => {
+/** '/from_url/?pub_key=XXXXXXXXXXXXXXXXXXXX' */
+const index: Middleware = (ctx) => {
   const isPrivateIP = (url: string): boolean =>
     url.includes('192.168.') ||
     (url.includes('localhost') && !url.includes(`http://localhost:${PORT}/`))
   const doesNotExist = (url: string): boolean => url === 'https://1.com/1.jpg'
 
   const publicKey = ctx.query && ctx.query.pub_key
-  const sourceUrl = ctx.query && ctx.query.source_url
+  const sourceUrl = ctx.query && (ctx.query.source_url as string)
   const checkForUrlDuplicates = !!parseInt(
-    ctx.query && ctx.query.check_URL_duplicates
+    ctx.query && (ctx.query.check_URL_duplicates as string)
   )
   const saveUrlForRecurrentUploads = !!parseInt(
-    ctx.query && ctx.query.save_URL_duplicates
+    ctx.query && (ctx.query.save_URL_duplicates as string)
   )
 
   // Check params
@@ -83,13 +80,9 @@ const index = (ctx) => {
   ctx.body = response
 }
 
-/**
- * '/from_url/status/?pub_key=XXXXXXXXXXXXXXXXXXXX&token=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX'
- *
- * @param {object} ctx
- */
-const status = (ctx) => {
-  const token = ctx.query && ctx.query.token
+/** '/from_url/status/?pub_key=XXXXXXXXXXXXXXXXXXXX&token=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX' */
+const status: Middleware = (ctx) => {
+  const token = ctx.query && (ctx.query.token as string)
 
   if (token) {
     const tokenState = state[token]
