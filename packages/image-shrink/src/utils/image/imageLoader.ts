@@ -14,7 +14,7 @@ export const processImage = (
         resolve(image)
       })
       image.addEventListener('error', () => {
-        reject(image)
+        reject(new Error('Failed to load image. Probably not an image.'))
       })
     }
   })

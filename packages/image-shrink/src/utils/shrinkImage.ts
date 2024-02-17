@@ -31,6 +31,7 @@ export const shrinkImage = (
       const supportNative = 'imageSmoothingQuality' in ctx
 
       // native scaling on ios gives blurry results
+      // TODO: check if it's still true
       const useNativeScaling = supportNative && !isIOS() && !isIpadOS
 
       return useNativeScaling

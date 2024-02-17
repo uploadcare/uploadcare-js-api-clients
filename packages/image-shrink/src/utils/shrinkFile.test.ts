@@ -32,7 +32,25 @@ describe('shrinkFile', () => {
     expect(height).toBe(500)
   })
 
-  it("should skip shrink if it's not required", async () => {
+  it('should throw a error if the passed file is not an image', async () => {
+    const originalFile = new Blob(['Hello world'], { type: 'text/plain' })
+    const promise = shrinkFile(originalFile, {
+      size: 100 * 100
+    })
+    expect(promise).rejects.toThrowError('not an image')
+  })
+
+  it('should throw a error if unable to convert canvas to blob', async () => {
+    const originalFile = await loadImageAsBlob(
+      () => import('../test/samples/line.jpg')
+    )
+    const promise = shrinkFile(originalFile, {
+      size: 100 * 100
+    })
+    expect(promise).rejects.toThrowError('Failed to convert canvas to blob')
+  })
+
+  it("should skip shrink if it's not required and throw a error", async () => {
     const originalFile = await loadImageAsBlob(
       () => import('../test/samples/2000x2000.jpeg')
     )

@@ -33,6 +33,9 @@ export default defineConfig({
   plugins: [uploadPlugin()],
   test: {
     testTimeout: 100000,
+    coverage: {
+      provider: 'istanbul'
+    },
     browser: {
       enabled: true,
       name: 'chromium',
