@@ -6,7 +6,9 @@
       alt="">
 </a>
 
-File Uploader lets you accept hi-res images and shrink them in size to a reasonable resolution, keeping the original aspect ratio. See docs [here][uc-docs-image-shrink].
+File Uploader lets you accept hi-res images and shrink them in size to a reasonable resolution, keeping the original aspect ratio. See docs [here][uc-docs-image-shrink] wrapper to work with browser.
+
+[API Reference](https://uploadcare.github.io/uploadcare-js-api-clients/image-shrink/)
 
 [![Build Status][badge-build]][build-url]
 [![NPM version][npm-img]][npm-url]
@@ -32,6 +34,11 @@ npm install @uploadcare/image-shrink
 
 ```typescript
 import { shrinkFile } from '@uploadcare/image-shrink'
+
+const shrinkedBlob = shrinkImage(blob, {
+    size: number,
+    quality?: number
+})
 ```
 
 ## Security issues
