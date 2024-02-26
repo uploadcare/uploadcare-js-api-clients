@@ -5,6 +5,7 @@ type TChunk = {
   view: DataView
 }
 
+// TODO: unwrap promises
 export const readJpegChunks = () => {
   const stack: TChunk[] = []
   const promiseReadJpegChunks = (blob: Blob) =>
@@ -37,7 +38,6 @@ export const readJpegChunks = () => {
               break
             }
           }
-
           readNextChunk()
         })
 
@@ -50,7 +50,7 @@ export const readJpegChunks = () => {
             return
           }
 
-          const marker = view?.getUint8(1)
+          const marker = view.getUint8(1)
 
           if (marker === 0xda) {
             resolve(true)
