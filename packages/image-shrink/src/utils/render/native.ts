@@ -1,5 +1,11 @@
 import { canvasResize } from '../canvas/canvasResize'
 
+type TNative = {
+  img: HTMLImageElement
+  targetW: number
+  targetH: number
+}
+
 /**
  * Native high-quality canvas resampling
  *
@@ -7,12 +13,5 @@ import { canvasResize } from '../canvas/canvasResize'
  * https://caniuse.com/mdn-api_canvasrenderingcontext2d_imagesmoothingenabled
  * Target dimensions expected to be supported by browser.
  */
-export const native = ({
-  img,
-  targetW,
-  targetH
-}: {
-  img: HTMLImageElement
-  targetW: number
-  targetH: number
-}) => canvasResize(img, targetW, targetH)
+export const native = ({ img, targetW, targetH }: TNative) =>
+  canvasResize(img, targetW, targetH)

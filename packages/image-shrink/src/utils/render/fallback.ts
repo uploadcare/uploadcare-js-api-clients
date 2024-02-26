@@ -1,6 +1,14 @@
 import { testCanvasSize } from '../canvas/testCanvasSize'
 import { canvasResize } from '../canvas/canvasResize'
 
+type TFallback = {
+  img: HTMLImageElement
+  sourceW: number
+  targetW: number
+  targetH: number
+  step: number
+}
+
 /**
  * Goes from target to source by step, the last incomplete step is dropped.
  * Always returns at least one step - target. Source step is not included.
@@ -9,12 +17,12 @@ import { canvasResize } from '../canvas/canvasResize'
  * Example with step = 0.71, source = 2000, target = 400 400 (target) <- 563 <-
  * 793 <- 1117 <- 1574 (dropped) <- [2000 (source)]
  */
-const calcShrinkSteps = function (
-  sourceW: number,
-  targetW: number,
-  targetH: number,
-  step: number
-) {
+const calcShrinkSteps = function ({
+  sourceW,
+  targetW,
+  targetH,
+  step
+}: Omit<TFallback, 'img'>) {
   const steps: Array<[number, number]> = []
   let sW: number = targetW
   let sH: number = targetH
@@ -47,14 +55,8 @@ export const fallback = ({
   targetW,
   targetH,
   step
-}: {
-  img: HTMLImageElement
-  sourceW: number
-  targetW: number
-  targetH: number
-  step: number
-}): Promise<HTMLCanvasElement> => {
-  const steps = calcShrinkSteps(sourceW, targetW, targetH, step)
+}: TFallback): Promise<HTMLCanvasElement> => {
+  const steps = calcShrinkSteps({ sourceW, targetW, targetH, step })
 
   return steps.reduce(
     (chain, [w, h]) => {
