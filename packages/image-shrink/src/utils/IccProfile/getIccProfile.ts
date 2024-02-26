@@ -1,10 +1,10 @@
 import { readJpegChunks } from '../image/JPEG/readJpegChunks'
 
-export const getIccProfile = async (file: File) => {
+export const getIccProfile = async (blob: Blob) => {
   const iccProfile: DataView[] = []
   const { promiseReadJpegChunks, stack } = readJpegChunks()
 
-  return await promiseReadJpegChunks(file)
+  return await promiseReadJpegChunks(blob)
     .then(() => {
       stack.forEach(({ marker, view }) => {
         if (marker === 0xe2) {

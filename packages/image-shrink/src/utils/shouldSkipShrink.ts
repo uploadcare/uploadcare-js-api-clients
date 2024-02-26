@@ -1,12 +1,12 @@
 import { readJpegChunks } from './image/JPEG/readJpegChunks'
 import { allowLayers, markers } from '../constants'
 
-export const shouldSkipShrink = async (file: File) => {
+export const shouldSkipShrink = async (blob: Blob) => {
   let skip = false
 
   const { promiseReadJpegChunks, stack } = readJpegChunks()
 
-  return await promiseReadJpegChunks(file)
+  return await promiseReadJpegChunks(blob)
     .then(() => {
       stack.forEach(({ marker, view }) => {
         if (!skip && markers.indexOf(marker) >= 0) {
