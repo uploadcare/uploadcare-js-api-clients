@@ -40,7 +40,11 @@
     }
   },
   "sideEffects": false,
-  "files": ["dist/*", "README.md", "LICENSE"],
+  "files": [
+    "dist/*",
+    "README.md",
+    "LICENSE"
+  ],
   "engines": {
     "node": ">=16"
   },
@@ -80,7 +84,11 @@
     "@koa/router": "10.1.1",
     "@types/express-serve-static-core": "^4.17.28",
     "@types/koa": "2.13.4",
+    "@types/koa__cors": "^5.0.0",
+    "@types/koa__router": "^12.0.4",
     "@types/ws": "8.5.3",
+    "@uploadcare/api-client-utils": "^6.14.0",
+    "chalk": "^4.1.2",
     "data-uri-to-buffer": "3.0.1",
     "dataurl-to-blob": "0.0.1",
     "jest-environment-jsdom": "29.3.1",
@@ -89,9 +97,7 @@
     "koa-add-trailing-slashes": "2.0.1",
     "koa-body": "5.0.0",
     "mock-socket": "9.0.3",
-    "start-server-and-test": "1.14.0",
-    "@uploadcare/api-client-utils": "^6.14.0",
-    "chalk": "^4.1.2"
+    "start-server-and-test": "1.14.0"
   },
   "dependencies": {
     "form-data": "^4.0.0",

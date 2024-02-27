@@ -66,7 +66,7 @@ const request = ({
           .split(/[\r\n]+/)
 
         // Create a map of header names to values
-        const responseHeaders = {}
+        const responseHeaders: Record<string, string> = {}
 
         headersArray.forEach(function (line) {
           const parts = line.split(': ')

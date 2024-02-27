@@ -1,22 +1,28 @@
 import { createCanvas } from './createCanvas'
 
-export const canvasResize = (img, w, h) => {
-  return new Promise((resolve, reject) => {
-    try {
-      const { ctx, canvas } = createCanvas()
+export const canvasResize = async (
+  img: CanvasImageSource,
+  w: number,
+  h: number
+) => {
+  try {
+    const { ctx, canvas } = createCanvas()
 
-      canvas.width = w
-      canvas.height = h
+    canvas.width = w
+    canvas.height = h
 
-      ctx.imageSmoothingQuality = 'high'
-      ctx.drawImage(img, 0, 0, w, h)
+    ctx.imageSmoothingQuality = 'high'
+    ctx.drawImage(img, 0, 0, w, h)
 
-      img.src = '//:0' // for image
-      img.width = img.height = 1 // for canvas
-
-      resolve(canvas)
-    } catch (e) {
-      reject(`Failed to resize image. ${e}`)
+    if (img instanceof HTMLImageElement) {
+      img.src = '//:0' // free memory
     }
-  })
+    if (img instanceof HTMLCanvasElement) {
+      img.width = img.height = 1 // free memory
+    }
+
+    return canvas
+  } catch (e) {
+    throw new Error('Canvas resize error', { cause: e })
+  }
 }

@@ -4,11 +4,12 @@ import * as info from './controllers/info'
 import * as group from './controllers/group'
 import * as throttle from './controllers/throttle'
 import * as multipart from './controllers/multipart'
+import type { Context, Middleware } from 'koa'
 
 export type RouteType = {
   [path: string]: {
-    method: string
-    fn: (ctx: Record<string, unknown>, next?: () => Promise<unknown>) => void
+    method: 'get' | 'post' | 'put' | 'delete'
+    fn: Middleware
     isProtected: boolean
     isFake?: boolean
     description?: string
@@ -16,7 +17,7 @@ export type RouteType = {
 }
 
 // this route need for health check
-const index = (ctx) => {
+const index = (ctx: Context) => {
   ctx.body = 'server is up'
 }
 

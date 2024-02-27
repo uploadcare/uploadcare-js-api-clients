@@ -1,6 +1,7 @@
 import { ROUTES, RouteType } from '../routes'
 import { ALLOWED_PUBLIC_KEYS } from '../config'
 import error from '../utils/error'
+import { type Middleware } from 'koa'
 
 /** Routes protected by auth. */
 const protectedRoutes: Array<string> = ROUTES.filter((route: RouteType) => {
@@ -55,20 +56,16 @@ const isAuthorized = ({ url, publicKey }: IsAuthorizedParams) => {
   return !!(publicKey && ALLOWED_PUBLIC_KEYS.includes(publicKey))
 }
 
-/**
- * Uploadcare Auth middleware.
- *
- * @param {object} ctx
- * @param {function} next
- */
-const auth = (ctx, next) => {
-  const urlWithSlash = ctx.url.split('?').shift()
+/** Uploadcare Auth middleware. */
+const auth: Middleware = (ctx, next) => {
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  const urlWithSlash = ctx.url.split('?').shift()!
   const url = urlWithSlash.substring(0, urlWithSlash.length - 1)
 
   let key = 'pub_key'
   const params: IsAuthorizedParams = {
     url,
-    publicKey: getPublicKeyFromSource(ctx.query, key)
+    publicKey: getPublicKeyFromSource(ctx.query as Record<string, string>, key)
   }
 
   // pub_key in body

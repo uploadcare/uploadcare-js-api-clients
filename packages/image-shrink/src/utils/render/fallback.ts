@@ -1,7 +1,28 @@
 import { testCanvasSize } from '../canvas/testCanvasSize'
 import { canvasResize } from '../canvas/canvasResize'
 
-const calcShrinkSteps = function (sourceW, targetW, targetH, step) {
+type TFallback = {
+  img: HTMLImageElement
+  sourceW: number
+  targetW: number
+  targetH: number
+  step: number
+}
+
+/**
+ * Goes from target to source by step, the last incomplete step is dropped.
+ * Always returns at least one step - target. Source step is not included.
+ * Sorted descending.
+ *
+ * Example with step = 0.71, source = 2000, target = 400 400 (target) <- 563 <-
+ * 793 <- 1117 <- 1574 (dropped) <- [2000 (source)]
+ */
+const calcShrinkSteps = function ({
+  sourceW,
+  targetW,
+  targetH,
+  step
+}: Omit<TFallback, 'img'>) {
   const steps: Array<[number, number]> = []
   let sW: number = targetW
   let sH: number = targetH
@@ -19,22 +40,35 @@ const calcShrinkSteps = function (sourceW, targetW, targetH, step) {
   return steps.reverse()
 }
 
-export const fallback = ({ img, sourceW, targetW, targetH, step }) => {
-  const steps = calcShrinkSteps(sourceW, targetW, targetH, step)
+/**
+ * Fallback resampling algorithm
+ *
+ * Reduces dimensions by step until reaches target dimensions, this gives a
+ * better output quality than one-step method
+ *
+ * Target dimensions expected to be supported by browser, unsupported steps will
+ * be dropped.
+ */
+export const fallback = ({
+  img,
+  sourceW,
+  targetW,
+  targetH,
+  step
+}: TFallback): Promise<HTMLCanvasElement> => {
+  const steps = calcShrinkSteps({ sourceW, targetW, targetH, step })
 
-  return steps
-    .reduce((chain, [w, h]) => {
-      return chain
-        .then((canvas) => {
-          return testCanvasSize(w, h)
-            .then(() => canvas)
-            .catch(() => canvasResize(canvas, w, h))
-        })
-        .then((canvas) => {
-          const progress = (sourceW - w) / (sourceW - targetW)
-          return { canvas, progress }
-        })
-    }, Promise.resolve(img))
-    .then(({ canvas }) => canvas)
-    .catch((error) => Promise.reject(error))
+  return steps.reduce(
+    (chain, [w, h]) => {
+      return chain.then((canvas) => {
+        return (
+          testCanvasSize(w, h)
+            .then(() => canvasResize(canvas, w, h))
+            // Here we assume that at least one step will be supported and HTMLImageElement will be converted to HTMLCanvasElement
+            .catch(() => canvas as unknown as HTMLCanvasElement)
+        )
+      })
+    },
+    Promise.resolve(img as HTMLCanvasElement | HTMLImageElement)
+  ) as Promise<HTMLCanvasElement>
 }

@@ -1,92 +1,103 @@
-import { shrinkImage } from './shrinkImage'
+import { getIccProfile } from './IccProfile/getIccProfile'
+import { replaceIccProfile } from './IccProfile/replaceIccProfile'
 import { stripIccProfile } from './IccProfile/stripIccProfile'
-import { shouldSkipShrink } from './shouldSkipShrink'
 import { canvasToBlob } from './canvas/canvasToBlob'
 import { hasTransparency } from './canvas/hasTransparency'
-import { isBrowserApplyExif } from './exif/isBrowserApplyExif'
 import { getExif } from './exif/getExif'
-import { getIccProfile } from './IccProfile/getIccProfile'
+import { isBrowserApplyExifOrientation } from './exif/isBrowserApplyExif'
 import { replaceExif } from './exif/replaceExif'
-import { replaceIccProfile } from './IccProfile/replaceIccProfile'
+import { imageLoader } from './image/imageLoader'
+import { shouldSkipShrink } from './shouldSkipShrink'
+import { shrinkImage } from './shrinkImage'
 
 export type TSetting = {
   size: number
   quality?: number
 }
 
-export const shrinkFile = (file: File, settings: TSetting): Promise<Blob> => {
-  /*eslint no-async-promise-executor: "off"*/
-  return new Promise(async (resolve, reject) => {
-    if (!(URL && DataView && Blob)) {
-      reject('Not support')
+export const shrinkFile = async (
+  inputBlob: Blob,
+  settings: TSetting
+): Promise<Blob> => {
+  try {
+    const shouldSkip = await shouldSkipShrink(inputBlob)
+    if (shouldSkip) {
+      throw new Error('Should skipped')
     }
 
-    try {
-      const image = await shouldSkipShrink(file)
-        .then((shouldSkip) => {
-          if (shouldSkip) {
-            return reject('Should skipped')
-          }
-        })
-        .then(() => {
-          return stripIccProfile(file).catch(() => {
-            reject('Failed to strip ICC profile and not image')
-          })
-        })
+    // Try to extract EXIF and ICC profile
+    const exifResults = await Promise.allSettled([
+      getExif(inputBlob),
+      isBrowserApplyExifOrientation(),
+      getIccProfile(inputBlob)
+    ])
 
-      const exifList = Promise.allSettled([
-        getExif(file),
-        isBrowserApplyExif(),
-        getIccProfile(file)
-      ])
+    const isRejected = exifResults.some(
+      (result) => result.status === 'rejected'
+    )
+    // If any of the promises is rejected, this is not a JPEG image
+    const isJPEG = !isRejected
 
-      exifList.then(async (results) => {
-        const isRejected = results.some(
-          (result) => result.status === 'rejected'
-        )
+    const [exifResult, isExifOrientationAppliedResult, iccProfileResult] =
+      exifResults
 
-        const [exif, isExifApplied, iccProfile] = results as {
-          value: any
-          status: string
-        }[]
-        const isJPEG = !isRejected
+    // Load blob into the image
+    const inputBlobWithoutIcc = await stripIccProfile(inputBlob).catch(
+      () => inputBlob
+    )
 
-        return shrinkImage(image as HTMLImageElement, settings)
-          .then(async (canvas) => {
-            let format = 'image/jpeg'
-            let quality: number | undefined = settings?.quality || 0.8
+    const image = await imageLoader(URL.createObjectURL(inputBlobWithoutIcc))
+    URL.revokeObjectURL(image.src)
 
-            if (!isJPEG && hasTransparency(canvas)) {
-              format = 'image/png'
-              quality = undefined
-            }
+    // Shrink the image
+    const canvas = await shrinkImage(image, settings)
 
-            canvasToBlob(canvas, format, quality, (blob) => {
-              canvas.width = canvas.height = 1
+    let format = 'image/jpeg'
+    let quality: number | undefined = settings?.quality || 0.8
 
-              let replaceChain = Promise.resolve(blob)
-
-              if (exif.value) {
-                replaceChain = replaceChain
-                  .then((blob) =>
-                    replaceExif(blob, exif.value, isExifApplied.value)
-                  )
-                  .catch(() => blob)
-              }
-
-              if (iccProfile?.value?.length > 0) {
-                replaceChain = replaceChain
-                  .then((blob) => replaceIccProfile(blob, iccProfile.value))
-                  .catch(() => blob)
-              }
-
-              replaceChain.then(resolve).catch(() => resolve(blob))
-            })
-          })
-          .catch(() => reject(file))
-      })
-    } catch (e) {
-      reject(`Failed to shrink image: ${e}`)
+    if (!isJPEG && hasTransparency(canvas)) {
+      format = 'image/png'
+      quality = undefined
     }
-  })
+
+    // Convert canvas to blob
+    let newBlob = await canvasToBlob(canvas, format, quality)
+
+    // Set EXIF for the new blob
+    if (isJPEG && exifResult.status === 'fulfilled' && exifResult.value) {
+      const exif = exifResult.value
+      const isExifOrientationApplied =
+        isExifOrientationAppliedResult.status === 'fulfilled'
+          ? isExifOrientationAppliedResult.value
+          : false
+      newBlob = await replaceExif(newBlob, exif, isExifOrientationApplied)
+      // TODO: should we continue shrink if failed to replace EXIF?
+      // .catch(() => newBlob)
+    }
+
+    // Set ICC profile for the new blob
+    if (
+      isJPEG &&
+      iccProfileResult.status === 'fulfilled' &&
+      iccProfileResult.value.length > 0
+    ) {
+      newBlob = await replaceIccProfile(newBlob, iccProfileResult.value)
+      // TODO: should we continue shrink if failed to replace ICC?
+      // .catch(() => newBlob)
+    }
+
+    return newBlob
+  } catch (e) {
+    let message: string | undefined
+    if (e instanceof Error) {
+      message = e.message
+    }
+    if (typeof e === 'string') {
+      message = e
+    }
+    throw new Error(
+      `Failed to shrink image. ${message ? `Message: "${message}".` : ''}`,
+      { cause: e }
+    )
+  }
 }

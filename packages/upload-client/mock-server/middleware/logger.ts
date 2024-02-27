@@ -1,4 +1,5 @@
 import chalk from 'chalk'
+import { type Middleware } from 'koa'
 
 /**
  * Pretty print for JSON.
@@ -18,13 +19,8 @@ const pretty = (json: Record<string, unknown>): string =>
 const isEmptyObject = (object: Record<string, unknown>): boolean =>
   Object.keys(object).length === 0 && object.constructor === Object
 
-/**
- * Logger for requests and responses.
- *
- * @param {object} ctx
- * @param {function} next
- */
-const logger = async (ctx, next) => {
+/** Logger for requests and responses. */
+const logger: Middleware = async (ctx, next) => {
   await next()
 
   const request = `${chalk.gray('-->')} ${chalk.bold(

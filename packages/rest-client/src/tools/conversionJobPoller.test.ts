@@ -1,3 +1,4 @@
+/// <reference types="jest-extended" />
 import { jest } from '@jest/globals'
 import { DOCUMENT_UUID, VIDEO_UUID } from '../../test/fixtures'
 import { testSettings } from '../../test/helpers'

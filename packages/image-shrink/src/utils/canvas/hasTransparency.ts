@@ -1,6 +1,6 @@
 import { createCanvas } from './createCanvas'
 
-export const hasTransparency = (img) => {
+export const hasTransparency = (img: CanvasImageSource) => {
   const canvasSize = 50
 
   // Create a canvas element and get 2D rendering context

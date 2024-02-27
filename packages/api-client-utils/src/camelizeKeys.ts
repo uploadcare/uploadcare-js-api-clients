@@ -37,7 +37,7 @@ export function camelizeKeys<T>(
   if (!isObject(source)) {
     return source
   }
-  const result = {}
+  const result: Record<string, unknown> = {}
   for (const key of Object.keys(source)) {
     let value = source[key]
     if (ignoreKeys.includes(key)) {

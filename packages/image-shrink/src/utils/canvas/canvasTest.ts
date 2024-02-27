@@ -13,7 +13,8 @@ const FILL_STYLE = `rgba(${TestPixel.R}, ${TestPixel.G}, ${TestPixel.B}, ${
 })`
 
 type TFillRect = [number, number, number, number]
-export const canvasTest = (width, height) => {
+
+export const canvasTest = (width: number, height: number) => {
   try {
     const fill: TFillRect = [width - 1, height - 1, 1, 1] // x, y, width, height
 

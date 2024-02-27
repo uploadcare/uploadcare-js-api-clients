@@ -1,12 +1,9 @@
+import { type Middleware } from 'koa'
 import json from '../data/base'
 import find from '../utils/find'
 
-/**
- * '/base/'
- *
- * @param {object} ctx
- */
-const index = (ctx) => {
+/** '/base/' */
+const index: Middleware = (ctx) => {
   ctx.body = find(json, 'info')
 }
 

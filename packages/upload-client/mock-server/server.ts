@@ -6,6 +6,7 @@ import chalk from 'chalk'
 
 // Middleware
 import cors from '@koa/cors'
+// @ts-expect-error There is no types for this package
 import addTrailingSlashes from 'koa-add-trailing-slashes'
 // @ts-ignore
 import koaBody from 'koa-body'
@@ -24,7 +25,7 @@ const app = new Koa()
 const router = new Router()
 
 const silent = process.argv.includes('--silent')
-const noop = (_, next) => next()
+const noop: Koa.Middleware = (_, next) => next()
 
 // Use middleware
 app.use(cors())

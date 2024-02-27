@@ -1,6 +1,11 @@
-export const memoize = (fn, serializer) => {
-  const cache = {}
-  return (...args) => {
+type FnArgs = [number, number]
+type Cache = Record<string, boolean>
+type Serializer = (args: FnArgs, cache: Cache) => number
+type Fn = (...args: FnArgs) => boolean
+
+export const memoize = (fn: Fn, serializer: Serializer) => {
+  const cache: Cache = {}
+  return (...args: FnArgs) => {
     const key = serializer(args, cache)
     return key in cache ? cache[key] : (cache[key] = fn(...args))
   }
@@ -13,7 +18,7 @@ export const memoize = (fn, serializer) => {
  * - Browser supports higher canvas size
  * - Browser doesn't support lower canvas size
  */
-export const memoKeySerializer = (args, cache) => {
+export const memoKeySerializer: Serializer = (args, cache) => {
   const [w] = args
   const cachedWidths = Object.keys(cache)
     .map((val) => parseInt(val, 10))

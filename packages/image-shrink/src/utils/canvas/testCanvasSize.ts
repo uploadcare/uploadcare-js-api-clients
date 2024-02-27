@@ -2,8 +2,8 @@ import { sizes } from '../../constants'
 import { memoize, memoKeySerializer } from '../../helper/memoize'
 import { canvasTest } from './canvasTest'
 
-function wrapAsync(fn) {
-  return (...args) => {
+function wrapAsync<A extends unknown[], R>(fn: (...args: A) => R) {
+  return (...args: A) => {
     return new Promise((resolve) => {
       setTimeout(() => {
         const result = fn(...args)
@@ -16,25 +16,22 @@ function wrapAsync(fn) {
 const squareTest = wrapAsync(memoize(canvasTest, memoKeySerializer))
 const dimensionTest = wrapAsync(memoize(canvasTest, memoKeySerializer))
 
-export const testCanvasSize = (w, h) => {
-  return new Promise((resolve, reject) => {
-    const testSquareSide = sizes.squareSide.find((side) => side * side >= w * h)
-    const testDimension = sizes.dimension.find((side) => side >= w && side >= h)
+export const testCanvasSize = async (w: number, h: number) => {
+  const testSquareSide = sizes.squareSide.find((side) => side * side >= w * h)
+  const testDimension = sizes.dimension.find((side) => side >= w && side >= h)
 
-    if (!testSquareSide || !testDimension) {
-      reject()
-      return
-    }
+  if (!testSquareSide || !testDimension) {
+    throw new Error('Not supported')
+  }
 
-    Promise.all([
-      squareTest(testSquareSide, testSquareSide),
-      dimensionTest(testDimension, 1)
-    ]).then(([squareSupported, dimensionSupported]) => {
-      if (squareSupported && dimensionSupported) {
-        resolve(true)
-      } else {
-        reject()
-      }
-    })
-  })
+  const [squareSupported, dimensionSupported] = await Promise.all([
+    squareTest(testSquareSide, testSquareSide),
+    dimensionTest(testDimension, 1)
+  ])
+
+  if (squareSupported && dimensionSupported) {
+    return true
+  } else {
+    throw new Error('Not supported')
+  }
 }
