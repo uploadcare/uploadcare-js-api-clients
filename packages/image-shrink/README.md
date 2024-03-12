@@ -61,8 +61,8 @@ request at [hello@uploadcare.com][uc-email-hello].
 [badge-stack-url]: https://stackshare.io/uploadcare/stacks/
 [badge-release-img]: https://img.shields.io/github/release/uploadcare/uploadcare-js-api-clients.svg
 [badge-release-url]: https://github.com/uploadcare/uploadcare-js-api-clients/releases
-[npm-img]: http://img.shields.io/npm/v/@uploadcare/signed-uploads.svg
-[npm-url]: https://www.npmjs.org/package/@uploadcare/signed-uploads
+[npm-img]: http://img.shields.io/npm/v/@uploadcare/image-shrink.svg
+[npm-url]: https://www.npmjs.org/package/@uploadcare/image-shrink
 [badge-build]: https://github.com/uploadcare/uploadcare-js-api-clients/actions/workflows/checks.yml/badge.svg
 [build-url]: https://github.com/uploadcare/uploadcare-js-api-clients/actions/workflows/checks.yml
 [uc-docs-image-shrink]: https://uploadcare.com/docs/file-uploader/feature-shrink/
