@@ -1,4 +1,4 @@
-type Task<T = unknown> = () => Promise<T>
+export type Task<T = unknown> = () => Promise<T>
 type Resolver = (value: unknown) => void
 type Rejector = (error: unknown) => void
 
