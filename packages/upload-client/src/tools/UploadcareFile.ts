@@ -15,19 +15,19 @@ function isGroupFileInfo(
 }
 export class UploadcareFile {
   readonly uuid: Uuid
-  readonly name: null | string = null
-  readonly size: null | number = null
-  readonly isStored: null | boolean = null
-  readonly isImage: null | boolean = null
-  readonly mimeType: null | string = null
-  readonly cdnUrl: null | string = null
-  readonly s3Url: null | string = null
-  readonly originalFilename: null | string = null
-  readonly imageInfo: null | ImageInfo = null
-  readonly videoInfo: null | VideoInfo = null
-  readonly contentInfo: null | ContentInfo = null
-  readonly metadata: null | Metadata = null
-  readonly s3Bucket: null | string = null
+  readonly name: string
+  readonly size: number
+  readonly isStored: boolean
+  readonly isImage: boolean
+  readonly mimeType: string
+  readonly cdnUrl: string
+  readonly s3Url: string | null
+  readonly originalFilename: string
+  readonly imageInfo: ImageInfo | null
+  readonly videoInfo: VideoInfo | null
+  readonly contentInfo: ContentInfo | null
+  readonly metadata: Metadata | null
+  readonly s3Bucket: string | null
   readonly defaultEffects: null | string = null
 
   constructor(

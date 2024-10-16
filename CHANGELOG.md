@@ -1,3 +1,12 @@
+## [6.14.2](https://github.com/uploadcare/uploadcare-js-api-clients/compare/v6.14.1...v6.14.2) (2024-10-16)
+
+
+### Bug Fixes
+
+* **upload-client/types:** make `UploadcareFile` instance properties non-nullable cause they're can't be `null` actually ([#529](https://github.com/uploadcare/uploadcare-js-api-clients/issues/529)) ([57c84a4](https://github.com/uploadcare/uploadcare-js-api-clients/commit/57c84a4f360ca86b0084cdac2cd08da0a4127a6e))
+
+
+
 ## [6.14.1](https://github.com/uploadcare/uploadcare-js-api-clients/compare/v6.14.0...v6.14.1) (2024-03-08)
 
 # [6.14.0](https://github.com/uploadcare/uploadcare-js-api-clients/compare/v6.13.0...v6.14.0) (2024-02-15)
