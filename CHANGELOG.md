@@ -3,7 +3,7 @@
 
 ### Bug Fixes
 
-* **types:** make `UploadcareFile` instance properties non-nullable cause they're can't be `null` actually ([#529](https://github.com/uploadcare/uploadcare-js-api-clients/issues/529)) ([57c84a4](https://github.com/uploadcare/uploadcare-js-api-clients/commit/57c84a4f360ca86b0084cdac2cd08da0a4127a6e))
+* **upload-client/types:** make `UploadcareFile` instance properties non-nullable cause they're can't be `null` actually ([#529](https://github.com/uploadcare/uploadcare-js-api-clients/issues/529)) ([57c84a4](https://github.com/uploadcare/uploadcare-js-api-clients/commit/57c84a4f360ca86b0084cdac2cd08da0a4127a6e))
 
 
 
