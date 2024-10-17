@@ -59,14 +59,17 @@ export const fallback = ({
   const steps = calcShrinkSteps({ sourceW, targetW, targetH, step })
 
   return steps.reduce(
-    (chain, [w, h]) => {
+    (chain, [w, h], idx) => {
       return chain.then((canvas) => {
-        return (
-          testCanvasSize(w, h)
-            .then(() => canvasResize(canvas, w, h))
-            // Here we assume that at least one step will be supported and HTMLImageElement will be converted to HTMLCanvasElement
-            .catch(() => canvas as unknown as HTMLCanvasElement)
-        )
+        return testCanvasSize(w, h)
+          .then(() => canvasResize(canvas, w, h))
+          .catch(() => {
+            if (idx === steps.length - 1) {
+              // If the last step is failed then we assume that we can't shrink the image at all
+              throw new Error('Not supported')
+            }
+            return canvas as unknown as HTMLCanvasElement
+          })
       })
     },
     Promise.resolve(img as HTMLCanvasElement | HTMLImageElement)

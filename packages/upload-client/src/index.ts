@@ -79,7 +79,7 @@ export {
   CancelError,
   UploadcareError
 } from '@uploadcare/api-client-utils'
-export { Queue } from './tools/Queue'
+export { Queue, Task } from './tools/Queue'
 
 import { NetworkError } from '@uploadcare/api-client-utils'
 /** @deprecated Please use NetworkError instead. */
@@ -90,6 +90,7 @@ export { Headers, ErrorRequestInfo } from './request/types'
 export { UploadcareFile } from './tools/UploadcareFile'
 export { UploadcareGroup } from './tools/UploadcareGroup'
 export { UploadError, ErrorResponseInfo } from './tools/UploadError'
+export { ServerErrorCode } from './tools/ServerErrorCode'
 
 import { UploadError } from './tools/UploadError'
 /** @deprecated Please use UploadError instead. */
@@ -114,4 +115,4 @@ export {
   ComputableProgressInfo,
   UnknownProgressInfo
 } from './api/types'
-export { isReadyPoll } from './tools/isReadyPoll'
+export { isReadyPoll, IsReadyPoolOptions } from './tools/isReadyPoll'
