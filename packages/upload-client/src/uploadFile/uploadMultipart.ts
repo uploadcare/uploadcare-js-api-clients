@@ -143,7 +143,8 @@ export const uploadMultipart = async (
     userAgent,
     retryThrottledRequestMaxTimes,
     retryNetworkErrorMaxTimes,
-    metadata
+    metadata,
+    multipartChunkSize
   })
     .then(async ({ uuid, parts }) => {
       const getChunk = await prepareChunks(file, size, multipartChunkSize)

@@ -19,6 +19,15 @@ describe('uploadMultipart', () => {
     expect(file.cdnUrl).toBeTruthy()
   })
 
+  it('should accept multipartChunkSize option', async () => {
+    const file = await uploadMultipart(fileToUpload, {
+      ...settings,
+      multipartChunkSize: 10 * 1024 * 1024
+    })
+
+    expect(file.cdnUrl).toBeTruthy()
+  })
+
   it('should accept store setting', async () => {
     const settings = getSettingsForTesting({
       publicKey: factory.publicKey('image'),
