@@ -1,10 +1,8 @@
 ## [6.14.3](https://github.com/uploadcare/uploadcare-js-api-clients/compare/v6.14.2...v6.14.3) (2025-02-25)
 
-
 ### Bug Fixes
 
 * **upload-client/multipart:** set custom chunk size for multipart ([#531](https://github.com/uploadcare/uploadcare-js-api-clients/issues/531)) ([13d4c84](https://github.com/uploadcare/uploadcare-js-api-clients/commit/13d4c84bd1925fe00095297a2df73dcd321847a8))
-
 
 
 ## [6.14.2](https://github.com/uploadcare/uploadcare-js-api-clients/compare/v6.14.1...v6.14.2) (2024-10-16)
