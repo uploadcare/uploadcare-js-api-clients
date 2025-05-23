@@ -1,4 +1,3 @@
-import path from 'node:path'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { defineConfig } from 'vite'
@@ -10,7 +9,7 @@ export default defineConfig({
   plugins: [dts({ insertTypesEntry: true })],
   build: {
     lib: {
-      entry: resolve(__dirname, 'src/main.js'),
+      entry: resolve(__dirname, 'src/main.ts'),
       name: 'index',
       fileName: 'index'
     },
@@ -20,7 +19,7 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      '@': path.resolve('src')
+      '@': resolve(__dirname, 'src')
     }
   }
 })
