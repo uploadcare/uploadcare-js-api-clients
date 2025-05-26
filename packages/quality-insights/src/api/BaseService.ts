@@ -1,4 +1,4 @@
-import { keysOfBodyToCamelToSnake } from '../utils/keysOfBodyToCamelToSnake'
+import { deepCamelKeysToSnake } from '../utils/deepCamelKeysToSnake'
 import { Err, Ok, Result } from '../shared/lib/Result'
 
 const BASE_URL = import.meta.env.VITE_BASE_URL
@@ -46,7 +46,7 @@ export class BaseAPIService {
     return await this.base<T>(endpoint, {
       ...options,
       method: 'POST',
-      body: JSON.stringify(keysOfBodyToCamelToSnake(body)),
+      body: JSON.stringify(deepCamelKeysToSnake(body)),
       headers: {
         'Content-Type': 'application/json',
         ...(options.headers || {})
