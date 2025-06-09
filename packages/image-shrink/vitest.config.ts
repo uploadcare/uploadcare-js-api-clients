@@ -22,7 +22,10 @@ const uploadPlugin = (): PluginOption => ({
         } catch (err) {
           await mkdir(snapshotsFolder)
         }
-        await writeFile(path.resolve(snapshotsFolder, filename), body)
+        await writeFile(
+          path.resolve(snapshotsFolder, filename),
+          new Uint8Array(body)
+        )
         res.statusCode = 200
         res.end('ok')
         return
@@ -36,14 +39,15 @@ export default defineConfig({
   plugins: [uploadPlugin()],
   test: {
     testTimeout: 100000,
-    coverage: {
-      provider: 'istanbul'
-    },
     browser: {
       enabled: true,
-      name: 'chromium',
       provider: 'playwright',
-      headless: true
+      instances: [
+        {
+          browser: 'chromium',
+          headless: true
+        }
+      ]
     }
   }
 })

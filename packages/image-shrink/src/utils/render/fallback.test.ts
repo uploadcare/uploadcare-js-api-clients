@@ -37,6 +37,6 @@ describe('fallback', () => {
       targetH: 65535 + 1,
       step: 0.71
     })
-    expect(promise).rejects.toThrow('Not supported')
+    await expect(promise).rejects.toThrow('Not supported')
   })
 })

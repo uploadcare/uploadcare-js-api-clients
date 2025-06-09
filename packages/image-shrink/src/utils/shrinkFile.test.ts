@@ -37,7 +37,7 @@ describe('shrinkFile', () => {
     const promise = shrinkFile(originalFile, {
       size: 100 * 100
     })
-    expect(promise).rejects.toThrowError('not an image')
+    await expect(promise).rejects.toThrowError('not an image')
   })
 
   it('should throw a error if unable to convert canvas to blob', async () => {
@@ -47,7 +47,9 @@ describe('shrinkFile', () => {
     const promise = shrinkFile(originalFile, {
       size: 100 * 100
     })
-    expect(promise).rejects.toThrowError('Failed to convert canvas to blob')
+    await expect(promise).rejects.toThrowError(
+      'Failed to convert canvas to blob'
+    )
   })
 
   it("should skip shrink if it's not required and throw a error", async () => {
@@ -57,7 +59,7 @@ describe('shrinkFile', () => {
     const promise = shrinkFile(originalFile, {
       size: 2000 * 2000
     })
-    expect(promise).rejects.toThrowError('Not required')
+    await expect(promise).rejects.toThrowError('Not required')
   })
 
   it('should keep transparent PNG as PNG', async (ctx) => {
