@@ -1,6 +1,6 @@
 {
   "name": "@uploadcare/quality-insights",
-  "version": "0.1.0-alpha.0",
+  "version": "0.1.0-alpha.2",
   "description": "Uploadcare Quality Insights API client",
   "keywords": [
     "uploadcare",
@@ -8,6 +8,9 @@
     "api",
     "client"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
   "type": "module",
   "main": "./dist/index.umd.cjs",
   "types": "./dist/main.d.ts",
@@ -15,7 +18,8 @@
   "exports": {
     ".": {
       "import": "./dist/index.js",
-      "require": "./dist/index.umd.cjs"
+      "require": "./dist/index.umd.cjs",
+      "types": "./dist/main.d.ts"
     }
   },
   "sideEffects": false,
@@ -25,9 +29,10 @@
     "LICENSE"
   ],
   "scripts": {
-    "dev": "vite",
-    "dev:watch": "tsc && vite build --watch --mode staging",
-    "build": "tsc && vite build",
+    "prepack": "cp ../../LICENSE ./LICENSE",
+    "dev": "tsc && vite build --watch --mode staging",
+    "build:staging": "tsc && vite build --mode staging",
+    "build:prod": "tsc && vite build",
     "preview": "vite preview"
   },
   "repository": {
