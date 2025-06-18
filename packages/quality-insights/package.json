@@ -33,10 +33,16 @@
     "dev": "tsc && vite build --watch --mode staging",
     "build:staging": "tsc && vite build --mode staging",
     "build:prod": "tsc && vite build",
+    "size": "npm run build:prod && size-limit",
     "test": "vitest",
     "test:coverage": "vitest run --coverage",
     "preview": "vite preview"
   },
+  "size-limit": [
+    {
+      "path": "dist/*.{js,cjs}"
+    }
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/uploadcare/uploadcare-js-api-clients.git"
@@ -47,7 +53,9 @@
     "url": "https://github.com/uploadcare/uploadcare-js-api-clients/issues"
   },
   "devDependencies": {
+    "@size-limit/file": "^11.2.0",
     "@vitest/coverage-v8": "^3.2.4",
+    "size-limit": "^11.2.0",
     "typescript": "~5.7.2",
     "vite": "^6.3.1",
     "vitest": "^3.2.4",
