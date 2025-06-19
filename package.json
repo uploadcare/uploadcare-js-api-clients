@@ -9,7 +9,8 @@
     "packages/upload-client",
     "packages/rest-client",
     "packages/signed-uploads",
-    "packages/image-shrink"
+    "packages/image-shrink",
+    "packages/quality-insights"
   ],
   "engines": {
     "node": ">=16"

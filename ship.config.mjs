@@ -9,12 +9,18 @@ export default {
       'packages/upload-client',
       'packages/rest-client',
       'packages/signed-uploads',
-      'packages/image-shrink'
+      'packages/image-shrink',
+      'packages/quality-insights'
     ]
   },
   publishCommand: ({ defaultCommand }) => `${defaultCommand} --access public`,
   versionUpdated: ({ version, dir }) => {
-    const packages = ['upload-client', 'rest-client', 'api-client-utils']
+    const packages = [
+      'upload-client',
+      'rest-client',
+      'api-client-utils',
+      'quality-insights'
+    ]
     const versionPaths = packages.map((p) =>
       resolve(dir, 'packages', p, 'src/version.ts')
     )
@@ -22,5 +28,5 @@ export default {
       writeFileSync(versionPath, `export default '${version}'\n`)
     }
   },
-  pullRequestReviewers: ['nd0ut']
+  pullRequestReviewers: ['nd0ut', 'egordidenko']
 }
