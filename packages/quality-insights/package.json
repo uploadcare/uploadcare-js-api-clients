@@ -32,7 +32,7 @@
     "prepack": "cp ../../LICENSE ./LICENSE",
     "dev": "tsc && vite build --watch --mode staging",
     "build:staging": "tsc && vite build --mode staging",
-    "build:prod": "tsc && vite build",
+    "build": "tsc && vite build",
     "size": "npm run build:prod && size-limit",
     "test": "vitest",
     "test:coverage": "vitest run --coverage",
