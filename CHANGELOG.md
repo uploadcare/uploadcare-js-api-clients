@@ -1,3 +1,13 @@
+# [6.15.0](https://github.com/uploadcare/uploadcare-js-api-clients/compare/v6.14.3...v6.15.0) (2025-06-23)
+
+
+### Features
+
+* add `cname-prefix` package ([#534](https://github.com/uploadcare/uploadcare-js-api-clients/issues/534)) ([aa26175](https://github.com/uploadcare/uploadcare-js-api-clients/commit/aa2617524982ed716bd5c7789f7459c1af827f5c))
+* **quality-insights:** added quality-insights package ([#533](https://github.com/uploadcare/uploadcare-js-api-clients/issues/533)) ([d2d3208](https://github.com/uploadcare/uploadcare-js-api-clients/commit/d2d32089795276172f6f4c6864f5897d5f06ae0b))
+
+
+
 ## [6.14.3](https://github.com/uploadcare/uploadcare-js-api-clients/compare/v6.14.2...v6.14.3) (2025-02-25)
 
 ### Bug Fixes
