@@ -3,8 +3,8 @@
 
 ### Features
 
-* add `cname-prefix` package ([#534](https://github.com/uploadcare/uploadcare-js-api-clients/issues/534)) ([aa26175](https://github.com/uploadcare/uploadcare-js-api-clients/commit/aa2617524982ed716bd5c7789f7459c1af827f5c))
-* **quality-insights:** added quality-insights package ([#533](https://github.com/uploadcare/uploadcare-js-api-clients/issues/533)) ([d2d3208](https://github.com/uploadcare/uploadcare-js-api-clients/commit/d2d32089795276172f6f4c6864f5897d5f06ae0b))
+* **cname-prefix:** add `cname-prefix` package ([#534](https://github.com/uploadcare/uploadcare-js-api-clients/issues/534)) ([aa26175](https://github.com/uploadcare/uploadcare-js-api-clients/commit/aa2617524982ed716bd5c7789f7459c1af827f5c))
+* **quality-insights:** add `quality-insights` package ([#533](https://github.com/uploadcare/uploadcare-js-api-clients/issues/533)) ([d2d3208](https://github.com/uploadcare/uploadcare-js-api-clients/commit/d2d32089795276172f6f4c6864f5897d5f06ae0b))
 
 
 
