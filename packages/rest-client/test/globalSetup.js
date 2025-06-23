@@ -11,15 +11,8 @@ const __dirname = fileURLToPath(new URL('.', import.meta.url))
  * with --experimentalSpecifierResolution flag enabled
  */
 export default () => {
-  const tsNodeEsm = path.join(
-    __dirname,
-    '../../../node_modules/.bin/ts-node-esm'
-  )
-  const flags = '--experimentalSpecifierResolution node'
-  const cmd = `${tsNodeEsm} ${flags} ${path.join(
-    __dirname,
-    './globalSetup.ts'
-  )}`
+  const tsxBin = path.join(__dirname, '../../../node_modules/.bin/tsx')
+  const cmd = `${tsxBin} ${path.join(__dirname, './globalSetup.ts')}`
 
   return new Promise((resolve, reject) => {
     exec(cmd, (err, stdout, stderr) => {
