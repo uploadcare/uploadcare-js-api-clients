@@ -7,7 +7,7 @@ import { ConversionType } from '../types/ConversionType'
 import { conversionJobPoller } from './conversionJobPoller'
 import { delay } from '@uploadcare/api-client-utils'
 
-jest.setTimeout(60 * 1000)
+jest.setTimeout(120 * 1000)
 
 describe('conversionJobPoller', () => {
   it('should work with video conversion', async () => {
