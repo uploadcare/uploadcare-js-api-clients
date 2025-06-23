@@ -10,7 +10,8 @@
     "packages/rest-client",
     "packages/signed-uploads",
     "packages/image-shrink",
-    "packages/quality-insights"
+    "packages/quality-insights",
+    "packages/cname-prefix"
   ],
   "engines": {
     "node": ">=16"

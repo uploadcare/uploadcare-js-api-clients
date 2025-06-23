@@ -1,7 +1,7 @@
 {
-  "name": "@uploadcare/image-shrink",
+  "name": "@uploadcare/cname-prefix",
   "version": "6.14.3",
-  "description": "Library for work with Uploadcare image shrink",
+  "description": "Helpers for working with Uploadcare CNAME-prefixed URLs in browser environments.",
   "type": "module",
   "main": "./dist/cjs/index.browser.cjs",
   "module": "./dist/esm/index.browser.mjs",
@@ -14,7 +14,9 @@
   },
   "sideEffects": false,
   "files": [
-    "dist/*"
+    "dist/*",
+    "README.md",
+    "LICENSE"
   ],
   "scripts": {
     "prepack": "cp ../../LICENSE ./LICENSE",
@@ -44,12 +46,8 @@
     "signature"
   ],
   "devDependencies": {
-    "@imagemagick/magick-wasm": "^0.0.28",
-    "@types/content-type": "^1.1.8",
     "@vitest/browser": "^3.2.3",
     "@vitest/coverage-v8": "^3.2.3",
-    "playwright": "^1.41.2",
-    "raw-body": "^2.5.2",
     "ts-node": "^10.8.1",
     "vitest": "^3.2.3"
   }

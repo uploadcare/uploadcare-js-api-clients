@@ -10,7 +10,8 @@ export default {
       'packages/rest-client',
       'packages/signed-uploads',
       'packages/image-shrink',
-      'packages/quality-insights'
+      'packages/quality-insights',
+      'packages/cname-prefix',
     ]
   },
   publishCommand: ({ defaultCommand }) => `${defaultCommand} --access public`,
@@ -19,7 +20,8 @@ export default {
       'upload-client',
       'rest-client',
       'api-client-utils',
-      'quality-insights'
+      'quality-insights',
+      'cname-prefix'
     ]
     const versionPaths = packages.map((p) =>
       resolve(dir, 'packages', p, 'src/version.ts')

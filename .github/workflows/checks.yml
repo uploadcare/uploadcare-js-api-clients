@@ -34,6 +34,10 @@ jobs:
               - 'packages/signed-uploads/**'
             image-shrink:
               - 'packages/image-shrink/**'
+            cname-prefix:
+              - 'packages/cname-prefix/**'
+            quality-insights:
+              - 'packages/quality-insights/**'
       - name: Install dependencies
         working-directory: ./
         run: npm i
