@@ -2,6 +2,18 @@
   "$schema": "https://typedoc.org/schema.json",
   "out": "docs",
   "excludePrivate": true,
-  "exclude": ["**/*.test.ts"],
-  "tsconfig": "./tsconfig.typedoc.json"
+  "tsconfig": "./tsconfig.typedoc.json",
+  "highlightLanguages": [
+    "bash",
+    "console",
+    "css",
+    "html",
+    "javascript",
+    "json",
+    "jsonc",
+    "json5",
+    "tsx",
+    "typescript",
+    "xml"
+  ]
 }

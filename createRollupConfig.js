@@ -16,7 +16,7 @@ const RollbarFormat = Object.freeze({
   ESM: 'esm'
 })
 
-export const createRollupConfig = ({ targetEnv, cwd }) =>
+export const createRollupConfig = ({ targetEnv, cwd, exclude }) =>
   [RollbarFormat.CJS, RollbarFormat.ESM].map((format) => {
     const extension = format === 'esm' ? 'mjs' : 'cjs'
     return {
@@ -45,7 +45,8 @@ export const createRollupConfig = ({ targetEnv, cwd }) =>
         nodeExternals({ exclude: /@uploadcare/ }),
         nodeResolve(),
         typescript({
-          tsconfig: path.join(cwd, 'tsconfig.build.json')
+          tsconfig: path.join(cwd, 'tsconfig.build.json'),
+          exclude
         }),
         // @see https://github.com/arethetypeswrong/arethetypeswrong.github.io
         copy({
