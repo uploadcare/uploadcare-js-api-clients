@@ -1,6 +1,6 @@
 {
   "name": "@uploadcare/cname-prefix",
-  "version": "6.15.1",
+  "version": "6.15.2",
   "description": "Helpers for working with Uploadcare CNAME-prefixed URLs in browser environments.",
   "type": "module",
   "main": "./dist/cjs/index.browser.cjs",
