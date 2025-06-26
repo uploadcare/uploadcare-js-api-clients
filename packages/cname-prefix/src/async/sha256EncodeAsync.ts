@@ -1,4 +1,4 @@
-export const sha256Encode = async (data: string): Promise<number> => {
+export const sha256EncodeAsync = async (data: string): Promise<number> => {
   const msgUint8 = new TextEncoder().encode(data)
   const hashBuffer = await window.crypto.subtle.digest('SHA-256', msgUint8)
   const hashArray = Array.from(new Uint8Array(hashBuffer))

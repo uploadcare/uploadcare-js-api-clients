@@ -1,0 +1,1 @@
+export { getPrefixedCdnBaseAsync } from './getPrefixedCdnBaseAsync'
