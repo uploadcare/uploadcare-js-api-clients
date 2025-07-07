@@ -1,0 +1,1 @@
+export { getPrefixedCdnBaseSync } from './getPrefixedCdnBaseSync'

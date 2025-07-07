@@ -8,8 +8,16 @@
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "import": "./dist/esm/index.browser.mjs",
-      "require": "./dist/cjs/index.browser.cjs"
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./async": {
+      "import": "./dist/async.js",
+      "require": "./dist/async.cjs"
+    },
+    "./sync": {
+      "import": "./dist/sync.js",
+      "require": "./dist/sync.cjs"
     }
   },
   "sideEffects": false,
@@ -24,9 +32,7 @@
     "test": "npx playwright install-deps chromium && vitest --run  --coverage",
     "test:watch": "npx playwright install-deps chromium && vitest",
     "prebuild": "npm run clean",
-    "build": "npm run build:types && npm run build:compile",
-    "build:types": "dts-bundle-generator --project tsconfig.dts.json -o dist/index.d.ts src/index.ts",
-    "build:compile": "rollup -c"
+    "build": "tsc && vite build"
   },
   "repository": {
     "type": "git",
@@ -46,8 +52,10 @@
     "signature"
   ],
   "devDependencies": {
-    "@vitest/browser": "^3.2.3",
-    "@vitest/coverage-v8": "^3.2.3",
-    "vitest": "^3.2.3"
+    "@vitest/browser": "^3.2.4",
+    "@vitest/coverage-v8": "^3.2.4",
+    "vite": "^7.0.0",
+    "vite-plugin-dts": "^4.5.4",
+    "vitest": "^3.2.4"
   }
 }
