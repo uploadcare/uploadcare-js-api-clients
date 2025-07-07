@@ -1,3 +1,12 @@
+# [6.16.0](https://github.com/uploadcare/uploadcare-js-api-clients/compare/v6.15.2...v6.16.0) (2025-07-07)
+
+
+### Features
+
+* **cname-prefix:** add sync method to generate sha256 prefix ([#541](https://github.com/uploadcare/uploadcare-js-api-clients/issues/541)) ([7aa7f0b](https://github.com/uploadcare/uploadcare-js-api-clients/commit/7aa7f0b4162e2e8ad8c11f439bdf01a3e1c2923e))
+
+
+
 ## [6.15.2](https://github.com/uploadcare/uploadcare-js-api-clients/compare/v6.15.1...v6.14.3) (2025-06-24)
 
 ### Features
