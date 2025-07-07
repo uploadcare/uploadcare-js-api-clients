@@ -3,19 +3,22 @@
   "version": "6.16.0",
   "description": "Helpers for working with Uploadcare CNAME-prefixed URLs in browser environments.",
   "type": "module",
-  "main": "./dist/cjs/index.browser.cjs",
-  "module": "./dist/esm/index.browser.mjs",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
+      "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
       "require": "./dist/index.cjs"
     },
     "./async": {
+      "types": "./dist/async.d.ts",
       "import": "./dist/async.js",
       "require": "./dist/async.cjs"
     },
     "./sync": {
+      "types": "./dist/sync.d.ts",
       "import": "./dist/sync.js",
       "require": "./dist/sync.cjs"
     }
