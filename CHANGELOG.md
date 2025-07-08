@@ -1,3 +1,11 @@
+## [6.16.2](https://github.com/uploadcare/uploadcare-js-api-clients/compare/v6.16.1...v6.16.2) (2025-07-08)
+
+
+### Bug Fixes
+
+* **cname-prefix:** use bigint instead of number ([#545](https://github.com/uploadcare/uploadcare-js-api-clients/issues/545)) ([34ccc91](https://github.com/uploadcare/uploadcare-js-api-clients/commit/34ccc91e6b6c0acc3b75adbc34d47608888d7519))
+
+
 ## [6.16.1](https://github.com/uploadcare/uploadcare-js-api-clients/compare/v6.16.0...v6.16.1) (2025-07-07)
 
 

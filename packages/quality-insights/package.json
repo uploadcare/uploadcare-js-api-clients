@@ -1,6 +1,6 @@
 {
   "name": "@uploadcare/quality-insights",
-  "version": "6.16.1",
+  "version": "6.16.2",
   "description": "Uploadcare Quality Insights API client",
   "keywords": [
     "uploadcare",
