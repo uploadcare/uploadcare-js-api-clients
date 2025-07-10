@@ -6,7 +6,6 @@
 * **cname-prefix:** add `isPrefixedCdnBase` helper ([#547](https://github.com/uploadcare/uploadcare-js-api-clients/issues/547)) ([09d2a8c](https://github.com/uploadcare/uploadcare-js-api-clients/commit/09d2a8c22b8ccfe83f678e2bb7875bb991f9f429))
 
 
-
 ## [6.16.2](https://github.com/uploadcare/uploadcare-js-api-clients/compare/v6.16.1...v6.16.2) (2025-07-08)
 
 
