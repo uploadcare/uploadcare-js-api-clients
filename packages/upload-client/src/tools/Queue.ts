@@ -13,7 +13,8 @@ export class Queue {
     this._concurrency = concurrency
   }
 
-  private _run() {
+  /** Run tasks from the queue up to the concurrency limit */
+  run() {
     const tasksLeft = this._concurrency - this._running
     for (let i = 0; i < tasksLeft; i++) {
       const task = this._pending.shift()
@@ -33,20 +34,35 @@ export class Queue {
           this._resolvers.delete(task)
           this._rejectors.delete(task)
           this._running -= 1
-          this._run()
+          this.run()
         })
         .then((value) => resolver(value))
         .catch((error) => rejector(error))
     }
   }
 
-  add<T>(task: Task<T>): Promise<T> {
+  /**
+   * Add a task to the queue
+   *
+   * If you want to add a lot of tasks at once, consider setting `autoRun` to
+   * false and calling `run()` manually after adding all tasks to avoid multiple
+   * redundant calls to `run()`.
+   *
+   * @param task The task to add
+   * @param autoRun Whether to automatically run the queue after adding the task
+   *   (default: true)
+   * @returns A promise that resolves or rejects with the task's result
+   */
+  add<T>(
+    task: Task<T>,
+    { autoRun }: { autoRun?: boolean } = { autoRun: true }
+  ): Promise<T> {
     return new Promise((resolve, reject) => {
       this._resolvers.set(task, resolve as Resolver)
       this._rejectors.set(task, reject as Rejector)
 
       this._pending.push(task)
-      this._run()
+      autoRun && this.run()
     }) as Promise<T>
   }
 
@@ -60,7 +76,7 @@ export class Queue {
 
   set concurrency(value: number) {
     this._concurrency = value
-    this._run()
+    this.run()
   }
 
   get concurrency() {
