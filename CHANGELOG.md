@@ -6,7 +6,6 @@
 * **upload-client/queue:** add flag to disable auto-run and expose run method in public to run queue manually ([#550](https://github.com/uploadcare/uploadcare-js-api-clients/issues/550)) ([4189ae9](https://github.com/uploadcare/uploadcare-js-api-clients/commit/4189ae964eccae33d1009fb55b1bbcbd5927ee52))
 
 
-
 # [6.17.0](https://github.com/uploadcare/uploadcare-js-api-clients/compare/v6.16.2...v6.17.0) (2025-07-10)
 
 
