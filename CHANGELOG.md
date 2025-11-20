@@ -1,3 +1,12 @@
+## [6.18.1](https://github.com/uploadcare/uploadcare-js-api-clients/compare/v6.18.0...v6.18.1) (2025-11-20)
+
+
+### Bug Fixes
+
+* **quality-insights:** fix package deps ([#552](https://github.com/uploadcare/uploadcare-js-api-clients/issues/552)) ([c9626f0](https://github.com/uploadcare/uploadcare-js-api-clients/commit/c9626f07b3aef757479f0840b1b802cc7b3c5db6))
+
+
+
 # [6.18.0](https://github.com/uploadcare/uploadcare-js-api-clients/compare/v6.17.0...v6.18.0) (2025-09-25)
 
 
