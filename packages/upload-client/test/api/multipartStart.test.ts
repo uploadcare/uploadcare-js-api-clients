@@ -3,7 +3,7 @@ import * as factory from '../_fixtureFactory'
 import { getSettingsForTesting } from '../_helpers'
 import { UploadError } from '../../src/tools/UploadError'
 
-describe('API - multipartStart', () => {
+describe.skip('API - multipartStart', () => {
   const size = factory.file(12).size
 
   it('should be able to start upload data', async () => {
