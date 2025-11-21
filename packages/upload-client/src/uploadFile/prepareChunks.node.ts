@@ -7,6 +7,8 @@ export const prepareChunks: PrepareChunks = async (
   fileSize: number,
   chunkSize: number
 ) => {
-  return (index: number): NodeFile =>
-    sliceChunk(file as NodeFile, index, fileSize, chunkSize)
+  return {
+    getChunk: (index: number): NodeFile =>
+      sliceChunk(file as NodeFile, index, fileSize, chunkSize)
+  }
 }
