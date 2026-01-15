@@ -1,3 +1,12 @@
+## [6.18.3](https://github.com/uploadcare/uploadcare-js-api-clients/compare/v6.18.2...v6.18.3) (2026-01-15)
+
+
+### Bug Fixes
+
+* **upload-client/UploadcareGroup:** rewrite group cdnUrl base domain with specified one ([#560](https://github.com/uploadcare/uploadcare-js-api-clients/issues/560)) ([fdf1035](https://github.com/uploadcare/uploadcare-js-api-clients/commit/fdf103548bfc51d7372dc2873c1b394903dda911))
+
+
+
 ## [6.18.2](https://github.com/uploadcare/uploadcare-js-api-clients/compare/v6.18.1...v6.18.2) (2025-11-21)
 
 
