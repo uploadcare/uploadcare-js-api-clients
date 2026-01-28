@@ -1,3 +1,11 @@
+## [6.18.4](https://github.com/uploadcare/uploadcare-js-api-clients/compare/v6.18.3...v6.18.4) (2026-01-28)
+
+### Bug Fixes
+
+* **quality-insights:** exclude zod imports from dts ([#563](https://github.com/uploadcare/uploadcare-js-api-clients/issues/563)) ([2f2fba8](https://github.com/uploadcare/uploadcare-js-api-clients/commit/2f2fba850f8361cf67a640443e33a526643ee62b))
+
+
+
 ## [6.18.3](https://github.com/uploadcare/uploadcare-js-api-clients/compare/v6.18.2...v6.18.3) (2026-01-15)
 
 
