@@ -1,5 +1,5 @@
 import { isReactNativeAsset } from '../tools/isFileData'
-import { SupportedFileInput } from '../types'
+import { Sliceable, SupportedFileInput } from '../types'
 import { getBlobFromReactNativeAsset } from '../tools/getBlobFromReactNativeAsset'
 import { sliceChunk } from './sliceChunk'
 import { PrepareChunks } from './types'
@@ -19,17 +19,26 @@ export const prepareChunks: PrepareChunks = async (
   fileSize: number,
   chunkSize: number
 ) => {
-  let blob: Blob
+  let blob: Sliceable
   if (isReactNativeAsset(file)) {
     blob = await getBlobFromReactNativeAsset(file)
   } else {
-    blob = file as Blob
+    blob = file as Sliceable
   }
 
-  const chunks: Blob[] = []
-  return (index: number): Blob => {
-    const chunk = sliceChunk(blob, index, fileSize, chunkSize)
-    chunks.push(chunk)
-    return chunk
+  const chunks: Set<Sliceable> = new Set()
+  return {
+    getChunk: (index: number): Sliceable => {
+      const chunk = sliceChunk(blob, index, fileSize, chunkSize)
+      chunks.add(chunk)
+      return chunk
+    },
+    /**
+     * Remove references to all the chunks from the memory to make able
+     * react-native to deallocate it
+     */
+    disposeChunks: () => {
+      chunks.clear()
+    }
   }
 }

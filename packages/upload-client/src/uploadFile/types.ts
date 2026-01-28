@@ -28,4 +28,7 @@ export type PrepareChunks = (
   file: SupportedFileInput,
   fileSize: number,
   chunkSize: number
-) => Promise<(index: number) => Sliceable>
+) => Promise<{
+  getChunk: (index: number) => Sliceable
+  disposeChunks?: () => void
+}>
