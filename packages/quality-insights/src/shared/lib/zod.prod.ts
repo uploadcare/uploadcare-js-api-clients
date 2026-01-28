@@ -1,4 +1,4 @@
-import { TelemetryRequest } from '../types/telemetry'
+import type { TelemetryRequest } from '../types/telemetry'
 
 type SafeParseReturnType =
   | {
