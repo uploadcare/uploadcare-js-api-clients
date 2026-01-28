@@ -1,5 +1,6 @@
 import { GroupFileInfo, GroupId, GroupInfo } from '../api/types'
 import defaultSettings from '../defaultSettings'
+import { replaceUrlBase } from './replaceUrlBase'
 import { UploadcareFile } from './UploadcareFile'
 
 export class UploadcareGroup {
@@ -31,7 +32,7 @@ export class UploadcareGroup {
     this.isStored = !!groupInfo.datetimeStored
     this.isImage = !!Object.values(groupFiles).filter((file) => file.isImage)
       .length
-    this.cdnUrl = groupInfo.cdnUrl
+    this.cdnUrl = replaceUrlBase(groupInfo.cdnUrl, baseCDN)
     this.files = groupFiles.map(
       (fileInfo) => new UploadcareFile(fileInfo, { baseCDN })
     )

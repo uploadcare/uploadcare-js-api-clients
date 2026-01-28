@@ -1,6 +1,6 @@
 {
   "name": "@uploadcare/image-shrink",
-  "version": "6.18.2",
+  "version": "6.18.3",
   "description": "Library for work with Uploadcare image shrink",
   "type": "module",
   "main": "./dist/cjs/index.browser.cjs",
