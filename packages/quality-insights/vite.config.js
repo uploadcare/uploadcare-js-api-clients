@@ -6,7 +6,12 @@ import dts from 'vite-plugin-dts'
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
 export default defineConfig({
-  plugins: [dts({ insertTypesEntry: true })],
+  plugins: [
+    dts({
+      insertTypesEntry: true,
+      exclude: ['**/*.dev.ts']
+    })
+  ],
   build: {
     lib: {
       entry: resolve(__dirname, 'src/main.ts'),

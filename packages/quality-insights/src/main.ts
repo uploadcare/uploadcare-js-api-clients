@@ -1,3 +1,3 @@
 export { TelemetryAPIService } from './api/TelemetryAPI'
 
-export { type TelemetryRequest } from './shared/schema/telemetry'
+export { type TelemetryRequest } from './shared/types/telemetry'
