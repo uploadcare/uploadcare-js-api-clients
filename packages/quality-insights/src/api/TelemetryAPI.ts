@@ -1,6 +1,6 @@
 import { BaseAPIService } from './BaseService'
 import { parseTelemetryRequest } from '../shared/lib/parseTelemetryRequest'
-import { TelemetryRequest } from '../shared/types/telemetry'
+import type { TelemetryRequest } from '../shared/types/telemetry'
 
 export class TelemetryAPIService extends BaseAPIService {
   constructor() {
