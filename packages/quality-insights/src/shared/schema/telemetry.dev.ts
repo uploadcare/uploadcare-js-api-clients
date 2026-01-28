@@ -1,6 +1,7 @@
 import * as z from 'zod'
+import type { TelemetryRequest, TelemetryResponse } from '../types/telemetry'
 
-export const TelemetryRequestSchema = z.object({
+export const TelemetryRequestSchema: z.ZodType<TelemetryRequest> = z.object({
   eventType: z.string().nullable(),
   activity: z.string().nullable(),
   projectPubkey: z.string(),
@@ -13,12 +14,8 @@ export const TelemetryRequestSchema = z.object({
   payload: z.record(z.unknown()).nullable()
 })
 
-export const TelemetryResponseSchema = z.object({
+export const TelemetryResponseSchema: z.ZodType<TelemetryResponse> = z.object({
   status: z.string(),
   message: z.string(),
   event_id: z.string()
 })
-
-export type TelemetryRequest = z.infer<typeof TelemetryRequestSchema>
-
-export type TelemetryResponse = z.infer<typeof TelemetryResponseSchema>

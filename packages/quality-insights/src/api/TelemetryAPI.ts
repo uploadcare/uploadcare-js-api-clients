@@ -1,9 +1,6 @@
 import { BaseAPIService } from './BaseService'
-import {
-  TelemetryRequest,
-  TelemetryRequestSchema
-} from '../shared/schema/telemetry'
-import { safeParseAsync } from '../shared/lib/zod'
+import { parseTelemetryRequest } from '../shared/lib/parseTelemetryRequest'
+import type { TelemetryRequest } from '../shared/types/telemetry'
 
 export class TelemetryAPIService extends BaseAPIService {
   constructor() {
@@ -11,12 +8,7 @@ export class TelemetryAPIService extends BaseAPIService {
   }
 
   public async sendEvent(body: TelemetryRequest, options?: RequestInit) {
-    const parseResult = await safeParseAsync(
-      import.meta.env.MODE === 'development'
-        ? TelemetryRequestSchema
-        : undefined,
-      body
-    )
+    const parseResult = await parseTelemetryRequest(body)
 
     if (!parseResult.success) {
       console.error(
