@@ -1,4 +1,4 @@
-import { expect, jest } from '@jest/globals'
+import { expect, vi } from 'vitest'
 import { Headers, Response } from '../lib/fetch/fetch.node'
 import { RestClientError } from './RestClientError'
 import { retryIfFailed } from './retryIfFailed'
@@ -26,7 +26,7 @@ const createRunner = ({
   response?: Response
 }) => {
   let runs = 0
-  const mock = jest.fn(async () => {
+  const mock = vi.fn(async () => {
     ++runs
 
     if (runs <= attempts) {

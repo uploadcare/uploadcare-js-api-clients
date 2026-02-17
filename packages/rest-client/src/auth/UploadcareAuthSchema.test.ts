@@ -1,4 +1,4 @@
-import { describe, expect, it, jest } from '@jest/globals'
+import { describe, expect, it, vi } from 'vitest'
 import { delay } from '@uploadcare/api-client-utils'
 import { Headers, Request } from '../lib/fetch/fetch.node'
 import { defaultSettings } from '../settings'
@@ -43,7 +43,7 @@ describe('UploadcareAuthScheme', () => {
   })
 
   it('should pass correct params to the signature resolver', async () => {
-    const signatureResolver = jest.fn(async () => 'signature')
+    const signatureResolver = vi.fn(async () => 'signature')
     const authScheme = new UploadcareAuthSchema({
       publicKey: 'public-key',
       signatureResolver
@@ -121,8 +121,8 @@ describe('UploadcareAuthScheme', () => {
   })
 
   it('should accept custom md5 function', async () => {
-    const signatureResolver = jest.fn(async () => 'signature')
-    const customMd5 = jest.fn(() => 'hash')
+    const signatureResolver = vi.fn(async () => 'signature')
+    const customMd5 = vi.fn(() => 'hash')
 
     const authScheme = new UploadcareAuthSchema({
       publicKey: 'public-key',

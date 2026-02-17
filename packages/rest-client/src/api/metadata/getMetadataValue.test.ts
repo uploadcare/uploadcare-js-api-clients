@@ -1,4 +1,4 @@
-import { describe, it } from '@jest/globals'
+import { describe, it } from 'vitest'
 import { getMetadataValue } from './getMetadataValue'
 
 import { INVALID_UUID, METADATA_UUID } from '../../../test/fixtures'

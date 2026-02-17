@@ -1,5 +1,5 @@
-/** @jest-environment jsdom */
-import { expect } from '@jest/globals'
+// @vitest-environment jsdom
+import { expect } from 'vitest'
 import {
   isBlob,
   isBuffer,

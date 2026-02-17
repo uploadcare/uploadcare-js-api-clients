@@ -4,7 +4,7 @@ import multipartComplete from '../../src/api/multipartComplete'
 import * as factory from '../_fixtureFactory'
 import { getSettingsForTesting } from '../_helpers'
 import { UploadError } from '../../src/tools/UploadError'
-import { jest, expect } from '@jest/globals'
+import { vi, expect } from 'vitest'
 
 const getChunk = (
   file: Buffer | Blob,
@@ -18,7 +18,7 @@ const getChunk = (
   return file.slice(start, end)
 }
 
-jest.setTimeout(60000)
+vi.setConfig({ testTimeout: 60000 })
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const naiveMultipart = (file, parts, options): Promise<any> =>

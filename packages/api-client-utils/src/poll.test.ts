@@ -2,13 +2,13 @@ import { poll, PollCheckFunction } from './poll'
 import { onCancel } from './onCancel'
 import { CancelError } from './CancelError'
 import { delay } from './delay'
-import { jest, expect } from '@jest/globals'
+import { vi, expect } from 'vitest'
 
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 const longJob = (attemps: number, fails: Error | null = null) => {
   let runs = 1
-  const condition = jest.fn()
-  const cancel = jest.fn()
+  const condition = vi.fn()
+  const cancel = vi.fn()
 
   const isFinish: PollCheckFunction<boolean> = (signal) => {
     condition()

@@ -15,5 +15,5 @@ export const replaceExif = async (
     setExifOrientation(exif, 1)
   }
 
-  return replaceJpegChunk(blob, 0xe1, [exif.buffer])
+  return replaceJpegChunk(blob, 0xe1, [exif.buffer as ArrayBuffer])
 }

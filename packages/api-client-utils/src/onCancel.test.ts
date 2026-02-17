@@ -1,17 +1,23 @@
 import { onCancel } from '@uploadcare/api-client-utils'
-import { jest, expect } from '@jest/globals'
+import { vi, expect } from 'vitest'
 
 describe('onCancel', () => {
-  it('should work', (done) => {
+  it('should work', async () => {
     const ctrl = new AbortController()
+    const callback = vi.fn()
 
-    onCancel(ctrl.signal, done)
+    onCancel(ctrl.signal, callback)
     ctrl.abort()
+
+    // Wait for async execution
+    await Promise.resolve()
+
+    expect(callback).toHaveBeenCalled()
   })
 
   it('should run callback ones', async () => {
     const ctrl = new AbortController()
-    const hanlder = jest.fn()
+    const hanlder = vi.fn()
 
     ctrl.abort()
     onCancel(ctrl.signal, hanlder)
@@ -26,8 +32,8 @@ describe('onCancel', () => {
 
   it('should execute more than one callback', async () => {
     const ctrl = new AbortController()
-    const firstOnCancel = jest.fn()
-    const secondOnCancel = jest.fn()
+    const firstOnCancel = vi.fn()
+    const secondOnCancel = vi.fn()
 
     onCancel(ctrl.signal, firstOnCancel)
     onCancel(ctrl.signal, secondOnCancel)
@@ -43,7 +49,7 @@ describe('onCancel', () => {
   })
 
   it('should run callback on already aborted signal', async () => {
-    const spy = jest.fn()
+    const spy = vi.fn()
     const ctrl = new AbortController()
 
     ctrl.abort()

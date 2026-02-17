@@ -1,6 +1,6 @@
 import { delay } from '@uploadcare/api-client-utils'
 import { Queue } from '../../src/tools/Queue'
-import { expect } from '@jest/globals'
+import { expect } from 'vitest'
 
 const DELAY = 100
 const TIME_TOLERANCE = DELAY / 2

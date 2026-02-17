@@ -2,7 +2,7 @@ import * as factory from '../_fixtureFactory'
 import { getSettingsForTesting, assertComputableProgress } from '../_helpers'
 import { UploadError } from '../../src/tools/UploadError'
 import { uploadFromUploaded } from '../../src/uploadFile/uploadFromUploaded'
-import { jest, expect } from '@jest/globals'
+import { vi, expect } from 'vitest'
 
 describe('uploadFromUploaded', () => {
   const uuid = factory.uuid('image')
@@ -42,7 +42,7 @@ describe('uploadFromUploaded', () => {
   })
 
   it('should be able to handle progress', async () => {
-    const onProgress = jest.fn()
+    const onProgress = vi.fn()
     const settings = getSettingsForTesting({
       publicKey: factory.publicKey('image'),
       onProgress

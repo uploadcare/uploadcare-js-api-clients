@@ -2,7 +2,7 @@ import * as factory from '../_fixtureFactory'
 import { getSettingsForTesting, assertComputableProgress } from '../_helpers'
 import { uploadFileGroup } from '../../src/uploadFileGroup'
 import { UploadError } from '../../src/tools/UploadError'
-import { jest, expect } from '@jest/globals'
+import { vi, expect } from 'vitest'
 
 describe('groupFrom Uploaded[]', () => {
   const files = factory.groupOfFiles('valid')
@@ -48,7 +48,7 @@ describe('groupFrom Uploaded[]', () => {
   })
 
   it('should be able to handle progress', async () => {
-    const onProgress = jest.fn()
+    const onProgress = vi.fn()
     const upload = uploadFileGroup(files, {
       ...settings,
       onProgress

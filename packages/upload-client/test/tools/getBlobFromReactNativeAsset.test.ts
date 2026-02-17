@@ -1,14 +1,14 @@
-/** @jest-environment jsdom */
+// @vitest-environment jsdom
 import { getBlobFromReactNativeAsset } from '../../src/tools/getBlobFromReactNativeAsset'
-import { expect, jest } from '@jest/globals'
+import { expect, vi } from 'vitest'
 
-global.fetch = jest.fn(() =>
+global.fetch = vi.fn(() =>
   Promise.resolve({
     blob: () => new Blob(['111'])
   })
 ) as unknown as typeof fetch
 
-beforeEach(() => (global.fetch as jest.Mock).mockClear())
+beforeEach(() => (global.fetch as vi.Mock).mockClear())
 
 describe('getBlobFromReactNativeAsset', () => {
   it('should convert ReactNative asset as Blob', async () => {

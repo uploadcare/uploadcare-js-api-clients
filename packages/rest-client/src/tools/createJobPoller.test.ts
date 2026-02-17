@@ -1,23 +1,22 @@
-import { jest } from '@jest/globals'
+import { vi } from 'vitest'
 import { CancelError } from '@uploadcare/api-client-utils'
 import { createJobPoller } from './createJobPoller'
 
 describe('createJobPoller', () => {
   it('should pass proper objects in the all callbacks', async () => {
-    const runner = jest.fn(async () => ({
+    const runner = vi.fn(async () => ({
       result: ['finished', 'failed']
     }))
-    const resolveJobs = jest.fn(
-      (response: Awaited<ReturnType<typeof runner>>) =>
-        response.result.map((r) => ({ status: r }))
+    const resolveJobs = vi.fn((response: Awaited<ReturnType<typeof runner>>) =>
+      response.result.map((r) => ({ status: r }))
     )
-    const getJobStatus = jest.fn(
+    const getJobStatus = vi.fn(
       async (job: ReturnType<typeof resolveJobs>[number]) => job.status
     )
-    const isJobFinished = jest.fn((response) => response === 'finished')
-    const isJobFailed = jest.fn((response) => response === 'failed')
-    const getResult = jest.fn(async () => 'result')
-    const getError = jest.fn(async () => 'error')
+    const isJobFinished = vi.fn((response) => response === 'finished')
+    const isJobFailed = vi.fn((response) => response === 'failed')
+    const getResult = vi.fn(async () => 'result')
+    const getError = vi.fn(async () => 'error')
     const poller = createJobPoller({
       runner,
       resolveJobs,
@@ -71,7 +70,7 @@ describe('createJobPoller', () => {
   it('should be able to abort polling', async () => {
     const abortController = new AbortController()
 
-    const getJobStatus = jest.fn(async () => {
+    const getJobStatus = vi.fn(async () => {
       setTimeout(() => abortController.abort(), 0)
       return 'status'
     })
@@ -98,7 +97,7 @@ describe('createJobPoller', () => {
   })
 
   it('should be able to abort request', async () => {
-    const getJobStatus = jest.fn(async () => 'status')
+    const getJobStatus = vi.fn(async () => 'status')
 
     const poller = createJobPoller({
       runner: async () => ({ result: 'test' }),

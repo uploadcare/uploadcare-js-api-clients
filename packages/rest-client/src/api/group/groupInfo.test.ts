@@ -1,4 +1,4 @@
-import { describe, it } from '@jest/globals'
+import { describe, it } from 'vitest'
 import { groupInfo } from './groupInfo'
 
 import { GROUP_FILE_UUID, INVALID_UUID } from '../../../test/fixtures'

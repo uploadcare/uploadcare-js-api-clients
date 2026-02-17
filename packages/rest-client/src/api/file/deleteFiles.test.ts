@@ -1,4 +1,4 @@
-import { describe, it } from '@jest/globals'
+import { describe, it } from 'vitest'
 import { deleteFiles } from './deleteFiles'
 
 import { INVALID_UUID, STORE_UUID } from '../../../test/fixtures'

@@ -1,4 +1,4 @@
-import { expect, it, describe } from '@jest/globals'
+import { expect, it, describe } from 'vitest'
 import { UploadcareSimpleAuthSchema } from './UploadcareSimpleAuthSchema'
 import { defaultSettings } from '../settings'
 import { Headers, Request } from '../lib/fetch/fetch.node'

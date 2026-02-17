@@ -1,5 +1,4 @@
-/// <reference types="jest-extended" />
-import { jest } from '@jest/globals'
+import { vi } from 'vitest'
 import { ADDONS_UUID } from '../../test/fixtures'
 import { testSettings, uploadClient } from '../../test/helpers'
 import { copyFileToLocalStorage } from '../api/file/copyFileToLocalStorage'
@@ -7,7 +6,7 @@ import { AddonExecutionStatus } from '../types/AddonExecutionStatus'
 import { AddonName } from '../types/AddonName'
 import { addonJobPoller } from './addonJobPoller'
 
-jest.setTimeout(80 * 1000)
+vi.setTimeout(80 * 1000)
 
 describe('addonJobPoller', () => {
   it('should work', async () => {
@@ -32,7 +31,7 @@ describe('addonJobPoller', () => {
     if (result.error) {
       expect(result.result).toBe(null)
     } else {
-      expect(result.error).toBeFalse()
+      expect(result.error).toBe(false)
       expect(result.result?.data).toBeTruthy()
     }
   })
@@ -43,8 +42,8 @@ describe('addonJobPoller', () => {
       testSettings
     )
 
-    const onRun = jest.fn()
-    const onStatus = jest.fn()
+    const onRun = vi.fn()
+    const onStatus = vi.fn()
 
     await addonJobPoller(
       {
@@ -62,14 +61,17 @@ describe('addonJobPoller', () => {
     expect(onRun.mock.calls.length).toBe(1)
     expect(onRun.mock.calls[0]).toEqual([
       expect.objectContaining({
-        requestId: expect.toBeString()
+        requestId: expect.any(String)
       })
     ])
     expect(onStatus.mock.calls.length).toBeGreaterThanOrEqual(1)
     expect(onStatus.mock.lastCall).toEqual([
       expect.objectContaining({
-        status: expect.toBeOneOf(Object.values(AddonExecutionStatus))
+        status: expect.anything()
       })
     ])
+    expect(Object.values(AddonExecutionStatus)).toContain(
+      onStatus.mock.lastCall?.[0]?.status
+    )
   })
 })

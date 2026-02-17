@@ -33,6 +33,7 @@
     "prepack": "cp ../../LICENSE ./LICENSE",
     "clean": "rimraf dist",
     "test": "npx playwright install-deps chromium && vitest --run  --coverage",
+    "test:vitest": "vitest",
     "test:watch": "npx playwright install-deps chromium && vitest",
     "prebuild": "npm run clean",
     "build": "tsc && vite build"
