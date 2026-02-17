@@ -40,7 +40,11 @@
     }
   },
   "sideEffects": false,
-  "files": ["dist/*", "README.md", "LICENSE"],
+  "files": [
+    "dist/*",
+    "README.md",
+    "LICENSE"
+  ],
   "engines": {
     "node": ">=16"
   },
@@ -48,9 +52,9 @@
     "prepack": "cp ../../LICENSE ./LICENSE",
     "mock:start": "tsx ./mock-server/server.ts --silent",
     "clean": "rimraf dist",
-    "test": "start-server-and-test mock:start :3000 test:jest",
-    "test:production": "TEST_ENV=production npm run test:jest",
-    "test:jest": "node --experimental-vm-modules ../../node_modules/jest/bin/jest.js",
+    "test": "start-server-and-test mock:start :3000 test:vitest",
+    "test:production": "TEST_ENV=production vitest run",
+    "test:vitest": "vitest run",
     "prebuild": "npm run clean",
     "build": "npm run build:types && npm run build:compile",
     "build:types": "dts-bundle-generator --project tsconfig.dts.json -o dist/index.d.ts src/index.ts",
@@ -87,12 +91,10 @@
     "chalk": "^4.1.2",
     "data-uri-to-buffer": "3.0.1",
     "dataurl-to-blob": "0.0.1",
-    "jest-environment-jsdom": "30.2.0",
-    "jest-websocket-mock": "2.4.0",
+    "jsdom": "^25.0.1",
     "koa": "^2.16.3",
     "koa-add-trailing-slashes": "2.0.1",
     "koa-body": "5.0.0",
-    "mock-socket": "9.0.3",
     "start-server-and-test": "^2.1.3"
   },
   "dependencies": {

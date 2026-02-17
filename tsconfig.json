@@ -10,6 +10,7 @@
     "moduleResolution": "bundler",
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
+    "types": ["vitest/globals"]
   },
   "exclude": ["node_modules", "**/*.test.ts"],
   "references": [

@@ -8,9 +8,9 @@ import { UploadError } from '../../src/tools/UploadError'
 import http from 'http'
 import https, { RequestOptions } from 'https'
 import { uploadFromUrl } from '../../src/uploadFile/uploadFromUrl'
-import { jest, expect } from '@jest/globals'
+import { vi, expect } from 'vitest'
 
-jest.setTimeout(60000)
+vi.setConfig({ testTimeout: 60000 })
 
 // TODO: add tests for metadata
 describe('uploadFromUrl', () => {
@@ -47,7 +47,7 @@ describe('uploadFromUrl', () => {
 
     const protocol = settings.baseURL.includes('https') ? 'https' : 'http'
     const isHttpsProtocol = protocol === 'https'
-    const spy = jest.spyOn(isHttpsProtocol ? https : http, 'request')
+    const spy = vi.spyOn(isHttpsProtocol ? https : http, 'request')
     await uploadFromUrl(sourceUrl, settings)
 
     const uploadRequest = spy.mock.calls.find(
@@ -68,7 +68,7 @@ describe('uploadFromUrl', () => {
 
     const protocol = settings.baseURL.includes('https') ? 'https' : 'http'
     const isHttpsProtocol = protocol === 'https'
-    const spy = jest.spyOn(isHttpsProtocol ? https : http, 'request')
+    const spy = vi.spyOn(isHttpsProtocol ? https : http, 'request')
     await uploadFromUrl(sourceUrl, settings)
 
     const uploadRequest = spy.mock.calls.find(
@@ -110,7 +110,7 @@ describe('uploadFromUrl', () => {
   })
 
   it('should be able to handle computable progress', async () => {
-    const onProgress = jest.fn()
+    const onProgress = vi.fn()
     const sourceUrl = factory.imageUrl('valid')
     const settings = getSettingsForTesting({
       publicKey: factory.publicKey('image'),
@@ -124,7 +124,7 @@ describe('uploadFromUrl', () => {
 
   process.env.TEST_ENV !== 'production' &&
     it('should be able to handle non-computable unknown progress', async () => {
-      const onProgress = jest.fn()
+      const onProgress = vi.fn()
       const sourceUrl = factory.imageUrl('valid')
       const settings = getSettingsForTesting({
         publicKey: factory.publicKey('unknownProgress'),

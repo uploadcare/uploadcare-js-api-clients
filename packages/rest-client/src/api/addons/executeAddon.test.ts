@@ -1,4 +1,4 @@
-import { describe, it } from '@jest/globals'
+import { describe, it } from 'vitest'
 import { executeAddon } from './executeAddon'
 
 import { testSettings } from '../../../test/helpers'

@@ -1,9 +1,9 @@
 import { listOfFiles } from '../api/file/listOfFiles'
 import { paginate, Paginator } from './paginate'
 import { testSettings } from '../../test/helpers'
-import { expect, jest } from '@jest/globals'
+import { expect, vi } from 'vitest'
 
-jest.setTimeout(30000)
+vi.setConfig({ testTimeout: 30000 })
 
 describe('paginate', () => {
   it('should iterate over all the pages', async () => {

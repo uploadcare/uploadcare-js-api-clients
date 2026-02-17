@@ -17,7 +17,8 @@
   ],
   "scripts": {
     "clean": "rimraf dist",
-    "test": "node --experimental-vm-modules ../../node_modules/jest/bin/jest.js",
+    "test": "vitest run",
+    "test:vitest": "vitest",
     "prebuild": "npm run clean",
     "build": "npm run build:types && npm run build:compile",
     "build:types": "dts-bundle-generator --project tsconfig.dts.json -o dist/index.d.ts src/index.ts",

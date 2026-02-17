@@ -1,6 +1,6 @@
 import { race } from '../../src/tools/race'
 import { onCancel, CancelError } from '@uploadcare/api-client-utils'
-import { jest, expect } from '@jest/globals'
+import { vi, expect } from 'vitest'
 
 const returnAfter = (
   value: number,
@@ -67,7 +67,7 @@ describe('race', () => {
   })
 
   it('should cancel all functions when first resolves', async () => {
-    const spies = Array.from({ length: 5 }, () => jest.fn())
+    const spies = Array.from({ length: 5 }, () => vi.fn())
 
     const createCancelHandler =
       (index: number) =>
@@ -100,7 +100,7 @@ describe('race', () => {
   })
 
   it('should cancel all functions after calling stopRace', async () => {
-    const spies = Array.from({ length: 5 }, () => jest.fn())
+    const spies = Array.from({ length: 5 }, () => vi.fn())
 
     const createCancelHandler =
       (index: number) =>
@@ -138,7 +138,7 @@ describe('race', () => {
   it('should be cancellable', async () => {
     const controller = new AbortController()
 
-    const spies = Array.from({ length: 5 }, () => jest.fn())
+    const spies = Array.from({ length: 5 }, () => vi.fn())
 
     const createCancelHandler =
       (index: number) =>

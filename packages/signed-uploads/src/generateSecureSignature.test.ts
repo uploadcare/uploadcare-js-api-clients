@@ -1,5 +1,5 @@
 import { generateSecureSignature } from './generateSecureSignature'
-import { jest, expect } from '@jest/globals'
+import { vi, expect } from 'vitest'
 
 const FIXTURE_SECRET = 'YOUR_SECRET_KEY'
 const FIXTURE_DATE = new Date(1678359840000)
@@ -10,7 +10,7 @@ const EXPECTED_EXPIRE = '1678361640'
 
 describe('generateSecureSignature', () => {
   beforeAll(() => {
-    jest.useFakeTimers().setSystemTime(FIXTURE_DATE)
+    vi.useFakeTimers().setSystemTime(FIXTURE_DATE)
   })
 
   it('should return signature and expire by `expire` as number', () => {

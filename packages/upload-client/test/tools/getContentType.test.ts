@@ -1,4 +1,4 @@
-/** @jest-environment jsdom */
+// @vitest-environment jsdom
 import { getContentType } from '../../src/tools/getContentType'
 
 describe('getContentType', () => {

@@ -6,7 +6,7 @@ import {
 } from '../_helpers'
 import { uploadFileGroup } from '../../src/uploadFileGroup'
 import { UploadError } from '../../src/tools/UploadError'
-import { jest, expect } from '@jest/globals'
+import { vi, expect } from 'vitest'
 
 describe('groupFrom Url[]', () => {
   const sourceUrl = factory.imageUrl('valid')
@@ -47,7 +47,7 @@ describe('groupFrom Url[]', () => {
   })
 
   it('should be able to handle progress', async () => {
-    const onProgress = jest.fn()
+    const onProgress = vi.fn()
     const upload = uploadFileGroup(files, {
       ...settings,
       onProgress
@@ -60,7 +60,7 @@ describe('groupFrom Url[]', () => {
 
   process.env.TEST_ENV !== 'production' &&
     it('should be able to handle non-computable unknown progress', async () => {
-      const onProgress = jest.fn()
+      const onProgress = vi.fn()
       const settings = getSettingsForTesting({
         publicKey: factory.publicKey('unknownProgress'),
         onProgress

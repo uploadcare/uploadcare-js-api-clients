@@ -1,5 +1,4 @@
-/// <reference types="jest-extended" />
-import { jest } from '@jest/globals'
+import { vi } from 'vitest'
 import { DOCUMENT_UUID, VIDEO_UUID } from '../../test/fixtures'
 import { testSettings } from '../../test/helpers'
 import { ConversionStatus } from '../types/ConversionStatus'
@@ -7,7 +6,7 @@ import { ConversionType } from '../types/ConversionType'
 import { conversionJobPoller } from './conversionJobPoller'
 import { delay } from '@uploadcare/api-client-utils'
 
-jest.setTimeout(120 * 1000)
+vi.setTimeout(120 * 1000)
 
 describe('conversionJobPoller', () => {
   it('should work with video conversion', async () => {
@@ -33,15 +32,15 @@ describe('conversionJobPoller', () => {
     })
     const finishedJob = await promises[1]
     // test types for `thumbnailsGroupUuid` presence
-    expect(finishedJob.result?.thumbnailsGroupUuid).toBeString()
+    expect(typeof finishedJob.result?.thumbnailsGroupUuid).toBe('string')
     expect(finishedJob).toEqual(
       expect.objectContaining({
         status: ConversionStatus.FINISHED,
         error: null,
         path: paths[1],
         result: expect.objectContaining({
-          thumbnailsGroupUuid: expect.toBeString(),
-          uuid: expect.toBeString()
+          thumbnailsGroupUuid: expect.any(String),
+          uuid: expect.any(String)
         })
       })
     )
@@ -75,7 +74,7 @@ describe('conversionJobPoller', () => {
         error: null,
         path: paths[1],
         result: expect.objectContaining({
-          uuid: expect.toBeString()
+          uuid: expect.any(String)
         })
       })
     )
@@ -84,8 +83,8 @@ describe('conversionJobPoller', () => {
   it('should accept onRun and onStatus callbacks', async () => {
     const path = `${DOCUMENT_UUID}/document/-/format/pdf/`
 
-    const onRun = jest.fn()
-    const onStatus = jest.fn()
+    const onRun = vi.fn()
+    const onStatus = vi.fn()
 
     const promises = await conversionJobPoller(
       {
@@ -107,9 +106,9 @@ describe('conversionJobPoller', () => {
         problems: {},
         result: [
           expect.objectContaining({
-            originalSource: expect.toBeString(),
-            token: expect.toBeNumber(),
-            uuid: expect.toBeString()
+            originalSource: expect.any(String),
+            token: expect.any(Number),
+            uuid: expect.any(String)
           })
         ]
       })
@@ -122,7 +121,7 @@ describe('conversionJobPoller', () => {
         path,
         status: ConversionStatus.FINISHED,
         result: expect.objectContaining({
-          uuid: expect.toBeString()
+          uuid: expect.any(String)
         })
       })
     ])
@@ -151,7 +150,7 @@ describe('conversionJobPoller', () => {
     expect(promises.length).toBe(1)
     await promises[0].catch((err) => {
       expect(err.name).toBe('CancelError')
-      expect(err.isCancel).toBeTrue()
+      expect(err.isCancel).toBe(true)
     })
   })
 })

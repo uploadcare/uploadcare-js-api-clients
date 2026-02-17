@@ -1,6 +1,5 @@
-import { describe, it } from '@jest/globals'
+import { describe, it } from 'vitest'
 
-import 'jest-extended'
 import { DOCUMENT_UUID } from '../../../test/fixtures'
 import { testSettings } from '../../../test/helpers'
 import { conversionInfo } from './conversionInfo'
@@ -14,7 +13,7 @@ describe('conversionInfo', () => {
 
     expect(error).toBeNull()
     expect(format.name).toEqual('txt')
-    expect(format.conversionFormats).toBeArray()
+    expect(Array.isArray(format.conversionFormats)).toBe(true)
     expect(format.conversionFormats.map<string>(({ name }) => name)).toContain(
       'pdf'
     )

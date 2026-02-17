@@ -1,5 +1,4 @@
-import { describe, it } from '@jest/globals'
-import 'jest-extended'
+import { describe, it } from 'vitest'
 import { ADDONS_UUID } from '../../../test/fixtures'
 import { testSettings } from '../../../test/helpers'
 import { AddonExecutionStatus } from '../../types/AddonExecutionStatus'
@@ -23,12 +22,12 @@ describe('addonExecutionStatus', () => {
       },
       testSettings
     )
-    expect(response.status).toBeOneOf([
+    expect([
       AddonExecutionStatus.DONE,
       AddonExecutionStatus.ERROR,
       AddonExecutionStatus.IN_PROGRESS,
       AddonExecutionStatus.UNKNOWN
-    ])
+    ]).toContain(response.status)
   })
 
   it('should throw error if non-200 status received', async () => {

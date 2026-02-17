@@ -1,7 +1,6 @@
-import { describe, it } from '@jest/globals'
+import { describe, it } from 'vitest'
 import { conversionJobStatus } from './conversionJobStatus'
 
-import 'jest-extended'
 import { DOCUMENT_UUID, VIDEO_UUID } from '../../../test/fixtures'
 import { testSettings } from '../../../test/helpers'
 import { ConversionStatus } from '../../types/ConversionStatus'
@@ -27,12 +26,12 @@ describe('conversionJobStatus', () => {
       },
       testSettings
     )
-    expect(response.status).toBeOneOf([
+    expect([
       ConversionStatus.PENDING,
       ConversionStatus.PROCESSING,
       ConversionStatus.FINISHED,
       ConversionStatus.FAILED
-    ])
+    ]).toContain(response.status)
   })
 
   it('should work with document conversion', async () => {
@@ -53,12 +52,12 @@ describe('conversionJobStatus', () => {
       },
       testSettings
     )
-    expect(response.status).toBeOneOf([
+    expect([
       ConversionStatus.PENDING,
       ConversionStatus.PROCESSING,
       ConversionStatus.FINISHED,
       ConversionStatus.FAILED
-    ])
+    ]).toContain(response.status)
   })
 
   it('should throw error if non-200 status received', async () => {

@@ -1,9 +1,8 @@
-/** @jest-environment jsdom */
-
-import { UploadError } from '../../src/tools/UploadError'
+// @vitest-environment jsdom
+import { CancelError } from '@uploadcare/api-client-utils'
 import request from '../../src/request/request.browser'
 import getUrl from '../../src/tools/getUrl'
-import { jest, expect } from '@jest/globals'
+import { vi, expect } from 'vitest'
 
 describe('request', () => {
   it('should post', async () => {
@@ -53,11 +52,11 @@ describe('request', () => {
         }),
         signal: cntr.signal
       })
-    ).rejects.toThrowError(new UploadError('Request canceled'))
+    ).rejects.toThrowError(new CancelError('Request canceled'))
   })
 
   it('should handle progress', async () => {
-    const onProgress = jest.fn()
+    const onProgress = vi.fn()
     const response = await request({
       method: 'POST',
       url: getUrl('https://upload.uploadcare.com', '/base/', {

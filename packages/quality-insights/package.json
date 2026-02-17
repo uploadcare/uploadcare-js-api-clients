@@ -35,6 +35,7 @@
     "build": "tsc && vite build",
     "size": "npm run build:prod && size-limit",
     "test": "vitest",
+    "test:vitest": "vitest",
     "test:coverage": "vitest run --coverage",
     "preview": "vite preview"
   },

@@ -2,7 +2,7 @@ import * as factory from '../_fixtureFactory'
 import { uploadFileGroup } from '../../src/uploadFileGroup'
 import { getSettingsForTesting, assertComputableProgress } from '../_helpers'
 import { UploadError } from '../../src/tools/UploadError'
-import { jest, expect } from '@jest/globals'
+import { vi, expect } from 'vitest'
 
 describe('groupFrom Object[]', () => {
   const fileToUpload = factory.image('blackSquare').data
@@ -43,7 +43,7 @@ describe('groupFrom Object[]', () => {
   })
 
   it('should be able to handle progress', async () => {
-    const onProgress = jest.fn()
+    const onProgress = vi.fn()
     const upload = uploadFileGroup(files, {
       ...settings,
       onProgress

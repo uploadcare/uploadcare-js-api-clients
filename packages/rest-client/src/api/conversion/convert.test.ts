@@ -1,4 +1,4 @@
-import { describe, it } from '@jest/globals'
+import { describe, it } from 'vitest'
 import { convert } from './convert'
 
 import { testSettings } from '../../../test/helpers'

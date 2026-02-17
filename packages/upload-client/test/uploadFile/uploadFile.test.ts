@@ -1,9 +1,9 @@
-import { expect, jest } from '@jest/globals'
+import { expect, vi } from 'vitest'
 import { uploadFile } from '../../src/uploadFile/uploadFile'
 import * as factory from '../_fixtureFactory'
 import { getSettingsForTesting } from '../_helpers'
 
-jest.setTimeout(60000)
+vi.setConfig({ testTimeout: 60000 })
 
 /**
  * Those spying tests are commented because jest isn't able to mock statically
@@ -12,7 +12,7 @@ jest.setTimeout(60000)
  */
 describe('uploadFile', () => {
   // afterEach(() => {
-  //   jest.clearAllMocks()
+  //   vi.clearAllMocks()
   // })
 
   it('should upload small files using `uploadDirect`', async () => {
@@ -21,7 +21,7 @@ describe('uploadFile', () => {
       publicKey: factory.publicKey('image')
     })
 
-    // const spy = jest.spyOn(uploadDirect, 'default')
+    // const spy = vi.spyOn(uploadDirect, 'default')
     const file = await uploadFile(fileToUpload, settings)
 
     // expect(spy).toHaveBeenCalled()
@@ -34,7 +34,7 @@ describe('uploadFile', () => {
       publicKey: factory.publicKey('multipart')
     })
 
-    // const spy = jest.spyOn(uploadMultipart, 'default')
+    // const spy = vi.spyOn(uploadMultipart, 'default')
     const file = await uploadFile(fileToUpload, settings)
 
     // expect(spy).toHaveBeenCalled()
@@ -47,7 +47,7 @@ describe('uploadFile', () => {
       publicKey: factory.publicKey('image')
     })
 
-    // const spy = jest.spyOn(uploadFromUrl, 'default')
+    // const spy = vi.spyOn(uploadFromUrl, 'default')
     const file = await uploadFile(sourceUrl, settings)
 
     // expect(spy).toHaveBeenCalled()
@@ -60,7 +60,7 @@ describe('uploadFile', () => {
       publicKey: factory.publicKey('image')
     })
 
-    // const spy = jest.spyOn(uploadFromUploaded, 'default')
+    // const spy = vi.spyOn(uploadFromUploaded, 'default')
     const file = await uploadFile(uuid, settings)
 
     // expect(spy).toHaveBeenCalled()

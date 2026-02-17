@@ -2,7 +2,7 @@ import dataUriToBuffer from 'data-uri-to-buffer'
 import dataUriToBlob from 'dataurl-to-blob'
 import defaultSettings from '../src/defaultSettings'
 import { DefaultSettings } from '../src/types'
-import { jest, expect } from '@jest/globals'
+import { expect, type Mock } from 'vitest'
 import { ProgressCallback, ComputableProgressInfo } from '../src/api/types'
 
 export const dataURItoBuffer: (uri: string) => Buffer = dataUriToBuffer as (
@@ -39,7 +39,7 @@ export const getSettingsForTesting = <T>(options: T): T & DefaultSettings => {
 }
 
 export function assertComputableProgress(
-  onProgress: jest.Mock<ProgressCallback<ComputableProgressInfo>>
+  onProgress: Mock<ProgressCallback<ComputableProgressInfo>>
 ): void {
   expect(onProgress).toHaveBeenCalled()
   expect(onProgress).toHaveBeenLastCalledWith({ isComputable: true, value: 1 })
@@ -55,7 +55,7 @@ export function assertComputableProgress(
 }
 
 export function assertUnknownProgress(
-  onProgress: jest.Mock<ProgressCallback>
+  onProgress: Mock<ProgressCallback>
 ): void {
   expect(onProgress).toHaveBeenCalled()
   expect(onProgress).toHaveBeenCalledWith({ isComputable: false })
