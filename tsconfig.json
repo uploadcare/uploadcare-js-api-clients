@@ -9,8 +9,7 @@
     "resolveJsonModule": true,
     "moduleResolution": "bundler",
     "allowSyntheticDefaultImports": true,
-    "esModuleInterop": true,
-    "types": ["vitest/globals"]
+    "esModuleInterop": true
   },
   "exclude": ["node_modules", "**/*.test.ts"],
   "references": [
