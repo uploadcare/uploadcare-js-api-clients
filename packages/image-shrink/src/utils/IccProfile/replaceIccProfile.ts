@@ -5,6 +5,6 @@ export const replaceIccProfile = (blob: Blob, iccProfiles: DataView[]) => {
   return replaceJpegChunk(
     blob,
     MARKER,
-    iccProfiles.map((chunk) => chunk.buffer)
+    iccProfiles.map((chunk) => chunk.buffer) as ArrayBuffer[]
   )
 }
