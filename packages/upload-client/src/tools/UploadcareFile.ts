@@ -18,6 +18,7 @@ export class UploadcareFile {
   readonly name: string
   readonly size: number
   readonly isStored: boolean
+  readonly isReady: boolean
   readonly isImage: boolean
   readonly mimeType: string
   readonly cdnUrl: string
@@ -53,6 +54,7 @@ export class UploadcareFile {
     this.name = fileName || fileInfo.filename
     this.size = fileInfo.size
     this.isStored = fileInfo.isStored
+    this.isReady = fileInfo.isReady
     this.isImage = fileInfo.isImage
     this.mimeType = fileInfo.mimeType
     this.cdnUrl = cdnUrl

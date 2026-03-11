@@ -17,7 +17,7 @@ export type FileInfo = {
   mimeType: string
   isImage: boolean
   isStored: boolean
-  isReady: string
+  isReady: boolean
   imageInfo: ImageInfo | null
   videoInfo: VideoInfo | null
   contentInfo: ContentInfo | null
