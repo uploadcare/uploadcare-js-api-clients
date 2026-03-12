@@ -12,7 +12,7 @@ const createFileInfo = (overrides: Partial<FileInfo> = {}): FileInfo => ({
   mimeType: 'image/jpeg',
   isImage: true,
   isStored: true,
-  isReady: 'success',
+  isReady: true,
   imageInfo: null,
   videoInfo: null,
   contentInfo: null,
