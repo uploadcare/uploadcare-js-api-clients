@@ -33,9 +33,7 @@ describe('uploadFromUploaded', () => {
 
     ctrl.abort()
 
-    await expect(upload).rejects.toThrowError(
-      new UploadError('Request canceled')
-    )
+    await expect(upload).rejects.toThrowError(new UploadError('Poll canceled'))
   })
 
   it('should accept new file name setting', async () => {
