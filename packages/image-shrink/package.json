@@ -1,7 +1,7 @@
 {
   "name": "@uploadcare/image-shrink",
   "version": "6.18.4",
-  "description": "Library for work with Uploadcare image shrink",
+  "description": "@uploadcare/image-shrink is a browser-based image compression library that shrinks images to a target resolution while preserving aspect ratios, EXIF metadata, and ICC color profiles. Outputs JPEG with configurable quality and automatically switches to PNG for images with transparency. Uses native canvas scaling with intelligent multi-pass fallback for iOS. Designed for pre-upload image optimization in web applications.",
   "type": "module",
   "main": "./dist/cjs/index.browser.cjs",
   "module": "./dist/esm/index.browser.mjs",

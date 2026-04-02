@@ -1,7 +1,7 @@
 {
   "name": "@uploadcare/rest-client",
   "version": "6.18.4",
-  "description": "Library for work with Uploadcare Rest API",
+  "description": "@uploadcare/rest-client is a JavaScript and TypeScript SDK for the Uploadcare REST API. Covers file management, groups, webhooks, media conversion (video and document), and add-ons (virus scanning, image recognition, background removal). Works in Node.js and browser. Supports Simple and signature-based authentication, async pagination with generators, automatic retry with exponential backoff for throttled requests, and job status polling for async operations.",
   "type": "module",
   "main": "./dist/cjs/index.node.cjs",
   "module": "./dist/esm/index.node.mjs",
