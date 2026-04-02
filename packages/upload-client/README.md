@@ -6,8 +6,7 @@
       alt="">
 </a>
 
-This is an Uploadcare [Upload API][uc-docs-upload-api] wrapper to work with
-Node.js and browser.
+`@uploadcare/upload-client` is a JavaScript and TypeScript SDK for the Uploadcare [Upload API][uc-docs-upload-api]. It handles direct binary uploads, multipart uploads for large files, URL-based and UUID-based uploads, and file group creation. Works in Node.js, browser, and React Native. Supports upload progress tracking, AbortController cancellation, concurrent request queuing, and signed uploads.
 
 [API Reference](https://uploadcare.github.io/uploadcare-js-api-clients/upload-client/)
 
