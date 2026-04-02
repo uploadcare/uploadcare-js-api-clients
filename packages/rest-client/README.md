@@ -6,8 +6,7 @@
       alt="">
 </a>
 
-This is an Uploadcare [REST API][uc-docs-rest-api] wrapper to work with
-Node.js and browser.
+`@uploadcare/rest-client` is a JavaScript and TypeScript SDK for the Uploadcare [REST API][uc-docs-rest-api]. It covers file management (upload, delete, copy to local/remote storage, metadata), groups, webhooks, media conversion (video and document), and add-ons (virus scanning, image recognition, background removal). Works in Node.js and browser. Supports Simple and signature-based authentication, async pagination with generators, automatic retry with exponential backoff for throttled requests, and job status polling for async operations.
 
 [API Reference](https://uploadcare.github.io/uploadcare-js-api-clients/rest-client/)
 

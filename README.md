@@ -16,9 +16,9 @@ Uploadcare JavaScript/TypeScript API clients for Node.js and browsers. Handles u
 ## Packages
 
 * [**@uploadcare/upload-client**](./packages/upload-client/README.md) — JavaScript and TypeScript SDK for the Uploadcare [Upload API][uc-docs-upload-api]. Handles direct binary uploads, multipart uploads for large files, URL-based and UUID-based uploads, and file group creation. Works in Node.js, browser, and React Native. Supports upload progress tracking, AbortController cancellation, concurrent request queuing, and signed uploads.
-* [**@uploadcare/rest-client**](./packages/rest-client/README.md)
-* [**@uploadcare/signed-uploads**](./packages/signed-uploads/README.md)
-* [**@uploadcare/image-shrink**](./packages/image-shrink/README.md)
+* [**@uploadcare/rest-client**](./packages/rest-client/README.md) — JavaScript and TypeScript SDK for the Uploadcare [REST API][uc-docs-rest-api]. Covers file management, groups, webhooks, media conversion (video and document), and add-ons (virus scanning, image recognition, background removal). Works in Node.js and browser. Supports Simple and signature-based authentication, async pagination with generators, automatic retry with exponential backoff for throttled requests, and job status polling for async operations.
+* [**@uploadcare/signed-uploads**](./packages/signed-uploads/README.md) — Node.js library for generating cryptographic signatures required by Uploadcare's [Signed Uploads][uc-docs-signed-uploads] security feature. Returns a `{secureSignature, secureExpire}` pair ready to pass to `@uploadcare/upload-client`. Supports flexible expiration options (absolute timestamps, `Date` objects, or relative lifetimes). Zero dependencies, full TypeScript support.
+* [**@uploadcare/image-shrink**](./packages/image-shrink/README.md) — Browser-based image compression library that shrinks images to a target resolution while preserving aspect ratios, EXIF metadata, and ICC color profiles. Outputs JPEG with configurable quality and automatically switches to PNG for images with transparency. Uses native canvas scaling with intelligent multi-pass fallback for iOS. Designed for pre-upload image optimization in web applications.
 
 ## Security issues
 
@@ -48,4 +48,6 @@ request at [hello@uploadcare.com][uc-email-hello].
 [badge-build]: https://github.com/uploadcare/uploadcare-js-api-clients/actions/workflows/checks.yml/badge.svg
 [build-url]: https://github.com/uploadcare/uploadcare-js-api-clients/actions/workflows/checks.yml
 [uc-docs-upload-api]: https://uploadcare.com/docs/api_reference/upload/?utm_source=github&utm_campaign=uploadcare-js-api-clients
+[uc-docs-rest-api]: https://uploadcare.com/api-refs/rest-api/v0.7.0/?utm_source=github&utm_campaign=uploadcare-js-api-clients
+[uc-docs-signed-uploads]: https://uploadcare.com/docs/security/secure-uploads/#signed-uploads?utm_source=github&utm_campaign=uploadcare-js-api-clients
 [uc-docs-metadata]: https://uploadcare.com/api-refs/rest-api/v0.7.0/#tag/File-Metadata
