@@ -15,7 +15,7 @@ Uploadcare JavaScript/TypeScript API clients for Node.js and browsers. Handles u
 
 ## Packages
 
-* [**@uploadcare/upload-client**](./packages/upload-client/README.md)
+* [**@uploadcare/upload-client**](./packages/upload-client/README.md) — JavaScript and TypeScript SDK for the Uploadcare [Upload API][uc-docs-upload-api]. Handles direct binary uploads, multipart uploads for large files, URL-based and UUID-based uploads, and file group creation. Works in Node.js, browser, and React Native. Supports upload progress tracking, AbortController cancellation, concurrent request queuing, and signed uploads.
 * [**@uploadcare/rest-client**](./packages/rest-client/README.md)
 * [**@uploadcare/signed-uploads**](./packages/signed-uploads/README.md)
 * [**@uploadcare/image-shrink**](./packages/image-shrink/README.md)
