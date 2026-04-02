@@ -39,10 +39,13 @@
   "homepage": "https://github.com/uploadcare/uploadcare-js-api-clients#readme",
   "keywords": [
     "uploadcare",
-    "signed",
-    "uploads",
-    "secure",
-    "signature"
+    "signed-uploads",
+    "signature",
+    "security",
+    "authentication",
+    "hmac",
+    "typescript",
+    "nodejs"
   ],
   "devDependencies": {},
   "dependencies": {}

@@ -68,11 +68,17 @@
   "homepage": "https://github.com/uploadcare/uploadcare-js-api-clients#readme",
   "keywords": [
     "uploadcare",
-    "file",
-    "uploader",
-    "image",
     "upload",
-    "store",
+    "file",
+    "sdk",
+    "typescript",
+    "multipart",
+    "nodejs",
+    "browser",
+    "react-native",
+    "progress",
+    "abort",
+    "signed-uploads",
     "cdn"
   ],
   "devDependencies": {

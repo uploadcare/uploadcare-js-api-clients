@@ -38,10 +38,16 @@
   "homepage": "https://github.com/uploadcare/uploadcare-js-api-clients#readme",
   "keywords": [
     "uploadcare",
-    "signed",
-    "uploads",
-    "secure",
-    "signature"
+    "image",
+    "shrink",
+    "compression",
+    "resize",
+    "canvas",
+    "browser",
+    "jpeg",
+    "png",
+    "exif",
+    "optimization"
   ],
   "devDependencies": {
     "@imagemagick/magick-wasm": "^0.0.28",

@@ -52,7 +52,20 @@
     "url": "https://github.com/uploadcare/uploadcare-js-api-clients/issues"
   },
   "homepage": "https://github.com/uploadcare/uploadcare-js-api-clients#readme",
-  "keywords": ["uploadcare", "file", "rest", "api"],
+  "keywords": [
+    "uploadcare",
+    "rest",
+    "api",
+    "sdk",
+    "typescript",
+    "file",
+    "file-management",
+    "webhooks",
+    "media-conversion",
+    "nodejs",
+    "browser",
+    "pagination"
+  ],
   "devDependencies": {
     "@types/blueimp-md5": "^2.18.0",
     "@types/node-fetch": "^2.6.2",
