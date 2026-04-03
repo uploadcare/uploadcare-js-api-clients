@@ -6,7 +6,7 @@
       alt="">
 </a>
 
-File Uploader lets you accept hi-res images and shrink them in size to a reasonable resolution, keeping the original aspect ratio. See docs [here][uc-docs-image-shrink] wrapper to work with browser.
+`@uploadcare/image-shrink` is a browser-based image compression library that shrinks images to a target resolution while preserving aspect ratios, EXIF metadata, and ICC color profiles. Outputs JPEG with configurable quality and automatically switches to PNG for images with transparency. Uses native canvas scaling with intelligent multi-pass fallback for iOS. Designed for pre-upload image optimization in web applications. See docs [here][uc-docs-image-shrink].
 
 [API Reference](https://uploadcare.github.io/uploadcare-js-api-clients/image-shrink/)
 

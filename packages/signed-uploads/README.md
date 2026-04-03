@@ -6,8 +6,7 @@
       alt="">
 </a>
 
-This is Uploadcare [Signed Uploads][uc-docs-signed-uploads] wrapper to work with
-Node.js.
+`@uploadcare/signed-uploads` is a Node.js library for generating HMAC-SHA256 signatures required by Uploadcare's [Signed Uploads][uc-docs-signed-uploads] security feature. It accepts flexible expiration options (absolute timestamps, `Date` objects, or relative lifetimes) and returns a `{secureSignature, secureExpire}` pair ready to pass to `@uploadcare/upload-client`. Zero dependencies, full TypeScript support.
 
 [API Reference](https://uploadcare.github.io/uploadcare-js-api-clients/signed-uploads/)
 

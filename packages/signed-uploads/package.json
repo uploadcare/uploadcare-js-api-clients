@@ -1,7 +1,7 @@
 {
   "name": "@uploadcare/signed-uploads",
   "version": "6.18.4",
-  "description": "Library for work with Uploadcare Signed Uploads",
+  "description": "@uploadcare/signed-uploads is a Node.js library for generating cryptographic signatures required by Uploadcare Signed Uploads security feature. Returns a {secureSignature, secureExpire} pair ready to pass to @uploadcare/upload-client. Supports flexible expiration options (absolute timestamps, Date objects, or relative lifetimes). Zero dependencies, full TypeScript support.",
   "type": "module",
   "main": "./dist/cjs/index.node.cjs",
   "module": "./dist/esm/index.node.mjs",
@@ -39,10 +39,13 @@
   "homepage": "https://github.com/uploadcare/uploadcare-js-api-clients#readme",
   "keywords": [
     "uploadcare",
-    "signed",
-    "uploads",
-    "secure",
-    "signature"
+    "signed-uploads",
+    "signature",
+    "security",
+    "authentication",
+    "hmac",
+    "typescript",
+    "nodejs"
   ],
   "devDependencies": {},
   "dependencies": {}
