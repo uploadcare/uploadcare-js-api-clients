@@ -181,19 +181,18 @@ export const uploadMultipart = async (
     .then((fileInfo) => {
       if (fileInfo.isReady) {
         return fileInfo
-      } else {
-        return isReadyPoll(fileInfo.uuid, {
-          publicKey,
-          baseURL,
-          source,
-          integration,
-          userAgent,
-          retryThrottledRequestMaxTimes,
-          retryNetworkErrorMaxTimes,
-          onProgress,
-          signal
-        })
       }
+      return isReadyPoll(fileInfo.uuid, {
+        publicKey,
+        baseURL,
+        source,
+        integration,
+        userAgent,
+        retryThrottledRequestMaxTimes,
+        retryNetworkErrorMaxTimes,
+        onProgress,
+        signal
+      })
     })
     .then((fileInfo) => new UploadcareFile(fileInfo, { baseCDN }))
 }

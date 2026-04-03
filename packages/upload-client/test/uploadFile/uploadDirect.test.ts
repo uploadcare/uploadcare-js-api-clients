@@ -2,6 +2,7 @@ import * as factory from '../_fixtureFactory'
 import { getSettingsForTesting, assertComputableProgress } from '../_helpers'
 import { UploadError } from '../../src/tools/UploadError'
 import { uploadDirect } from '../../src/uploadFile/uploadDirect'
+import info from '../../src/api/info'
 import { jest, expect } from '@jest/globals'
 
 // TODO: add tests for metadata
@@ -15,6 +16,18 @@ describe('uploadDirect', () => {
     const file = await uploadDirect(fileToUpload, settings)
 
     expect(file.cdnUrl).toBeTruthy()
+  })
+
+  it('should wait until file is ready', async () => {
+    const fileToUpload = factory.image('blackSquare').data
+    const settings = getSettingsForTesting({
+      publicKey: factory.publicKey('image')
+    })
+
+    const file = await uploadDirect(fileToUpload, settings)
+    const fileInfo = await info(file.uuid, settings)
+
+    expect(fileInfo.isReady).toBe(true)
   })
 
   it('should accept store setting', async () => {
