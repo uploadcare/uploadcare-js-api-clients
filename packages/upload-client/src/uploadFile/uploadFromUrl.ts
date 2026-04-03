@@ -232,8 +232,11 @@ export const uploadFromUrl = (
 
       return result
     })
-    .then((result) =>
-      isReadyPoll(result.uuid, {
+    .then((result) => {
+      if (result.isReady) {
+        return result
+      }
+      return isReadyPoll(result.uuid, {
         publicKey,
         baseURL,
         integration,
@@ -242,5 +245,5 @@ export const uploadFromUrl = (
         onProgress,
         signal
       })
-    )
+    })
     .then((fileInfo) => new UploadcareFile(fileInfo, { baseCDN }))

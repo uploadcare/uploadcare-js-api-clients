@@ -2,6 +2,7 @@ import * as factory from '../_fixtureFactory'
 import { getSettingsForTesting, assertComputableProgress } from '../_helpers'
 import { UploadError } from '../../src/tools/UploadError'
 import { uploadFromUploaded } from '../../src/uploadFile/uploadFromUploaded'
+import info from '../../src/api/info'
 import { jest, expect } from '@jest/globals'
 
 describe('uploadFromUploaded', () => {
@@ -16,6 +17,13 @@ describe('uploadFromUploaded', () => {
     expect(file.cdnUrl).toBeTruthy()
   })
 
+  it('should wait until file is ready', async () => {
+    const file = await uploadFromUploaded(uuid, settings)
+    const fileInfo = await info(file.uuid, settings)
+
+    expect(fileInfo.isReady).toBe(true)
+  })
+
   it('should be able to cancel uploading', async () => {
     const ctrl = new AbortController()
     const upload = uploadFromUploaded(uuid, {
@@ -25,9 +33,7 @@ describe('uploadFromUploaded', () => {
 
     ctrl.abort()
 
-    await expect(upload).rejects.toThrowError(
-      new UploadError('Request canceled')
-    )
+    await expect(upload).rejects.toThrowError(new UploadError('Poll cancelled'))
   })
 
   it('should accept new file name setting', async () => {

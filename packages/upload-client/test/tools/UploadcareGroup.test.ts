@@ -12,7 +12,7 @@ const createFile = (overrides: Partial<GroupFileInfo> = {}): GroupFileInfo => ({
   mimeType: 'image/jpeg',
   isImage: true,
   isStored: true,
-  isReady: 'success',
+  isReady: true,
   imageInfo: null,
   videoInfo: null,
   contentInfo: null,

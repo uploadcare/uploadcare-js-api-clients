@@ -1,5 +1,5 @@
 import { UploadcareFile } from '../tools/UploadcareFile'
-import info from '../api/info'
+import { isReadyPoll } from '../tools/isReadyPoll'
 
 /* Types */
 import { Uuid } from '..'
@@ -41,25 +41,15 @@ export const uploadFromUploaded = (
     baseCDN
   }: FromUploadedOptions
 ): Promise<UploadcareFile> => {
-  return info(uuid, {
+  return isReadyPoll(uuid, {
     publicKey,
     baseURL,
     signal,
+    onProgress,
     source,
     integration,
     userAgent,
     retryThrottledRequestMaxTimes,
     retryNetworkErrorMaxTimes
-  })
-    .then((fileInfo) => new UploadcareFile(fileInfo, { baseCDN, fileName }))
-    .then((result) => {
-      // hack for node ¯\_(ツ)_/¯
-      if (onProgress)
-        onProgress({
-          isComputable: true,
-          value: 1
-        })
-
-      return result
-    })
+  }).then((fileInfo) => new UploadcareFile(fileInfo, { baseCDN, fileName }))
 }

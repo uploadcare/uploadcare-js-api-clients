@@ -8,6 +8,7 @@ import { UploadError } from '../../src/tools/UploadError'
 import http from 'http'
 import https, { RequestOptions } from 'https'
 import { uploadFromUrl } from '../../src/uploadFile/uploadFromUrl'
+import info from '../../src/api/info'
 import { jest, expect } from '@jest/globals'
 
 jest.setTimeout(60000)
@@ -24,6 +25,18 @@ describe('uploadFromUrl', () => {
 
     expect(file.cdnUrl).toBeTruthy()
     expect(file.uuid).toBeTruthy()
+  })
+
+  it('should wait until file is ready', async () => {
+    const sourceUrl = factory.imageUrl('valid')
+    const settings = getSettingsForTesting({
+      publicKey: factory.publicKey('image')
+    })
+
+    const file = await uploadFromUrl(sourceUrl, settings)
+    const fileInfo = await info(file.uuid, settings)
+
+    expect(fileInfo.isReady).toBe(true)
   })
 
   it('should accept store setting', async () => {

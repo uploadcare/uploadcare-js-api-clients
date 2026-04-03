@@ -2,6 +2,7 @@ import * as factory from '../_fixtureFactory'
 import { getSettingsForTesting, assertComputableProgress } from '../_helpers'
 import { UploadError } from '../../src/tools/UploadError'
 import { uploadMultipart } from '../../src/uploadFile/uploadMultipart'
+import info from '../../src/api/info'
 import { jest, expect } from '@jest/globals'
 
 jest.setTimeout(60000)
@@ -17,6 +18,13 @@ describe('uploadMultipart', () => {
     const file = await uploadMultipart(fileToUpload, settings)
 
     expect(file.cdnUrl).toBeTruthy()
+  })
+
+  it('should wait until file is ready', async () => {
+    const file = await uploadMultipart(fileToUpload, settings)
+    const fileInfo = await info(file.uuid, settings)
+
+    expect(fileInfo.isReady).toBe(true)
   })
 
   it('should accept multipartChunkSize option', async () => {
