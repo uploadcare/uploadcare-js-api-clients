@@ -147,27 +147,32 @@ export const uploadMultipart = async (
     multipartChunkSize
   })
     .then(async ({ uuid, parts }) => {
-      const getChunk = await prepareChunks(file, size, multipartChunkSize)
-      return Promise.all([
-        uuid,
-        runWithConcurrency(
-          maxConcurrentRequests,
-          parts.map(
-            (url, index) => (): Promise<MultipartUploadResponse> =>
-              uploadPart(getChunk(index), url, {
-                publicKey,
-                contentType,
-                onProgress: createProgressHandler(parts.length, index),
-                signal,
-                integration,
-                retryThrottledRequestMaxTimes,
-                retryNetworkErrorMaxTimes
-              })
-          )
+      const { getChunk, disposeChunks } = await prepareChunks(
+        file,
+        size,
+        multipartChunkSize
+      )
+      await runWithConcurrency(
+        maxConcurrentRequests,
+        parts.map(
+          (url, index) => async (): Promise<MultipartUploadResponse> => {
+            const chunk = getChunk(index)
+            return uploadPart(chunk, url, {
+              publicKey,
+              contentType,
+              onProgress: createProgressHandler(parts.length, index),
+              signal,
+              integration,
+              retryThrottledRequestMaxTimes,
+              retryNetworkErrorMaxTimes
+            })
+          }
         )
-      ])
+      ).finally(() => disposeChunks?.())
+
+      return uuid
     })
-    .then(([uuid]) =>
+    .then((uuid) =>
       multipartComplete(uuid, {
         publicKey,
         baseURL,
