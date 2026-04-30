@@ -1,0 +1,58 @@
+{
+  "$schema": "https://context7.com/schema/context7.json",
+  "projectTitle": "Uploadcare JavaScript API Clients",
+  "description": "JavaScript and TypeScript clients for Uploadcare Upload and REST APIs, plus signed uploads, image shrink, CNAME prefix, and quality insights utilities.",
+  "url": "https://context7.com/uploadcare/uploadcare-js-api-clients",
+  "public_key": "pk_WoigIc3LrHKMjLxnI0IA2",
+  "branch": "master",
+  "folders": [
+    "packages/api-client-utils",
+    "packages/upload-client",
+    "packages/rest-client",
+    "packages/signed-uploads",
+    "packages/image-shrink",
+    "packages/cname-prefix",
+    "packages/quality-insights"
+  ],
+  "excludeFolders": [
+    "**/dist",
+    "**/coverage",
+    "**/node_modules",
+    "**/mock-server",
+    "**/*test*",
+    "**/*spec*"
+  ],
+  "excludeFiles": [
+    "CHANGELOG.md",
+    "LICENSE",
+    "AUTHORS.txt",
+    ".gitignore",
+    ".eslintignore",
+    ".env.production",
+    ".env.staging",
+    "index.html",
+    "package-lock.json",
+    "jest.config.js",
+    "rollup.config.js",
+    "vite.config.js",
+    "vitest.config.ts",
+    "tsconfig.json",
+    "tsconfig.build.json",
+    "tsconfig.dts.json"
+  ],
+  "rules": [
+    "Use @uploadcare/upload-client for Upload API operations and @uploadcare/rest-client for authenticated file, group, webhook, conversion, and add-on operations.",
+    "Use UploadClient with a public key for uploads; never expose a REST API secret key in browser code.",
+    "Prefer UploadcareAuthSchema signature-based REST authentication over UploadcareSimpleAuthSchema for production.",
+    "Use @uploadcare/signed-uploads on the server to generate secureSignature and secureExpire for signed upload flows.",
+    "Import only from documented package entrypoints, not from internal src paths.",
+    "Prefer package-specific exports for shared helpers; use @uploadcare/api-client-utils directly only when the utility package is an explicit dependency.",
+    "Use @uploadcare/image-shrink only in browser-like environments with Blob, Image, and canvas APIs.",
+    "Use @uploadcare/cname-prefix when deriving CNAME-prefixed CDN bases from a public key and CDN base."
+  ],
+  "previousVersions": [
+    {
+      "tag": "v5.2.0"
+    }
+  ]
+}
