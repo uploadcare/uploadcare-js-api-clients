@@ -179,6 +179,14 @@ describe('validateOperations', () => {
       )
     })
 
+    it('ignores @-prefixed internal operations in video chains', () => {
+      expect(
+        codes([op('size', '720x540'), op('@clib', 'pkg', '1.0.0')], {
+          conversion: 'video'
+        })
+      ).not.toContain('unknown-operation')
+    })
+
     it('does not apply image rules to video chains', () => {
       expect(
         codes([op('format', 'webm')], { conversion: 'video' })

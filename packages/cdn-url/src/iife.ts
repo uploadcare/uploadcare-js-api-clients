@@ -15,7 +15,7 @@
 export * from './index'
 export * as ops from './ops/index'
 export * as video from './video/index'
-export * as documents from './document/index'
+export * as document from './document/index'
 export * as gif2video from './gif2video/index'
 export * as group from './group/index'
 export * as proxy from './proxy/index'
