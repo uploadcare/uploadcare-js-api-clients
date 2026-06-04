@@ -252,7 +252,11 @@ function validateVideo(operations: readonly CdnOperation[]): Diagnostic[] {
       }
     }
 
-    if (!isThumbs && !KNOWN_VIDEO_OPS.has(op.name)) {
+    if (
+      !isThumbs &&
+      !op.name.startsWith('@') &&
+      !KNOWN_VIDEO_OPS.has(op.name)
+    ) {
       diagnostics.push({
         severity: 'info',
         code: 'unknown-operation',

@@ -229,7 +229,7 @@ export type FilterName = (typeof FILTER_NAMES)[number]
  */
 export const filter = /* @__PURE__ */ namedOp(
   'filter',
-  function filter(name: FilterName | string, amount?: number): CdnOperation {
+  function filter(name: FilterName, amount?: number): CdnOperation {
     assertOneOf(name, FILTER_NAMES, 'filter name')
     if (amount == null) return createOp('filter', name)
     assertIntInRange(amount, -100, 200, 'filter amount')
