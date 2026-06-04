@@ -3,3 +3,14 @@ dist
 .env
 docs
 **/coverage/**
+
+# cdn-url docs: keep the source, ignore generated artifacts
+!packages/cdn-url/docs/
+packages/cdn-url/docs/reference/
+packages/cdn-url/docs/.vitepress/dist/
+packages/cdn-url/docs/.vitepress/cache/
+
+# firebase (docs deploy is staged outside the repo)
+firebase.json
+.firebaserc
+.firebase/
