@@ -13,10 +13,10 @@ import type { GroupId } from '../types'
  */
 export function parseGroupId(id: string): GroupId {
   const match = id.match(GROUP_ID_RE)
-  if (!match) {
+  if (match?.[1] === undefined || match[2] === undefined) {
     throw new TypeError(`Invalid group id: "${id}" (expected "uuid~count")`)
   }
-  return { uuid: match[1] as string, count: Number(match[2]) }
+  return { uuid: match[1], count: Number(match[2]) }
 }
 
 /**
