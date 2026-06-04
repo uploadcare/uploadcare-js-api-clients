@@ -1,0 +1,32 @@
+{
+  "$schema": "https://typedoc.org/schema.json",
+  "plugin": ["typedoc-plugin-markdown", "typedoc-vitepress-theme"],
+  "entryPoints": [
+    "src/index.ts",
+    "src/ops/index.ts",
+    "src/video/index.ts",
+    "src/document/index.ts",
+    "src/gif2video/index.ts",
+    "src/group/index.ts",
+    "src/proxy/index.ts",
+    "src/builder/index.ts",
+    "src/fluent/index.ts",
+    "src/validate/index.ts"
+  ],
+  "out": "docs/reference",
+  "docsRoot": "docs",
+  "tsconfig": "tsconfig.json",
+  "readme": "none",
+  "excludePrivate": true,
+  "excludeInternal": true,
+  "hideBreadcrumbs": true,
+  "useCodeBlocks": true,
+  "indexFormat": "table",
+  "parametersFormat": "table",
+  "enumMembersFormat": "table",
+  "typeDeclarationFormat": "table",
+  "sourceLinkTemplate": "https://github.com/uploadcare/uploadcare-js-api-clients/blob/{gitRevision}/packages/cdn-url/src/{path}#L{line}",
+  "gitRevision": "master",
+  "basePath": "src",
+  "disableGit": true
+}

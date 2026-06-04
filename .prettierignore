@@ -1,2 +1,4 @@
 node_modules
 dist
+# owned by oxlint/oxfmt
+packages/cdn-url
