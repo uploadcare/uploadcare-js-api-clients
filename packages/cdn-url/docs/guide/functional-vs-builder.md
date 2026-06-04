@@ -68,14 +68,17 @@ Every entry point is independent, and `sideEffects: false` lets bundlers drop ev
 
 Production bundle weight per entry (minified, not gzipped):
 
-| Import                                | Cost                                             |
-| ------------------------------------- | ------------------------------------------------ |
-| `proxy`                               | ~0.4 kB                                          |
-| `index` (parse + serialize + domains) | ~0.6 kB + shared chunks                          |
-| `group`, `document`, `gif2video`      | ~1 kB each                                       |
-| `video`                               | ~1.5 kB                                          |
-| `builder`                             | ~3.7 kB — it carries parse **and** serialize     |
-| `ops` (all 45 creators)               | ~6 kB; a handful of creators: a fraction of that |
+| Import                                | Cost                                                                  |
+| ------------------------------------- | --------------------------------------------------------------------- |
+| `proxy`                               | ~0.4 kB                                                               |
+| `index` (parse + serialize + domains) | ~0.6 kB + shared chunks                                               |
+| `group`, `document`, `gif2video`      | ~1 kB each                                                            |
+| `video`                               | ~1.5 kB                                                               |
+| `builder`                             | ~3.7 kB — it carries parse **and** serialize                          |
+| `ops` (all 45 creators)               | ~6 kB; a handful of creators: a fraction of that                      |
+| `fluent` (the `cdn` mega-object)      | ~14 kB — every flavor + all 45 creators; cannot tree-shake, by design |
+
+The `fluent` entry is the one exception to "you only pay for what you import": reaching for `cdn` pulls in the whole library. That's the deal — one import, full surface. If size matters, use the functional core or `builder` instead.
 
 ## Which to use
 
