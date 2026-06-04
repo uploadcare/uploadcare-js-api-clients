@@ -189,7 +189,10 @@ export abstract class ImageChain<S extends ChainState> extends Chain<S> {
 
   // Overlays & text ------------------------------------------------------------
   /** Appends `overlay`; mirrors the creator in `@uploadcare/cdn-url/ops`. */
-  public overlay(source: string | 'self', options?: ops.OverlayOptions): this {
+  public overlay(
+    source: ops.OverlaySource,
+    options?: ops.OverlayOptions
+  ): this {
     return this._add(ops.overlay(source, options))
   }
   /** Appends `rect`; mirrors the creator in `@uploadcare/cdn-url/ops`. */

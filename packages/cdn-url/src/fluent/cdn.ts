@@ -83,6 +83,10 @@ function wrapParsed(parsed: ParsedCdnUrl): ParsedChain {
         operations: parsed.operations,
         sourceUrl: parsed.sourceUrl
       })
+    default: {
+      const exhaustive: never = parsed
+      throw new TypeError(`Unsupported CDN URL kind: ${String(exhaustive)}`)
+    }
   }
 }
 

@@ -1,8 +1,17 @@
 import { GROUP_ID_RE, UUID_RE } from './grammar'
 import type { CdnOperation, ConversionKind, ParsedCdnUrl } from './types'
 
-const CONVERSIONS: ConversionKind[] = ['video', 'document', 'gif2video']
+const CONVERSIONS: readonly ConversionKind[] = [
+  'video',
+  'document',
+  'gif2video'
+]
 const EMBEDDED_URL_RE = /\/(https?:\/\/.+)$/i
+
+/** Narrows a path segment to a conversion prefix. */
+function isConversion(segment: string | undefined): segment is ConversionKind {
+  return segment != null && (CONVERSIONS as readonly string[]).includes(segment)
+}
 
 /**
  * Parses any Uploadcare CDN URL — file, group, group element, conversion
@@ -34,33 +43,29 @@ export function parseCdnUrl(url: string): ParsedCdnUrl {
 
   // Proxy: operations (if any) followed by an embedded absolute source URL.
   // The query/hash belong to the source, not to the CDN URL itself.
-  const embedded = pathname.match(EMBEDDED_URL_RE)
-  if (embedded) {
-    const prefix = pathname.slice(
-      0,
-      pathname.length - (embedded[1] as string).length
-    )
+  const embeddedSource = pathname.match(EMBEDDED_URL_RE)?.[1]
+  if (embeddedSource !== undefined) {
+    const prefix = pathname.slice(0, pathname.length - embeddedSource.length)
     return {
       kind: 'proxy',
       origin,
       operations: parseOperationSegments(segmentize(prefix), 'proxy prefix'),
-      sourceUrl: (embedded[1] as string) + parsed.search + parsed.hash
+      sourceUrl: embeddedSource + parsed.search + parsed.hash
     }
   }
 
   const hasTrailingSlash = pathname.endsWith('/')
   const segments = segmentize(pathname)
-  if (segments.length === 0) {
+  const head = segments.shift()
+  if (head === undefined) {
     throw new TypeError(`Not a CDN URL (empty path): "${url}"`)
   }
-
-  const head = segments.shift() as string
   const common = { origin, search: parsed.search, hash: parsed.hash }
 
   const groupMatch = head.match(GROUP_ID_RE)
-  if (groupMatch) {
+  if (groupMatch?.[1] !== undefined) {
     const group = {
-      uuid: groupMatch[1] as string,
+      uuid: groupMatch[1],
       count: Number(groupMatch[2])
     }
     if (segments[0] === 'nth') {
@@ -92,11 +97,9 @@ export function parseCdnUrl(url: string): ParsedCdnUrl {
   }
 
   let conversion: ConversionKind | null = null
-  if (
-    segments.length > 0 &&
-    (CONVERSIONS as string[]).includes(segments[0] as string)
-  ) {
-    conversion = segments.shift() as ConversionKind
+  if (isConversion(segments[0])) {
+    conversion = segments[0]
+    segments.shift()
   }
 
   const filename = takeFilename(segments, hasTrailingSlash)
@@ -137,7 +140,7 @@ function takeFilename(
   hasTrailingSlash: boolean
 ): string | null {
   if (hasTrailingSlash || segments.length === 0) return null
-  return segments.pop() as string
+  return segments.pop() ?? null
 }
 
 /** Consumes `-`, name, params… groups; throws on segments outside an op chain. */
@@ -160,8 +163,10 @@ function parseOperationSegments(
     }
     i += 1
     const params: string[] = []
-    while (i < segments.length && segments[i] !== '-') {
-      params.push(segments[i] as string)
+    while (i < segments.length) {
+      const param = segments[i]
+      if (param === undefined || param === '-') break
+      params.push(param)
       i += 1
     }
     operations.push({ name, params })

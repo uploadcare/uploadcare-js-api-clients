@@ -71,6 +71,7 @@ export {
   font,
   overlay,
   type OverlayOptions,
+  type OverlaySource,
   rect,
   type RelativePoint,
   text,

@@ -23,15 +23,26 @@ export abstract class Chain<S extends ChainState> {
 
   /** @internal */
   protected _next(patch: Partial<S>): this {
+    // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- this.constructor is typed Function
     const Ctor = this.constructor as new (state: S) => this
     return new Ctor({ ...this._s, ...patch })
   }
 
+  /**
+   * Forks with a new operations array. The single place the `Partial<S>`
+   * cast lives: `{ operations }` is a valid `Partial<S>` (S extends
+   * ChainState), but TS cannot prove it for an unresolved generic S.
+   * @internal
+   */
+  protected _withOperations(operations: CdnOperation[]): this {
+    // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- see jsdoc
+    const patch = { operations } as Partial<S>
+    return this._next(patch)
+  }
+
   /** @internal */
   protected _add(...operations: CdnOperation[]): this {
-    return this._next({
-      operations: [...this._s.operations, ...operations]
-    } as Partial<S>)
+    return this._withOperations([...this._s.operations, ...operations])
   }
 
   /** Appends an arbitrary operation without validation (escape hatch). */
@@ -44,9 +55,9 @@ export abstract class Chain<S extends ChainState> {
    * an operation object, or the creator itself: `chain.withoutOp(resize)`.
    */
   public withoutOp(ref: OperationRef): this {
-    return this._next({
-      operations: this._s.operations.filter((op) => !operationMatches(op, ref))
-    } as Partial<S>)
+    return this._withOperations(
+      this._s.operations.filter((op) => !operationMatches(op, ref))
+    )
   }
 
   /** The operations accumulated so far (defensive copy). */

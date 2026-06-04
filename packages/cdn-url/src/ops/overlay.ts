@@ -25,6 +25,12 @@ function relativePoint(value: RelativePoint, label: string): string {
   return alignment(value, label)
 }
 
+/**
+ * Overlay source: another file's UUID, or `'self'` for the image itself.
+ * The `& {}` keeps `'self'` in autocomplete without collapsing to `string`.
+ */
+export type OverlaySource = 'self' | (string & {})
+
 /** Options for {@link overlay}. Params are positional and ordered. */
 export interface OverlayOptions {
   /** Relative size, e.g. `['50p', '50p']` (CDN default 100%). */
@@ -50,7 +56,7 @@ export interface OverlayOptions {
 export const overlay = /* @__PURE__ */ namedOp(
   'overlay',
   function overlay(
-    source: string | 'self',
+    source: OverlaySource,
     options: OverlayOptions = {}
   ): CdnOperation {
     const params: string[] = [source]

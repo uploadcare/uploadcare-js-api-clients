@@ -123,7 +123,7 @@ export function assertOneOf<T extends string>(
   label: string
 ): asserts value is T {
   if (!__DEV__) return
-  if (!allowed.includes(value as T)) {
+  if (!(allowed as readonly string[]).includes(value)) {
     throw new RangeError(
       `${label} must be one of ${allowed.join(', ')}; got "${value}"`
     )

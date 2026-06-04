@@ -10,8 +10,15 @@ conventions in several ways — do not "fix" these divergences.
   monorepo eslint/prettier explicitly ignore `packages/cdn-url` (see root
   `.eslintignore` / `.prettierignore`). Never add eslint or prettier
   configs/deps here, and never remove the root ignore entries.
-- Lint: `npm run lint` (oxlint). Format: `npm run format` (oxfmt). Style is
-  prettier-config-standard-compatible: no semicolons, single quotes, 80 cols.
+- Lint: `npm run lint` — **type-aware** oxlint (`oxlint --type-aware`, backed by
+  the `oxlint-tsgolint` devDep; needs `tsconfig.json`). Format: `npm run format`
+  (oxfmt). Style is prettier-config-standard-compatible: no semicolons, single
+  quotes, 80 cols.
+- `tsconfig.json` sets `noUncheckedIndexedAccess: true` — indexed access is
+  `T | undefined`. Guard it (`?.[i]`, `=== undefined` checks); do **not** reach
+  for `as` casts — type-aware lint rejects unnecessary/unsafe assertions. The
+  only sanctioned `no-unsafe-type-assertion` disable is the single `Partial<S>`
+  cast in `fluent/chain-base.ts` (generic immutable-builder plumbing).
 - In markdown docs, never write bare array expression statements in code
   examples (`;[preview()]`) — oxfmt adds ASI-guard semicolons that look broken
   to readers. Assign to a `const` instead.
