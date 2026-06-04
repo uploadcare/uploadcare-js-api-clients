@@ -154,11 +154,11 @@
     "docs:api": "typedoc --validation.notDocumented --treatValidationWarningsAsErrors",
     "docs:dev": "npm run docs:api && vitepress dev docs",
     "docs:build": "npm run docs:api && vitepress build docs",
-    "lint": "oxlint --type-aware src",
+    "lint": "oxlint src",
     "format": "oxfmt .",
     "format:check": "oxfmt --check .",
     "test:browser": "vitest --run --config vitest.browser.config.ts",
-    "lint:fix": "oxlint --type-aware src --fix"
+    "lint:fix": "oxlint src --fix"
   },
   "repository": {
     "type": "git",

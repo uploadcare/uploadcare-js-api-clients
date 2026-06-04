@@ -10,9 +10,10 @@ conventions in several ways — do not "fix" these divergences.
   monorepo eslint/prettier explicitly ignore `packages/cdn-url` (see root
   `.eslintignore` / `.prettierignore`). Never add eslint or prettier
   configs/deps here, and never remove the root ignore entries.
-- Lint: `npm run lint` — **type-aware** oxlint (`oxlint --type-aware`, backed by
-  the `oxlint-tsgolint` devDep; needs `tsconfig.json`). Format: `npm run format`
-  (oxfmt). Style is prettier-config-standard-compatible: no semicolons, single
+- Lint: `npm run lint` (`oxlint src`). **Type-aware linting is on** via
+  `options.typeAware: true` in `.oxlintrc.json` (backed by the `oxlint-tsgolint`
+  devDep), so bare `oxlint` and editor LSP integrations get it too — no CLI flag
+  needed. Format: `npm run format` (oxfmt). Style is prettier-config-standard-compatible: no semicolons, single
   quotes, 80 cols.
 - `tsconfig.json` sets `noUncheckedIndexedAccess: true` — indexed access is
   `T | undefined`. Guard it (`?.[i]`, `=== undefined` checks); do **not** reach
