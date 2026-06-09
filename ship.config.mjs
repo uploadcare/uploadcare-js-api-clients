@@ -14,7 +14,7 @@ export default {
       'packages/cname-prefix',
     ]
   },
-  publishCommand: ({ defaultCommand }) => `${defaultCommand} --access public`,
+  publishCommand: ({ tag }) => `npm stage publish --tag ${tag}`,
   versionUpdated: ({ version, dir }) => {
     const packages = [
       'upload-client',

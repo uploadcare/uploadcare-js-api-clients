@@ -9,13 +9,15 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event.pull_request.merged == true && startsWith(github.head_ref, 'releases/v')
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
           ref:  master
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
+      - name: Pin npm with staged publishing support
+        run: npm install -g npm@">=11.15.0"
       - run: npm ci
       - run: |
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
@@ -24,3 +26,20 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
+      - name: Read release version
+        id: ver
+        run: echo "version=$(node -p "require('./package.json').version")" >> "$GITHUB_OUTPUT"
+      - name: Notify Slack about staged release
+        uses: slackapi/slack-github-action@37ebaef184d7626c5f204ab8d3baff4262dd30f0 # v1.27.0
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+        with:
+          channel-id: ${{ secrets.SLACK_NPM_RELEASE_CHANNEL }}
+          slack-message: |
+            :package: *@uploadcare/api-clients v${{ steps.ver.outputs.version }}* staged for review (2FA required to approve each):
+            • <https://www.npmjs.com/package/@uploadcare/upload-client?activeTab=staged|@uploadcare/upload-client>
+            • <https://www.npmjs.com/package/@uploadcare/rest-client?activeTab=staged|@uploadcare/rest-client>
+            • <https://www.npmjs.com/package/@uploadcare/signed-uploads?activeTab=staged|@uploadcare/signed-uploads>
+            • <https://www.npmjs.com/package/@uploadcare/image-shrink?activeTab=staged|@uploadcare/image-shrink>
+            • <https://www.npmjs.com/package/@uploadcare/quality-insights?activeTab=staged|@uploadcare/quality-insights>
+            • <https://www.npmjs.com/package/@uploadcare/cname-prefix?activeTab=staged|@uploadcare/cname-prefix>
