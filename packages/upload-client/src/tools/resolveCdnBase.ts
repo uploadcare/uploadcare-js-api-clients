@@ -22,10 +22,14 @@ export const resolveCdnBase = ({
   baseCDN?: string
   prefixedBaseCDN?: string
 }): Promise<string> => {
+  // Compare slash-insensitively so the documented default is recognised
+  // whether passed as `https://ucarecdn.com` or `https://ucarecdn.com/`.
+  const isDefaultBase =
+    baseCDN.replace(/\/+$/, '') === defaultSettings.baseCDN.replace(/\/+$/, '')
+
   if (
     publicKey &&
-    (baseCDN === defaultSettings.baseCDN ||
-      isPrefixedCdnBase(baseCDN, prefixedBaseCDN))
+    (isDefaultBase || isPrefixedCdnBase(baseCDN, prefixedBaseCDN))
   ) {
     return getPrefixedCdnBase(publicKey, prefixedBaseCDN)
   }

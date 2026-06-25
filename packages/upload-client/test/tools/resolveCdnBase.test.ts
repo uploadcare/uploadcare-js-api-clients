@@ -22,6 +22,18 @@ describe('resolveCdnBase', () => {
     ).resolves.toBe(expectedPrefixed)
   })
 
+  it('accepts the documented default https://ucarecdn.com explicitly', async () => {
+    await expect(
+      resolveCdnBase({ publicKey, baseCDN: 'https://ucarecdn.com' })
+    ).resolves.toBe(expectedPrefixed)
+  })
+
+  it('accepts the default with a trailing slash (https://ucarecdn.com/)', async () => {
+    await expect(
+      resolveCdnBase({ publicKey, baseCDN: 'https://ucarecdn.com/' })
+    ).resolves.toBe(expectedPrefixed)
+  })
+
   it('re-derives when an explicit base already points at the prefixed zone', async () => {
     await expect(
       resolveCdnBase({ publicKey, baseCDN: 'https://stale1234.ucarecd.net' })
