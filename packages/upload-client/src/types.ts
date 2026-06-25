@@ -2,6 +2,11 @@ import { CustomUserAgent, StoreValue } from '@uploadcare/api-client-utils'
 
 export interface DefaultSettings {
   baseCDN: string
+  /**
+   * Base domain used to build per-project prefixed CDN URLs (default
+   * `https://ucarecd.net`).
+   */
+  prefixedBaseCDN: string
   baseURL: string
   maxContentLength: number
   retryThrottledRequestMaxTimes: number

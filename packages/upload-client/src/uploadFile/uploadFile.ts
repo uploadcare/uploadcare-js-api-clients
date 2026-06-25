@@ -43,6 +43,7 @@ export type FileFromOptions = {
   maxConcurrentRequests?: number
 
   baseCDN?: string
+  prefixedBaseCDN?: string
 
   checkForUrlDuplicates?: boolean
   saveUrlForRecurrentUploads?: boolean
@@ -80,6 +81,7 @@ export async function uploadFile(
     maxConcurrentRequests,
 
     baseCDN = defaultSettings.baseCDN,
+    prefixedBaseCDN = defaultSettings.prefixedBaseCDN,
 
     checkForUrlDuplicates,
     saveUrlForRecurrentUploads,
@@ -116,6 +118,7 @@ export async function uploadFile(
         retryNetworkErrorMaxTimes,
 
         baseCDN,
+        prefixedBaseCDN,
         metadata
       })
     }
@@ -141,6 +144,7 @@ export async function uploadFile(
       retryNetworkErrorMaxTimes,
 
       baseCDN,
+      prefixedBaseCDN,
       metadata
     })
   }
@@ -152,6 +156,7 @@ export async function uploadFile(
       fileName,
       baseURL,
       baseCDN,
+      prefixedBaseCDN,
       checkForUrlDuplicates,
       saveUrlForRecurrentUploads,
       secureSignature,
@@ -189,7 +194,8 @@ export async function uploadFile(
       retryThrottledRequestMaxTimes,
       retryNetworkErrorMaxTimes,
 
-      baseCDN
+      baseCDN,
+      prefixedBaseCDN
     })
   }
 

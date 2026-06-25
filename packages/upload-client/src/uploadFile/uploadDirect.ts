@@ -1,6 +1,7 @@
 import base from '../api/base'
 import { isReadyPoll } from '../tools/isReadyPoll'
 import { UploadcareFile } from '../tools/UploadcareFile'
+import { toUploadcareFile } from '../tools/toUploadcareFile'
 
 import {
   CustomUserAgent,
@@ -31,6 +32,7 @@ export type DirectOptions = {
   retryNetworkErrorMaxTimes?: number
 
   baseCDN?: string
+  prefixedBaseCDN?: string
   metadata?: Metadata
 }
 
@@ -57,6 +59,7 @@ export const uploadDirect = (
     retryNetworkErrorMaxTimes,
 
     baseCDN,
+    prefixedBaseCDN,
     metadata
   }: DirectOptions
 ): Promise<UploadcareFile> => {
@@ -90,5 +93,7 @@ export const uploadDirect = (
         signal
       })
     })
-    .then((fileInfo) => new UploadcareFile(fileInfo, { baseCDN }))
+    .then((fileInfo) =>
+      toUploadcareFile(fileInfo, { publicKey, baseCDN, prefixedBaseCDN })
+    )
 }
