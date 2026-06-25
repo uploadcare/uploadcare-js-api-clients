@@ -15,7 +15,7 @@ export default {
       'packages/cdn-url',
     ]
   },
-  publishCommand: ({ defaultCommand }) => `${defaultCommand} --access public`,
+  publishCommand: ({ tag }) => `npm stage publish --tag ${tag}`,
   versionUpdated: ({ version, dir }) => {
     const packages = [
       'upload-client',
