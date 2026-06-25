@@ -3,8 +3,7 @@
       src="https://ucarecdn.com/edfdf045-34c0-4087-bbdd-e3834921f890/userpiccircletransparent.svg"
       alt="">
 </a>
-<p>This is Uploadcare <a href="https://uploadcare.com/docs/security/secure-uploads/#signed-uploads?utm_source=github&amp;utm_campaign=uploadcare-js-api-clients">Signed Uploads</a> wrapper to work with
-Node.js.</p>
+<p><code>@uploadcare/signed-uploads</code> is a Node.js library for generating HMAC-SHA256 signatures required by Uploadcare's <a href="https://uploadcare.com/docs/security/secure-uploads/#signed-uploads?utm_source=github&amp;utm_campaign=uploadcare-js-api-clients">Signed Uploads</a> security feature. It accepts flexible expiration options (absolute timestamps, <code>Date</code> objects, or relative lifetimes) and returns a <code>{secureSignature, secureExpire}</code> pair ready to pass to <code>@uploadcare/upload-client</code>. Zero dependencies, full TypeScript support.</p>
 <p><a href="https://uploadcare.github.io/uploadcare-js-api-clients/signed-uploads/">API Reference</a></p>
 <p><a href="https://github.com/uploadcare/uploadcare-js-api-clients/actions/workflows/checks.yml"><img src="https://github.com/uploadcare/uploadcare-js-api-clients/actions/workflows/checks.yml/badge.svg" alt="Build Status"></a>
 <a href="https://www.npmjs.org/package/@uploadcare/signed-uploads"><img src="http://img.shields.io/npm/v/@uploadcare/signed-uploads.svg" alt="NPM version"></a>
