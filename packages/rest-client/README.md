@@ -6,7 +6,7 @@
       alt="">
 </a>
 
-`@uploadcare/rest-client` is a JavaScript and TypeScript SDK for the Uploadcare [REST API][uc-docs-rest-api]. It covers file management (upload, delete, copy to local/remote storage, metadata), groups, webhooks, media conversion (video and document), and add-ons (virus scanning, image recognition, background removal). Works in Node.js and browser. Supports Simple and signature-based authentication, async pagination with generators, automatic retry with exponential backoff for throttled requests, and job status polling for async operations.
+`@uploadcare/rest-client` is a JavaScript and TypeScript SDK for the Uploadcare [REST API][uc-docs-rest-api]. It covers file management (upload, delete, copy to local/remote storage, metadata, tags), groups, webhooks, media conversion (video and document), and add-ons (virus scanning, image recognition, background removal). Works in Node.js and browser. Supports Simple and signature-based authentication, async pagination with generators, automatic retry with exponential backoff for throttled requests, and job status polling for async operations.
 
 [API Reference](https://uploadcare.github.io/uploadcare-js-api-clients/rest-client/)
 
@@ -132,6 +132,41 @@ const result = await listOfFiles({}, { authSchema: uploadcareSimpleAuthSchema })
 ```
 
 List of all available API methods is available at the [rest-client API Reference](https://uploadcare.github.io/uploadcare-js-api-clients/rest-client/).
+
+#### File tags
+
+Files can carry a list of searchable string tags (API version 0.7). Use
+`getTags` to read them, `replaceTags` to overwrite the whole set, and
+`updateTags` to add and/or remove tags in a single atomic request:
+
+```typescript
+import {
+  getTags,
+  replaceTags,
+  updateTags,
+  UploadcareSimpleAuthSchema
+} from '@uploadcare/rest-client';
+
+const authSchema = new UploadcareSimpleAuthSchema({
+  publicKey: 'YOUR_PUBLIC_KEY',
+  secretKey: 'YOUR_SECRET_KEY',
+});
+
+// Read the current tags
+const { tags } = await getTags({ uuid: 'FILE_UUID' }, { authSchema });
+
+// Replace the entire tag set
+await replaceTags({ uuid: 'FILE_UUID', tags: ['cat', 'animal'] }, { authSchema });
+
+// Add and remove tags at once (delete is applied before add)
+const result = await updateTags(
+  { uuid: 'FILE_UUID', add: ['dog', 'outdoor'], delete: ['cat'] },
+  { authSchema }
+);
+// result: { tags, added, deleted }
+```
+
+See [docs][uc-file-tags] for normalization rules and limits.
 
 ### Settings
 
@@ -290,3 +325,4 @@ request at [hello@uploadcare.com][uc-email-hello].
 [badge-build]: https://github.com/uploadcare/uploadcare-js-api-clients/actions/workflows/checks.yml/badge.svg
 [build-url]: https://github.com/uploadcare/uploadcare-js-api-clients/actions/workflows/checks.yml
 [uc-docs-rest-api]: https://uploadcare.com/api-refs/rest-api/v0.7.0/?utm_source=github&utm_campaign=uploadcare-js-api-clients
+[uc-file-tags]: https://uploadcare.com/docs/file-tags/

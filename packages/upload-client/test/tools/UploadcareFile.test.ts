@@ -18,6 +18,7 @@ const createFileInfo = (overrides: Partial<FileInfo> = {}): FileInfo => ({
   contentInfo: null,
   s3Bucket: 'my-bucket',
   metadata: undefined,
+  tags: undefined,
   ...overrides
 })
 
@@ -38,6 +39,15 @@ describe('UploadcareFile', () => {
     )
     expect(file.name).toBe('custom-name.jpg')
     expect(file.metadata).toBeNull()
+    expect(file.tags).toBeNull()
+  })
+
+  it('exposes tags provided by file info', () => {
+    const fileInfo = createFileInfo({ tags: ['cat', 'animal'] })
+
+    const file = new UploadcareFile(fileInfo)
+
+    expect(file.tags).toEqual(['cat', 'animal'])
   })
 
   it('sets defaultEffects when provided by group file info', () => {

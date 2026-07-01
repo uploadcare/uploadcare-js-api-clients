@@ -4,7 +4,8 @@ import {
   CustomUserAgent,
   camelizeKeys,
   Metadata,
-  StoreValue
+  StoreValue,
+  Tags
 } from '@uploadcare/api-client-utils'
 
 import request from '../request/request.node'
@@ -36,6 +37,7 @@ export type MultipartStartOptions = {
   retryThrottledRequestMaxTimes?: number
   retryNetworkErrorMaxTimes?: number
   metadata?: Metadata
+  tags?: Tags
 }
 
 export type MultipartPart = string
@@ -66,7 +68,8 @@ export default function multipartStart(
     retryThrottledRequestMaxTimes = defaultSettings.retryThrottledRequestMaxTimes,
     retryNetworkErrorMaxTimes = defaultSettings.retryNetworkErrorMaxTimes,
 
-    metadata
+    metadata,
+    tags
   }: MultipartStartOptions
 ): Promise<MultipartStartResponse> {
   return retryIfFailed(
@@ -87,7 +90,8 @@ export default function multipartStart(
           signature: secureSignature,
           expire: secureExpire,
           source: source,
-          metadata
+          metadata,
+          tags: tags && tags.join(',')
         }),
         signal
       }).then(({ data, headers, request }) => {

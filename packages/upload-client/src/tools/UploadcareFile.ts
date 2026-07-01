@@ -3,7 +3,8 @@ import {
   ContentInfo,
   ImageInfo,
   VideoInfo,
-  Metadata
+  Metadata,
+  Tags
 } from '@uploadcare/api-client-utils'
 import getUrl from './getUrl'
 import defaultSettings from '../defaultSettings'
@@ -27,6 +28,7 @@ export class UploadcareFile {
   readonly videoInfo: VideoInfo | null
   readonly contentInfo: ContentInfo | null
   readonly metadata: Metadata | null
+  readonly tags: Tags | null
   readonly s3Bucket: string | null
   readonly defaultEffects: null | string = null
 
@@ -61,6 +63,7 @@ export class UploadcareFile {
     this.videoInfo = fileInfo.videoInfo
     this.contentInfo = fileInfo.contentInfo
     this.metadata = fileInfo.metadata || null
+    this.tags = fileInfo.tags || null
     this.s3Bucket = s3Bucket || null
     this.s3Url = s3Url
 

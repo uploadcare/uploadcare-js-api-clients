@@ -2,7 +2,8 @@ import {
   camelizeKeys,
   CustomUserAgent,
   Metadata,
-  StoreValue
+  StoreValue,
+  Tags
 } from '@uploadcare/api-client-utils'
 import { defaultSettings } from '../defaultSettings'
 import request from '../request/request.node'
@@ -46,8 +47,9 @@ export type BaseOptions = {
   retryThrottledRequestMaxTimes?: number
   retryNetworkErrorMaxTimes?: number
   metadata?: Metadata
+  tags?: Tags
 }
-
+;``
 /**
  * Performs file uploading request to Uploadcare Upload API. Can be canceled and
  * has progress.
@@ -69,7 +71,8 @@ export default function base(
     userAgent,
     retryThrottledRequestMaxTimes = defaultSettings.retryThrottledRequestMaxTimes,
     retryNetworkErrorMaxTimes = defaultSettings.retryNetworkErrorMaxTimes,
-    metadata
+    metadata,
+    tags
   }: BaseOptions
 ): Promise<BaseResponse> {
   return retryIfFailed(
@@ -93,7 +96,8 @@ export default function base(
           signature: secureSignature,
           expire: secureExpire,
           source: source,
-          metadata
+          metadata,
+          tags: tags && tags.join(',')
         }),
         signal,
         onProgress

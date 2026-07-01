@@ -7,7 +7,8 @@ import { uploadFromUrl } from './uploadFromUrl'
 import {
   CustomUserAgent,
   Metadata,
-  StoreValue
+  StoreValue,
+  Tags
 } from '@uploadcare/api-client-utils'
 import { ProgressCallback, Url, Uuid } from '../api/types'
 import { getFileSize } from '../tools/getFileSize'
@@ -50,6 +51,7 @@ export type FileFromOptions = {
   pusherKey?: string
 
   metadata?: Metadata
+  tags?: Tags
 }
 
 /** Uploads file from provided data. */
@@ -90,7 +92,8 @@ export async function uploadFile(
     saveUrlForRecurrentUploads,
     pusherKey,
 
-    metadata
+    metadata,
+    tags
   }: FileFromOptions
 ): Promise<UploadcareFile> {
   if (isFileData(data)) {
@@ -122,7 +125,8 @@ export async function uploadFile(
 
         baseCDN,
         prefixedBaseCDN,
-        metadata
+        metadata,
+        tags
       })
     }
 
@@ -148,7 +152,8 @@ export async function uploadFile(
 
       baseCDN,
       prefixedBaseCDN,
-      metadata
+      metadata,
+      tags
     })
   }
 
