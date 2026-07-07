@@ -12,6 +12,7 @@ export default {
       'packages/image-shrink',
       'packages/quality-insights',
       'packages/cname-prefix',
+      'packages/cdn-url',
     ]
   },
   publishCommand: ({ tag }) => `npm stage publish --tag ${tag}`,
