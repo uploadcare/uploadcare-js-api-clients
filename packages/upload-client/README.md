@@ -269,8 +269,7 @@ By default (when `baseCDN` is omitted) the client returns a **per-project
 prefixed** CDN URL derived from your `publicKey`, e.g.
 `https://<prefix>.ucarecd.net/<uuid>/`. Set `baseCDN` explicitly to use that
 exact domain verbatim instead — either the classic shared domain
-(`https://ucarecdn.com/`) or your own custom CNAME. See
-[Which CDN domain is used?](#faq) below.
+(`https://ucarecdn.com/`) or your own custom CNAME.
 
 Not set by default (prefixing is applied). Only affects `cdnUrl`; the Upload API
 endpoint is controlled by `baseURL`.
@@ -570,68 +569,6 @@ And then you can run test:
 ```
 npm run test:jest
 ```
-
-## FAQ
-
-### Which CDN domain is used?
-
-Starting with this version, uploaded files and groups get a **per-project
-prefixed** CDN URL **by default**:
-
-```typescript
-const file = await uploadFile(data, { publicKey: 'YOUR_PUBLIC_KEY' })
-file.cdnUrl // 'https://<prefix>.ucarecd.net/<uuid>/'
-```
-
-The `<prefix>` is derived from your `publicKey`. This matches the default
-behavior of the Uploadcare uploader (`blocks`) and other SDKs, so the whole
-family is consistent out of the box.
-
-The prefixed domain and the classic `ucarecdn.com` serve the same files, so
-URLs stored previously keep working.
-
-### How do I keep the legacy `ucarecdn.com` domain?
-
-Pass it explicitly as `baseCDN`. Any `baseCDN` you set is used **verbatim**, so
-prefixing is skipped:
-
-```typescript
-const file = await uploadFile(data, {
-  publicKey: 'YOUR_PUBLIC_KEY',
-  baseCDN: 'https://ucarecdn.com'
-})
-file.cdnUrl // 'https://ucarecdn.com/<uuid>/'
-```
-
-This is the recommended opt-out if you have, for example, a Content Security
-Policy (`img-src`/`connect-src`) or an allowlist pinned to `ucarecdn.com`.
-
-### How do I use my own custom CDN domain (CNAME)?
-
-Same mechanism — set `baseCDN` to your domain. It is used verbatim:
-
-```typescript
-const file = await uploadFile(data, {
-  publicKey: 'YOUR_PUBLIC_KEY',
-  baseCDN: 'https://cdn.example.com'
-})
-file.cdnUrl // 'https://cdn.example.com/<uuid>/'
-```
-
-### The rules, in short
-
-- `baseCDN` **omitted** → prefixed by default
-  (`https://<prefix>.ucarecd.net/...`).
-- `baseCDN` set to **any domain** (including `https://ucarecdn.com` or your
-  CNAME) → used **verbatim**, no prefixing.
-- `baseCDN` set to the **prefixed zone** itself (`https://ucarecd.net` or an
-  already-prefixed `https://<prefix>.ucarecd.net`) → re-derived to the correct
-  per-project prefix (idempotent), so passing an already-resolved base is safe.
-- Change the zone that prefixes are built from with
-  [`prefixedBaseCDN`](#prefixedbasecdn-string).
-
-All of the above apply per call and per `UploadClient` instance, so you can mix
-prefixed and legacy behavior across uploads.
 
 ## Security issues
 
