@@ -32,12 +32,28 @@ npm install @uploadcare/cname-prefix
 
 ## Usage
 
-```typescript
-import { getPrefixedCdnBase } from '@uploadcare/cname-prefix'
+The package builds a subdomain-based (prefixed) CDN base from your public key. Two variants
+are available with identical output:
 
-const prefixedCdnBase = getPrefixedCdnBase('demopublickey', 'https://ucarecd.net')
-// prefixedCdnBase === 'https://1s4oyld5dc.ucarecd.net'
+- `getPrefixedCdnBaseAsync` uses the Web Crypto API (`window.crypto.subtle`),
+  returns a Promise, and works in browsers in a secure context (HTTPS or
+  `localhost`). It is not available in Node.js or non-secure contexts.
+- `getPrefixedCdnBaseSync` ships its own SHA-256, runs synchronously, and works
+  anywhere: browsers (any context), Node.js, web workers, and edge runtimes.
+
+```typescript
+import { getPrefixedCdnBaseAsync, getPrefixedCdnBaseSync } from '@uploadcare/cname-prefix'
+
+await getPrefixedCdnBaseAsync('demopublickey', 'https://ucarecd.net')
+// 'https://1s4oyld5dc.ucarecd.net'
+
+getPrefixedCdnBaseSync('demopublickey', 'https://ucarecd.net')
+// 'https://1s4oyld5dc.ucarecd.net'
 ```
+
+Import from `@uploadcare/cname-prefix/async` or `/sync` to include just one
+variant. Use `isPrefixedCdnBase(cdnBase, base)` to check whether a CDN base is
+already prefixed.
 
 ## Security issues
 
