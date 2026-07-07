@@ -45,7 +45,10 @@ export function uploadFileGroup(
     contentType,
     multipartChunkSize = defaultSettings.multipartChunkSize,
 
-    baseCDN = defaultSettings.baseCDN,
+    // Left undefined on purpose when the caller omits it, so `resolveCdnBase`
+    // can distinguish "not set" (→ prefixed default) from an explicit base
+    // (→ used verbatim, e.g. the legacy `https://ucarecdn.com`).
+    baseCDN,
     prefixedBaseCDN = defaultSettings.prefixedBaseCDN,
     checkForUrlDuplicates,
     saveUrlForRecurrentUploads,

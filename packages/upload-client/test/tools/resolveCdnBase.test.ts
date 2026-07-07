@@ -16,22 +16,22 @@ describe('resolveCdnBase', () => {
     expect(expectedPrefixed).toMatch(/^https:\/\/[a-z0-9]+\.ucarecd\.net$/)
   })
 
-  it('derives the prefixed base when baseCDN is the default', async () => {
+  it('keeps the classic domain verbatim when passed explicitly (legacy opt-out)', async () => {
     await expect(
       resolveCdnBase({ publicKey, baseCDN: defaultSettings.baseCDN })
-    ).resolves.toBe(expectedPrefixed)
+    ).resolves.toBe(defaultSettings.baseCDN)
   })
 
-  it('accepts the documented default https://ucarecdn.com explicitly', async () => {
+  it('keeps https://ucarecdn.com verbatim when passed explicitly', async () => {
     await expect(
       resolveCdnBase({ publicKey, baseCDN: 'https://ucarecdn.com' })
-    ).resolves.toBe(expectedPrefixed)
+    ).resolves.toBe('https://ucarecdn.com')
   })
 
-  it('accepts the default with a trailing slash (https://ucarecdn.com/)', async () => {
+  it('keeps an explicit base with a trailing slash verbatim', async () => {
     await expect(
       resolveCdnBase({ publicKey, baseCDN: 'https://ucarecdn.com/' })
-    ).resolves.toBe(expectedPrefixed)
+    ).resolves.toBe('https://ucarecdn.com/')
   })
 
   it('re-derives when an explicit base already points at the prefixed zone', async () => {
