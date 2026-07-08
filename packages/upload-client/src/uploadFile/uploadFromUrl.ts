@@ -13,6 +13,7 @@ import {
   poll
 } from '@uploadcare/api-client-utils'
 import { UploadcareFile } from '../tools/UploadcareFile'
+import { toUploadcareFile } from '../tools/toUploadcareFile'
 import { FileInfo, ProgressCallback } from '../api/types'
 
 function pollStrategy({
@@ -89,6 +90,7 @@ function pollStrategy({
 
 export type UploadFromUrlOptions = {
   baseCDN?: string
+  prefixedBaseCDN?: string
   onProgress?: ProgressCallback
   pusherKey?: string
 } & FromUrlOptions
@@ -159,6 +161,7 @@ export const uploadFromUrl = (
     fileName,
     baseURL,
     baseCDN,
+    prefixedBaseCDN,
     checkForUrlDuplicates,
     saveUrlForRecurrentUploads,
     secureSignature,
@@ -246,4 +249,6 @@ export const uploadFromUrl = (
         signal
       })
     })
-    .then((fileInfo) => new UploadcareFile(fileInfo, { baseCDN }))
+    .then((fileInfo) =>
+      toUploadcareFile(fileInfo, { publicKey, baseCDN, prefixedBaseCDN })
+    )

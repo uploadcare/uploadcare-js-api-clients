@@ -6,6 +6,7 @@ import { DefaultSettings } from './types'
  */
 const defaultSettings: DefaultSettings = {
   baseCDN: 'https://ucarecdn.com',
+  prefixedBaseCDN: 'https://ucarecd.net',
   baseURL: 'https://upload.uploadcare.com',
   maxContentLength: 50 * 1024 * 1024, // 50 MB
   retryThrottledRequestMaxTimes: 1,

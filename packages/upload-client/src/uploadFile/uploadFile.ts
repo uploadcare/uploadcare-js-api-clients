@@ -43,6 +43,7 @@ export type FileFromOptions = {
   maxConcurrentRequests?: number
 
   baseCDN?: string
+  prefixedBaseCDN?: string
 
   checkForUrlDuplicates?: boolean
   saveUrlForRecurrentUploads?: boolean
@@ -79,7 +80,11 @@ export async function uploadFile(
     multipartChunkSize,
     maxConcurrentRequests,
 
-    baseCDN = defaultSettings.baseCDN,
+    // Left undefined on purpose when the caller omits it, so `resolveCdnBase`
+    // can distinguish "not set" (→ prefixed default) from an explicit base
+    // (→ used verbatim, e.g. the legacy `https://ucarecdn.com`).
+    baseCDN,
+    prefixedBaseCDN = defaultSettings.prefixedBaseCDN,
 
     checkForUrlDuplicates,
     saveUrlForRecurrentUploads,
@@ -116,6 +121,7 @@ export async function uploadFile(
         retryNetworkErrorMaxTimes,
 
         baseCDN,
+        prefixedBaseCDN,
         metadata
       })
     }
@@ -141,6 +147,7 @@ export async function uploadFile(
       retryNetworkErrorMaxTimes,
 
       baseCDN,
+      prefixedBaseCDN,
       metadata
     })
   }
@@ -152,6 +159,7 @@ export async function uploadFile(
       fileName,
       baseURL,
       baseCDN,
+      prefixedBaseCDN,
       checkForUrlDuplicates,
       saveUrlForRecurrentUploads,
       secureSignature,
@@ -189,7 +197,8 @@ export async function uploadFile(
       retryThrottledRequestMaxTimes,
       retryNetworkErrorMaxTimes,
 
-      baseCDN
+      baseCDN,
+      prefixedBaseCDN
     })
   }
 

@@ -6,12 +6,12 @@
   "license": "MIT",
   "workspaces": [
     "packages/api-client-utils",
+    "packages/cname-prefix",
     "packages/upload-client",
     "packages/rest-client",
     "packages/signed-uploads",
     "packages/image-shrink",
-    "packages/quality-insights",
-    "packages/cname-prefix"
+    "packages/quality-insights"
   ],
   "engines": {
     "node": ">=16"

@@ -31,4 +31,17 @@ describe('isPrefixedCdnBase', () => {
     const prefixCdnBase = 'https://ucarecd.net'
     expect(isPrefixedCdnBase(cdnBase, prefixCdnBase)).toBe(false)
   })
+
+  it('should return true for the prefixed zone itself (no subdomain)', () => {
+    expect(
+      isPrefixedCdnBase('https://ucarecd.net', 'https://ucarecd.net')
+    ).toBe(true)
+  })
+
+  it('should return false for a host that only ends with the zone string but is not a subdomain', () => {
+    // `notucarecd.net` shares the suffix `ucarecd.net` but is a different domain.
+    expect(
+      isPrefixedCdnBase('https://notucarecd.net', 'https://ucarecd.net')
+    ).toBe(false)
+  })
 })

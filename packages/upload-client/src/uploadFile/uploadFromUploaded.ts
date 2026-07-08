@@ -1,4 +1,5 @@
 import { UploadcareFile } from '../tools/UploadcareFile'
+import { toUploadcareFile } from '../tools/toUploadcareFile'
 import { isReadyPoll } from '../tools/isReadyPoll'
 
 /* Types */
@@ -23,6 +24,7 @@ export type FromUploadedOptions = {
   retryNetworkErrorMaxTimes?: number
 
   baseCDN?: string
+  prefixedBaseCDN?: string
 }
 
 export const uploadFromUploaded = (
@@ -38,7 +40,8 @@ export const uploadFromUploaded = (
     userAgent,
     retryThrottledRequestMaxTimes,
     retryNetworkErrorMaxTimes,
-    baseCDN
+    baseCDN,
+    prefixedBaseCDN
   }: FromUploadedOptions
 ): Promise<UploadcareFile> => {
   return isReadyPoll(uuid, {
@@ -51,5 +54,12 @@ export const uploadFromUploaded = (
     userAgent,
     retryThrottledRequestMaxTimes,
     retryNetworkErrorMaxTimes
-  }).then((fileInfo) => new UploadcareFile(fileInfo, { baseCDN, fileName }))
+  }).then((fileInfo) =>
+    toUploadcareFile(fileInfo, {
+      publicKey,
+      baseCDN,
+      prefixedBaseCDN,
+      fileName
+    })
+  )
 }

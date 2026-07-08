@@ -13,6 +13,7 @@ import defaultSettings from '../defaultSettings'
 import { isReadyPoll } from '../tools/isReadyPoll'
 import runWithConcurrency from '../tools/runWithConcurrency'
 import { UploadcareFile } from '../tools/UploadcareFile'
+import { toUploadcareFile } from '../tools/toUploadcareFile'
 import { prepareChunks } from './prepareChunks.node'
 
 import {
@@ -44,6 +45,7 @@ export type MultipartOptions = {
   retryNetworkErrorMaxTimes?: number
   maxConcurrentRequests?: number
   baseCDN?: string
+  prefixedBaseCDN?: string
   metadata?: Metadata
 }
 
@@ -97,6 +99,7 @@ export const uploadMultipart = async (
     maxConcurrentRequests = defaultSettings.maxConcurrentRequests,
 
     baseCDN,
+    prefixedBaseCDN,
     metadata
   }: MultipartOptions
 ): Promise<UploadcareFile> => {
@@ -194,5 +197,7 @@ export const uploadMultipart = async (
         signal
       })
     })
-    .then((fileInfo) => new UploadcareFile(fileInfo, { baseCDN }))
+    .then((fileInfo) =>
+      toUploadcareFile(fileInfo, { publicKey, baseCDN, prefixedBaseCDN })
+    )
 }

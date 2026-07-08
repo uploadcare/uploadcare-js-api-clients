@@ -1,6 +1,7 @@
 import group from '../api/group'
 import defaultSettings from '../defaultSettings'
 import { UploadcareGroup } from '../tools/UploadcareGroup'
+import { toUploadcareGroup } from '../tools/toUploadcareGroup'
 import { FileFromOptions, uploadFile } from '../uploadFile'
 
 /* Types */
@@ -44,7 +45,11 @@ export function uploadFileGroup(
     contentType,
     multipartChunkSize = defaultSettings.multipartChunkSize,
 
-    baseCDN = defaultSettings.baseCDN,
+    // Left undefined on purpose when the caller omits it, so `resolveCdnBase`
+    // can distinguish "not set" (→ prefixed default) from an explicit base
+    // (→ used verbatim, e.g. the legacy `https://ucarecdn.com`).
+    baseCDN,
+    prefixedBaseCDN = defaultSettings.prefixedBaseCDN,
     checkForUrlDuplicates,
     saveUrlForRecurrentUploads,
 
@@ -108,6 +113,7 @@ export function uploadFileGroup(
             multipartChunkSize,
 
             baseCDN,
+            prefixedBaseCDN,
             checkForUrlDuplicates,
             saveUrlForRecurrentUploads
           }).then((fileInfo) => fileInfo.uuid)
@@ -131,7 +137,9 @@ export function uploadFileGroup(
       retryThrottledRequestMaxTimes,
       retryNetworkErrorMaxTimes
     })
-      .then((groupInfo) => new UploadcareGroup(groupInfo, { baseCDN }))
+      .then((groupInfo) =>
+        toUploadcareGroup(groupInfo, { publicKey, baseCDN, prefixedBaseCDN })
+      )
       .then((group) => {
         onProgress && onProgress({ isComputable: true, value: 1 })
         return group

@@ -262,10 +262,24 @@ It is required when using Upload API.
 
 #### `baseCDN: string`
 
-Defines your schema and CDN domain. Can be changed to one of the predefined
-values (`https://ucarecdn.com/`) or your custom CNAME.
+Defines the schema and CDN domain used to build the `cdnUrl` of uploaded files
+and groups.
 
-Defaults to `https://ucarecdn.com/`.
+By default (when `baseCDN` is omitted) the client returns a **per-project
+prefixed** CDN URL derived from your `publicKey`, e.g.
+`https://<prefix>.ucarecd.net/<uuid>/`. Set `baseCDN` explicitly to use that
+exact domain verbatim instead — either the classic shared domain
+(`https://ucarecdn.com/`) or your own custom CNAME.
+
+Not set by default (prefixing is applied). Only affects `cdnUrl`; the Upload API
+endpoint is controlled by `baseURL`.
+
+#### `prefixedBaseCDN: string`
+
+The base domain from which per-project prefixed CDN URLs are derived when
+prefixing is applied.
+
+Defaults to `https://ucarecd.net`.
 
 #### `baseURL: string`
 
