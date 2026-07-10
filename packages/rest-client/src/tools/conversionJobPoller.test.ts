@@ -27,7 +27,7 @@ describe('conversionJobPoller', () => {
     expect(promises.length).toBe(2)
     await expect(promises[0]).resolves.toEqual({
       status: ConversionStatus.FAILED,
-      error: 'CDN Path error: Cannot parse url part: invalid',
+      error: 'Operations parsing: Cannot parse url part: invalid',
       path: paths[0],
       result: null
     })
@@ -64,7 +64,7 @@ describe('conversionJobPoller', () => {
     expect(promises.length).toBe(2)
     await expect(promises[0]).resolves.toEqual({
       status: ConversionStatus.FAILED,
-      error: 'CDN Path error: Cannot parse url part: invalid',
+      error: 'Operations parsing: Cannot parse url part: invalid',
       path: paths[0],
       result: null
     })
