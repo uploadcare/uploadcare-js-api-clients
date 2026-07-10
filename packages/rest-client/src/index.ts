@@ -60,6 +60,7 @@ export { ValueOf } from './types/ValueOf'
 export { ConversionType } from './types/ConversionType'
 export {
   Metadata,
+  Tags,
   ContentInfo,
   ImageInfo,
   MimeInfo,
@@ -186,6 +187,19 @@ export {
   UpdateMetadataResponse,
   UpdateMetadataOptions
 } from './api/metadata/updateMetadata'
+
+/** Low-level Tags API */
+export { getTags, GetTagsResponse, GetTagsOptions } from './api/tags/getTags'
+export {
+  replaceTags,
+  ReplaceTagsResponse,
+  ReplaceTagsOptions
+} from './api/tags/replaceTags'
+export {
+  updateTags,
+  UpdateTagsResponse,
+  UpdateTagsOptions
+} from './api/tags/updateTags'
 
 /** Low-level Webhooks API */
 export {

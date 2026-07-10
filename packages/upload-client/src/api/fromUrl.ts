@@ -4,7 +4,8 @@ import {
   CustomUserAgent,
   camelizeKeys,
   Metadata,
-  StoreValue
+  StoreValue,
+  Tags
 } from '@uploadcare/api-client-utils'
 
 import request from '../request/request.node'
@@ -15,6 +16,7 @@ import { getUserAgent } from '../tools/getUserAgent'
 import { UploadError } from '../tools/UploadError'
 import { retryIfFailed } from '../tools/retryIfFailed'
 import { getStoreValue } from '../tools/getStoreValue'
+import { getTagsValue } from '../tools/getTagsValue'
 
 export enum TypeEnum {
   Token = 'token',
@@ -70,6 +72,7 @@ export type FromUrlOptions = {
   retryThrottledRequestMaxTimes?: number
   retryNetworkErrorMaxTimes?: number
   metadata?: Metadata
+  tags?: Tags
 }
 
 /** Uploading files from URL. */
@@ -90,7 +93,8 @@ export default function fromUrl(
     userAgent,
     retryThrottledRequestMaxTimes = defaultSettings.retryThrottledRequestMaxTimes,
     retryNetworkErrorMaxTimes = defaultSettings.retryNetworkErrorMaxTimes,
-    metadata
+    metadata,
+    tags
   }: FromUrlOptions
 ): Promise<FromUrlSuccessResponse> {
   return retryIfFailed(
@@ -111,7 +115,8 @@ export default function fromUrl(
           signature: secureSignature,
           expire: secureExpire,
           source: source,
-          metadata
+          metadata,
+          tags: getTagsValue(tags)
         }),
         signal
       }).then(({ data, headers, request }) => {

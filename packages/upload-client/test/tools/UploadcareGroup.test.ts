@@ -17,6 +17,7 @@ const createFile = (overrides: Partial<GroupFileInfo> = {}): GroupFileInfo => ({
   videoInfo: null,
   contentInfo: null,
   metadata: undefined,
+  tags: undefined,
   defaultEffects: '-/resize/640x/',
   ...overrides
 })

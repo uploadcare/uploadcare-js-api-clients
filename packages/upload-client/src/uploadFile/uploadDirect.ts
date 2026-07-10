@@ -6,7 +6,8 @@ import { toUploadcareFile } from '../tools/toUploadcareFile'
 import {
   CustomUserAgent,
   Metadata,
-  StoreValue
+  StoreValue,
+  Tags
 } from '@uploadcare/api-client-utils'
 import { ProgressCallback } from '../api/types'
 import { SupportedFileInput } from '../types'
@@ -34,6 +35,7 @@ export type DirectOptions = {
   baseCDN?: string
   prefixedBaseCDN?: string
   metadata?: Metadata
+  tags?: Tags
 }
 
 export const uploadDirect = (
@@ -60,7 +62,8 @@ export const uploadDirect = (
 
     baseCDN,
     prefixedBaseCDN,
-    metadata
+    metadata,
+    tags
   }: DirectOptions
 ): Promise<UploadcareFile> => {
   return base(file, {
@@ -78,7 +81,8 @@ export const uploadDirect = (
     userAgent,
     retryThrottledRequestMaxTimes,
     retryNetworkErrorMaxTimes,
-    metadata
+    metadata,
+    tags
   })
     .then(({ file }) => {
       return isReadyPoll(file, {

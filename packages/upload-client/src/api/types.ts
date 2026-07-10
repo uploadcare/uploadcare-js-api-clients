@@ -2,7 +2,8 @@ import {
   ContentInfo,
   ImageInfo,
   VideoInfo,
-  Metadata
+  Metadata,
+  Tags
 } from '@uploadcare/api-client-utils'
 
 export type FileInfo = {
@@ -23,6 +24,7 @@ export type FileInfo = {
   contentInfo: ContentInfo | null
   s3Bucket?: string
   metadata?: Metadata
+  tags?: Tags
 }
 
 export type GroupFileInfo = FileInfo & {

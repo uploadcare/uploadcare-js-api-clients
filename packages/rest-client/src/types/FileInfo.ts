@@ -1,4 +1,4 @@
-import { ContentInfo, Metadata } from '@uploadcare/api-client-utils'
+import { ContentInfo, Metadata, Tags } from '@uploadcare/api-client-utils'
 import { AppData } from './AppData'
 
 // TODO: ensure that it's proper type
@@ -19,5 +19,6 @@ export type FileInfo = {
   variations: FileInfoVariations | null
   contentInfo: ContentInfo | null
   metadata: Metadata | null
+  tags: Tags | null
   appdata: AppData | null
 }

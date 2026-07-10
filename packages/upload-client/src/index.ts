@@ -66,6 +66,7 @@ export {
   getUserAgent,
   NetworkError,
   Metadata,
+  Tags,
   ContentInfo,
   ImageInfo,
   MimeInfo,

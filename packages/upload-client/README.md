@@ -429,6 +429,23 @@ Non-string values will be converted to `string`. `undefined` values will be igno
 
 See [docs][uc-file-metadata] and [REST API][uc-docs-metadata] for details.
 
+### `tags: Tags`
+
+```typescript
+type Tags = string[]
+```
+
+A list of searchable string tags to attach to the file at upload time. Tags are
+normalized before storage (lowercased, whitespace stripped, duplicates and empty
+strings removed). Up to 50 tags per file, 100 characters each, limited to Latin
+letters, digits, `-`, `_` and `.`.
+
+Supported for direct, multipart and from-URL uploads. The upload response does not include
+tags — read them afterwards from `UploadcareFile.tags` or via the REST API. Tags
+require API version 0.7.
+
+See [docs][uc-file-tags] for details.
+
 ### Uploading queue
 
 If you're going to upload a lot of files at once, it's useful to do it in a queue. Otherwise, a large number of simultaneous requests can clog the internet channel and slow down the process.
@@ -600,6 +617,7 @@ request at [hello@uploadcare.com][uc-email-hello].
 [uc-docs-upload-api]: https://uploadcare.com/docs/api_reference/upload/?utm_source=github&utm_campaign=uploadcare-js-api-clients
 [uc-docs-metadata]: https://uploadcare.com/api-refs/rest-api/v0.7.0/#tag/File-Metadata
 [uc-file-metadata]: https://uploadcare.com/docs/file-metadata/
+[uc-file-tags]: https://uploadcare.com/docs/file-tags/
 [react-native-url-polyfill]: https://github.com/charpeni/react-native-url-polyfill
 [react-native-url-polyfill-issue]: https://github.com/charpeni/react-native-url-polyfill/issues/284
 [react-native-url-polyfill-example]: https://github.com/charpeni/react-native-url-polyfill/commit/5985d7efc07b496b829883540d09c6f0be384387

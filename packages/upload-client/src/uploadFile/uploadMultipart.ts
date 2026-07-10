@@ -1,7 +1,8 @@
 import {
   CustomUserAgent,
   Metadata,
-  StoreValue
+  StoreValue,
+  Tags
 } from '@uploadcare/api-client-utils'
 import multipartComplete from '../api/multipartComplete'
 import multipartStart from '../api/multipartStart'
@@ -47,6 +48,7 @@ export type MultipartOptions = {
   baseCDN?: string
   prefixedBaseCDN?: string
   metadata?: Metadata
+  tags?: Tags
 }
 
 const uploadPart = (
@@ -100,7 +102,8 @@ export const uploadMultipart = async (
 
     baseCDN,
     prefixedBaseCDN,
-    metadata
+    metadata,
+    tags
   }: MultipartOptions
 ): Promise<UploadcareFile> => {
   const size = fileSize ?? (await getFileSize(file))
@@ -147,6 +150,7 @@ export const uploadMultipart = async (
     retryThrottledRequestMaxTimes,
     retryNetworkErrorMaxTimes,
     metadata,
+    tags,
     multipartChunkSize
   })
     .then(async ({ uuid, parts }) => {
