@@ -50,7 +50,6 @@ export type BaseOptions = {
   metadata?: Metadata
   tags?: Tags
 }
-;``
 /**
  * Performs file uploading request to Uploadcare Upload API. Can be canceled and
  * has progress.
