@@ -440,7 +440,7 @@ normalized before storage (lowercased, whitespace stripped, duplicates and empty
 strings removed). Up to 50 tags per file, 100 characters each, limited to Latin
 letters, digits, `-`, `_` and `.`.
 
-Supported for direct and multipart uploads. The upload response does not include
+Supported for direct, multipart and from-URL uploads. The upload response does not include
 tags — read them afterwards from `UploadcareFile.tags` or via the REST API. Tags
 require API version 0.7.
 

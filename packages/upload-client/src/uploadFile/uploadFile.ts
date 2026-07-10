@@ -181,7 +181,8 @@ export async function uploadFile(
       retryThrottledRequestMaxTimes,
       retryNetworkErrorMaxTimes,
       pusherKey,
-      metadata
+      metadata,
+      tags
     })
   }
 
