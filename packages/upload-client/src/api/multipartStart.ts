@@ -91,7 +91,7 @@ export default function multipartStart(
           expire: secureExpire,
           source: source,
           metadata,
-          tags: tags && tags.join(',')
+          tags: Array.isArray(tags) ? tags.join(',') : tags
         }),
         signal
       }).then(({ data, headers, request }) => {
