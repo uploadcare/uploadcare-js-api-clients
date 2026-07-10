@@ -20,6 +20,7 @@ import { getUserAgent } from '../tools/getUserAgent'
 import { retryIfFailed } from '../tools/retryIfFailed'
 import { UploadError } from '../tools/UploadError'
 import { getStoreValue } from '../tools/getStoreValue'
+import { getTagsValue } from '../tools/getTagsValue'
 
 export type MultipartStartOptions = {
   publicKey: string
@@ -91,7 +92,7 @@ export default function multipartStart(
           expire: secureExpire,
           source: source,
           metadata,
-          tags: Array.isArray(tags) ? tags.join(',') : tags
+          tags: getTagsValue(tags)
         }),
         signal
       }).then(({ data, headers, request }) => {

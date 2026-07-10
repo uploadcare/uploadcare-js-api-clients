@@ -16,6 +16,7 @@ import { getUserAgent } from '../tools/getUserAgent'
 import { UploadError } from '../tools/UploadError'
 import { retryIfFailed } from '../tools/retryIfFailed'
 import { getStoreValue } from '../tools/getStoreValue'
+import { getTagsValue } from '../tools/getTagsValue'
 
 export enum TypeEnum {
   Token = 'token',
@@ -115,7 +116,7 @@ export default function fromUrl(
           expire: secureExpire,
           source: source,
           metadata,
-          tags: Array.isArray(tags) ? tags.join(',') : tags
+          tags: getTagsValue(tags)
         }),
         signal
       }).then(({ data, headers, request }) => {

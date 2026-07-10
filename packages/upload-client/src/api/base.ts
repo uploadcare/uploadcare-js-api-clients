@@ -18,6 +18,7 @@ import { FailedResponse } from '../request/types'
 import { getContentType } from '../tools/getContentType'
 import { getFileName } from '../tools/getFileName'
 import { getStoreValue } from '../tools/getStoreValue'
+import { getTagsValue } from '../tools/getTagsValue'
 import { SupportedFileInput } from '../types'
 import { ProgressCallback, Uuid } from './types'
 
@@ -97,7 +98,7 @@ export default function base(
           expire: secureExpire,
           source: source,
           metadata,
-          tags: Array.isArray(tags) ? tags.join(',') : tags
+          tags: getTagsValue(tags)
         }),
         signal,
         onProgress
