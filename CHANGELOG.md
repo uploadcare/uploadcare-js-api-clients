@@ -8,7 +8,7 @@
 
 ### Features
 
-* add file tags support to upload-client and rest-client ([#575](https://github.com/uploadcare/uploadcare-js-api-clients/issues/575)) ([94aa133](https://github.com/uploadcare/uploadcare-js-api-clients/commit/94aa133f5ab4aeab7c6582233677ada1dd281f6a))
+* **upload-client** & **rest-client** add file tags support ([#575](https://github.com/uploadcare/uploadcare-js-api-clients/issues/575)) ([94aa133](https://github.com/uploadcare/uploadcare-js-api-clients/commit/94aa133f5ab4aeab7c6582233677ada1dd281f6a)). See docs [here](https://uploadcare.com/docs/file-tags/).
 * **upload-client:** use prefixed CDN domains by default ([#574](https://github.com/uploadcare/uploadcare-js-api-clients/issues/574)) ([cdcf13a](https://github.com/uploadcare/uploadcare-js-api-clients/commit/cdcf13a2a3f27733fd87eeee4843610b85d66daa))
 
 
