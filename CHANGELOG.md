@@ -1,3 +1,18 @@
+# [6.19.0](https://github.com/uploadcare/uploadcare-js-api-clients/compare/v6.18.4...v6.19.0) (2026-07-13)
+
+
+### Bug Fixes
+
+* **upload-client:** FileInfo isReady should be a boolean ([#568](https://github.com/uploadcare/uploadcare-js-api-clients/issues/568)) ([0aa5b35](https://github.com/uploadcare/uploadcare-js-api-clients/commit/0aa5b353a03a2c4c704d910d715d01f1c8b81c1a))
+
+
+### Features
+
+* **upload-client** & **rest-client** add file tags support ([#575](https://github.com/uploadcare/uploadcare-js-api-clients/issues/575)) ([94aa133](https://github.com/uploadcare/uploadcare-js-api-clients/commit/94aa133f5ab4aeab7c6582233677ada1dd281f6a)). See docs [here](https://uploadcare.com/docs/file-tags/).
+* **upload-client:** use prefixed CDN domains by default ([#574](https://github.com/uploadcare/uploadcare-js-api-clients/issues/574)) ([cdcf13a](https://github.com/uploadcare/uploadcare-js-api-clients/commit/cdcf13a2a3f27733fd87eeee4843610b85d66daa))
+
+
+
 ## [6.18.4](https://github.com/uploadcare/uploadcare-js-api-clients/compare/v6.18.3...v6.18.4) (2026-01-28)
 
 ### Bug Fixes

@@ -1,6 +1,6 @@
 {
   "name": "@uploadcare/upload-client",
-  "version": "6.18.4",
+  "version": "6.19.0",
   "description": "`@uploadcare/upload-client` is a JavaScript and TypeScript SDK for the Uploadcare Upload API. It handles direct binary uploads, multipart uploads for large files, URL-based and UUID-based uploads, and file group creation. Works in Node.js, browser, and React Native. Supports upload progress tracking, AbortController cancellation, concurrent request queuing, and signed uploads.",
   "type": "module",
   "module": "./dist/esm/index.node.mjs",
@@ -89,8 +89,8 @@
     "@types/koa__cors": "^5.0.0",
     "@types/koa__router": "^12.0.4",
     "@types/ws": "8.5.3",
-    "@uploadcare/api-client-utils": "^6.18.4",
-    "@uploadcare/cname-prefix": "^6.18.4",
+    "@uploadcare/api-client-utils": "^6.19.0",
+    "@uploadcare/cname-prefix": "^6.19.0",
     "chalk": "^4.1.2",
     "data-uri-to-buffer": "3.0.1",
     "dataurl-to-blob": "0.0.1",
