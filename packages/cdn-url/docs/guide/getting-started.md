@@ -91,7 +91,7 @@ The package is split into atomic entry points, so you import only what you use:
 | Entry                           | What's inside                                                              |
 | ------------------------------- | -------------------------------------------------------------------------- |
 | `@uploadcare/cdn-url`           | `parseCdnUrl`, `serializeCdnUrl`, `parseOperations`, domain helpers, types |
-| `@uploadcare/cdn-url/ops`       | ~45 image operation creators                                               |
+| `@uploadcare/cdn-url/ops`       | 47 image operation creators, including a `rawOp` escape hatch              |
 | `@uploadcare/cdn-url/group`     | group ids, `nth` elements, archives                                        |
 | `@uploadcare/cdn-url/proxy`     | delivery proxy URLs for remote sources                                     |
 | `@uploadcare/cdn-url/video`     | video conversion paths                                                     |

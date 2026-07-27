@@ -126,19 +126,23 @@ Also available without a bundler at all, via the IIFE global build:
 
 ## Tree-shaking: what you actually ship
 
-Every entry point is independent, and `sideEffects: false` lets bundlers drop everything you don't import. Each operation creator is an atom: importing `preview` does not pull in the other 44.
+Every entry point is independent, and `sideEffects: false` lets bundlers drop everything you don't import. Each operation creator is an atom: importing `preview` does not pull in the other 46.
 
-Production bundle weight per entry (minified, not gzipped):
+What each entry costs when you import everything it exports, bundled and minified from the production build. Shared chunks are included, so these are the real numbers rather than per-file sizes:
 
-| Import                                | Cost                                                                |
-| ------------------------------------- | ------------------------------------------------------------------- |
-| `proxy`                               | ~0.4 kB                                                             |
-| `index` (parse + serialize + domains) | ~0.6 kB + shared chunks                                             |
-| `group`, `document`, `gif2video`      | ~1 kB each                                                          |
-| `video`                               | ~1.5 kB                                                             |
-| `builder`                             | ~4.4 kB; it carries parse and serialize                             |
-| `ops` (all 45 creators)               | ~6 kB; a handful of creators: a fraction of that                    |
-| `fluent` (the `cdn` mega-object)      | ~14 kB; every flavor plus all 45 creators, and it cannot tree-shake |
+| Import                                | Minified | Gzipped |
+| ------------------------------------- | -------- | ------- |
+| `proxy`                               | 0.6 kB   | 0.4 kB  |
+| `document`                            | 0.7 kB   | 0.4 kB  |
+| `video`                               | 1.0 kB   | 0.6 kB  |
+| `gif2video`                           | 1.3 kB   | 0.7 kB  |
+| `group`                               | 1.4 kB   | 0.8 kB  |
+| `index` (parse + serialize + domains) | 3.2 kB   | 1.4 kB  |
+| `builder`                             | 4.3 kB   | 1.8 kB  |
+| `ops` (all 47 creators)               | 6.3 kB   | 2.3 kB  |
+| `fluent` (the `cdn` mega-object)      | 13.4 kB  | 4.2 kB  |
+
+Importing everything is the worst case, and it is not what most code does. One creator plus the core is about 1.3 kB gzipped, not 2.3 plus 1.4, because the creators you don't name are dropped.
 
 The `fluent` entry is the one exception to "you only pay for what you import": reaching for `cdn` pulls in the whole library. That's the deal: one import, full surface. If size matters, use the functional core or `builder` instead.
 
