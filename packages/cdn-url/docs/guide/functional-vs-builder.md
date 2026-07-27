@@ -144,7 +144,7 @@ What each entry costs when you import everything it exports, bundled and minifie
 
 Importing everything is the worst case, and it is not what most code does. One creator plus the core is about 1.3 kB gzipped, not 2.3 plus 1.4, because the creators you don't name are dropped.
 
-The `fluent` entry is the one exception to "you only pay for what you import": reaching for `cdn` pulls in the whole library. That's the deal: one import, full surface. If size matters, use the functional core or `builder` instead.
+The `fluent` entry is the one exception to "you only pay for what you import": reaching for `cdn` pulls in the whole library, and it cannot tree-shake by design. That's the deal: one import, full surface. If size matters, use the functional core or `builder` instead.
 
 ## Which to use
 
