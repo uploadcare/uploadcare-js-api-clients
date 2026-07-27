@@ -258,4 +258,74 @@ describe('fluent operation references', () => {
       cdn.video(UUID).size({ width: 720 }).thumbs(5).withoutOp(thumbs).path
     ).toBe(`/${UUID}/video/-/size/720x/`)
   })
+
+  describe('chain inspection', () => {
+    it('hasOp() and getOp() mirror the builder', async () => {
+      const { preview, quality } = await import('../ops/index')
+      const chain = cdn.file(UUID).preview(800, 600).quality('smart')
+      expect(chain.hasOp(quality)).toBe(true)
+      expect(chain.hasOp('blur')).toBe(false)
+      expect(chain.getOp(quality)).toEqual({
+        name: 'quality',
+        params: ['smart']
+      })
+      expect(chain.getOp(preview)).toEqual({
+        name: 'preview',
+        params: ['800x600']
+      })
+      expect(chain.getOp('blur')).toBeNull()
+    })
+
+    it('getAllOps() collects every match', () => {
+      const chain = cdn
+        .file(UUID)
+        .op('overlay', UUID, '50p,50p')
+        .preview(800, 600)
+        .op('overlay', UUID, '10p,10p')
+      expect(chain.getAllOps('overlay')).toEqual([
+        { name: 'overlay', params: [UUID, '50p,50p'] },
+        { name: 'overlay', params: [UUID, '10p,10p'] }
+      ])
+      expect(chain.getAllOps('blur')).toEqual([])
+    })
+
+    it('replaceOp() swaps in place, appending when absent', async () => {
+      const { quality, resize } = await import('../ops/index')
+      const chain = cdn.file(UUID).resize({ width: 300 }).quality('smart')
+      expect(chain.replaceOp(resize({ width: 500 })).href).toBe(
+        `${ORIGIN}/${UUID}/-/resize/500x/-/quality/smart/`
+      )
+      expect(cdn.file(UUID).replaceOp(quality('best')).href).toBe(
+        `${ORIGIN}/${UUID}/-/quality/best/`
+      )
+    })
+
+    it('replaceOp() handles counted video ops', async () => {
+      const { thumbs } = await import('../video/index')
+      expect(
+        cdn.video(UUID).size({ width: 720 }).thumbs(5).replaceOp(thumbs(3)).path
+      ).toBe(`/${UUID}/video/-/size/720x/-/thumbs~3/`)
+    })
+
+    it('replaceAllOps() collapses duplicates into one', () => {
+      const chain = cdn
+        .file(UUID)
+        .op('overlay', UUID, '50p,50p')
+        .preview(800, 600)
+        .op('overlay', UUID, '10p,10p')
+      expect(
+        chain.replaceAllOps({ name: 'overlay', params: [UUID] }).operations
+      ).toEqual([
+        { name: 'overlay', params: [UUID] },
+        { name: 'preview', params: ['800x600'] }
+      ])
+    })
+
+    it('inspection does not mutate the chain', () => {
+      const chain = cdn.file(UUID).preview(800, 600)
+      chain.getAllOps('preview').length = 0
+      chain.replaceAllOps({ name: 'preview', params: ['1x1'] })
+      expect(chain.href).toBe(`${ORIGIN}/${UUID}/-/preview/800x600/`)
+    })
+  })
 })

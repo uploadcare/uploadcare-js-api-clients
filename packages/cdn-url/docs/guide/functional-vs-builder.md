@@ -35,7 +35,24 @@ const url = CdnUrl.parse(src)
   .setOrigin('https://1zlmtnsbgr.ucarecd.net').href
 ```
 
-`with`, `without`, `replace`, `has`, `get`, `setFilename`, `setOrigin` — see the [builder reference](/reference/builder/).
+`with`, `without`, `replace`, `replaceAll`, `has`, `get`, `getAll`, `setFilename`, `setOrigin` — see the [builder reference](/reference/builder/).
+
+### Inspecting and overriding a chain
+
+Refs are interchangeable: an operation name, an operation object, or the creator itself. Aliases resolve to the directive they produce (`cropByRatio` → `crop`), and counted video operations match on their base name (`thumbs~5` ↔ `thumbs`).
+
+```ts
+const url = CdnUrl.parse(src)
+
+url.has(quality) // is a quality set?
+url.get(quality) // → { name: 'quality', params: ['smart'] } | null
+url.getAll(overlay) // → every overlay, in chain order
+
+url.replace(resize({ width: 500 })) // swap the first match, or append
+url.replaceAll(overlay(uuid, { size: ['50p', '50p'] })) // collapse to exactly one
+```
+
+`replace` touches only the first match, which is what you want for a single-valued operation like `resize` or `quality`. For a [stackable](/how-to/validate-user-input#stackable-operations) operation that legitimately repeats, reach for `replaceAll` — otherwise you rewrite the first `overlay` and leave the rest in place.
 
 ## The fluent mega-object
 
@@ -52,6 +69,20 @@ cdn.configure({ origin: 'https://cdn.example.com' }).file(uuid).preview().href
 ```
 
 Each starter returns a kind-specific chain — video chains only offer video methods, group roots only `nth()`/`archive()` — so invalid combinations are compile-time errors. Chains are immutable and reuse the creators' development-bundle validation.
+
+The builder's inspection API is mirrored on every chain, with an `Op` suffix so the names can never collide with a transformation method:
+
+```ts
+const chain = cdn.file(uuid).resize({ width: 300 }).quality('smart')
+
+chain.hasOp(quality) // → true
+chain.getOp(quality) // → { name: 'quality', params: ['smart'] } | null
+chain.getAllOps('overlay') // → every overlay
+chain.replaceOp(resize({ width: 500 })) // swap the first match, or append
+chain.replaceAllOps({ name: 'overlay', params: [uuid] }) // collapse to one
+chain.withoutOp(quality) // drop every match
+chain.op('custom', 'arg') // append anything, unvalidated
+```
 
 Also available without a bundler at all, via the IIFE global build:
 

@@ -1,7 +1,15 @@
 import { describe, expect, it } from 'vitest'
 
 import type { CdnOperation } from '../index'
-import { validateOperations } from './index'
+import {
+  CORE_OPERATIONS,
+  MUST_BE_LAST_OPERATIONS,
+  STACKABLE_OPERATIONS,
+  isCoreOperation,
+  isStackable,
+  mustBeLast,
+  validateOperations
+} from './index'
 
 const op = (name: string, ...params: string[]): CdnOperation => ({
   name,
@@ -192,5 +200,58 @@ describe('validateOperations', () => {
         codes([op('format', 'webm')], { conversion: 'video' })
       ).not.toContain('no-core-operation')
     })
+  })
+})
+
+describe('rule sets', () => {
+  it('exposes the sets the validator is built on', () => {
+    expect(CORE_OPERATIONS.has('scale_crop')).toBe(true)
+    expect(CORE_OPERATIONS.has('blur')).toBe(false)
+    expect(STACKABLE_OPERATIONS.has('overlay')).toBe(true)
+    expect(STACKABLE_OPERATIONS.has('quality')).toBe(false)
+    expect(MUST_BE_LAST_OPERATIONS.has('json')).toBe(true)
+    expect(MUST_BE_LAST_OPERATIONS.has('preview')).toBe(false)
+  })
+
+  it('is consistent with the diagnostics the validator emits', () => {
+    for (const name of ['quality', 'blur', 'rotate']) {
+      expect(STACKABLE_OPERATIONS.has(name)).toBe(false)
+      expect(codes([op(name, '1'), op(name, '1')])).toContain(
+        'duplicate-operation'
+      )
+    }
+    for (const name of ['overlay', 'text_align']) {
+      expect(STACKABLE_OPERATIONS.has(name)).toBe(true)
+      expect(codes([op(name, '1'), op(name, '1')])).not.toContain(
+        'duplicate-operation'
+      )
+    }
+  })
+})
+
+describe('rule predicates', () => {
+  it('isCoreOperation() accepts any operation ref', () => {
+    expect(isCoreOperation('resize')).toBe(true)
+    expect(isCoreOperation(op('scale_crop', '1x1'))).toBe(true)
+    expect(isCoreOperation('blur')).toBe(false)
+  })
+
+  it('isStackable() reports whether repeating an op is meaningful', () => {
+    expect(isStackable('overlay')).toBe(true)
+    expect(isStackable(op('crop', '1:1'))).toBe(true)
+    expect(isStackable('quality')).toBe(false)
+  })
+
+  it('mustBeLast() covers image and counted video ops', () => {
+    expect(mustBeLast('json')).toBe(true)
+    expect(mustBeLast('main_colors')).toBe(true)
+    expect(mustBeLast(op('thumbs~5'))).toBe(true)
+    expect(mustBeLast('preview')).toBe(false)
+  })
+
+  it('resolves creator refs and aliases', async () => {
+    const { cropByRatio, quality } = await import('../ops/index')
+    expect(isStackable(cropByRatio)).toBe(true)
+    expect(isStackable(quality)).toBe(false)
   })
 })

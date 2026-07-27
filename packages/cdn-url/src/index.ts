@@ -4,6 +4,7 @@ export { detectDomainKind, isUploadcareDomain } from './domain'
 export {
   type NamedOperationCreator,
   type OperationRef,
+  operationBaseName,
   operationMatches,
   operationNameOf
 } from './operation-ref'

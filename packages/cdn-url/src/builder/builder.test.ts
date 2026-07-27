@@ -127,4 +127,81 @@ describe('CdnUrl builder', () => {
       expect(url.without('quality').href).toBe(`https://ucarecdn.com/${UUID}/`)
     })
   })
+
+  describe('getAll()', () => {
+    it('collects every match, not just the first', () => {
+      const url = CdnUrl.parse(
+        `https://ucarecdn.com/${UUID}/-/overlay/${UUID}/50p,50p/-/preview/-/overlay/${UUID}/10p,10p/`
+      )
+      expect(url.getAll('overlay')).toEqual([
+        { name: 'overlay', params: [UUID, '50p,50p'] },
+        { name: 'overlay', params: [UUID, '10p,10p'] }
+      ])
+    })
+
+    it('returns an empty array when nothing matches', () => {
+      const url = CdnUrl.parse(`https://ucarecdn.com/${UUID}/-/preview/`)
+      expect(url.getAll(quality)).toEqual([])
+    })
+
+    it('accepts creator refs and resolves aliases', () => {
+      const url = CdnUrl.parse(
+        `https://ucarecdn.com/${UUID}/-/crop/16:9/-/crop/1:1/`
+      )
+      expect(url.getAll(cropByRatio)).toHaveLength(2)
+    })
+
+    it('is a defensive copy', () => {
+      const url = CdnUrl.parse(`https://ucarecdn.com/${UUID}/-/preview/`)
+      url.getAll('preview').length = 0
+      expect(url.operations).toHaveLength(1)
+    })
+  })
+
+  describe('replace() with counted suffixes', () => {
+    it('replaces thumbs~5 with thumbs~3 instead of appending', async () => {
+      const { thumbs } = await import('../video/index')
+      const url = new CdnUrl({
+        origin: 'https://ucarecdn.com',
+        uuid: UUID,
+        operations: [thumbs(5)]
+      })
+      expect(url.replace(thumbs(3)).operations).toEqual([
+        { name: 'thumbs~3', params: [] }
+      ])
+    })
+  })
+
+  describe('replaceAll()', () => {
+    it('collapses every match into one, at the first match position', () => {
+      const url = CdnUrl.parse(
+        `https://ucarecdn.com/${UUID}/-/overlay/${UUID}/50p,50p/-/preview/-/overlay/${UUID}/10p,10p/`
+      )
+      expect(url.replaceAll(quality('smart')).operations).toEqual([
+        { name: 'overlay', params: [UUID, '50p,50p'] },
+        { name: 'preview', params: [] },
+        { name: 'overlay', params: [UUID, '10p,10p'] },
+        { name: 'quality', params: ['smart'] }
+      ])
+      expect(
+        url.replaceAll({ name: 'overlay', params: [UUID] }).operations
+      ).toEqual([
+        { name: 'overlay', params: [UUID] },
+        { name: 'preview', params: [] }
+      ])
+    })
+
+    it('appends when nothing matches', () => {
+      const url = CdnUrl.parse(`https://ucarecdn.com/${UUID}/-/preview/`)
+      expect(url.replaceAll(quality('best')).href).toBe(
+        `https://ucarecdn.com/${UUID}/-/preview/-/quality/best/`
+      )
+    })
+
+    it('leaves the original untouched', () => {
+      const url = CdnUrl.parse(`https://ucarecdn.com/${UUID}/-/preview/`)
+      url.replaceAll(quality('best'))
+      expect(url.operations).toEqual([{ name: 'preview', params: [] }])
+    })
+  })
 })

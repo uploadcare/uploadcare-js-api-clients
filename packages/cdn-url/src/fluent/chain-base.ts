@@ -60,6 +60,82 @@ export abstract class Chain<S extends ChainState> {
     )
   }
 
+  /**
+   * Whether a matching operation is present. Mirrors `CdnUrl.has`; named with
+   * the `Op` suffix so it can never collide with a transformation method.
+   *
+   * @example
+   * ```ts
+   * cdn.file(uuid).quality('smart').hasOp(quality) // → true
+   * ```
+   */
+  public hasOp(ref: OperationRef): boolean {
+    return this._s.operations.some((op) => operationMatches(op, ref))
+  }
+
+  /**
+   * First matching operation, or `null`. Mirrors `CdnUrl.get`.
+   *
+   * @example
+   * ```ts
+   * cdn.file(uuid).quality('smart').getOp('quality')
+   * // → { name: 'quality', params: ['smart'] }
+   * ```
+   */
+  public getOp(ref: OperationRef): CdnOperation | null {
+    return this._s.operations.find((op) => operationMatches(op, ref)) ?? null
+  }
+
+  /**
+   * Every matching operation, in chain order. Mirrors `CdnUrl.getAll`.
+   *
+   * @example
+   * ```ts
+   * chain.getAllOps('overlay') // → [{ name: 'overlay', … }, …]
+   * ```
+   */
+  public getAllOps(ref: OperationRef): CdnOperation[] {
+    return this._s.operations.filter((op) => operationMatches(op, ref))
+  }
+
+  /**
+   * Replaces the first matching operation in place, or appends it. Mirrors
+   * `CdnUrl.replace`.
+   *
+   * @example
+   * ```ts
+   * cdn.file(uuid).resize({ width: 300 }).replaceOp(resize({ width: 500 })).href
+   * ```
+   */
+  public replaceOp(operation: CdnOperation): this {
+    const current = this._s.operations
+    const index = current.findIndex((op) => operationMatches(op, operation))
+    if (index === -1) return this._add(operation)
+    const next = [...current]
+    next[index] = operation
+    return this._withOperations(next)
+  }
+
+  /**
+   * Collapses every matching operation into one, kept at the position of the
+   * first match; appends when nothing matches. Mirrors `CdnUrl.replaceAll`.
+   *
+   * @example
+   * ```ts
+   * chain.replaceAllOps({ name: 'overlay', params: [uuid] }).operations
+   * ```
+   */
+  public replaceAllOps(operation: CdnOperation): this {
+    const current = this._s.operations
+    const index = current.findIndex((op) => operationMatches(op, operation))
+    if (index === -1) return this._add(operation)
+    return this._withOperations(
+      current.flatMap((op, i) =>
+        i === index ? [operation] : operationMatches(op, operation) ? [] : [op]
+      )
+    )
+  }
+
   /** The operations accumulated so far (defensive copy). */
   public get operations(): CdnOperation[] {
     return [...this._s.operations]

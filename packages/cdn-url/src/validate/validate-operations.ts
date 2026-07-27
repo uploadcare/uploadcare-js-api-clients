@@ -3,6 +3,7 @@
  * operation creators cannot check on their own. Non-throwing — returns
  * diagnostics so callers decide what to do with them.
  */
+import { type OperationRef, operationBaseName } from '../operation-ref'
 import type { CdnOperation, ConversionKind } from '../types'
 
 /** How serious a {@link Diagnostic} is. */
@@ -26,17 +27,69 @@ export type ValidationContext = {
   conversion?: ConversionKind
 }
 
-/** Ops that make the CDN actually process an image. */
-const CORE_OPS = new Set(['preview', 'resize', 'smart_resize', 'scale_crop'])
+/**
+ * Operations that make the CDN actually process an image. A chain without one
+ * of these delivers the original file untouched.
+ *
+ * @see https://uploadcare.com/docs/transformations/image/
+ * @example
+ * ```ts
+ * CORE_OPERATIONS.has('scale_crop') // → true
+ * ```
+ */
+export const CORE_OPERATIONS: ReadonlySet<string> = new Set([
+  'preview',
+  'resize',
+  'smart_resize',
+  'scale_crop'
+])
 
-/** Info-returning ops: a chain of only these needs no core operation. */
-const INFO_OPS = new Set(['json', 'jsonp', 'main_colors'])
+/**
+ * Info-returning operations: a chain built only from these needs no core
+ * operation, because it returns metadata rather than an image.
+ *
+ * @see https://uploadcare.com/docs/intelligence/face-detection/
+ * @example
+ * ```ts
+ * INFO_OPERATIONS.has('json') // → true
+ * ```
+ */
+export const INFO_OPERATIONS: ReadonlySet<string> = new Set([
+  'json',
+  'jsonp',
+  'main_colors'
+])
 
-/** Image ops that must be the last directive in the chain. */
-const MUST_BE_LAST = new Set(['main_colors', 'json', 'jsonp'])
+/**
+ * Operations that must be the last directive in the chain. Video `thumbs~N`
+ * is subject to the same rule — use {@link mustBeLast}, which handles the
+ * counted suffix.
+ *
+ * @see https://uploadcare.com/docs/transformations/image/colors/#operation-main-colors
+ * @example
+ * ```ts
+ * MUST_BE_LAST_OPERATIONS.has('json') // → true
+ * ```
+ */
+export const MUST_BE_LAST_OPERATIONS: ReadonlySet<string> = new Set([
+  'main_colors',
+  'json',
+  'jsonp'
+])
 
-/** Ops that may legitimately appear multiple times. */
-const REPEATABLE = new Set([
+/**
+ * Stackable operations — those that may legitimately appear more than once in
+ * a chain. Repeating anything else is a `duplicate-operation` warning, since
+ * the CDN applies only the last occurrence.
+ *
+ * @see https://uploadcare.com/docs/transformations/image/overlay/
+ * @example
+ * ```ts
+ * STACKABLE_OPERATIONS.has('overlay') // → true
+ * STACKABLE_OPERATIONS.has('quality') // → false
+ * ```
+ */
+export const STACKABLE_OPERATIONS: ReadonlySet<string> = new Set([
   'overlay',
   'rect',
   'text',
@@ -49,6 +102,51 @@ const REPEATABLE = new Set([
   'scale_crop',
   'crop'
 ])
+
+/**
+ * Whether an operation is a core (image-processing) one.
+ *
+ * @see https://uploadcare.com/docs/transformations/image/
+ * @example
+ * ```ts
+ * isCoreOperation(resize) // → true
+ * isCoreOperation('blur') // → false
+ * ```
+ */
+export function isCoreOperation(ref: OperationRef): boolean {
+  return CORE_OPERATIONS.has(operationBaseName(ref))
+}
+
+/**
+ * Whether repeating this operation in a chain is meaningful. `false` means the
+ * CDN keeps only the last occurrence.
+ *
+ * @see https://uploadcare.com/docs/transformations/image/overlay/
+ * @example
+ * ```ts
+ * isStackable(overlay) // → true
+ * isStackable(quality) // → false
+ * ```
+ */
+export function isStackable(ref: OperationRef): boolean {
+  return STACKABLE_OPERATIONS.has(operationBaseName(ref))
+}
+
+/**
+ * Whether the operation has to be the final directive in its chain. Handles
+ * counted video operations, so `thumbs~5` reports `true`.
+ *
+ * @see https://uploadcare.com/docs/transformations/video-encoding/#operation-thumbs
+ * @example
+ * ```ts
+ * mustBeLast('json') // → true
+ * mustBeLast(thumbs(5)) // → true
+ * ```
+ */
+export function mustBeLast(ref: OperationRef): boolean {
+  const name = operationBaseName(ref)
+  return MUST_BE_LAST_OPERATIONS.has(name) || name === 'thumbs'
+}
 
 const KNOWN_IMAGE_OPS = new Set([
   'preview',
@@ -106,7 +204,7 @@ function maxOutputDimension(
 ): number | null {
   let max: number | null = null
   for (const op of operations) {
-    if (!CORE_OPS.has(op.name)) continue
+    if (!CORE_OPERATIONS.has(op.name)) continue
     const dims = op.params[0]?.match(DIMS_RE)
     if (!dims) continue
     for (const side of [dims[1], dims[2]]) {
@@ -144,7 +242,7 @@ function validateImage(operations: readonly CdnOperation[]): Diagnostic[] {
   operations.forEach((op, index) => {
     const isLast = index === operations.length - 1
 
-    if (MUST_BE_LAST.has(op.name) && !isLast) {
+    if (MUST_BE_LAST_OPERATIONS.has(op.name) && !isLast) {
       diagnostics.push({
         severity: 'error',
         code: 'must-be-last',
@@ -153,7 +251,7 @@ function validateImage(operations: readonly CdnOperation[]): Diagnostic[] {
       })
     }
 
-    if (seen.has(op.name) && !REPEATABLE.has(op.name)) {
+    if (seen.has(op.name) && !STACKABLE_OPERATIONS.has(op.name)) {
       diagnostics.push({
         severity: 'warning',
         code: 'duplicate-operation',
@@ -188,9 +286,9 @@ function validateImage(operations: readonly CdnOperation[]): Diagnostic[] {
     }
   })
 
-  const hasCore = operations.some((op) => CORE_OPS.has(op.name))
+  const hasCore = operations.some((op) => CORE_OPERATIONS.has(op.name))
   const hasProcessing = operations.some(
-    (op) => KNOWN_IMAGE_OPS.has(op.name) && !INFO_OPS.has(op.name)
+    (op) => KNOWN_IMAGE_OPS.has(op.name) && !INFO_OPERATIONS.has(op.name)
   )
   if (!hasCore && hasProcessing) {
     diagnostics.push({

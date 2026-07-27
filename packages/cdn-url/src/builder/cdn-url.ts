@@ -120,14 +120,47 @@ export class CdnUrl {
     )
   }
 
-  /** Replaces the first same-named operation in place, or appends it. */
+  /**
+   * Replaces the first matching operation in place, or appends it. Matching
+   * follows {@link operationMatches}, so counted operations are swapped
+   * rather than duplicated (`thumbs~5` → `thumbs~3`).
+   *
+   * Only the first match is touched. For a stackable operation that legitimately
+   * repeats (`overlay`, `text`, …) use {@link CdnUrl.replaceAll} instead.
+   *
+   * @example
+   * ```ts
+   * CdnUrl.parse(url).replace(resize({ width: 500 })).href
+   * ```
+   */
   public replace(operation: CdnOperation): CdnUrl {
     return this.#withOperations((current) => {
-      const index = current.findIndex((op) => op.name === operation.name)
+      const index = current.findIndex((op) => operationMatches(op, operation))
       if (index === -1) return [...current, operation]
       const next = [...current]
       next[index] = operation
       return next
+    })
+  }
+
+  /**
+   * Collapses every matching operation into a single one, kept at the position
+   * of the first match; appends when nothing matches. The way to force a
+   * stackable operation to occur exactly once.
+   *
+   * @example
+   * ```ts
+   * // two overlays in, one overlay out
+   * CdnUrl.parse(url).replaceAll(overlay(uuid, { size: ['50p', '50p'] })).href
+   * ```
+   */
+  public replaceAll(operation: CdnOperation): CdnUrl {
+    return this.#withOperations((current) => {
+      const index = current.findIndex((op) => operationMatches(op, operation))
+      if (index === -1) return [...current, operation]
+      return current.flatMap((op, i) =>
+        i === index ? [operation] : operationMatches(op, operation) ? [] : [op]
+      )
     })
   }
 
@@ -139,6 +172,19 @@ export class CdnUrl {
   /** First matching operation (name, object or creator ref), or null. */
   public get(ref: OperationRef): CdnOperation | null {
     return this.operations.find((op) => operationMatches(op, ref)) ?? null
+  }
+
+  /**
+   * Every matching operation, in chain order — the stackable-aware companion
+   * to {@link CdnUrl.get}. Returns a fresh array; empty when nothing matches.
+   *
+   * @example
+   * ```ts
+   * CdnUrl.parse(url).getAll(overlay) // → [{ name: 'overlay', … }, …]
+   * ```
+   */
+  public getAll(ref: OperationRef): CdnOperation[] {
+    return this.operations.filter((op) => operationMatches(op, ref))
   }
 
   /**

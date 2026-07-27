@@ -98,7 +98,7 @@ The package is split into atomic entry points — import only what you use:
 | `@uploadcare/cdn-url/document`  | document conversion paths                                                  |
 | `@uploadcare/cdn-url/gif2video` | animated image → video URLs                                                |
 | `@uploadcare/cdn-url/builder`   | chainable `CdnUrl` facade                                                  |
-| `@uploadcare/cdn-url/validate`  | cross-operation chain diagnostics                                          |
+| `@uploadcare/cdn-url/validate`  | cross-operation chain diagnostics, plus the rule sets behind them          |
 
 ## Prefer one import for everything?
 

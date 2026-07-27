@@ -41,6 +41,32 @@ Video chains use their own rule set:
 validateOperations(operations, { conversion: 'video' })
 ```
 
+## Stackable operations
+
+Some operations are meant to repeat — you can layer several `overlay`s or `text`s. For everything else the CDN keeps only the last occurrence, which is what `duplicate-operation` warns about.
+
+The rules the validator is built on are exported, so you can reason about a single operation without running the whole validator:
+
+```ts
+import {
+  isStackable,
+  isCoreOperation,
+  mustBeLast,
+  STACKABLE_OPERATIONS,
+  CORE_OPERATIONS,
+  MUST_BE_LAST_OPERATIONS
+} from '@uploadcare/cdn-url/validate'
+
+isStackable(overlay) // → true — layering is meaningful
+isStackable(quality) // → false — a second one just wins
+isCoreOperation(resize) // → true — unlocks the CDN's processing defaults
+mustBeLast(thumbs(5)) // → true — counted suffix handled
+```
+
+The predicates take any operation ref (name, operation object, or creator) and resolve aliases and counted suffixes; the raw `ReadonlySet`s are there when you need to enumerate rather than ask.
+
+This is what tells you which override to reach for: `isStackable(op)` false means `url.replace(op)` is right, true means you probably want `url.replaceAll(op)` or a deliberate `with()` to add another layer.
+
 ## Policy is yours
 
 The library reports; you decide. Sensible defaults for an API boundary:

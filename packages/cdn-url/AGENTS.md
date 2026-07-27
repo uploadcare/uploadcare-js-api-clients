@@ -89,8 +89,11 @@ conventions in several ways — do not "fix" these divergences.
   core operation (`preview`/`resize`/`smart_resize`/`scale_crop`) unlocks the
   defaults. `progressive` affects only the JPEG fallback path.
 - **Video `thumbs` serializes as `thumbs~N`** (name carries the count).
-  Matching by ref handles this via the `name~` prefix rule in
-  `operationMatches`. Bare `thumb`/`thumbs` are NOT valid operations.
+  `operationMatches` compares **base names** (`operationBaseName` strips the
+  `~N`), so matching is symmetric: `thumbs~5` matches the `thumbs` ref, the
+  `thumbs` operation matches a `thumbs~5` ref, and `thumbs~5` matches
+  `thumbs~3` — which is what lets `replace` swap a counted op instead of
+  appending a second one. Bare `thumb`/`thumbs` are NOT valid operations.
 - The engine's exact accept/reject rules live in the private
   `uploadcare/actions_dsl` repo (inaccessible). The public docs are the spec.
 - **Docs source of truth is `uploadcare/fern-docs`** — `uploadcare/docs` is
