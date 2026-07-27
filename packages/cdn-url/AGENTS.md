@@ -100,6 +100,15 @@ conventions in several ways — do not "fix" these divergences.
   `thumbs` operation matches a `thumbs~5` ref, and `thumbs~5` matches
   `thumbs~3` — which is what lets `replace` swap a counted op instead of
   appending a second one. Bare `thumb`/`thumbs` are NOT valid operations.
+- **Order-dependent operations are modelled in `validate/dependencies.ts`**:
+  `font`/`text_align`/`text_box` are state for the **following** `text` (their
+  own JSDoc says so, sourced from the overlay docs), `stretch` for the
+  following `resize`/`scale_crop`, and `format/jpeg` is a chain-wide 5000px
+  ceiling. Nearest modifier wins. The table is **deliberately incomplete** —
+  overlay z-order and `blur_region`/`blur` are unmodelled because the rules
+  aren't public. Do not add edges you cannot source; an honest gap beats a
+  guess. `validateImage` drives its orphaned-modifier diagnostics off this
+  model, so the two cannot drift.
 - The engine's exact accept/reject rules live in the private
   `uploadcare/actions_dsl` repo (inaccessible). The public docs are the spec.
 - **Docs source of truth is `uploadcare/fern-docs`** — `uploadcare/docs` is

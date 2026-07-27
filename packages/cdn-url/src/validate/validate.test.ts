@@ -113,6 +113,26 @@ describe('validateOperations', () => {
     )
   })
 
+  it('warns when a text modifier has no following text operation', () => {
+    const diags = validateOperations([op('preview'), op('font', '24')])
+    expect(diags).toContainEqual(
+      expect.objectContaining({
+        code: 'modifier-without-target',
+        severity: 'warning',
+        opIndex: 1
+      })
+    )
+    expect(
+      codes([op('font', '24'), op('text', '1x1', 'top', 'Hi')])
+    ).not.toContain('modifier-without-target')
+  })
+
+  it('keeps the dedicated stretch code rather than the generic one', () => {
+    const c = codes([op('preview'), op('stretch', 'off')])
+    expect(c).toContain('stretch-without-resize')
+    expect(c).not.toContain('modifier-without-target')
+  })
+
   it('errors when output dimensions exceed the 3000px default ceiling', () => {
     const diags = validateOperations([op('resize', '3200x')])
     expect(diags).toContainEqual(

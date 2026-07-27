@@ -4,6 +4,7 @@
  * diagnostics so callers decide what to do with them.
  */
 import { type OperationRef, operationBaseName } from '../operation-ref'
+import { isOperationModifier, operationDependents } from './dependencies'
 import type { CdnOperation, ConversionKind } from '../types'
 
 /** How serious a {@link Diagnostic} is. */
@@ -261,19 +262,28 @@ function validateImage(operations: readonly CdnOperation[]): Diagnostic[] {
     }
     seen.add(op.name)
 
-    if (op.name === 'stretch') {
-      const followedByResize = operations
-        .slice(index + 1)
-        .some((next) => next.name === 'resize' || next.name === 'scale_crop')
-      if (!followedByResize) {
-        diagnostics.push({
-          severity: 'warning',
-          code: 'stretch-without-resize',
-          message:
-            'stretch only affects a following resize/scale_crop operation',
-          opIndex: index
-        })
-      }
+    // Orphaned modifiers: state that never reaches a target. `stretch` keeps
+    // its own long-standing code; the rest share the generic one.
+    if (
+      isOperationModifier(op) &&
+      operationDependents(operations, index).length === 0
+    ) {
+      diagnostics.push(
+        op.name === 'stretch'
+          ? {
+              severity: 'warning',
+              code: 'stretch-without-resize',
+              message:
+                'stretch only affects a following resize/scale_crop operation',
+              opIndex: index
+            }
+          : {
+              severity: 'warning',
+              code: 'modifier-without-target',
+              message: `${op.name} only affects a following text operation; none follows it`,
+              opIndex: index
+            }
+      )
     }
 
     if (!KNOWN_IMAGE_OPS.has(op.name) && !op.name.startsWith('@')) {

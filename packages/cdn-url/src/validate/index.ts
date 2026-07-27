@@ -1,4 +1,12 @@
 export {
+  OPERATION_MODIFIERS,
+  type DependencyKind,
+  type OperationDependency,
+  isOperationModifier,
+  operationDependents,
+  operationInputs
+} from './dependencies'
+export {
   CORE_OPERATIONS,
   type Diagnostic,
   type DiagnosticSeverity,

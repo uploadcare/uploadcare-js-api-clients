@@ -33,6 +33,7 @@ Note what parsing does **not** do: `parseOperations` accepts any well-formed cha
 | `no-core-operation`             | warning  | processing ops present but no `preview`/`resize`/`smart_resize`/`scale_crop` — the CDN delivers the original untouched |
 | `duplicate-operation`           | warning  | same non-repeatable op twice; the CDN applies the last one                                                             |
 | `stretch-without-resize`        | warning  | `stretch` with no following resize — it does nothing                                                                   |
+| `modifier-without-target`       | warning  | `font` / `text_align` / `text_box` with no following `text` — it does nothing                                          |
 | `unknown-operation`             | info     | op the library doesn't know; passed through as-is                                                                      |
 
 Video chains use their own rule set:
@@ -66,6 +67,47 @@ mustBeLast(thumbs(5)) // → true — counted suffix handled
 The predicates take any operation ref (name, operation object, or creator) and resolve aliases and counted suffixes; the raw `ReadonlySet`s are there when you need to enumerate rather than ask.
 
 This is what tells you which override to reach for: `isStackable(op)` false means `url.replace(op)` is right, true means you probably want `url.replaceAll(op)` or a deliberate `with()` to add another layer.
+
+## Order-dependent operations
+
+A CDN chain is flat — nothing nests. But a few operations are _state_ for a later one: `font`, `text_align` and `text_box` configure the `text` that follows them, and `stretch` configures the following `resize`/`scale_crop`. Move one across its target and it silently stops applying.
+
+`operationInputs` and `operationDependents` make those edges queryable in both directions:
+
+```ts
+import {
+  operationInputs,
+  operationDependents
+} from '@uploadcare/cdn-url/validate'
+
+const ops = parseOperations(userInput)
+
+operationInputs(ops, i) // what configures the operation at i
+operationDependents(ops, i) // what the operation at i affects
+```
+
+Each edge reports the related operation, its `index`, a `reason`, and a `kind`:
+
+- **`modifier`** — positional state. The nearest preceding one wins, so a second `font` overrides the first for everything after it.
+- **`ceiling`** — a chain-wide limit rather than a position: `format/jpeg` raises the output dimension cap from 3000px to 5000px for every core operation, wherever it sits.
+
+```ts
+const chain = [
+  font(24),
+  textAlign('center', 'bottom'),
+  text(['80p', '20p'], 'bottom', 'Hi')
+]
+operationInputs(chain, 2).map((d) => d.operation.name) // → ['font', 'text_align']
+operationDependents(chain, 0).map((d) => d.index) // → [2]
+```
+
+An empty `operationDependents` result for a modifier means it does nothing — which is precisely what the `stretch-without-resize` and `modifier-without-target` diagnostics report. The validator is built on this model, so the two cannot disagree.
+
+`OPERATION_MODIFIERS` exposes the table (target → the operations that configure it), and `isOperationModifier(ref)` answers the single-operation question.
+
+::: warning Deliberately incomplete
+Only relationships the library can source are modelled: the text-overlay state operations, the `stretch` rule, and the `format/jpeg` ceiling. Overlay z-order, `blur_region` versus `blur`, and other interactions are **not** represented — the CDN engine's exact rules are not public, and guessing would be worse than an honest gap. Treat a missing edge as "not modelled", not "no relationship".
+:::
 
 ## Policy is yours
 
