@@ -1,6 +1,6 @@
 # Render stored URLs
 
-You upload images, your users edit them with the [cloud image editor](https://uploadcare.com/docs/file-uploader/image-editor/), and you store the result in your database. Later you need to render that image somewhere else — as a 400×400 thumbnail in a list, a hero banner, an `srcset`. The stored URL already carries the user's edits; you just need to add sizing on top.
+You upload images, your users edit them with the [cloud image editor](https://uploadcare.com/docs/file-uploader/image-editor/), and you store the result in your database. Later you need to render that image somewhere else: a 400×400 thumbnail in a list, or one entry of an `srcset`. The stored URL already carries the user's edits, so all you need to add is sizing on top.
 
 ## Why not string concatenation
 
@@ -11,12 +11,12 @@ The obvious approach breaks in non-obvious ways:
 const thumb = `${stored}-/preview/400x400/`
 ```
 
-| Stored value                      | Result                                           |
-| --------------------------------- | ------------------------------------------------ |
-| `…/uuid/`                         | ✅ works — by luck                               |
-| `…/uuid` (no trailing slash)      | ❌ `…/uuid-/preview/400x400/` — broken path      |
-| `…/uuid/-/crop/640x480/photo.jpg` | ❌ ops appended **after the filename** — ignored |
-| `…/uuid/?token=exp=…`             | ❌ ops appended after the query string — broken  |
+| Stored value                      | Result                                             |
+| --------------------------------- | -------------------------------------------------- |
+| `…/uuid/`                         | ✅ works, by luck                                  |
+| `…/uuid` (no trailing slash)      | ❌ `…/uuid-/preview/400x400/`, a broken path       |
+| `…/uuid/-/crop/640x480/photo.jpg` | ❌ ops land after the filename, so they're ignored |
+| `…/uuid/?token=exp=…`             | ❌ ops land after the query string, so it breaks   |
 
 Regex patching has the same problem from the other direction:
 
@@ -29,7 +29,7 @@ const thumb = stored.replace(/-\/.*$/, '-/preview/400x400/')
 
 ## What's in your database?
 
-Depending on how you saved the editor output, you have one of three shapes. All three end in the same place — an `operations` array you can extend.
+Depending on how you saved the editor output, you have one of three shapes. All three end in the same place: an `operations` array you can extend.
 
 ### A full CDN URL
 
@@ -51,7 +51,7 @@ The user's crop stays. The filename stays at the end, where the CDN expects it.
 
 ### A uuid only
 
-No parsing needed — build from scratch:
+Nothing to parse. Build it from scratch:
 
 ```ts
 import { serializeCdnUrl } from '@uploadcare/cdn-url'
@@ -66,7 +66,7 @@ const thumb = serializeCdnUrl({
 
 ### A uuid + modifiers string
 
-Some integrations store the modifiers string (the uploader calls it `cdnUrlModifiers`, e.g. `'-/crop/640x480/130,80/'`) in its own column — `row.modifiers` below. `parseOperations` turns it back into an array:
+Some integrations store the modifiers string (the uploader calls it `cdnUrlModifiers`, e.g. `'-/crop/640x480/130,80/'`) in its own column (`row.modifiers` below). `parseOperations` turns it back into an array:
 
 ```ts
 import { parseOperations, serializeCdnUrl } from '@uploadcare/cdn-url'
@@ -81,9 +81,9 @@ const thumb = serializeCdnUrl({
 
 ## Append vs replace
 
-Operations form a sequential pipeline, and **order matters**: appending `preview` _after_ the stored `crop` resizes the cropped result — which is almost always what you want. Appending it _before_ would crop the resized image instead.
+Operations form a sequential pipeline, and order matters. Appending `preview` _after_ the stored `crop` resizes the cropped result, which is almost always what you want. Appending it _before_ would crop the resized image instead.
 
-For non-repeatable operations (`quality`, `format`, …) the CDN applies the **last occurrence** when the same one appears twice; sizing operations genuinely stack as pipeline steps. Appending a second `quality` works, but the URL carries dead weight — and a second `resize` after a `preview` chain can produce surprising sizes. When the stored URL may already contain the operation you're adding, replace instead of append:
+For non-repeatable operations (`quality`, `format`, …) the CDN applies the last occurrence when the same one appears twice; sizing operations genuinely stack as pipeline steps. Appending a second `quality` works, but the URL carries dead weight, and a second `resize` after a `preview` chain can produce surprising sizes. When the stored URL may already contain the operation you're adding, replace instead of append:
 
 ```ts
 const withoutSizing = parsed.operations.filter(
@@ -95,11 +95,11 @@ const thumb = serializeCdnUrl({
 })
 ```
 
-To catch accidental duplicates during development, run the chain through [`validateOperations`](/how-to/validate-user-input) — duplicates surface as `duplicate-operation` warnings.
+To catch accidental duplicates during development, run the chain through [`validateOperations`](/how-to/validate-user-input); duplicates surface as `duplicate-operation` warnings.
 
 ## Rebasing onto another domain
 
-Stored URLs often point at the legacy `ucarecdn.com` while your project now serves from a [prefixed or custom domain](https://uploadcare.com/docs/delivery/cdn/) — one you've already configured in your project settings; the library only writes the string. The origin is just a field:
+Stored URLs often point at the legacy `ucarecdn.com` while your project now serves from a [prefixed or custom domain](https://uploadcare.com/docs/delivery/cdn/), one you've already configured in your project settings; the library only writes the string. The origin is just a field:
 
 ```ts
 const rebased = serializeCdnUrl({
@@ -108,7 +108,7 @@ const rebased = serializeCdnUrl({
 })
 ```
 
-Everything else — uuid, the user's edits, the filename — survives untouched.
+Everything else survives untouched: the uuid, the user's edits, the filename.
 
 ## A taste of srcset
 
@@ -128,15 +128,15 @@ const srcset = widths
   .join(', ')
 ```
 
-See [Responsive images](/how-to/responsive-images) for the full treatment — or skip the manual work entirely with [`<uc-img>` adaptive delivery](https://uploadcare.com/docs/adaptive-delivery/), which generates the variants for you.
+See [Responsive images](/how-to/responsive-images) for the full treatment, or skip the manual work entirely with [`<uc-img>` adaptive delivery](https://uploadcare.com/docs/adaptive-delivery/), which generates the variants for you.
 
 ::: warning Signed URLs
-If your project uses [secure delivery](https://uploadcare.com/docs/security/secure-delivery/), stored URLs may carry `?token=…`. Parsing preserves the token — but appending operations **changes the path the signature was computed for**, so the CDN rejects the modified URL with the old token. Re-sign it before serving.
+If your project uses [secure delivery](https://uploadcare.com/docs/security/secure-delivery/), stored URLs may carry `?token=…`. Parsing preserves the token, but appending operations changes the path the signature was computed for, so the CDN rejects the modified URL with the old token. Re-sign it before serving.
 :::
 
 ## Defensive parsing
 
-Database rows lie. `parseCdnUrl` throws a `TypeError` on anything that isn't a CDN URL — in both the development and production bundles, since this is structural, not validation:
+Database rows lie. `parseCdnUrl` throws a `TypeError` on anything that isn't a CDN URL, in both the development and production bundles, since this is structural rather than validation:
 
 ```ts
 function tryParse(stored: string) {

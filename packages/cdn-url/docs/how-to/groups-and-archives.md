@@ -13,7 +13,7 @@ const group = parseGroupId('c2499162-eb07-4b93-b31e-94a89a47e858~3')
 formatGroupId(group) // → 'c2499162-…~3'
 ```
 
-`parseGroupId` throws a `TypeError` on malformed ids in every bundle flavor — handy for validating stored values.
+`parseGroupId` throws a `TypeError` on malformed ids in every bundle flavor, which makes it handy for validating stored values.
 
 ## Addressing the group and its files
 
@@ -33,8 +33,8 @@ nthUrl('https://ucarecdn.com', group, 1, [preview(400, 400)])
 
 Two rules the library enforces for you:
 
-- **Group roots can't carry operations** — transformations go on `nth` elements only. (The parsed `group` shape doesn't even have an `operations` field.)
-- **The index is validated against the count** — `nthUrl(origin, group, 3)` on a `~3` group throws a `RangeError` in development.
+- Group roots can't carry operations. Transformations go on `nth` elements only, and the parsed `group` shape doesn't even have an `operations` field.
+- The index is validated against the count, so `nthUrl(origin, group, 3)` on a `~3` group throws a `RangeError` in development.
 
 ## Rendering a gallery
 
@@ -58,4 +58,4 @@ archiveUrl('https://ucarecdn.com', group, 'tar', 'photos.tar')
 // → https://ucarecdn.com/:uuid~3/archive/tar/photos.tar
 ```
 
-Archive fine print: **originals only** (transformations are discarded), ≤ 2 GB uncompressed, and the request 404s if any file in the group was removed.
+Archive fine print: you get originals only (transformations are discarded), the uncompressed limit is 2 GB, and the request 404s if any file in the group was removed.

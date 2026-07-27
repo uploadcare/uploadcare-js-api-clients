@@ -13,16 +13,16 @@ The package ships two bundle flavors from one source, selected automatically thr
 | `validate` module                                 | ✅ fully functional                 | ✅ fully functional  |
 | Minified                                          | no                                  | yes                  |
 
-The contract: **catch mistakes in development; production is garbage-in, garbage-out.** `quality('ultra')` throws on your machine and in CI; in a production build it serializes to `-/quality/ultra/` and the CDN responds with an error instead.
+The contract is to catch mistakes in development; production is garbage in, garbage out. `quality('ultra')` throws on your machine and in CI; in a production build it serializes to `-/quality/ultra/` and the CDN responds with an error instead.
 
-Structural errors stay in both flavors because callers rely on them for control flow — a `try/catch` around `parseCdnUrl` behaves identically everywhere.
+Structural errors stay in both flavors because callers rely on them for control flow. A `try/catch` around `parseCdnUrl` behaves identically everywhere.
 
 ## Who picks which bundle
 
-- **Vite, webpack, and friends** resolve the `development` condition in dev servers and `production` in production builds — no configuration needed.
-- **Node** uses the production bundle by default; opt into checks with `node --conditions=development`.
-- **Unknown/legacy resolvers** fall back to production — the safe, minimal default.
+- Vite, webpack and friends resolve the `development` condition in dev servers and `production` in production builds, with no configuration needed.
+- Node uses the production bundle by default; opt into the checks with `node --conditions=development`.
+- Unknown or legacy resolvers fall back to production, the safe minimal default.
 
 ## Validating at runtime anyway
 
-Stripped checks protect _your_ code from _your_ mistakes. If operation chains come from **users or stored data**, validate them explicitly — [`validateOperations`](/how-to/validate-user-input) works identically in both flavors and returns diagnostics instead of throwing.
+Stripped checks protect _your_ code from _your_ mistakes. If operation chains come from users or stored data, validate them explicitly. [`validateOperations`](/how-to/validate-user-input) works identically in both flavors and returns diagnostics instead of throwing.

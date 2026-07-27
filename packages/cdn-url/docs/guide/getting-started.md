@@ -1,6 +1,6 @@
 # Getting started
 
-`@uploadcare/cdn-url` builds and parses [Uploadcare CDN](https://uploadcare.com/docs/delivery/cdn/) URLs — image transformations, file groups, delivery proxy and conversion paths — with full TypeScript types and zero dependencies.
+`@uploadcare/cdn-url` builds and parses [Uploadcare CDN](https://uploadcare.com/docs/delivery/cdn/) URLs: image transformations, file groups, delivery proxy and conversion paths. It ships full TypeScript types and no dependencies.
 
 ## Install
 
@@ -32,18 +32,18 @@ No bundler at all? The [IIFE global build](/guide/functional-vs-builder#the-flue
 
 ## Supported environments
 
-The library touches no DOM and no Node-specific APIs — it runs anywhere modern JavaScript runs. Zero dependencies, `sideEffects: false`, ESM + CommonJS.
+The library touches no DOM and no Node-specific APIs, so it runs anywhere modern JavaScript runs. Zero dependencies, `sideEffects: false`, ESM + CommonJS.
 
-| Environment                                        | Support                                                                                                         |
-| -------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
-| Node.js                                            | **≥ 16** — production bundle by default; `node --conditions=development` opts into [dev checks](/guide/bundles) |
-| Browsers                                           | evergreen: Chrome/Edge 87+, Firefox 78+, Safari 14+ — the full test suite runs in real Chromium on every change |
-| Bun, Deno                                          | ✓ via npm compatibility                                                                                         |
-| Edge runtimes (Cloudflare Workers, Vercel Edge, …) | ✓ — standard JavaScript only                                                                                    |
-| React Native                                       | ✓ with a spec-compliant `URL` polyfill (Hermes' built-in `URL` is incomplete)                                   |
-| No bundler                                         | ✓ via the [IIFE global build](/guide/functional-vs-builder#the-fluent-mega-object)                              |
+| Environment                                        | Support                                                                                                        |
+| -------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| Node.js                                            | ≥ 16. Production bundle by default; `node --conditions=development` opts into [dev checks](/guide/bundles)     |
+| Browsers                                           | evergreen: Chrome/Edge 87+, Firefox 78+, Safari 14+. The full test suite runs in real Chromium on every change |
+| Bun, Deno                                          | ✓ via npm compatibility                                                                                        |
+| Edge runtimes (Cloudflare Workers, Vercel Edge, …) | ✓, standard JavaScript only                                                                                    |
+| React Native                                       | ✓ with a spec-compliant `URL` polyfill (Hermes' built-in `URL` is incomplete)                                  |
+| No bundler                                         | ✓ via the [IIFE global build](/guide/functional-vs-builder#the-fluent-mega-object)                             |
 
-The only platform features required are `URL` and `String.prototype.replaceAll` (ES2021) — present in every runtime above. Build artifacts are additionally smoke-tested in plain Node (ESM + CJS, every entry point) on every build.
+The only platform features required are `URL` and `String.prototype.replaceAll` (ES2021), present in every runtime above. Build artifacts are additionally smoke-tested in plain Node (ESM + CJS, every entry point) on every build.
 
 ## Build a URL
 
@@ -62,7 +62,7 @@ serializeCdnUrl({
 // format/auto + adaptive quality are applied by the CDN automatically
 ```
 
-Every operation creator validates its input eagerly during development — `quality('ultra')` throws a `RangeError` telling you the allowed values. In production builds these checks are stripped for size: see [Dev & production bundles](/guide/bundles) for the exact contract.
+Every operation creator validates its input eagerly during development, so `quality('ultra')` throws a `RangeError` telling you the allowed values. In production builds these checks are stripped for size: see [Dev & production bundles](/guide/bundles) for the exact contract.
 
 ## Parse and edit a URL
 
@@ -86,7 +86,7 @@ Parsing is lenient: operations the library doesn't know (including internal `@`-
 
 ## Pick your entry points
 
-The package is split into atomic entry points — import only what you use:
+The package is split into atomic entry points, so you import only what you use:
 
 | Entry                           | What's inside                                                              |
 | ------------------------------- | -------------------------------------------------------------------------- |
@@ -102,7 +102,7 @@ The package is split into atomic entry points — import only what you use:
 
 ## Prefer one import for everything?
 
-The fluent entry trades tree-shaking for convenience — the whole library behind a single chainable object:
+The fluent entry trades tree-shaking for convenience: the whole library behind a single chainable object.
 
 ```ts
 import { cdn } from '@uploadcare/cdn-url/fluent'
@@ -114,8 +114,8 @@ See [Functional core vs builder vs fluent](/guide/functional-vs-builder).
 
 ## Where next
 
-- [CDN URL anatomy](/guide/url-anatomy) — how the URLs are structured and what the parser gives you
-- [Render stored URLs](/how-to/render-stored-urls) — the most common real-world task
-- [Functional core vs builder](/guide/functional-vs-builder) — two API styles, when to use which
-- [Dev & production bundles](/guide/bundles) — what throws where, and why production is silent
-- [API Reference](/reference/) — every function, with examples
+- [CDN URL anatomy](/guide/url-anatomy): how the URLs are structured and what the parser gives you
+- [Render stored URLs](/how-to/render-stored-urls): the most common real-world task
+- [Functional core vs builder](/guide/functional-vs-builder): two API styles, and when to use which
+- [Dev & production bundles](/guide/bundles): what throws where, and why production is silent
+- [API Reference](/reference/): every function, with examples

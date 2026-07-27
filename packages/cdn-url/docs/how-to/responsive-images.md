@@ -1,6 +1,6 @@
 # Responsive images
 
-Serve each device the pixels it actually needs: a `srcset` of CDN-resized variants plus DPR-aware quality. No image build pipeline — every variant is just a URL.
+Serve each device the pixels it actually needs: a `srcset` of CDN-resized variants plus DPR-aware quality. There is no image build pipeline, because every variant is just a URL.
 
 ## Width-based srcset
 
@@ -21,7 +21,7 @@ function variant(uuid: string, width: number): string {
 const srcset = WIDTHS.map((w) => `${variant(uuid, w)} ${w}w`).join(', ')
 ```
 
-The `preview` alone is enough — once a chain contains a processing operation,
+The `preview` alone is enough. Once a chain contains a processing operation,
 the CDN defaults to `format/auto` (AVIF/WebP negotiation) and applies adaptive
 quality automatically. See [Best practices](/best-practices) for when explicit
 `format`/`quality`/`progressive` overrides still earn their place.
@@ -35,7 +35,7 @@ quality automatically. See [Best practices](/best-practices) for when explicit
 />
 ```
 
-`preview(w, w)` downscales proportionally to fit — it never crops and never upscales, so one operation covers both landscape and portrait sources.
+`preview(w, w)` downscales proportionally to fit. It never crops and never upscales, so one operation covers both landscape and portrait sources.
 
 ## Pixel-density variants
 
@@ -50,7 +50,7 @@ const src2x = variant(uuid, 400)
 <img src="…200…" srcset="…400… 2x" width="200" height="200" alt="…" />
 ```
 
-On high-DPR screens the extra pixels hide compression artifacts — an explicit `quality('lightest')` override on the 2x variant typically looks identical to the adaptive default and saves real bytes. See [Best practices](/best-practices#high-pixel-ratios-bigger-and-lighter).
+On high-DPR screens the extra pixels hide compression artifacts, so an explicit `quality('lightest')` override on the 2x variant typically looks identical to the adaptive default and saves real bytes. See [Best practices](/best-practices#high-pixel-ratios-bigger-and-lighter).
 
 ## Computing sizes at runtime
 
@@ -69,4 +69,4 @@ function fitted(cssWidth: number): number {
 
 ## Or let the components do it
 
-[`<uc-img>` adaptive delivery](https://uploadcare.com/docs/adaptive-delivery/) generates `srcset` automatically from layout, including lazy loading and placeholders. Reach for this library when you need URLs outside an `<img>` tag — Open Graph images, emails, canvas, server-rendered markup.
+[`<uc-img>` adaptive delivery](https://uploadcare.com/docs/adaptive-delivery/) generates `srcset` automatically from layout, including lazy loading and placeholders. Reach for this library when you need URLs outside an `<img>` tag: Open Graph images, emails, canvas, server-rendered markup.

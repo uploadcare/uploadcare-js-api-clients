@@ -6,6 +6,7 @@
 import { describe, expect, it } from 'vitest'
 
 import { CdnUrl } from './builder/index'
+import { cdn } from './fluent/index'
 import {
   detectDomainKind,
   isUploadcareDomain,
@@ -29,7 +30,8 @@ import { isStackable, operationInputs } from './validate/index'
 
 // --- the page's preamble, verbatim -----------------------------------------
 const uuid = 'c2499162-eb07-4b93-b31e-94a89a47e858'
-const stored = `https://ucarecdn.com/${uuid}/-/resize/300x/-/quality/smart/`
+const origin = 'https://ucarecdn.com'
+const stored = `${origin}/${uuid}/-/resize/300x/-/quality/smart/`
 
 function mapOperations(
   url: string,
@@ -44,16 +46,15 @@ describe('cookbook: getting a URL out', () => {
   it('thumbnail from a uuid', () => {
     expect(
       serializeCdnUrl({
-        kind: 'file',
         origin: 'https://ucarecdn.com',
         uuid,
-        conversion: null,
-        operations: [scaleCrop(300, 300, { type: 'smart' })],
-        filename: null,
-        search: '',
-        hash: ''
+        operations: [scaleCrop(300, 300, { type: 'smart' })]
       })
     ).toBe(`https://ucarecdn.com/${uuid}/-/scale_crop/300x300/smart/`)
+    // the absolute minimum: origin + one addressing field
+    expect(serializeCdnUrl({ origin: 'https://ucarecdn.com', uuid })).toBe(
+      `https://ucarecdn.com/${uuid}/`
+    )
   })
 
   it('swap the CDN domain', () => {
@@ -264,5 +265,144 @@ describe('cookbook: the chainable translation table', () => {
         ops.push(blur(10))
       })
     ).toThrow(TypeError)
+  })
+})
+
+// --- Builder and Fluent tabs -----------------------------------------------
+describe('cookbook: Builder tab', () => {
+  const url = CdnUrl.parse(stored)
+
+  it('thumbnail, origin, filename, strip', () => {
+    expect(
+      new CdnUrl({
+        origin,
+        uuid,
+        operations: [scaleCrop(300, 300, { type: 'smart' })]
+      }).href
+    ).toBe(`${origin}/${uuid}/-/scale_crop/300x300/smart/`)
+    expect(url.setOrigin('https://1zlmtnsbgr.ucarecd.net').href).toBe(
+      `https://1zlmtnsbgr.ucarecd.net/${uuid}/-/resize/300x/-/quality/smart/`
+    )
+    expect(url.setFilename('invoice-2026.pdf').href).toBe(
+      `${origin}/${uuid}/-/resize/300x/-/quality/smart/invoice-2026.pdf`
+    )
+    expect(url.updateOperations(() => []).href).toBe(`${origin}/${uuid}/`)
+  })
+
+  it('edit, inspect, insert, reorder', () => {
+    expect(url.replace(resize({ width: 500 })).href).toBe(
+      `${origin}/${uuid}/-/resize/500x/-/quality/smart/`
+    )
+    const guarded = url.has(resize) ? url.replace(resize({ width: 500 })) : url
+    expect(guarded.href).toBe(
+      `${origin}/${uuid}/-/resize/500x/-/quality/smart/`
+    )
+    const next = url.has(blur) ? url : url.with(blur(10))
+    expect(next.href).toContain('/-/blur/10/')
+    expect(url.has(blur)).toBe(false)
+    expect(url.get(resize)).toEqual({ name: 'resize', params: ['300x'] })
+    expect(url.getAll(overlay)).toEqual([])
+    expect(url.updateOperations((ops) => [blur(10), ...ops]).href).toBe(
+      `${origin}/${uuid}/-/blur/10/-/resize/300x/-/quality/smart/`
+    )
+    expect(url.updateOperations((ops) => ops.reverse()).href).toBe(
+      `${origin}/${uuid}/-/quality/smart/-/resize/300x/`
+    )
+  })
+
+  it('the second overlay', () => {
+    const many = CdnUrl.parse(
+      `${origin}/${uuid}/-/overlay/${uuid}/10p,10p/-/overlay/${uuid}/20p,20p/`
+    )
+    const replacement = overlay(uuid, { size: ['50p', '50p'] })
+    let seen = 0
+    expect(
+      many
+        .updateOperations((ops) =>
+          ops.map((op) =>
+            operationMatches(op, overlay) && seen++ === 1 ? replacement : op
+          )
+        )
+        .operations.map((op) => op.params[1])
+    ).toEqual(['10p,10p', '50px50p'])
+  })
+
+  it('conversion yields a full URL, not a path', () => {
+    expect(
+      new CdnUrl({
+        origin,
+        uuid,
+        conversion: 'video',
+        operations: [size({ width: 480 }), thumbs(5)]
+      }).href
+    ).toBe(`${origin}/${uuid}/video/-/size/480x/-/thumbs~5/`)
+  })
+
+  it('signed url keeps the stale token', () => {
+    const signed = `${origin}/${uuid}/-/preview/300x300/?token=abc123`
+    const edited = CdnUrl.parse(signed).with(resize({ width: 400 })).href
+    expect(edited).toContain('token=abc123')
+    expect(edited).toContain('resize/400x')
+  })
+})
+
+describe('cookbook: Fluent tab', () => {
+  const parsedChain = cdn.parse(stored)
+  if (parsedChain.kind !== 'file') throw new Error('expected a file url')
+  const chain = parsedChain
+
+  it('thumbnail, origin, filename, strip', () => {
+    expect(cdn.file(uuid).scaleCrop(300, 300, { type: 'smart' }).href).toBe(
+      `${origin}/${uuid}/-/scale_crop/300x300/smart/`
+    )
+    expect(chain.on('https://1zlmtnsbgr.ucarecd.net').href).toBe(
+      `https://1zlmtnsbgr.ucarecd.net/${uuid}/-/resize/300x/-/quality/smart/`
+    )
+    expect(chain.filename('invoice-2026.pdf').href).toBe(
+      `${origin}/${uuid}/-/resize/300x/-/quality/smart/invoice-2026.pdf`
+    )
+    expect(chain.updateOperations(() => []).href).toBe(`${origin}/${uuid}/`)
+  })
+
+  it('edit, inspect, insert, reorder', () => {
+    expect(chain.replaceOp(resize({ width: 500 })).href).toBe(
+      `${origin}/${uuid}/-/resize/500x/-/quality/smart/`
+    )
+    const next = chain.hasOp(blur) ? chain : chain.blur(10)
+    expect(next.href).toContain('/-/blur/10/')
+    expect(chain.hasOp(blur)).toBe(false)
+    expect(chain.getOp(resize)).toEqual({ name: 'resize', params: ['300x'] })
+    expect(chain.getAllOps(overlay)).toEqual([])
+    expect(chain.updateOperations((ops) => [blur(10), ...ops]).href).toBe(
+      `${origin}/${uuid}/-/blur/10/-/resize/300x/-/quality/smart/`
+    )
+    expect(chain.updateOperations((ops) => ops.reverse()).href).toBe(
+      `${origin}/${uuid}/-/quality/smart/-/resize/300x/`
+    )
+  })
+
+  it('video conversion path', () => {
+    expect(
+      cdn
+        .video(uuid)
+        .size({ width: 720 })
+        .thumbs(5)
+        .updateOperations((ops) =>
+          ops.map((op) =>
+            operationMatches(op, size) ? size({ width: 480 }) : op
+          )
+        ).path
+    ).toBe(`/${uuid}/video/-/size/480x/-/thumbs~5/`)
+  })
+
+  it('signed url keeps the stale token', () => {
+    const signed = `${origin}/${uuid}/-/preview/300x300/?token=abc123`
+    const s = cdn.parse(signed)
+    expect(s.kind).toBe('file')
+    if (s.kind === 'file') {
+      const edited = s.resize({ width: 400 }).href
+      expect(edited).toContain('token=abc123')
+      expect(edited).toContain('resize/400x')
+    }
   })
 })

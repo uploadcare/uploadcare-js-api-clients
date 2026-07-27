@@ -1,6 +1,6 @@
 # Avatars
 
-The avatar problem: arbitrary user photos in, consistent squares (or circles) out — faces centered, small files.
+The avatar problem: arbitrary user photos in, consistent squares (or circles) out, with faces centered and files small.
 
 ## The recipe
 
@@ -30,9 +30,9 @@ avatarUrl(uuid, 96)
 
 What each piece does:
 
-- **`scaleCrop(size, size, { type })`** — scales down and crops to an exact square. The smart types run content detection as a fallback chain: `smart_faces_objects` tries faces first, then salient objects, then sensible defaults. `'smart'` is the full detection chain; narrower variants like `'smart_faces'` pick specific detectors — see [`SCALE_CROP_TYPES`](/reference/ops/variables/SCALE_CROP_TYPES) for the complete list. Plain `scaleCrop(size, size, { align: 'center' })` skips detection entirely.
-- **`borderRadius('50p')`** — circle crop on the CDN. Skip it if you round corners in CSS (cheaper to change later, works with transparent hover states).
-- Format negotiation (`format/auto`) and adaptive quality apply **automatically** once the chain has a processing operation — no extra ops needed ([Best practices](/best-practices)).
+- `scaleCrop(size, size, { type })` scales down and crops to an exact square. The smart types run content detection as a fallback chain: `smart_faces_objects` tries faces first, then salient objects, then sensible defaults. `'smart'` is the full detection chain, and narrower variants like `'smart_faces'` pick specific detectors. [`SCALE_CROP_TYPES`](/reference/ops/variables/SCALE_CROP_TYPES) has the complete list. Plain `scaleCrop(size, size, { align: 'center' })` skips detection entirely.
+- `borderRadius('50p')` does the circle crop on the CDN. Skip it if you round corners in CSS (cheaper to change later, and it works with transparent hover states).
+- Format negotiation (`format/auto`) and adaptive quality apply automatically once the chain has a processing operation, so no extra ops are needed ([Best practices](/best-practices)).
 
 ## Tighter face crops
 
@@ -47,11 +47,11 @@ const ops = [
 ]
 ```
 
-Remember operations are a pipeline — the `scaleCrop` here only resizes, because the `crop` already chose the region.
+Operations are a pipeline, so the `scaleCrop` here only resizes: the `crop` already chose the region.
 
 ## Retina variants
 
-Avatars are fixed-size, so density descriptors fit naturally — see [Responsive images](/how-to/responsive-images#pixel-density-variants):
+Avatars are fixed-size, so density descriptors fit naturally (see [Responsive images](/how-to/responsive-images#pixel-density-variants)):
 
 ```html
 <img
@@ -68,4 +68,4 @@ Avatars are fixed-size, so density descriptors fit naturally — see [Responsive
 
 ## Fallback for missing photos
 
-`scaleCrop` smart types need a processable image. If the row might reference a deleted file, wrap rendering with an `onerror` fallback or pre-validate the uuid server-side — the URL itself is always well-formed, but the CDN returns 404 for missing files.
+`scaleCrop` smart types need a processable image. If the row might reference a deleted file, wrap rendering with an `onerror` fallback or pre-validate the uuid server-side. The URL itself is always well-formed, but the CDN returns 404 for missing files.

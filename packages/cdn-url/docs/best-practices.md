@@ -1,13 +1,13 @@
 # Best practices
 
-Patterns proven across Uploadcare's own products. The overarching rule: **the CDN does the heavy lifting once you give it one processing operation** — most of the rest is overrides.
+Patterns proven across Uploadcare's own products. The rule most of them follow from: the CDN does the heavy lifting once you give it one processing operation. The rest is mostly overrides.
 
 ## One core operation unlocks the defaults
 
-The CDN only processes an image when the chain contains `preview`, `resize`, `smart_resize` or `scale_crop`. Without one, the **original file is delivered untouched** — silently. With one, two powerful defaults kick in:
+The CDN only processes an image when the chain contains `preview`, `resize`, `smart_resize` or `scale_crop`. Without one it delivers the original file untouched, and it does so silently. With one, two defaults kick in:
 
-- **`format/auto` is applied by default** — AVIF/WebP negotiation with the client, PNG for alpha/artwork, JPEG otherwise. No need to add `format('auto')` yourself.
-- **Adaptive quality** — content-aware compression — is enabled by default for projects created on or after August 4, 2025 (older projects: enable it under Delivery settings in the dashboard).
+- `format/auto` is applied by default: AVIF/WebP negotiation with the client, PNG for alpha and artwork, JPEG otherwise. You don't need to add `format('auto')` yourself.
+- Adaptive quality, meaning content-aware compression, is enabled by default for projects created on or after August 4, 2025. Older projects can turn it on under Delivery settings in the dashboard.
 
 So the canonical thumbnail chain is just:
 
@@ -18,7 +18,7 @@ const ops = [preview(400, 400)]
 Bare `preview()` exists exactly to trigger processing without resizing:
 
 ```ts
-// ❌ no core operation — delivered as the original, nothing applies
+// ❌ no core operation, so the original is delivered and nothing applies
 const broken = [stripMeta('sensitive')]
 
 // ✅ processed: format/auto + adaptive quality + the strip
@@ -29,17 +29,17 @@ const processed = [preview(), stripMeta('sensitive')]
 
 ::: tip When to be explicit anyway
 
-- `format(…)` — to force a specific output (`preserve` for downloads, `jpeg` to unlock the 5000px ceiling), or when serving from S3-bypass storage where `auto` doesn't apply.
-- `quality(…)` — on projects **created before August 4, 2025** with adaptive quality not enabled, or to override the adaptive choice (see high-DPR below).
-- `progressive(true)` — affects only the JPEG fallback path (it never forces JPEG); worth it for large hero images on slow connections, noise elsewhere.
+- Use `format(…)` to force a specific output (`preserve` for downloads, `jpeg` to unlock the 5000px ceiling), or when you serve from S3-bypass storage where `auto` doesn't apply.
+- Use `quality(…)` on projects created before August 4, 2025 that don't have adaptive quality enabled, or to override the adaptive choice (see high-DPR below).
+- `progressive(true)` affects only the JPEG fallback path and never forces JPEG. Worth it for large hero images on slow connections, noise elsewhere.
   :::
 
 ## High pixel ratios: bigger and lighter
 
-For 2x+ screens, increase resolution and _decrease_ quality — sharper on retina at roughly the same bytes. This is the one case where an explicit `quality` override earns its place:
+For 2x+ screens, increase resolution and _decrease_ quality. The image looks sharper on retina at roughly the same byte count. This is the one case where an explicit `quality` override earns its place:
 
 ```ts
-// browser-only: devicePixelRatio is a window global — guard it in SSR
+// browser-only: devicePixelRatio is a window global, guard it in SSR
 const ops =
   devicePixelRatio >= 2
     ? [preview(800, 800), quality('lightest')]
@@ -59,17 +59,17 @@ When in doubt: `preview` for content images, `scaleCrop` for fixed slots (cards,
 
 ## Respect the dimension ceilings
 
-Output is capped at **3000×3000**, or **5000×5000 when `format('jpeg')`** is in the chain. Cap your DPR math:
+Output is capped at 3000×3000, or 5000×5000 when `format('jpeg')` is in the chain. Cap your DPR math:
 
 ```ts
 const size = Math.min(Math.ceil(cssSize * devicePixelRatio), 3000)
 ```
 
-Oversized requests fail at the CDN — and `validateOperations` flags them before that.
+Oversized requests fail at the CDN, and `validateOperations` flags them before that.
 
 ## Don't upscale
 
-`preview` never upscales, `resize` does when the source is smaller. If you use `resize` with user-provided sources, lead with `stretch('off')` — blurry upscaled images are worse than smaller crisp ones:
+`preview` never upscales, `resize` does when the source is smaller. If you use `resize` with user-provided sources, lead with `stretch('off')`. A blurry upscaled image is worse than a smaller crisp one:
 
 ```ts
 const ops = [stretch('off'), resize({ width: 1920 })]
@@ -89,4 +89,4 @@ const ops = [preview(1280, 1280), stripMeta('sensitive')]
 
 ## Cache the strings, not the work
 
-URL building is pure string assembly — microseconds. But the _first request_ for each unique URL is a CDN cache miss that runs the pipeline. Prefer a small set of canonical sizes (`[320, 640, 960, 1280, 1920]`) over arbitrary per-layout values, so your users keep hitting warm caches.
+URL building is pure string assembly, so it costs microseconds. But the _first request_ for each unique URL is a CDN cache miss that runs the pipeline. Prefer a small set of canonical sizes (`[320, 640, 960, 1280, 1920]`) over arbitrary per-layout values, so your users keep hitting warm caches.
