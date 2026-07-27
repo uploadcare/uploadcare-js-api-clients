@@ -38,6 +38,12 @@ conventions in several ways — do not "fix" these divergences.
   valid CDN URL. The parser is lenient: unknown operations (incl. `@`-prefixed
   internal ones like `@clib`) pass through verbatim. Never make the parser
   reject unknown operations.
+- **`updateOperations(fn)` is the one operation mutator on both facades**;
+  `with`/`without`/`replace`/`replaceAll` (and the fluent `*Op` variants) are
+  sugar over it. It hands the callback a defensive copy. Conversion chains
+  (`video`/`document`/`gif2video`) emit a `.path` and `cdn.parse` only re-enters
+  file/group/group-element/proxy urls, so `updateOperations` is their **only**
+  edit path — don't remove it thinking the chain methods cover everything.
 - **Operation creators are strict** (ranges/enums/grammar), wrapped in
   `namedOp('cdn_name', fn)` so the creator itself works as an `OperationRef`
   (`url.without(resize)`). Aliased creators map to their real directive:

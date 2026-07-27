@@ -35,7 +35,7 @@ const url = CdnUrl.parse(src)
   .setOrigin('https://1zlmtnsbgr.ucarecd.net').href
 ```
 
-`with`, `without`, `replace`, `replaceAll`, `has`, `get`, `getAll`, `setFilename`, `setOrigin` — see the [builder reference](/reference/builder/).
+`with`, `without`, `replace`, `replaceAll`, `has`, `get`, `getAll`, `updateOperations`, `setFilename`, `setOrigin` — see the [builder reference](/reference/builder/).
 
 ### Inspecting and overriding a chain
 
@@ -53,6 +53,24 @@ url.replaceAll(overlay(uuid, { size: ['50p', '50p'] })) // collapse to exactly o
 ```
 
 `replace` touches only the first match, which is what you want for a single-valued operation like `resize` or `quality`. For a [stackable](/how-to/validate-user-input#stackable-operations) operation that legitimately repeats, reach for `replaceAll` — otherwise you rewrite the first `overlay` and leave the rest in place.
+
+### Editing by position
+
+Neither one helps when you mean _the second overlay_, or _the overlay with these parameters_. `updateOperations` is the primitive underneath all of them — it hands your callback the chain as a plain array and takes the result as the new chain:
+
+```ts
+// replace the second overlay, leaving the others alone
+let seen = -1
+url.updateOperations((ops) =>
+  ops.map((op) => (operationMatches(op, overlay) && ++seen === 1 ? next : op))
+)
+
+url.updateOperations((ops) => [quality('smart'), ...ops]) // prepend
+url.updateOperations((ops) => [...ops.slice(0, 2), next, ...ops.slice(2)]) // insert at
+url.updateOperations((ops) => ops.filter((op) => op.params[1] !== '90p,90p')) // by params
+```
+
+The callback gets a defensive copy, so mutating it in place is safe. `with`, `without`, `replace` and `replaceAll` are all sugar over this — use them when they fit, and drop to `updateOperations` when they don't.
 
 ## The fluent mega-object
 
@@ -82,6 +100,19 @@ chain.replaceOp(resize({ width: 500 })) // swap the first match, or append
 chain.replaceAllOps({ name: 'overlay', params: [uuid] }) // collapse to one
 chain.withoutOp(quality) // drop every match
 chain.op('custom', 'arg') // append anything, unvalidated
+chain.updateOperations((ops) => ops.reverse()) // rewrite the whole chain
+```
+
+`updateOperations` matters most on conversion chains. A `video`/`document`/`gif2video` chain emits a `.path`, and `cdn.parse` only re-enters `file`/`group`/`group-element`/`proxy` urls — so there is no round-trip back into the chain. The callback is their only edit path:
+
+```ts
+cdn
+  .video(uuid)
+  .size({ width: 720 })
+  .thumbs(5)
+  .updateOperations((ops) =>
+    ops.map((op) => (op.name === 'size' ? size({ width: 480 }) : op))
+  ).path // → /uuid/video/-/size/480x/-/thumbs~5/
 ```
 
 Also available without a bundler at all, via the IIFE global build:

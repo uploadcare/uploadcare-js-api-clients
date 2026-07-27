@@ -321,6 +321,57 @@ describe('fluent operation references', () => {
       ])
     })
 
+    it('updateOperations() replaces the nth match, keeping position', () => {
+      const chain = cdn
+        .file(UUID)
+        .op('overlay', UUID, '50p,50p')
+        .preview(800, 600)
+        .op('overlay', UUID, '10p,10p')
+      let seen = -1
+      expect(
+        chain
+          .updateOperations((ops) =>
+            ops.map((op) =>
+              op.name === 'overlay' && ++seen === 1
+                ? { name: 'overlay', params: [UUID, '1p,1p'] }
+                : op
+            )
+          )
+          .operations.map((op) => op.params[1])
+      ).toEqual(['50p,50p', undefined, '1p,1p'])
+    })
+
+    it('updateOperations() gives conversion chains an edit path', async () => {
+      const { size } = await import('../video/index')
+      expect(
+        cdn
+          .video(UUID)
+          .size({ width: 720 })
+          .thumbs(5)
+          .updateOperations((ops) =>
+            ops.map((op) => (op.name === 'size' ? size({ width: 480 }) : op))
+          ).path
+      ).toBe(`/${UUID}/video/-/size/480x/-/thumbs~5/`)
+    })
+
+    it('updateOperations() preserves the chain subtype', () => {
+      const video = cdn.video(UUID).size({ width: 720 })
+      expect(video.updateOperations((ops) => ops)).toBeInstanceOf(
+        video.constructor
+      )
+      const file = cdn.file(UUID).preview(800, 600)
+      expect(file.updateOperations((ops) => ops).href).toBe(file.href)
+    })
+
+    it('updateOperations() hands the callback a defensive copy', () => {
+      const chain = cdn.file(UUID).preview(800, 600)
+      chain.updateOperations((ops) => {
+        ops.push({ name: 'quality', params: ['smart'] })
+        return ops
+      })
+      expect(chain.href).toBe(`${ORIGIN}/${UUID}/-/preview/800x600/`)
+    })
+
     it('inspection does not mutate the chain', () => {
       const chain = cdn.file(UUID).preview(800, 600)
       chain.getAllOps('preview').length = 0

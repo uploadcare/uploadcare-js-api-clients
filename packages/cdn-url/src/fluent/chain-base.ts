@@ -61,6 +61,31 @@ export abstract class Chain<S extends ChainState> {
   }
 
   /**
+   * The primitive the other operation mutators are sugar over: rewrites the
+   * whole chain through a callback, preserving the chain subtype. Mirrors
+   * `CdnUrl.updateOperations`, and is the only way to edit by position —
+   * replacing the *nth* stackable operation, inserting at an index, or
+   * reordering. It is also the sole edit path for conversion chains
+   * (`video`/`document`/`gif2video`), which cannot be re-parsed from output.
+   *
+   * The callback receives a defensive copy; whatever it returns becomes the
+   * new chain.
+   *
+   * @example
+   * ```ts
+   * cdn.video(uuid).size({ width: 720 }).thumbs(5)
+   *   .updateOperations((ops) =>
+   *     ops.map((op) => (op.name === 'size' ? size({ width: 480 }) : op))
+   *   ).path // → /uuid/video/-/size/480x/-/thumbs~5/
+   * ```
+   */
+  public updateOperations(
+    update: (current: CdnOperation[]) => CdnOperation[]
+  ): this {
+    return this._withOperations(update([...this._s.operations]))
+  }
+
+  /**
    * Whether a matching operation is present. Mirrors `CdnUrl.has`; named with
    * the `Op` suffix so it can never collide with a transformation method.
    *

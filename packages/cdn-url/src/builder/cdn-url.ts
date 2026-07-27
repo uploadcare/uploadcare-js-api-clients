@@ -207,6 +207,33 @@ export class CdnUrl {
     return new CdnUrl({ ...this.#parsed, origin: trimTrailingSlashes(origin) })
   }
 
+  /**
+   * The primitive every other operation mutator is sugar over: rewrites the
+   * whole chain through a callback. Reach for it when position matters and
+   * {@link CdnUrl.replace} / {@link CdnUrl.replaceAll} do not fit — replacing
+   * the *nth* stackable operation, inserting at an index, reordering, or
+   * matching on parameters rather than name.
+   *
+   * The callback receives a defensive copy, so mutating it in place is safe;
+   * whatever it returns becomes the new chain.
+   *
+   * @throws TypeError on group root urls, which cannot carry operations.
+   * @see https://uploadcare.com/docs/transformations/image/
+   * @example
+   * ```ts
+   * // replace the second overlay, leaving the others untouched
+   * let seen = -1
+   * url.updateOperations((ops) =>
+   *   ops.map((op) => (operationMatches(op, overlay) && ++seen === 1 ? next : op))
+   * )
+   * ```
+   */
+  public updateOperations(
+    update: (current: CdnOperation[]) => CdnOperation[]
+  ): CdnUrl {
+    return this.#withOperations(update)
+  }
+
   #withOperations(update: (current: CdnOperation[]) => CdnOperation[]): CdnUrl {
     if (!('operations' in this.#parsed)) {
       if (__DEV__) {
@@ -216,7 +243,7 @@ export class CdnUrl {
     }
     return new CdnUrl({
       ...this.#parsed,
-      operations: update(this.#parsed.operations)
+      operations: update([...this.#parsed.operations])
     })
   }
 }

@@ -172,6 +172,72 @@ describe('CdnUrl builder', () => {
     })
   })
 
+  describe('updateOperations()', () => {
+    const overlays = `https://ucarecdn.com/${UUID}/-/overlay/${UUID}/50p,50p/-/preview/-/overlay/${UUID}/10p,10p/-/overlay/${UUID}/90p,90p/`
+
+    it('replaces the nth match, keeping position', () => {
+      const url = CdnUrl.parse(overlays)
+      const next = { name: 'overlay', params: [UUID, '1p,1p'] }
+      let seen = -1
+      const out = url.updateOperations((ops) =>
+        ops.map((op) => (op.name === 'overlay' && ++seen === 1 ? next : op))
+      )
+      expect(out.operations.map((op) => op.params[1])).toEqual([
+        '50p,50p',
+        undefined,
+        '1p,1p',
+        '90p,90p'
+      ])
+    })
+
+    it('supports insert-at, reorder and filter in one primitive', () => {
+      const url = CdnUrl.parse(`https://ucarecdn.com/${UUID}/-/preview/`)
+      expect(
+        url.updateOperations((ops) => [quality('smart'), ...ops]).operations
+      ).toEqual([
+        { name: 'quality', params: ['smart'] },
+        { name: 'preview', params: [] }
+      ])
+      expect(
+        CdnUrl.parse(overlays)
+          .updateOperations((ops) => ops.reverse())
+          .operations.map((op) => op.name)
+      ).toEqual(['overlay', 'overlay', 'preview', 'overlay'])
+    })
+
+    it('hands the callback a defensive copy', () => {
+      const url = CdnUrl.parse(`https://ucarecdn.com/${UUID}/-/preview/`)
+      url.updateOperations((ops) => {
+        ops.push(quality('smart'))
+        return ops
+      })
+      expect(url.operations).toEqual([{ name: 'preview', params: [] }])
+    })
+
+    it('is immutable and returns a new instance', () => {
+      const url = CdnUrl.parse(`https://ucarecdn.com/${UUID}/-/preview/`)
+      const out = url.updateOperations((ops) => [...ops, quality('best')])
+      expect(out).not.toBe(url)
+      expect(url.operations).toHaveLength(1)
+      expect(out.href).toBe(
+        `https://ucarecdn.com/${UUID}/-/preview/-/quality/best/`
+      )
+    })
+
+    it('throws on group root urls, which carry no operations', () => {
+      const root = CdnUrl.parse(`https://ucarecdn.com/${UUID}~3/`)
+      expect(() => root.updateOperations((ops) => ops)).toThrow(TypeError)
+    })
+
+    it('is the primitive the other mutators are sugar over', () => {
+      const url = CdnUrl.parse(overlays)
+      expect(
+        url.updateOperations((ops) => ops.filter((op) => op.name !== 'overlay'))
+          .href
+      ).toBe(url.without('overlay').href)
+    })
+  })
+
   describe('replaceAll()', () => {
     it('collapses every match into one, at the first match position', () => {
       const url = CdnUrl.parse(
