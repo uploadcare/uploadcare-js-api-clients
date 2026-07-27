@@ -4,7 +4,7 @@
  * diagnostics so callers decide what to do with them.
  */
 import { type OperationRef, operationBaseName } from '../operation-ref'
-import { isOperationModifier, operationDependents } from './dependencies'
+import { isOperationModifier, operationGraph } from './dependencies'
 import type { CdnOperation, ConversionKind } from '../types'
 
 /** How serious a {@link Diagnostic} is. */
@@ -239,6 +239,7 @@ export function validateOperations(
 function validateImage(operations: readonly CdnOperation[]): Diagnostic[] {
   const diagnostics: Diagnostic[] = []
   const seen = new Set<string>()
+  const graph = operationGraph(operations)
 
   operations.forEach((op, index) => {
     const isLast = index === operations.length - 1
@@ -264,10 +265,7 @@ function validateImage(operations: readonly CdnOperation[]): Diagnostic[] {
 
     // Orphaned modifiers: state that never reaches a target. `stretch` keeps
     // its own long-standing code; the rest share the generic one.
-    if (
-      isOperationModifier(op) &&
-      operationDependents(operations, index).length === 0
-    ) {
+    if (isOperationModifier(op) && graph[index]?.dependents.length === 0) {
       diagnostics.push(
         op.name === 'stretch'
           ? {

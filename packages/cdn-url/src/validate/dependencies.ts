@@ -13,7 +13,11 @@
  * `blur` — is deliberately absent rather than guessed at; the engine's exact
  * rules are not public.
  */
-import { type OperationRef, operationBaseName } from '../operation-ref'
+import {
+  type OperationRef,
+  operationBaseName,
+  operationMatches
+} from '../operation-ref'
 import type { CdnOperation } from '../types'
 
 /**
@@ -128,7 +132,7 @@ function isJpegFormat(op: CdnOperation): boolean {
  * operationInputs(ops, 2).map((d) => d.operation.name) // → ['font', 'text_align']
  * ```
  */
-export function operationInputs(
+function inputsAt(
   operations: readonly CdnOperation[],
   index: number
 ): OperationDependency[] {
@@ -185,7 +189,7 @@ export function operationInputs(
  * operationDependents([preview(), font(24)], 1) // → []
  * ```
  */
-export function operationDependents(
+function dependentsAt(
   operations: readonly CdnOperation[],
   index: number
 ): OperationDependency[] {
@@ -225,4 +229,109 @@ export function operationDependents(
   }
 
   return dependents
+}
+
+/**
+ * Resolves a ref to a position in the chain. An operation that is an element of
+ * `operations` pins its exact occurrence by identity, which is what makes
+ * repeated operations addressable; anything else falls back to the first match,
+ * matching how `CdnUrl.get` behaves.
+ */
+function indexOf(
+  operations: readonly CdnOperation[],
+  ref: OperationRef
+): number {
+  if (typeof ref !== 'string' && 'params' in ref) {
+    const identity = operations.indexOf(ref)
+    if (identity !== -1) return identity
+  }
+  return operations.findIndex((op) => operationMatches(op, ref))
+}
+
+/**
+ * The operations feeding the one identified by `ref` — the state that
+ * configures it, plus any chain-wide limit that applies to it. Empty when the
+ * operation has no modelled dependencies or is absent from the chain.
+ *
+ * A modifier reaches a target only if no later occurrence of the same modifier
+ * sits between them, so the nearest one wins. Pass an element of `operations`
+ * to pin a specific occurrence; a name or creator resolves to the first match.
+ *
+ * @see https://uploadcare.com/docs/transformations/image/overlay/#overlay-text
+ * @example
+ * ```ts
+ * const ops = [font(24), textAlign('center', 'bottom'), text(['80p','20p'], 'bottom', 'Hi')]
+ * operationInputs(ops, 'text').map((d) => d.operation.name) // → ['font', 'text_align']
+ * ```
+ */
+export function operationInputs(
+  operations: readonly CdnOperation[],
+  ref: OperationRef
+): OperationDependency[] {
+  return inputsAt(operations, indexOf(operations, ref))
+}
+
+/**
+ * The inverse of {@link operationInputs}: the operations that the one
+ * identified by `ref` affects. For a modifier that is every following target it
+ * still reaches; for `format/jpeg` it is every core operation in the chain.
+ *
+ * @see https://uploadcare.com/docs/transformations/image/overlay/#overlay-text
+ * @example
+ * ```ts
+ * operationDependents([preview(), font(24)], 'font') // → [] — it affects nothing
+ * ```
+ */
+export function operationDependents(
+  operations: readonly CdnOperation[],
+  ref: OperationRef
+): OperationDependency[] {
+  return dependentsAt(operations, indexOf(operations, ref))
+}
+
+/**
+ * One node of {@link operationGraph}: an operation with both of its edge lists
+ * already resolved.
+ *
+ * @see https://uploadcare.com/docs/transformations/image/
+ * @example
+ * ```ts
+ * operationGraph(ops).filter((node) => node.dependents.length === 0)
+ * ```
+ */
+export interface OperationNode {
+  /** The operation this node describes. */
+  operation: CdnOperation
+  /** Its position in the chain. */
+  index: number
+  /** What configures it — see {@link operationInputs}. */
+  inputs: OperationDependency[]
+  /** What it affects — see {@link operationDependents}. */
+  dependents: OperationDependency[]
+}
+
+/**
+ * The whole chain as a dependency graph, one node per operation in order. Use
+ * this instead of querying node by node: it needs no ref lookup, addresses
+ * repeated operations unambiguously by position, and is what the validator
+ * itself runs on.
+ *
+ * @see https://uploadcare.com/docs/transformations/image/
+ * @example
+ * ```ts
+ * // every modifier that never reaches a target
+ * operationGraph(ops).filter(
+ *   (node) => isOperationModifier(node.operation) && node.dependents.length === 0
+ * )
+ * ```
+ */
+export function operationGraph(
+  operations: readonly CdnOperation[]
+): OperationNode[] {
+  return operations.map((operation, index) => ({
+    operation,
+    index,
+    inputs: inputsAt(operations, index),
+    dependents: dependentsAt(operations, index)
+  }))
 }

@@ -107,8 +107,11 @@ conventions in several ways — do not "fix" these divergences.
   ceiling. Nearest modifier wins. The table is **deliberately incomplete** —
   overlay z-order and `blur_region`/`blur` are unmodelled because the rules
   aren't public. Do not add edges you cannot source; an honest gap beats a
-  guess. `validateImage` drives its orphaned-modifier diagnostics off this
-  model, so the two cannot drift.
+  guess. The public surface is **ref-based, never index-based** (`operationInputs(ops, 'text')`)
+  to match `has`/`get`/`getAll`; passing an element of the array pins that exact
+  occurrence by identity, anything else takes the first match. Index arithmetic
+  stays private — `operationGraph` is the positional view, and `validateImage`
+  drives its orphaned-modifier diagnostics off it, so the two cannot drift.
 - The engine's exact accept/reject rules live in the private
   `uploadcare/actions_dsl` repo (inaccessible). The public docs are the spec.
 - **Docs source of truth is `uploadcare/fern-docs`** — `uploadcare/docs` is

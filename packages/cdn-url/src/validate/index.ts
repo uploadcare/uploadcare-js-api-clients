@@ -2,7 +2,9 @@ export {
   OPERATION_MODIFIERS,
   type DependencyKind,
   type OperationDependency,
+  type OperationNode,
   isOperationModifier,
+  operationGraph,
   operationDependents,
   operationInputs
 } from './dependencies'

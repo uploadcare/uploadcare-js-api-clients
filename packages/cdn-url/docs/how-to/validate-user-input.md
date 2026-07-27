@@ -72,7 +72,7 @@ This is what tells you which override to reach for: `isStackable(op)` false mean
 
 A CDN chain is flat — nothing nests. But a few operations are _state_ for a later one: `font`, `text_align` and `text_box` configure the `text` that follows them, and `stretch` configures the following `resize`/`scale_crop`. Move one across its target and it silently stops applying.
 
-`operationInputs` and `operationDependents` make those edges queryable in both directions:
+`operationInputs` and `operationDependents` make those edges queryable in both directions. They take an operation ref — a name, a creator, or an operation object — exactly like `has`/`get`/`getAll`:
 
 ```ts
 import {
@@ -82,8 +82,15 @@ import {
 
 const ops = parseOperations(userInput)
 
-operationInputs(ops, i) // what configures the operation at i
-operationDependents(ops, i) // what the operation at i affects
+operationInputs(ops, 'text') // what configures the text
+operationDependents(ops, font) // what this font affects
+```
+
+A name or creator resolves to the **first** match, like `CdnUrl.get`. To pin one occurrence out of several, pass the element itself — identity wins over name matching:
+
+```ts
+const [, second] = url.getAll(text)
+operationInputs(url.operations, second) // the modifiers reaching that text
 ```
 
 Each edge reports the related operation, its `index`, a `reason`, and a `kind`:
@@ -97,11 +104,29 @@ const chain = [
   textAlign('center', 'bottom'),
   text(['80p', '20p'], 'bottom', 'Hi')
 ]
-operationInputs(chain, 2).map((d) => d.operation.name) // → ['font', 'text_align']
-operationDependents(chain, 0).map((d) => d.index) // → [2]
+operationInputs(chain, 'text').map((d) => d.operation.name) // → ['font', 'text_align']
+operationDependents(chain, 'font').map((d) => d.index) // → [2]
 ```
 
-An empty `operationDependents` result for a modifier means it does nothing — which is precisely what the `stretch-without-resize` and `modifier-without-target` diagnostics report. The validator is built on this model, so the two cannot disagree.
+### Walking the whole chain
+
+When you want every relationship at once — a UI, a normalizer, an audit — skip the per-operation lookups and take the graph. One node per operation, in order, with both edge lists already resolved:
+
+```ts
+import {
+  operationGraph,
+  isOperationModifier
+} from '@uploadcare/cdn-url/validate'
+
+// every modifier that never reaches a target
+const orphans = operationGraph(ops).filter(
+  (node) => isOperationModifier(node.operation) && node.dependents.length === 0
+)
+```
+
+The graph addresses operations by position, so it stays unambiguous even when the same operation object appears twice in a chain.
+
+An empty `dependents` list for a modifier means it does nothing — which is precisely what the `stretch-without-resize` and `modifier-without-target` diagnostics report. The validator runs on this same graph, so the two cannot disagree.
 
 `OPERATION_MODIFIERS` exposes the table (target → the operations that configure it), and `isOperationModifier(ref)` answers the single-operation question.
 
