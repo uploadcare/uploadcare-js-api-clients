@@ -4,7 +4,9 @@ The [delivery proxy](https://uploadcare.com/docs/delivery/proxy/) fetches images
 
 ## Build a proxified URL
 
-```ts
+::: code-group
+
+```ts [Atomic]
 import { defaultProxyEndpoint, proxyUrl } from '@uploadcare/cdn-url/proxy'
 import { preview, resize } from '@uploadcare/cdn-url/ops'
 
@@ -17,6 +19,33 @@ proxyUrl(endpoint, 'https://yoursite.com/assets/hero.jpg', [
 ])
 // → https://YOUR_PUBLIC_KEY.ucr.io/-/preview/-/resize/1280x/https://yoursite.com/assets/hero.jpg
 ```
+
+```ts [Builder]
+import { CdnUrl } from '@uploadcare/cdn-url/builder'
+import { defaultProxyEndpoint } from '@uploadcare/cdn-url/proxy'
+import { preview, resize } from '@uploadcare/cdn-url/ops'
+
+new CdnUrl({
+  origin: defaultProxyEndpoint('YOUR_PUBLIC_KEY'),
+  sourceUrl: 'https://yoursite.com/assets/hero.jpg',
+  operations: [preview(), resize({ width: 1280 })]
+}).href
+```
+
+```ts [Fluent]
+import { cdn } from '@uploadcare/cdn-url/fluent'
+import { defaultProxyEndpoint } from '@uploadcare/cdn-url/proxy'
+
+cdn
+  .proxy(
+    defaultProxyEndpoint('YOUR_PUBLIC_KEY'),
+    'https://yoursite.com/assets/hero.jpg'
+  )
+  .preview()
+  .resize({ width: 1280 }).href
+```
+
+:::
 
 Operations sit between the endpoint and the source URL. The source keeps its own query string verbatim.
 

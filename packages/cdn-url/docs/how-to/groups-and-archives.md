@@ -17,7 +17,9 @@ formatGroupId(group) // → 'c2499162-…~3'
 
 ## Addressing the group and its files
 
-```ts
+::: code-group
+
+```ts [Atomic]
 import { groupUrl, nthUrl } from '@uploadcare/cdn-url/group'
 import { preview } from '@uploadcare/cdn-url/ops'
 
@@ -30,6 +32,34 @@ nthUrl('https://ucarecdn.com', group, 0)
 nthUrl('https://ucarecdn.com', group, 1, [preview(400, 400)])
 // → https://ucarecdn.com/:uuid~3/nth/1/-/preview/400x400/
 ```
+
+```ts [Builder]
+import { CdnUrl } from '@uploadcare/cdn-url/builder'
+import { preview } from '@uploadcare/cdn-url/ops'
+
+new CdnUrl({ origin: 'https://ucarecdn.com', group }).href
+// → https://ucarecdn.com/:uuid~3/
+
+new CdnUrl({
+  origin: 'https://ucarecdn.com',
+  group,
+  nth: 1,
+  operations: [preview(400, 400)]
+}).href
+// → https://ucarecdn.com/:uuid~3/nth/1/-/preview/400x400/
+```
+
+```ts [Fluent]
+import { cdn } from '@uploadcare/cdn-url/fluent'
+
+cdn.group(group).href
+// → https://ucarecdn.com/:uuid~3/
+
+cdn.group(group).nth(1).preview(400, 400).href
+// → https://ucarecdn.com/:uuid~3/nth/1/-/preview/400x400/
+```
+
+:::
 
 Two rules the library enforces for you:
 
@@ -48,7 +78,9 @@ const thumbs = Array.from({ length: group.count }, (_, i) =>
 
 Hand the whole group to the user as one download:
 
-```ts
+::: code-group
+
+```ts [Atomic]
 import { archiveUrl } from '@uploadcare/cdn-url/group'
 
 archiveUrl('https://ucarecdn.com', group, 'zip')
@@ -57,5 +89,19 @@ archiveUrl('https://ucarecdn.com', group, 'zip')
 archiveUrl('https://ucarecdn.com', group, 'tar', 'photos.tar')
 // → https://ucarecdn.com/:uuid~3/archive/tar/photos.tar
 ```
+
+```ts [Fluent]
+import { cdn } from '@uploadcare/cdn-url/fluent'
+
+cdn.group(group).archive('zip')
+// → https://ucarecdn.com/:uuid~3/archive/zip/
+
+cdn.group(group).archive('tar', 'photos.tar')
+// → https://ucarecdn.com/:uuid~3/archive/tar/photos.tar
+```
+
+:::
+
+There is no builder tab here. `CdnUrl` addresses one URL and has no `archive` method, so archives come from the `group` entry or a fluent group chain.
 
 Archive fine print: you get originals only (transformations are discarded), the uncompressed limit is 2 GB, and the request 404s if any file in the group was removed.

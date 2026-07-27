@@ -4,14 +4,11 @@ The avatar problem: arbitrary user photos in, consistent squares (or circles) ou
 
 ## The recipe
 
-```ts
+::: code-group
+
+```ts [Atomic]
 import { serializeCdnUrl } from '@uploadcare/cdn-url'
-import {
-  borderRadius,
-  format,
-  quality,
-  scaleCrop
-} from '@uploadcare/cdn-url/ops'
+import { borderRadius, scaleCrop } from '@uploadcare/cdn-url/ops'
 
 function avatarUrl(uuid: string, size: number): string {
   return serializeCdnUrl({
@@ -27,6 +24,35 @@ function avatarUrl(uuid: string, size: number): string {
 avatarUrl(uuid, 96)
 // → …/-/scale_crop/96x96/smart_faces_objects/-/border_radius/50p/
 ```
+
+```ts [Builder]
+import { CdnUrl } from '@uploadcare/cdn-url/builder'
+import { borderRadius, scaleCrop } from '@uploadcare/cdn-url/ops'
+
+function avatarUrl(uuid: string, size: number): string {
+  return new CdnUrl({
+    origin: 'https://ucarecdn.com',
+    uuid,
+    operations: [
+      scaleCrop(size, size, { type: 'smart_faces_objects' }),
+      borderRadius('50p')
+    ]
+  }).href
+}
+```
+
+```ts [Fluent]
+import { cdn } from '@uploadcare/cdn-url/fluent'
+
+function avatarUrl(uuid: string, size: number): string {
+  return cdn
+    .file(uuid)
+    .scaleCrop(size, size, { type: 'smart_faces_objects' })
+    .borderRadius('50p').href
+}
+```
+
+:::
 
 What each piece does:
 

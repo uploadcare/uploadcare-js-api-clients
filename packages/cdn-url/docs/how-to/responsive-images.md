@@ -4,9 +4,11 @@ Serve each device the pixels it actually needs: a `srcset` of CDN-resized varian
 
 ## Width-based srcset
 
-```ts
+::: code-group
+
+```ts [Atomic]
 import { serializeCdnUrl } from '@uploadcare/cdn-url'
-import { format, preview, quality } from '@uploadcare/cdn-url/ops'
+import { preview } from '@uploadcare/cdn-url/ops'
 
 const WIDTHS = [320, 640, 960, 1280, 1920]
 
@@ -20,6 +22,37 @@ function variant(uuid: string, width: number): string {
 
 const srcset = WIDTHS.map((w) => `${variant(uuid, w)} ${w}w`).join(', ')
 ```
+
+```ts [Builder]
+import { CdnUrl } from '@uploadcare/cdn-url/builder'
+import { preview } from '@uploadcare/cdn-url/ops'
+
+const WIDTHS = [320, 640, 960, 1280, 1920]
+
+function variant(uuid: string, width: number): string {
+  return new CdnUrl({
+    origin: 'https://ucarecdn.com',
+    uuid,
+    operations: [preview(width, width)]
+  }).href
+}
+
+const srcset = WIDTHS.map((w) => `${variant(uuid, w)} ${w}w`).join(', ')
+```
+
+```ts [Fluent]
+import { cdn } from '@uploadcare/cdn-url/fluent'
+
+const WIDTHS = [320, 640, 960, 1280, 1920]
+
+function variant(uuid: string, width: number): string {
+  return cdn.file(uuid).preview(width, width).href
+}
+
+const srcset = WIDTHS.map((w) => `${variant(uuid, w)} ${w}w`).join(', ')
+```
+
+:::
 
 The `preview` alone is enough. Once a chain contains a processing operation,
 the CDN defaults to `format/auto` (AVIF/WebP negotiation) and applies adaptive

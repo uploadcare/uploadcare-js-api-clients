@@ -6,7 +6,9 @@ Video and document conversion are asynchronous REST jobs, not on-the-fly URL tra
 
 `videoPath` produces the domain-less string `POST /convert/video/` expects:
 
-```ts
+::: code-group
+
+```ts [Atomic]
 import {
   cut,
   format,
@@ -25,6 +27,25 @@ videoPath(uuid, [
 ])
 // → /:uuid/video/-/size/720x540/-/format/webm/-/quality/better/-/cut/0:0:10.0/30.0/-/thumbs~5/
 ```
+
+```ts [Fluent]
+import { cdn } from '@uploadcare/cdn-url/fluent'
+
+cdn
+  .video(uuid)
+  .size({ width: 720, height: 540 })
+  .format('webm')
+  .quality('better')
+  .cut('0:0:10.0', '30.0')
+  .thumbs(5).path
+// → /:uuid/video/-/size/720x540/-/format/webm/-/quality/better/-/cut/0:0:10.0/30.0/-/thumbs~5/
+```
+
+:::
+
+::: warning No builder tab, on purpose
+`CdnUrl` can hold a `conversion: 'video'` and will happily serialize it, but it attaches the origin and hands back a full URL. The convert API wants a path, so use `videoPath` or a fluent video chain instead.
+:::
 
 Grammar the creators enforce (in development):
 
