@@ -64,6 +64,14 @@ conventions in several ways — do not "fix" these divergences.
   BOTH bundles — it is opt-in API, not a dev check.
 - `scripts/verify-bundles.mjs` + `scripts/smoke-node.mjs` run as part of
   `npm run build` and will fail the build if flavors regress.
+- **Prod flavors minify with terser, not esbuild** — measured ~37% smaller
+  gzip on `fluent.js`, ~19% across `dist/prod`. Only safe `compress`/`mangle`
+  options are on; `unsafe*` buys ~1% and is not worth it. The IIFE build needs
+  `mangle.reserved: ['UCCdnUrl']`, otherwise top-level mangling renames the
+  global away (smoke test catches this). `mangleProps` was measured and
+  **rejected**: ~31 B gzip on `fluent`, ~20 B on the IIFE, against a real risk
+  of inconsistent renaming if a `_`-prefixed prop ever crosses a chunk
+  boundary.
 
 ## Domain knowledge (hard-won, don't re-litigate)
 

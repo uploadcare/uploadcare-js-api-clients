@@ -187,6 +187,7 @@
     "oxlint": "^1.68.0",
     "oxlint-tsgolint": "^0.23.0",
     "playwright": "^1.49.0",
+    "terser": "^5.49.0",
     "typedoc": "^0.28.19",
     "typedoc-plugin-markdown": "^4.12.0",
     "typedoc-vitepress-theme": "^1.1.3",
