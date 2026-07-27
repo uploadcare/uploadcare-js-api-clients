@@ -82,7 +82,18 @@ export abstract class Chain<S extends ChainState> {
   public updateOperations(
     update: (current: CdnOperation[]) => CdnOperation[]
   ): this {
-    return this._withOperations(update([...this._s.operations]))
+    const next = update([...this._s.operations])
+    // A block-bodied callback with no `return` would otherwise fork a chain
+    // whose operations are undefined — corrupt rather than merely empty.
+    if (!Array.isArray(next)) {
+      if (__DEV__) {
+        throw new TypeError(
+          'updateOperations callback must return an operations array'
+        )
+      }
+      return this
+    }
+    return this._withOperations(next)
   }
 
   /**

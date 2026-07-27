@@ -224,6 +224,28 @@ describe('CdnUrl builder', () => {
       )
     })
 
+    it('rejects a callback that does not return an array', () => {
+      const url = CdnUrl.parse(`https://ucarecdn.com/${UUID}/-/preview/`)
+      // a block-bodied arrow with no `return` is the common slip
+      expect(() =>
+        // @ts-expect-error deliberately wrong callback shape
+        url.updateOperations((ops) => {
+          ops.push(quality('smart'))
+        })
+      ).toThrow(TypeError)
+    })
+
+    it('rejects a callback that does not return an array', () => {
+      const url = CdnUrl.parse(`https://ucarecdn.com/${UUID}/-/preview/`)
+      // a block-bodied arrow that forgets to return is the common slip
+      expect(() =>
+        // @ts-expect-error deliberately wrong callback shape
+        url.updateOperations((ops) => {
+          ops.push(quality('smart'))
+        })
+      ).toThrow(TypeError)
+    })
+
     it('throws on group root urls, which carry no operations', () => {
       const root = CdnUrl.parse(`https://ucarecdn.com/${UUID}~3/`)
       expect(() => root.updateOperations((ops) => ops)).toThrow(TypeError)

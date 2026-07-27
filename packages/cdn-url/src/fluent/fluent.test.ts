@@ -363,6 +363,26 @@ describe('fluent operation references', () => {
       expect(file.updateOperations((ops) => ops).href).toBe(file.href)
     })
 
+    it('updateOperations() rejects a callback that returns no array', () => {
+      expect(() =>
+        // @ts-expect-error deliberately wrong callback shape
+        cdn
+          .file(UUID)
+          .preview(800, 600)
+          .updateOperations(() => undefined)
+      ).toThrow(TypeError)
+    })
+
+    it('updateOperations() rejects a callback that returns no array', () => {
+      expect(() =>
+        // @ts-expect-error deliberately wrong callback shape
+        cdn
+          .file(UUID)
+          .preview(800, 600)
+          .updateOperations(() => undefined)
+      ).toThrow(TypeError)
+    })
+
     it('updateOperations() hands the callback a defensive copy', () => {
       const chain = cdn.file(UUID).preview(800, 600)
       chain.updateOperations((ops) => {

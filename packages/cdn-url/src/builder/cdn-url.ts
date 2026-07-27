@@ -241,9 +241,17 @@ export class CdnUrl {
       }
       return this
     }
-    return new CdnUrl({
-      ...this.#parsed,
-      operations: update([...this.#parsed.operations])
-    })
+    const next = update([...this.#parsed.operations])
+    // A block-bodied callback with no `return` would otherwise build a CdnUrl
+    // whose `operations` is undefined — corrupt rather than merely empty.
+    if (!Array.isArray(next)) {
+      if (__DEV__) {
+        throw new TypeError(
+          'updateOperations callback must return an operations array'
+        )
+      }
+      return this
+    }
+    return new CdnUrl({ ...this.#parsed, operations: next })
   }
 }

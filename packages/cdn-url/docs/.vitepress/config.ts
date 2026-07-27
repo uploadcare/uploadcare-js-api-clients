@@ -13,7 +13,7 @@ export default defineConfig({
     logo: 'https://ucarecdn.com/edfdf045-34c0-4087-bbdd-e3834921f890/userpiccircletransparent.svg',
     nav: [
       { text: 'Guide', link: '/guide/getting-started' },
-      { text: 'How-to', link: '/how-to/render-stored-urls' },
+      { text: 'How-to', link: '/how-to/cookbook' },
       { text: 'API Reference', link: '/reference/' },
       {
         text: 'Uploadcare',
@@ -43,6 +43,7 @@ export default defineConfig({
       {
         text: 'How-to',
         items: [
+          { text: 'Cookbook', link: '/how-to/cookbook' },
           { text: 'Render stored URLs', link: '/how-to/render-stored-urls' },
           { text: 'Responsive images', link: '/how-to/responsive-images' },
           { text: 'Avatars', link: '/how-to/avatars' },
