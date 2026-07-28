@@ -313,8 +313,59 @@ describe('parseOperations', () => {
     expect(serializeOperations(parseOperations(modifiers))).toBe(modifiers)
   })
 
-  it('throws a TypeError on strings that are not operation chains', () => {
-    expect(() => parseOperations('foo/bar')).toThrow(TypeError)
+  // CHANGED (was: threw a TypeError). The leading `-` marker is now optional,
+  // so a bare chain is accepted — and since the parser never rejects unknown
+  // operation names, `foo/bar` is an unknown operation rather than an error.
+  it('accepts a chain that omits the leading marker', () => {
+    expect(parseOperations('foo/bar')).toEqual([
+      { name: 'foo', params: ['bar'] }
+    ])
+  })
+
+  it('parses a marker-less chain of several operations', () => {
+    // Operations are still `-`-separated, so this stays unambiguous: `blur` is
+    // a second operation, not a third param of `resize`.
+    expect(parseOperations('resize/300x/-/blur/10')).toEqual([
+      { name: 'resize', params: ['300x'] },
+      { name: 'blur', params: ['10'] }
+    ])
+  })
+
+  it.each([
+    ['bare, no delimiters', 'resize/300x'],
+    ['leading slash, no marker', '/resize/300x/'],
+    ['marker, no trailing slash', '-/resize/300x'],
+    ['surrounding whitespace', '  -/resize/300x/  '],
+    ['whitespace around a bare chain', ' resize/300x ']
+  ])('normalises %s', (_label, modifiers) => {
+    expect(parseOperations(modifiers)).toEqual([
+      { name: 'resize', params: ['300x'] }
+    ])
+  })
+
+  it('returns an empty list for a whitespace-only string', () => {
+    expect(parseOperations('   ')).toEqual([])
+  })
+
+  it.each([
+    ['a lone marker', '-'],
+    ['a marker with no name', '-/-/resize/300x']
+  ])('still throws a TypeError for %s', (_label, modifiers) => {
+    expect(() => parseOperations(modifiers)).toThrow(TypeError)
+  })
+
+  it('keeps the url parsers strict about the marker', () => {
+    // The leniency above is local to `parseOperations`. A non-`-` segment after
+    // the uuid is a filename, not an operation, and garbage after it still throws.
+    expect(parseCdnUrl(`https://ucarecdn.com/${UUID}/photo.jpg`)).toMatchObject(
+      {
+        filename: 'photo.jpg',
+        operations: []
+      }
+    )
+    expect(() => parseCdnUrl(`https://ucarecdn.com/${UUID}/a/b/`)).toThrow(
+      TypeError
+    )
   })
 })
 

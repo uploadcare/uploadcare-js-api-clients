@@ -48,6 +48,17 @@ conventions in several ways — do not "fix" these divergences.
   valid CDN URL. The parser is lenient: unknown operations (incl. `@`-prefixed
   internal ones like `@clib`) pass through verbatim. Never make the parser
   reject unknown operations.
+- **`parseOperations` is lenient about shape, the URL parsers are not.** A bare
+  modifiers string may omit the leading `-` marker and carry surrounding slashes
+  or whitespace (`'resize/300x'`, `'/resize/300x/'`, `'  -/resize/300x/  '`),
+  because callers get these values from config, DOM attributes and stored
+  `cdnUrlModifiers` alike. Operations within a chain are still `-`-separated, so
+  `resize/300x/-/blur/10` stays unambiguous. The trade is deliberate: almost any
+  slash-shaped string now parses, so `parseOperations` accepts a malformed chain
+  rather than diagnosing it. Keep this leniency **local to `parseOperations`** —
+  inside a URL a non-`-` segment is a filename or an error, and loosening the
+  shared segment parser would make `/<uuid>/garbage/` parse `garbage` as an
+  operation.
 - **`updateOperations(fn)` is the one operation mutator on both facades**;
   `with`/`without`/`replace`/`replaceAll` (and the fluent `*Op` variants) are
   sugar over it. It hands the callback a defensive copy. Conversion chains

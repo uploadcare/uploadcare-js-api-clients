@@ -247,16 +247,31 @@ export function parseCdnUrl(url: string): ParsedCdnUrl {
  * alongside a uuid) into operations. Lenient like {@link parseCdnUrl};
  * round-trips with `serializeOperations`.
  *
- * @throws TypeError when the string is not an operation chain.
+ * Modifiers reach callers in whatever shape their own inputs arrive in — a
+ * stored `-/…/` value, a hand-written config string, a DOM attribute — so the
+ * leading `-` marker, surrounding slashes and surrounding whitespace are all
+ * optional. Operations within a chain are still separated by `-`, which keeps
+ * `resize/300x/-/blur/10` unambiguous. Consequently almost any slash-shaped
+ * string parses: this does not diagnose a malformed chain, it accepts one.
+ *
+ * The leniency is deliberately local. Inside a URL a segment that is not `-`
+ * is a filename or an error, so {@link parseCdnUrl} and the per-kind parsers
+ * stay strict about the marker.
+ *
+ * @throws TypeError when an operation name is missing (`'-'`, `'-/-/x'`).
  * @see https://uploadcare.com/docs/cdn-operations/
  * @example
  * ```ts
  * parseOperations('-/crop/640x480/center/-/preview/')
  * // → [{ name: 'crop', params: ['640x480', 'center'] }, { name: 'preview', params: [] }]
+ *
+ * parseOperations('resize/300x') // → [{ name: 'resize', params: ['300x'] }]
  * ```
  */
 export function parseOperations(modifiers: string): CdnOperation[] {
-  return parseOperationSegments(segmentize(modifiers), modifiers)
+  const segments = segmentize(modifiers.trim())
+  if (segments.length > 0 && segments[0] !== '-') segments.unshift('-')
+  return parseOperationSegments(segments, modifiers)
 }
 
 function segmentize(pathname: string): string[] {
