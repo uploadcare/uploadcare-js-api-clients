@@ -1,4 +1,15 @@
-export { parseCdnUrl, parseOperations } from './parse'
+export {
+  isFileUrl,
+  isGroupElementUrl,
+  isGroupUrl,
+  isProxyUrl,
+  parseCdnUrl,
+  parseFileUrl,
+  parseGroupElementUrl,
+  parseGroupUrl,
+  parseOperations,
+  parseProxyUrl
+} from './parse'
 export { serializeCdnUrl, serializeOperations } from './serialize'
 export { detectDomainKind, isUploadcareDomain } from './domain'
 export {

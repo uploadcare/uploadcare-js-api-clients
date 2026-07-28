@@ -1,6 +1,19 @@
 import { describe, expect, it } from 'vitest'
 
-import { parseCdnUrl, parseOperations, serializeOperations } from './index'
+import {
+  isFileUrl,
+  isGroupElementUrl,
+  isGroupUrl,
+  isProxyUrl,
+  parseCdnUrl,
+  parseFileUrl,
+  parseGroupElementUrl,
+  parseGroupUrl,
+  parseOperations,
+  parseProxyUrl,
+  serializeCdnUrl,
+  serializeOperations
+} from './index'
 
 const UUID = 'c2499162-eb07-4b93-b31e-94a89a47e858'
 
@@ -302,5 +315,181 @@ describe('parseOperations', () => {
 
   it('throws a TypeError on strings that are not operation chains', () => {
     expect(() => parseOperations('foo/bar')).toThrow(TypeError)
+  })
+})
+
+describe('per-kind parsers', () => {
+  const FILE = `https://ucarecdn.com/${UUID}/-/resize/300x/photo.jpg`
+  const GROUP = `https://ucarecdn.com/${UUID}~3/`
+  const ELEMENT = `https://ucarecdn.com/${UUID}~3/nth/1/-/preview/150x150/`
+  const PROXY = 'https://pk.ucr.io/-/preview/https://example.com/a.jpg'
+
+  describe('parseFileUrl', () => {
+    it('returns the file shape already narrowed, no kind check needed', () => {
+      const file = parseFileUrl(FILE)
+      // Type-level: uuid is reachable without narrowing.
+      const uuid: string = file.uuid
+      expect(uuid).toBe(UUID)
+      expect(file).toEqual({
+        kind: 'file',
+        origin: 'https://ucarecdn.com',
+        uuid: UUID,
+        conversion: null,
+        operations: [{ name: 'resize', params: ['300x'] }],
+        filename: 'photo.jpg',
+        search: '',
+        hash: ''
+      })
+    })
+
+    it('reads conversion prefixes, query and hash like parseCdnUrl does', () => {
+      expect(parseFileUrl(`https://ucarecdn.com/${UUID}/video/?a=1#f`)).toEqual(
+        {
+          kind: 'file',
+          origin: 'https://ucarecdn.com',
+          uuid: UUID,
+          conversion: 'video',
+          operations: [],
+          filename: null,
+          search: '?a=1',
+          hash: '#f'
+        }
+      )
+    })
+
+    it('rejects the other kinds rather than mis-parsing them', () => {
+      expect(() => parseFileUrl(GROUP)).toThrow(TypeError)
+      expect(() => parseFileUrl(ELEMENT)).toThrow(TypeError)
+      expect(() => parseFileUrl(PROXY)).toThrow(TypeError)
+      expect(() => parseFileUrl('not-a-url')).toThrow(TypeError)
+      expect(() => parseFileUrl('https://ucarecdn.com/')).toThrow(TypeError)
+    })
+  })
+
+  describe('parseGroupUrl', () => {
+    it('returns the group root shape', () => {
+      expect(parseGroupUrl(GROUP)).toEqual({
+        kind: 'group',
+        origin: 'https://ucarecdn.com',
+        group: { uuid: UUID, count: 3 },
+        search: '',
+        hash: ''
+      })
+    })
+
+    it('rejects element, file and proxy urls', () => {
+      expect(() => parseGroupUrl(ELEMENT)).toThrow(TypeError)
+      expect(() => parseGroupUrl(FILE)).toThrow(TypeError)
+      expect(() => parseGroupUrl(PROXY)).toThrow(TypeError)
+    })
+  })
+
+  describe('parseGroupElementUrl', () => {
+    it('returns the element shape', () => {
+      expect(parseGroupElementUrl(ELEMENT)).toEqual({
+        kind: 'group-element',
+        origin: 'https://ucarecdn.com',
+        group: { uuid: UUID, count: 3 },
+        nth: 1,
+        operations: [{ name: 'preview', params: ['150x150'] }],
+        filename: null,
+        search: '',
+        hash: ''
+      })
+    })
+
+    it('rejects a group root, which has no nth segment', () => {
+      expect(() => parseGroupElementUrl(GROUP)).toThrow(TypeError)
+      expect(() => parseGroupElementUrl(FILE)).toThrow(TypeError)
+    })
+  })
+
+  describe('parseProxyUrl', () => {
+    it('returns the proxy shape with the source url intact', () => {
+      expect(parseProxyUrl(PROXY)).toEqual({
+        kind: 'proxy',
+        origin: 'https://pk.ucr.io',
+        operations: [{ name: 'preview', params: [] }],
+        sourceUrl: 'https://example.com/a.jpg'
+      })
+    })
+
+    it('keeps the query string with the embedded source', () => {
+      const parsed = parseProxyUrl(
+        'https://pk.ucr.io/https://example.com/a.jpg?v=2'
+      )
+      expect(parsed.sourceUrl).toBe('https://example.com/a.jpg?v=2')
+    })
+
+    it('rejects urls with no embedded source', () => {
+      expect(() => parseProxyUrl(FILE)).toThrow(TypeError)
+      expect(() => parseProxyUrl(GROUP)).toThrow(TypeError)
+    })
+  })
+
+  describe('agreement with parseCdnUrl', () => {
+    it('every per-kind parser matches the all-kinds parser exactly', () => {
+      expect(parseFileUrl(FILE)).toEqual(parseCdnUrl(FILE))
+      expect(parseGroupUrl(GROUP)).toEqual(parseCdnUrl(GROUP))
+      expect(parseGroupElementUrl(ELEMENT)).toEqual(parseCdnUrl(ELEMENT))
+      expect(parseProxyUrl(PROXY)).toEqual(parseCdnUrl(PROXY))
+    })
+
+    it('round-trips through serializeCdnUrl like parseCdnUrl does', () => {
+      for (const url of [FILE, GROUP, ELEMENT, PROXY]) {
+        expect(serializeCdnUrl(parseCdnUrl(url))).toBe(url)
+      }
+      expect(serializeCdnUrl(parseFileUrl(FILE))).toBe(FILE)
+      expect(serializeCdnUrl(parseGroupUrl(GROUP))).toBe(GROUP)
+      expect(serializeCdnUrl(parseGroupElementUrl(ELEMENT))).toBe(ELEMENT)
+      expect(serializeCdnUrl(parseProxyUrl(PROXY))).toBe(PROXY)
+    })
+  })
+
+  describe('guards', () => {
+    it('classify a url string without throwing', () => {
+      expect(isFileUrl(FILE)).toBe(true)
+      expect(isGroupUrl(GROUP)).toBe(true)
+      expect(isGroupElementUrl(ELEMENT)).toBe(true)
+      expect(isProxyUrl(PROXY)).toBe(true)
+    })
+
+    it('are mutually exclusive across the four kinds', () => {
+      const guards = { isFileUrl, isGroupUrl, isGroupElementUrl, isProxyUrl }
+      for (const [url, expected] of [
+        [FILE, 'isFileUrl'],
+        [GROUP, 'isGroupUrl'],
+        [ELEMENT, 'isGroupElementUrl'],
+        [PROXY, 'isProxyUrl']
+      ] as const) {
+        for (const [name, guard] of Object.entries(guards)) {
+          expect([name, guard(url)]).toEqual([name, name === expected])
+        }
+      }
+    })
+
+    it('return false rather than throwing on junk', () => {
+      for (const junk of [
+        'not-a-url',
+        '',
+        'https://ucarecdn.com/',
+        'https://example.com/x'
+      ]) {
+        expect(isFileUrl(junk)).toBe(false)
+        expect(isGroupUrl(junk)).toBe(false)
+        expect(isGroupElementUrl(junk)).toBe(false)
+        expect(isProxyUrl(junk)).toBe(false)
+      }
+    })
+
+    it('a passing guard means the matching parser succeeds', () => {
+      for (const url of [FILE, GROUP, ELEMENT, PROXY]) {
+        if (isFileUrl(url)) expect(() => parseFileUrl(url)).not.toThrow()
+        if (isGroupUrl(url)) expect(() => parseGroupUrl(url)).not.toThrow()
+        if (isGroupElementUrl(url))
+          expect(() => parseGroupElementUrl(url)).not.toThrow()
+        if (isProxyUrl(url)) expect(() => parseProxyUrl(url)).not.toThrow()
+      }
+    })
   })
 })

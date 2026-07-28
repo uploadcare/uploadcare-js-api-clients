@@ -34,6 +34,16 @@ conventions in several ways — do not "fix" these divergences.
 - **`ParsedCdnUrl` is a discriminated union** (`kind: 'file' | 'group' |
 'group-element' | 'proxy'`). Each member carries only the fields its kind
   allows (group roots have no `operations`, proxies no `uuid`/`search`).
+- **Per-kind parsers exist alongside `parseCdnUrl`**: `parseFileUrl`,
+  `parseGroupUrl`, `parseGroupElementUrl`, `parseProxyUrl`, plus `isFileUrl`
+  and friends. `parseCdnUrl` **delegates** to them, so the dispatch lives in
+  one place and cannot drift; a test asserts all five agree on every fixture.
+  They exist for bundle size: importing `parseFileUrl` alone is 714 B gzipped
+  against 1078 B for `parseCdnUrl`. They are exported from the **root entry**,
+  not a new entry point — per-symbol tree-shaking already gives the saving, so
+  do not add an entry for them. Note esbuild does not drop the unused
+  `GROUP_ID_RE` even with `/* @__PURE__ */`, so a few tens of bytes of regex
+  ride along regardless; `join_vars: false` was measured and does not help.
 - **Round-trip law:** `serializeCdnUrl(parseCdnUrl(url)) === url` for every
   valid CDN URL. The parser is lenient: unknown operations (incl. `@`-prefixed
   internal ones like `@clib`) pass through verbatim. Never make the parser

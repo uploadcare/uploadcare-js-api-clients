@@ -7,8 +7,11 @@
 
 export const UUID_SOURCE =
   '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}'
-export const UUID_RE = new RegExp(`^${UUID_SOURCE}$`, 'i')
-export const GROUP_ID_RE = new RegExp(`^(${UUID_SOURCE})~([0-9]+)$`, 'i')
+export const UUID_RE = /* @__PURE__ */ new RegExp(`^${UUID_SOURCE}$`, 'i')
+export const GROUP_ID_RE = /* @__PURE__ */ new RegExp(
+  `^(${UUID_SOURCE})~([0-9]+)$`,
+  'i'
+)
 
 /** Strips trailing slashes from an origin or endpoint. */
 export function trimTrailingSlashes(url: string): string {

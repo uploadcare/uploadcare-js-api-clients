@@ -1,5 +1,14 @@
 import { GROUP_ID_RE, UUID_RE } from './grammar'
-import type { CdnOperation, ConversionKind, ParsedCdnUrl } from './types'
+import type {
+  CdnOperation,
+  ConversionKind,
+  GroupId,
+  ParsedCdnUrl,
+  ParsedFileUrl,
+  ParsedGroupElementUrl,
+  ParsedGroupUrl,
+  ParsedProxyUrl
+} from './types'
 
 const CONVERSIONS: readonly ConversionKind[] = [
   'video',
@@ -11,6 +20,187 @@ const EMBEDDED_URL_RE = /\/(https?:\/\/.+)$/i
 /** Narrows a path segment to a conversion prefix. */
 function isConversion(segment: string | undefined): segment is ConversionKind {
   return segment != null && (CONVERSIONS as readonly string[]).includes(segment)
+}
+
+/**
+ * Splits a URL into the pieces every parser needs. Shared so the per-kind
+ * parsers and {@link parseCdnUrl} cannot drift apart.
+ */
+function splitUrl(url: string): {
+  origin: string
+  pathname: string
+  search: string
+  hash: string
+  hasTrailingSlash: boolean
+} {
+  let parsed: URL
+  try {
+    parsed = new URL(url)
+  } catch {
+    throw new TypeError(`Invalid URL: "${url}"`)
+  }
+  return {
+    origin: `${parsed.protocol}//${parsed.host}`,
+    pathname: parsed.pathname,
+    search: parsed.search,
+    hash: parsed.hash,
+    hasTrailingSlash: parsed.pathname.endsWith('/')
+  }
+}
+
+/** The embedded source of a proxy url, or null when there is none. */
+function embeddedSourceOf(pathname: string): string | null {
+  return pathname.match(EMBEDDED_URL_RE)?.[1] ?? null
+}
+
+/**
+ * Parses a delivery proxy URL. Narrower than {@link parseCdnUrl}: importing
+ * this alone leaves the file and group parsers out of your bundle.
+ *
+ * @throws TypeError when the URL carries no embedded source.
+ * @see https://uploadcare.com/docs/delivery/proxy/
+ * @example
+ * ```ts
+ * parseProxyUrl('https://pk.ucr.io/-/preview/https://example.com/a.jpg')
+ * // → { kind: 'proxy', origin: 'https://pk.ucr.io', operations: [...], sourceUrl: 'https://example.com/a.jpg' }
+ * ```
+ */
+export function parseProxyUrl(url: string): ParsedProxyUrl {
+  const { origin, pathname, search, hash } = splitUrl(url)
+  const source = embeddedSourceOf(pathname)
+  if (source === null) {
+    throw new TypeError(`Not a proxy URL (no embedded source): "${url}"`)
+  }
+  const prefix = pathname.slice(0, pathname.length - source.length)
+  return {
+    kind: 'proxy',
+    origin,
+    operations: parseOperationSegments(segmentize(prefix), 'proxy prefix'),
+    sourceUrl: source + search + hash
+  }
+}
+
+/**
+ * Parses a group root URL (`/:uuid~N/`). Group roots carry no operations and
+ * no filename, which is why the returned shape has neither.
+ *
+ * @throws TypeError when the URL is not a bare group root.
+ * @see https://uploadcare.com/docs/file-groups/
+ * @example
+ * ```ts
+ * parseGroupUrl('https://ucarecdn.com/:uuid~3/')
+ * // → { kind: 'group', group: { uuid: ':uuid', count: 3 }, ... }
+ * ```
+ */
+export function parseGroupUrl(url: string): ParsedGroupUrl {
+  const { origin, pathname, search, hash } = splitUrl(url)
+  if (embeddedSourceOf(pathname) !== null) {
+    throw new TypeError(`Not a group URL (proxy source): "${url}"`)
+  }
+  const segments = segmentize(pathname)
+  const head = segments.shift()
+  const group = head === undefined ? null : matchGroupId(head)
+  if (group === null) {
+    throw new TypeError(`Not a group URL (no group id): "${url}"`)
+  }
+  if (segments.length > 0) {
+    throw new TypeError(`Unexpected path after group id in "${url}"`)
+  }
+  return { kind: 'group', origin, search, hash, group }
+}
+
+/**
+ * Parses a group element URL (`/:uuid~N/nth/i/`). Narrower than
+ * {@link parseCdnUrl}, and distinct from {@link parseGroupUrl}, which handles
+ * the group root.
+ *
+ * @throws TypeError when the URL is not a group element.
+ * @see https://uploadcare.com/docs/file-groups/#group-cdn
+ * @example
+ * ```ts
+ * parseGroupElementUrl('https://ucarecdn.com/:uuid~3/nth/1/')
+ * // → { kind: 'group-element', nth: 1, group: { uuid: ':uuid', count: 3 }, ... }
+ * ```
+ */
+export function parseGroupElementUrl(url: string): ParsedGroupElementUrl {
+  const { origin, pathname, search, hash, hasTrailingSlash } = splitUrl(url)
+  if (embeddedSourceOf(pathname) !== null) {
+    throw new TypeError(`Not a group element URL (proxy source): "${url}"`)
+  }
+  const segments = segmentize(pathname)
+  const head = segments.shift()
+  const group = head === undefined ? null : matchGroupId(head)
+  if (group === null) {
+    throw new TypeError(`Not a group element URL (no group id): "${url}"`)
+  }
+  if (segments[0] !== 'nth') {
+    throw new TypeError(`Not a group element URL (no nth segment): "${url}"`)
+  }
+  const index = Number(segments[1])
+  if (!Number.isInteger(index)) {
+    throw new TypeError(`Invalid group element index in "${url}"`)
+  }
+  segments.splice(0, 2)
+  const filename = takeFilename(segments, hasTrailingSlash)
+  return {
+    kind: 'group-element',
+    origin,
+    search,
+    hash,
+    group,
+    nth: index,
+    operations: parseOperationSegments(segments, url),
+    filename
+  }
+}
+
+/**
+ * Parses a single-file URL, including conversion results. Narrower than
+ * {@link parseCdnUrl}: importing this alone keeps the group and proxy parsers
+ * out of your bundle, and the result is already narrowed to
+ * {@link ParsedFileUrl} without a `kind` check.
+ *
+ * @throws TypeError when the URL is not a single-file CDN URL.
+ * @see https://uploadcare.com/docs/delivery/cdn/
+ * @example
+ * ```ts
+ * parseFileUrl('https://ucarecdn.com/:uuid/-/resize/300x/photo.jpg').uuid
+ * // → ':uuid' — no narrowing needed
+ * ```
+ */
+export function parseFileUrl(url: string): ParsedFileUrl {
+  const { origin, pathname, search, hash, hasTrailingSlash } = splitUrl(url)
+  if (embeddedSourceOf(pathname) !== null) {
+    throw new TypeError(`Not a file URL (proxy source): "${url}"`)
+  }
+  const segments = segmentize(pathname)
+  const head = segments.shift()
+  if (head === undefined || !UUID_RE.test(head)) {
+    throw new TypeError(`Not a file URL (no uuid): "${url}"`)
+  }
+  let conversion: ConversionKind | null = null
+  if (isConversion(segments[0])) {
+    conversion = segments[0]
+    segments.shift()
+  }
+  const filename = takeFilename(segments, hasTrailingSlash)
+  return {
+    kind: 'file',
+    origin,
+    search,
+    hash,
+    uuid: head,
+    conversion,
+    operations: parseOperationSegments(segments, url),
+    filename
+  }
+}
+
+/** Matches a `uuid~count` head segment, or null when it is not one. */
+function matchGroupId(head: string): GroupId | null {
+  const match = head.match(GROUP_ID_RE)
+  if (match?.[1] === undefined) return null
+  return { uuid: match[1], count: Number(match[2]) }
 }
 
 /**
@@ -31,86 +221,25 @@ function isConversion(segment: string | undefined): segment is ConversionKind {
  * ```
  */
 export function parseCdnUrl(url: string): ParsedCdnUrl {
-  let parsed: URL
-  try {
-    parsed = new URL(url)
-  } catch {
-    throw new TypeError(`Invalid URL: "${url}"`)
-  }
+  const { pathname } = splitUrl(url)
 
-  const origin = `${parsed.protocol}//${parsed.host}`
-  const pathname = parsed.pathname
+  if (embeddedSourceOf(pathname) !== null) return parseProxyUrl(url)
 
-  // Proxy: operations (if any) followed by an embedded absolute source URL.
-  // The query/hash belong to the source, not to the CDN URL itself.
-  const embeddedSource = pathname.match(EMBEDDED_URL_RE)?.[1]
-  if (embeddedSource !== undefined) {
-    const prefix = pathname.slice(0, pathname.length - embeddedSource.length)
-    return {
-      kind: 'proxy',
-      origin,
-      operations: parseOperationSegments(segmentize(prefix), 'proxy prefix'),
-      sourceUrl: embeddedSource + parsed.search + parsed.hash
-    }
-  }
-
-  const hasTrailingSlash = pathname.endsWith('/')
-  const segments = segmentize(pathname)
-  const head = segments.shift()
+  const head = segmentize(pathname)[0]
   if (head === undefined) {
     throw new TypeError(`Not a CDN URL (empty path): "${url}"`)
   }
-  const common = { origin, search: parsed.search, hash: parsed.hash }
-
-  const groupMatch = head.match(GROUP_ID_RE)
-  if (groupMatch?.[1] !== undefined) {
-    const group = {
-      uuid: groupMatch[1],
-      count: Number(groupMatch[2])
-    }
-    if (segments[0] === 'nth') {
-      const index = Number(segments[1])
-      if (!Number.isInteger(index)) {
-        throw new TypeError(`Invalid group element index in "${url}"`)
-      }
-      segments.splice(0, 2)
-      const filename = takeFilename(segments, hasTrailingSlash)
-      return {
-        kind: 'group-element',
-        ...common,
-        group,
-        nth: index,
-        operations: parseOperationSegments(segments, url),
-        filename
-      }
-    }
-    if (segments.length > 0) {
-      throw new TypeError(`Unexpected path after group id in "${url}"`)
-    }
-    return { kind: 'group', ...common, group }
+  if (matchGroupId(head) !== null) {
+    return segmentize(pathname)[1] === 'nth'
+      ? parseGroupElementUrl(url)
+      : parseGroupUrl(url)
   }
-
   if (!UUID_RE.test(head)) {
     throw new TypeError(
       `Not a CDN URL (no uuid, group or proxy source): "${url}"`
     )
   }
-
-  let conversion: ConversionKind | null = null
-  if (isConversion(segments[0])) {
-    conversion = segments[0]
-    segments.shift()
-  }
-
-  const filename = takeFilename(segments, hasTrailingSlash)
-  return {
-    kind: 'file',
-    ...common,
-    uuid: head,
-    conversion,
-    operations: parseOperationSegments(segments, url),
-    filename
-  }
+  return parseFileUrl(url)
 }
 
 /**
@@ -172,4 +301,79 @@ function parseOperationSegments(
     operations.push({ name, params })
   }
   return operations
+}
+
+/**
+ * Whether a string is a single-file CDN URL, without parsing it or throwing.
+ * Pair with {@link parseFileUrl} when the input is untrusted.
+ *
+ * @see https://uploadcare.com/docs/delivery/cdn/
+ * @example
+ * ```ts
+ * isFileUrl('https://ucarecdn.com/:uuid/') // → true
+ * isFileUrl('https://ucarecdn.com/:uuid~3/') // → false, that is a group
+ * ```
+ */
+export function isFileUrl(url: string): boolean {
+  try {
+    parseFileUrl(url)
+    return true
+  } catch {
+    return false
+  }
+}
+
+/**
+ * Whether a string is a group root URL, without parsing it or throwing.
+ *
+ * @see https://uploadcare.com/docs/file-groups/
+ * @example
+ * ```ts
+ * isGroupUrl('https://ucarecdn.com/:uuid~3/') // → true
+ * ```
+ */
+export function isGroupUrl(url: string): boolean {
+  try {
+    parseGroupUrl(url)
+    return true
+  } catch {
+    return false
+  }
+}
+
+/**
+ * Whether a string is a group element URL, without parsing it or throwing.
+ *
+ * @see https://uploadcare.com/docs/file-groups/#group-cdn
+ * @example
+ * ```ts
+ * isGroupElementUrl('https://ucarecdn.com/:uuid~3/nth/1/') // → true
+ * ```
+ */
+export function isGroupElementUrl(url: string): boolean {
+  try {
+    parseGroupElementUrl(url)
+    return true
+  } catch {
+    return false
+  }
+}
+
+/**
+ * Whether a string is a delivery proxy URL, without parsing it or throwing.
+ * Distinct from `isProxyEndpoint`, which only inspects the host.
+ *
+ * @see https://uploadcare.com/docs/delivery/proxy/
+ * @example
+ * ```ts
+ * isProxyUrl('https://pk.ucr.io/https://example.com/a.jpg') // → true
+ * ```
+ */
+export function isProxyUrl(url: string): boolean {
+  try {
+    parseProxyUrl(url)
+    return true
+  } catch {
+    return false
+  }
 }
