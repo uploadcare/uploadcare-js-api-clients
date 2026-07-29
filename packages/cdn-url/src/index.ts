@@ -17,6 +17,22 @@ export {
   serializeOperations,
   serializeProxyUrl
 } from './serialize'
+// Also available from the dedicated `/tiny` entry, which is what the docs show:
+// re-exported here so a caller already importing from the root does not need a
+// second import path. Per-symbol tree-shaking means nobody pays for them unless
+// they are named.
+export {
+  type CropAlignment,
+  joinModifiers,
+  modifiers,
+  type ModifiersChain,
+  normalizeModifiers,
+  type OperationLiteral,
+  tinyBuild,
+  tinyParse,
+  type TinyFileUrl,
+  unsafeOperation
+} from './tiny/index'
 export { detectDomainKind, isUploadcareDomain } from './domain'
 export {
   type NamedOperationCreator,

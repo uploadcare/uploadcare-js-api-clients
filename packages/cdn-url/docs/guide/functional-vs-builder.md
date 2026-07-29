@@ -153,21 +153,21 @@ Every entry point is independent, and `sideEffects: false` lets bundlers drop ev
 
 What each entry costs when you import everything it exports, bundled and minified from the production build. Shared chunks are included, so these are the real numbers rather than per-file sizes:
 
-| Import                              | Minified | Gzipped |
-| ----------------------------------- | -------- | ------- |
-| `proxy`                             | 0.4 kB   | 0.3 kB  |
-| `document`                          | 0.6 kB   | 0.4 kB  |
-| `video`                             | 0.9 kB   | 0.6 kB  |
-| `gif2video`                         | 1.2 kB   | 0.6 kB  |
-| `group`                             | 1.4 kB   | 0.7 kB  |
-| `validate`                          | 5.2 kB   | 2.1 kB  |
-| `builder`                           | 5.7 kB   | 2.0 kB  |
-| `tiny` (string level)               | 0.9 kB   | 0.5 kB  |
-| `index` (parse, serialize, domains) | 5.0 kB   | 1.7 kB  |
-| `ops` (all 47 creators)             | 6.1 kB   | 2.2 kB  |
-| `fluent` (the `cdn` mega-object)    | 15.1 kB  | 4.5 kB  |
+| Import                                  | Minified | Gzipped |
+| --------------------------------------- | -------- | ------- |
+| `proxy`                                 | 0.4 kB   | 0.3 kB  |
+| `document`                              | 0.6 kB   | 0.4 kB  |
+| `video`                                 | 0.9 kB   | 0.6 kB  |
+| `gif2video`                             | 1.2 kB   | 0.6 kB  |
+| `group`                                 | 1.4 kB   | 0.7 kB  |
+| `validate`                              | 5.2 kB   | 2.1 kB  |
+| `builder`                               | 5.7 kB   | 2.0 kB  |
+| `tiny` (string level)                   | 0.9 kB   | 0.5 kB  |
+| `index` (everything below, re-exported) | 5.9 kB   | 2.0 kB  |
+| `ops` (all 47 creators)                 | 6.1 kB   | 2.2 kB  |
+| `fluent` (the `cdn` mega-object)        | 15.1 kB  | 4.5 kB  |
 
-Importing everything is the worst case, and it is not what most code does. The core plus one creator is about 1.6 kB gzipped, not 2.2 plus 1.7, because the creators you don't name are dropped — and the [string level](/guide/string-level-api) does the same job for 0.4 kB from its own entry.
+Importing everything is the worst case, and it is not what most code does. The core plus one creator is about 1.6 kB gzipped, not 2.2 plus 2.0, because the creators you don't name are dropped. The [string level](/guide/string-level-api) does the same job for 0.4 kB, and costs the same whether you import it from `/tiny` or from the root — 348 B versus 347 B brotli, measured.
 
 The `fluent` entry is the one exception to "you only pay for what you import": reaching for `cdn` pulls in the whole library, and it cannot tree-shake by design. That's the deal: one import, full surface. If size matters, use the functional core or `builder` instead.
 

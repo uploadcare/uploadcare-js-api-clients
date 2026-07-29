@@ -4,8 +4,9 @@ Everything else in this library treats an operation as data — `{ name: 'blur',
 
 It costs runtime validation, URL kinds, and the ability to inspect what you are editing. What it buys is bytes: 362 B brotli, against 821 B for the narrowest full-model path and 4520 B for the fluent `cdn` object, [measured below](#what-it-costs).
 
-Throughout this page `:uuid` stands in for a real file uuid, and `parts` for a
-value of the exported type `TinyFileUrl`.
+Examples import from `@uploadcare/cdn-url/tiny`, the dedicated entry. Everything here is re-exported from the root entry too, and costs the same either way — 348 B against 347 B brotli — so use whichever import path your code already has.
+
+Throughout this page `:uuid` stands in for a real file uuid, and `parts` for a value of the exported type `TinyFileUrl`.
 
 ::: tip File URLs only, and only when you already know it is one
 `tinyParse` handles `/:uuid/-/…/filename` and nothing else. It cannot tell what kind of URL you gave it and has no way to tell you, so the caller has to know. If your input is of unknown kind, checking costs more than simply using [`parseFileUrl`](/reference/index/functions/parseFileUrl), which validates as well. See [What it costs](#what-it-costs).

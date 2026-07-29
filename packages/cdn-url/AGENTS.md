@@ -84,6 +84,14 @@ conventions in several ways — do not "fix" these divergences.
   (`video`/`document`/`gif2video`) emit a `.path` and `cdn.parse` only re-enters
   file/group/group-element/proxy urls, so `updateOperations` is their **only**
   edit path — don't remove it thinking the chain methods cover everything.
+- **The string level is reachable from two import paths on purpose.** `/tiny` is a
+  registered entry point (the docs use it, since it names the contract) and the same
+  symbols are re-exported from the root entry for callers who already import from
+  there. It costs nothing: a consumer naming only `tinyParse`/`tinyBuild`/`modifiers`
+  bundles 347 B brotli through the root against 348 B through `/tiny`. Do not remove
+  either path — and remember the root entry's own "import everything" figure carries
+  them (2.0 kB gzipped rather than 1.7 kB), which is what the table in
+  `functional-vs-builder.md` reports.
 - **`src/tiny/` holds the string-level API — `literals.ts` (the chain: `modifiers`,
   `normalizeModifiers`, `joinModifiers`, the `ModifiersChain` brand) and
   `url.ts` (`tinyParse`/`tinyBuild`/`TinyFileUrl`). One folder because they are one

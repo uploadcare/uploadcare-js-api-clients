@@ -88,18 +88,18 @@ Parsing is lenient: operations the library doesn't know (including internal `@`-
 
 The package is split into atomic entry points, so you import only what you use:
 
-| Entry                           | What's inside                                                                                               |
-| ------------------------------- | ----------------------------------------------------------------------------------------------------------- |
-| `@uploadcare/cdn-url`           | `parseCdnUrl` plus per-kind parsers and guards, `serializeCdnUrl`, `parseOperations`, domain helpers, types |
-| `@uploadcare/cdn-url/ops`       | 47 image operation creators, including a `rawOp` escape hatch                                               |
-| `@uploadcare/cdn-url/group`     | group ids, `nth` elements, archives                                                                         |
-| `@uploadcare/cdn-url/proxy`     | delivery proxy URLs for remote sources                                                                      |
-| `@uploadcare/cdn-url/video`     | video conversion paths                                                                                      |
-| `@uploadcare/cdn-url/document`  | document conversion paths                                                                                   |
-| `@uploadcare/cdn-url/gif2video` | animated image → video URLs                                                                                 |
-| `@uploadcare/cdn-url/builder`   | chainable `CdnUrl` facade                                                                                   |
-| `@uploadcare/cdn-url/validate`  | cross-operation chain diagnostics, plus the rule sets behind them                                           |
-| `@uploadcare/cdn-url/tiny`      | [string-level](/guide/string-level-api) file-URL split/join and typed modifier literals, no runtime checks  |
+| Entry                           | What's inside                                                                                                                             |
+| ------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| `@uploadcare/cdn-url`           | `parseCdnUrl` plus per-kind parsers and guards, `serializeCdnUrl`, `parseOperations`, domain helpers, types — and everything from `/tiny` |
+| `@uploadcare/cdn-url/ops`       | 47 image operation creators, including a `rawOp` escape hatch                                                                             |
+| `@uploadcare/cdn-url/group`     | group ids, `nth` elements, archives                                                                                                       |
+| `@uploadcare/cdn-url/proxy`     | delivery proxy URLs for remote sources                                                                                                    |
+| `@uploadcare/cdn-url/video`     | video conversion paths                                                                                                                    |
+| `@uploadcare/cdn-url/document`  | document conversion paths                                                                                                                 |
+| `@uploadcare/cdn-url/gif2video` | animated image → video URLs                                                                                                               |
+| `@uploadcare/cdn-url/builder`   | chainable `CdnUrl` facade                                                                                                                 |
+| `@uploadcare/cdn-url/validate`  | cross-operation chain diagnostics, plus the rule sets behind them                                                                         |
+| `@uploadcare/cdn-url/tiny`      | [string-level](/guide/string-level-api) file-URL split/join and typed modifier literals, no runtime checks                                |
 
 ## Prefer one import for everything?
 
