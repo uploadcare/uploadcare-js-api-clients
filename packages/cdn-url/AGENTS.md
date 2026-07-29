@@ -134,9 +134,18 @@ conventions in several ways — do not "fix" these divergences.
   publishes; keep the two in step, and re-measure rather than copying them forward. The round-trip law holds for every url in
   the corpus, **including** the ones whose fields it gets wrong — a group element
   keeps `nth/2/` in `modifiers`, a proxy keeps its embedded source there and its
-  `uuid` is `-`. That is the ceiling: it exists for internal size-critical callers
-  that only append or clear modifiers. Do not teach it kinds, do not add
-  validation, and do not use it in public API.
+  `uuid` is `-`. That is the ceiling.
+- **`tiny/` is public, and its publicity is the thing to be careful about.** It is a
+  registered entry point, re-exported from the root entry, and documented with its own
+  guide page — an earlier note here called it internal and told you not to expose it,
+  which stopped being true once those three things landed. Treat it as supported API:
+  its signatures and the round-trip law are a contract, and a breaking change to
+  either needs the same care as one to `parseCdnUrl`.
+  What has *not* changed is the ceiling above. Being public is not a reason to grow
+  it: do not teach it kinds, do not add validation, do not make it throw. A caller
+  who needs any of those wants `parseFileUrl`. The guide page has to keep saying so,
+  because the failure mode is a consumer reaching for `tinyParse` on a url whose kind
+  they have not established and quietly getting `uuid: '-'`.
 - **`ModifiersChain` is nominal, not a pattern type.** `string & { readonly
 [CHAIN]: true }`, branded through the one `asModifiersChain` entrance, so it is a
   plain string at run time and free. A pattern type (`'' | `${string}/`) was tried
