@@ -15,6 +15,8 @@ https://ucarecdn.com/c2499162-…-47e858/-/crop/640x480/-/preview/400x400/photo.
 - operations: zero or more `-/name/params/` directives, applied in order as a pipeline
 - filename: optional, anything after the last operation without a trailing slash
 
+One directive is an **operation** (`resize/300x`); the whole serialized run of them is the **modifiers** (`-/resize/300x/-/blur/10/`), which is the word Uploadcare's API uses for a file's stored transformation string (`cdnUrlModifiers`). This library parses modifiers into operations and serializes them back — see [the string-level API](/guide/string-level-api) for working with the string form directly.
+
 `parseCdnUrl` returns exactly these fields, discriminated by `kind`:
 
 ```ts

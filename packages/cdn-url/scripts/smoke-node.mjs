@@ -27,7 +27,8 @@ const entries = [
   'proxy',
   'builder',
   'fluent',
-  'validate'
+  'validate',
+  'tiny'
 ]
 
 for (const entry of entries) {

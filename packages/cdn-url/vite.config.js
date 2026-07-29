@@ -34,7 +34,8 @@ const entries = {
   proxy: resolve(__dirname, 'src/proxy/index.ts'),
   builder: resolve(__dirname, 'src/builder/index.ts'),
   fluent: resolve(__dirname, 'src/fluent/index.ts'),
-  validate: resolve(__dirname, 'src/validate/index.ts')
+  validate: resolve(__dirname, 'src/validate/index.ts'),
+  tiny: resolve(__dirname, 'src/tiny/index.ts')
 }
 
 /**

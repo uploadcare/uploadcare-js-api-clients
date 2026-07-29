@@ -24,6 +24,7 @@ import {
   text,
   textAlign
 } from './ops/index'
+import { joinModifiers, modifiers, tinyBuild, tinyParse } from './tiny/index'
 import type { CdnOperation } from './types'
 import { size, thumbs, videoPath } from './video/index'
 import { isStackable, operationInputs } from './validate/index'
@@ -41,6 +42,18 @@ function mapOperations(
   if (!('operations' in parsed)) return url
   return serializeCdnUrl({ ...parsed, operations: fn([...parsed.operations]) })
 }
+
+describe('I want the smallest possible bundle', () => {
+  it('edits the chain as a string', () => {
+    const parts = tinyParse(stored)
+    expect(
+      tinyBuild({
+        ...parts,
+        modifiers: joinModifiers(parts.modifiers, modifiers('blur/10'))
+      })
+    ).toBe(`${origin}/${uuid}/-/resize/300x/-/quality/smart/-/blur/10/`)
+  })
+})
 
 describe('cookbook: getting a URL out', () => {
   it('thumbnail from a uuid', () => {

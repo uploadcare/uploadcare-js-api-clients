@@ -1,6 +1,6 @@
 # Functional core vs builder vs fluent
 
-The library has three API styles over the same data model. They produce identical URLs; the difference is ergonomics and bundle size.
+The library has four API styles over the same data model. They produce identical URLs; the difference is ergonomics and bundle size. Three of them are below; the fourth, [the string-level API](/guide/string-level-api), drops the data model entirely and trades validation for bytes.
 
 ## The functional core
 
@@ -124,25 +124,50 @@ Also available without a bundler at all, via the IIFE global build:
 </script>
 ```
 
+## The string level
+
+The fourth style drops the data model. A chain is one string, a file URL is a handful of named strings, and there are no operation objects to build or inspect:
+
+```ts
+import {
+  joinModifiers,
+  modifiers,
+  tinyBuild,
+  tinyParse
+} from '@uploadcare/cdn-url/tiny'
+
+const parts = tinyParse(src)
+const url = tinyBuild({
+  ...parts,
+  modifiers: joinModifiers(parts.modifiers, modifiers('preview/800x600'))
+})
+```
+
+The operations are still type-checked — `modifiers('rezise/800x')` does not compile — but nothing is validated at run time, there are no URL kinds, and it handles **single-file URLs only**. In exchange it is 362 B brotli against 1844 B for the same edit through the builder.
+
+That trade is only worth it under a real size budget, and only when you already know the URL is a file URL: see [The string-level API](/guide/string-level-api) for what it gets wrong and where it corrupts URLs if you feed it the wrong kind.
+
 ## Tree-shaking: what you actually ship
 
 Every entry point is independent, and `sideEffects: false` lets bundlers drop everything you don't import. Each operation creator is an atom: importing `preview` does not pull in the other 46.
 
 What each entry costs when you import everything it exports, bundled and minified from the production build. Shared chunks are included, so these are the real numbers rather than per-file sizes:
 
-| Import                                | Minified | Gzipped |
-| ------------------------------------- | -------- | ------- |
-| `proxy`                               | 0.6 kB   | 0.4 kB  |
-| `document`                            | 0.7 kB   | 0.4 kB  |
-| `video`                               | 1.0 kB   | 0.6 kB  |
-| `gif2video`                           | 1.3 kB   | 0.7 kB  |
-| `group`                               | 1.4 kB   | 0.8 kB  |
-| `index` (parse + serialize + domains) | 3.2 kB   | 1.4 kB  |
-| `builder`                             | 4.3 kB   | 1.8 kB  |
-| `ops` (all 47 creators)               | 6.3 kB   | 2.3 kB  |
-| `fluent` (the `cdn` mega-object)      | 13.4 kB  | 4.2 kB  |
+| Import                              | Minified | Gzipped |
+| ----------------------------------- | -------- | ------- |
+| `proxy`                             | 0.4 kB   | 0.3 kB  |
+| `document`                          | 0.6 kB   | 0.4 kB  |
+| `video`                             | 0.9 kB   | 0.6 kB  |
+| `gif2video`                         | 1.2 kB   | 0.6 kB  |
+| `group`                             | 1.4 kB   | 0.7 kB  |
+| `validate`                          | 5.2 kB   | 2.1 kB  |
+| `builder`                           | 5.7 kB   | 2.0 kB  |
+| `tiny` (string level)               | 0.9 kB   | 0.5 kB  |
+| `index` (parse, serialize, domains) | 5.0 kB   | 1.7 kB  |
+| `ops` (all 47 creators)             | 6.1 kB   | 2.2 kB  |
+| `fluent` (the `cdn` mega-object)    | 15.1 kB  | 4.5 kB  |
 
-Importing everything is the worst case, and it is not what most code does. One creator plus the core is about 1.3 kB gzipped, not 2.3 plus 1.4, because the creators you don't name are dropped.
+Importing everything is the worst case, and it is not what most code does. The core plus one creator is about 1.6 kB gzipped, not 2.2 plus 1.7, because the creators you don't name are dropped — and the [string level](/guide/string-level-api) does the same job for 0.4 kB from its own entry.
 
 The `fluent` entry is the one exception to "you only pay for what you import": reaching for `cdn` pulls in the whole library, and it cannot tree-shake by design. That's the deal: one import, full surface. If size matters, use the functional core or `builder` instead.
 
@@ -151,4 +176,5 @@ The `fluent` entry is the one exception to "you only pay for what you import": r
 - Building URLs in a library, a framework loader, or anything size-sensitive: functional core. You'll likely ship under 2 kB.
 - Application code that edits URLs in several places: the builder reads better and is harder to misuse (it knows group roots can't take operations, for instance).
 - Scripts, prototypes, and app code that touches many URL flavors: the fluent `cdn` object. One import, full surface, kind-safe chains.
+- Under a hard size budget — a framework loader, an inlined script: [the string-level API](/guide/string-level-api). No operation objects and no validation, at about a third of the bytes of the narrowest path above.
 - Mixing is fine. The builder accepts the same operation objects (`.with(preview(800, 600))`), and `toJSON()` hands you back the plain parsed shape whenever you want to drop down.

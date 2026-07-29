@@ -6,7 +6,7 @@ import type {
   StripMetaMode,
   SrgbMode,
   FilterName
-} from './ops'
+} from '../ops'
 
 /**
  * Operations as **typed string literals**, for callers whose only need is to write
@@ -129,12 +129,44 @@ export function unsafeOperation(operation: string): OperationLiteral {
   return operation as OperationLiteral
 }
 
+declare const CHAIN: unique symbol
+
 /**
- * Joins typed operation literals into a modifiers chain — the whole runtime cost
- * of this module.
+ * A `-/name/params/` directive chain, **nominally** typed: a plain string at run
+ * time, but assignable only from a value this module produced — `modifiers()`,
+ * {@link normalizeModifiers}, `joinModifiers()` or `tinyParse`.
+ *
+ * A pattern type (`` `${string}/` ``) was tried first and rejected: any string
+ * ending in a slash satisfied it, which is barely a type. The brand instead states
+ * the invariant that matters — *this string went through the chain machinery* — so
+ * a hand-written `'-/resize/300x/'`, a stored `'resize/300x'` and a stray `''` are
+ * all rejected until normalized. It costs nothing at run time and one cast in each
+ * producer, which is how a brand works.
+ *
+ * Operation names are still {@link OperationLiteral}'s business; the brand says
+ * where a chain came from, not that every directive in it is spelled right.
+ *
+ * @see https://uploadcare.com/docs/cdn-operations/
+ * @example
+ * ```ts
+ * const chain: ModifiersChain = modifiers('preview', 'blur/10')
+ * const longer: ModifiersChain = joinModifiers(chain, modifiers('grayscale'))
+ * const stored: ModifiersChain = normalizeModifiers('/resize/300x')
+ * const empty: ModifiersChain = modifiers() // '' needs a producer too
+ * ```
+ */
+export type ModifiersChain = string & {
+  /** Brand marker. Exists only in the type system — never present at run time. */
+  readonly [CHAIN]: true
+}
+
+/**
+ * Joins typed operation literals into a {@link ModifiersChain} —
+ * the whole runtime cost of this module.
  *
  * Equivalent to `serializeOperations` for callers holding literals rather than
  * `CdnOperation` objects, and round-trips with `parseOperations` the same way.
+ * Call it with no arguments for the empty chain.
  *
  * @example
  * ```ts
@@ -142,6 +174,70 @@ export function unsafeOperation(operation: string): OperationLiteral {
  * modifiers() // → ''
  * ```
  */
-export function modifiers(...operations: OperationLiteral[]): string {
-  return operations.map((operation) => `-/${operation}/`).join('')
+export function modifiers(...operations: OperationLiteral[]): ModifiersChain {
+  let chain = ''
+  for (const operation of operations) chain += `-/${operation}/`
+  return asModifiersChain(chain)
+}
+
+/**
+ * Concatenates chains — the branded stand-in for `` `${a}${b}` ``, which would
+ * widen back to `string`. Order is preserved, so this is how you append to a chain
+ * you already have.
+ *
+ * @see https://uploadcare.com/docs/cdn-operations/
+ * @example
+ * ```ts
+ * joinModifiers(parts.modifiers, modifiers('resize/300x', 'blur/10'))
+ * // → '-/preview/-/resize/300x/-/blur/10/'
+ * ```
+ */
+export function joinModifiers(...chains: ModifiersChain[]): ModifiersChain {
+  return asModifiersChain(chains.join(''))
+}
+
+/**
+ * Brands a string as a {@link ModifiersChain}. The single place the cast lives —
+ * every producer in the package routes through here, including `tinyParse`, so the
+ * brand has exactly one entrance.
+ *
+ * @internal
+ */
+export function asModifiersChain(chain: string): ModifiersChain {
+  // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- applying the brand is the one operation a nominal type cannot express without a cast; every producer routes through here so there is exactly one
+  return chain as ModifiersChain
+}
+
+/**
+ * Normalizes a modifiers string of any shape into a {@link ModifiersChain} — the
+ * string-level counterpart of `parseOperations`, and the way a value that did not
+ * come from `modifiers()` becomes a chain.
+ *
+ * The same leniency `parseOperations` grants, for the same reason: these values
+ * arrive from config, DOM attributes and stored `cdnUrlModifiers` alike, so the
+ * leading `-` marker, surrounding slashes, doubled slashes and surrounding
+ * whitespace are all tolerated. Operations within a chain still separate on `-`,
+ * which keeps `resize/300x/-/blur/10` unambiguous. Nothing is validated: a
+ * malformed chain is accepted, not diagnosed.
+ *
+ * @see https://uploadcare.com/docs/cdn-operations/
+ * @example
+ * ```ts
+ * normalizeModifiers('resize/100x') // → '-/resize/100x/'
+ * normalizeModifiers('/resize//100x/') // → '-/resize/100x/'
+ * normalizeModifiers('  -/resize/100x/  ') // → '-/resize/100x/'
+ * normalizeModifiers('resize/300x/-/blur/10') // → '-/resize/300x/-/blur/10/'
+ * normalizeModifiers('') // → ''
+ * ```
+ */
+export function normalizeModifiers(value: string): ModifiersChain {
+  // split/filter/join collapses runs of slashes and drops the ones at either end
+  // in one pass — the same shape as `segmentize` in parse.ts, no regex needed.
+  const chain = value
+    .trim()
+    .split('/')
+    .filter((segment) => segment !== '')
+    .join('/')
+  if (chain === '') return asModifiersChain('')
+  return asModifiersChain(chain.startsWith('-/') ? `${chain}/` : `-/${chain}/`)
 }

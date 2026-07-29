@@ -37,6 +37,7 @@ export default defineConfig({
             text: 'API styles & tree-shaking',
             link: '/guide/functional-vs-builder'
           },
+          { text: 'The string-level API', link: '/guide/string-level-api' },
           { text: 'Dev & production bundles', link: '/guide/bundles' }
         ]
       },

@@ -18,8 +18,13 @@ conventions in several ways — do not "fix" these divergences.
 - `tsconfig.json` sets `noUncheckedIndexedAccess: true` — indexed access is
   `T | undefined`. Guard it (`?.[i]`, `=== undefined` checks); do **not** reach
   for `as` casts — type-aware lint rejects unnecessary/unsafe assertions. The
-  only sanctioned `no-unsafe-type-assertion` disable is the single `Partial<S>`
-  cast in `fluent/chain-base.ts` (generic immutable-builder plumbing).
+  sanctioned `no-unsafe-type-assertion` disables are exactly three, each with its
+  reason in the comment: the `Partial<S>` cast in `fluent/chain-base.ts` (generic
+  immutable-builder plumbing), `unsafeOperation` in `literals.ts` (widening past the
+  union is the feature) and `asModifiersChain` in the same file (applying a brand
+  cannot be expressed without one — which is why every producer routes through that
+  single function instead of casting locally). Do not add a fourth without the same
+  kind of justification.
 - In markdown docs, never write bare array expression statements in code
   examples (`;[preview()]`) — oxfmt adds ASI-guard semicolons that look broken
   to readers. Assign to a `const` instead.
@@ -79,6 +84,78 @@ conventions in several ways — do not "fix" these divergences.
   (`video`/`document`/`gif2video`) emit a `.path` and `cdn.parse` only re-enters
   file/group/group-element/proxy urls, so `updateOperations` is their **only**
   edit path — don't remove it thinking the chain methods cover everything.
+- **`src/tiny/` holds the string-level API — `literals.ts` (the chain: `modifiers`,
+  `normalizeModifiers`, `joinModifiers`, the `ModifiersChain` brand) and
+  `url.ts` (`tinyParse`/`tinyBuild`/`TinyFileUrl`). One folder because they are one
+  story: the zero-machinery path for callers who cannot spend bytes. Both are
+  re-exported from the **root entry**, not a new entry point — per-symbol
+  tree-shaking already gives the saving.**
+- **Vocabulary, used consistently everywhere:** an _operation_ is one directive
+  (`resize/300x`, or `{ name, params }` as data); _modifiers_ are the whole
+  serialized run of them (`-/resize/300x/-/blur/10/`), which is the word Uploadcare's
+  own API uses (`cdnUrlModifiers`). So `modifiers()` takes operations and returns
+  modifiers, `parseOperations` goes the other way, and a `modifiers` field is always
+  the whole chain. Both guide pages define this; do not let a third word ("chain"
+  as a type name aside, "directives", "transformations") drift in as a synonym.
+- **`tiny/` is single-file urls only.** `TinyFileUrl` names it, the fields mirror
+  `ParsedFileUrl` (`origin`/`uuid`/`filename`/`search`/`hash`, with `modifiers`
+  standing in for `operations`), and everything but `origin`/`uuid` is optional so
+  `tinyBuild` builds from scratch. Groups, group elements and proxy urls round-trip
+  untouched but produce meaningless fields — documented, not guarded, because
+  guarding is what costs the bytes. **A conversion result is a file url too**
+  (`isFileUrl` returns true for `/:uuid/gif2video/…`) and its prefix lands in
+  `modifiers`, so replacing the chain drops the conversion; appending is safe.
+- **`tiny/` normalizes nothing on the way in, and the guide says so.** `origin` must
+  not end in a slash (`serializeFileUrl` trims, `tinyBuild` does not — it emits
+  `host//:uuid/`), `search`/`hash` carry their own `?`/`#`, and `tinyParse` on a
+  non-url returns nonsense fields rather than throwing. There is also no
+  `replace`/`without` at this level, so appending an operation the chain already has
+  leaves both occurrences (last one wins at the CDN). All five are tested in
+  `docs-string-level.test.ts` so the page cannot drift from them.
+- **A secure-delivery token is invalidated by _any_ edit, appending included.** An
+  earlier draft said appending was safe — true only for the conversion prefix.
+- **`tiny/url.ts` is string surgery, not a parser, and must stay that way.** `tinyParse`
+  cuts a url into `origin`/`uuid`/`modifiers`/`tail` and `tinyBuild` joins it back:
+  no grammar, no `CdnOperation`, no kinds, no throwing — and no chain handling
+  either: normalizing a loose modifiers string is `tiny/literals.ts`'s job, since the
+  chain is its domain object, not the url's. Same job in every bundle — parse a url,
+  append one operation, serialize — measured with esbuild `--minify` on the prod
+  flavor: `parseCdnUrl` 1326 B brotli, `parseFileUrl` 821 B, `tinyParse` + `modifiers`
+  362 B, `tinyParse` + `normalizeModifiers` 373 B, and `tinyParse` behind an
+  `isFileUrl` guard 890 B. These are the figures the string-level guide page
+  publishes; keep the two in step, and re-measure rather than copying them forward. The round-trip law holds for every url in
+  the corpus, **including** the ones whose fields it gets wrong — a group element
+  keeps `nth/2/` in `modifiers`, a proxy keeps its embedded source there and its
+  `uuid` is `-`. That is the ceiling: it exists for internal size-critical callers
+  that only append or clear modifiers. Do not teach it kinds, do not add
+  validation, and do not use it in public API.
+- **`ModifiersChain` is nominal, not a pattern type.** `string & { readonly
+[CHAIN]: true }`, branded through the one `asModifiersChain` entrance, so it is a
+  plain string at run time and free. A pattern type (`'' | `${string}/`) was tried
+  first and **rejected**: every string ending in a slash satisfied it, which is
+  barely a type. The brand states the invariant that matters — this string came out
+  of the chain machinery — so a hand-written `'-/resize/300x/'`, a stored
+  `'resize/300x'`, a stray `''` and a `` `${a}${b}` `` concatenation are all
+rejected. Producers: `modifiers()`(typed literals),`normalizeModifiers()`(a
+loose string of any shape: missing marker, doubled or edge slashes, surrounding
+whitespace — the same leniency`parseOperations`grants, normalized with`split('/').filter().join('/')`, one pass, no regex), `joinModifiers()`(append,
+since template concatenation widens back to`string`) and `tinyParse`. The empty
+chain is `modifiers()`, not `''`— that is the ergonomic price of nominality, paid
+on purpose. Verified to survive the emitted`.d.ts`: `declare const CHAIN: unique
+  symbol`lands in`dist/types`, and a consumer compiled against it still gets the
+rejections. Operation *names* remain `OperationLiteral`'s business; the brand says
+  where a chain came from, not that every directive in it is spelled right.
+- **A tagged-template writer (`` mods`resize/100x` ``) was built, measured and
+  removed. Do not reintroduce it.** TypeScript hands a tag function a
+  `TemplateStringsArray`, never the literal text
+  ([TS#33304](https://github.com/microsoft/TypeScript/issues/33304)) — measured
+  against five signature variants (`readonly [...S]`, `S`, `S & { raw }`,
+  `readonly [...S] & { raw }`, `readonly [S]`, with and without `const` type
+  parameters), every one widening to `readonly string[]`, `TemplateStringsArray` or
+  `string`. So a tag cannot validate `` mods`rezise/100` ``, and it duplicated
+  `modifiers()` while quietly dropping its checking. The checked way to interpolate
+  is a template literal in **argument** position — ``modifiers(`resize/${width}x`)``
+  — where the `OperationLiteral` parameter type applies contextually.
 - **There are two ways to write an operation, and the choice is about inputs.** The
   creators in `/ops` build `CdnOperation` objects and validate; `OperationLiteral` +
   `modifiers()` in `literals.ts` are typed strings with no runtime machinery at all
@@ -166,7 +243,23 @@ conventions in several ways — do not "fix" these divergences.
   legacy; never cite it.
 - Secure-delivery tokens (`?token=…`) are preserved through parse/serialize
   but never generated here; editing operations invalidates an existing
-  signature.
+  signature. The string-level guide states this as a hazard, not a feature — reader
+  testing caught it framed as "the token rides along untouched", which reads as
+  reassurance that signed delivery keeps working.
+- **`normalizeModifiers` collapses runs of slashes, which destroys an embedded URL**:
+  `'preview/https://example.com/'` → `'-/preview/https:/example.com/'`. That is
+  exactly what `tinyParse` puts in `modifiers` for a proxy url, so normalizing the
+  output of `tinyParse` on an unknown-kind url corrupts it. Documented and tested,
+  not fixed: collapsing is what makes the lenient shapes work, and the alternative is
+  teaching the normalizer about proxy urls, which is the machinery `tiny/` exists to
+  avoid.
+- **The string level only pays off when the caller already knows the url's kind.**
+  Guarding an unknown url with `isFileUrl` measures **890 B** brotli against **821 B**
+  for `parseFileUrl` + `serializeFileUrl` — the guarded string-level path is _larger_
+  than the real parser, which also validates. The unguarded path is 362 B. So any
+  advice to use `tinyParse` on urls of mixed kind is wrong twice over, and the guide
+  leads with that. Re-measure when `tiny/` changes: splitting `search`/`hash` out of
+  the old `tail` field cost 77 B on its own.
 
 ## Testing & verification
 
@@ -204,7 +297,13 @@ npm run docs:api         # typedoc — FAILS on any undocumented public symbol
   (`npx vitepress build docs`), not from inside `docs/`.
 - Docs pages are reader-tested: when adding substantial pages, verify them
   with a fresh-context agent answering realistic questions from the prose
-  alone.
+  alone. Constrain that agent to the single page — it must not read the source,
+  or it answers from the code and proves nothing about the prose.
+- **Page snippets are executed, not trusted.** `docs-cookbook.test.ts`,
+  `docs-how-to.test.ts` and `docs-string-level.test.ts` mirror the snippets from
+  their pages verbatim, so a page cannot claim an output the code does not produce.
+  Tables of behaviour count too: the url-kind table on the string-level page has one
+  test per row. Add to these when you add a page with runnable examples.
 
 ## Monorepo integration
 

@@ -1,6 +1,6 @@
 {
   "name": "@uploadcare/cdn-url",
-  "version": "6.20.0-alpha.0",
+  "version": "6.20.0-alpha.4",
   "description": "Build and parse Uploadcare CDN URLs: transformations, groups, proxy, video/document conversions. Typed, atomic, tree-shakeable.",
   "type": "module",
   "main": "./dist/prod/index.cjs",
@@ -136,6 +136,19 @@
       },
       "import": "./dist/prod/validate.js",
       "require": "./dist/prod/validate.cjs"
+    },
+    "./tiny": {
+      "types": "./dist/types/tiny.d.ts",
+      "development": {
+        "import": "./dist/dev/tiny.js",
+        "require": "./dist/dev/tiny.cjs"
+      },
+      "production": {
+        "import": "./dist/prod/tiny.js",
+        "require": "./dist/prod/tiny.cjs"
+      },
+      "import": "./dist/prod/tiny.js",
+      "require": "./dist/prod/tiny.cjs"
     }
   },
   "sideEffects": false,

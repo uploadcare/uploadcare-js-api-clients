@@ -99,6 +99,7 @@ The package is split into atomic entry points, so you import only what you use:
 | `@uploadcare/cdn-url/gif2video` | animated image → video URLs                                                                                 |
 | `@uploadcare/cdn-url/builder`   | chainable `CdnUrl` facade                                                                                   |
 | `@uploadcare/cdn-url/validate`  | cross-operation chain diagnostics, plus the rule sets behind them                                           |
+| `@uploadcare/cdn-url/tiny`      | [string-level](/guide/string-level-api) file-URL split/join and typed modifier literals, no runtime checks  |
 
 ## Prefer one import for everything?
 
@@ -116,6 +117,7 @@ See [Functional core vs builder vs fluent](/guide/functional-vs-builder).
 
 - [CDN URL anatomy](/guide/url-anatomy): how the URLs are structured and what the parser gives you
 - [Render stored URLs](/how-to/render-stored-urls): the most common real-world task
-- [Functional core vs builder](/guide/functional-vs-builder): two API styles, and when to use which
+- [Functional core vs builder](/guide/functional-vs-builder): the API styles, and when to use which
+- [The string-level API](/guide/string-level-api): when a size budget decides the design
 - [Dev & production bundles](/guide/bundles): what throws where, and why production is silent
 - [API Reference](/reference/): every function, with examples

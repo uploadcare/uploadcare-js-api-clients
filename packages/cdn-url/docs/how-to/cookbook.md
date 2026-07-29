@@ -2,17 +2,20 @@
 
 Task-shaped index. Find what you're trying to do, take the snippet. The other how-to pages go deep on one topic; this one goes wide across tasks.
 
-Every recipe is shown in all three API styles. Pick a tab and stay in it.
+Every recipe is shown in all three API styles. Pick a tab and stay in it. A fourth style, [the string level](/guide/string-level-api), trades the operation model for bytes; it gets one recipe of its own rather than a tab, since it only handles single-file URLs.
 
 ## Before you start
 
 **The three styles do the same work at different prices.** Every operation creator is an independent atom and every entry point is separate, so a bundler drops whatever you don't name:
 
-| tab         | what you import                  | gzipped |
-| ----------- | -------------------------------- | ------- |
-| **Atomic**  | functional core + one op creator | 1311 B  |
-| **Builder** | `CdnUrl` + one op creator        | 1888 B  |
-| **Fluent**  | the `cdn` object                 | 4129 B  |
+| tab            | what you import                   | gzipped |
+| -------------- | --------------------------------- | ------- |
+| _string level_ | `tinyParse`/`tinyBuild` + a chain | 419 B   |
+| **Atomic**     | functional core + one op creator  | 1487 B  |
+| **Builder**    | `CdnUrl` + one op creator         | 2041 B  |
+| **Fluent**     | the `cdn` object                  | 4967 B  |
+
+Measured on one task — parse a URL, add one operation, serialize.
 
 Atomic is the smallest and the most explicit. Builder wraps one URL in an immutable class. Fluent puts every URL flavor behind one chainable object, and it is the only style that turns an invalid combination into a compile error: `cdn.video(uuid).blur(10)` does not typecheck, because video chains carry no image methods. [API styles & tree-shaking](/guide/functional-vs-builder) compares them properly.
 
@@ -391,6 +394,28 @@ Conversion chains also can't be re-parsed: `parseCdnUrl` and `cdn.parse` only re
 
 Match with `operationMatches`, never `op.name === 'size'`. Counted operations fuse the count into the name: `thumbs(5)` is literally called `thumbs~5`, so a string comparison against `'thumbs'` never fires.
 
+### I want the smallest possible bundle
+
+When a size budget decides the design and the URL is a single file you already know the shape of, skip the operation model: edit the chain as a string.
+
+```ts
+import {
+  joinModifiers,
+  modifiers,
+  tinyBuild,
+  tinyParse
+} from '@uploadcare/cdn-url/tiny'
+
+const parts = tinyParse(stored)
+const url = tinyBuild({
+  ...parts,
+  modifiers: joinModifiers(parts.modifiers, modifiers('blur/10'))
+})
+// → https://ucarecdn.com/<uuid>/-/resize/300x/-/quality/smart/-/blur/10/
+```
+
+419 B gzipped against 1487 B for the Atomic tab. The operations stay type-checked, but nothing is validated at run time, there are no kinds, and it is **file URLs only** — replacing the chain on a group element or a conversion result destroys the URL. Read [The string-level API](/guide/string-level-api) before using it; it is the one style that can hand you a broken URL without an error.
+
 ## Understanding a chain
 
 These read a chain rather than build one, so they are the same in every style.
@@ -495,5 +520,6 @@ The editing recipes above are the full treatment; there's no deeper page for the
 | address group files, build a zip | [Groups & archives](/how-to/groups-and-archives)           |
 | convert video or documents       | [Video & documents](/how-to/video-and-documents)           |
 | vet user-supplied modifiers      | [Validate user input](/how-to/validate-user-input)         |
-| choose between the three styles  | [API styles & tree-shaking](/guide/functional-vs-builder)  |
+| choose between the four styles   | [API styles & tree-shaking](/guide/functional-vs-builder)  |
+| edit URLs on a byte budget       | [The string-level API](/guide/string-level-api)            |
 | use it without a bundler         | [Getting started](/guide/getting-started)                  |
