@@ -79,6 +79,19 @@ conventions in several ways — do not "fix" these divergences.
   (`video`/`document`/`gif2video`) emit a `.path` and `cdn.parse` only re-enters
   file/group/group-element/proxy urls, so `updateOperations` is their **only**
   edit path — don't remove it thinking the chain methods cover everything.
+- **There are two ways to write an operation, and the choice is about inputs.** The
+  creators in `/ops` build `CdnOperation` objects and validate; `OperationLiteral` +
+  `modifiers()` in `literals.ts` are typed strings with no runtime machinery at all
+  (852 → 254 B brotli measured over twenty operations, byte-identical output). Use
+  the **creators** when a value comes from user input or arithmetic, because their
+  range checks — dev-only, but that is where you want them — are the only thing
+  standing between a bad number and a broken URL. Use the **literals** when the
+  caller authors the operation itself and only needs the chain. Do not add a third
+  way. `OperationLiteral` reuses the creators' own enum types (`Format`, `Quality`,
+  `FilterName`, …) so the two cannot disagree about an enum, and
+  `literals.test.ts` fails if the library gains an operation the union has not caught
+  up with — the fixture there is type-checked against the union and runtime-checked
+  against every creator's `opName`.
 - **Operation creators are strict** (ranges/enums/grammar), wrapped in
   `namedOp('cdn_name', fn)` so the creator itself works as an `OperationRef`
   (`url.without(resize)`). Aliased creators map to their real directive:

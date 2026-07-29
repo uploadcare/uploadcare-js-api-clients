@@ -17,6 +17,12 @@ export {
   serializeOperations,
   serializeProxyUrl
 } from './serialize'
+export {
+  type CropAlignment,
+  modifiers,
+  type OperationLiteral,
+  unsafeOperation
+} from './literals'
 export { detectDomainKind, isUploadcareDomain } from './domain'
 export {
   type NamedOperationCreator,
