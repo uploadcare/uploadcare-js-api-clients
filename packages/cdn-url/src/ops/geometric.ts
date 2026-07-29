@@ -14,7 +14,7 @@ import {
   sizeValue
 } from '../grammar'
 import type { CdnOperation } from '../types'
-import { createOp } from './create-op'
+import { rawOp } from './raw-op'
 
 /**
  * Downscales an image proportionally to fit the given dimensions
@@ -31,11 +31,11 @@ import { createOp } from './create-op'
 export const preview = /* @__PURE__ */ namedOp(
   'preview',
   function preview(width?: number, height?: number): CdnOperation {
-    if (width == null && height == null) return createOp('preview')
+    if (width == null && height == null) return rawOp('preview')
     if (__DEV__ && (width == null || height == null)) {
       throw new TypeError('preview requires either no dimensions or both')
     }
-    return createOp('preview', dimensions(width, height, 'preview'))
+    return rawOp('preview', dimensions(width, height, 'preview'))
   }
 )
 
@@ -52,7 +52,7 @@ export const preview = /* @__PURE__ */ namedOp(
 export const resize = /* @__PURE__ */ namedOp(
   'resize',
   function resize(dims: { width?: number; height?: number }): CdnOperation {
-    return createOp('resize', dimensions(dims.width, dims.height, 'resize'))
+    return rawOp('resize', dimensions(dims.width, dims.height, 'resize'))
   }
 )
 
@@ -69,7 +69,7 @@ export const resize = /* @__PURE__ */ namedOp(
 export const smartResize = /* @__PURE__ */ namedOp(
   'smart_resize',
   function smartResize(width: number, height: number): CdnOperation {
-    return createOp('smart_resize', dimensions(width, height, 'smart_resize'))
+    return rawOp('smart_resize', dimensions(width, height, 'smart_resize'))
   }
 )
 
@@ -92,7 +92,7 @@ export const stretch = /* @__PURE__ */ namedOp(
   'stretch',
   function stretch(mode: StretchMode): CdnOperation {
     assertOneOf(mode, STRETCH_MODES, 'stretch mode')
-    return createOp('stretch', mode)
+    return rawOp('stretch', mode)
   }
 )
 
@@ -115,8 +115,8 @@ export const crop = /* @__PURE__ */ namedOp(
   ): CdnOperation {
     const dims = dimensions(width, height, 'crop')
     return align == null
-      ? createOp('crop', dims)
-      : createOp('crop', dims, alignment(align, 'crop alignment'))
+      ? rawOp('crop', dims)
+      : rawOp('crop', dims, alignment(align, 'crop alignment'))
   }
 )
 
@@ -138,8 +138,8 @@ export const cropByRatio = /* @__PURE__ */ namedOp(
       throw new RangeError(`Invalid crop ratio: "${ratio}" (expected "N:M")`)
     }
     return align == null
-      ? createOp('crop', ratio)
-      : createOp('crop', ratio, alignment(align, 'crop alignment'))
+      ? rawOp('crop', ratio)
+      : rawOp('crop', ratio, alignment(align, 'crop alignment'))
   }
 )
 
@@ -182,7 +182,7 @@ export const cropByTag = /* @__PURE__ */ namedOp(
     }
     if (options.align != null)
       params.push(alignment(options.align, 'crop alignment'))
-    return createOp('crop', ...params)
+    return rawOp('crop', ...params)
   }
 )
 
@@ -226,7 +226,7 @@ export const scaleCrop = /* @__PURE__ */ namedOp(
     }
     if (options.align != null)
       params.push(alignment(options.align, 'scale_crop alignment'))
-    return createOp('scale_crop', ...params)
+    return rawOp('scale_crop', ...params)
   }
 )
 
@@ -257,7 +257,7 @@ export const borderRadius = /* @__PURE__ */ namedOp(
     const params = [radiiList(radii, 'border_radius')]
     if (verticalRadii != null)
       params.push(radiiList(verticalRadii, 'border_radius vertical'))
-    return createOp('border_radius', ...params)
+    return rawOp('border_radius', ...params)
   }
 )
 
@@ -274,7 +274,7 @@ export const borderRadius = /* @__PURE__ */ namedOp(
 export const setfill = /* @__PURE__ */ namedOp(
   'setfill',
   function setfill(fill: string): CdnOperation {
-    return createOp('setfill', color(fill, 'setfill color'))
+    return rawOp('setfill', color(fill, 'setfill color'))
   }
 )
 
@@ -292,7 +292,7 @@ export const zoomObjects = /* @__PURE__ */ namedOp(
   'zoom_objects',
   function zoomObjects(zoom: number): CdnOperation {
     assertIntInRange(zoom, 1, 100, 'zoom_objects')
-    return createOp('zoom_objects', String(zoom))
+    return rawOp('zoom_objects', String(zoom))
   }
 )
 
@@ -308,7 +308,7 @@ export const zoomObjects = /* @__PURE__ */ namedOp(
 export const autorotate = /* @__PURE__ */ namedOp(
   'autorotate',
   function autorotate(enabled: boolean): CdnOperation {
-    return createOp('autorotate', enabled ? 'yes' : 'no')
+    return rawOp('autorotate', enabled ? 'yes' : 'no')
   }
 )
 
@@ -329,7 +329,7 @@ export const rotate = /* @__PURE__ */ namedOp(
         `rotate angle must be a multiple of 90, got ${angle}`
       )
     }
-    return createOp('rotate', String(angle))
+    return rawOp('rotate', String(angle))
   }
 )
 
@@ -345,7 +345,7 @@ export const rotate = /* @__PURE__ */ namedOp(
 export const flip = /* @__PURE__ */ namedOp(
   'flip',
   function flip(): CdnOperation {
-    return createOp('flip')
+    return rawOp('flip')
   }
 )
 
@@ -361,6 +361,6 @@ export const flip = /* @__PURE__ */ namedOp(
 export const mirror = /* @__PURE__ */ namedOp(
   'mirror',
   function mirror(): CdnOperation {
-    return createOp('mirror')
+    return rawOp('mirror')
   }
 )

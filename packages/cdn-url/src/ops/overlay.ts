@@ -13,7 +13,7 @@ import {
   sizeValue
 } from '../grammar'
 import type { CdnOperation } from '../types'
-import { createOp } from './create-op'
+import { rawOp } from './raw-op'
 
 /** A point given as an alignment keyword, offsets object or `[x, y]` pair. */
 export type RelativePoint = Alignment | [SizeValue, SizeValue]
@@ -75,7 +75,7 @@ export const overlay = /* @__PURE__ */ namedOp(
     if (position != null)
       params.push(relativePoint(position, 'overlay position'))
     if (opacity != null) params.push(sizeValue(opacity, 'overlay opacity'))
-    return createOp('overlay', ...params)
+    return rawOp('overlay', ...params)
   }
 )
 
@@ -95,7 +95,7 @@ export const rect = /* @__PURE__ */ namedOp(
     size: [SizeValue, SizeValue],
     position: RelativePoint
   ): CdnOperation {
-    return createOp(
+    return rawOp(
       'rect',
       color(fill, 'rect color'),
       dimensions(size[0], size[1], 'rect size'),
@@ -129,7 +129,7 @@ export const text = /* @__PURE__ */ namedOp(
     position: RelativePoint,
     value: string
   ): CdnOperation {
-    return createOp(
+    return rawOp(
       'text',
       dimensions(size[0], size[1], 'text size'),
       relativePoint(position, 'text position'),
@@ -158,7 +158,7 @@ export const textAlign = /* @__PURE__ */ namedOp(
   function textAlign(halign: TextHAlign, valign: TextVAlign): CdnOperation {
     assertOneOf(halign, ['left', 'right', 'center'] as const, 'text halign')
     assertOneOf(valign, ['top', 'bottom', 'center'] as const, 'text valign')
-    return createOp('text_align', halign, valign)
+    return rawOp('text_align', halign, valign)
   }
 )
 
@@ -179,8 +179,8 @@ export const font = /* @__PURE__ */ namedOp(
       throw new RangeError(`font size must be a positive integer, got ${size}`)
     }
     return fill == null
-      ? createOp('font', String(size))
-      : createOp('font', String(size), color(fill, 'font color'))
+      ? rawOp('font', String(size))
+      : rawOp('font', String(size), color(fill, 'font color'))
   }
 )
 
@@ -216,6 +216,6 @@ export const textBox = /* @__PURE__ */ namedOp(
       }
       params.push(String(padding))
     }
-    return createOp('text_box', ...params)
+    return rawOp('text_box', ...params)
   }
 )

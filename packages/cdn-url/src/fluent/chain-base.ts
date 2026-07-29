@@ -1,4 +1,10 @@
-import { type OperationRef, operationMatches } from '../operation-ref'
+import {
+  type OperationRef,
+  operationMatches,
+  replaceEveryMatch,
+  replaceFirstMatch,
+  updatedOperations
+} from '../operation-ref'
 import type { CdnOperation } from '../types'
 
 /** @internal */
@@ -82,17 +88,8 @@ export abstract class Chain<S extends ChainState> {
   public updateOperations(
     update: (current: CdnOperation[]) => CdnOperation[]
   ): this {
-    const next = update([...this._s.operations])
-    // A block-bodied callback with no `return` would otherwise fork a chain
-    // whose operations are undefined — corrupt rather than merely empty.
-    if (!Array.isArray(next)) {
-      if (__DEV__) {
-        throw new TypeError(
-          'updateOperations callback must return an operations array'
-        )
-      }
-      return this
-    }
+    const next = updatedOperations(this._s.operations, update)
+    if (next === null) return this
     return this._withOperations(next)
   }
 
@@ -144,12 +141,9 @@ export abstract class Chain<S extends ChainState> {
    * ```
    */
   public replaceOp(operation: CdnOperation): this {
-    const current = this._s.operations
-    const index = current.findIndex((op) => operationMatches(op, operation))
-    if (index === -1) return this._add(operation)
-    const next = [...current]
-    next[index] = operation
-    return this._withOperations(next)
+    return this._withOperations(
+      replaceFirstMatch(this._s.operations, operation)
+    )
   }
 
   /**
@@ -162,13 +156,8 @@ export abstract class Chain<S extends ChainState> {
    * ```
    */
   public replaceAllOps(operation: CdnOperation): this {
-    const current = this._s.operations
-    const index = current.findIndex((op) => operationMatches(op, operation))
-    if (index === -1) return this._add(operation)
     return this._withOperations(
-      current.flatMap((op, i) =>
-        i === index ? [operation] : operationMatches(op, operation) ? [] : [op]
-      )
+      replaceEveryMatch(this._s.operations, operation)
     )
   }
 

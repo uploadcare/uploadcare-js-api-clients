@@ -6,7 +6,7 @@
 import { assertIntInRange, assertOneOf } from '../grammar'
 import { namedOp } from '../operation-ref'
 import type { CdnOperation } from '../types'
-import { createOp } from '../ops/create-op'
+import { rawOp } from '../ops/raw-op'
 
 /** Resize modes accepted by {@link size}. */
 export const VIDEO_RESIZE_MODES = [
@@ -54,9 +54,9 @@ export const size = /* @__PURE__ */ namedOp(
       }
     }
     const dims = `${width ?? ''}x${height ?? ''}`
-    if (mode == null) return createOp('size', dims)
+    if (mode == null) return rawOp('size', dims)
     assertOneOf(mode, VIDEO_RESIZE_MODES, 'video resize mode')
-    return createOp('size', dims, mode)
+    return rawOp('size', dims, mode)
   }
 )
 
@@ -84,7 +84,7 @@ export const quality = /* @__PURE__ */ namedOp(
   'quality',
   function quality(value: VideoQuality): CdnOperation {
     assertOneOf(value, VIDEO_QUALITIES, 'video quality')
-    return createOp('quality', value)
+    return rawOp('quality', value)
   }
 )
 
@@ -106,7 +106,7 @@ export const format = /* @__PURE__ */ namedOp(
   'format',
   function format(value: VideoFormat): CdnOperation {
     assertOneOf(value, VIDEO_FORMATS, 'video format')
-    return createOp('format', value)
+    return rawOp('format', value)
   }
 )
 
@@ -132,7 +132,7 @@ export const cut = /* @__PURE__ */ namedOp(
     if (__DEV__ && length !== 'end' && !TIME_RE.test(length)) {
       throw new RangeError(`Invalid cut length: "${length}"`)
     }
-    return createOp('cut', startTime, length)
+    return rawOp('cut', startTime, length)
   }
 )
 
@@ -154,7 +154,7 @@ export const thumbs = /* @__PURE__ */ namedOp(
   ): CdnOperation {
     assertIntInRange(count, 1, 50, 'thumbs count')
     return options.fromFirstFrame
-      ? createOp(`thumbs~${count}`, 'yes')
-      : createOp(`thumbs~${count}`)
+      ? rawOp(`thumbs~${count}`, 'yes')
+      : rawOp(`thumbs~${count}`)
   }
 )

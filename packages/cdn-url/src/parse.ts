@@ -225,12 +225,13 @@ export function parseCdnUrl(url: string): ParsedCdnUrl {
 
   if (embeddedSourceOf(pathname) !== null) return parseProxyUrl(url)
 
-  const head = segmentize(pathname)[0]
+  const segments = segmentize(pathname)
+  const head = segments[0]
   if (head === undefined) {
     throw new TypeError(`Not a CDN URL (empty path): "${url}"`)
   }
   if (matchGroupId(head) !== null) {
-    return segmentize(pathname)[1] === 'nth'
+    return segments[1] === 'nth'
       ? parseGroupElementUrl(url)
       : parseGroupUrl(url)
   }

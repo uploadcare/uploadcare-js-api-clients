@@ -76,18 +76,12 @@ export const OPERATION_MODIFIERS: ReadonlyMap<
   ['scale_crop', new Set(['stretch'])]
 ])
 
-/** Reverse index: modifier name → the targets it can configure. */
-const MODIFIER_TARGETS: ReadonlyMap<string, ReadonlySet<string>> = (() => {
-  const reversed = new Map<string, Set<string>>()
-  for (const [target, modifiers] of OPERATION_MODIFIERS) {
-    for (const modifier of modifiers) {
-      const targets = reversed.get(modifier) ?? new Set<string>()
-      targets.add(target)
-      reversed.set(modifier, targets)
-    }
-  }
-  return reversed
-})()
+/** The targets a modifier name can configure — {@link OPERATION_MODIFIERS} read backwards. */
+function modifierTargets(modifier: string): string[] {
+  return [...OPERATION_MODIFIERS]
+    .filter(([, modifiers]) => modifiers.has(modifier))
+    .map(([target]) => target)
+}
 
 /**
  * Whether an operation is state for a later one, rather than an effect in its
@@ -102,18 +96,30 @@ const MODIFIER_TARGETS: ReadonlyMap<string, ReadonlySet<string>> = (() => {
  * ```
  */
 export function isOperationModifier(ref: OperationRef): boolean {
-  return MODIFIER_TARGETS.has(operationBaseName(ref))
+  return modifierTargets(operationBaseName(ref)).length > 0
 }
 
-/** Core operations whose output dimensions the `format/jpeg` ceiling applies to. */
-const CEILING_TARGETS = new Set([
+/**
+ * Operations that make the CDN actually process an image. A chain without one
+ * of these delivers the original file untouched — and they are exactly the
+ * operations the `format/jpeg` dimension ceiling applies to, which is why the
+ * set lives here and `validateOperations` re-exports it.
+ *
+ * @see https://uploadcare.com/docs/transformations/image/
+ * @example
+ * ```ts
+ * CORE_OPERATIONS.has('scale_crop') // → true
+ * ```
+ */
+export const CORE_OPERATIONS: ReadonlySet<string> = new Set([
   'preview',
   'resize',
   'smart_resize',
   'scale_crop'
 ])
 
-function isJpegFormat(op: CdnOperation): boolean {
+/** Whether the operation is the `format/jpeg` directive that raises the ceiling. @internal */
+export function isJpegFormat(op: CdnOperation): boolean {
   return op.name === 'format' && op.params[0] === 'jpeg'
 }
 
@@ -161,7 +167,7 @@ function inputsAt(
     dependencies.sort((a, b) => a.index - b.index)
   }
 
-  if (CEILING_TARGETS.has(targetName)) {
+  if (CORE_OPERATIONS.has(targetName)) {
     const i = operations.findIndex(isJpegFormat)
     const ceiling = operations[i]
     if (ceiling !== undefined) {
@@ -199,14 +205,14 @@ function dependentsAt(
   const sourceName = operationBaseName(source)
   const dependents: OperationDependency[] = []
 
-  const targets = MODIFIER_TARGETS.get(sourceName)
-  if (targets !== undefined) {
+  const targets = modifierTargets(sourceName)
+  if (targets.length > 0) {
     for (let i = index + 1; i < operations.length; i++) {
       const candidate = operations[i]
       if (candidate === undefined) continue
       const name = operationBaseName(candidate)
       if (name === sourceName) break
-      if (!targets.has(name)) continue
+      if (!targets.includes(name)) continue
       dependents.push({
         kind: 'modifier',
         operation: candidate,
@@ -218,7 +224,7 @@ function dependentsAt(
 
   if (isJpegFormat(source)) {
     operations.forEach((candidate, i) => {
-      if (!CEILING_TARGETS.has(operationBaseName(candidate))) return
+      if (!CORE_OPERATIONS.has(operationBaseName(candidate))) return
       dependents.push({
         kind: 'ceiling',
         operation: candidate,

@@ -6,7 +6,7 @@
 import { assertOneOf } from '../grammar'
 import { namedOp } from '../operation-ref'
 import type { CdnOperation } from '../types'
-import { createOp } from '../ops/create-op'
+import { rawOp } from '../ops/raw-op'
 
 /** Output formats accepted by {@link format}. */
 export const GIF2VIDEO_FORMATS = ['mp4', 'webm'] as const
@@ -27,7 +27,7 @@ export const format = /* @__PURE__ */ namedOp(
   'format',
   function format(value: Gif2VideoFormat): CdnOperation {
     assertOneOf(value, GIF2VIDEO_FORMATS, 'gif2video format')
-    return createOp('format', value)
+    return rawOp('format', value)
   }
 )
 
@@ -58,6 +58,6 @@ export const quality = /* @__PURE__ */ namedOp(
   'quality',
   function quality(value: Gif2VideoQuality): CdnOperation {
     assertOneOf(value, GIF2VIDEO_QUALITIES, 'gif2video quality')
-    return createOp('quality', value)
+    return rawOp('quality', value)
   }
 )

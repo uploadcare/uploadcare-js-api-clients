@@ -14,7 +14,7 @@ import type {
  *
  * The creators in `/ops` build `CdnOperation` objects and validate their inputs.
  * That validation is `__DEV__`-only, so a production bundle carries the creator
- * machinery — `createOp`, the `namedOp` wrapper that makes a creator usable as an
+ * machinery — `rawOp`, the `namedOp` wrapper that makes a creator usable as an
  * `OperationRef`, the `dimensions`/`alignment` grammar helpers — without any of the
  * checks. For a caller that never inspects an operation and never uses
  * `without(resize)`, that machinery is pure weight.

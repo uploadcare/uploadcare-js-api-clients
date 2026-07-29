@@ -1,5 +1,11 @@
 import { trimTrailingSlashes } from '../grammar'
-import { type OperationRef, operationMatches } from '../operation-ref'
+import {
+  type OperationRef,
+  operationMatches,
+  replaceEveryMatch,
+  replaceFirstMatch,
+  updatedOperations
+} from '../operation-ref'
 import { parseCdnUrl } from '../parse'
 import { serializeCdnUrl } from '../serialize'
 import type { CdnOperation, CdnUrlInput, ParsedCdnUrl } from '../types'
@@ -134,13 +140,9 @@ export class CdnUrl {
    * ```
    */
   public replace(operation: CdnOperation): CdnUrl {
-    return this.#withOperations((current) => {
-      const index = current.findIndex((op) => operationMatches(op, operation))
-      if (index === -1) return [...current, operation]
-      const next = [...current]
-      next[index] = operation
-      return next
-    })
+    return this.#withOperations((current) =>
+      replaceFirstMatch(current, operation)
+    )
   }
 
   /**
@@ -155,13 +157,9 @@ export class CdnUrl {
    * ```
    */
   public replaceAll(operation: CdnOperation): CdnUrl {
-    return this.#withOperations((current) => {
-      const index = current.findIndex((op) => operationMatches(op, operation))
-      if (index === -1) return [...current, operation]
-      return current.flatMap((op, i) =>
-        i === index ? [operation] : operationMatches(op, operation) ? [] : [op]
-      )
-    })
+    return this.#withOperations((current) =>
+      replaceEveryMatch(current, operation)
+    )
   }
 
   /** Whether a matching operation is present (name, object or creator ref). */
@@ -241,17 +239,8 @@ export class CdnUrl {
       }
       return this
     }
-    const next = update([...this.#parsed.operations])
-    // A block-bodied callback with no `return` would otherwise build a CdnUrl
-    // whose `operations` is undefined — corrupt rather than merely empty.
-    if (!Array.isArray(next)) {
-      if (__DEV__) {
-        throw new TypeError(
-          'updateOperations callback must return an operations array'
-        )
-      }
-      return this
-    }
+    const next = updatedOperations(this.#parsed.operations, update)
+    if (next === null) return this
     return new CdnUrl({ ...this.#parsed, operations: next })
   }
 }

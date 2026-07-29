@@ -6,7 +6,7 @@
 import { assertOneOf } from '../grammar'
 import { namedOp } from '../operation-ref'
 import type { CdnOperation } from '../types'
-import { createOp } from './create-op'
+import { rawOp } from './raw-op'
 
 /** Output formats accepted by {@link format}. */
 export const FORMATS = ['jpeg', 'png', 'webp', 'auto', 'preserve'] as const
@@ -27,7 +27,7 @@ export const format = /* @__PURE__ */ namedOp(
   'format',
   function format(value: Format): CdnOperation {
     assertOneOf(value, FORMATS, 'format')
-    return createOp('format', value)
+    return rawOp('format', value)
   }
 )
 
@@ -57,7 +57,7 @@ export const quality = /* @__PURE__ */ namedOp(
   'quality',
   function quality(value: Quality): CdnOperation {
     assertOneOf(value, QUALITIES, 'quality')
-    return createOp('quality', value)
+    return rawOp('quality', value)
   }
 )
 
@@ -73,7 +73,7 @@ export const quality = /* @__PURE__ */ namedOp(
 export const progressive = /* @__PURE__ */ namedOp(
   'progressive',
   function progressive(enabled: boolean): CdnOperation {
-    return createOp('progressive', enabled ? 'yes' : 'no')
+    return rawOp('progressive', enabled ? 'yes' : 'no')
   }
 )
 
@@ -95,7 +95,7 @@ export const stripMeta = /* @__PURE__ */ namedOp(
   'strip_meta',
   function stripMeta(mode: StripMetaMode): CdnOperation {
     assertOneOf(mode, STRIP_META_MODES, 'strip_meta mode')
-    return createOp('strip_meta', mode)
+    return rawOp('strip_meta', mode)
   }
 )
 
@@ -111,7 +111,7 @@ export const stripMeta = /* @__PURE__ */ namedOp(
 export const inline = /* @__PURE__ */ namedOp(
   'inline',
   function inline(enabled: boolean): CdnOperation {
-    return createOp('inline', enabled ? 'yes' : 'no')
+    return rawOp('inline', enabled ? 'yes' : 'no')
   }
 )
 
@@ -127,6 +127,6 @@ export const inline = /* @__PURE__ */ namedOp(
 export const rasterize = /* @__PURE__ */ namedOp(
   'rasterize',
   function rasterize(): CdnOperation {
-    return createOp('rasterize')
+    return rawOp('rasterize')
   }
 )

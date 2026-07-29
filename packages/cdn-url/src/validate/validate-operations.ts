@@ -4,8 +4,17 @@
  * diagnostics so callers decide what to do with them.
  */
 import { type OperationRef, operationBaseName } from '../operation-ref'
-import { isOperationModifier, operationGraph } from './dependencies'
+import {
+  CORE_OPERATIONS,
+  isJpegFormat,
+  isOperationModifier,
+  operationGraph
+} from './dependencies'
 import type { CdnOperation, ConversionKind } from '../types'
+
+// Re-exported rather than redeclared: the ceiling model in `dependencies` needs
+// the same set, and two lists of the same four names would drift.
+export { CORE_OPERATIONS } from './dependencies'
 
 /** How serious a {@link Diagnostic} is. */
 export type DiagnosticSeverity = 'error' | 'warning' | 'info'
@@ -27,23 +36,6 @@ export type ValidationContext = {
   /** Apply conversion-path rules (`video` etc.) instead of image rules. */
   conversion?: ConversionKind
 }
-
-/**
- * Operations that make the CDN actually process an image. A chain without one
- * of these delivers the original file untouched.
- *
- * @see https://uploadcare.com/docs/transformations/image/
- * @example
- * ```ts
- * CORE_OPERATIONS.has('scale_crop') // → true
- * ```
- */
-export const CORE_OPERATIONS: ReadonlySet<string> = new Set([
-  'preview',
-  'resize',
-  'smart_resize',
-  'scale_crop'
-])
 
 /**
  * Info-returning operations: a chain built only from these needs no core
@@ -309,9 +301,7 @@ function validateImage(operations: readonly CdnOperation[]): Diagnostic[] {
 
   const maxDim = maxOutputDimension(operations)
   if (maxDim != null) {
-    const isJpeg = operations.some(
-      (op) => op.name === 'format' && op.params[0] === 'jpeg'
-    )
+    const isJpeg = operations.some(isJpegFormat)
     const limit = isJpeg ? 5000 : 3000
     if (maxDim > limit) {
       diagnostics.push({

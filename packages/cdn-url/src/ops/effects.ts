@@ -12,7 +12,7 @@ import {
   sizeValue
 } from '../grammar'
 import type { CdnOperation } from '../types'
-import { createOp } from './create-op'
+import { rawOp } from './raw-op'
 
 function adjustment(
   name: string,
@@ -21,7 +21,7 @@ function adjustment(
   max: number
 ): CdnOperation {
   assertIntInRange(value, min, max, name)
-  return createOp(name, String(value))
+  return rawOp(name, String(value))
 }
 
 /**
@@ -134,9 +134,9 @@ export const warmth = /* @__PURE__ */ namedOp(
 export const enhance = /* @__PURE__ */ namedOp(
   'enhance',
   function enhance(strength?: number): CdnOperation {
-    if (strength == null) return createOp('enhance')
+    if (strength == null) return rawOp('enhance')
     assertIntInRange(strength, 0, 100, 'enhance strength')
-    return createOp('enhance', String(strength))
+    return rawOp('enhance', String(strength))
   }
 )
 
@@ -152,7 +152,7 @@ export const enhance = /* @__PURE__ */ namedOp(
 export const grayscale = /* @__PURE__ */ namedOp(
   'grayscale',
   function grayscale(): CdnOperation {
-    return createOp('grayscale')
+    return rawOp('grayscale')
   }
 )
 
@@ -168,7 +168,7 @@ export const grayscale = /* @__PURE__ */ namedOp(
 export const invert = /* @__PURE__ */ namedOp(
   'invert',
   function invert(): CdnOperation {
-    return createOp('invert')
+    return rawOp('invert')
   }
 )
 
@@ -231,9 +231,9 @@ export const filter = /* @__PURE__ */ namedOp(
   'filter',
   function filter(name: FilterName, amount?: number): CdnOperation {
     assertOneOf(name, FILTER_NAMES, 'filter name')
-    if (amount == null) return createOp('filter', name)
+    if (amount == null) return rawOp('filter', name)
     assertIntInRange(amount, -100, 200, 'filter amount')
-    return createOp('filter', name, String(amount))
+    return rawOp('filter', name, String(amount))
   }
 )
 
@@ -254,12 +254,12 @@ export const blur = /* @__PURE__ */ namedOp(
       if (__DEV__ && amount != null) {
         throw new TypeError('blur amount requires a strength')
       }
-      return createOp('blur')
+      return rawOp('blur')
     }
     assertIntInRange(strength, 0, 5000, 'blur strength')
-    if (amount == null) return createOp('blur', String(strength))
+    if (amount == null) return rawOp('blur', String(strength))
     assertIntInRange(amount, -200, 100, 'blur amount')
-    return createOp('blur', String(strength), String(amount))
+    return rawOp('blur', String(strength), String(amount))
   }
 )
 
@@ -310,7 +310,7 @@ export const blurRegion = /* @__PURE__ */ namedOp(
       assertIntInRange(options.strength, 0, 5000, 'blur_region strength')
       params.push(String(options.strength))
     }
-    return createOp('blur_region', ...params)
+    return rawOp('blur_region', ...params)
   }
 )
 
@@ -326,9 +326,9 @@ export const blurRegion = /* @__PURE__ */ namedOp(
 export const sharp = /* @__PURE__ */ namedOp(
   'sharp',
   function sharp(strength?: number): CdnOperation {
-    if (strength == null) return createOp('sharp')
+    if (strength == null) return rawOp('sharp')
     assertIntInRange(strength, 0, 20, 'sharp strength')
-    return createOp('sharp', String(strength))
+    return rawOp('sharp', String(strength))
   }
 )
 
@@ -350,7 +350,7 @@ export const srgb = /* @__PURE__ */ namedOp(
   'srgb',
   function srgb(mode: SrgbMode): CdnOperation {
     assertOneOf(mode, SRGB_MODES, 'srgb mode')
-    return createOp('srgb', mode)
+    return rawOp('srgb', mode)
   }
 )
 
@@ -371,7 +371,7 @@ export const maxIccSize = /* @__PURE__ */ namedOp(
         `max_icc_size must be a non-negative integer, got ${kb}`
       )
     }
-    return createOp('max_icc_size', String(kb))
+    return rawOp('max_icc_size', String(kb))
   }
 )
 
@@ -387,9 +387,9 @@ export const maxIccSize = /* @__PURE__ */ namedOp(
 export const mainColors = /* @__PURE__ */ namedOp(
   'main_colors',
   function mainColors(count?: number): CdnOperation {
-    if (count == null) return createOp('main_colors')
+    if (count == null) return rawOp('main_colors')
     assertIntInRange(count, 1, 256, 'main_colors count')
-    return createOp('main_colors', String(count))
+    return rawOp('main_colors', String(count))
   }
 )
 
@@ -405,7 +405,7 @@ export const mainColors = /* @__PURE__ */ namedOp(
 export const json = /* @__PURE__ */ namedOp(
   'json',
   function json(): CdnOperation {
-    return createOp('json')
+    return rawOp('json')
   }
 )
 
@@ -421,6 +421,6 @@ export const json = /* @__PURE__ */ namedOp(
 export const jsonp = /* @__PURE__ */ namedOp(
   'jsonp',
   function jsonp(): CdnOperation {
-    return createOp('jsonp')
+    return rawOp('jsonp')
   }
 )

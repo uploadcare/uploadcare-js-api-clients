@@ -66,6 +66,63 @@ export function operationMatches(op: CdnOperation, ref: OperationRef): boolean {
 }
 
 /**
+ * Replaces the first matching operation in place, or appends it when nothing
+ * matches. Lives here rather than in the facades so `CdnUrl.replace` and
+ * `Chain.replaceOp` cannot drift apart.
+ *
+ * @internal
+ */
+export function replaceFirstMatch(
+  operations: readonly CdnOperation[],
+  operation: CdnOperation
+): CdnOperation[] {
+  const index = operations.findIndex((op) => operationMatches(op, operation))
+  if (index === -1) return [...operations, operation]
+  return operations.map((op, i) => (i === index ? operation : op))
+}
+
+/**
+ * Collapses every matching operation into one, kept at the position of the
+ * first match; appends when nothing matches.
+ *
+ * @internal
+ */
+export function replaceEveryMatch(
+  operations: readonly CdnOperation[],
+  operation: CdnOperation
+): CdnOperation[] {
+  const index = operations.findIndex((op) => operationMatches(op, operation))
+  if (index === -1) return [...operations, operation]
+  return operations.flatMap((op, i) =>
+    i === index ? [operation] : operationMatches(op, operation) ? [] : [op]
+  )
+}
+
+/**
+ * Runs an `updateOperations` callback over a defensive copy, returning null
+ * when it handed back something other than an array — a block-bodied callback
+ * with no `return` would otherwise produce a chain whose operations are
+ * undefined, corrupt rather than merely empty.
+ *
+ * @internal
+ */
+export function updatedOperations(
+  operations: readonly CdnOperation[],
+  update: (current: CdnOperation[]) => CdnOperation[]
+): CdnOperation[] | null {
+  const next = update([...operations])
+  if (!Array.isArray(next)) {
+    if (__DEV__) {
+      throw new TypeError(
+        'updateOperations callback must return an operations array'
+      )
+    }
+    return null
+  }
+  return next
+}
+
+/**
  * Brands an operation creator with the directive name it produces.
  *
  * @internal

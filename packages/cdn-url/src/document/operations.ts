@@ -6,7 +6,7 @@
 import { assertOneOf } from '../grammar'
 import { namedOp } from '../operation-ref'
 import type { CdnOperation } from '../types'
-import { createOp } from '../ops/create-op'
+import { rawOp } from '../ops/raw-op'
 
 /** Target formats accepted by {@link format}. */
 export const DOCUMENT_TARGETS = [
@@ -52,7 +52,7 @@ export const format = /* @__PURE__ */ namedOp(
   'format',
   function format(target: DocumentTarget): CdnOperation {
     assertOneOf(target, DOCUMENT_TARGETS, 'document format')
-    return createOp('format', target)
+    return rawOp('format', target)
   }
 )
 
@@ -73,6 +73,6 @@ export const page = /* @__PURE__ */ namedOp(
         `document page must be a positive 1-based integer, got ${number}`
       )
     }
-    return createOp('page', String(number))
+    return rawOp('page', String(number))
   }
 )
