@@ -1,5 +1,11 @@
 import { trimTrailingSlashes } from './grammar'
-import type { CdnOperation, CdnUrlInput } from './types'
+import type {
+  CdnOperation,
+  CdnUrlInput,
+  FileUrlInput,
+  GroupUrlInput,
+  ProxyUrlInput
+} from './types'
 
 /**
  * Serializes operations into the `-/name/params/` directive chain
@@ -34,28 +40,79 @@ export function serializeOperations(
  * ```
  */
 export function serializeCdnUrl(input: CdnUrlInput): string {
-  const origin = trimTrailingSlashes(input.origin)
-  const ops = serializeOperations(input.operations ?? [])
-
   if ('sourceUrl' in input && input.sourceUrl != null) {
-    return `${origin}/${ops}${input.sourceUrl}`
+    return serializeProxyUrl(input)
   }
-
-  const search = ('search' in input ? input.search : '') ?? ''
-  const hash = ('hash' in input ? input.hash : '') ?? ''
-
   if ('group' in input && input.group != null) {
-    let path = `${origin}/${input.group.uuid}~${input.group.count}/`
-    if (input.nth != null) {
-      path += `nth/${input.nth}/${ops}${input.filename ?? ''}`
-    }
-    return path + search + hash
+    return serializeGroupUrl(input)
   }
-
   if ('uuid' in input && input.uuid != null) {
-    const conversion = input.conversion != null ? `${input.conversion}/` : ''
-    return `${origin}/${input.uuid}/${conversion}${ops}${input.filename ?? ''}${search}${hash}`
+    return serializeFileUrl(input)
   }
-
   throw new TypeError('serializeCdnUrl requires one of: uuid, group, sourceUrl')
+}
+
+/**
+ * Builds a url for a single stored file — the write-side counterpart of
+ * {@link parseFileUrl}.
+ *
+ * Exists for the same reason the per-kind parsers do: a caller that only ever
+ * builds file urls should not carry the group and proxy branches. Import this
+ * instead of {@link serializeCdnUrl} and they tree-shake away.
+ *
+ * @see https://uploadcare.com/docs/delivery/cdn/
+ * @example
+ * ```ts
+ * serializeFileUrl({ origin: 'https://ucarecdn.com', uuid, operations: [preview(800, 600)] })
+ * // → https://ucarecdn.com/:uuid/-/preview/800x600/
+ * ```
+ */
+export function serializeFileUrl(input: FileUrlInput): string {
+  const origin = trimTrailingSlashes(input.origin)
+  const conversion = input.conversion != null ? `${input.conversion}/` : ''
+  const ops = serializeOperations(input.operations ?? [])
+  const tail = `${input.filename ?? ''}${input.search ?? ''}${input.hash ?? ''}`
+  return `${origin}/${input.uuid}/${conversion}${ops}${tail}`
+}
+
+/**
+ * Builds a group root url, or a group element url when `nth` is given — the
+ * write-side counterpart of {@link parseGroupUrl} and {@link parseGroupElementUrl}.
+ *
+ * One function rather than two because both come from a single `GroupUrlInput`:
+ * a group root is the same url without an element index. Group roots address the
+ * whole group, so `operations` and `filename` apply only with `nth`.
+ *
+ * @see https://uploadcare.com/docs/file-groups/
+ * @example
+ * ```ts
+ * serializeGroupUrl({ origin: 'https://ucarecdn.com', group: { uuid, count: 3 } })
+ * // → https://ucarecdn.com/:uuid~3/
+ * ```
+ */
+export function serializeGroupUrl(input: GroupUrlInput): string {
+  const origin = trimTrailingSlashes(input.origin)
+  let path = `${origin}/${input.group.uuid}~${input.group.count}/`
+  if (input.nth != null) {
+    const ops = serializeOperations(input.operations ?? [])
+    path += `nth/${input.nth}/${ops}${input.filename ?? ''}`
+  }
+  return path + (input.search ?? '') + (input.hash ?? '')
+}
+
+/**
+ * Builds a delivery proxy url for a remote source — the write-side counterpart of
+ * {@link parseProxyUrl}. The source url is embedded verbatim and trails the
+ * operations, so it carries its own query string.
+ *
+ * @see https://uploadcare.com/docs/delivery/proxy/
+ * @example
+ * ```ts
+ * serializeProxyUrl({ origin: 'https://pubkey.ucr.io', sourceUrl: 'https://example.com/a.jpg' })
+ * // → https://pubkey.ucr.io/https://example.com/a.jpg
+ * ```
+ */
+export function serializeProxyUrl(input: ProxyUrlInput): string {
+  const origin = trimTrailingSlashes(input.origin)
+  return `${origin}/${serializeOperations(input.operations ?? [])}${input.sourceUrl}`
 }

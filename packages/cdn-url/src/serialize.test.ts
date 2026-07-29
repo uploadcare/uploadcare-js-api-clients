@@ -1,6 +1,13 @@
 import { describe, expect, it } from 'vitest'
 
-import { parseCdnUrl, serializeCdnUrl, serializeOperations } from './index'
+import {
+  parseCdnUrl,
+  serializeCdnUrl,
+  serializeFileUrl,
+  serializeGroupUrl,
+  serializeOperations,
+  serializeProxyUrl
+} from './index'
 
 const UUID = 'c2499162-eb07-4b93-b31e-94a89a47e858'
 
@@ -131,5 +138,81 @@ describe('serializeCdnUrl', () => {
         expect(serializeCdnUrl(parseCdnUrl(url))).toBe(url)
       })
     }
+
+    /**
+     * The per-kind serializers exist so a caller that only builds one kind can drop
+     * the other branches. That is only safe if they agree with the dispatcher on
+     * every url it accepts, so the same corpus runs through them, routed by kind.
+     */
+    for (const url of urls) {
+      it(`round-trips ${url} through its per-kind serializer`, () => {
+        const parsed = parseCdnUrl(url)
+        let serialized: string
+        if (parsed.kind === 'proxy') {
+          serialized = serializeProxyUrl(parsed)
+        } else if (parsed.kind === 'file') {
+          serialized = serializeFileUrl(parsed)
+        } else {
+          serialized = serializeGroupUrl(parsed)
+        }
+        expect(serialized).toBe(url)
+        expect(serialized).toBe(serializeCdnUrl(parsed))
+      })
+    }
+  })
+
+  describe('per-kind serializers', () => {
+    it('builds a file url, tolerating a trailing slash on the origin', () => {
+      expect(
+        serializeFileUrl({ origin: 'https://ucarecdn.com/', uuid: UUID })
+      ).toBe(`https://ucarecdn.com/${UUID}/`)
+    })
+
+    it('builds a group root url with no operations', () => {
+      // A group root addresses the whole group, so operations do not apply without
+      // an element index — passing them is a no-op rather than an error.
+      expect(
+        serializeGroupUrl({
+          origin: 'https://ucarecdn.com',
+          group: { uuid: UUID, count: 3 },
+          operations: [{ name: 'preview', params: [] }]
+        })
+      ).toBe(`https://ucarecdn.com/${UUID}~3/`)
+    })
+
+    it('builds a group element url with operations and a filename', () => {
+      expect(
+        serializeGroupUrl({
+          origin: 'https://ucarecdn.com',
+          group: { uuid: UUID, count: 3 },
+          nth: 0,
+          operations: [{ name: 'preview', params: ['150x150'] }],
+          filename: 'photo.jpg'
+        })
+      ).toBe(`https://ucarecdn.com/${UUID}~3/nth/0/-/preview/150x150/photo.jpg`)
+    })
+
+    it('embeds the proxy source after the operations, verbatim', () => {
+      expect(
+        serializeProxyUrl({
+          origin: 'https://pubkey.ucr.io',
+          sourceUrl: 'https://example.com/a.jpg?v=2',
+          operations: [{ name: 'resize', params: ['500x'] }]
+        })
+      ).toBe(
+        'https://pubkey.ucr.io/-/resize/500x/https://example.com/a.jpg?v=2'
+      )
+    })
+
+    it('keeps the conversion prefix ahead of the operations on a file url', () => {
+      expect(
+        serializeFileUrl({
+          origin: 'https://ucarecdn.com',
+          uuid: UUID,
+          conversion: 'video',
+          operations: [{ name: 'size', params: ['720x540'] }]
+        })
+      ).toBe(`https://ucarecdn.com/${UUID}/video/-/size/720x540/`)
+    })
   })
 })

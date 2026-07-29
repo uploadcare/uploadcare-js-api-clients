@@ -41,9 +41,23 @@ conventions in several ways — do not "fix" these divergences.
   They exist for bundle size: importing `parseFileUrl` alone is 714 B gzipped
   against 1078 B for `parseCdnUrl`. They are exported from the **root entry**,
   not a new entry point — per-symbol tree-shaking already gives the saving, so
-  do not add an entry for them. Note esbuild does not drop the unused
-  `GROUP_ID_RE` even with `/* @__PURE__ */`, so a few tens of bytes of regex
-  ride along regardless; `join_vars: false` was measured and does not help.
+  do not add an entry for them.
+- **Per-kind serializers mirror them**: `serializeFileUrl`, `serializeGroupUrl`,
+  `serializeProxyUrl`, with `serializeCdnUrl` **delegating** to the three for the
+  same anti-drift reason. Measured on a file-only consumer that parses and
+  serializes: 903 → 748 B brotli (2171 → 1682 raw) versus using the dispatcher.
+  One group serializer covers both root and element because both come from a
+  single `GroupUrlInput` — a root is the same url without `nth`. The round-trip
+  corpus runs through the per-kind functions as well as the dispatcher, which is
+  what makes it safe for a caller to import only one.
+- **Write the uuid grammars as regex literals, never `new RegExp`.** esbuild will
+  not eliminate a `new RegExp(...)` call even when marked `/* @__PURE__ */`, so
+  composing `UUID_RE`/`GROUP_ID_RE` from a shared source string left the unused
+  group regex in file-only bundles (verified: 172 → 110 B in a minimal repro).
+  Literals are side-effect-free, so an unused one drops. The trade is that the
+  uuid pattern is written twice; `grammar.test.ts` pins that the two agree, so a
+  change to one fails until it is made to both. (`join_vars: false` was measured
+  as an alternative to all this and does not help.)
 - **Round-trip law:** `serializeCdnUrl(parseCdnUrl(url)) === url` for every
   valid CDN URL. The parser is lenient: unknown operations (incl. `@`-prefixed
   internal ones like `@clib`) pass through verbatim. Never make the parser

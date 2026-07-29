@@ -10,7 +10,13 @@ export {
   parseOperations,
   parseProxyUrl
 } from './parse'
-export { serializeCdnUrl, serializeOperations } from './serialize'
+export {
+  serializeCdnUrl,
+  serializeFileUrl,
+  serializeGroupUrl,
+  serializeOperations,
+  serializeProxyUrl
+} from './serialize'
 export { detectDomainKind, isUploadcareDomain } from './domain'
 export {
   type NamedOperationCreator,
