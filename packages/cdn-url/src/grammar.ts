@@ -5,13 +5,20 @@
  * production bundle skips the checks and serializes inputs as-is.
  */
 
-export const UUID_SOURCE =
-  '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}'
-export const UUID_RE = /* @__PURE__ */ new RegExp(`^${UUID_SOURCE}$`, 'i')
-export const GROUP_ID_RE = /* @__PURE__ */ new RegExp(
-  `^(${UUID_SOURCE})~([0-9]+)$`,
-  'i'
-)
+/**
+ * Written as regex **literals**, not composed from a shared source string with
+ * `new RegExp`. esbuild will not eliminate a `new RegExp(...)` call even when it
+ * carries `/* @__PURE__ *​/`, so the composed form left `GROUP_ID_RE` in bundles
+ * that only ever parse file urls — measurably, and for no benefit. A literal is
+ * side-effect-free by construction, so an unused one is dropped.
+ *
+ * The cost is that the uuid pattern appears twice; `grammar.test.ts` pins that the
+ * two agree, so a future edit to one has to be made to both.
+ */
+export const UUID_RE =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+export const GROUP_ID_RE =
+  /^([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})~([0-9]+)$/i
 
 /** Strips trailing slashes from an origin or endpoint. */
 export function trimTrailingSlashes(url: string): string {
