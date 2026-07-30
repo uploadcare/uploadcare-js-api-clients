@@ -13,7 +13,7 @@ import { ImageChain } from './image-chain'
 
 /** @internal */
 interface FileState extends ChainState {
-  origin: string
+  cdnBase: string
   uuid: string
   filename: string | null
   search: string
@@ -25,9 +25,9 @@ export class FileChain extends ImageChain<FileState> {
   /** Discriminant for chains returned by `cdn.parse`. */
   public readonly kind = 'file' as const
 
-  /** Rebases the chain onto another origin. */
-  public on(origin: string): this {
-    return this._next({ origin })
+  /** Rebases the chain onto another cdnBase (trailing slash tolerated). */
+  public on(cdnBase: string): this {
+    return this._next({ cdnBase })
   }
 
   /** Sets (or clears) the trailing filename. */
@@ -48,7 +48,7 @@ export class FileChain extends ImageChain<FileState> {
 
 /** @internal */
 interface GroupState {
-  origin: string
+  cdnBase: string
   group: GroupId
   search: string
   hash: string
@@ -62,9 +62,9 @@ export class GroupChain {
   /** @internal */
   public constructor(private readonly _s: GroupState) {}
 
-  /** Rebases the chain onto another origin. */
-  public on(origin: string): GroupChain {
-    return new GroupChain({ ...this._s, origin })
+  /** Rebases the chain onto another cdnBase (trailing slash tolerated). */
+  public on(cdnBase: string): GroupChain {
+    return new GroupChain({ ...this._s, cdnBase })
   }
 
   /** Addresses a single file in the group (zero-based). */
@@ -78,7 +78,7 @@ export class GroupChain {
       )
     }
     return new GroupElementChain({
-      origin: this._s.origin,
+      cdnBase: this._s.cdnBase,
       group: this._s.group,
       nth: index,
       operations: [],
@@ -90,12 +90,12 @@ export class GroupChain {
 
   /** Archive url for the whole group (originals only). */
   public archive(format: ArchiveFormat, filename?: string): string {
-    return archiveUrl(this._s.origin, this._s.group, format, filename)
+    return archiveUrl(this._s.cdnBase, this._s.group, format, filename)
   }
 
   /** The group root URL. */
   public get href(): string {
-    return serializeCdnUrl({ origin: this._s.origin, group: this._s.group })
+    return serializeCdnUrl({ cdnBase: this._s.cdnBase, group: this._s.group })
   }
 
   /** Alias of the terminal getter for string coercion. */
@@ -106,7 +106,7 @@ export class GroupChain {
 
 /** @internal */
 interface GroupElementState extends ChainState {
-  origin: string
+  cdnBase: string
   group: GroupId
   nth: number
   filename: string | null
@@ -119,9 +119,9 @@ export class GroupElementChain extends ImageChain<GroupElementState> {
   /** Discriminant for chains returned by `cdn.parse`. */
   public readonly kind = 'group-element' as const
 
-  /** Rebases the chain onto another origin. */
-  public on(origin: string): this {
-    return this._next({ origin })
+  /** Rebases the chain onto another cdnBase (trailing slash tolerated). */
+  public on(cdnBase: string): this {
+    return this._next({ cdnBase })
   }
 
   /** Sets (or clears) the trailing filename. */
@@ -142,7 +142,7 @@ export class GroupElementChain extends ImageChain<GroupElementState> {
 
 /** @internal */
 interface ProxyState extends ChainState {
-  origin: string
+  cdnBase: string
   sourceUrl: string
 }
 
@@ -153,7 +153,7 @@ export class ProxyChain extends ImageChain<ProxyState> {
 
   /** Rebases the chain onto another proxy endpoint. */
   public on(endpoint: string): this {
-    return this._next({ origin: trimTrailingSlashes(endpoint) })
+    return this._next({ cdnBase: trimTrailingSlashes(endpoint) })
   }
 
   /** The serialized URL. */
@@ -234,7 +234,7 @@ export class DocumentChain extends Chain<ConversionState> {
 
 /** @internal */
 interface Gif2VideoState extends ChainState {
-  origin: string
+  cdnBase: string
   uuid: string
 }
 
@@ -249,15 +249,15 @@ export class Gif2VideoChain extends Chain<Gif2VideoState> {
     return this._add(gifOps.quality(value))
   }
 
-  /** Rebases the chain onto another origin. */
-  public on(origin: string): this {
-    return this._next({ origin })
+  /** Rebases the chain onto another cdnBase (trailing slash tolerated). */
+  public on(cdnBase: string): this {
+    return this._next({ cdnBase })
   }
 
   /** The serialized URL. */
   public get href(): string {
     return serializeCdnUrl({
-      origin: this._s.origin,
+      cdnBase: this._s.cdnBase,
       uuid: this._s.uuid,
       conversion: 'gif2video',
       operations: this._s.operations

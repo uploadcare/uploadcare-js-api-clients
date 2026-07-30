@@ -1,18 +1,37 @@
 import { describe, expect, it } from 'vitest'
 
-import { cdn } from './index'
+import {
+  base,
+  LEGACY_CDN_BASE,
+  parse,
+  PREFIX_CDN_BASE,
+  prefixedCdnBase
+} from './index'
 
 const UUID = 'c2499162-eb07-4b93-b31e-94a89a47e858'
-const ORIGIN = 'https://ucarecdn.com'
+const PUBLIC_KEY = 'demopublickey'
+// sha256(PUBLIC_KEY) as a bigint, base36, first 10 chars — computed with
+// node:crypto, independently of @uploadcare/cname-prefix, so this pins the real
+// prefix and not whatever that package happens to return.
+const PREFIX = '1s4oyld5dc'
+const CDN_BASE = `https://${PREFIX}.ucarecd.net`
+
+const cdn = base(prefixedCdnBase(PUBLIC_KEY))
+
+// Never invoked — it exists for the type checker only.
+const typeProbe = () => {
+  // @ts-expect-error a base is required; there is no working default
+  void base()
+}
 
 describe('cdn.file', () => {
-  it('builds a bare file url with the default origin', () => {
-    expect(cdn.file(UUID).href).toBe(`${ORIGIN}/${UUID}/`)
+  it('builds a bare file url on the configured cdnBase', () => {
+    expect(cdn.file(UUID).href).toBe(`${CDN_BASE}/${UUID}/`)
   })
 
   it('chains image operations in order', () => {
     expect(cdn.file(UUID).preview(800, 600).quality('smart').href).toBe(
-      `${ORIGIN}/${UUID}/-/preview/800x600/-/quality/smart/`
+      `${CDN_BASE}/${UUID}/-/preview/800x600/-/quality/smart/`
     )
   })
 
@@ -20,24 +39,24 @@ describe('cdn.file', () => {
     expect(
       cdn.file(UUID).scaleCrop(96, 96, { type: 'smart' }).borderRadius('50p')
         .href
-    ).toBe(`${ORIGIN}/${UUID}/-/scale_crop/96x96/smart/-/border_radius/50p/`)
+    ).toBe(`${CDN_BASE}/${UUID}/-/scale_crop/96x96/smart/-/border_radius/50p/`)
     expect(cdn.file(UUID).blur(20).grayscale().flip().href).toBe(
-      `${ORIGIN}/${UUID}/-/blur/20/-/grayscale/-/flip/`
+      `${CDN_BASE}/${UUID}/-/blur/20/-/grayscale/-/flip/`
     )
     expect(cdn.file(UUID).overlay('self', { size: ['50p', '50p'] }).href).toBe(
-      `${ORIGIN}/${UUID}/-/overlay/self/50px50p/`
+      `${CDN_BASE}/${UUID}/-/overlay/self/50px50p/`
     )
   })
 
   it('is immutable — chains fork', () => {
-    const base = cdn.file(UUID).preview(800, 600)
-    const a = base.quality('smart')
-    const b = base.quality('best')
+    const previewed = cdn.file(UUID).preview(800, 600)
+    const a = previewed.quality('smart')
+    const b = previewed.quality('best')
     expect(a.href).not.toBe(b.href)
-    expect(base.href).toBe(`${ORIGIN}/${UUID}/-/preview/800x600/`)
+    expect(previewed.href).toBe(`${CDN_BASE}/${UUID}/-/preview/800x600/`)
   })
 
-  it('on() rebases the origin', () => {
+  it('on() rebases the cdnBase', () => {
     expect(cdn.file(UUID).preview().on('https://cdn.example.com').href).toBe(
       `https://cdn.example.com/${UUID}/-/preview/`
     )
@@ -45,18 +64,18 @@ describe('cdn.file', () => {
 
   it('filename() appends a trailing filename', () => {
     expect(cdn.file(UUID).preview().filename('photo.jpg').href).toBe(
-      `${ORIGIN}/${UUID}/-/preview/photo.jpg`
+      `${CDN_BASE}/${UUID}/-/preview/photo.jpg`
     )
   })
 
   it('op() is the raw escape hatch, withoutOp() removes by name', () => {
     expect(cdn.file(UUID).op('@clib', 'lib', '1.0').href).toBe(
-      `${ORIGIN}/${UUID}/-/@clib/lib/1.0/`
+      `${CDN_BASE}/${UUID}/-/@clib/lib/1.0/`
     )
     expect(
       cdn.file(UUID).preview(800, 600).quality('smart').withoutOp('preview')
         .href
-    ).toBe(`${ORIGIN}/${UUID}/-/quality/smart/`)
+    ).toBe(`${CDN_BASE}/${UUID}/-/quality/smart/`)
   })
 
   it('toString() and String() coercion match href', () => {
@@ -65,9 +84,33 @@ describe('cdn.file', () => {
   })
 })
 
-describe('cdn.configure', () => {
-  it('binds a default origin for all starters', () => {
-    const custom = cdn.configure({ origin: 'https://cdn.example.com' })
+describe('prefixedCdnBase', () => {
+  it('is the cname-prefix helper under a shorter name', () => {
+    expect(prefixedCdnBase(PUBLIC_KEY)).toBe(CDN_BASE)
+    expect(PREFIX_CDN_BASE).toBe('https://ucarecd.net')
+  })
+
+  it('feeds base(), which binds it for every starter', () => {
+    expect(cdn.file(UUID).href).toBe(`${CDN_BASE}/${UUID}/`)
+    expect(cdn.group(`${UUID}~3`).href).toBe(`${CDN_BASE}/${UUID}~3/`)
+    expect(cdn.gif2video(UUID).format('webm').href).toBe(
+      `${CDN_BASE}/${UUID}/gif2video/-/format/webm/`
+    )
+  })
+
+  it('nothing prefixes on your behalf — a bare zone stays bare', () => {
+    expect(base(PREFIX_CDN_BASE).file(UUID).href).toBe(
+      `https://ucarecd.net/${UUID}/`
+    )
+    // …which is why there is no default: the only fallback a JS caller can trip
+    // into is the legacy shared base, which does serve unprefixed.
+    expect(LEGACY_CDN_BASE).toBe('https://ucarecdn.com')
+  })
+})
+
+describe('base(cdnBase)', () => {
+  it('uses the given base as it stands', () => {
+    const custom = base('https://cdn.example.com')
     expect(custom.file(UUID).href).toBe(`https://cdn.example.com/${UUID}/`)
     expect(custom.group(`${UUID}~3`).href).toBe(
       `https://cdn.example.com/${UUID}~3/`
@@ -75,27 +118,59 @@ describe('cdn.configure', () => {
   })
 
   it('on() still overrides per chain', () => {
-    const custom = cdn.configure({ origin: 'https://cdn.example.com' })
-    expect(custom.file(UUID).on(ORIGIN).href).toBe(`${ORIGIN}/${UUID}/`)
+    const custom = base('https://cdn.example.com')
+    expect(custom.file(UUID).on(CDN_BASE).href).toBe(`${CDN_BASE}/${UUID}/`)
+  })
+
+  it('cdn.base() rebases the whole entry object', () => {
+    expect(cdn.base('https://cdn.example.com').file(UUID).href).toBe(
+      `https://cdn.example.com/${UUID}/`
+    )
+    expect(cdn.base).toBe(base)
+  })
+
+  it('refuses to guess a base', () => {
+    expect(typeProbe).toBeTypeOf('function')
+    // @ts-expect-error probing the runtime guard a JS caller would hit
+    expect(() => base()).toThrow(TypeError)
+    expect(() => base('')).toThrow(TypeError)
+  })
+})
+
+describe('the fluent entry object is frozen', () => {
+  it('rejects reassigning a starter', () => {
+    expect(Object.isFrozen(cdn)).toBe(true)
+    expect(Object.isFrozen(base(LEGACY_CDN_BASE))).toBe(true)
+    expect(() => {
+      // @ts-expect-error the surface is readonly at the type level too
+      cdn.file = () => cdn.file(UUID)
+    }).toThrow(TypeError)
   })
 })
 
 describe('cdn.parse', () => {
+  it('is also importable standalone — a stored url carries its own cdnBase', () => {
+    const legacy = parse(`${LEGACY_CDN_BASE}/${UUID}/-/preview/`)
+    expect(legacy.kind).toBe('file')
+    expect(legacy.href).toBe(`${LEGACY_CDN_BASE}/${UUID}/-/preview/`)
+    expect(cdn.parse).toBe(parse)
+  })
+
   it('returns a file chain for file urls, ready to extend', () => {
-    const chain = cdn.parse(`${ORIGIN}/${UUID}/-/crop/640x480/photo.jpg`)
+    const chain = cdn.parse(`${CDN_BASE}/${UUID}/-/crop/640x480/photo.jpg`)
     expect(chain.kind).toBe('file')
     if (chain.kind !== 'file') throw new Error('expected file chain')
     expect(chain.preview(400, 400).href).toBe(
-      `${ORIGIN}/${UUID}/-/crop/640x480/-/preview/400x400/photo.jpg`
+      `${CDN_BASE}/${UUID}/-/crop/640x480/-/preview/400x400/photo.jpg`
     )
   })
 
   it('returns a group chain for group root urls', () => {
-    const chain = cdn.parse(`${ORIGIN}/${UUID}~3/`)
+    const chain = cdn.parse(`${CDN_BASE}/${UUID}~3/`)
     expect(chain.kind).toBe('group')
     if (chain.kind !== 'group') throw new Error('expected group chain')
     expect(chain.nth(1).resize({ width: 256 }).href).toBe(
-      `${ORIGIN}/${UUID}~3/nth/1/-/resize/256x/`
+      `${CDN_BASE}/${UUID}~3/nth/1/-/resize/256x/`
     )
   })
 
@@ -111,31 +186,31 @@ describe('cdn.parse', () => {
   })
 
   it('preserves query and hash through edits', () => {
-    const chain = cdn.parse(`${ORIGIN}/${UUID}/-/preview/?token=exp=1~hmac=x`)
+    const chain = cdn.parse(`${CDN_BASE}/${UUID}/-/preview/?token=exp=1~hmac=x`)
     if (chain.kind !== 'file') throw new Error('expected file chain')
     expect(chain.quality('smart').href).toBe(
-      `${ORIGIN}/${UUID}/-/preview/-/quality/smart/?token=exp=1~hmac=x`
+      `${CDN_BASE}/${UUID}/-/preview/-/quality/smart/?token=exp=1~hmac=x`
     )
   })
 })
 
 describe('cdn.group', () => {
   it('accepts a group id string or object', () => {
-    expect(cdn.group(`${UUID}~3`).href).toBe(`${ORIGIN}/${UUID}~3/`)
+    expect(cdn.group(`${UUID}~3`).href).toBe(`${CDN_BASE}/${UUID}~3/`)
     expect(cdn.group({ uuid: UUID, count: 3 }).href).toBe(
-      `${ORIGIN}/${UUID}~3/`
+      `${CDN_BASE}/${UUID}~3/`
     )
   })
 
   it('nth() yields an image-capable element chain', () => {
     expect(
       cdn.group(`${UUID}~3`).nth(0).preview(300, 300).quality('smart').href
-    ).toBe(`${ORIGIN}/${UUID}~3/nth/0/-/preview/300x300/-/quality/smart/`)
+    ).toBe(`${CDN_BASE}/${UUID}~3/nth/0/-/preview/300x300/-/quality/smart/`)
   })
 
   it('archive() builds archive urls', () => {
     expect(cdn.group(`${UUID}~3`).archive('zip', 'all.zip')).toBe(
-      `${ORIGIN}/${UUID}~3/archive/zip/all.zip`
+      `${CDN_BASE}/${UUID}~3/archive/zip/all.zip`
     )
   })
 
@@ -185,12 +260,12 @@ describe('cdn.document', () => {
 describe('cdn.gif2video', () => {
   it('chains gif2video ops into a CDN url', () => {
     expect(cdn.gif2video(UUID).format('webm').quality('better').href).toBe(
-      `${ORIGIN}/${UUID}/gif2video/-/format/webm/-/quality/better/`
+      `${CDN_BASE}/${UUID}/gif2video/-/format/webm/-/quality/better/`
     )
   })
 
-  it('respects configure() origin', () => {
-    const custom = cdn.configure({ origin: 'https://cdn.example.com' })
+  it('respects the configured cdn base', () => {
+    const custom = cdn.base('https://cdn.example.com')
     expect(custom.gif2video(UUID).format('mp4').href).toBe(
       `https://cdn.example.com/${UUID}/gif2video/-/format/mp4/`
     )
@@ -209,7 +284,7 @@ describe('review regressions', () => {
   it('group element chains can set a filename', () => {
     expect(
       cdn.group(`${UUID}~3`).nth(0).preview(300, 300).filename('a.jpg').href
-    ).toBe(`${ORIGIN}/${UUID}~3/nth/0/-/preview/300x300/a.jpg`)
+    ).toBe(`${CDN_BASE}/${UUID}~3/nth/0/-/preview/300x300/a.jpg`)
   })
 
   it('proxy chains can rebase onto another endpoint', () => {
@@ -246,9 +321,9 @@ describe('fluent operation references', () => {
     const { preview, quality } = await import('../ops/index')
     expect(
       cdn.file(UUID).preview(800, 600).quality('smart').withoutOp(preview).href
-    ).toBe(`${ORIGIN}/${UUID}/-/quality/smart/`)
+    ).toBe(`${CDN_BASE}/${UUID}/-/quality/smart/`)
     expect(cdn.file(UUID).quality('smart').withoutOp(quality).href).toBe(
-      `${ORIGIN}/${UUID}/`
+      `${CDN_BASE}/${UUID}/`
     )
   })
 
@@ -293,10 +368,10 @@ describe('fluent operation references', () => {
       const { quality, resize } = await import('../ops/index')
       const chain = cdn.file(UUID).resize({ width: 300 }).quality('smart')
       expect(chain.replaceOp(resize({ width: 500 })).href).toBe(
-        `${ORIGIN}/${UUID}/-/resize/500x/-/quality/smart/`
+        `${CDN_BASE}/${UUID}/-/resize/500x/-/quality/smart/`
       )
       expect(cdn.file(UUID).replaceOp(quality('best')).href).toBe(
-        `${ORIGIN}/${UUID}/-/quality/best/`
+        `${CDN_BASE}/${UUID}/-/quality/best/`
       )
     })
 
@@ -389,14 +464,14 @@ describe('fluent operation references', () => {
         ops.push({ name: 'quality', params: ['smart'] })
         return ops
       })
-      expect(chain.href).toBe(`${ORIGIN}/${UUID}/-/preview/800x600/`)
+      expect(chain.href).toBe(`${CDN_BASE}/${UUID}/-/preview/800x600/`)
     })
 
     it('inspection does not mutate the chain', () => {
       const chain = cdn.file(UUID).preview(800, 600)
       chain.getAllOps('preview').length = 0
       chain.replaceAllOps({ name: 'preview', params: ['1x1'] })
-      expect(chain.href).toBe(`${ORIGIN}/${UUID}/-/preview/800x600/`)
+      expect(chain.href).toBe(`${CDN_BASE}/${UUID}/-/preview/800x600/`)
     })
   })
 })

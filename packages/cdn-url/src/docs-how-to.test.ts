@@ -5,7 +5,7 @@
 import { describe, expect, it } from 'vitest'
 
 import { CdnUrl } from './builder/index'
-import { cdn } from './fluent/index'
+import { base, prefixedCdnBase } from './fluent/index'
 import { serializeCdnUrl } from './index'
 import { archiveUrl, groupUrl, nthUrl } from './group/index'
 import { borderRadius, preview, resize, scaleCrop } from './ops/index'
@@ -13,8 +13,10 @@ import { defaultProxyEndpoint, proxyUrl } from './proxy/index'
 import { cut, format, quality, size, thumbs, videoPath } from './video/index'
 
 const uuid = 'c2499162-eb07-4b93-b31e-94a89a47e858'
-const ORIGIN = 'https://ucarecdn.com'
+const CDN_BASE = 'https://1s4oyld5dc.ucarecd.net'
 const group = { uuid, count: 3 }
+
+const cdn = base(prefixedCdnBase('demopublickey'))
 
 const fluentAvatar = (u: string, s: number) =>
   cdn
@@ -27,7 +29,7 @@ const fluentVariant = (u: string, w: number) => cdn.file(u).preview(w, w).href
 describe('avatars: the three tabs agree', () => {
   const atomic = (u: string, s: number) =>
     serializeCdnUrl({
-      origin: ORIGIN,
+      cdnBase: CDN_BASE,
       uuid: u,
       operations: [
         scaleCrop(s, s, { type: 'smart_faces_objects' }),
@@ -36,7 +38,7 @@ describe('avatars: the three tabs agree', () => {
     })
   const builder = (u: string, s: number) =>
     new CdnUrl({
-      origin: ORIGIN,
+      cdnBase: CDN_BASE,
       uuid: u,
       operations: [
         scaleCrop(s, s, { type: 'smart_faces_objects' }),
@@ -45,7 +47,7 @@ describe('avatars: the three tabs agree', () => {
     }).href
 
   it('all three produce the documented URL', () => {
-    const expected = `${ORIGIN}/${uuid}/-/scale_crop/96x96/smart_faces_objects/-/border_radius/50p/`
+    const expected = `${CDN_BASE}/${uuid}/-/scale_crop/96x96/smart_faces_objects/-/border_radius/50p/`
     expect(atomic(uuid, 96)).toBe(expected)
     expect(builder(uuid, 96)).toBe(expected)
     expect(fluentAvatar(uuid, 96)).toBe(expected)
@@ -55,33 +57,33 @@ describe('avatars: the three tabs agree', () => {
 describe('responsive images: the three tabs agree', () => {
   const WIDTHS = [320, 640, 960, 1280, 1920]
   const atomic = (u: string, w: number) =>
-    serializeCdnUrl({ origin: ORIGIN, uuid: u, operations: [preview(w, w)] })
+    serializeCdnUrl({ cdnBase: CDN_BASE, uuid: u, operations: [preview(w, w)] })
   const builder = (u: string, w: number) =>
-    new CdnUrl({ origin: ORIGIN, uuid: u, operations: [preview(w, w)] }).href
+    new CdnUrl({ cdnBase: CDN_BASE, uuid: u, operations: [preview(w, w)] }).href
 
   it('all three produce the same srcset', () => {
     const build = (v: (u: string, w: number) => string) =>
       WIDTHS.map((w) => `${v(uuid, w)} ${w}w`).join(', ')
     expect(build(atomic)).toBe(build(builder))
     expect(build(atomic)).toBe(build(fluentVariant))
-    expect(atomic(uuid, 320)).toBe(`${ORIGIN}/${uuid}/-/preview/320x320/`)
+    expect(atomic(uuid, 320)).toBe(`${CDN_BASE}/${uuid}/-/preview/320x320/`)
   })
 })
 
 describe('groups: addressing tabs agree', () => {
   it('group root', () => {
-    const expected = `${ORIGIN}/${uuid}~3/`
-    expect(groupUrl(ORIGIN, group)).toBe(expected)
-    expect(new CdnUrl({ origin: ORIGIN, group }).href).toBe(expected)
+    const expected = `${CDN_BASE}/${uuid}~3/`
+    expect(groupUrl(CDN_BASE, group)).toBe(expected)
+    expect(new CdnUrl({ cdnBase: CDN_BASE, group }).href).toBe(expected)
     expect(cdn.group(group).href).toBe(expected)
   })
 
   it('nth element with operations', () => {
-    const expected = `${ORIGIN}/${uuid}~3/nth/1/-/preview/400x400/`
-    expect(nthUrl(ORIGIN, group, 1, [preview(400, 400)])).toBe(expected)
+    const expected = `${CDN_BASE}/${uuid}~3/nth/1/-/preview/400x400/`
+    expect(nthUrl(CDN_BASE, group, 1, [preview(400, 400)])).toBe(expected)
     expect(
       new CdnUrl({
-        origin: ORIGIN,
+        cdnBase: CDN_BASE,
         group,
         nth: 1,
         operations: [preview(400, 400)]
@@ -91,21 +93,21 @@ describe('groups: addressing tabs agree', () => {
   })
 
   it('nth is zero-based', () => {
-    expect(nthUrl(ORIGIN, group, 0)).toBe(`${ORIGIN}/${uuid}~3/nth/0/`)
+    expect(nthUrl(CDN_BASE, group, 0)).toBe(`${CDN_BASE}/${uuid}~3/nth/0/`)
   })
 
   it('archives: atomic and fluent agree, and the builder has no archive', () => {
-    expect(archiveUrl(ORIGIN, group, 'zip')).toBe(
-      `${ORIGIN}/${uuid}~3/archive/zip/`
+    expect(archiveUrl(CDN_BASE, group, 'zip')).toBe(
+      `${CDN_BASE}/${uuid}~3/archive/zip/`
     )
     expect(cdn.group(group).archive('zip')).toBe(
-      `${ORIGIN}/${uuid}~3/archive/zip/`
+      `${CDN_BASE}/${uuid}~3/archive/zip/`
     )
-    expect(archiveUrl(ORIGIN, group, 'tar', 'photos.tar')).toBe(
-      `${ORIGIN}/${uuid}~3/archive/tar/photos.tar`
+    expect(archiveUrl(CDN_BASE, group, 'tar', 'photos.tar')).toBe(
+      `${CDN_BASE}/${uuid}~3/archive/tar/photos.tar`
     )
     expect(cdn.group(group).archive('tar', 'photos.tar')).toBe(
-      `${ORIGIN}/${uuid}~3/archive/tar/photos.tar`
+      `${CDN_BASE}/${uuid}~3/archive/tar/photos.tar`
     )
     // the page says there is no builder tab because the method does not exist
     expect('archive' in CdnUrl.prototype).toBe(false)
@@ -127,7 +129,7 @@ describe('proxy: the three tabs agree', () => {
     ).toBe(expected)
     expect(
       new CdnUrl({
-        origin: endpoint,
+        cdnBase: endpoint,
         sourceUrl: source,
         operations: [preview(), resize({ width: 1280 })]
       }).href
@@ -167,12 +169,12 @@ describe('video: atomic and fluent agree; the builder differs by design', () => 
 
   it('the builder yields a full URL, which is why the page omits that tab', () => {
     const built = new CdnUrl({
-      origin: ORIGIN,
+      cdnBase: CDN_BASE,
       uuid,
       conversion: 'video',
       operations: [size({ width: 720, height: 540 })]
     }).href
     expect(built.startsWith('https://')).toBe(true)
-    expect(built).toBe(`${ORIGIN}/${uuid}/video/-/size/720x540/`)
+    expect(built).toBe(`${CDN_BASE}/${uuid}/video/-/size/720x540/`)
   })
 })

@@ -114,7 +114,7 @@ import { tinyParse } from '@uploadcare/cdn-url/tiny'
 
 tinyParse('https://ucarecdn.com/:uuid/-/resize/300x/photo.jpg?v=2')
 // → {
-//     origin: 'https://ucarecdn.com',
+//     cdnBase: 'https://ucarecdn.com',
 //     uuid: ':uuid',
 //     modifiers: '-/resize/300x/',
 //     filename: 'photo.jpg',
@@ -126,29 +126,29 @@ tinyParse('https://ucarecdn.com/:uuid/-/resize/300x/photo.jpg?v=2')
 ```
 https://ucarecdn.com/:uuid/-/resize/300x/photo.jpg?v=2#top
 └──────┬───────────┘└─┬──┘└──────┬─────┘└───┬────┘└─┬┘└─┬┘
-     origin          uuid    modifiers   filename search hash
+     cdnBase          uuid    modifiers   filename search hash
 ```
 
 The cuts are lexical: the first slash after the host, the last slash of the path, then the first `?` and `#`. The field names are [`ParsedFileUrl`](/reference/index/interfaces/ParsedFileUrl)'s, except that `modifiers` holds the serialized chain where it holds an `operations` array.
 
-Only `origin` and `uuid` are required — everything else defaults to empty, so `tinyBuild` also builds URLs from scratch:
+Only `cdnBase` and `uuid` are required — everything else defaults to empty, so `tinyBuild` also builds URLs from scratch:
 
 ```ts
 import { modifiers, tinyBuild } from '@uploadcare/cdn-url/tiny'
 
-const origin = 'https://ucarecdn.com' // a trailing slash is fine too
+const cdnBase = 'https://ucarecdn.com' // a trailing slash is fine too
 const uuid = ':uuid'
 
-tinyBuild({ origin, uuid })
+tinyBuild({ cdnBase, uuid })
 // → https://ucarecdn.com/:uuid/
 
-tinyBuild({ origin, uuid, modifiers: modifiers('preview/800x600') })
+tinyBuild({ cdnBase, uuid, modifiers: modifiers('preview/800x600') })
 // → https://ucarecdn.com/:uuid/-/preview/800x600/
 ```
 
 `search` and `hash` carry their own punctuation, so supply them as `'?v=2'` and `'#top'` — `tinyBuild` writes the slashes between fields but not the `?` or `#`. `filename` is `''` for a URL that ends in a slash.
 
-A trailing slash on `origin` is trimmed for you — config values and `new URL(x).origin` both produce them — so `'https://ucarecdn.com/'` and `'https://ucarecdn.com'` build the same URL, exactly as [`serializeFileUrl`](/reference/index/functions/serializeFileUrl) behaves. That is the only normalization: `uuid` still has to be a bare segment, and a malformed field yields a malformed URL with no error.
+A trailing slash on `cdnBase` is trimmed for you — config values and `new URL(x).origin` both produce them — so `'https://ucarecdn.com/'` and `'https://ucarecdn.com'` build the same URL, exactly as [`serializeFileUrl`](/reference/index/functions/serializeFileUrl) behaves. That is the only normalization: `uuid` still has to be a bare segment, and a malformed field yields a malformed URL with no error.
 
 Nothing is validated and nothing throws. Unknown operations and internal `@`-prefixed directives (`@clib`) pass through verbatim, which is what makes the round trip exact:
 
@@ -161,7 +161,7 @@ Outside that set nothing throws either, but the result may differ, and the field
 
 ```ts
 tinyBuild(tinyParse('https://ucarecdn.com')) // → 'https://ucarecdn.com//'
-tinyParse('not a url') // → { origin: 'not a url', uuid: '', … }
+tinyParse('not a url') // → { cdnBase: 'not a url', uuid: '', … }
 ```
 
 Validate before you get here if the input is untrusted — [`isFileUrl`](/reference/index/functions/isFileUrl) is the cheap check, and [What it costs](#what-it-costs) explains why reaching for it usually means you wanted `parseFileUrl` all along.

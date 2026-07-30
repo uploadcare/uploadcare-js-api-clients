@@ -54,11 +54,11 @@ import { serializeCdnUrl } from '@uploadcare/cdn-url'
 import { preview } from '@uploadcare/cdn-url/ops'
 
 serializeCdnUrl({
-  origin: 'https://ucarecdn.com',
+  cdnBase: 'https://1s4oyld5dc.ucarecd.net',
   uuid: 'c2499162-eb07-4b93-b31e-94a89a47e858',
   operations: [preview(1000, 400)]
 })
-// → https://ucarecdn.com/c2499162-…/-/preview/1000x400/
+// → https://1s4oyld5dc.ucarecd.net/c2499162-…/-/preview/1000x400/
 // format/auto + adaptive quality are applied by the CDN automatically
 ```
 
@@ -72,14 +72,16 @@ Any CDN URL decomposes into a plain object you can edit and serialize back:
 import { parseCdnUrl, serializeCdnUrl } from '@uploadcare/cdn-url'
 import { stripMeta } from '@uploadcare/cdn-url/ops'
 
-const parsed = parseCdnUrl('https://ucarecdn.com/:uuid/-/resize/300x/photo.jpg')
+const parsed = parseCdnUrl(
+  'https://1s4oyld5dc.ucarecd.net/:uuid/-/resize/300x/photo.jpg'
+)
 // { kind: 'file', uuid: ':uuid', operations: [{ name: 'resize', params: ['300x'] }], filename: 'photo.jpg', … }
 
 serializeCdnUrl({
   ...parsed,
   operations: [...parsed.operations, stripMeta('sensitive')]
 })
-// → https://ucarecdn.com/:uuid/-/resize/300x/-/strip_meta/sensitive/photo.jpg
+// → https://1s4oyld5dc.ucarecd.net/:uuid/-/resize/300x/-/strip_meta/sensitive/photo.jpg
 ```
 
 Parsing is lenient: operations the library doesn't know (including internal `@`-prefixed ones) pass through untouched, so `serializeCdnUrl(parseCdnUrl(url)) === url` always holds.
@@ -106,7 +108,9 @@ The package is split into atomic entry points, so you import only what you use:
 The fluent entry trades tree-shaking for convenience: the whole library behind a single chainable object.
 
 ```ts
-import { cdn } from '@uploadcare/cdn-url/fluent'
+import { base, prefixedCdnBase } from '@uploadcare/cdn-url/fluent'
+
+const cdn = base(prefixedCdnBase('demopublickey'))
 
 cdn.file(uuid).preview(1000, 400).stripMeta('sensitive').href
 ```

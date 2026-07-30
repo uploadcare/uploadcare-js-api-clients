@@ -34,7 +34,7 @@ conventions in several ways — do not "fix" these divergences.
 - **No code in barrel (`index.ts`) files** — barrels re-export only.
 - **Functional core, facades on top.** `parse.ts` / `serialize.ts` /
   `grammar.ts` / `operation-ref.ts` are the core. The `builder` (CdnUrl class)
-  and `fluent` (`cdn` mega-object) entries wrap it; they must never grow logic
+  and `fluent` (`base()` mega-object) entries wrap it; they must never grow logic
   the core doesn't have.
 - **`ParsedCdnUrl` is a discriminated union** (`kind: 'file' | 'group' |
 'group-element' | 'proxy'`). Each member carries only the fields its kind
@@ -98,6 +98,34 @@ conventions in several ways — do not "fix" these divergences.
   story: the zero-machinery path for callers who cannot spend bytes. Both are
   re-exported from the **root entry**, not a new entry point — per-symbol
   tree-shaking already gives the saving.**
+- **The fluent entry has no zero-config object.** `base(cdnBase)` is the only way
+  in — the old `cdn` singleton and `configure({...})` are gone. A base is
+  required because no host works for every project: a bare `ucarecd.net` does
+  **not** resolve (it only answers `<prefix>.ucarecd.net`), so the one fallback a
+  JS caller can trip into is `LEGACY_CDN_BASE` (`ucarecdn.com`), which does serve
+  unprefixed. Never reintroduce a bare-`ucarecd.net` default. `parse` is exported
+  standalone as well, since a stored url carries its own base and needs no
+  `base()` call.
+- **The object `base()` returns is frozen and its `Cdn` members are `readonly`**
+  (property syntax, not method syntax — methods cannot be `readonly`). Chains
+  were already immutable; this stops a consumer monkey-patching a shared entry
+  point. `cdn.base(...)` rebases and returns a new frozen object.
+- **`prefixedCdnBase(publicKey, cdnBase = PREFIX_CDN_BASE)` is the only prefix
+  path, and it is deliberately manual.** It wraps `getPrefixedCdnBaseSync` from
+  `@uploadcare/cname-prefix` (the package's first and only runtime dependency),
+  defaulting the zone and trimming a trailing slash. Nothing prefixes on the
+  caller's behalf — an earlier draft gave `configure` a `publicKey` option and it
+  was **removed**: it welded 4.7 kB of SHA-256 (2.1 kB gzipped) into every fluent
+  consumer's bundle. Kept in its own module (`src/prefixed-cdn-base.ts`, its own
+  dist chunk), it drops for anyone who doesn't name it: `fluent` measures 19.8 kB
+  min / 6.6 kB gz with it and 15.0 / 4.4 without. The figures in
+  `functional-vs-builder.md` are those; re-measure rather than copy them forward.
+- **One word for the host: `cdnBase`.** `origin` was renamed out of the whole
+  package — `ParsedCdnUrl.cdnBase`, `FileUrlInput.cdnBase`, `TinyFileUrl.cdnBase`,
+  `CdnUrl.setCdnBase`, every helper's first argument. It matches
+  `@uploadcare/cname-prefix` and the uploader's own config vocabulary. `origin`
+  now only ever means the Web API (`new URL(x).origin`) — do not let it back in as
+  a field name, and do not add a second synonym for `cdnBase` either.
 - **Vocabulary, used consistently everywhere:** an _operation_ is one directive
   (`resize/300x`, or `{ name, params }` as data); _modifiers_ are the whole
   serialized run of them (`-/resize/300x/-/blur/10/`), which is the word Uploadcare's
@@ -106,14 +134,21 @@ conventions in several ways — do not "fix" these divergences.
   the whole chain. Both guide pages define this; do not let a third word ("chain"
   as a type name aside, "directives", "transformations") drift in as a synonym.
 - **`tiny/` is single-file urls only.** `TinyFileUrl` names it, the fields mirror
-  `ParsedFileUrl` (`origin`/`uuid`/`filename`/`search`/`hash`, with `modifiers`
-  standing in for `operations`), and everything but `origin`/`uuid` is optional so
+  `ParsedFileUrl` (`cdnBase`/`uuid`/`filename`/`search`/`hash`, with `modifiers`
+  standing in for `operations`), and everything but `cdnBase`/`uuid` is optional so
   `tinyBuild` builds from scratch. Groups, group elements and proxy urls round-trip
   untouched but produce meaningless fields — documented, not guarded, because
   guarding is what costs the bytes. **A conversion result is a file url too**
   (`isFileUrl` returns true for `/:uuid/gif2video/…`) and its prefix lands in
   `modifiers`, so replacing the chain drops the conversion; appending is safe.
-- **`tiny/` normalizes nothing on the way in, and the guide says so.** `origin` must
+- **A trailing slash on `cdnBase` is tolerated by every entry that takes one** —
+  serializers, the builder and its `setCdnBase`, `configure`, every chain's `on()`,
+  the group/proxy/gif2video helpers and `tinyBuild`. Config files and
+  `new URL(x).origin` both produce them. The trimming is `trimTrailingSlashes`, but
+  each entry has to call it, so `cdn-base.test.ts` pins the whole matrix (bare, one
+  slash, three slashes) rather than trusting the next cdnBase-accepting function to
+  remember. Add a row there when you add one.
+- **`tiny/` normalizes nothing on the way in, and the guide says so.** `cdnBase` must
   not end in a slash (`serializeFileUrl` trims, `tinyBuild` does not — it emits
   `host//:uuid/`), `search`/`hash` carry their own `?`/`#`, and `tinyParse` on a
   non-url returns nonsense fields rather than throwing. There is also no
@@ -123,7 +158,7 @@ conventions in several ways — do not "fix" these divergences.
 - **A secure-delivery token is invalidated by _any_ edit, appending included.** An
   earlier draft said appending was safe — true only for the conversion prefix.
 - **`tiny/url.ts` is string surgery, not a parser, and must stay that way.** `tinyParse`
-  cuts a url into `origin`/`uuid`/`modifiers`/`tail` and `tinyBuild` joins it back:
+  cuts a url into `cdnBase`/`uuid`/`modifiers`/`tail` and `tinyBuild` joins it back:
   no grammar, no `CdnOperation`, no kinds, no throwing — and no chain handling
   either: normalizing a loose modifiers string is `tiny/literals.ts`'s job, since the
   chain is its domain object, not the url's. Same job in every bundle — parse a url,
@@ -141,7 +176,7 @@ conventions in several ways — do not "fix" these divergences.
   which stopped being true once those three things landed. Treat it as supported API:
   its signatures and the round-trip law are a contract, and a breaking change to
   either needs the same care as one to `parseCdnUrl`.
-  What has *not* changed is the ceiling above. Being public is not a reason to grow
+  What has _not_ changed is the ceiling above. Being public is not a reason to grow
   it: do not teach it kinds, do not add validation, do not make it throw. A caller
   who needs any of those wants `parseFileUrl`. The guide page has to keep saying so,
   because the failure mode is a consumer reaching for `tinyParse` on a url whose kind
@@ -323,6 +358,12 @@ npm run docs:api         # typedoc — FAILS on any undocumented public symbol
   test per row. Add to these when you add a page with runnable examples.
 
 ## Monorepo integration
+
+- **`@uploadcare/cname-prefix` is the one runtime dependency** (workspace
+  sibling, version in lockstep), imported only by `src/prefixed-cdn-base.ts` via
+  its `/sync` entry — the sync path is pure JS, so the Node smoke tests pass. Do
+  not import it anywhere else, and do not add a second runtime dep without the
+  same kind of size accounting.
 
 - Registered in root `package.json` `workspaces` and `ship.config.mjs`
   `packagesToPublish`. Version is synced by ship-js (currently in lockstep

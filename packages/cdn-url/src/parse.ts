@@ -27,7 +27,7 @@ function isConversion(segment: string | undefined): segment is ConversionKind {
  * parsers and {@link parseCdnUrl} cannot drift apart.
  */
 function splitUrl(url: string): {
-  origin: string
+  cdnBase: string
   pathname: string
   search: string
   hash: string
@@ -40,7 +40,7 @@ function splitUrl(url: string): {
     throw new TypeError(`Invalid URL: "${url}"`)
   }
   return {
-    origin: `${parsed.protocol}//${parsed.host}`,
+    cdnBase: `${parsed.protocol}//${parsed.host}`,
     pathname: parsed.pathname,
     search: parsed.search,
     hash: parsed.hash,
@@ -62,11 +62,11 @@ function embeddedSourceOf(pathname: string): string | null {
  * @example
  * ```ts
  * parseProxyUrl('https://pk.ucr.io/-/preview/https://example.com/a.jpg')
- * // → { kind: 'proxy', origin: 'https://pk.ucr.io', operations: [...], sourceUrl: 'https://example.com/a.jpg' }
+ * // → { kind: 'proxy', cdnBase: 'https://pk.ucr.io', operations: [...], sourceUrl: 'https://example.com/a.jpg' }
  * ```
  */
 export function parseProxyUrl(url: string): ParsedProxyUrl {
-  const { origin, pathname, search, hash } = splitUrl(url)
+  const { cdnBase, pathname, search, hash } = splitUrl(url)
   const source = embeddedSourceOf(pathname)
   if (source === null) {
     throw new TypeError(`Not a proxy URL (no embedded source): "${url}"`)
@@ -74,7 +74,7 @@ export function parseProxyUrl(url: string): ParsedProxyUrl {
   const prefix = pathname.slice(0, pathname.length - source.length)
   return {
     kind: 'proxy',
-    origin,
+    cdnBase,
     operations: parseOperationSegments(segmentize(prefix), 'proxy prefix'),
     sourceUrl: source + search + hash
   }
@@ -93,7 +93,7 @@ export function parseProxyUrl(url: string): ParsedProxyUrl {
  * ```
  */
 export function parseGroupUrl(url: string): ParsedGroupUrl {
-  const { origin, pathname, search, hash } = splitUrl(url)
+  const { cdnBase, pathname, search, hash } = splitUrl(url)
   if (embeddedSourceOf(pathname) !== null) {
     throw new TypeError(`Not a group URL (proxy source): "${url}"`)
   }
@@ -106,7 +106,7 @@ export function parseGroupUrl(url: string): ParsedGroupUrl {
   if (segments.length > 0) {
     throw new TypeError(`Unexpected path after group id in "${url}"`)
   }
-  return { kind: 'group', origin, search, hash, group }
+  return { kind: 'group', cdnBase, search, hash, group }
 }
 
 /**
@@ -123,7 +123,7 @@ export function parseGroupUrl(url: string): ParsedGroupUrl {
  * ```
  */
 export function parseGroupElementUrl(url: string): ParsedGroupElementUrl {
-  const { origin, pathname, search, hash, hasTrailingSlash } = splitUrl(url)
+  const { cdnBase, pathname, search, hash, hasTrailingSlash } = splitUrl(url)
   if (embeddedSourceOf(pathname) !== null) {
     throw new TypeError(`Not a group element URL (proxy source): "${url}"`)
   }
@@ -144,7 +144,7 @@ export function parseGroupElementUrl(url: string): ParsedGroupElementUrl {
   const filename = takeFilename(segments, hasTrailingSlash)
   return {
     kind: 'group-element',
-    origin,
+    cdnBase,
     search,
     hash,
     group,
@@ -169,7 +169,7 @@ export function parseGroupElementUrl(url: string): ParsedGroupElementUrl {
  * ```
  */
 export function parseFileUrl(url: string): ParsedFileUrl {
-  const { origin, pathname, search, hash, hasTrailingSlash } = splitUrl(url)
+  const { cdnBase, pathname, search, hash, hasTrailingSlash } = splitUrl(url)
   if (embeddedSourceOf(pathname) !== null) {
     throw new TypeError(`Not a file URL (proxy source): "${url}"`)
   }
@@ -186,7 +186,7 @@ export function parseFileUrl(url: string): ParsedFileUrl {
   const filename = takeFilename(segments, hasTrailingSlash)
   return {
     kind: 'file',
-    origin,
+    cdnBase,
     search,
     hash,
     uuid: head,

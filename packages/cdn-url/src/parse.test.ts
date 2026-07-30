@@ -23,7 +23,7 @@ describe('parseCdnUrl', () => {
       const parsed = parseCdnUrl(`https://ucarecdn.com/${UUID}/`)
       expect(parsed).toEqual({
         kind: 'file',
-        origin: 'https://ucarecdn.com',
+        cdnBase: 'https://ucarecdn.com',
         uuid: UUID,
         conversion: null,
         operations: [],
@@ -46,13 +46,13 @@ describe('parseCdnUrl', () => {
 
     it('parses prefixed ucarecd.net domains', () => {
       const parsed = parseCdnUrl(`https://1zlmtnsbgr.ucarecd.net/${UUID}/`)
-      expect(parsed.origin).toBe('https://1zlmtnsbgr.ucarecd.net')
+      expect(parsed.cdnBase).toBe('https://1zlmtnsbgr.ucarecd.net')
       expect(parsed).toMatchObject({ kind: 'file', uuid: UUID })
     })
 
     it('parses custom domains', () => {
       const parsed = parseCdnUrl(`https://cdn.example.com/${UUID}/`)
-      expect(parsed.origin).toBe('https://cdn.example.com')
+      expect(parsed.cdnBase).toBe('https://cdn.example.com')
       expect(parsed).toMatchObject({ kind: 'file', uuid: UUID })
     })
 
@@ -164,7 +164,7 @@ describe('parseCdnUrl', () => {
       const parsed = parseCdnUrl(`https://ucarecdn.com/${UUID}~11/`)
       expect(parsed).toEqual({
         kind: 'group',
-        origin: 'https://ucarecdn.com',
+        cdnBase: 'https://ucarecdn.com',
         group: { uuid: UUID, count: 11 },
         search: '',
         hash: ''
@@ -182,7 +182,7 @@ describe('parseCdnUrl', () => {
       )
       expect(parsed).toEqual({
         kind: 'group-element',
-        origin: 'https://ucarecdn.com',
+        cdnBase: 'https://ucarecdn.com',
         group: { uuid: UUID, count: 3 },
         nth: 2,
         operations: [{ name: 'preview', params: ['150x150'] }],
@@ -253,7 +253,7 @@ describe('parseCdnUrl', () => {
       )
       expect(parsed).toEqual({
         kind: 'proxy',
-        origin: 'https://pubkey.ucr.io',
+        cdnBase: 'https://pubkey.ucr.io',
         operations: [],
         sourceUrl: 'https://example.com/image.jpg?q=1#h'
       })
@@ -383,7 +383,7 @@ describe('per-kind parsers', () => {
       expect(uuid).toBe(UUID)
       expect(file).toEqual({
         kind: 'file',
-        origin: 'https://ucarecdn.com',
+        cdnBase: 'https://ucarecdn.com',
         uuid: UUID,
         conversion: null,
         operations: [{ name: 'resize', params: ['300x'] }],
@@ -397,7 +397,7 @@ describe('per-kind parsers', () => {
       expect(parseFileUrl(`https://ucarecdn.com/${UUID}/video/?a=1#f`)).toEqual(
         {
           kind: 'file',
-          origin: 'https://ucarecdn.com',
+          cdnBase: 'https://ucarecdn.com',
           uuid: UUID,
           conversion: 'video',
           operations: [],
@@ -421,7 +421,7 @@ describe('per-kind parsers', () => {
     it('returns the group root shape', () => {
       expect(parseGroupUrl(GROUP)).toEqual({
         kind: 'group',
-        origin: 'https://ucarecdn.com',
+        cdnBase: 'https://ucarecdn.com',
         group: { uuid: UUID, count: 3 },
         search: '',
         hash: ''
@@ -439,7 +439,7 @@ describe('per-kind parsers', () => {
     it('returns the element shape', () => {
       expect(parseGroupElementUrl(ELEMENT)).toEqual({
         kind: 'group-element',
-        origin: 'https://ucarecdn.com',
+        cdnBase: 'https://ucarecdn.com',
         group: { uuid: UUID, count: 3 },
         nth: 1,
         operations: [{ name: 'preview', params: ['150x150'] }],
@@ -459,7 +459,7 @@ describe('per-kind parsers', () => {
     it('returns the proxy shape with the source url intact', () => {
       expect(parseProxyUrl(PROXY)).toEqual({
         kind: 'proxy',
-        origin: 'https://pk.ucr.io',
+        cdnBase: 'https://pk.ucr.io',
         operations: [{ name: 'preview', params: [] }],
         sourceUrl: 'https://example.com/a.jpg'
       })

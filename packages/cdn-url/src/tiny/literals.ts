@@ -230,10 +230,10 @@ export function asModifiersChain(chain: string): ModifiersChain {
  * normalizeModifiers('') // → ''
  * ```
  */
-export function normalizeModifiers(value: string): ModifiersChain {
+export function normalizeModifiers(raw: string): ModifiersChain {
   // split/filter/join collapses runs of slashes and drops the ones at either end
   // in one pass — the same shape as `segmentize` in parse.ts, no regex needed.
-  const chain = value
+  const chain = raw
     .trim()
     .split('/')
     .filter((segment) => segment !== '')

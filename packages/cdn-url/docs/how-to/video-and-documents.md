@@ -29,7 +29,9 @@ videoPath(uuid, [
 ```
 
 ```ts [Fluent]
-import { cdn } from '@uploadcare/cdn-url/fluent'
+import { base, prefixedCdnBase } from '@uploadcare/cdn-url/fluent'
+
+const cdn = base(prefixedCdnBase('demopublickey'))
 
 cdn
   .video(uuid)
@@ -44,7 +46,7 @@ cdn
 :::
 
 ::: warning No builder tab, on purpose
-`CdnUrl` can hold a `conversion: 'video'` and will happily serialize it, but it attaches the origin and hands back a full URL. The convert API wants a path, so use `videoPath` or a fluent video chain instead.
+`CdnUrl` can hold a `conversion: 'video'` and will happily serialize it, but it attaches the CDN base and hands back a full URL. The convert API wants a path, so use `videoPath` or a fluent video chain instead.
 :::
 
 Grammar the creators enforce (in development):
@@ -89,8 +91,11 @@ Animated GIFs convert to video directly on the CDN, with no REST job:
 ```ts
 import { format, gif2videoUrl, quality } from '@uploadcare/cdn-url/gif2video'
 
-gif2videoUrl('https://ucarecdn.com', uuid, [format('webm'), quality('better')])
-// → https://ucarecdn.com/:uuid/gif2video/-/format/webm/-/quality/better/
+gif2videoUrl('https://1s4oyld5dc.ucarecd.net', uuid, [
+  format('webm'),
+  quality('better')
+])
+// → https://1s4oyld5dc.ucarecd.net/:uuid/gif2video/-/format/webm/-/quality/better/
 ```
 
 ```html

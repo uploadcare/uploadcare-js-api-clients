@@ -26,15 +26,17 @@ import { defaultProxyEndpoint } from '@uploadcare/cdn-url/proxy'
 import { preview, resize } from '@uploadcare/cdn-url/ops'
 
 new CdnUrl({
-  origin: defaultProxyEndpoint('YOUR_PUBLIC_KEY'),
+  cdnBase: defaultProxyEndpoint('YOUR_PUBLIC_KEY'),
   sourceUrl: 'https://yoursite.com/assets/hero.jpg',
   operations: [preview(), resize({ width: 1280 })]
 }).href
 ```
 
 ```ts [Fluent]
-import { cdn } from '@uploadcare/cdn-url/fluent'
+import { base, prefixedCdnBase } from '@uploadcare/cdn-url/fluent'
 import { defaultProxyEndpoint } from '@uploadcare/cdn-url/proxy'
+
+const cdn = base(prefixedCdnBase('demopublickey'))
 
 cdn
   .proxy(
@@ -63,7 +65,7 @@ proxyUrl('https://proxy.yourdomain.com', source, ops)
 const parsed = parseCdnUrl(
   'https://pubkey.ucr.io/-/resize/500x/https://example.com/a.jpg?v=2'
 )
-// { kind: 'proxy', origin: 'https://pubkey.ucr.io', operations: […], sourceUrl: 'https://example.com/a.jpg?v=2' }
+// { kind: 'proxy', cdnBase: 'https://pubkey.ucr.io', operations: […], sourceUrl: 'https://example.com/a.jpg?v=2' }
 ```
 
 There is no `uuid`: the shape doesn't have one, and TypeScript will tell you so.
@@ -71,7 +73,7 @@ There is no `uuid`: the shape doesn't have one, and TypeScript will tell you so.
 ## Prerequisites and failure modes
 
 - Allow-list the source domain in your project settings first; otherwise the proxy answers `400 Domain is not allowed`.
-- The proxy probes the source with a `HEAD` request before fetching, so your origin server must answer those correctly.
+- The proxy probes the source with a `HEAD` request before fetching, so your cdnBase server must answer those correctly.
 - Fetching counts against your project's upload units and storage (it's a `from_url` upload under the hood); the processed variants don't.
 
 ## Proxy vs uploading

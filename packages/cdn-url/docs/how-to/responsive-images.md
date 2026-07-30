@@ -14,7 +14,7 @@ const WIDTHS = [320, 640, 960, 1280, 1920]
 
 function variant(uuid: string, width: number): string {
   return serializeCdnUrl({
-    origin: 'https://ucarecdn.com',
+    cdnBase: 'https://1s4oyld5dc.ucarecd.net',
     uuid,
     operations: [preview(width, width)]
   })
@@ -31,7 +31,7 @@ const WIDTHS = [320, 640, 960, 1280, 1920]
 
 function variant(uuid: string, width: number): string {
   return new CdnUrl({
-    origin: 'https://ucarecdn.com',
+    cdnBase: 'https://1s4oyld5dc.ucarecd.net',
     uuid,
     operations: [preview(width, width)]
   }).href
@@ -41,8 +41,9 @@ const srcset = WIDTHS.map((w) => `${variant(uuid, w)} ${w}w`).join(', ')
 ```
 
 ```ts [Fluent]
-import { cdn } from '@uploadcare/cdn-url/fluent'
+import { base, prefixedCdnBase } from '@uploadcare/cdn-url/fluent'
 
+const cdn = base(prefixedCdnBase('demopublickey'))
 const WIDTHS = [320, 640, 960, 1280, 1920]
 
 function variant(uuid: string, width: number): string {

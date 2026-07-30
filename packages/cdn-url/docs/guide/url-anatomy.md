@@ -5,12 +5,12 @@ Every Uploadcare CDN URL follows one structure. Once you know it, the parser's o
 ## A file URL
 
 ```
-https://ucarecdn.com/c2499162-…-47e858/-/crop/640x480/-/preview/400x400/photo.jpg
+https://1s4oyld5dc.ucarecd.net/c2499162-…-47e858/-/crop/640x480/-/preview/400x400/photo.jpg
 └──────┬───────────┘└─────┬───────────┘└──────────┬──────────────────┘└───┬────┘
-     origin              uuid                operations               filename
+     cdnBase              uuid                operations               filename
 ```
 
-- origin: scheme + host, no path
+- cdnBase: scheme + host, no path
 - uuid: the file id
 - operations: zero or more `-/name/params/` directives, applied in order as a pipeline
 - filename: optional, anything after the last operation without a trailing slash
@@ -33,7 +33,7 @@ The shape only has the fields its kind allows, and TypeScript narrows on `kind`:
 | `group-element` | `group`, `nth`, `operations`, `filename`, `search`, `hash`       |
 | `proxy`         | `sourceUrl`, `operations`; the source keeps its own query/hash   |
 
-All kinds carry `origin`.
+All kinds carry `cdnBase`.
 
 ## Domains
 
@@ -50,16 +50,16 @@ import { detectDomainKind } from '@uploadcare/cdn-url'
 detectDomainKind('https://1zlmtnsbgr.ucarecd.net') // → 'prefixed'
 ```
 
-The parser and serializer work identically on all of them. The origin is just a field, which makes [rebasing between domains](/how-to/render-stored-urls#rebasing-onto-another-domain) a one-liner.
+The parser and serializer work identically on all of them. The cdnBase is just a field, which makes [rebasing between domains](/how-to/render-stored-urls#rebasing-onto-another-domain) a one-liner.
 
 ## Group URLs
 
 A group id is a uuid with a file count: `:uuid~3`. Group roots list the files and cannot carry operations; individual files are addressed with `nth` (zero-based) and can:
 
 ```
-https://ucarecdn.com/:uuid~3/                          group root
-https://ucarecdn.com/:uuid~3/nth/1/-/resize/256x/      second file, resized
-https://ucarecdn.com/:uuid~3/archive/zip/all.zip       originals as an archive
+https://1s4oyld5dc.ucarecd.net/:uuid~3/                          group root
+https://1s4oyld5dc.ucarecd.net/:uuid~3/nth/1/-/resize/256x/      second file, resized
+https://1s4oyld5dc.ucarecd.net/:uuid~3/archive/zip/all.zip       originals as an archive
 ```
 
 See [Groups & archives](/how-to/groups-and-archives).
@@ -71,7 +71,7 @@ The delivery proxy fetches remote sources through the CDN. Operations sit betwee
 ```
 https://pubkey.ucr.io/-/preview/-/resize/500x/https://example.com/image.jpg?v=2
 └────────┬──────────┘└──────────┬───────────┘└──────────────┬─────────────────┘
-       origin              operations                    sourceUrl
+       cdnBase              operations                    sourceUrl
 ```
 
 See [Remote images via proxy](/how-to/remote-images-via-proxy).

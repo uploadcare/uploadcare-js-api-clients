@@ -35,14 +35,14 @@ describe('serializeOperations', () => {
 describe('serializeCdnUrl', () => {
   it('builds a minimal file url', () => {
     expect(
-      serializeCdnUrl({ origin: 'https://ucarecdn.com', uuid: UUID })
+      serializeCdnUrl({ cdnBase: 'https://ucarecdn.com', uuid: UUID })
     ).toBe(`https://ucarecdn.com/${UUID}/`)
   })
 
   it('builds a file url with operations and filename', () => {
     expect(
       serializeCdnUrl({
-        origin: 'https://ucarecdn.com',
+        cdnBase: 'https://ucarecdn.com',
         uuid: UUID,
         operations: [
           { name: 'preview', params: ['150x150'] },
@@ -53,16 +53,16 @@ describe('serializeCdnUrl', () => {
     ).toBe(`https://ucarecdn.com/${UUID}/-/preview/150x150/-/enhance/25/2.jpeg`)
   })
 
-  it('normalizes trailing slash in origin', () => {
+  it('normalizes trailing slash in cdnBase', () => {
     expect(
-      serializeCdnUrl({ origin: 'https://ucarecdn.com/', uuid: UUID })
+      serializeCdnUrl({ cdnBase: 'https://ucarecdn.com/', uuid: UUID })
     ).toBe(`https://ucarecdn.com/${UUID}/`)
   })
 
   it('builds group urls', () => {
     expect(
       serializeCdnUrl({
-        origin: 'https://ucarecdn.com',
+        cdnBase: 'https://ucarecdn.com',
         group: { uuid: UUID, count: 11 }
       })
     ).toBe(`https://ucarecdn.com/${UUID}~11/`)
@@ -71,7 +71,7 @@ describe('serializeCdnUrl', () => {
   it('builds group element urls with operations', () => {
     expect(
       serializeCdnUrl({
-        origin: 'https://ucarecdn.com',
+        cdnBase: 'https://ucarecdn.com',
         group: { uuid: UUID, count: 3 },
         nth: 1,
         operations: [{ name: 'resize', params: ['256x'] }]
@@ -82,7 +82,7 @@ describe('serializeCdnUrl', () => {
   it('builds conversion urls without -/ after the uuid', () => {
     expect(
       serializeCdnUrl({
-        origin: 'https://ucarecdn.com',
+        cdnBase: 'https://ucarecdn.com',
         uuid: UUID,
         conversion: 'video',
         operations: [{ name: 'size', params: ['720x540'] }]
@@ -93,7 +93,7 @@ describe('serializeCdnUrl', () => {
   it('builds proxy urls with embedded source', () => {
     expect(
       serializeCdnUrl({
-        origin: 'https://pubkey.ucr.io',
+        cdnBase: 'https://pubkey.ucr.io',
         sourceUrl: 'https://example.com/image.jpg?q=1',
         operations: [{ name: 'resize', params: ['500x'] }]
       })
@@ -105,7 +105,7 @@ describe('serializeCdnUrl', () => {
   it('appends preserved query and hash', () => {
     expect(
       serializeCdnUrl({
-        origin: 'https://cdn.example.com',
+        cdnBase: 'https://cdn.example.com',
         uuid: UUID,
         operations: [{ name: 'preview', params: [] }],
         search: '?token=exp=1~hmac=x',
@@ -116,7 +116,7 @@ describe('serializeCdnUrl', () => {
 
   it('throws when neither uuid, group nor sourceUrl is given', () => {
     // @ts-expect-error the input union requires an addressing field
-    expect(() => serializeCdnUrl({ origin: 'https://ucarecdn.com' })).toThrow(
+    expect(() => serializeCdnUrl({ cdnBase: 'https://ucarecdn.com' })).toThrow(
       TypeError
     )
   })
@@ -162,9 +162,9 @@ describe('serializeCdnUrl', () => {
   })
 
   describe('per-kind serializers', () => {
-    it('builds a file url, tolerating a trailing slash on the origin', () => {
+    it('builds a file url, tolerating a trailing slash on the cdnBase', () => {
       expect(
-        serializeFileUrl({ origin: 'https://ucarecdn.com/', uuid: UUID })
+        serializeFileUrl({ cdnBase: 'https://ucarecdn.com/', uuid: UUID })
       ).toBe(`https://ucarecdn.com/${UUID}/`)
     })
 
@@ -173,7 +173,7 @@ describe('serializeCdnUrl', () => {
       // an element index — passing them is a no-op rather than an error.
       expect(
         serializeGroupUrl({
-          origin: 'https://ucarecdn.com',
+          cdnBase: 'https://ucarecdn.com',
           group: { uuid: UUID, count: 3 },
           operations: [{ name: 'preview', params: [] }]
         })
@@ -183,7 +183,7 @@ describe('serializeCdnUrl', () => {
     it('builds a group element url with operations and a filename', () => {
       expect(
         serializeGroupUrl({
-          origin: 'https://ucarecdn.com',
+          cdnBase: 'https://ucarecdn.com',
           group: { uuid: UUID, count: 3 },
           nth: 0,
           operations: [{ name: 'preview', params: ['150x150'] }],
@@ -195,7 +195,7 @@ describe('serializeCdnUrl', () => {
     it('embeds the proxy source after the operations, verbatim', () => {
       expect(
         serializeProxyUrl({
-          origin: 'https://pubkey.ucr.io',
+          cdnBase: 'https://pubkey.ucr.io',
           sourceUrl: 'https://example.com/a.jpg?v=2',
           operations: [{ name: 'resize', params: ['500x'] }]
         })
@@ -207,7 +207,7 @@ describe('serializeCdnUrl', () => {
     it('keeps the conversion prefix ahead of the operations on a file url', () => {
       expect(
         serializeFileUrl({
-          origin: 'https://ucarecdn.com',
+          cdnBase: 'https://ucarecdn.com',
           uuid: UUID,
           conversion: 'video',
           operations: [{ name: 'size', params: ['720x540'] }]

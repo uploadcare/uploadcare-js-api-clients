@@ -6,8 +6,8 @@ import { CdnUrl } from './index'
 const UUID = 'c2499162-eb07-4b93-b31e-94a89a47e858'
 
 describe('CdnUrl builder', () => {
-  it('constructs from origin and uuid', () => {
-    const url = new CdnUrl({ origin: 'https://ucarecdn.com', uuid: UUID })
+  it('constructs from cdnBase and uuid', () => {
+    const url = new CdnUrl({ cdnBase: 'https://ucarecdn.com', uuid: UUID })
     expect(url.href).toBe(`https://ucarecdn.com/${UUID}/`)
   })
 
@@ -58,9 +58,9 @@ describe('CdnUrl builder', () => {
     )
   })
 
-  it('setOrigin() rebases the url onto another domain', () => {
+  it('setCdnBase() rebases the url onto another domain', () => {
     const url = CdnUrl.parse(`https://ucarecdn.com/${UUID}/-/preview/`)
-    expect(url.setOrigin('https://1zlmtnsbgr.ucarecd.net').href).toBe(
+    expect(url.setCdnBase('https://1zlmtnsbgr.ucarecd.net').href).toBe(
       `https://1zlmtnsbgr.ucarecd.net/${UUID}/-/preview/`
     )
   })
@@ -162,7 +162,7 @@ describe('CdnUrl builder', () => {
     it('replaces thumbs~5 with thumbs~3 instead of appending', async () => {
       const { thumbs } = await import('../video/index')
       const url = new CdnUrl({
-        origin: 'https://ucarecdn.com',
+        cdnBase: 'https://ucarecdn.com',
         uuid: UUID,
         operations: [thumbs(5)]
       })

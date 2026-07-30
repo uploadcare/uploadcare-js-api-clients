@@ -23,11 +23,11 @@ import { parseCdnUrl, serializeCdnUrl } from '@uploadcare/cdn-url'
 import { stripMeta } from '@uploadcare/cdn-url/ops'
 
 const parsed = parseCdnUrl(
-  'https://ucarecdn.com/c2499162-eb07-4b93-b31e-94a89a47e858/-/resize/300x/photo.jpg'
+  'https://1s4oyld5dc.ucarecd.net/c2499162-eb07-4b93-b31e-94a89a47e858/-/resize/300x/photo.jpg'
 )
 // {
 //   kind: 'file',
-//   origin: 'https://ucarecdn.com',
+//   cdnBase: 'https://1s4oyld5dc.ucarecd.net',
 //   uuid: 'c2499162-eb07-4b93-b31e-94a89a47e858',
 //   operations: [{ name: 'resize', params: ['300x'] }],
 //   filename: 'photo.jpg',
@@ -63,11 +63,11 @@ import { serializeCdnUrl } from '@uploadcare/cdn-url'
 import { preview, quality, scaleCrop, stripMeta } from '@uploadcare/cdn-url/ops'
 
 serializeCdnUrl({
-  origin: 'https://ucarecdn.com',
+  cdnBase: 'https://1s4oyld5dc.ucarecd.net',
   uuid: 'c2499162-eb07-4b93-b31e-94a89a47e858',
   operations: [scaleCrop(1252, 670, { type: 'smart' }), stripMeta('sensitive')]
 })
-// https://ucarecdn.com/c2499162-…/-/scale_crop/1252x670/smart/-/strip_meta/sensitive/
+// https://1s4oyld5dc.ucarecd.net/c2499162-…/-/scale_crop/1252x670/smart/-/strip_meta/sensitive/
 // format/auto + adaptive quality are applied by the CDN automatically
 
 preview(1000, 400) // { name: 'preview', params: ['1000x400'] }
@@ -90,7 +90,7 @@ An optional immutable wrapper when chaining reads better than spreading:
 import { CdnUrl } from '@uploadcare/cdn-url/builder'
 import { preview, quality } from '@uploadcare/cdn-url/ops'
 
-CdnUrl.parse('https://ucarecdn.com/c2499162-…/-/resize/300x/')
+CdnUrl.parse('https://1s4oyld5dc.ucarecd.net/c2499162-…/-/resize/300x/')
   .without(resize)
   .with(preview(800, 600), stripMeta('sensitive'))
   .setFilename('hero.jpg').href
@@ -102,12 +102,20 @@ Everything behind one import, chainable end to end — for code that prefers
 convenience over tree-shaking (~14 kB minified):
 
 ```ts
-import { cdn } from '@uploadcare/cdn-url/fluent'
+import { base, prefixedCdnBase } from '@uploadcare/cdn-url/fluent'
+
+// `prefixedCdnBase` computes your project's host from its public key
+const cdn = base(prefixedCdnBase('demopublickey'))
 
 cdn.file(uuid).scaleCrop(96, 96, { type: 'smart' }).borderRadius('50p').href
+// https://1s4oyld5dc.ucarecd.net/:uuid/-/scale_crop/96x96/smart/-/border_radius/50p/
 cdn.video(uuid).size({ width: 720, height: 540 }).thumbs(5).path
-cdn.configure({ origin: 'https://cdn.example.com' }).file(uuid).preview().href
+cdn.base('https://cdn.example.com').file(uuid).preview().href
 ```
+
+Delivering from your own CNAME instead? Pass it straight to `base`. A base is
+always required — there is no default host, since a bare `ucarecd.net` URL does
+not resolve without a project prefix.
 
 Works without a bundler too, via the IIFE global build
 (`dist/cdn-url.global.js` → `window.UCCdnUrl`).
@@ -140,9 +148,11 @@ import {
 } from '@uploadcare/cdn-url/group'
 
 const group = parseGroupId('c2499162-eb07-4b93-b31e-94a89a47e858~3')
-groupUrl('https://ucarecdn.com', group) // https://ucarecdn.com/c2499162-…~3/
-nthUrl('https://ucarecdn.com', group, 1, [{ name: 'resize', params: ['256x'] }])
-archiveUrl('https://ucarecdn.com', group, 'zip', 'all.zip')
+groupUrl('https://1s4oyld5dc.ucarecd.net', group) // https://1s4oyld5dc.ucarecd.net/c2499162-…~3/
+nthUrl('https://1s4oyld5dc.ucarecd.net', group, 1, [
+  { name: 'resize', params: ['256x'] }
+])
+archiveUrl('https://1s4oyld5dc.ucarecd.net', group, 'zip', 'all.zip')
 ```
 
 ## Delivery proxy
@@ -189,8 +199,8 @@ import {
   format as gifFormat
 } from '@uploadcare/cdn-url/gif2video'
 
-gif2videoUrl('https://ucarecdn.com', uuid, [gifFormat('webm')])
-// https://ucarecdn.com/:uuid/gif2video/-/format/webm/
+gif2videoUrl('https://1s4oyld5dc.ucarecd.net', uuid, [gifFormat('webm')])
+// https://1s4oyld5dc.ucarecd.net/:uuid/gif2video/-/format/webm/
 ```
 
 The lenient URL parser still understands `/:uuid/video/...` inside full URLs,

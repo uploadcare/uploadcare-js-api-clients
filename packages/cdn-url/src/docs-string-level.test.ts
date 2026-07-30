@@ -76,7 +76,7 @@ describe('Splitting and rebuilding a URL', () => {
     expect(
       tinyParse(`https://ucarecdn.com/${UUID}/-/resize/300x/photo.jpg`)
     ).toEqual({
-      origin: 'https://ucarecdn.com',
+      cdnBase: 'https://ucarecdn.com',
       uuid: UUID,
       modifiers: '-/resize/300x/',
       filename: 'photo.jpg',
@@ -94,12 +94,12 @@ describe('Splitting and rebuilding a URL', () => {
   })
 
   it('builds a url from scratch, with every optional field omitted', () => {
-    expect(tinyBuild({ origin: 'https://ucarecdn.com', uuid: UUID })).toBe(
+    expect(tinyBuild({ cdnBase: 'https://ucarecdn.com', uuid: UUID })).toBe(
       `https://ucarecdn.com/${UUID}/`
     )
     expect(
       tinyBuild({
-        origin: 'https://ucarecdn.com',
+        cdnBase: 'https://ucarecdn.com',
         uuid: UUID,
         modifiers: modifiers('preview/800x600')
       })
@@ -215,11 +215,11 @@ describe('Operation vs modifiers', () => {
 })
 
 describe('Editing hazards, as the page tabulates them', () => {
-  it('tolerates a trailing slash on the origin', () => {
-    expect(tinyBuild({ origin: 'https://ucarecdn.com/', uuid: UUID })).toBe(
+  it('tolerates a trailing slash on the cdnBase', () => {
+    expect(tinyBuild({ cdnBase: 'https://ucarecdn.com/', uuid: UUID })).toBe(
       `https://ucarecdn.com/${UUID}/`
     )
-    expect(tinyBuild({ origin: 'https://ucarecdn.com///', uuid: UUID })).toBe(
+    expect(tinyBuild({ cdnBase: 'https://ucarecdn.com///', uuid: UUID })).toBe(
       `https://ucarecdn.com/${UUID}/`
     )
   })
@@ -227,7 +227,7 @@ describe('Editing hazards, as the page tabulates them', () => {
   it('search and hash carry their own punctuation', () => {
     expect(
       tinyBuild({
-        origin: 'https://ucarecdn.com',
+        cdnBase: 'https://ucarecdn.com',
         uuid: UUID,
         search: '?v=2',
         hash: '#top'
@@ -246,7 +246,7 @@ describe('Editing hazards, as the page tabulates them', () => {
   })
 
   it('omitted, undefined and modifiers() are the same empty chain', () => {
-    const base = { origin: 'https://ucarecdn.com', uuid: UUID }
+    const base = { cdnBase: 'https://ucarecdn.com', uuid: UUID }
     const bare = `https://ucarecdn.com/${UUID}/`
     expect(tinyBuild(base)).toBe(bare)
     expect(tinyBuild({ ...base, modifiers: undefined })).toBe(bare)
@@ -270,7 +270,7 @@ describe('Editing hazards, as the page tabulates them', () => {
 
   it('tinyParse on junk returns nonsense rather than throwing', () => {
     expect(tinyParse('not a url')).toMatchObject({
-      origin: 'not a url',
+      cdnBase: 'not a url',
       uuid: ''
     })
   })

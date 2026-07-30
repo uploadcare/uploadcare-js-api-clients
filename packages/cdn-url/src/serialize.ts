@@ -35,7 +35,7 @@ export function serializeOperations(
  * @see https://uploadcare.com/docs/delivery/cdn/
  * @example
  * ```ts
- * serializeCdnUrl({ origin: 'https://ucarecdn.com', uuid, operations: [preview(800, 600)] })
+ * serializeCdnUrl({ cdnBase: 'https://ucarecdn.com', uuid, operations: [preview(800, 600)] })
  * // → https://ucarecdn.com/:uuid/-/preview/800x600/
  * ```
  */
@@ -63,16 +63,16 @@ export function serializeCdnUrl(input: CdnUrlInput): string {
  * @see https://uploadcare.com/docs/delivery/cdn/
  * @example
  * ```ts
- * serializeFileUrl({ origin: 'https://ucarecdn.com', uuid, operations: [preview(800, 600)] })
+ * serializeFileUrl({ cdnBase: 'https://ucarecdn.com', uuid, operations: [preview(800, 600)] })
  * // → https://ucarecdn.com/:uuid/-/preview/800x600/
  * ```
  */
 export function serializeFileUrl(input: FileUrlInput): string {
-  const origin = trimTrailingSlashes(input.origin)
+  const cdnBase = trimTrailingSlashes(input.cdnBase)
   const conversion = input.conversion != null ? `${input.conversion}/` : ''
   const ops = serializeOperations(input.operations ?? [])
   const tail = `${input.filename ?? ''}${input.search ?? ''}${input.hash ?? ''}`
-  return `${origin}/${input.uuid}/${conversion}${ops}${tail}`
+  return `${cdnBase}/${input.uuid}/${conversion}${ops}${tail}`
 }
 
 /**
@@ -86,13 +86,13 @@ export function serializeFileUrl(input: FileUrlInput): string {
  * @see https://uploadcare.com/docs/file-groups/
  * @example
  * ```ts
- * serializeGroupUrl({ origin: 'https://ucarecdn.com', group: { uuid, count: 3 } })
+ * serializeGroupUrl({ cdnBase: 'https://ucarecdn.com', group: { uuid, count: 3 } })
  * // → https://ucarecdn.com/:uuid~3/
  * ```
  */
 export function serializeGroupUrl(input: GroupUrlInput): string {
-  const origin = trimTrailingSlashes(input.origin)
-  let path = `${origin}/${input.group.uuid}~${input.group.count}/`
+  const cdnBase = trimTrailingSlashes(input.cdnBase)
+  let path = `${cdnBase}/${input.group.uuid}~${input.group.count}/`
   if (input.nth != null) {
     const ops = serializeOperations(input.operations ?? [])
     path += `nth/${input.nth}/${ops}${input.filename ?? ''}`
@@ -108,11 +108,11 @@ export function serializeGroupUrl(input: GroupUrlInput): string {
  * @see https://uploadcare.com/docs/delivery/proxy/
  * @example
  * ```ts
- * serializeProxyUrl({ origin: 'https://pubkey.ucr.io', sourceUrl: 'https://example.com/a.jpg' })
+ * serializeProxyUrl({ cdnBase: 'https://pubkey.ucr.io', sourceUrl: 'https://example.com/a.jpg' })
  * // → https://pubkey.ucr.io/https://example.com/a.jpg
  * ```
  */
 export function serializeProxyUrl(input: ProxyUrlInput): string {
-  const origin = trimTrailingSlashes(input.origin)
-  return `${origin}/${serializeOperations(input.operations ?? [])}${input.sourceUrl}`
+  const cdnBase = trimTrailingSlashes(input.cdnBase)
+  return `${cdnBase}/${serializeOperations(input.operations ?? [])}${input.sourceUrl}`
 }

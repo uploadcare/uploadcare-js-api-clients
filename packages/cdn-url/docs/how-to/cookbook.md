@@ -37,8 +37,8 @@ import {
 import { blur, overlay, resize, scaleCrop } from '@uploadcare/cdn-url/ops'
 
 const uuid = 'c2499162-eb07-4b93-b31e-94a89a47e858'
-const origin = 'https://ucarecdn.com'
-const stored = `${origin}/${uuid}/-/resize/300x/-/quality/smart/`
+const cdnBase = 'https://1s4oyld5dc.ucarecd.net'
+const stored = `${cdnBase}/${uuid}/-/resize/300x/-/quality/smart/`
 
 /** Rewrite a URL's operation chain and serialize it back. */
 function mapOperations(
@@ -58,20 +58,21 @@ import { CdnUrl } from '@uploadcare/cdn-url/builder'
 import { blur, overlay, resize, scaleCrop } from '@uploadcare/cdn-url/ops'
 
 const uuid = 'c2499162-eb07-4b93-b31e-94a89a47e858'
-const origin = 'https://ucarecdn.com'
-const stored = `${origin}/${uuid}/-/resize/300x/-/quality/smart/`
+const cdnBase = 'https://1s4oyld5dc.ucarecd.net'
+const stored = `${cdnBase}/${uuid}/-/resize/300x/-/quality/smart/`
 
 const url = CdnUrl.parse(stored)
 ```
 
 ```ts [Fluent]
 import { operationMatches } from '@uploadcare/cdn-url'
-import { cdn } from '@uploadcare/cdn-url/fluent'
+import { base, prefixedCdnBase } from '@uploadcare/cdn-url/fluent'
 import { blur, overlay, resize } from '@uploadcare/cdn-url/ops'
 
+const cdn = base(prefixedCdnBase('demopublickey'))
 const uuid = 'c2499162-eb07-4b93-b31e-94a89a47e858'
-const origin = 'https://ucarecdn.com'
-const stored = `${origin}/${uuid}/-/resize/300x/-/quality/smart/`
+const cdnBase = 'https://1s4oyld5dc.ucarecd.net'
+const stored = `${cdnBase}/${uuid}/-/resize/300x/-/quality/smart/`
 
 // cdn.parse returns a union, so narrow once to get a FileChain
 const parsed = cdn.parse(stored)
@@ -91,16 +92,16 @@ const chain = parsed
 
 ```ts [Atomic]
 serializeCdnUrl({
-  origin,
+  cdnBase,
   uuid,
   operations: [scaleCrop(300, 300, { type: 'smart' })]
 })
-// → https://ucarecdn.com/<uuid>/-/scale_crop/300x300/smart/
+// → https://1s4oyld5dc.ucarecd.net/<uuid>/-/scale_crop/300x300/smart/
 ```
 
 ```ts [Builder]
 new CdnUrl({
-  origin,
+  cdnBase,
   uuid,
   operations: [scaleCrop(300, 300, { type: 'smart' })]
 }).href
@@ -112,7 +113,7 @@ cdn.file(uuid).scaleCrop(300, 300, { type: 'smart' }).href
 
 :::
 
-The input is loose in all three: `origin` plus one addressing field (`uuid`, `group` or `sourceUrl`) is the minimum, and `operations`, `filename`, `conversion`, `search` and `hash` are optional. `serializeCdnUrl({ origin, uuid })` alone gives you the bare file URL.
+The input is loose in all three: `cdnBase` plus one addressing field (`uuid`, `group` or `sourceUrl`) is the minimum, and `operations`, `filename`, `conversion`, `search` and `hash` are optional. `serializeCdnUrl({ cdnBase, uuid })` alone gives you the bare file URL.
 
 One core operation is enough. The CDN applies `format/auto` on its own once a chain does any processing, and adaptive quality is the default for projects created on or after 2025-08-04.
 
@@ -123,12 +124,12 @@ One core operation is enough. The CDN applies `format/auto` on its own once a ch
 ```ts [Atomic]
 serializeCdnUrl({
   ...parseCdnUrl(stored),
-  origin: 'https://1zlmtnsbgr.ucarecd.net'
+  cdnBase: 'https://1zlmtnsbgr.ucarecd.net'
 })
 ```
 
 ```ts [Builder]
-url.setOrigin('https://1zlmtnsbgr.ucarecd.net').href
+url.setCdnBase('https://1zlmtnsbgr.ucarecd.net').href
 ```
 
 ```ts [Fluent]
@@ -148,7 +149,7 @@ const file = parseCdnUrl(stored)
 if (file.kind === 'file') {
   serializeCdnUrl({ ...file, filename: 'invoice-2026.pdf' })
 }
-// → https://ucarecdn.com/<uuid>/-/resize/300x/-/quality/smart/invoice-2026.pdf
+// → https://1s4oyld5dc.ucarecd.net/<uuid>/-/resize/300x/-/quality/smart/invoice-2026.pdf
 ```
 
 ```ts [Builder]
@@ -171,7 +172,7 @@ Note the asymmetry: what `parseCdnUrl` _returns_ is fully populated, so `filenam
 
 ```ts [Atomic]
 mapOperations(stored, () => [])
-// → https://ucarecdn.com/<uuid>/
+// → https://1s4oyld5dc.ucarecd.net/<uuid>/
 ```
 
 ```ts [Builder]
@@ -201,7 +202,7 @@ serializeCdnUrl({ ...withToken, search: '' })
 mapOperations(stored, (ops) =>
   ops.map((op) => (operationMatches(op, resize) ? resize({ width: 500 }) : op))
 )
-// → https://ucarecdn.com/<uuid>/-/resize/500x/-/quality/smart/
+// → https://1s4oyld5dc.ucarecd.net/<uuid>/-/resize/500x/-/quality/smart/
 ```
 
 ```ts [Builder]
@@ -363,12 +364,12 @@ videoPath(uuid, smaller)
 import { size, thumbs } from '@uploadcare/cdn-url/video'
 
 new CdnUrl({
-  origin,
+  cdnBase,
   uuid,
   conversion: 'video',
   operations: [size({ width: 480 }), thumbs(5)]
 }).href
-// → https://ucarecdn.com/<uuid>/video/-/size/480x/-/thumbs~5/
+// → https://1s4oyld5dc.ucarecd.net/<uuid>/video/-/size/480x/-/thumbs~5/
 ```
 
 ```ts [Fluent]
@@ -387,7 +388,7 @@ cdn
 :::
 
 ::: warning Paths, not URLs
-Video and document conversions are **paths** you submit to the REST convert API, not URLs you serve. Atomic and fluent both give you `/<uuid>/video/…`. The builder attaches the origin and gives you a full URL, which is the wrong shape for the convert API. Reach for it only when you actually want a URL.
+Video and document conversions are **paths** you submit to the REST convert API, not URLs you serve. Atomic and fluent both give you `/<uuid>/video/…`. The builder attaches the CDN base and gives you a full URL, which is the wrong shape for the convert API. Reach for it only when you actually want a URL.
 
 Conversion chains also can't be re-parsed: `parseCdnUrl` and `cdn.parse` only read file, group, group-element and proxy URLs. Build the operations before you serialize.
 :::
@@ -411,7 +412,7 @@ const url = tinyBuild({
   ...parts,
   modifiers: joinModifiers(parts.modifiers, modifiers('blur/10'))
 })
-// → https://ucarecdn.com/<uuid>/-/resize/300x/-/quality/smart/-/blur/10/
+// → https://1s4oyld5dc.ucarecd.net/<uuid>/-/resize/300x/-/quality/smart/-/blur/10/
 ```
 
 419 B gzipped against 1487 B for the Atomic tab. The operations stay type-checked, but nothing is validated at run time, there are no kinds, and it is **file URLs only** — replacing the chain on a group element or a conversion result destroys the URL. Read [The string-level API](/guide/string-level-api) before using it; it is the one style that can hand you a broken URL without an error.
@@ -472,21 +473,21 @@ detectDomainKind('https://1zlmtnsbgr.ucarecd.net') // → 'prefixed'
 ::: code-group
 
 ```ts [Atomic]
-const signed = `${origin}/${uuid}/-/preview/300x300/?token=abc123`
+const signed = `${cdnBase}/${uuid}/-/preview/300x300/?token=abc123`
 
 mapOperations(signed, (ops) => [...ops, resize({ width: 400 })])
 // still carries ?token=abc123, and the CDN will now reject it
 ```
 
 ```ts [Builder]
-const signed = `${origin}/${uuid}/-/preview/300x300/?token=abc123`
+const signed = `${cdnBase}/${uuid}/-/preview/300x300/?token=abc123`
 
 CdnUrl.parse(signed).with(resize({ width: 400 })).href
 // still carries ?token=abc123, and the CDN will now reject it
 ```
 
 ```ts [Fluent]
-const signed = `${origin}/${uuid}/-/preview/300x300/?token=abc123`
+const signed = `${cdnBase}/${uuid}/-/preview/300x300/?token=abc123`
 
 const s = cdn.parse(signed)
 if (s.kind === 'file') s.resize({ width: 400 }).href

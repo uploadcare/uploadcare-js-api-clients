@@ -23,40 +23,42 @@ formatGroupId(group) // → 'c2499162-…~3'
 import { groupUrl, nthUrl } from '@uploadcare/cdn-url/group'
 import { preview } from '@uploadcare/cdn-url/ops'
 
-groupUrl('https://ucarecdn.com', group)
-// → https://ucarecdn.com/:uuid~3/            (lists the files)
+groupUrl('https://1s4oyld5dc.ucarecd.net', group)
+// → https://1s4oyld5dc.ucarecd.net/:uuid~3/            (lists the files)
 
-nthUrl('https://ucarecdn.com', group, 0)
-// → https://ucarecdn.com/:uuid~3/nth/0/      (first file, zero-based)
+nthUrl('https://1s4oyld5dc.ucarecd.net', group, 0)
+// → https://1s4oyld5dc.ucarecd.net/:uuid~3/nth/0/      (first file, zero-based)
 
-nthUrl('https://ucarecdn.com', group, 1, [preview(400, 400)])
-// → https://ucarecdn.com/:uuid~3/nth/1/-/preview/400x400/
+nthUrl('https://1s4oyld5dc.ucarecd.net', group, 1, [preview(400, 400)])
+// → https://1s4oyld5dc.ucarecd.net/:uuid~3/nth/1/-/preview/400x400/
 ```
 
 ```ts [Builder]
 import { CdnUrl } from '@uploadcare/cdn-url/builder'
 import { preview } from '@uploadcare/cdn-url/ops'
 
-new CdnUrl({ origin: 'https://ucarecdn.com', group }).href
-// → https://ucarecdn.com/:uuid~3/
+new CdnUrl({ cdnBase: 'https://1s4oyld5dc.ucarecd.net', group }).href
+// → https://1s4oyld5dc.ucarecd.net/:uuid~3/
 
 new CdnUrl({
-  origin: 'https://ucarecdn.com',
+  cdnBase: 'https://1s4oyld5dc.ucarecd.net',
   group,
   nth: 1,
   operations: [preview(400, 400)]
 }).href
-// → https://ucarecdn.com/:uuid~3/nth/1/-/preview/400x400/
+// → https://1s4oyld5dc.ucarecd.net/:uuid~3/nth/1/-/preview/400x400/
 ```
 
 ```ts [Fluent]
-import { cdn } from '@uploadcare/cdn-url/fluent'
+import { base, prefixedCdnBase } from '@uploadcare/cdn-url/fluent'
+
+const cdn = base(prefixedCdnBase('demopublickey'))
 
 cdn.group(group).href
-// → https://ucarecdn.com/:uuid~3/
+// → https://1s4oyld5dc.ucarecd.net/:uuid~3/
 
 cdn.group(group).nth(1).preview(400, 400).href
-// → https://ucarecdn.com/:uuid~3/nth/1/-/preview/400x400/
+// → https://1s4oyld5dc.ucarecd.net/:uuid~3/nth/1/-/preview/400x400/
 ```
 
 :::
@@ -64,13 +66,13 @@ cdn.group(group).nth(1).preview(400, 400).href
 Two rules the library enforces for you:
 
 - Group roots can't carry operations. Transformations go on `nth` elements only, and the parsed `group` shape doesn't even have an `operations` field.
-- The index is validated against the count, so `nthUrl(origin, group, 3)` on a `~3` group throws a `RangeError` in development.
+- The index is validated against the count, so `nthUrl(cdnBase, group, 3)` on a `~3` group throws a `RangeError` in development.
 
 ## Rendering a gallery
 
 ```ts
 const thumbs = Array.from({ length: group.count }, (_, i) =>
-  nthUrl('https://ucarecdn.com', group, i, [preview(300, 300)])
+  nthUrl('https://1s4oyld5dc.ucarecd.net', group, i, [preview(300, 300)])
 )
 ```
 
@@ -83,21 +85,23 @@ Hand the whole group to the user as one download:
 ```ts [Atomic]
 import { archiveUrl } from '@uploadcare/cdn-url/group'
 
-archiveUrl('https://ucarecdn.com', group, 'zip')
-// → https://ucarecdn.com/:uuid~3/archive/zip/
+archiveUrl('https://1s4oyld5dc.ucarecd.net', group, 'zip')
+// → https://1s4oyld5dc.ucarecd.net/:uuid~3/archive/zip/
 
-archiveUrl('https://ucarecdn.com', group, 'tar', 'photos.tar')
-// → https://ucarecdn.com/:uuid~3/archive/tar/photos.tar
+archiveUrl('https://1s4oyld5dc.ucarecd.net', group, 'tar', 'photos.tar')
+// → https://1s4oyld5dc.ucarecd.net/:uuid~3/archive/tar/photos.tar
 ```
 
 ```ts [Fluent]
-import { cdn } from '@uploadcare/cdn-url/fluent'
+import { base, prefixedCdnBase } from '@uploadcare/cdn-url/fluent'
+
+const cdn = base(prefixedCdnBase('demopublickey'))
 
 cdn.group(group).archive('zip')
-// → https://ucarecdn.com/:uuid~3/archive/zip/
+// → https://1s4oyld5dc.ucarecd.net/:uuid~3/archive/zip/
 
 cdn.group(group).archive('tar', 'photos.tar')
-// → https://ucarecdn.com/:uuid~3/archive/tar/photos.tar
+// → https://1s4oyld5dc.ucarecd.net/:uuid~3/archive/tar/photos.tar
 ```
 
 :::

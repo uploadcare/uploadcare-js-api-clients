@@ -12,7 +12,7 @@ import { borderRadius, scaleCrop } from '@uploadcare/cdn-url/ops'
 
 function avatarUrl(uuid: string, size: number): string {
   return serializeCdnUrl({
-    origin: 'https://ucarecdn.com',
+    cdnBase: 'https://1s4oyld5dc.ucarecd.net',
     uuid,
     operations: [
       scaleCrop(size, size, { type: 'smart_faces_objects' }),
@@ -31,7 +31,7 @@ import { borderRadius, scaleCrop } from '@uploadcare/cdn-url/ops'
 
 function avatarUrl(uuid: string, size: number): string {
   return new CdnUrl({
-    origin: 'https://ucarecdn.com',
+    cdnBase: 'https://1s4oyld5dc.ucarecd.net',
     uuid,
     operations: [
       scaleCrop(size, size, { type: 'smart_faces_objects' }),
@@ -42,7 +42,9 @@ function avatarUrl(uuid: string, size: number): string {
 ```
 
 ```ts [Fluent]
-import { cdn } from '@uploadcare/cdn-url/fluent'
+import { base, prefixedCdnBase } from '@uploadcare/cdn-url/fluent'
+
+const cdn = base(prefixedCdnBase('demopublickey'))
 
 function avatarUrl(uuid: string, size: number): string {
   return cdn

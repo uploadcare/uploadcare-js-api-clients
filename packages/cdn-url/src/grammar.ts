@@ -20,7 +20,7 @@ export const UUID_RE =
 export const GROUP_ID_RE =
   /^([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})~([0-9]+)$/i
 
-/** Strips trailing slashes from an origin or endpoint. */
+/** Strips trailing slashes from a CDN base or endpoint. */
 export function trimTrailingSlashes(url: string): string {
   return url.replace(/\/+$/, '')
 }

@@ -8,12 +8,7 @@ export {
   ProxyChain,
   VideoChain
 } from './chains'
-export {
-  configure,
-  DEFAULT_ORIGIN,
-  type FluentConfig,
-  type ParsedChain,
-  type Cdn,
-  cdn
-} from './cdn'
+export { base, type Cdn, parse, type ParsedChain } from './cdn'
+export { LEGACY_CDN_BASE, PREFIX_CDN_BASE } from '../cdn-base'
+export { prefixedCdnBase } from '../prefixed-cdn-base'
 export { defaultProxyEndpoint } from '../proxy/endpoint'

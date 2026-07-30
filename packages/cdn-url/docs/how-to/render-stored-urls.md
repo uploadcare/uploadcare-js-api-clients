@@ -58,7 +58,7 @@ import { serializeCdnUrl } from '@uploadcare/cdn-url'
 import { preview } from '@uploadcare/cdn-url/ops'
 
 const thumb = serializeCdnUrl({
-  origin: 'https://ucarecdn.com',
+  cdnBase: 'https://ucarecdn.com',
   uuid: row.uuid,
   operations: [preview(400, 400)]
 })
@@ -73,7 +73,7 @@ import { parseOperations, serializeCdnUrl } from '@uploadcare/cdn-url'
 import { preview } from '@uploadcare/cdn-url/ops'
 
 const thumb = serializeCdnUrl({
-  origin: 'https://ucarecdn.com',
+  cdnBase: 'https://ucarecdn.com',
   uuid: row.uuid,
   operations: [...parseOperations(row.modifiers), preview(400, 400)]
 })
@@ -99,12 +99,12 @@ To catch accidental duplicates during development, run the chain through [`valid
 
 ## Rebasing onto another domain
 
-Stored URLs often point at the legacy `ucarecdn.com` while your project now serves from a [prefixed or custom domain](https://uploadcare.com/docs/delivery/cdn/), one you've already configured in your project settings; the library only writes the string. The origin is just a field:
+Stored URLs often point at the legacy `ucarecdn.com` while your project now serves from a [prefixed or custom domain](https://uploadcare.com/docs/delivery/cdn/), one you've already configured in your project settings; the library only writes the string. The cdnBase is just a field:
 
 ```ts
 const rebased = serializeCdnUrl({
   ...parseCdnUrl(stored),
-  origin: 'https://cdn.example.com' // your CNAME, or https://<prefix>.ucarecd.net
+  cdnBase: 'https://cdn.example.com' // your CNAME, or https://<prefix>.ucarecd.net
 })
 ```
 
@@ -188,7 +188,7 @@ function thumbUrl(row: ImageRow): string | null {
       })
     }
     return serializeCdnUrl({
-      origin: 'https://ucarecdn.com',
+      cdnBase: 'https://ucarecdn.com',
       uuid: row.uuid,
       operations: [...parseOperations(row.modifiers ?? ''), ...THUMB]
     })

@@ -13,12 +13,12 @@ import type { CdnOperation, CdnUrlInput, ParsedCdnUrl } from '../types'
 /** Normalizes a loose {@link CdnUrlInput} into a full {@link ParsedCdnUrl}. */
 function normalizeInput(input: CdnUrlInput | ParsedCdnUrl): ParsedCdnUrl {
   if ('kind' in input) return input
-  const origin = trimTrailingSlashes(input.origin)
+  const cdnBase = trimTrailingSlashes(input.cdnBase)
 
   if ('sourceUrl' in input) {
     return {
       kind: 'proxy',
-      origin,
+      cdnBase,
       operations: input.operations ?? [],
       sourceUrl: input.sourceUrl
     }
@@ -31,7 +31,7 @@ function normalizeInput(input: CdnUrlInput | ParsedCdnUrl): ParsedCdnUrl {
     if (input.nth != null) {
       return {
         kind: 'group-element',
-        origin,
+        cdnBase,
         group: input.group,
         nth: input.nth,
         operations: input.operations ?? [],
@@ -40,12 +40,12 @@ function normalizeInput(input: CdnUrlInput | ParsedCdnUrl): ParsedCdnUrl {
         hash
       }
     }
-    return { kind: 'group', origin, group: input.group, search, hash }
+    return { kind: 'group', cdnBase, group: input.group, search, hash }
   }
 
   return {
     kind: 'file',
-    origin,
+    cdnBase,
     uuid: input.uuid,
     conversion: input.conversion ?? null,
     operations: input.operations ?? [],
@@ -200,9 +200,12 @@ export class CdnUrl {
     return new CdnUrl({ ...this.#parsed, filename })
   }
 
-  /** Rebases the url onto another domain. */
-  public setOrigin(origin: string): CdnUrl {
-    return new CdnUrl({ ...this.#parsed, origin: trimTrailingSlashes(origin) })
+  /** Rebases the url onto another domain (trailing slash tolerated). */
+  public setCdnBase(cdnBase: string): CdnUrl {
+    return new CdnUrl({
+      ...this.#parsed,
+      cdnBase: trimTrailingSlashes(cdnBase)
+    })
   }
 
   /**

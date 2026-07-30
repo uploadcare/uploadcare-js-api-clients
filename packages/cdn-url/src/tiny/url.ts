@@ -23,20 +23,20 @@ const HASH_RE = /#/
 
 /**
  * A single-file CDN url cut into the strings {@link tinyBuild} joins back
- * together. Only `origin` and `uuid` are required; the rest default to empty, so
- * a bare url is `{ origin, uuid }`. The field names match `ParsedFileUrl`, with
+ * together. Only `cdnBase` and `uuid` are required; the rest default to empty, so
+ * a bare url is `{ cdnBase, uuid }`. The field names match `ParsedFileUrl`, with
  * `modifiers` standing in for its `operations`.
  *
  * @see https://uploadcare.com/docs/delivery/cdn/
  * @example
  * ```ts
  * // https://ucarecdn.com/:uuid/-/resize/300x/photo.jpg?v=2#top
- * // └── origin ───────┘ └uuid┘ └modifiers──┘ └filename┘└sr┘└hash┘
+ * // └── cdnBase ───────┘ └uuid┘ └modifiers──┘ └filename┘└sr┘└hash┘
  * ```
  */
 export interface TinyFileUrl {
   /** Scheme + host. A trailing slash is tolerated and trimmed on build. */
-  origin: string
+  cdnBase: string
   /** The uuid — the first path segment. */
   uuid: string
   /** The directive chain between uuid and filename. Optional, empty by default. */
@@ -63,7 +63,7 @@ export interface TinyFileUrl {
  * @example
  * ```ts
  * tinyParse('https://ucarecdn.com/:uuid/-/resize/300x/photo.jpg')
- * // → { origin: 'https://ucarecdn.com', uuid: ':uuid',
+ * // → { cdnBase: 'https://ucarecdn.com', uuid: ':uuid',
  * //     modifiers: '-/resize/300x/', filename: 'photo.jpg', search: '', hash: '' }
  * ```
  */
@@ -80,7 +80,7 @@ export function tinyParse(url: string): TinyFileUrl {
   const fragment = trailing.search(HASH_RE)
   const queryEnd = fragment === -1 ? trailing.length : fragment
   return {
-    origin: pathStart === -1 ? url : url.slice(0, pathStart),
+    cdnBase: pathStart === -1 ? url : url.slice(0, pathStart),
     uuid: uuidEnd === -1 ? path : path.slice(0, uuidEnd),
     modifiers: asModifiersChain(cut === -1 ? '' : `${rest.slice(0, cut)}/`),
     filename: query === -1 ? trailing : trailing.slice(0, query),
@@ -91,9 +91,9 @@ export function tinyParse(url: string): TinyFileUrl {
 
 /**
  * Joins {@link TinyFileUrl} back into a url — the tiny counterpart of
- * `serializeFileUrl`. Every field but `origin` and `uuid` is optional, so this
+ * `serializeFileUrl`. Every field but `cdnBase` and `uuid` is optional, so this
  * builds a url from scratch as readily as it rebuilds a parsed one. A trailing
- * slash on `origin` is trimmed, matching `serializeFileUrl`; nothing else is
+ * slash on `cdnBase` is trimmed, matching `serializeFileUrl`; nothing else is
  * normalized.
  *
  * Edit `modifiers` through `modifiers()`, which takes typed `OperationLiteral`s,
@@ -103,7 +103,7 @@ export function tinyParse(url: string): TinyFileUrl {
  * @see https://uploadcare.com/docs/cdn-operations/
  * @example
  * ```ts
- * tinyBuild({ origin, uuid, modifiers: modifiers('preview/800x600') })
+ * tinyBuild({ cdnBase, uuid, modifiers: modifiers('preview/800x600') })
  * // → https://ucarecdn.com/:uuid/-/preview/800x600/
  *
  * const parts = tinyParse(stored) // …/:uuid/-/preview/photo.jpg
@@ -115,8 +115,8 @@ export function tinyParse(url: string): TinyFileUrl {
  * ```
  */
 export function tinyBuild(input: TinyFileUrl): string {
-  // The one thing normalized on the way out: an origin from config or
+  // The one thing normalized on the way out: a CDN base from config or
   // `new URL(x).origin + '/'` would otherwise produce `host//:uuid/`.
-  const origin = trimTrailingSlashes(input.origin)
-  return `${origin}/${input.uuid}/${input.modifiers ?? ''}${input.filename ?? ''}${input.search ?? ''}${input.hash ?? ''}`
+  const cdnBase = trimTrailingSlashes(input.cdnBase)
+  return `${cdnBase}/${input.uuid}/${input.modifiers ?? ''}${input.filename ?? ''}${input.search ?? ''}${input.hash ?? ''}`
 }

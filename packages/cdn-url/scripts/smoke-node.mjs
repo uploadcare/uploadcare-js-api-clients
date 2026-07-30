@@ -54,9 +54,10 @@ check('core roundtrip (prod esm)', async () => {
 })
 
 check('fluent chain (prod cjs)', () => {
-  const { cdn } = require('../dist/prod/fluent.cjs')
+  const { base, prefixedCdnBase } = require('../dist/prod/fluent.cjs')
+  const cdn = base(prefixedCdnBase('demopublickey'))
   const href = cdn.file(UUID).preview(800, 600).quality('smart').href
-  const expected = `https://ucarecdn.com/${UUID}/-/preview/800x600/-/quality/smart/`
+  const expected = `https://1s4oyld5dc.ucarecd.net/${UUID}/-/preview/800x600/-/quality/smart/`
   if (href !== expected) throw new Error(`fluent mismatch: ${href}`)
 })
 
@@ -75,8 +76,11 @@ check('iife global', async () => {
   const code = readFileSync(resolve(pkgRoot, 'dist/cdn-url.global.js'), 'utf8')
   const fn = new Function(`${code}; return UCCdnUrl`)
   const global = fn()
-  const href = global.cdn.file(UUID).preview().href
-  if (href !== `https://ucarecdn.com/${UUID}/-/preview/`)
+  const href = global
+    .base(global.prefixedCdnBase('demopublickey'))
+    .file(UUID)
+    .preview().href
+  if (href !== `https://1s4oyld5dc.ucarecd.net/${UUID}/-/preview/`)
     throw new Error('iife mismatch')
 })
 

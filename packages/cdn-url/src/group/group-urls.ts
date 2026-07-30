@@ -13,8 +13,8 @@ import { formatGroupId } from './group-id'
  * groupUrl('https://ucarecdn.com', { uuid, count: 3 }) // → https://ucarecdn.com/:uuid~3/
  * ```
  */
-export function groupUrl(origin: string, group: GroupId): string {
-  return serializeCdnUrl({ origin, group })
+export function groupUrl(cdnBase: string, group: GroupId): string {
+  return serializeCdnUrl({ cdnBase, group })
 }
 
 /**
@@ -29,7 +29,7 @@ export function groupUrl(origin: string, group: GroupId): string {
  * ```
  */
 export function nthUrl(
-  origin: string,
+  cdnBase: string,
   group: GroupId,
   index: number,
   operations: CdnOperation[] = [],
@@ -44,7 +44,7 @@ export function nthUrl(
     )
   }
   return serializeCdnUrl({
-    origin,
+    cdnBase,
     group,
     nth: index,
     operations,
@@ -69,12 +69,12 @@ export type ArchiveFormat = (typeof ARCHIVE_FORMATS)[number]
  * ```
  */
 export function archiveUrl(
-  origin: string,
+  cdnBase: string,
   group: GroupId,
   format: ArchiveFormat,
   filename?: string
 ): string {
   assertOneOf(format, ARCHIVE_FORMATS, 'archive format')
-  const base = trimTrailingSlashes(origin)
+  const base = trimTrailingSlashes(cdnBase)
   return `${base}/${formatGroupId(group)}/archive/${format}/${filename ?? ''}`
 }

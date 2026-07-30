@@ -5,11 +5,11 @@ import { tinyBuild, tinyParse, type TinyFileUrl } from './url'
 const UUID = '1bac376c-aa7e-4356-861b-dd2ee0510f79'
 
 describe('tinyParse', () => {
-  it('splits origin, uuid, modifiers, filename and search', () => {
+  it('splits cdnBase, uuid, modifiers, filename and search', () => {
     expect(
       tinyParse(`https://ucarecdn.com/${UUID}/-/resize/300x/photo.jpg`)
     ).toEqual({
-      origin: 'https://ucarecdn.com',
+      cdnBase: 'https://ucarecdn.com',
       uuid: UUID,
       modifiers: '-/resize/300x/',
       filename: 'photo.jpg',
@@ -20,7 +20,7 @@ describe('tinyParse', () => {
 
   it('leaves modifiers empty on a bare url', () => {
     expect(tinyParse(`https://ucarecdn.com/${UUID}/`)).toEqual({
-      origin: 'https://ucarecdn.com',
+      cdnBase: 'https://ucarecdn.com',
       uuid: UUID,
       modifiers: '',
       filename: '',

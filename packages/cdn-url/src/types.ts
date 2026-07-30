@@ -34,7 +34,7 @@ export type CdnUrlKind = 'file' | 'group' | 'group-element' | 'proxy'
 
 interface CdnUrlShapeBase {
   /** Scheme + host, no trailing slash, e.g. `https://ucarecdn.com`. */
-  origin: string
+  cdnBase: string
   /** Preserved query string (incl. secure tokens), `''` or `?...`. */
   search: string
   /** Preserved fragment, `''` or `#...`. */
@@ -99,8 +99,8 @@ export interface ParsedGroupElementUrl extends CdnUrlShapeBase {
 export interface ParsedProxyUrl {
   /** Discriminant: a delivery proxy url with an embedded source. */
   kind: 'proxy'
-  /** Proxy endpoint origin, e.g. `https://pubkey.ucr.io`. */
-  origin: string
+  /** Proxy endpoint cdnBase, e.g. `https://pubkey.ucr.io`. */
+  cdnBase: string
   /** Transformation directives applied before fetching the source, in order. */
   operations: CdnOperation[]
   /** The embedded remote source url, verbatim. */
@@ -121,7 +121,7 @@ export type ParsedCdnUrl =
 /** Input shape for building a file url with `serializeCdnUrl`. */
 export interface FileUrlInput {
   /** Scheme + host, e.g. `https://ucarecdn.com` (trailing slash tolerated). */
-  origin: string
+  cdnBase: string
   /** File UUID. */
   uuid: string
   /** Conversion path prefix (`video`, `document`, `gif2video`), if any. */
@@ -139,7 +139,7 @@ export interface FileUrlInput {
 /** Input shape for building a group root or group element url. */
 export interface GroupUrlInput {
   /** Scheme + host, e.g. `https://ucarecdn.com` (trailing slash tolerated). */
-  origin: string
+  cdnBase: string
   /** Group id to address. */
   group: GroupId
   /** Zero-based element index; omit for the group root url. */
@@ -156,8 +156,8 @@ export interface GroupUrlInput {
 
 /** Input shape for building a delivery proxy url. */
 export interface ProxyUrlInput {
-  /** Proxy endpoint origin, e.g. `https://pubkey.ucr.io`. */
-  origin: string
+  /** Proxy endpoint cdnBase, e.g. `https://pubkey.ucr.io` (trailing slash tolerated). */
+  cdnBase: string
   /** Remote source url to embed, verbatim (query string included). */
   sourceUrl: string
   /** Transformation directives applied before the source (default none). */
