@@ -109,12 +109,20 @@ conventions in several ways — do not "fix" these divergences.
   throw is structural and fires in **both** bundle flavors. Two interfaces rather
   than a conditional-typed `Cdn<Bound>`: the error message is legible and no `as`
   cast is needed to build the objects.
-  A base is required because no host works for every project — a bare
-  `ucarecd.net` does **not** resolve (only `<prefix>.ucarecd.net` does), so the one
-  fallback a JS caller can reach is `LEGACY_CDN_BASE` (`ucarecdn.com`), which does
-  serve unprefixed. Never reintroduce a bare-`ucarecd.net` default. This API was
-  `configure({...})`, then `base(cdnBase)`, then `createCdn(cdnBase)`; all are
+  A base is required because no host works for every project, and there is **no
+  fallback at all**: `cdn.base('')` throws in _both_ bundle flavors, like
+  `parseCdnUrl` on a non-CDN url. An earlier version fell back to
+  `LEGACY_CDN_BASE` in production and it was the worst of both worlds — a
+  well-formed url on a domain the project may not serve from, which 404s for some
+  projects and quietly works for others, hiding the bug exactly where it is
+  hardest to find. Never reintroduce a default host, legacy or otherwise. This API
+  was `configure({...})`, then `base(cdnBase)`, then `createCdn(cdnBase)`; all are
   gone. Do not add a second way in.
+- **The `cdn` object's runtime shape is wider than `UnboundCdn` on purpose.**
+  `file`/`group`/`gif2video` exist as throwing stubs so a JavaScript caller gets a
+  message naming `base`, which means `'file' in cdn` is `true`. Never use key
+  presence to detect whether a base is bound, and do not "fix" the mismatch by
+  deleting the stubs — the message is the point.
 - **`base` is the one name for "same thing, different host"** — on the fluent
   entry object, on every chain, and on the builder. `ProxyChain.proxy` is the
   single exception, because its argument is a `*.ucr.io` endpoint and not a CDN
@@ -129,10 +137,14 @@ conventions in several ways — do not "fix" these divergences.
   members are `readonly`** (property syntax, not method syntax — methods cannot be
   `readonly`). Chains were already immutable; this stops a consumer
   monkey-patching a shared entry point.
-- **The prefixed-base helpers are re-exported from every entry that takes a base**
-  — root, `fluent`, `builder`, `group`, `proxy`, `gif2video`, `tiny` — alongside
-  `LEGACY_CDN_BASE`/`PREFIX_CDN_BASE`. All resolve to the same module, so a bundle
-  never duplicates them and nobody pays unless they name one. `ops`, `video`,
+- **`src/cdn-base/` owns "where do we deliver from"**: `constants.ts` (the two
+  zones), `prefixed.ts` (the two derive-from-public-key helpers) and a barrel that
+  re-exports both with the rationale stated **once**. Every entry that takes a base
+  — root, `fluent`, `builder`, `group`, `proxy`, `gif2video`, `tiny` — re-exports
+  that barrel in one line; do not paste the symbol list into a barrel again.
+  Measured byte-neutral: naming only a constant through `/group` is 50 B brotli and
+  carries no SHA-256. The two modules stay split so importing a constant does not
+  drag the hashing code's graph edge along. `ops`, `video`,
   `document` and `validate` deliberately do **not**: no base is involved there, and
   `videoPath`/`documentPath` returning host-free paths is something the docs state
   plainly.
@@ -148,7 +160,7 @@ conventions in several ways — do not "fix" these divergences.
   defaulting the zone and trimming a trailing slash. Nothing prefixes on the
   caller's behalf — an earlier draft gave `configure` a `publicKey` option and it
   was **removed**: it welded 4.7 kB of SHA-256 (2.1 kB gzipped) into every fluent
-  consumer's bundle. Kept in its own module (`src/prefixed-cdn-base.ts`, its own
+  consumer's bundle. Kept in its own module (`src/cdn-base/prefixed.ts`, its own
   dist chunk), it drops for anyone who doesn't name it: `fluent` measures 19.8 kB
   min / 6.6 kB gz with it and 15.0 / 4.4 without. The figures in
   `functional-vs-builder.md` are those; re-measure rather than copy them forward.
@@ -197,9 +209,9 @@ conventions in several ways — do not "fix" these divergences.
   either: normalizing a loose modifiers string is `tiny/literals.ts`'s job, since the
   chain is its domain object, not the url's. Same job in every bundle — parse a url,
   append one operation, serialize — measured with esbuild `--minify` on the prod
-  flavor: `parseCdnUrl` 1326 B brotli, `parseFileUrl` 821 B, `tinyParse` + `modifiers`
-  362 B, `tinyParse` + `normalizeModifiers` 373 B, and `tinyParse` behind an
-  `isFileUrl` guard 890 B. These are the figures the string-level guide page
+  flavor: `parseCdnUrl` 1343 B brotli, `parseFileUrl` 824 B, `tinyParse` + `modifiers`
+  363 B, `tinyParse` + `normalizeModifiers` 383 B, and `tinyParse` behind an
+  `isFileUrl` guard 843 B. These are the figures the string-level guide page
   publishes; keep the two in step, and re-measure rather than copying them forward. The round-trip law holds for every url in
   the corpus, **including** the ones whose fields it gets wrong — a group element
   keeps `nth/2/` in `modifiers`, a proxy keeps its embedded source there and its
@@ -340,12 +352,30 @@ rejections. Operation *names* remain `OperationLiteral`'s business; the brand sa
   teaching the normalizer about proxy urls, which is the machinery `tiny/` exists to
   avoid.
 - **The string level only pays off when the caller already knows the url's kind.**
-  Guarding an unknown url with `isFileUrl` measures **890 B** brotli against **821 B**
-  for `parseFileUrl` + `serializeFileUrl` — the guarded string-level path is _larger_
-  than the real parser, which also validates. The unguarded path is 362 B. So any
+  Guarding an unknown url with `isFileUrl` measures **843 B** brotli against **824 B**
+  for `parseFileUrl` + `serializeFileUrl` — the guarded string-level path buys nothing
+  over the real parser, which also validates. The unguarded path is 363 B. So any
   advice to use `tinyParse` on urls of mixed kind is wrong twice over, and the guide
   leads with that. Re-measure when `tiny/` changes: splitting `search`/`hash` out of
   the old `tail` field cost 77 B on its own.
+
+## API stability
+
+- **Everything above is pre-1.0 churn, and it stops at 6.20.0.** The package has
+  only ever shipped `6.20.0-alpha.x`, which is why this session could rename
+  `origin`→`cdnBase`, `configure`→`cdn.base`, `setCdnBase`/`setFilename`→
+  `base`/`filename` and `on`/`setEndpoint`→`base`/`proxy` without aliases:
+  deprecation shims for an unreleased API are pure debt.
+  **After the first non-alpha release, that stops.** A rename then needs the
+  old name kept as a deprecated alias for at least one minor, a `@deprecated`
+  JSDoc tag naming the replacement, and a line in the changelog. Assume Hyrum's
+  Law applies to anything observable — including the exact text of the errors in
+  the failure-mode table, which callers will match on.
+- **The failure-mode table in `docs/guide/bundles.md` is part of the contract.**
+  Four modes exist (always-throw, dev-throw-then-no-op, dev-throw-then-GIGO,
+  return-diagnostics) and each public function belongs to exactly one. Adding a
+  function means adding it to a row; changing which row a function is in is a
+  breaking change even when the types do not move.
 
 ## Testing & verification
 
@@ -385,16 +415,18 @@ npm run docs:api         # typedoc — FAILS on any undocumented public symbol
   with a fresh-context agent answering realistic questions from the prose
   alone. Constrain that agent to the single page — it must not read the source,
   or it answers from the code and proves nothing about the prose.
-- **Page snippets are executed, not trusted.** `docs-cookbook.test.ts`,
-  `docs-how-to.test.ts`, `docs-string-level.test.ts` and `docs-cdn-base.test.ts`
-  mirror the snippets from their pages verbatim, so a page cannot claim an output the code does not produce.
+- **Page snippets are executed, not trusted.** One `docs-*.test.ts` per page —
+  `docs-cookbook`, `docs-how-to`, `docs-string-level`, `docs-cdn-base`,
+  `docs-text-watermarks`, `docs-privacy-and-signing`, plus `docs-signing.node`
+  for the Node-only signing snippet — mirror the snippets from their pages
+  verbatim, sharing fixtures through `src/docs-fixtures.ts`, so a page cannot claim an output the code does not produce.
   Tables of behaviour count too: the url-kind table on the string-level page has one
   test per row. Add to these when you add a page with runnable examples.
 
 ## Monorepo integration
 
 - **`@uploadcare/cname-prefix` is the one runtime dependency** (workspace
-  sibling, version in lockstep), imported only by `src/prefixed-cdn-base.ts` via
+  sibling, version in lockstep), imported only by `src/cdn-base/prefixed.ts` via
   its `/sync` entry — the sync path is pure JS, so the Node smoke tests pass. Do
   not import it anywhere else, and do not add a second runtime dep without the
   same kind of size accounting.

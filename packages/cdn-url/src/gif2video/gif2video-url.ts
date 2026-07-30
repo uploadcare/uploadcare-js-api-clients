@@ -1,4 +1,4 @@
-import { serializeCdnUrl } from '../serialize'
+import { serializeFileUrl } from '../serialize'
 import type { CdnOperation } from '../types'
 
 /**
@@ -18,5 +18,10 @@ export function gif2videoUrl(
   uuid: string,
   operations: CdnOperation[] = []
 ): string {
-  return serializeCdnUrl({ cdnBase, uuid, conversion: 'gif2video', operations })
+  return serializeFileUrl({
+    cdnBase,
+    uuid,
+    conversion: 'gif2video',
+    operations
+  })
 }

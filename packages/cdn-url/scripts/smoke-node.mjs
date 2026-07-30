@@ -61,6 +61,24 @@ check('fluent chain (prod cjs)', () => {
   if (href !== expected) throw new Error(`fluent mismatch: ${href}`)
 })
 
+check('structural guards survive minification (prod cjs)', () => {
+  const { cdn } = require('../dist/prod/fluent.cjs')
+  // A url cannot address a file without a host: this must throw in the
+  // production flavor too, not fall back to some default domain.
+  const throws = (fn) => {
+    try {
+      fn()
+      return false
+    } catch {
+      return true
+    }
+  }
+  if (!throws(() => cdn.base('')))
+    throw new Error('prod: cdn.base("") did not throw')
+  if (!throws(() => cdn.file(UUID)))
+    throw new Error('prod: unbound cdn.file() did not throw')
+})
+
 check('dev bundle still validates (dev esm)', async () => {
   const { quality } = await import(distUrl('dev/ops.js'))
   try {

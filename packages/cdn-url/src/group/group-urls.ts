@@ -1,5 +1,5 @@
 import { assertOneOf, trimTrailingSlashes } from '../grammar'
-import { serializeCdnUrl } from '../serialize'
+import { serializeGroupUrl } from '../serialize'
 import type { CdnOperation, GroupId } from '../types'
 import { formatGroupId } from './group-id'
 
@@ -14,7 +14,7 @@ import { formatGroupId } from './group-id'
  * ```
  */
 export function groupUrl(cdnBase: string, group: GroupId): string {
-  return serializeCdnUrl({ cdnBase, group })
+  return serializeGroupUrl({ cdnBase, group })
 }
 
 /**
@@ -43,7 +43,7 @@ export function nthUrl(
       `Group element index ${index} is out of range 0..${group.count - 1}`
     )
   }
-  return serializeCdnUrl({
+  return serializeGroupUrl({
     cdnBase,
     group,
     nth: index,

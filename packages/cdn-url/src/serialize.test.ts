@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
+import { CdnUrl } from './builder/index'
+import type { CdnUrlInput } from './types'
 import {
   parseCdnUrl,
   serializeCdnUrl,
@@ -10,6 +12,7 @@ import {
 } from './index'
 
 const UUID = 'c2499162-eb07-4b93-b31e-94a89a47e858'
+const CDN_BASE = 'https://ucarecdn.com'
 
 describe('serializeOperations', () => {
   it('serializes operations into a -/-delimited string', () => {
@@ -214,5 +217,46 @@ describe('serializeCdnUrl', () => {
         })
       ).toBe(`https://ucarecdn.com/${UUID}/video/-/size/720x540/`)
     })
+  })
+})
+
+describe('one owner for "which kind is this input?"', () => {
+  // The serializer and the builder used to discriminate `CdnUrlInput`
+  // separately, with different rules: a key present but `undefined` counted as
+  // intent for one and not the other, so this input produced a file url through
+  // `serializeCdnUrl` and a `TypeError` through `new CdnUrl(...)`.
+  const cases: CdnUrlInput[] = [
+    { cdnBase: CDN_BASE, uuid: UUID, sourceUrl: undefined },
+    { cdnBase: CDN_BASE, uuid: UUID, group: undefined },
+    { cdnBase: CDN_BASE, group: { uuid: UUID, count: 3 }, uuid: undefined },
+    {
+      cdnBase: CDN_BASE,
+      sourceUrl: 'https://example.com/a.jpg',
+      uuid: undefined
+    }
+  ]
+
+  it.each(cases)('the two facades agree on %j', (input) => {
+    const viaCore = (() => {
+      try {
+        return serializeCdnUrl(input)
+      } catch {
+        return 'throws'
+      }
+    })()
+    const viaBuilder = (() => {
+      try {
+        return new CdnUrl(input).href
+      } catch {
+        return 'throws'
+      }
+    })()
+    expect(viaBuilder).toBe(viaCore)
+  })
+
+  it('an input with no addressing value at all throws in both', () => {
+    const empty: CdnUrlInput = { cdnBase: CDN_BASE, uuid: undefined }
+    expect(() => serializeCdnUrl(empty)).toThrow(TypeError)
+    expect(() => new CdnUrl(empty)).toThrow(TypeError)
   })
 })

@@ -10,10 +10,10 @@ Every recipe is shown in all three API styles. Pick a tab and stay in it. A four
 
 | tab            | what you import                   | gzipped |
 | -------------- | --------------------------------- | ------- |
-| _string level_ | `tinyParse`/`tinyBuild` + a chain | 419 B   |
+| _string level_ | `tinyParse`/`tinyBuild` + a chain | 414 B   |
 | **Atomic**     | functional core + one op creator  | 1487 B  |
-| **Builder**    | `CdnUrl` + one op creator         | 2041 B  |
-| **Fluent**     | `cdn.base()` + a chain            | 4967 B  |
+| **Builder**    | `CdnUrl` + one op creator         | 2069 B  |
+| **Fluent**     | `cdn` + a chain                   | 4509 B  |
 
 Measured on one task — parse a URL, add one operation, serialize. None of them include `prefixedCdnBase`: recipes that build from a uuid need [a CDN base](/guide/cdn-base), and deriving it from a public key adds 2.1 kB gzipped unless you paste the host as a literal.
 
@@ -443,11 +443,51 @@ const url = tinyBuild({
 // → https://1s4oyld5dc.ucarecd.net/<uuid>/-/resize/300x/-/quality/smart/-/blur/10/
 ```
 
-419 B gzipped against 1487 B for the Atomic tab. The operations stay type-checked, but nothing is validated at run time, there are no kinds, and it is **file URLs only** — replacing the chain on a group element or a conversion result destroys the URL. Read [The string-level API](/guide/string-level-api) before using it; it is the one style that can hand you a broken URL without an error.
+414 B gzipped against 1487 B for the Atomic tab. The operations stay type-checked, but nothing is validated at run time, there are no kinds, and it is **file URLs only** — replacing the chain on a group element or a conversion result destroys the URL. Read [The string-level API](/guide/string-level-api) before using it; it is the one style that can hand you a broken URL without an error.
 
 ## Understanding a chain
 
 These read a chain rather than build one, so they are the same in every style.
+
+### I want to strip GPS and EXIF before sharing
+
+```ts
+myCdn.file(uuid).stripMeta('sensitive').href
+// → …/-/strip_meta/sensitive/
+```
+
+`'sensitive'` drops identifying tags but keeps orientation and colour profile, so photos do not rotate or shift colour. `'all'` and `'none'` are the other two modes. It affects the derivative, not the stored original — see [Redact & strip metadata](/how-to/redact-and-strip-metadata).
+
+### I want to blur a face or a region
+
+```ts
+myCdn.file(uuid).blurRegion({ faces: true }).href
+// → …/-/blur_region/faces/
+
+myCdn.file(uuid).blurRegion({
+  width: '30p',
+  height: '20p',
+  x: '10p',
+  y: '15p',
+  strength: 250
+}).href
+// → …/-/blur_region/30px20p/10p,15p/250/
+```
+
+Face detection is best-effort, percentages travel better than pixels across sizes, and anyone holding the URL can delete the operation. [Redact & strip metadata](/how-to/redact-and-strip-metadata) has the caveats.
+
+### I want a watermark in the corner
+
+```ts
+myCdn.file(uuid).overlay(logoUuid, {
+  size: ['20p', '20p'],
+  position: ['90p', '90p'],
+  opacity: '60p'
+}).href
+// → …/-/overlay/:logoUuid/20px20p/90p,90p/60p/
+```
+
+There is no `'se'` keyword — the five are `center`, `top`, `right`, `bottom`, `left` — so a corner needs offsets. The options are positional: `position` requires `size`, `opacity` requires `position`. [Text & watermarks](/how-to/text-and-watermarks) explains what happens when you skip one.
 
 ### I want to know if an operation can be repeated
 
@@ -496,7 +536,7 @@ detectDomainKind('https://1zlmtnsbgr.ucarecd.net') // → 'prefixed'
 
 ### I want to keep my signed URL working after editing it
 
-**You can't.** [Secure delivery](https://uploadcare.com/docs/security/secure-delivery/) tokens survive parse and serialize untouched, but they sign the URL _including_ its operations. Change the chain and the old signature no longer matches the path.
+**It depends on the token's `acl`.** [Secure delivery](https://uploadcare.com/docs/security/secure-delivery/) tokens survive parse and serialize untouched, and the CDN checks the request path against the ACL the token carries. Signed for an exact path (`acl=/:uuid/-/preview/300x300/`), any edit is a `403`. Signed with a wildcard (`acl=/:uuid/*`), editing is fine and the token keeps verifying. [Signed URLs](/how-to/signed-urls) covers both, and which to choose.
 
 ::: code-group
 
@@ -524,7 +564,7 @@ if (s.kind === 'file') s.resize({ width: 400 }).href
 
 :::
 
-Re-sign after editing, or build the final chain before signing. This library preserves tokens but never generates them; signing happens in your backend.
+With an exact-path ACL: re-sign after editing, or build the final chain before signing. This library preserves tokens but never generates them; signing needs your secret and happens in your backend.
 
 ### Parsing does not validate values
 

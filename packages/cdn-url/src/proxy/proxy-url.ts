@@ -1,5 +1,4 @@
-import { trimTrailingSlashes } from '../grammar'
-import { serializeOperations } from '../serialize'
+import { serializeProxyUrl } from '../serialize'
 import type { CdnOperation } from '../types'
 
 /**
@@ -19,6 +18,5 @@ export function proxyUrl(
   sourceUrl: string,
   operations: CdnOperation[] = []
 ): string {
-  const base = trimTrailingSlashes(endpoint)
-  return `${base}/${serializeOperations(operations)}${sourceUrl}`
+  return serializeProxyUrl({ cdnBase: endpoint, sourceUrl, operations })
 }

@@ -1,8 +1,8 @@
 import { getPrefixedCdnBaseAsync } from '@uploadcare/cname-prefix/async'
 import { getPrefixedCdnBaseSync } from '@uploadcare/cname-prefix/sync'
 
-import { PREFIX_CDN_BASE } from './cdn-base'
-import { trimTrailingSlashes } from './grammar'
+import { PREFIX_CDN_BASE } from './constants'
+import { trimTrailingSlashes } from '../grammar'
 
 /**
  * Your project's prefixed CDN base: `<prefix>.ucarecd.net`, computed with the

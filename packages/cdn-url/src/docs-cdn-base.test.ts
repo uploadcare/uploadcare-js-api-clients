@@ -24,9 +24,11 @@ import { defaultProxyEndpoint, proxyUrl } from './proxy/index'
 import { documentPath } from './document/index'
 import { videoPath } from './video/index'
 
-const uuid = 'c2499162-eb07-4b93-b31e-94a89a47e858'
-const group = { uuid, count: 3 }
-const PREFIXED = 'https://1s4oyld5dc.ucarecd.net'
+import {
+  CDN_BASE as PREFIXED,
+  GROUP as group,
+  UUID as uuid
+} from './docs-fixtures'
 
 describe('cdn-base: the prefixed base', () => {
   it('derives the documented host from the documented key', () => {

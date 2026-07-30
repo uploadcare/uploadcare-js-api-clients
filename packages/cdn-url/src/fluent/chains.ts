@@ -7,21 +7,25 @@ import * as docOps from '../document/operations'
 import * as gifOps from '../gif2video/operations'
 import * as videoOps from '../video/operations'
 import { serializeCdnUrl } from '../serialize'
-import type { GroupId } from '../types'
+import type {
+  GroupId,
+  ParsedFileUrl,
+  ParsedGroupElementUrl,
+  ParsedGroupUrl,
+  ParsedProxyUrl
+} from '../types'
 import { Chain, type ChainState } from './chain-base'
 import { ImageChain } from './image-chain'
 
-/** @internal */
-interface FileState extends ChainState {
-  cdnBase: string
-  uuid: string
-  filename: string | null
-  search: string
-  hash: string
-}
-
-/** A chainable single-file CDN url. */
-export class FileChain extends ImageChain<FileState> {
+/**
+ * A chainable single-file CDN url.
+ *
+ * Its state is the {@link ParsedFileUrl} itself rather than a copy of selected
+ * fields: `href` is `serializeCdnUrl(state)`, so any field the parser produces —
+ * `conversion` included — survives a parse → edit → serialize round trip without
+ * anyone remembering to thread it through.
+ */
+export class FileChain extends ImageChain<ParsedFileUrl> {
   /** Discriminant for chains returned by `cdn.parse`. */
   public readonly kind = 'file' as const
 
@@ -47,12 +51,6 @@ export class FileChain extends ImageChain<FileState> {
 }
 
 /** @internal */
-interface GroupState {
-  cdnBase: string
-  group: GroupId
-  search: string
-  hash: string
-}
 
 /** A chainable group root url — element access and archives only. */
 export class GroupChain {
@@ -60,7 +58,7 @@ export class GroupChain {
   public readonly kind = 'group' as const
 
   /** @internal */
-  public constructor(private readonly _s: GroupState) {}
+  public constructor(private readonly _s: ParsedGroupUrl) {}
 
   /** Rebases the chain onto another cdnBase (trailing slash tolerated). */
   public base(cdnBase: string): GroupChain {
@@ -78,6 +76,7 @@ export class GroupChain {
       )
     }
     return new GroupElementChain({
+      kind: 'group-element',
       cdnBase: this._s.cdnBase,
       group: this._s.group,
       nth: index,
@@ -95,7 +94,7 @@ export class GroupChain {
 
   /** The group root URL. */
   public get href(): string {
-    return serializeCdnUrl({ cdnBase: this._s.cdnBase, group: this._s.group })
+    return serializeCdnUrl(this._s)
   }
 
   /** Alias of the terminal getter for string coercion. */
@@ -105,17 +104,9 @@ export class GroupChain {
 }
 
 /** @internal */
-interface GroupElementState extends ChainState {
-  cdnBase: string
-  group: GroupId
-  nth: number
-  filename: string | null
-  search: string
-  hash: string
-}
 
 /** A chainable group element — full image operation surface. */
-export class GroupElementChain extends ImageChain<GroupElementState> {
+export class GroupElementChain extends ImageChain<ParsedGroupElementUrl> {
   /** Discriminant for chains returned by `cdn.parse`. */
   public readonly kind = 'group-element' as const
 
@@ -140,14 +131,8 @@ export class GroupElementChain extends ImageChain<GroupElementState> {
   }
 }
 
-/** @internal */
-interface ProxyState extends ChainState {
-  cdnBase: string
-  sourceUrl: string
-}
-
 /** A chainable delivery-proxy url over a remote source. */
-export class ProxyChain extends ImageChain<ProxyState> {
+export class ProxyChain extends ImageChain<ParsedProxyUrl> {
   /** Discriminant for chains returned by `cdn.parse`. */
   public readonly kind = 'proxy' as const
 

@@ -92,6 +92,12 @@ myCdn.file(uuid).preview().base('https://cdn.example.com').href
 
 Each starter returns a kind-specific chain (video chains only offer video methods, group roots only `nth()`/`archive()`), so invalid combinations are compile-time errors. Chains are immutable and reuse the creators' development-bundle validation.
 
+Method names follow three rules, and knowing them saves guessing:
+
+- **transformations are named after the operation** — `preview()`, `resize()`, `blur()`, one per CDN directive;
+- **the parts of the URL that are not operations are named after themselves** — `base()`, `filename()`, `proxy()`, matching the builder's methods exactly;
+- **inspection carries an `Op` suffix** — `hasOp()`, `getOp()`, `getAllOps()`, `replaceOp()`, `withoutOp()`, `updateOperations()`. The suffix exists because a bare `get` or `with` would collide with an operation name; it is the one place the fluent and builder surfaces cannot align.
+
 The builder's inspection API is mirrored on every chain, with an `Op` suffix so the names can never collide with a transformation method:
 
 ```ts
@@ -168,9 +174,9 @@ What each entry costs when you import everything it exports, bundled and minifie
 | `validate`                              | 5.2 kB   | 2.1 kB  |
 | `builder`                               | 5.7 kB   | 2.0 kB  |
 | `tiny` (string level)                   | 0.9 kB   | 0.5 kB  |
-| `index` (everything below, re-exported) | 10.6 kB  | 4.2 kB  |
+| `index` (everything below, re-exported) | 8.1 kB   | 3.3 kB  |
 | `ops` (all 47 creators)                 | 6.1 kB   | 2.2 kB  |
-| `fluent` (the `cdn.base()` mega-object) | 19.8 kB  | 6.6 kB  |
+| `fluent` (the `cdn` mega-object)        | 17.4 kB  | 5.9 kB  |
 
 Both totals now carry `prefixedCdnBase` — the SHA-256 that derives your project's host, re-exported from `@uploadcare/cname-prefix`. It is 4.7 kB minified (2.1 kB gzipped) of that figure and drops entirely if you never name it: `cdn` plus one chain measures 15.0 kB minified, 4.4 kB gzipped. Compute the host once at build time or paste it as a literal and you pay nothing for the hashing.
 

@@ -62,8 +62,14 @@ export default defineConfig({
             text: 'Remote images via proxy',
             link: '/how-to/remote-images-via-proxy'
           },
+          { text: 'Text & watermarks', link: '/how-to/text-and-watermarks' },
+          {
+            text: 'Redact & strip metadata',
+            link: '/how-to/redact-and-strip-metadata'
+          },
           { text: 'Groups & archives', link: '/how-to/groups-and-archives' },
           { text: 'Video & documents', link: '/how-to/video-and-documents' },
+          { text: 'Signed URLs', link: '/how-to/signed-urls' },
           { text: 'Validate user input', link: '/how-to/validate-user-input' }
         ]
       },

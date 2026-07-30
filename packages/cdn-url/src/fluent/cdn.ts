@@ -1,4 +1,3 @@
-import { LEGACY_CDN_BASE } from '../cdn-base'
 import { trimTrailingSlashes } from '../grammar'
 import { parseCdnUrl } from '../parse'
 import type { ParsedCdnUrl } from '../types'
@@ -30,6 +29,12 @@ export type ParsedChain =
  * url without a host, so reaching for one here is a compile error. Call
  * {@link UnboundCdn.base} first; it hands back a {@link Cdn} with the full
  * surface.
+ *
+ * Note that the object's runtime shape is deliberately wider than this type: the
+ * three absent starters exist as stubs that throw a message naming `base`, so a
+ * JavaScript caller gets an explanation rather than "undefined is not a
+ * function". `'file' in cdn` is therefore `true` — do not use key presence to
+ * detect whether a base is bound.
  */
 export interface UnboundCdn {
   /**
@@ -85,39 +90,19 @@ export function parse(url: string): ParsedChain {
 }
 
 function wrapParsed(parsed: ParsedCdnUrl): ParsedChain {
+  // Each chain's state *is* the parsed url, so this hands the object over
+  // untouched. It used to copy field by field, which is how `conversion` went
+  // missing from `FileChain` and a parsed gif2video url serialized back without
+  // its prefix.
   switch (parsed.kind) {
     case 'file':
-      return new FileChain({
-        cdnBase: parsed.cdnBase,
-        uuid: parsed.uuid,
-        operations: parsed.operations,
-        filename: parsed.filename,
-        search: parsed.search,
-        hash: parsed.hash
-      })
+      return new FileChain(parsed)
     case 'group':
-      return new GroupChain({
-        cdnBase: parsed.cdnBase,
-        group: parsed.group,
-        search: parsed.search,
-        hash: parsed.hash
-      })
+      return new GroupChain(parsed)
     case 'group-element':
-      return new GroupElementChain({
-        cdnBase: parsed.cdnBase,
-        group: parsed.group,
-        nth: parsed.nth,
-        operations: parsed.operations,
-        filename: parsed.filename,
-        search: parsed.search,
-        hash: parsed.hash
-      })
+      return new GroupElementChain(parsed)
     case 'proxy':
-      return new ProxyChain({
-        cdnBase: parsed.cdnBase,
-        operations: parsed.operations,
-        sourceUrl: parsed.sourceUrl
-      })
+      return new ProxyChain(parsed)
     default: {
       const exhaustive: never = parsed
       throw new TypeError(`Unsupported CDN URL kind: ${String(exhaustive)}`)
@@ -130,6 +115,7 @@ const baseFree = {
   parse,
   proxy: (endpoint: string, sourceUrl: string): ProxyChain =>
     new ProxyChain({
+      kind: 'proxy',
       cdnBase: trimTrailingSlashes(endpoint),
       operations: [],
       sourceUrl
@@ -140,23 +126,26 @@ const baseFree = {
 }
 
 function bind(cdnBase: string): Cdn {
-  if (__DEV__ && !cdnBase) {
+  // Structural, so it throws in both bundle flavors — like `parseCdnUrl` on a
+  // non-CDN url. A url cannot address a file without a host, and the previous
+  // behaviour (falling back to the legacy shared base in production) was worse
+  // than failing: it produced a well-formed url on a domain the project may not
+  // serve from, which 404s for some projects and quietly works for others.
+  if (!cdnBase) {
     throw new TypeError(
       'base(): a CDN base is required — pass your prefixed host (see prefixedCdnBase), your CNAME, or LEGACY_CDN_BASE'
     )
   }
-
-  // The fallback is for JS callers only, and it is the legacy shared base: never
-  // a bare `ucarecd.net`, which does not resolve without a project prefix on it.
-  const resolved = cdnBase || LEGACY_CDN_BASE
 
   return Object.freeze({
     ...baseFree,
     base: bind,
     file: (uuid: string) =>
       new FileChain({
-        cdnBase: resolved,
+        kind: 'file',
+        cdnBase,
         uuid,
+        conversion: null,
         operations: [],
         filename: null,
         search: '',
@@ -164,13 +153,14 @@ function bind(cdnBase: string): Cdn {
       }),
     group: (id: GroupInput) =>
       new GroupChain({
-        cdnBase: resolved,
+        kind: 'group',
+        cdnBase,
         group: toGroupId(id),
         search: '',
         hash: ''
       }),
     gif2video: (uuid: string) =>
-      new Gif2VideoChain({ cdnBase: resolved, uuid, operations: [] })
+      new Gif2VideoChain({ cdnBase, uuid, operations: [] })
   })
 }
 

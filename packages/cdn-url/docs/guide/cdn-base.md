@@ -137,7 +137,7 @@ const myCdn = cdn.base(prefixedCdnBase('demopublickey'))
 const legacy = cdn.base(LEGACY_CDN_BASE)
 ```
 
-Only the fluent entry enforces any of this, and it does so twice over. `cdn.file(uuid)` does not compile — `file`, `group` and `gif2video` exist only on the object `base` returns — and a JavaScript caller who gets past the type system hits a `TypeError` naming the fix. `cdn.base()` with no argument is likewise a compile error, and `cdn.base('')` throws in [development builds](/guide/bundles).
+Only the fluent entry enforces any of this, and it does so twice over. `cdn.file(uuid)` does not compile — `file`, `group` and `gif2video` exist only on the object `base` returns — and a JavaScript caller who gets past the type system hits a `TypeError` naming the fix. `cdn.base()` with no argument is likewise a compile error, and `cdn.base('')` throws in **both** [bundle flavors](/guide/bundles) — a url cannot address a file without a host, so there is no default to fall back to.
 
 The functional core and the builder take you at your word: any string, including an empty one, and you get back whatever that produces.
 
@@ -222,7 +222,7 @@ Better still, if the key is fixed at build time, paste the result as a literal a
 export const CDN_BASE = 'https://1s4oyld5dc.ucarecd.net'
 ```
 
-Nothing else in the library imports either helper, so not naming them drops both: importing everything from the fluent entry measures 19.8 kB minified / 6.6 kB gzipped, and 15.0 kB / 4.4 kB when neither is named. See [tree-shaking](/guide/functional-vs-builder#tree-shaking-what-you-actually-ship) for the full table.
+Nothing else in the library imports either helper, so not naming them drops both: importing everything from the fluent entry measures 17.4 kB minified / 5.9 kB gzipped, and 15.1 kB / 4.5 kB when neither is named. See [tree-shaking](/guide/functional-vs-builder#tree-shaking-what-you-actually-ship) for the full table.
 
 ## Things that bite
 

@@ -152,6 +152,18 @@ describe('cdn.base(cdnBase)', () => {
     expect(() => cdn.base()).toThrow(TypeError)
     expect(() => cdn.base('')).toThrow(TypeError)
   })
+
+  it('has no default host to fall back to, in either flavor', () => {
+    // The guard is deliberately outside `if (__DEV__)`; `scripts/smoke-node.mjs`
+    // asserts the same thing against the built production bundle, where this
+    // suite cannot reach. This pins the intent so nobody "optimizes" the check
+    // back behind a dev flag.
+    expect(() => cdn.base('')).toThrow(/CDN base is required/)
+    expect(LEGACY_CDN_BASE).toBe('https://ucarecdn.com') // opt in explicitly
+    expect(cdn.base(LEGACY_CDN_BASE).file(UUID).href).toBe(
+      `${LEGACY_CDN_BASE}/${UUID}/`
+    )
+  })
 })
 
 describe('the fluent entry object is frozen', () => {
@@ -166,6 +178,32 @@ describe('the fluent entry object is frozen', () => {
 })
 
 describe('cdn.parse', () => {
+  it('round-trips every kind, conversion prefixes included', () => {
+    // Regression: `wrapParsed` used to copy the parsed url field by field and
+    // omitted `conversion`, so a parsed gif2video url serialized back pointing
+    // at the original image. The chains now hold the parsed url itself.
+    for (const url of [
+      `${CDN_BASE}/${UUID}/`,
+      `${CDN_BASE}/${UUID}/-/preview/800x600/photo.jpg`,
+      `${CDN_BASE}/${UUID}/gif2video/-/format/webm/`,
+      `${CDN_BASE}/${UUID}/video/-/size/720x540/`,
+      `${CDN_BASE}/${UUID}~3/`,
+      `${CDN_BASE}/${UUID}~3/nth/1/-/resize/256x/`,
+      `${CDN_BASE}/${UUID}/-/preview/?token=exp=1~acl=/x/*~hmac=deadbeef`,
+      'https://pk.ucr.io/-/preview/https://example.com/a.jpg'
+    ]) {
+      expect(cdn.parse(url).href).toBe(url)
+    }
+  })
+
+  it('keeps the conversion prefix through an edit', () => {
+    const chain = cdn.parse(`${CDN_BASE}/${UUID}/gif2video/-/format/webm/`)
+    if (chain.kind !== 'file') throw new Error('expected a file chain')
+    expect(chain.quality('better').href).toBe(
+      `${CDN_BASE}/${UUID}/gif2video/-/format/webm/-/quality/better/`
+    )
+  })
+
   it('is also importable standalone — a stored url carries its own cdnBase', () => {
     const legacy = parse(`${LEGACY_CDN_BASE}/${UUID}/-/preview/`)
     expect(legacy.kind).toBe('file')

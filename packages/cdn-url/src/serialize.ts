@@ -1,4 +1,5 @@
 import { trimTrailingSlashes } from './grammar'
+import { isFileInput, isGroupInput, isProxyInput } from './input-kind'
 import type {
   CdnOperation,
   CdnUrlInput,
@@ -40,15 +41,9 @@ export function serializeOperations(
  * ```
  */
 export function serializeCdnUrl(input: CdnUrlInput): string {
-  if ('sourceUrl' in input && input.sourceUrl != null) {
-    return serializeProxyUrl(input)
-  }
-  if ('group' in input && input.group != null) {
-    return serializeGroupUrl(input)
-  }
-  if ('uuid' in input && input.uuid != null) {
-    return serializeFileUrl(input)
-  }
+  if (isProxyInput(input)) return serializeProxyUrl(input)
+  if (isGroupInput(input)) return serializeGroupUrl(input)
+  if (isFileInput(input)) return serializeFileUrl(input)
   throw new TypeError('serializeCdnUrl requires one of: uuid, group, sourceUrl')
 }
 

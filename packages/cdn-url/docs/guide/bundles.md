@@ -17,6 +17,21 @@ The contract is to catch mistakes in development; production is garbage in, garb
 
 Structural errors stay in both flavors because callers rely on them for control flow. A `try/catch` around `parseCdnUrl` behaves identically everywhere.
 
+## What each function does when it fails
+
+Four failure modes exist, and which one you get is a property of the function, not of the bundle. This is the whole map:
+
+| Failure mode                                                       | Functions                                                                                                                                                           | In production                     |
+| ------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------- |
+| **Always throws** — structural, you cannot proceed                 | `parseCdnUrl` and the per-kind parsers, `parseGroupId`, `serializeCdnUrl`'s addressing guard, `cdn.base('')`, `cdn.file`/`group`/`gif2video` before a base is bound | throws                            |
+| **Dev-only throw, then no-op** — misuse the facade catches for you | builder and chain guards: operations on a group root, a filename on a proxy                                                                                         | returns the receiver unchanged    |
+| **Dev-only throw, then garbage in / garbage out** — value checks   | every operation creator (`quality('ultra')`, out-of-range sizes, bad enums), `videoPath`/`nthUrl` input checks                                                      | serializes the bad value as given |
+| **Never throws, returns findings**                                 | `validateOperations` and the rest of the `validate` entry                                                                                                           | identical to development          |
+
+Two functions sit outside the table because their behaviour depends on the runtime rather than the bundle: [`prefixedCdnBaseAsync`](/guide/cdn-base#sync-or-async) resolves in browsers and workers and **rejects under Node**, where the synchronous helper is native; `prefixedCdnBase` works everywhere.
+
+The string level ([`tinyParse`/`tinyBuild`](/guide/string-level-api)) throws nowhere, in either flavor, by design — it does no validation at all.
+
 ## Who picks which bundle
 
 - Vite, webpack and friends resolve the `development` condition in dev servers and `production` in production builds, with no configuration needed.

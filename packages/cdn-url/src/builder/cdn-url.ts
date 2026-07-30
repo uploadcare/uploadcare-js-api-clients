@@ -1,4 +1,5 @@
 import { trimTrailingSlashes } from '../grammar'
+import { isFileInput, isGroupInput, isProxyInput } from '../input-kind'
 import {
   type OperationRef,
   operationMatches,
@@ -15,7 +16,7 @@ function normalizeInput(input: CdnUrlInput | ParsedCdnUrl): ParsedCdnUrl {
   if ('kind' in input) return input
   const cdnBase = trimTrailingSlashes(input.cdnBase)
 
-  if ('sourceUrl' in input) {
+  if (isProxyInput(input)) {
     return {
       kind: 'proxy',
       cdnBase,
@@ -27,7 +28,7 @@ function normalizeInput(input: CdnUrlInput | ParsedCdnUrl): ParsedCdnUrl {
   const search = input.search ?? ''
   const hash = input.hash ?? ''
 
-  if ('group' in input) {
+  if (isGroupInput(input)) {
     if (input.nth != null) {
       return {
         kind: 'group-element',
@@ -41,6 +42,14 @@ function normalizeInput(input: CdnUrlInput | ParsedCdnUrl): ParsedCdnUrl {
       }
     }
     return { kind: 'group', cdnBase, group: input.group, search, hash }
+  }
+
+  if (!isFileInput(input)) {
+    // Without an addressing field there is no `ParsedCdnUrl` to return, and
+    // this function's type says it returns one. Fail here rather than hand back
+    // `{ kind: 'file', uuid: undefined }` and throw later from `.href`, which is
+    // what the serializer would have done anyway — one rule, one moment.
+    throw new TypeError('CdnUrl requires one of: uuid, group, sourceUrl')
   }
 
   return {

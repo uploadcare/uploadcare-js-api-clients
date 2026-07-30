@@ -2,7 +2,7 @@
 
 Everything else in this library treats an operation as data — `{ name: 'blur', params: ['10'] }`, built by a creator from [`/ops`](/reference/ops/), validated, inspectable. This API treats the modifier chain as one string and a file URL as a handful of named strings.
 
-It costs runtime validation, URL kinds, and the ability to inspect what you are editing. What it buys is bytes: 362 B brotli, against 821 B for the narrowest full-model path and 4520 B for the fluent `cdn` object, [measured below](#what-it-costs).
+It costs runtime validation, URL kinds, and the ability to inspect what you are editing. What it buys is bytes: 363 B brotli, against 824 B for the narrowest full-model path and 4024 B for the fluent `cdn` object, [measured below](#what-it-costs).
 
 Examples import from `@uploadcare/cdn-url/tiny`, the dedicated entry. Everything here is re-exported from the root entry too, and costs the same either way — 348 B against 347 B brotli — so use whichever import path your code already has.
 
@@ -36,17 +36,17 @@ Each bundle below parses a URL, adds one `blur`, and serializes it — except th
 
 | The API                       | What it imports                                          | Raw     | Gzip   | Brotli |
 | ----------------------------- | -------------------------------------------------------- | ------- | ------ | ------ |
-| fluent                        | `cdn.parse(url)` → `.blur(10)` → `.href`                 | 16303 B | 4967 B | 4520 B |
-| builder                       | `CdnUrl.parse(url).with(blur(10)).href`                  | 6011 B  | 2041 B | 1844 B |
-| functional, any kind          | `parseCdnUrl` + `serializeCdnUrl` + `blur(10)`           | 4110 B  | 1487 B | 1326 B |
-| string level, kind unknown    | `tinyParse` + `tinyBuild` + an `isFileUrl` guard         | 2074 B  | 1001 B | 890 B  |
-| functional, file only         | `parseFileUrl` + `serializeFileUrl` + `blur(10)`         | 1894 B  | 933 B  | 821 B  |
-| string level, kind known      | `tinyParse` + `tinyBuild` + `modifiers('blur/10')`       | 751 B   | 419 B  | 362 B  |
-| string level, untrusted input | `tinyParse` + `tinyBuild` + `normalizeModifiers(stored)` | 768 B   | 439 B  | 373 B  |
+| fluent                        | `cdn.parse(url)` → `.blur(10)` → `.href`                 | 15059 B | 4509 B | 4024 B |
+| builder                       | `CdnUrl.parse(url).with(blur(10)).href`                  | 6090 B  | 2069 B | 1878 B |
+| functional, any kind          | `parseCdnUrl` + `serializeCdnUrl` + `blur(10)`           | 4123 B  | 1487 B | 1343 B |
+| string level, kind unknown    | `tinyParse` + `tinyBuild` + an `isFileUrl` guard         | 1958 B  | 950 B  | 843 B  |
+| functional, file only         | `parseFileUrl` + `serializeFileUrl` + `blur(10)`         | 1873 B  | 923 B  | 824 B  |
+| string level, kind known      | `tinyParse` + `tinyBuild` + `modifiers('blur/10')`       | 753 B   | 414 B  | 363 B  |
+| string level, untrusted input | `tinyParse` + `tinyBuild` + `normalizeModifiers(stored)` | 812 B   | 445 B  | 383 B  |
 
-The two facades at the top are the ones most code reaches for, and they are 5× and 12× the string level. That gap is the entire reason this API exists — the `cdn` mega-object cannot tree-shake by design, so `fluent` is a floor, not a worst case.
+The two facades at the top are the ones most code reaches for, and they are 11× and 5× the string level. That gap is the entire reason this API exists — the `cdn` mega-object cannot tree-shake by design, so `fluent` is a floor, not a worst case.
 
-Compare the two middle rows instead if you want the honest decision: guarding an unknown URL with `isFileUrl` pulls the real parser back in, landing 8% _above_ `parseFileUrl` — which also validates and hands you kinds. The bytes are close; the point is that you get strictly less for them. The string level pays off only once the kind is settled, and then it is 44% of `parseFileUrl` (362 vs 821 B brotli).
+Compare the two middle rows instead if you want the honest decision: guarding an unknown URL with `isFileUrl` pulls the real parser back in, landing within 2% of `parseFileUrl` — which also validates and hands you kinds. The bytes are close; the point is that you get strictly less for them. The string level pays off only once the kind is settled, and then it is 44% of `parseFileUrl` (363 vs 824 B brotli).
 
 Row five is worth noting too: accepting an untrusted stored string costs slightly more than authoring literals, because `normalizeModifiers` ships its own normalization.
 
