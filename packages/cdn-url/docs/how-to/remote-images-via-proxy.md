@@ -4,7 +4,7 @@ The [delivery proxy](https://uploadcare.com/docs/delivery/proxy/) fetches images
 
 ## Build a proxified URL
 
-A proxy endpoint is not a [CDN base](/guide/cdn-base): it is `<publicKey>.ucr.io` with your key verbatim, not a hashed prefix, and `defaultProxyEndpoint` builds it.
+A proxy endpoint is not a [CDN base](/guide/cdn-base): it is `<publicKey>.ucr.io` with your key verbatim, not a hashed prefix, and `defaultProxyEndpoint` builds it. Nor is there a string-level tab: the source URL is embedded in the path, and [`normalizeModifiers`](/guide/string-level-api) collapses its `https://` into `https:/`, corrupting it.
 
 ::: code-group
 

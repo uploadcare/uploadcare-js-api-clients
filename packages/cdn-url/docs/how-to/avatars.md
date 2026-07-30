@@ -56,6 +56,23 @@ function avatarUrl(uuid: string, size: number): string {
 }
 ```
 
+```ts [String level]
+import { modifiers, tinyBuild } from '@uploadcare/cdn-url/tiny'
+
+const cdnBase = 'https://1s4oyld5dc.ucarecd.net'
+
+function avatarUrl(uuid: string, size: number): string {
+  return tinyBuild({
+    cdnBase,
+    uuid,
+    modifiers: modifiers(
+      `scale_crop/${size}x${size}/smart_faces_objects`,
+      'border_radius/50p'
+    )
+  })
+}
+```
+
 :::
 
 What each piece does:

@@ -102,6 +102,37 @@ describe('cookbook: getting a URL out', () => {
     expect(() => parseCdnUrl('not-a-url')).toThrow(TypeError)
     expect(() => parseCdnUrl('https://example.com/')).toThrow(TypeError)
   })
+
+  it('the String level tab matches the other three, recipe by recipe', () => {
+    // thumbnail from a uuid
+    expect(
+      tinyBuild({
+        cdnBase,
+        uuid,
+        modifiers: modifiers('scale_crop/300x300/smart')
+      })
+    ).toBe(`${cdnBase}/${uuid}/-/scale_crop/300x300/smart/`)
+
+    // swap the CDN domain
+    expect(
+      tinyBuild({
+        ...tinyParse(stored),
+        cdnBase: 'https://1zlmtnsbgr.ucarecd.net'
+      })
+    ).toBe(
+      `https://1zlmtnsbgr.ucarecd.net/${uuid}/-/resize/300x/-/quality/smart/`
+    )
+
+    // download filename
+    expect(
+      tinyBuild({ ...tinyParse(stored), filename: 'invoice-2026.pdf' })
+    ).toBe(`${cdnBase}/${uuid}/-/resize/300x/-/quality/smart/invoice-2026.pdf`)
+
+    // original file, no operations — `modifiers()`, not ''
+    expect(tinyBuild({ ...tinyParse(stored), modifiers: modifiers() })).toBe(
+      `${cdnBase}/${uuid}/`
+    )
+  })
 })
 
 describe('cookbook: editing a chain', () => {

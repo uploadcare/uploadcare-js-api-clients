@@ -111,6 +111,12 @@ new CdnUrl({
 cdn.file(uuid).scaleCrop(300, 300, { type: 'smart' }).href
 ```
 
+```ts [String level]
+import { modifiers, tinyBuild } from '@uploadcare/cdn-url/tiny'
+
+tinyBuild({ cdnBase, uuid, modifiers: modifiers('scale_crop/300x300/smart') })
+```
+
 :::
 
 The input is loose in all three: `cdnBase` plus one addressing field (`uuid`, `group` or `sourceUrl`) is the minimum, and `operations`, `filename`, `conversion`, `search` and `hash` are optional. `serializeCdnUrl({ cdnBase, uuid })` alone gives you the bare file URL.
@@ -134,6 +140,13 @@ url.setCdnBase('https://1zlmtnsbgr.ucarecd.net').href
 
 ```ts [Fluent]
 chain.on('https://1zlmtnsbgr.ucarecd.net').href
+```
+
+```ts [String level]
+import { tinyBuild, tinyParse } from '@uploadcare/cdn-url/tiny'
+
+// file URLs only — see the caveat in "smallest possible bundle" below
+tinyBuild({ ...tinyParse(stored), cdnBase: 'https://1zlmtnsbgr.ucarecd.net' })
 ```
 
 :::
@@ -160,6 +173,12 @@ url.setFilename('invoice-2026.pdf').href
 chain.filename('invoice-2026.pdf').href
 ```
 
+```ts [String level]
+import { tinyBuild, tinyParse } from '@uploadcare/cdn-url/tiny'
+
+tinyBuild({ ...tinyParse(stored), filename: 'invoice-2026.pdf' })
+```
+
 :::
 
 Pass `null` to clear it. Group roots and proxy URLs cannot carry a filename at all. The builder and fluent forms throw in the development bundle and quietly do nothing in production; the atomic form makes you narrow on `kind` before you get the chance.
@@ -183,6 +202,13 @@ url.updateOperations(() => []).href
 chain.updateOperations(() => []).href
 ```
 
+```ts [String level]
+import { modifiers, tinyBuild, tinyParse } from '@uploadcare/cdn-url/tiny'
+
+// the empty chain is `modifiers()` — a bare '' is not a ModifiersChain
+tinyBuild({ ...tinyParse(stored), modifiers: modifiers() })
+```
+
 :::
 
 This clears the operation chain only. A filename, a `?token=` query and a conversion prefix all survive. Clear the query explicitly:
@@ -193,6 +219,8 @@ serializeCdnUrl({ ...withToken, search: '' })
 ```
 
 ## Editing a chain
+
+The string level is absent from this section on purpose: it can append to a chain and replace one wholesale, but it has no `has`/`replace`/`without` and no positional view, so every recipe below would mean writing your own string surgery. Appending is the one case it covers — see [smallest possible bundle](#i-want-the-smallest-possible-bundle).
 
 ### I want to change one operation and keep the rest
 

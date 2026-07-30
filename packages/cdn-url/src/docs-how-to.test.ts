@@ -6,7 +6,14 @@ import { describe, expect, it } from 'vitest'
 
 import { CdnUrl } from './builder/index'
 import { base, prefixedCdnBase } from './fluent/index'
-import { serializeCdnUrl } from './index'
+import {
+  joinModifiers,
+  modifiers,
+  normalizeModifiers,
+  serializeCdnUrl,
+  tinyBuild,
+  tinyParse
+} from './index'
 import { archiveUrl, groupUrl, nthUrl } from './group/index'
 import { borderRadius, preview, resize, scaleCrop } from './ops/index'
 import { defaultProxyEndpoint, proxyUrl } from './proxy/index'
@@ -26,7 +33,24 @@ const fluentAvatar = (u: string, s: number) =>
 
 const fluentVariant = (u: string, w: number) => cdn.file(u).preview(w, w).href
 
-describe('avatars: the three tabs agree', () => {
+const tinyAvatar = (u: string, s: number) =>
+  tinyBuild({
+    cdnBase: CDN_BASE,
+    uuid: u,
+    modifiers: modifiers(
+      `scale_crop/${s}x${s}/smart_faces_objects`,
+      'border_radius/50p'
+    )
+  })
+
+const tinyVariant = (u: string, w: number) =>
+  tinyBuild({
+    cdnBase: CDN_BASE,
+    uuid: u,
+    modifiers: modifiers(`preview/${w}x${w}`)
+  })
+
+describe('avatars: the four tabs agree', () => {
   const atomic = (u: string, s: number) =>
     serializeCdnUrl({
       cdnBase: CDN_BASE,
@@ -46,27 +70,76 @@ describe('avatars: the three tabs agree', () => {
       ]
     }).href
 
-  it('all three produce the documented URL', () => {
+  it('all four produce the documented URL', () => {
     const expected = `${CDN_BASE}/${uuid}/-/scale_crop/96x96/smart_faces_objects/-/border_radius/50p/`
     expect(atomic(uuid, 96)).toBe(expected)
     expect(builder(uuid, 96)).toBe(expected)
     expect(fluentAvatar(uuid, 96)).toBe(expected)
+    expect(tinyAvatar(uuid, 96)).toBe(expected)
   })
 })
 
-describe('responsive images: the three tabs agree', () => {
+describe('responsive images: the four tabs agree', () => {
   const WIDTHS = [320, 640, 960, 1280, 1920]
   const atomic = (u: string, w: number) =>
     serializeCdnUrl({ cdnBase: CDN_BASE, uuid: u, operations: [preview(w, w)] })
   const builder = (u: string, w: number) =>
     new CdnUrl({ cdnBase: CDN_BASE, uuid: u, operations: [preview(w, w)] }).href
 
-  it('all three produce the same srcset', () => {
+  it('all four produce the same srcset', () => {
     const build = (v: (u: string, w: number) => string) =>
       WIDTHS.map((w) => `${v(uuid, w)} ${w}w`).join(', ')
     expect(build(atomic)).toBe(build(builder))
     expect(build(atomic)).toBe(build(fluentVariant))
+    expect(build(atomic)).toBe(build(tinyVariant))
     expect(atomic(uuid, 320)).toBe(`${CDN_BASE}/${uuid}/-/preview/320x320/`)
+  })
+})
+
+describe('render stored urls: the string-level alternatives', () => {
+  const legacy = 'https://ucarecdn.com'
+  const storedUrl = `${legacy}/${uuid}/-/crop/640x480/130,80/photo.jpg`
+
+  it('appends to a stored full URL', () => {
+    const parts = tinyParse(storedUrl)
+    expect(
+      tinyBuild({
+        ...parts,
+        modifiers: joinModifiers(parts.modifiers, modifiers('preview/400x400'))
+      })
+    ).toBe(
+      `${legacy}/${uuid}/-/crop/640x480/130,80/-/preview/400x400/photo.jpg`
+    )
+  })
+
+  it('builds from a stored uuid alone', () => {
+    expect(
+      tinyBuild({
+        cdnBase: legacy,
+        uuid,
+        modifiers: modifiers('preview/400x400')
+      })
+    ).toBe(`${legacy}/${uuid}/-/preview/400x400/`)
+  })
+
+  it('accepts a stored modifiers column in any shape integrations save it', () => {
+    const expected = `${legacy}/${uuid}/-/crop/640x480/130,80/-/preview/400x400/`
+    for (const column of [
+      '-/crop/640x480/130,80/',
+      'crop/640x480/130,80',
+      '/crop/640x480/130,80/'
+    ]) {
+      expect(
+        tinyBuild({
+          cdnBase: legacy,
+          uuid,
+          modifiers: joinModifiers(
+            normalizeModifiers(column),
+            modifiers('preview/400x400')
+          )
+        })
+      ).toBe(expected)
+    }
   })
 })
 

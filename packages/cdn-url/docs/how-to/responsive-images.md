@@ -55,7 +55,26 @@ function variant(uuid: string, width: number): string {
 const srcset = WIDTHS.map((w) => `${variant(uuid, w)} ${w}w`).join(', ')
 ```
 
+```ts [String level]
+import { modifiers, tinyBuild } from '@uploadcare/cdn-url/tiny'
+
+const cdnBase = 'https://1s4oyld5dc.ucarecd.net'
+const WIDTHS = [320, 640, 960, 1280, 1920]
+
+function variant(uuid: string, width: number): string {
+  return tinyBuild({
+    cdnBase,
+    uuid,
+    modifiers: modifiers(`preview/${width}x${width}`)
+  })
+}
+
+const srcset = WIDTHS.map((w) => `${variant(uuid, w)} ${w}w`).join(', ')
+```
+
 :::
+
+A `srcset` is the case the [string level](/guide/string-level-api) was built for: one known file, one operation per variant, no validation needed, and the whole helper costs a few hundred bytes. The widths interpolate into a template literal in argument position, which is where `modifiers` still type-checks the operation name.
 
 The `preview` alone is enough. Once a chain contains a processing operation,
 the CDN defaults to `format/auto` (AVIF/WebP negotiation) and applies adaptive

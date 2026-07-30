@@ -17,7 +17,7 @@ formatGroupId(group) // → 'c2499162-…~3'
 
 ## Addressing the group and its files
 
-Group URLs need the same [CDN base](/guide/cdn-base) as file URLs — the first argument of `groupUrl`/`nthUrl`/`archiveUrl`, or the one bound into a fluent `base(...)`.
+Group URLs need the same [CDN base](/guide/cdn-base) as file URLs — the first argument of `groupUrl`/`nthUrl`/`archiveUrl`, or the one bound into a fluent `base(...)`. There is no string-level tab here: [`tinyParse`](/guide/string-level-api) reads a group element's `nth/1/` as part of the chain, so replacing the chain drops the addressing.
 
 ::: code-group
 

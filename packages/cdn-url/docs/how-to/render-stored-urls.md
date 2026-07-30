@@ -49,6 +49,27 @@ const thumb = serializeCdnUrl({
 
 The user's crop stays. The filename stays at the end, where the CDN expects it.
 
+Under a size budget, the same append needs no operation model at all — [the string level](/guide/string-level-api) works on the raw chain:
+
+```ts
+import {
+  joinModifiers,
+  modifiers,
+  normalizeModifiers,
+  tinyBuild,
+  tinyParse
+} from '@uploadcare/cdn-url/tiny'
+
+const parts = tinyParse(stored)
+const thumb = tinyBuild({
+  ...parts,
+  modifiers: joinModifiers(parts.modifiers, modifiers('preview/400x400'))
+})
+// → https://ucarecdn.com/:uuid/-/crop/640x480/130,80/-/preview/400x400/photo.jpg
+```
+
+It assumes the stored value is a file URL: a group element or a proxy URL parses into fields that look right and serialize back wrong. Everything below stays with the operation model, which knows the difference.
+
 ### A uuid only
 
 Nothing to parse. Build it from scratch:
@@ -64,6 +85,16 @@ const thumb = serializeCdnUrl({
 })
 ```
 
+Or, string level, with no parsing to skip in the first place:
+
+```ts
+tinyBuild({
+  cdnBase: 'https://ucarecdn.com',
+  uuid: row.uuid,
+  modifiers: modifiers('preview/400x400')
+})
+```
+
 ### A uuid + modifiers string
 
 Some integrations store the modifiers string (the uploader calls it `cdnUrlModifiers`, e.g. `'-/crop/640x480/130,80/'`) in its own column (`row.modifiers` below). `parseOperations` turns it back into an array:
@@ -76,6 +107,19 @@ const thumb = serializeCdnUrl({
   cdnBase: 'https://ucarecdn.com',
   uuid: row.uuid,
   operations: [...parseOperations(row.modifiers), preview(400, 400)]
+})
+```
+
+This is the shape the string level fits best, since the stored column is already a chain string. `normalizeModifiers` accepts it in any of the forms integrations save it in — with or without the leading `-`, with or without edge slashes:
+
+```ts
+tinyBuild({
+  cdnBase: 'https://ucarecdn.com',
+  uuid: row.uuid,
+  modifiers: joinModifiers(
+    normalizeModifiers(row.modifiers),
+    modifiers('preview/400x400')
+  )
 })
 ```
 
