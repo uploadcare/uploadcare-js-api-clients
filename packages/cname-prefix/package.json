@@ -1,7 +1,7 @@
 {
   "name": "@uploadcare/cname-prefix",
   "version": "6.19.0",
-  "description": "Helpers for working with Uploadcare CNAME-prefixed URLs in browser environments.",
+  "description": "Helpers for working with Uploadcare CNAME-prefixed URLs, with a native-crypto build for Node.",
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
@@ -9,16 +9,28 @@
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
+      "node": {
+        "import": "./dist/node/index.js",
+        "require": "./dist/node/index.cjs"
+      },
       "import": "./dist/index.js",
       "require": "./dist/index.cjs"
     },
     "./async": {
       "types": "./dist/async.d.ts",
+      "node": {
+        "import": "./dist/node/async.js",
+        "require": "./dist/node/async.cjs"
+      },
       "import": "./dist/async.js",
       "require": "./dist/async.cjs"
     },
     "./sync": {
       "types": "./dist/sync.d.ts",
+      "node": {
+        "import": "./dist/node/sync.js",
+        "require": "./dist/node/sync.cjs"
+      },
       "import": "./dist/sync.js",
       "require": "./dist/sync.cjs"
     }

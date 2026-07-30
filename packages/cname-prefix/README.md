@@ -35,14 +35,23 @@ npm install @uploadcare/cname-prefix
 The package builds a subdomain-based (prefixed) CDN base from your public key. Two variants
 are available with identical output:
 
-- `getPrefixedCdnBaseAsync` uses the Web Crypto API (`window.crypto.subtle`),
-  returns a Promise, and works in browsers in a secure context (HTTPS or
-  `localhost`). It is not available in Node.js or non-secure contexts.
-- `getPrefixedCdnBaseSync` ships its own SHA-256, runs synchronously, and works
-  anywhere: browsers (any context), Node.js, web workers, and edge runtimes.
+- `getPrefixedCdnBaseAsync` uses the Web Crypto API (`crypto.subtle`), returns a
+  Promise, and works in browsers and workers in a secure context (HTTPS or
+  `localhost`). In Node.js it rejects with an explanation: use the sync variant,
+  which is native there.
+- `getPrefixedCdnBaseSync` runs synchronously and works anywhere: browsers (any
+  context), Node.js, web workers, edge runtimes and React Native.
+
+Under the `node` export condition — which Node.js, Vitest and bundlers targeting
+Node all resolve — the sync variant uses `node:crypto`, so the portable SHA-256
+never reaches a server bundle: 240 B brotli against 975 B for the browser build.
+Nothing changes for callers; the import specifier is the same.
 
 ```typescript
-import { getPrefixedCdnBaseAsync, getPrefixedCdnBaseSync } from '@uploadcare/cname-prefix'
+import {
+  getPrefixedCdnBaseAsync,
+  getPrefixedCdnBaseSync
+} from '@uploadcare/cname-prefix'
 
 await getPrefixedCdnBaseAsync('demopublickey', 'https://ucarecd.net')
 // 'https://1s4oyld5dc.ucarecd.net'
@@ -79,4 +88,3 @@ request at [hello@uploadcare.com][uc-email-hello].
 [npm-url]: https://www.npmjs.org/package/@uploadcare/cname-prefix
 [badge-build]: https://github.com/uploadcare/uploadcare-js-api-clients/actions/workflows/checks.yml/badge.svg
 [build-url]: https://github.com/uploadcare/uploadcare-js-api-clients/actions/workflows/checks.yml
-
