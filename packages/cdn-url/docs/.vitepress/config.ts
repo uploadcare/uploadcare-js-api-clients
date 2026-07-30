@@ -9,6 +9,15 @@ export default defineConfig({
     'Build and parse Uploadcare CDN URLs: transformations, groups, proxy and conversion paths.',
   // GitHub Pages serves under the repo subpath; Firebase serves at the root.
   base: process.env.DOCS_BASE ?? '/uploadcare-js-api-clients/cdn-url/',
+  vite: {
+    build: {
+      // The only chunk above the default 500 kB is `@localSearchIndexroot` (~650
+      // kB): the generated TypeDoc reference is large, and MiniSearch indexes all
+      // of it. It is fetched only when a reader opens search, so the warning is
+      // noise here — code-splitting it is not something we control.
+      chunkSizeWarningLimit: 700
+    }
+  },
   themeConfig: {
     logo: 'https://ucarecdn.com/edfdf045-34c0-4087-bbdd-e3834921f890/userpiccircletransparent.svg',
     nav: [
