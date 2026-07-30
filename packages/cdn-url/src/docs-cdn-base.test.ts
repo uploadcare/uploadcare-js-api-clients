@@ -6,7 +6,12 @@
 import { describe, expect, it } from 'vitest'
 
 import { CdnUrl } from './builder/index'
-import { base, LEGACY_CDN_BASE, prefixedCdnBase } from './fluent/index'
+import {
+  base,
+  LEGACY_CDN_BASE,
+  prefixedCdnBase,
+  prefixedCdnBaseAsync
+} from './fluent/index'
 import { groupUrl } from './group/index'
 import {
   detectDomainKind,
@@ -39,6 +44,41 @@ describe('cdn-base: the prefixed base', () => {
     expect(LEGACY_CDN_BASE).toBe('https://ucarecdn.com')
     expect(PREFIX_CDN_BASE).not.toBe(LEGACY_CDN_BASE)
   })
+})
+
+// `prefixedCdnBaseAsync` uses WebCrypto, which is the browser's digest; the
+// dependency deliberately refuses it under Node, where the sync path is native.
+// So these run in the Chromium project only.
+const inBrowser = typeof globalThis.window !== 'undefined'
+
+describe('cdn-base: the async variant', () => {
+  it.skipIf(!inBrowser)(
+    'agrees with the sync one, digit for digit',
+    async () => {
+      await expect(prefixedCdnBaseAsync('demopublickey')).resolves.toBe(
+        prefixedCdnBase('demopublickey')
+      )
+      await expect(prefixedCdnBaseAsync('demopublickey')).resolves.toBe(
+        PREFIXED
+      )
+    }
+  )
+
+  it.skipIf(!inBrowser)('feeds base() once awaited', async () => {
+    const cdn = base(await prefixedCdnBaseAsync('demopublickey'))
+    expect(cdn.file(uuid).preview(800, 600).href).toBe(
+      `${PREFIXED}/${uuid}/-/preview/800x600/`
+    )
+  })
+
+  it.skipIf(!inBrowser)(
+    'takes the same zone argument and trims it',
+    async () => {
+      await expect(
+        prefixedCdnBaseAsync('demopublickey', 'https://cdn.example.com/')
+      ).resolves.toBe('https://1s4oyld5dc.cdn.example.com')
+    }
+  )
 })
 
 describe('cdn-base: the legacy base', () => {

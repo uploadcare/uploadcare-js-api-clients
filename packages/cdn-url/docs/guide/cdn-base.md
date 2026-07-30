@@ -139,15 +139,79 @@ const legacy = base(LEGACY_CDN_BASE)
 
 Only the fluent entry validates the base. `base()` with no argument is a compile error, and `base('')` throws a `TypeError` in [development builds](/guide/bundles), because there is no host it could fall back to. The functional core and the builder accept any string, including an empty one, and hand you back whatever that produces.
 
+## Sync or async
+
+Both variants exist, they return the same string, and the only difference is
+where the SHA-256 comes from.
+
+```ts
+import { prefixedCdnBase, prefixedCdnBaseAsync } from '@uploadcare/cdn-url'
+
+prefixedCdnBase('demopublickey') // → https://1s4oyld5dc.ucarecd.net
+await prefixedCdnBaseAsync('demopublickey') // → the same string
+```
+
+**In a browser, prefer the async one.** It calls
+[`crypto.subtle.digest`](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/digest),
+the platform's own implementation, so nothing is bundled but the call itself.
+
+**On the server, or when awaiting is awkward, prefer the sync one.** Under Node
+it resolves to a build backed by `node:crypto`, which is synchronous and native.
+Reach for it in a browser too when a `Promise` would infect the call site — a
+config module's top-level export, a synchronous render path, React Native — and
+accept the extra kilobyte.
+
+### What it costs
+
+Marginal cost over a bundle that already imports `base` and one chain, measured
+with esbuild `--minify` on the production build:
+
+| Where    | Helper                 | Added       |
+| -------- | ---------------------- | ----------- |
+| browser  | `prefixedCdnBaseAsync` | **+221 B**  |
+| browser  | `prefixedCdnBase`      | **+946 B**  |
+| Node     | `prefixedCdnBase`      | **+151 B**  |
+| Node     | `prefixedCdnBaseAsync` | unavailable |
+| anywhere | a pasted literal host  | 0 B         |
+
+Brotli, which is what a CDN serves. Neither number is large; the honest summary
+is that a pasted literal beats both, and between the two the async one is roughly
+a quarter of the cost in a browser.
+
+### How each one works underneath
+
+`prefixedCdnBaseAsync` awaits `crypto.subtle.digest('SHA-256', …)`, reads the 32
+result bytes as four 64-bit words into a `bigint`, writes it in base 36 and takes
+the leading 10 digits. WebCrypto is available in browsers, Web Workers and
+Service Workers on secure origins (HTTPS or `localhost`); on a plain `http://`
+origin `crypto.subtle` is undefined and the call fails. Under Node it rejects on
+purpose, pointing you at the sync variant, because the async one exists precisely
+to avoid bundling a hash — a problem Node does not have.
+
+`prefixedCdnBase` needs a digest **before** it returns, and `crypto.subtle`
+cannot provide one: it hands back a `Promise`, and no synchronous code can wait
+for a promise. A `while` loop makes it worse rather than better — it occupies the
+single thread that would run the promise's callback, so the wait can never end
+(measured: 2.3 million spins over 250 ms, the digest never delivered). `Atomics.wait`
+does block properly, but it throws on the main thread and needs a
+`SharedArrayBuffer`, which requires cross-origin isolation. So in a browser this
+variant carries a compact SHA-256 of its own — about a kilobyte, which is what
+the table above charges you.
+
+Under Node it carries nothing: `node:crypto`'s `createHash` is synchronous, and
+the `node` export condition swaps the implementation out. Same import specifier,
+same signature, no code change on your side.
+
 ## Compute it once, not per URL
 
-`prefixedCdnBase` carries a SHA-256 implementation: 4.7 kB minified, 2.1 kB gzipped. That is fine on a server or at build time, and wasteful in a browser bundle that only ever needs one host.
-
-The value depends solely on your public key, so resolve it as early as you can:
+Whichever variant you pick, the cost is per bundle rather than per call, and the answer never changes for a given public key. So resolve it once, as early as you can:
 
 ```ts
 // config.ts — one call, one place
 export const CDN_BASE = prefixedCdnBase(process.env.UPLOADCARE_PUBLIC_KEY!)
+
+// or, in a browser app that can await during startup
+export const CDN_BASE = await prefixedCdnBaseAsync(PUBLIC_KEY)
 ```
 
 Better still, if the key is fixed at build time, paste the result as a literal and skip the hashing entirely:
@@ -156,7 +220,7 @@ Better still, if the key is fixed at build time, paste the result as a literal a
 export const CDN_BASE = 'https://1s4oyld5dc.ucarecd.net'
 ```
 
-Nothing else in the library imports the hashing code, so leaving `prefixedCdnBase` unnamed drops it: importing everything from the fluent entry measures 19.8 kB minified / 6.6 kB gzipped with it, and 15.0 kB / 4.4 kB without. See [tree-shaking](/guide/functional-vs-builder#tree-shaking-what-you-actually-ship) for the full table.
+Nothing else in the library imports either helper, so not naming them drops both: importing everything from the fluent entry measures 19.8 kB minified / 6.6 kB gzipped, and 15.0 kB / 4.4 kB when neither is named. See [tree-shaking](/guide/functional-vs-builder#tree-shaking-what-you-actually-ship) for the full table.
 
 ## Things that bite
 

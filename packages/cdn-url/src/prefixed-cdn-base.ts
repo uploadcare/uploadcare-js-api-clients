@@ -1,18 +1,48 @@
+import { getPrefixedCdnBaseAsync } from '@uploadcare/cname-prefix/async'
 import { getPrefixedCdnBaseSync } from '@uploadcare/cname-prefix/sync'
 
 import { PREFIX_CDN_BASE } from './cdn-base'
 import { trimTrailingSlashes } from './grammar'
 
 /**
- * Your project's prefixed CDN base: `<prefix>.ucarecd.net`, where the prefix is
- * the first 10 base36 digits of `sha256(publicKey)`.
+ * Your project's prefixed CDN base: `<prefix>.ucarecd.net`, computed with the
+ * platform's own SHA-256 — `crypto.subtle` in a browser, `node:crypto` on the
+ * server. **Prefer this one in a browser**: it adds ~0.3 kB to a bundle, against
+ * ~1 kB for {@link prefixedCdnBase}, which has to carry a SHA-256 of its own to
+ * be able to return without awaiting.
  *
- * This is `getPrefixedCdnBaseSync` from
- * [`@uploadcare/cname-prefix`](https://www.npmjs.com/package/@uploadcare/cname-prefix)
- * under a shorter name, with {@link PREFIX_CDN_BASE} defaulted in and a trailing
- * slash tolerated. Nothing else prefixes anything on your behalf — pass the
- * result to `base` (or to any `cdnBase` field), and the hashing code only lands
- * in your bundle if you call this.
+ * Being async, it cannot be inlined into a `base(...)` call — resolve it once at
+ * startup and keep the string.
+ *
+ * @param publicKey - The project's public key.
+ * @param cdnBase - The zone to prefix; defaults to {@link PREFIX_CDN_BASE}. Pass
+ *   one explicitly only if you deliver from a different prefixed zone.
+ * @returns The prefixed base, without a trailing slash.
+ *
+ * @example
+ * ```ts
+ * const cdn = base(await prefixedCdnBaseAsync('demopublickey'))
+ * cdn.file(uuid).href
+ * // https://1s4oyld5dc.ucarecd.net/:uuid/
+ * ```
+ *
+ * @see https://uploadcare.com/docs/delivery/cdn/
+ */
+export const prefixedCdnBaseAsync = (
+  publicKey: string,
+  cdnBase: string = PREFIX_CDN_BASE
+): Promise<string> =>
+  getPrefixedCdnBaseAsync(publicKey, trimTrailingSlashes(cdnBase))
+
+/**
+ * Your project's prefixed CDN base: `<prefix>.ucarecd.net`, computed
+ * synchronously. **Prefer this one on the server**, where it uses `node:crypto`
+ * and costs ~0.2 kB, or anywhere awaiting is awkward — a config module's
+ * top-level export, a synchronous render path, a React Native bundle.
+ *
+ * In a browser it carries its own SHA-256 (~1 kB), because `crypto.subtle` only
+ * answers asynchronously and no synchronous code can wait for a promise. If you
+ * can await, {@link prefixedCdnBaseAsync} is the cheaper browser choice.
  *
  * @param publicKey - The project's public key.
  * @param cdnBase - The zone to prefix; defaults to {@link PREFIX_CDN_BASE}. Pass
