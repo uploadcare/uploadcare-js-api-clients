@@ -99,17 +99,21 @@ export function replaceEveryMatch(
 }
 
 /**
- * Runs an `updateOperations` callback over a defensive copy, returning null
- * when it handed back something other than an array — a block-bodied callback
- * with no `return` would otherwise produce a chain whose operations are
- * undefined, corrupt rather than merely empty.
+ * Runs an `updateOperations` callback over a defensive copy.
+ *
+ * A block-bodied callback with no `return` would otherwise produce a chain whose
+ * operations are `undefined` — corrupt rather than merely empty — so a
+ * non-array result throws in development and leaves the chain unchanged in
+ * production. Total by design: it used to return `null` for that case, which
+ * made every caller re-implement the same recovery and put a bundle-flavor
+ * signal in the return type.
  *
  * @internal
  */
 export function updatedOperations(
   operations: readonly CdnOperation[],
   update: (current: CdnOperation[]) => CdnOperation[]
-): CdnOperation[] | null {
+): CdnOperation[] {
   const next = update([...operations])
   if (!Array.isArray(next)) {
     if (__DEV__) {
@@ -117,9 +121,41 @@ export function updatedOperations(
         'updateOperations callback must return an operations array'
       )
     }
-    return null
+    return [...operations]
   }
   return next
+}
+
+/** Whether any operation matches the ref. @internal */
+export function hasOperation(
+  operations: readonly CdnOperation[],
+  ref: OperationRef
+): boolean {
+  return operations.some((op) => operationMatches(op, ref))
+}
+
+/** The first operation matching the ref, or null. @internal */
+export function findOperation(
+  operations: readonly CdnOperation[],
+  ref: OperationRef
+): CdnOperation | null {
+  return operations.find((op) => operationMatches(op, ref)) ?? null
+}
+
+/** Every operation matching the ref, in chain order. @internal */
+export function filterOperations(
+  operations: readonly CdnOperation[],
+  ref: OperationRef
+): CdnOperation[] {
+  return operations.filter((op) => operationMatches(op, ref))
+}
+
+/** Every operation *not* matching the ref, in chain order. @internal */
+export function withoutOperation(
+  operations: readonly CdnOperation[],
+  ref: OperationRef
+): CdnOperation[] {
+  return operations.filter((op) => !operationMatches(op, ref))
 }
 
 /**

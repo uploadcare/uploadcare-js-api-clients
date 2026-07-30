@@ -1,11 +1,14 @@
 import { trimTrailingSlashes } from '../grammar'
 import { isFileInput, isGroupInput, isProxyInput } from '../input-kind'
 import {
+  filterOperations,
+  findOperation,
+  hasOperation,
   type OperationRef,
-  operationMatches,
   replaceEveryMatch,
   replaceFirstMatch,
-  updatedOperations
+  updatedOperations,
+  withoutOperation
 } from '../operation-ref'
 import { parseCdnUrl } from '../parse'
 import { serializeCdnUrl } from '../serialize'
@@ -94,9 +97,17 @@ export class CdnUrl {
     return new CdnUrl(parseCdnUrl(url))
   }
 
+  /**
+   * The operation chain without copying it — for internal reads that only
+   * inspect. Empty for group root urls, which cannot carry operations.
+   */
+  get #ops(): readonly CdnOperation[] {
+    return 'operations' in this.#parsed ? this.#parsed.operations : []
+  }
+
   /** A defensive copy of the operation chain (empty for group root urls). */
   public get operations(): CdnOperation[] {
-    return 'operations' in this.#parsed ? [...this.#parsed.operations] : []
+    return [...this.#ops]
   }
 
   /** The serialized URL string. */
@@ -130,9 +141,7 @@ export class CdnUrl {
    * an operation object, or the creator itself: `url.without(resize)`.
    */
   public without(ref: OperationRef): CdnUrl {
-    return this.#withOperations((current) =>
-      current.filter((op) => !operationMatches(op, ref))
-    )
+    return this.#withOperations((current) => withoutOperation(current, ref))
   }
 
   /**
@@ -173,12 +182,12 @@ export class CdnUrl {
 
   /** Whether a matching operation is present (name, object or creator ref). */
   public has(ref: OperationRef): boolean {
-    return this.operations.some((op) => operationMatches(op, ref))
+    return hasOperation(this.#ops, ref)
   }
 
   /** First matching operation (name, object or creator ref), or null. */
   public get(ref: OperationRef): CdnOperation | null {
-    return this.operations.find((op) => operationMatches(op, ref)) ?? null
+    return findOperation(this.#ops, ref)
   }
 
   /**
@@ -191,7 +200,7 @@ export class CdnUrl {
    * ```
    */
   public getAll(ref: OperationRef): CdnOperation[] {
-    return this.operations.filter((op) => operationMatches(op, ref))
+    return filterOperations(this.#ops, ref)
   }
 
   /**
@@ -252,7 +261,6 @@ export class CdnUrl {
       return this
     }
     const next = updatedOperations(this.#parsed.operations, update)
-    if (next === null) return this
     return new CdnUrl({ ...this.#parsed, operations: next })
   }
 }

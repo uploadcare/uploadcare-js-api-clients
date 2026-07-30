@@ -79,6 +79,16 @@ check('structural guards survive minification (prod cjs)', () => {
     throw new Error('prod: unbound cdn.file() did not throw')
 })
 
+check('updateOperations no-ops rather than corrupts (prod cjs)', () => {
+  const { cdn } = require('../dist/prod/fluent.cjs')
+  const chain = cdn.base('https://x.ucarecd.net').file(UUID).preview(800, 600)
+  // Production strips the dev throw; the callback contract must degrade to
+  // "chain unchanged", never to `operations: undefined`.
+  const href = chain.updateOperations(() => undefined).href
+  if (href !== `https://x.ucarecd.net/${UUID}/-/preview/800x600/`)
+    throw new Error(`prod updateOperations mangled the chain: ${href}`)
+})
+
 check('dev bundle still validates (dev esm)', async () => {
   const { quality } = await import(distUrl('dev/ops.js'))
   try {

@@ -1,9 +1,12 @@
 import {
+  filterOperations,
+  findOperation,
+  hasOperation,
   type OperationRef,
-  operationMatches,
   replaceEveryMatch,
   replaceFirstMatch,
-  updatedOperations
+  updatedOperations,
+  withoutOperation
 } from '../operation-ref'
 import type { CdnOperation } from '../types'
 
@@ -61,9 +64,7 @@ export abstract class Chain<S extends ChainState> {
    * an operation object, or the creator itself: `chain.withoutOp(resize)`.
    */
   public withoutOp(ref: OperationRef): this {
-    return this._withOperations(
-      this._s.operations.filter((op) => !operationMatches(op, ref))
-    )
+    return this._withOperations(withoutOperation(this._s.operations, ref))
   }
 
   /**
@@ -88,9 +89,7 @@ export abstract class Chain<S extends ChainState> {
   public updateOperations(
     update: (current: CdnOperation[]) => CdnOperation[]
   ): this {
-    const next = updatedOperations(this._s.operations, update)
-    if (next === null) return this
-    return this._withOperations(next)
+    return this._withOperations(updatedOperations(this._s.operations, update))
   }
 
   /**
@@ -103,7 +102,7 @@ export abstract class Chain<S extends ChainState> {
    * ```
    */
   public hasOp(ref: OperationRef): boolean {
-    return this._s.operations.some((op) => operationMatches(op, ref))
+    return hasOperation(this._s.operations, ref)
   }
 
   /**
@@ -116,7 +115,7 @@ export abstract class Chain<S extends ChainState> {
    * ```
    */
   public getOp(ref: OperationRef): CdnOperation | null {
-    return this._s.operations.find((op) => operationMatches(op, ref)) ?? null
+    return findOperation(this._s.operations, ref)
   }
 
   /**
@@ -128,7 +127,7 @@ export abstract class Chain<S extends ChainState> {
    * ```
    */
   public getAllOps(ref: OperationRef): CdnOperation[] {
-    return this._s.operations.filter((op) => operationMatches(op, ref))
+    return filterOperations(this._s.operations, ref)
   }
 
   /**

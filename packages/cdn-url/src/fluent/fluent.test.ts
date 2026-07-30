@@ -166,6 +166,30 @@ describe('cdn.base(cdnBase)', () => {
   })
 })
 
+describe('updateOperations: one contract, both facades', () => {
+  it('a callback that returns nothing throws in dev and no-ops in prod', () => {
+    const chain = myCdn.file(UUID).preview(800, 600)
+    // vitest defines __DEV__ = true, so this is the dev half; the prod half —
+    // "leaves the chain unchanged" — is asserted against the built bundle by
+    // scripts/smoke-node.mjs.
+    // a block-bodied callback with no `return` — the mistake the guard exists for
+    expect(() =>
+      // @ts-expect-error the callback must return an array; this one returns void
+      chain.updateOperations(() => {})
+    ).toThrow(/must return an operations array/)
+  })
+
+  it('a valid callback rewrites the chain', () => {
+    expect(
+      myCdn
+        .file(UUID)
+        .preview(800, 600)
+        .updateOperations((ops) => [...ops, { name: 'blur', params: ['10'] }])
+        .href
+    ).toBe(`${CDN_BASE}/${UUID}/-/preview/800x600/-/blur/10/`)
+  })
+})
+
 describe('the fluent entry object is frozen', () => {
   it('rejects reassigning a starter', () => {
     expect(Object.isFrozen(cdn)).toBe(true)

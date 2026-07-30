@@ -78,6 +78,24 @@ conventions in several ways — do not "fix" these divergences.
   inside a URL a non-`-` segment is a filename or an error, and loosening the
   shared segment parser would make `/<uuid>/garbage/` parse `garbage` as an
   operation.
+- **A chain's state _is_ its `ParsedCdnUrl`.** `FileChain` holds a `ParsedFileUrl`,
+  `GroupElementChain` a `ParsedGroupElementUrl`, and so on, so `wrapParsed` hands
+  the parsed object over untouched and `href` is `serializeCdnUrl(this._s)`. It
+  used to copy field by field into a parallel state shape, which is how
+  `conversion` went missing and `cdn.parse` on a gif2video url serialized back
+  without its prefix. Never reintroduce a second shape for "a parsed url".
+- **`src/input-kind.ts` owns "which kind is this loose input?"** — three type
+  predicates shared by `serializeCdnUrl` and the builder's `normalizeInput`, which
+  used to answer differently: `'sourceUrl' in input` versus
+  `input.sourceUrl != null` made `{ uuid, sourceUrl: undefined }` a file url
+  through one and a `TypeError` through the other. A key that is present but
+  `undefined` is not intent.
+- **`updatedOperations` is total.** It returns the operations unchanged when a
+  callback hands back a non-array (after throwing in dev); it used to return
+  `null` for that case, so both facades re-implemented the same recovery and the
+  return type carried a bundle-flavor signal. The query helpers beside it
+  (`hasOperation`, `findOperation`, `filterOperations`, `withoutOperation`) exist
+  so the two facades cannot drift on what "matching" means.
 - **`updateOperations(fn)` is the one operation mutator on both facades**;
   `with`/`without`/`replace`/`replaceAll` (and the fluent `*Op` variants) are
   sugar over it. It hands the callback a defensive copy. Conversion chains
