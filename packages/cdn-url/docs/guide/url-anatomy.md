@@ -50,7 +50,7 @@ import { detectDomainKind } from '@uploadcare/cdn-url'
 detectDomainKind('https://1zlmtnsbgr.ucarecd.net') // → 'prefixed'
 ```
 
-The parser and serializer work identically on all of them. The cdnBase is just a field, which makes [rebasing between domains](/how-to/render-stored-urls#rebasing-onto-another-domain) a one-liner.
+The parser and serializer work identically on all of them. The cdnBase is just a field, which makes [rebasing between domains](/how-to/render-stored-urls#rebasing-onto-another-domain) a one-liner. For choosing the base you _build_ with — and deriving the prefixed one from your public key — see [The CDN base](/guide/cdn-base).
 
 ## Group URLs
 

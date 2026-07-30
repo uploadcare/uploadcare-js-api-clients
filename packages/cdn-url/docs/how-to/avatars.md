@@ -4,6 +4,8 @@ The avatar problem: arbitrary user photos in, consistent squares (or circles) ou
 
 ## The recipe
 
+All three tabs build from a uuid, so each needs [your CDN base](/guide/cdn-base) — the prefixed host below is derived from a public key with `prefixedCdnBase`.
+
 ::: code-group
 
 ```ts [Atomic]

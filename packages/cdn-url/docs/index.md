@@ -21,5 +21,5 @@ features:
   - title: Chain validation
     details: Cross-operation diagnostics for the core operation requirement, must-be-last rules, last-wins duplicates and dimension ceilings.
   - title: Tree-shakeable
-    details: Nine atomic entry points; import only what you use. The proxy entry is under half a kilobyte.
+    details: Eleven atomic entry points; import only what you use. The proxy entry is under half a kilobyte.
 ---

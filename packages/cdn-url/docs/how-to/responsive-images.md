@@ -4,6 +4,8 @@ Serve each device the pixels it actually needs: a `srcset` of CDN-resized varian
 
 ## Width-based srcset
 
+Each variant is built from a uuid, so these need [your CDN base](/guide/cdn-base); derive it once outside the loop rather than per width.
+
 ::: code-group
 
 ```ts [Atomic]

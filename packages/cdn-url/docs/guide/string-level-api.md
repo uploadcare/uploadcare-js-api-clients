@@ -131,7 +131,7 @@ https://ucarecdn.com/:uuid/-/resize/300x/photo.jpg?v=2#top
 
 The cuts are lexical: the first slash after the host, the last slash of the path, then the first `?` and `#`. The field names are [`ParsedFileUrl`](/reference/index/interfaces/ParsedFileUrl)'s, except that `modifiers` holds the serialized chain where it holds an `operations` array.
 
-Only `cdnBase` and `uuid` are required — everything else defaults to empty, so `tinyBuild` also builds URLs from scratch:
+Only `cdnBase` and `uuid` are required — everything else defaults to empty, so `tinyBuild` also builds URLs from scratch. The base is yours to supply, exactly as at every other layer; see [The CDN base](/guide/cdn-base), and note that deriving it with `prefixedCdnBase` costs more bytes than everything on this page put together, so a size-conscious caller pastes the host as a literal:
 
 ```ts
 import { modifiers, tinyBuild } from '@uploadcare/cdn-url/tiny'

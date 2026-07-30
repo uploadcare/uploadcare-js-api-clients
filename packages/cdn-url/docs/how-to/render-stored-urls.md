@@ -108,7 +108,7 @@ const rebased = serializeCdnUrl({
 })
 ```
 
-Everything else survives untouched: the uuid, the user's edits, the filename.
+Everything else survives untouched: the uuid, the user's edits, the filename. [The CDN base](/guide/cdn-base) covers where that value comes from — `prefixedCdnBase` derives your project's from its public key — and why a rebase invalidates a [signed URL](https://uploadcare.com/docs/security/secure-delivery/).
 
 ## A taste of srcset
 

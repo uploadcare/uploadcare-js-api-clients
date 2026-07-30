@@ -1,6 +1,6 @@
 # Getting started
 
-`@uploadcare/cdn-url` builds and parses [Uploadcare CDN](https://uploadcare.com/docs/delivery/cdn/) URLs: image transformations, file groups, delivery proxy and conversion paths. It ships full TypeScript types and no dependencies.
+`@uploadcare/cdn-url` builds and parses [Uploadcare CDN](https://uploadcare.com/docs/delivery/cdn/) URLs: image transformations, file groups, delivery proxy and conversion paths. It ships full TypeScript types and one runtime dependency, [`@uploadcare/cname-prefix`](https://www.npmjs.com/package/@uploadcare/cname-prefix), used only if you ask it to derive [your CDN base](/guide/cdn-base) from a public key.
 
 ## Install
 
@@ -32,7 +32,7 @@ No bundler at all? The [IIFE global build](/guide/functional-vs-builder#the-flue
 
 ## Supported environments
 
-The library touches no DOM and no Node-specific APIs, so it runs anywhere modern JavaScript runs. Zero dependencies, `sideEffects: false`, ESM + CommonJS.
+The library touches no DOM and no Node-specific APIs, so it runs anywhere modern JavaScript runs. `sideEffects: false`, ESM + CommonJS.
 
 | Environment                                        | Support                                                                                                        |
 | -------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
@@ -46,6 +46,8 @@ The library touches no DOM and no Node-specific APIs, so it runs anywhere modern
 The only platform features required are `URL` and `String.prototype.replaceAll` (ES2021), present in every runtime above. Build artifacts are additionally smoke-tested in plain Node (ESM + CJS, every entry point) on every build.
 
 ## Build a URL
+
+Every URL needs the host your project delivers from — its [CDN base](/guide/cdn-base). `https://1s4oyld5dc.ucarecd.net` below is a project-prefixed base, derived from a public key with `prefixedCdnBase`; that page covers legacy `ucarecdn.com` and custom CNAMEs too.
 
 Compose typed operations into a URL:
 

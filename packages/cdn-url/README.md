@@ -230,7 +230,7 @@ functional — it is an opt-in API, not a runtime check.
 
 ## Supported environments
 
-No DOM, no Node-specific APIs, zero dependencies — runs in Node.js **≥ 16**,
+No DOM, no Node-specific APIs, one runtime dependency — runs in Node.js **≥ 16**,
 evergreen browsers (Chrome/Edge 87+, Firefox 78+, Safari 14+), Bun, Deno, edge
 runtimes, and React Native (with a spec-compliant `URL` polyfill). The only
 platform features required are `URL` and `String.prototype.replaceAll`. The

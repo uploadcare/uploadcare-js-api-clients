@@ -46,7 +46,7 @@ cdn
 :::
 
 ::: warning No builder tab, on purpose
-`CdnUrl` can hold a `conversion: 'video'` and will happily serialize it, but it attaches the CDN base and hands back a full URL. The convert API wants a path, so use `videoPath` or a fluent video chain instead.
+`CdnUrl` can hold a `conversion: 'video'` and will happily serialize it, but it attaches the CDN base and hands back a full URL. The convert API wants a path, so use `videoPath` or a fluent video chain instead. Conversion paths are the one thing here that needs no [CDN base](/guide/cdn-base) at all; `gif2video`, being an on-the-fly URL, does.
 :::
 
 Grammar the creators enforce (in development):

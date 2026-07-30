@@ -4,6 +4,8 @@ The [delivery proxy](https://uploadcare.com/docs/delivery/proxy/) fetches images
 
 ## Build a proxified URL
 
+A proxy endpoint is not a [CDN base](/guide/cdn-base): it is `<publicKey>.ucr.io` with your key verbatim, not a hashed prefix, and `defaultProxyEndpoint` builds it.
+
 ::: code-group
 
 ```ts [Atomic]

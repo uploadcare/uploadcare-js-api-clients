@@ -148,9 +148,11 @@ conventions in several ways — do not "fix" these divergences.
   each entry has to call it, so `cdn-base.test.ts` pins the whole matrix (bare, one
   slash, three slashes) rather than trusting the next cdnBase-accepting function to
   remember. Add a row there when you add one.
-- **`tiny/` normalizes nothing on the way in, and the guide says so.** `cdnBase` must
-  not end in a slash (`serializeFileUrl` trims, `tinyBuild` does not — it emits
-  `host//:uuid/`), `search`/`hash` carry their own `?`/`#`, and `tinyParse` on a
+- **`tiny/` normalizes almost nothing on the way in, and the guide says so.** The one
+  exception is the trailing slash on `cdnBase`, which `tinyBuild` trims like every
+  other base-accepting entry (`cdn-base.test.ts` pins it; an earlier note here
+  claimed it emitted `host//:uuid/`, which stopped being true when the trim landed).
+  `search`/`hash` carry their own `?`/`#`, and `tinyParse` on a
   non-url returns nonsense fields rather than throwing. There is also no
   `replace`/`without` at this level, so appending an operation the chain already has
   leaves both occurrences (last one wins at the CDN). All five are tested in
@@ -352,8 +354,8 @@ npm run docs:api         # typedoc — FAILS on any undocumented public symbol
   alone. Constrain that agent to the single page — it must not read the source,
   or it answers from the code and proves nothing about the prose.
 - **Page snippets are executed, not trusted.** `docs-cookbook.test.ts`,
-  `docs-how-to.test.ts` and `docs-string-level.test.ts` mirror the snippets from
-  their pages verbatim, so a page cannot claim an output the code does not produce.
+  `docs-how-to.test.ts`, `docs-string-level.test.ts` and `docs-cdn-base.test.ts`
+  mirror the snippets from their pages verbatim, so a page cannot claim an output the code does not produce.
   Tables of behaviour count too: the url-kind table on the string-level page has one
   test per row. Add to these when you add a page with runnable examples.
 

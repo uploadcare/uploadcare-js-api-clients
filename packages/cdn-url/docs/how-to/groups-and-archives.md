@@ -17,6 +17,8 @@ formatGroupId(group) // → 'c2499162-…~3'
 
 ## Addressing the group and its files
 
+Group URLs need the same [CDN base](/guide/cdn-base) as file URLs — the first argument of `groupUrl`/`nthUrl`/`archiveUrl`, or the one bound into a fluent `base(...)`.
+
 ::: code-group
 
 ```ts [Atomic]

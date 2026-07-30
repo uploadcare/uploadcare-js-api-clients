@@ -41,6 +41,7 @@ export default defineConfig({
         text: 'Guide',
         items: [
           { text: 'Getting started', link: '/guide/getting-started' },
+          { text: 'The CDN base', link: '/guide/cdn-base' },
           { text: 'CDN URL anatomy', link: '/guide/url-anatomy' },
           {
             text: 'API styles & tree-shaking',
