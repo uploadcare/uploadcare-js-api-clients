@@ -8,7 +8,7 @@
 import { describe, expect, it } from 'vitest'
 
 import { CdnUrl } from './builder/index'
-import { base, prefixedCdnBase } from './fluent/index'
+import { cdn, prefixedCdnBase } from './fluent/index'
 import { gif2videoUrl } from './gif2video/index'
 import { archiveUrl, groupUrl, nthUrl } from './group/index'
 import {
@@ -25,7 +25,7 @@ const GROUP = { uuid: UUID, count: 3 }
 const SOURCE = 'https://example.com/a.jpg'
 
 // Any base will do for the `on()` rows — each one replaces it.
-const cdn = base('https://other.example')
+const myCdn = cdn.base('https://other.example')
 
 // Bare, one slash, and several: `trimTrailingSlashes` takes them all.
 const CDN_BASES = [
@@ -40,17 +40,16 @@ const cases: [name: string, build: (cdnBase: string) => string][] = [
   ['tinyBuild', (cdnBase) => tinyBuild({ cdnBase, uuid: UUID })],
   ['CdnUrl constructor', (cdnBase) => new CdnUrl({ cdnBase, uuid: UUID }).href],
   [
-    'CdnUrl.setCdnBase',
+    'CdnUrl.base',
     (cdnBase) =>
-      new CdnUrl({ cdnBase: 'https://other.example', uuid: UUID }).setCdnBase(
-        cdnBase
-      ).href
+      new CdnUrl({ cdnBase: 'https://other.example', uuid: UUID }).base(cdnBase)
+        .href
   ],
-  ['base(cdnBase)', (cdnBase) => base(cdnBase).file(UUID).href],
-  ['chain.on()', (cdnBase) => cdn.file(UUID).on(cdnBase).href],
+  ['cdn.base(cdnBase)', (cdnBase) => cdn.base(cdnBase).file(UUID).href],
+  ['chain.base()', (cdnBase) => myCdn.file(UUID).base(cdnBase).href],
   [
-    'gif2video chain.on()',
-    (cdnBase) => cdn.gif2video(UUID).on(cdnBase).format('webm').href
+    'gif2video chain.base()',
+    (cdnBase) => myCdn.gif2video(UUID).base(cdnBase).format('webm').href
   ],
   ['gif2videoUrl', (cdnBase) => gif2videoUrl(cdnBase, UUID, [])]
 ]
@@ -63,14 +62,14 @@ const groupCases: [name: string, build: (cdnBase: string) => string][] = [
   ['groupUrl', (cdnBase) => groupUrl(cdnBase, GROUP)],
   ['nthUrl', (cdnBase) => nthUrl(cdnBase, GROUP, 1)],
   ['archiveUrl', (cdnBase) => archiveUrl(cdnBase, GROUP, 'zip')],
-  ['group chain.on()', (cdnBase) => cdn.group(GROUP).on(cdnBase).href],
+  ['group chain.base()', (cdnBase) => myCdn.group(GROUP).base(cdnBase).href],
   [
-    'group element chain.on()',
-    (cdnBase) => cdn.group(GROUP).on(cdnBase).nth(1).href
+    'group element chain.base()',
+    (cdnBase) => myCdn.group(GROUP).base(cdnBase).nth(1).href
   ],
   [
     'group archive via chain',
-    (cdnBase) => cdn.group(GROUP).on(cdnBase).archive('zip')
+    (cdnBase) => myCdn.group(GROUP).base(cdnBase).archive('zip')
   ]
 ]
 
@@ -81,8 +80,8 @@ const proxyCases: [name: string, build: (cdnBase: string) => string][] = [
   ],
   ['proxyUrl', (cdnBase) => proxyUrl(cdnBase, SOURCE)],
   [
-    'proxy chain.on()',
-    (cdnBase) => cdn.proxy('https://pk.ucr.io', SOURCE).on(cdnBase).href
+    'proxy chain.proxy()',
+    (cdnBase) => myCdn.proxy('https://pk.ucr.io', SOURCE).proxy(cdnBase).href
   ]
 ]
 

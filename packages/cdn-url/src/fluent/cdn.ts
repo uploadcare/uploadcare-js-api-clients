@@ -22,32 +22,57 @@ export type ParsedChain =
   | ProxyChain
 
 /**
- * The fluent entry object, as returned by {@link base}. Every member is
- * `readonly` and the object itself is frozen, so a consumer cannot monkey-patch
- * a shared entry point; `base` returns a new one instead.
+ * What the `cdn` object offers before a CDN base is bound: the starters that do
+ * not need one. Conversion chains emit a path with no host by design, a proxy
+ * chain takes its endpoint as an argument, and a parsed url carries its own base.
+ *
+ * `file`, `group` and `gif2video` are absent on purpose — they cannot produce a
+ * url without a host, so reaching for one here is a compile error. Call
+ * {@link UnboundCdn.base} first; it hands back a {@link Cdn} with the full
+ * surface.
  */
-export interface Cdn {
-  /** Starts a single-file chain. */
-  readonly file: (uuid: string) => FileChain
+export interface UnboundCdn {
+  /**
+   * Binds the host to deliver from and returns the full entry object. The
+   * receiver is untouched — every object here is frozen.
+   *
+   * @example
+   * ```ts
+   * const my = cdn.base(prefixedCdnBase('demopublickey'))
+   * my.file(uuid).preview(800, 600).href
+   * ```
+   */
+  readonly base: (cdnBase: string) => Cdn
   /** Parses any CDN url into the matching chain — see {@link parse}. */
   readonly parse: (url: string) => ParsedChain
+  /** Starts a delivery-proxy chain; the endpoint is this call's argument, not the bound base. */
+  readonly proxy: (endpoint: string, sourceUrl: string) => ProxyChain
+  /** Starts a video conversion path chain (REST convert API) — a path, so no host is involved. */
+  readonly video: (uuid: string) => VideoChain
+  /** Starts a document conversion path chain (REST convert API) — a path, so no host is involved. */
+  readonly document: (uuid: string) => DocumentChain
+}
+
+/**
+ * The fluent entry object with a CDN base bound, as returned by
+ * {@link UnboundCdn.base}. Every member is `readonly` and the object is
+ * frozen, so a shared entry point cannot be monkey-patched.
+ *
+ * `base` remains available and returns another one, so several hosts can
+ * coexist in an app.
+ */
+export interface Cdn extends UnboundCdn {
+  /** Starts a single-file chain. */
+  readonly file: (uuid: string) => FileChain
   /** Starts a group root chain from a `uuid~count` id or parsed id. */
   readonly group: (id: GroupInput) => GroupChain
-  /** Starts a delivery-proxy chain over a remote source url. */
-  readonly proxy: (endpoint: string, sourceUrl: string) => ProxyChain
-  /** Starts a video conversion path chain (REST convert API). */
-  readonly video: (uuid: string) => VideoChain
-  /** Starts a document conversion path chain (REST convert API). */
-  readonly document: (uuid: string) => DocumentChain
   /** Starts an on-the-fly gif2video url chain. */
   readonly gif2video: (uuid: string) => Gif2VideoChain
-  /** Returns a new {@link Cdn} bound to a different CDN base — see {@link base}. */
-  readonly base: (cdnBase: string) => Cdn
 }
 
 /**
  * Parses any CDN url into the matching chain (narrow by `.kind`). Config-free:
- * the cdnBase comes from the url, so this needs no {@link base} call.
+ * the cdnBase comes from the url, so this needs no base bound.
  *
  * @example
  * ```ts
@@ -100,38 +125,35 @@ function wrapParsed(parsed: ParsedCdnUrl): ParsedChain {
   }
 }
 
-/**
- * Creates the fluent entry object, bound to the CDN base your project delivers
- * from: its prefixed host (see {@link prefixedCdnBase}), your own CNAME, or
- * {@link LEGACY_CDN_BASE}. Trailing slash tolerated.
- *
- * This is the only way in — no zero-config entry object exists, because no
- * single host works for every project.
- *
- * @example
- * ```ts
- * // your project's own prefixed host, derived from its public key
- * const cdn = base(prefixedCdnBase('demopublickey'))
- * cdn.file(uuid).preview(800, 600).href
- *
- * // or your own CNAME
- * base('https://cdn.example.com').file(uuid).href
- * ```
- */
-export function base(cdnBase: string): Cdn {
+/** The base-free starters, identical whether or not a host is bound. */
+const baseFree = {
+  parse,
+  proxy: (endpoint: string, sourceUrl: string): ProxyChain =>
+    new ProxyChain({
+      cdnBase: trimTrailingSlashes(endpoint),
+      operations: [],
+      sourceUrl
+    }),
+  video: (uuid: string): VideoChain => new VideoChain({ uuid, operations: [] }),
+  document: (uuid: string): DocumentChain =>
+    new DocumentChain({ uuid, operations: [] })
+}
+
+function bind(cdnBase: string): Cdn {
   if (__DEV__ && !cdnBase) {
     throw new TypeError(
       'base(): a CDN base is required — pass your prefixed host (see prefixedCdnBase), your CNAME, or LEGACY_CDN_BASE'
     )
   }
 
-  // The fallback is for JS callers only, and it is the legacy shared base:
-  // never a bare `ucarecd.net`, which does not resolve without a project prefix
-  // on it.
+  // The fallback is for JS callers only, and it is the legacy shared base: never
+  // a bare `ucarecd.net`, which does not resolve without a project prefix on it.
   const resolved = cdnBase || LEGACY_CDN_BASE
 
-  const api: Cdn = {
-    file: (uuid) =>
+  return Object.freeze({
+    ...baseFree,
+    base: bind,
+    file: (uuid: string) =>
       new FileChain({
         cdnBase: resolved,
         uuid,
@@ -140,26 +162,63 @@ export function base(cdnBase: string): Cdn {
         search: '',
         hash: ''
       }),
-    parse,
-    group: (id) =>
+    group: (id: GroupInput) =>
       new GroupChain({
         cdnBase: resolved,
         group: toGroupId(id),
         search: '',
         hash: ''
       }),
-    proxy: (endpoint, sourceUrl) =>
-      new ProxyChain({
-        cdnBase: trimTrailingSlashes(endpoint),
-        operations: [],
-        sourceUrl
-      }),
-    video: (uuid) => new VideoChain({ uuid, operations: [] }),
-    document: (uuid) => new DocumentChain({ uuid, operations: [] }),
-    gif2video: (uuid) =>
-      new Gif2VideoChain({ cdnBase: resolved, uuid, operations: [] }),
-    base
-  }
-
-  return Object.freeze(api)
+    gif2video: (uuid: string) =>
+      new Gif2VideoChain({ cdnBase: resolved, uuid, operations: [] })
+  })
 }
+
+/**
+ * A starter that cannot work without a host. Absent from {@link UnboundCdn} at
+ * the type level, so this only runs for JavaScript callers; it is a structural
+ * error rather than a validation one, so it throws in both bundle flavors.
+ */
+const needsBase = (name: string) => (): never => {
+  throw new TypeError(
+    `cdn.${name}() needs a CDN base: call cdn.base(…) first, e.g. cdn.base(prefixedCdnBase(publicKey)).${name}(…)`
+  )
+}
+
+/**
+ * The fluent mega-object: every CDN url flavor behind one import, chainable end
+ * to end.
+ *
+ * Bind a host before building anything addressed by one. `file`, `group` and
+ * `gif2video` exist only on the object `base` returns, so forgetting is a
+ * compile error, not a broken url:
+ *
+ * ```ts
+ * cdn.file(uuid) // ✗ Property 'file' does not exist on type 'UnboundCdn'
+ * ```
+ *
+ * The rest needs no host and works straight off `cdn`: conversion chains emit a
+ * path, a proxy chain takes its endpoint as an argument, and `parse` reads the
+ * base out of the url it is given.
+ *
+ * @example
+ * ```ts
+ * import { cdn } from '@uploadcare/cdn-url/fluent'
+ * import { prefixedCdnBase } from '@uploadcare/cdn-url'
+ *
+ * const my = cdn.base(prefixedCdnBase('demopublickey'))
+ * my.file(uuid).preview(800, 600).quality('smart').href
+ * my.group(groupId).nth(1).href
+ *
+ * // no host needed for these
+ * cdn.video(uuid).size({ width: 720, height: 540 }).thumbs(5).path
+ * cdn.parse(stored).kind
+ * ```
+ */
+export const cdn: UnboundCdn = Object.freeze({
+  ...baseFree,
+  base: bind,
+  file: needsBase('file'),
+  group: needsBase('group'),
+  gif2video: needsBase('gif2video')
+})

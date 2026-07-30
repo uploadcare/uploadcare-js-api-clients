@@ -4,7 +4,7 @@ The [delivery proxy](https://uploadcare.com/docs/delivery/proxy/) fetches images
 
 ## Build a proxified URL
 
-A proxy endpoint is not a [CDN base](/guide/cdn-base): it is `<publicKey>.ucr.io` with your key verbatim, not a hashed prefix, and `defaultProxyEndpoint` builds it. Nor is there a string-level tab: the source URL is embedded in the path, and [`normalizeModifiers`](/guide/string-level-api) collapses its `https://` into `https:/`, corrupting it.
+A proxy endpoint is not a [CDN base](/guide/cdn-base): it is `<publicKey>.ucr.io` with your key verbatim, not a hashed prefix, and `defaultProxyEndpoint` builds it. All three styles handle proxy URLs — the builder takes the endpoint as its `cdnBase` alongside a `sourceUrl`, and a parsed proxy URL round-trips through any of them. Nor is there a string-level tab: the source URL is embedded in the path, and [`normalizeModifiers`](/guide/string-level-api) collapses its `https://` into `https:/`, corrupting it.
 
 ::: code-group
 
@@ -35,11 +35,10 @@ new CdnUrl({
 ```
 
 ```ts [Fluent]
-import { base, prefixedCdnBase } from '@uploadcare/cdn-url/fluent'
+import { cdn } from '@uploadcare/cdn-url/fluent'
 import { defaultProxyEndpoint } from '@uploadcare/cdn-url/proxy'
 
-const cdn = base(prefixedCdnBase('demopublickey'))
-
+// no `cdn.base(…)` needed: the endpoint is this call's first argument
 cdn
   .proxy(
     defaultProxyEndpoint('YOUR_PUBLIC_KEY'),

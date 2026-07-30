@@ -53,11 +53,11 @@ Read those two hostnames carefully: `ucarecd.net` and `ucarecdn.com` are differe
 Older projects deliver from `ucarecdn.com`, the original shared domain. This library treats it like any other host: it parses, serializes and builds on it exactly as it does on a prefixed base, so nothing forces you to migrate stored URLs. New projects are not given it, though, which is why it is never a default here — name it explicitly ([CDN settings](https://uploadcare.com/docs/delivery/cdn/) is where the platform side of that decision lives):
 
 ```ts
-import { base, LEGACY_CDN_BASE } from '@uploadcare/cdn-url/fluent'
+import { cdn, LEGACY_CDN_BASE } from '@uploadcare/cdn-url/fluent'
 
 LEGACY_CDN_BASE // → https://ucarecdn.com
 
-base(LEGACY_CDN_BASE).file(uuid).preview(800, 600).href
+cdn.base(LEGACY_CDN_BASE).file(uuid).preview(800, 600).href
 // → https://ucarecdn.com/:uuid/-/preview/800x600/
 ```
 
@@ -68,7 +68,7 @@ Stored URLs from that era keep working, and moving them onto your prefixed base 
 If you [configured a custom CDN CNAME](https://uploadcare.com/docs/delivery/cdn/#settings), it is a DNS record pointing at your `ucarecd.net` subdomain, and delivery from it needs **no prefix**. Pass the host as it stands:
 
 ```ts
-base('https://cdn.example.com').file(uuid).href
+cdn.base('https://cdn.example.com').file(uuid).href
 // → https://cdn.example.com/:uuid/
 ```
 
@@ -81,16 +81,16 @@ The base is required everywhere, but each of the four [API styles](/guide/functi
 ::: code-group
 
 ```ts [fluent]
-import { base, prefixedCdnBase } from '@uploadcare/cdn-url/fluent'
+import { cdn, prefixedCdnBase } from '@uploadcare/cdn-url/fluent'
 
-// bind it once, then chain
-const cdn = base(prefixedCdnBase('demopublickey'))
+// `cdn` has no host yet: file/group/gif2video are absent until one is bound
+const myCdn = cdn.base(prefixedCdnBase('demopublickey'))
 
-cdn.file(uuid).preview(800, 600).href
-cdn.group(groupId).nth(1).href
+myCdn.file(uuid).preview(800, 600).href
+myCdn.group(groupId).nth(1).href
 
-// rebase for one call, without touching `cdn`
-cdn.base('https://cdn.example.com').file(uuid).href
+// rebase a single url, without touching `cdn`
+myCdn.file(uuid).base('https://cdn.example.com').href
 ```
 
 ```ts [functional core]
@@ -116,8 +116,8 @@ const cdnBase = prefixedCdnBase('demopublickey')
 
 new CdnUrl({ cdnBase, uuid }).with(preview(800, 600)).href
 
-// parsing carries the base over; `setCdnBase` replaces it
-CdnUrl.parse(stored).setCdnBase(cdnBase).href
+// parsing carries the base over; `base` replaces it
+CdnUrl.parse(stored).base(cdnBase).href
 ```
 
 ```ts [string level]
@@ -130,14 +130,16 @@ tinyBuild({ cdnBase: prefixedCdnBase('demopublickey'), uuid })
 
 Two conveniences hold at every layer: a trailing slash is always trimmed (config values and `new URL(x).origin` both produce them), and parsing an existing URL fills the field in for you, so you only supply a base when building from a uuid.
 
-Mixing bases in one app is fine, and normal — serving legacy URLs while writing new ones on your prefixed base is the usual migration shape. Either rebase per call with `cdn.base(...)`, or hold two entry objects:
+Mixing bases in one app is fine, and normal — serving legacy URLs while writing new ones on your prefixed base is the usual migration shape. Either rebase a single url with `base(...)`, or hold two entry objects:
 
 ```ts
-const cdn = base(prefixedCdnBase('demopublickey'))
-const legacy = base(LEGACY_CDN_BASE)
+const myCdn = cdn.base(prefixedCdnBase('demopublickey'))
+const legacy = cdn.base(LEGACY_CDN_BASE)
 ```
 
-Only the fluent entry validates the base. `base()` with no argument is a compile error, and `base('')` throws a `TypeError` in [development builds](/guide/bundles), because there is no host it could fall back to. The functional core and the builder accept any string, including an empty one, and hand you back whatever that produces.
+Only the fluent entry enforces any of this, and it does so twice over. `cdn.file(uuid)` does not compile — `file`, `group` and `gif2video` exist only on the object `base` returns — and a JavaScript caller who gets past the type system hits a `TypeError` naming the fix. `cdn.base()` with no argument is likewise a compile error, and `cdn.base('')` throws in [development builds](/guide/bundles).
+
+The functional core and the builder take you at your word: any string, including an empty one, and you get back whatever that produces.
 
 ## Sync or async
 
@@ -163,7 +165,7 @@ accept the extra kilobyte.
 
 ### What it costs
 
-Marginal cost over a bundle that already imports `base` and one chain, measured
+Marginal cost over a bundle that already imports `cdn` and one chain, measured
 with esbuild `--minify` on the production build:
 
 | Where    | Helper                 | Added       |
@@ -226,7 +228,7 @@ Nothing else in the library imports either helper, so not naming them drops both
 
 **A proxy endpoint is not a CDN base.** [Delivery proxy](/how-to/remote-images-via-proxy) URLs live on `<publicKey>.ucr.io` — the public key verbatim, no hashing — and `defaultProxyEndpoint` builds them. Passing a proxy endpoint to `prefixedCdnBase` produces a host that does not exist.
 
-It goes to the proxy entry points, not to `base()`:
+It goes to the proxy entry points, not to `cdn.base()`:
 
 ```ts
 import { defaultProxyEndpoint, proxyUrl } from '@uploadcare/cdn-url/proxy'
@@ -239,7 +241,7 @@ proxyUrl(endpoint, 'https://example.com/photo.jpg', [preview(800, 600)])
 // → https://demopublickey.ucr.io/-/preview/800x600/https://example.com/photo.jpg
 ```
 
-On a fluent chain the endpoint is the first argument of `cdn.proxy()`, so the base you bound with `base()` is simply not used for proxy URLs:
+On a fluent chain the endpoint is the first argument of `cdn.proxy()`, so the base you bound with `cdn.base()` is simply not used for proxy URLs — and a proxy chain rebases with `proxy()`, not `base()`:
 
 ```ts
 cdn.proxy(endpoint, 'https://example.com/photo.jpg').preview(800, 600).href

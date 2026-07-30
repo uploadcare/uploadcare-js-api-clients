@@ -44,12 +44,12 @@ function avatarUrl(uuid: string, size: number): string {
 ```
 
 ```ts [Fluent]
-import { base, prefixedCdnBase } from '@uploadcare/cdn-url/fluent'
+import { cdn, prefixedCdnBase } from '@uploadcare/cdn-url/fluent'
 
-const cdn = base(prefixedCdnBase('demopublickey'))
+const myCdn = cdn.base(prefixedCdnBase('demopublickey'))
 
 function avatarUrl(uuid: string, size: number): string {
-  return cdn
+  return myCdn
     .file(uuid)
     .scaleCrop(size, size, { type: 'smart_faces_objects' })
     .borderRadius('50p').href

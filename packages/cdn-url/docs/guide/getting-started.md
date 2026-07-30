@@ -110,11 +110,11 @@ The package is split into atomic entry points, so you import only what you use:
 The fluent entry trades tree-shaking for convenience: the whole library behind a single chainable object.
 
 ```ts
-import { base, prefixedCdnBase } from '@uploadcare/cdn-url/fluent'
+import { cdn, prefixedCdnBase } from '@uploadcare/cdn-url/fluent'
 
-const cdn = base(prefixedCdnBase('demopublickey'))
+const myCdn = cdn.base(prefixedCdnBase('demopublickey'))
 
-cdn.file(uuid).preview(1000, 400).stripMeta('sensitive').href
+myCdn.file(uuid).preview(1000, 400).stripMeta('sensitive').href
 ```
 
 See [Functional core vs builder vs fluent](/guide/functional-vs-builder).

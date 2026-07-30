@@ -93,7 +93,7 @@ import { preview, quality } from '@uploadcare/cdn-url/ops'
 CdnUrl.parse('https://1s4oyld5dc.ucarecd.net/c2499162-…/-/resize/300x/')
   .without(resize)
   .with(preview(800, 600), stripMeta('sensitive'))
-  .setFilename('hero.jpg').href
+  .filename('hero.jpg').href
 ```
 
 ## The fluent mega-object
@@ -102,18 +102,18 @@ Everything behind one import, chainable end to end — for code that prefers
 convenience over tree-shaking (~14 kB minified):
 
 ```ts
-import { base, prefixedCdnBase } from '@uploadcare/cdn-url/fluent'
+import { cdn, prefixedCdnBase } from '@uploadcare/cdn-url/fluent'
 
 // `prefixedCdnBase` computes your project's host from its public key
-const cdn = base(prefixedCdnBase('demopublickey'))
+const myCdn = cdn.base(prefixedCdnBase('demopublickey'))
 
-cdn.file(uuid).scaleCrop(96, 96, { type: 'smart' }).borderRadius('50p').href
+myCdn.file(uuid).scaleCrop(96, 96, { type: 'smart' }).borderRadius('50p').href
 // https://1s4oyld5dc.ucarecd.net/:uuid/-/scale_crop/96x96/smart/-/border_radius/50p/
 cdn.video(uuid).size({ width: 720, height: 540 }).thumbs(5).path
-cdn.base('https://cdn.example.com').file(uuid).preview().href
+myCdn.file(uuid).preview().base('https://cdn.example.com').href
 ```
 
-Delivering from your own CNAME instead? Pass it straight to `base`. A base is
+Delivering from your own CNAME instead? Pass it straight to `cdn`. A base is
 always required — there is no default host, since a bare `ucarecd.net` URL does
 not resolve without a project prefix.
 

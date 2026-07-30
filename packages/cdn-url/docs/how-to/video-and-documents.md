@@ -29,9 +29,9 @@ videoPath(uuid, [
 ```
 
 ```ts [Fluent]
-import { base, prefixedCdnBase } from '@uploadcare/cdn-url/fluent'
+import { cdn, prefixedCdnBase } from '@uploadcare/cdn-url/fluent'
 
-const cdn = base(prefixedCdnBase('demopublickey'))
+const myCdn = cdn.base(prefixedCdnBase('demopublickey'))
 
 cdn
   .video(uuid)

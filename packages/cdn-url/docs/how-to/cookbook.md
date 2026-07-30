@@ -13,7 +13,7 @@ Every recipe is shown in all three API styles. Pick a tab and stay in it. A four
 | _string level_ | `tinyParse`/`tinyBuild` + a chain | 419 B   |
 | **Atomic**     | functional core + one op creator  | 1487 B  |
 | **Builder**    | `CdnUrl` + one op creator         | 2041 B  |
-| **Fluent**     | `base()` + a chain                | 4967 B  |
+| **Fluent**     | `cdn.base()` + a chain            | 4967 B  |
 
 Measured on one task — parse a URL, add one operation, serialize. None of them include `prefixedCdnBase`: recipes that build from a uuid need [a CDN base](/guide/cdn-base), and deriving it from a public key adds 2.1 kB gzipped unless you paste the host as a literal.
 
@@ -66,10 +66,10 @@ const url = CdnUrl.parse(stored)
 
 ```ts [Fluent]
 import { operationMatches } from '@uploadcare/cdn-url'
-import { base, prefixedCdnBase } from '@uploadcare/cdn-url/fluent'
+import { cdn, prefixedCdnBase } from '@uploadcare/cdn-url/fluent'
 import { blur, overlay, resize } from '@uploadcare/cdn-url/ops'
 
-const cdn = base(prefixedCdnBase('demopublickey'))
+const myCdn = cdn.base(prefixedCdnBase('demopublickey'))
 const uuid = 'c2499162-eb07-4b93-b31e-94a89a47e858'
 const cdnBase = 'https://1s4oyld5dc.ucarecd.net'
 const stored = `${cdnBase}/${uuid}/-/resize/300x/-/quality/smart/`
@@ -108,7 +108,7 @@ new CdnUrl({
 ```
 
 ```ts [Fluent]
-cdn.file(uuid).scaleCrop(300, 300, { type: 'smart' }).href
+myCdn.file(uuid).scaleCrop(300, 300, { type: 'smart' }).href
 ```
 
 ```ts [String level]
@@ -135,11 +135,11 @@ serializeCdnUrl({
 ```
 
 ```ts [Builder]
-url.setCdnBase('https://1zlmtnsbgr.ucarecd.net').href
+url.base('https://1zlmtnsbgr.ucarecd.net').href
 ```
 
 ```ts [Fluent]
-chain.on('https://1zlmtnsbgr.ucarecd.net').href
+chain.base('https://1zlmtnsbgr.ucarecd.net').href
 ```
 
 ```ts [String level]
@@ -166,7 +166,7 @@ if (file.kind === 'file') {
 ```
 
 ```ts [Builder]
-url.setFilename('invoice-2026.pdf').href
+url.filename('invoice-2026.pdf').href
 ```
 
 ```ts [Fluent]

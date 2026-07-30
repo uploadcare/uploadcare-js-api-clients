@@ -98,18 +98,50 @@ conventions in several ways — do not "fix" these divergences.
   story: the zero-machinery path for callers who cannot spend bytes. Both are
   re-exported from the **root entry**, not a new entry point — per-symbol
   tree-shaking already gives the saving.**
-- **The fluent entry has no zero-config object.** `base(cdnBase)` is the only way
-  in — the old `cdn` singleton and `configure({...})` are gone. A base is
-  required because no host works for every project: a bare `ucarecd.net` does
-  **not** resolve (it only answers `<prefix>.ucarecd.net`), so the one fallback a
-  JS caller can trip into is `LEGACY_CDN_BASE` (`ucarecdn.com`), which does serve
-  unprefixed. Never reintroduce a bare-`ucarecd.net` default. `parse` is exported
-  standalone as well, since a stored url carries its own base and needs no
-  `base()` call.
-- **The object `base()` returns is frozen and its `Cdn` members are `readonly`**
-  (property syntax, not method syntax — methods cannot be `readonly`). Chains
-  were already immutable; this stops a consumer monkey-patching a shared entry
-  point. `cdn.base(...)` rebases and returns a new frozen object.
+- **One fluent export, `cdn`, and it starts without a host.** `UnboundCdn` carries
+  only the starters that need no base — `video`/`document` (paths, no host by
+  design), `proxy` (the endpoint is an argument) and `parse` (the url carries its
+  own) — plus `base`, which returns the full `Cdn`. `file`, `group` and
+  `gif2video` exist only on that bound object, so a missing base is a **compile**
+  error (`Property 'file' does not exist on type 'UnboundCdn'`). The unbound
+  object still carries throwing stubs for those three, so a JavaScript caller gets
+  a message naming `base` rather than `undefined is not a function`; that
+  throw is structural and fires in **both** bundle flavors. Two interfaces rather
+  than a conditional-typed `Cdn<Bound>`: the error message is legible and no `as`
+  cast is needed to build the objects.
+  A base is required because no host works for every project — a bare
+  `ucarecd.net` does **not** resolve (only `<prefix>.ucarecd.net` does), so the one
+  fallback a JS caller can reach is `LEGACY_CDN_BASE` (`ucarecdn.com`), which does
+  serve unprefixed. Never reintroduce a bare-`ucarecd.net` default. This API was
+  `configure({...})`, then `base(cdnBase)`, then `createCdn(cdnBase)`; all are
+  gone. Do not add a second way in.
+- **`base` is the one name for "same thing, different host"** — on the fluent
+  entry object, on every chain, and on the builder. `ProxyChain.proxy` is the
+  single exception, because its argument is a `*.ucr.io` endpoint and not a CDN
+  base, a distinction the guide teaches; the method name must not blur it.
+- **Both facades name mutators after the thing, not with a verb**: `base()`,
+  `proxy()`, `filename()`. The builder's `setCdnBase`/`setFilename` and the
+  chains' `on()` are gone, so `CdnUrl` now reads like a chain. The `*Op` family
+  (`withOp`, `withoutOp`, `replaceOp`, `getOp`, …) stays suffixed and chain-only:
+  there the bare names would collide with transformation methods, which is the one
+  place the two facades cannot align.
+- **Every object the fluent entry hands out is frozen, and `Cdn`/`UnboundCdn`
+  members are `readonly`** (property syntax, not method syntax — methods cannot be
+  `readonly`). Chains were already immutable; this stops a consumer
+  monkey-patching a shared entry point.
+- **The prefixed-base helpers are re-exported from every entry that takes a base**
+  — root, `fluent`, `builder`, `group`, `proxy`, `gif2video`, `tiny` — alongside
+  `LEGACY_CDN_BASE`/`PREFIX_CDN_BASE`. All resolve to the same module, so a bundle
+  never duplicates them and nobody pays unless they name one. `ops`, `video`,
+  `document` and `validate` deliberately do **not**: no base is involved there, and
+  `videoPath`/`documentPath` returning host-free paths is something the docs state
+  plainly.
+- **`prefixedCdnBaseAsync` is the browser-preferred helper, `prefixedCdnBase` the
+  server one.** The async path uses WebCrypto and adds ~221 B brotli to a browser
+  bundle; the sync path must carry a SHA-256 there (~946 B) because no synchronous
+  code can wait for a promise, and under Node it resolves to `node:crypto` (~151
+  B). Async rejects under Node by design. Re-measure rather than copying these
+  forward.
 - **`prefixedCdnBase(publicKey, cdnBase = PREFIX_CDN_BASE)` is the only prefix
   path, and it is deliberately manual.** It wraps `getPrefixedCdnBaseSync` from
   `@uploadcare/cname-prefix` (the package's first and only runtime dependency),
@@ -122,7 +154,7 @@ conventions in several ways — do not "fix" these divergences.
   `functional-vs-builder.md` are those; re-measure rather than copy them forward.
 - **One word for the host: `cdnBase`.** `origin` was renamed out of the whole
   package — `ParsedCdnUrl.cdnBase`, `FileUrlInput.cdnBase`, `TinyFileUrl.cdnBase`,
-  `CdnUrl.setCdnBase`, every helper's first argument. It matches
+  `CdnUrl.base`, every helper's first argument. It matches
   `@uploadcare/cname-prefix` and the uploader's own config vocabulary. `origin`
   now only ever means the Web API (`new URL(x).origin`) — do not let it back in as
   a field name, and do not add a second synonym for `cdnBase` either.
@@ -142,7 +174,7 @@ conventions in several ways — do not "fix" these divergences.
   (`isFileUrl` returns true for `/:uuid/gif2video/…`) and its prefix lands in
   `modifiers`, so replacing the chain drops the conversion; appending is safe.
 - **A trailing slash on `cdnBase` is tolerated by every entry that takes one** —
-  serializers, the builder and its `setCdnBase`, `configure`, every chain's `on()`,
+  serializers, the builder and its `base`, `configure`, every chain's `on()`,
   the group/proxy/gif2video helpers and `tinyBuild`. Config files and
   `new URL(x).origin` both produce them. The trimming is `trimTrailingSlashes`, but
   each entry has to call it, so `cdn-base.test.ts` pins the whole matrix (bare, one

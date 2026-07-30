@@ -48,19 +48,19 @@ describe('CdnUrl builder', () => {
     ).toBe(`https://ucarecdn.com/${UUID}/-/quality/best/`)
   })
 
-  it('setFilename() sets and clears the filename', () => {
+  it('filename() sets and clears it', () => {
     const url = CdnUrl.parse(`https://ucarecdn.com/${UUID}/-/preview/`)
-    expect(url.setFilename('img.png').href).toBe(
+    expect(url.filename('img.png').href).toBe(
       `https://ucarecdn.com/${UUID}/-/preview/img.png`
     )
-    expect(url.setFilename('img.png').setFilename(null).href).toBe(
+    expect(url.filename('img.png').filename(null).href).toBe(
       `https://ucarecdn.com/${UUID}/-/preview/`
     )
   })
 
-  it('setCdnBase() rebases the url onto another domain', () => {
+  it('base() rebases the url onto another domain', () => {
     const url = CdnUrl.parse(`https://ucarecdn.com/${UUID}/-/preview/`)
-    expect(url.setCdnBase('https://1zlmtnsbgr.ucarecd.net').href).toBe(
+    expect(url.base('https://1zlmtnsbgr.ucarecd.net').href).toBe(
       `https://1zlmtnsbgr.ucarecd.net/${UUID}/-/preview/`
     )
   })

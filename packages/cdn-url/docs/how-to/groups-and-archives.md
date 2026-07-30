@@ -52,14 +52,14 @@ new CdnUrl({
 ```
 
 ```ts [Fluent]
-import { base, prefixedCdnBase } from '@uploadcare/cdn-url/fluent'
+import { cdn, prefixedCdnBase } from '@uploadcare/cdn-url/fluent'
 
-const cdn = base(prefixedCdnBase('demopublickey'))
+const myCdn = cdn.base(prefixedCdnBase('demopublickey'))
 
-cdn.group(group).href
+myCdn.group(group).href
 // → https://1s4oyld5dc.ucarecd.net/:uuid~3/
 
-cdn.group(group).nth(1).preview(400, 400).href
+myCdn.group(group).nth(1).preview(400, 400).href
 // → https://1s4oyld5dc.ucarecd.net/:uuid~3/nth/1/-/preview/400x400/
 ```
 
@@ -95,14 +95,14 @@ archiveUrl('https://1s4oyld5dc.ucarecd.net', group, 'tar', 'photos.tar')
 ```
 
 ```ts [Fluent]
-import { base, prefixedCdnBase } from '@uploadcare/cdn-url/fluent'
+import { cdn, prefixedCdnBase } from '@uploadcare/cdn-url/fluent'
 
-const cdn = base(prefixedCdnBase('demopublickey'))
+const myCdn = cdn.base(prefixedCdnBase('demopublickey'))
 
-cdn.group(group).archive('zip')
+myCdn.group(group).archive('zip')
 // → https://1s4oyld5dc.ucarecd.net/:uuid~3/archive/zip/
 
-cdn.group(group).archive('tar', 'photos.tar')
+myCdn.group(group).archive('tar', 'photos.tar')
 // → https://1s4oyld5dc.ucarecd.net/:uuid~3/archive/tar/photos.tar
 ```
 

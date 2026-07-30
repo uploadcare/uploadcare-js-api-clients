@@ -43,13 +43,13 @@ const srcset = WIDTHS.map((w) => `${variant(uuid, w)} ${w}w`).join(', ')
 ```
 
 ```ts [Fluent]
-import { base, prefixedCdnBase } from '@uploadcare/cdn-url/fluent'
+import { cdn, prefixedCdnBase } from '@uploadcare/cdn-url/fluent'
 
-const cdn = base(prefixedCdnBase('demopublickey'))
+const myCdn = cdn.base(prefixedCdnBase('demopublickey'))
 const WIDTHS = [320, 640, 960, 1280, 1920]
 
 function variant(uuid: string, width: number): string {
-  return cdn.file(uuid).preview(width, width).href
+  return myCdn.file(uuid).preview(width, width).href
 }
 
 const srcset = WIDTHS.map((w) => `${variant(uuid, w)} ${w}w`).join(', ')

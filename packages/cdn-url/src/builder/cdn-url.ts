@@ -190,7 +190,7 @@ export class CdnUrl {
    *
    * @throws TypeError on group root and proxy urls.
    */
-  public setFilename(filename: string | null): CdnUrl {
+  public filename(filename: string | null): CdnUrl {
     if (this.#parsed.kind === 'group' || this.#parsed.kind === 'proxy') {
       if (__DEV__) {
         throw new TypeError(`${this.#parsed.kind} urls cannot carry a filename`)
@@ -201,7 +201,7 @@ export class CdnUrl {
   }
 
   /** Rebases the url onto another domain (trailing slash tolerated). */
-  public setCdnBase(cdnBase: string): CdnUrl {
+  public base(cdnBase: string): CdnUrl {
     return new CdnUrl({
       ...this.#parsed,
       cdnBase: trimTrailingSlashes(cdnBase)

@@ -6,7 +6,7 @@
 import { describe, expect, it } from 'vitest'
 
 import { CdnUrl } from './builder/index'
-import { base, prefixedCdnBase } from './fluent/index'
+import { cdn, prefixedCdnBase } from './fluent/index'
 import {
   detectDomainKind,
   isUploadcareDomain,
@@ -31,7 +31,7 @@ import { isStackable, operationInputs } from './validate/index'
 
 // --- the page's preamble, verbatim -----------------------------------------
 const uuid = 'c2499162-eb07-4b93-b31e-94a89a47e858'
-const cdn = base(prefixedCdnBase('demopublickey'))
+const myCdn = cdn.base(prefixedCdnBase('demopublickey'))
 const cdnBase = 'https://1s4oyld5dc.ucarecd.net'
 const stored = `${cdnBase}/${uuid}/-/resize/300x/-/quality/smart/`
 
@@ -327,10 +327,10 @@ describe('cookbook: Builder tab', () => {
         operations: [scaleCrop(300, 300, { type: 'smart' })]
       }).href
     ).toBe(`${cdnBase}/${uuid}/-/scale_crop/300x300/smart/`)
-    expect(url.setCdnBase('https://1zlmtnsbgr.ucarecd.net').href).toBe(
+    expect(url.base('https://1zlmtnsbgr.ucarecd.net').href).toBe(
       `https://1zlmtnsbgr.ucarecd.net/${uuid}/-/resize/300x/-/quality/smart/`
     )
-    expect(url.setFilename('invoice-2026.pdf').href).toBe(
+    expect(url.filename('invoice-2026.pdf').href).toBe(
       `${cdnBase}/${uuid}/-/resize/300x/-/quality/smart/invoice-2026.pdf`
     )
     expect(url.updateOperations(() => []).href).toBe(`${cdnBase}/${uuid}/`)
@@ -394,15 +394,15 @@ describe('cookbook: Builder tab', () => {
 })
 
 describe('cookbook: Fluent tab', () => {
-  const parsedChain = cdn.parse(stored)
+  const parsedChain = myCdn.parse(stored)
   if (parsedChain.kind !== 'file') throw new Error('expected a file url')
   const chain = parsedChain
 
   it('thumbnail, cdnBase, filename, strip', () => {
-    expect(cdn.file(uuid).scaleCrop(300, 300, { type: 'smart' }).href).toBe(
+    expect(myCdn.file(uuid).scaleCrop(300, 300, { type: 'smart' }).href).toBe(
       `${cdnBase}/${uuid}/-/scale_crop/300x300/smart/`
     )
-    expect(chain.on('https://1zlmtnsbgr.ucarecd.net').href).toBe(
+    expect(chain.base('https://1zlmtnsbgr.ucarecd.net').href).toBe(
       `https://1zlmtnsbgr.ucarecd.net/${uuid}/-/resize/300x/-/quality/smart/`
     )
     expect(chain.filename('invoice-2026.pdf').href).toBe(
@@ -444,7 +444,7 @@ describe('cookbook: Fluent tab', () => {
 
   it('signed url keeps the stale token', () => {
     const signed = `${cdnBase}/${uuid}/-/preview/300x300/?token=abc123`
-    const s = cdn.parse(signed)
+    const s = myCdn.parse(signed)
     expect(s.kind).toBe('file')
     if (s.kind === 'file') {
       const edited = s.resize({ width: 400 }).href

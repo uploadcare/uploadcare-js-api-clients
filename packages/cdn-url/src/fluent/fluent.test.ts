@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import {
-  base,
+  cdn,
   LEGACY_CDN_BASE,
   parse,
   PREFIX_CDN_BASE,
@@ -16,40 +16,40 @@ const PUBLIC_KEY = 'demopublickey'
 const PREFIX = '1s4oyld5dc'
 const CDN_BASE = `https://${PREFIX}.ucarecd.net`
 
-const cdn = base(prefixedCdnBase(PUBLIC_KEY))
+const myCdn = cdn.base(prefixedCdnBase(PUBLIC_KEY))
 
 // Never invoked — it exists for the type checker only.
 const typeProbe = () => {
   // @ts-expect-error a base is required; there is no working default
-  void base()
+  void cdn.base()
 }
 
 describe('cdn.file', () => {
   it('builds a bare file url on the configured cdnBase', () => {
-    expect(cdn.file(UUID).href).toBe(`${CDN_BASE}/${UUID}/`)
+    expect(myCdn.file(UUID).href).toBe(`${CDN_BASE}/${UUID}/`)
   })
 
   it('chains image operations in order', () => {
-    expect(cdn.file(UUID).preview(800, 600).quality('smart').href).toBe(
+    expect(myCdn.file(UUID).preview(800, 600).quality('smart').href).toBe(
       `${CDN_BASE}/${UUID}/-/preview/800x600/-/quality/smart/`
     )
   })
 
   it('supports the whole image op surface (spot checks)', () => {
     expect(
-      cdn.file(UUID).scaleCrop(96, 96, { type: 'smart' }).borderRadius('50p')
+      myCdn.file(UUID).scaleCrop(96, 96, { type: 'smart' }).borderRadius('50p')
         .href
     ).toBe(`${CDN_BASE}/${UUID}/-/scale_crop/96x96/smart/-/border_radius/50p/`)
-    expect(cdn.file(UUID).blur(20).grayscale().flip().href).toBe(
+    expect(myCdn.file(UUID).blur(20).grayscale().flip().href).toBe(
       `${CDN_BASE}/${UUID}/-/blur/20/-/grayscale/-/flip/`
     )
-    expect(cdn.file(UUID).overlay('self', { size: ['50p', '50p'] }).href).toBe(
-      `${CDN_BASE}/${UUID}/-/overlay/self/50px50p/`
-    )
+    expect(
+      myCdn.file(UUID).overlay('self', { size: ['50p', '50p'] }).href
+    ).toBe(`${CDN_BASE}/${UUID}/-/overlay/self/50px50p/`)
   })
 
   it('is immutable — chains fork', () => {
-    const previewed = cdn.file(UUID).preview(800, 600)
+    const previewed = myCdn.file(UUID).preview(800, 600)
     const a = previewed.quality('smart')
     const b = previewed.quality('best')
     expect(a.href).not.toBe(b.href)
@@ -57,29 +57,29 @@ describe('cdn.file', () => {
   })
 
   it('on() rebases the cdnBase', () => {
-    expect(cdn.file(UUID).preview().on('https://cdn.example.com').href).toBe(
-      `https://cdn.example.com/${UUID}/-/preview/`
-    )
+    expect(
+      myCdn.file(UUID).preview().base('https://cdn.example.com').href
+    ).toBe(`https://cdn.example.com/${UUID}/-/preview/`)
   })
 
   it('filename() appends a trailing filename', () => {
-    expect(cdn.file(UUID).preview().filename('photo.jpg').href).toBe(
+    expect(myCdn.file(UUID).preview().filename('photo.jpg').href).toBe(
       `${CDN_BASE}/${UUID}/-/preview/photo.jpg`
     )
   })
 
   it('op() is the raw escape hatch, withoutOp() removes by name', () => {
-    expect(cdn.file(UUID).op('@clib', 'lib', '1.0').href).toBe(
+    expect(myCdn.file(UUID).op('@clib', 'lib', '1.0').href).toBe(
       `${CDN_BASE}/${UUID}/-/@clib/lib/1.0/`
     )
     expect(
-      cdn.file(UUID).preview(800, 600).quality('smart').withoutOp('preview')
+      myCdn.file(UUID).preview(800, 600).quality('smart').withoutOp('preview')
         .href
     ).toBe(`${CDN_BASE}/${UUID}/-/quality/smart/`)
   })
 
   it('toString() and String() coercion match href', () => {
-    const chain = cdn.file(UUID).preview()
+    const chain = myCdn.file(UUID).preview()
     expect(String(chain)).toBe(chain.href)
   })
 })
@@ -91,15 +91,15 @@ describe('prefixedCdnBase', () => {
   })
 
   it('feeds base(), which binds it for every starter', () => {
-    expect(cdn.file(UUID).href).toBe(`${CDN_BASE}/${UUID}/`)
-    expect(cdn.group(`${UUID}~3`).href).toBe(`${CDN_BASE}/${UUID}~3/`)
-    expect(cdn.gif2video(UUID).format('webm').href).toBe(
+    expect(myCdn.file(UUID).href).toBe(`${CDN_BASE}/${UUID}/`)
+    expect(myCdn.group(`${UUID}~3`).href).toBe(`${CDN_BASE}/${UUID}~3/`)
+    expect(myCdn.gif2video(UUID).format('webm').href).toBe(
       `${CDN_BASE}/${UUID}/gif2video/-/format/webm/`
     )
   })
 
   it('nothing prefixes on your behalf — a bare zone stays bare', () => {
-    expect(base(PREFIX_CDN_BASE).file(UUID).href).toBe(
+    expect(cdn.base(PREFIX_CDN_BASE).file(UUID).href).toBe(
       `https://ucarecd.net/${UUID}/`
     )
     // …which is why there is no default: the only fallback a JS caller can trip
@@ -108,42 +108,59 @@ describe('prefixedCdnBase', () => {
   })
 })
 
-describe('base(cdnBase)', () => {
+describe('cdn.base(cdnBase)', () => {
   it('uses the given base as it stands', () => {
-    const custom = base('https://cdn.example.com')
+    const custom = cdn.base('https://cdn.example.com')
     expect(custom.file(UUID).href).toBe(`https://cdn.example.com/${UUID}/`)
     expect(custom.group(`${UUID}~3`).href).toBe(
       `https://cdn.example.com/${UUID}~3/`
     )
   })
 
-  it('on() still overrides per chain', () => {
-    const custom = base('https://cdn.example.com')
-    expect(custom.file(UUID).on(CDN_BASE).href).toBe(`${CDN_BASE}/${UUID}/`)
+  it('base() still overrides per chain', () => {
+    const custom = cdn.base('https://cdn.example.com')
+    expect(custom.file(UUID).base(CDN_BASE).href).toBe(`${CDN_BASE}/${UUID}/`)
   })
 
-  it('cdn.base() rebases the whole entry object', () => {
-    expect(cdn.base('https://cdn.example.com').file(UUID).href).toBe(
-      `https://cdn.example.com/${UUID}/`
-    )
-    expect(cdn.base).toBe(base)
+  it('rebinds without touching the receiver', () => {
+    const other = myCdn.base('https://cdn.example.com')
+    expect(other.file(UUID).href).toBe(`https://cdn.example.com/${UUID}/`)
+    expect(myCdn.file(UUID).href).toBe(`${CDN_BASE}/${UUID}/`)
+  })
+
+  it('refuses the base-requiring starters until a base is bound', () => {
+    for (const starter of ['file', 'group', 'gif2video'] as const) {
+      // @ts-expect-error absent from UnboundCdn — this is the compile-time half
+      expect(() => cdn[starter]('anything')).toThrow(TypeError)
+      // @ts-expect-error same
+      expect(() => cdn[starter]('anything')).toThrow(/cdn\.base\(/)
+    }
+  })
+
+  it('offers the base-free starters straight away', () => {
+    expect(cdn.video(UUID).thumbs(5).path).toBe(`/${UUID}/video/-/thumbs~5/`)
+    expect(cdn.document(UUID).path).toBe(`/${UUID}/document/`)
+    expect(cdn.parse(`${CDN_BASE}/${UUID}/`).kind).toBe('file')
+    expect(
+      cdn.proxy('https://pk.ucr.io', 'https://example.com/a.jpg').preview().href
+    ).toBe('https://pk.ucr.io/-/preview/https://example.com/a.jpg')
   })
 
   it('refuses to guess a base', () => {
     expect(typeProbe).toBeTypeOf('function')
     // @ts-expect-error probing the runtime guard a JS caller would hit
-    expect(() => base()).toThrow(TypeError)
-    expect(() => base('')).toThrow(TypeError)
+    expect(() => cdn.base()).toThrow(TypeError)
+    expect(() => cdn.base('')).toThrow(TypeError)
   })
 })
 
 describe('the fluent entry object is frozen', () => {
   it('rejects reassigning a starter', () => {
     expect(Object.isFrozen(cdn)).toBe(true)
-    expect(Object.isFrozen(base(LEGACY_CDN_BASE))).toBe(true)
+    expect(Object.isFrozen(cdn.base(LEGACY_CDN_BASE))).toBe(true)
     expect(() => {
       // @ts-expect-error the surface is readonly at the type level too
-      cdn.file = () => cdn.file(UUID)
+      cdn.file = () => myCdn.file(UUID)
     }).toThrow(TypeError)
   })
 })
@@ -157,7 +174,7 @@ describe('cdn.parse', () => {
   })
 
   it('returns a file chain for file urls, ready to extend', () => {
-    const chain = cdn.parse(`${CDN_BASE}/${UUID}/-/crop/640x480/photo.jpg`)
+    const chain = myCdn.parse(`${CDN_BASE}/${UUID}/-/crop/640x480/photo.jpg`)
     expect(chain.kind).toBe('file')
     if (chain.kind !== 'file') throw new Error('expected file chain')
     expect(chain.preview(400, 400).href).toBe(
@@ -166,7 +183,7 @@ describe('cdn.parse', () => {
   })
 
   it('returns a group chain for group root urls', () => {
-    const chain = cdn.parse(`${CDN_BASE}/${UUID}~3/`)
+    const chain = myCdn.parse(`${CDN_BASE}/${UUID}~3/`)
     expect(chain.kind).toBe('group')
     if (chain.kind !== 'group') throw new Error('expected group chain')
     expect(chain.nth(1).resize({ width: 256 }).href).toBe(
@@ -175,7 +192,7 @@ describe('cdn.parse', () => {
   })
 
   it('returns a proxy chain for proxified urls', () => {
-    const chain = cdn.parse(
+    const chain = myCdn.parse(
       `https://pubkey.ucr.io/-/preview/https://example.com/a.jpg`
     )
     expect(chain.kind).toBe('proxy')
@@ -186,7 +203,9 @@ describe('cdn.parse', () => {
   })
 
   it('preserves query and hash through edits', () => {
-    const chain = cdn.parse(`${CDN_BASE}/${UUID}/-/preview/?token=exp=1~hmac=x`)
+    const chain = myCdn.parse(
+      `${CDN_BASE}/${UUID}/-/preview/?token=exp=1~hmac=x`
+    )
     if (chain.kind !== 'file') throw new Error('expected file chain')
     expect(chain.quality('smart').href).toBe(
       `${CDN_BASE}/${UUID}/-/preview/-/quality/smart/?token=exp=1~hmac=x`
@@ -196,26 +215,26 @@ describe('cdn.parse', () => {
 
 describe('cdn.group', () => {
   it('accepts a group id string or object', () => {
-    expect(cdn.group(`${UUID}~3`).href).toBe(`${CDN_BASE}/${UUID}~3/`)
-    expect(cdn.group({ uuid: UUID, count: 3 }).href).toBe(
+    expect(myCdn.group(`${UUID}~3`).href).toBe(`${CDN_BASE}/${UUID}~3/`)
+    expect(myCdn.group({ uuid: UUID, count: 3 }).href).toBe(
       `${CDN_BASE}/${UUID}~3/`
     )
   })
 
   it('nth() yields an image-capable element chain', () => {
     expect(
-      cdn.group(`${UUID}~3`).nth(0).preview(300, 300).quality('smart').href
+      myCdn.group(`${UUID}~3`).nth(0).preview(300, 300).quality('smart').href
     ).toBe(`${CDN_BASE}/${UUID}~3/nth/0/-/preview/300x300/-/quality/smart/`)
   })
 
   it('archive() builds archive urls', () => {
-    expect(cdn.group(`${UUID}~3`).archive('zip', 'all.zip')).toBe(
+    expect(myCdn.group(`${UUID}~3`).archive('zip', 'all.zip')).toBe(
       `${CDN_BASE}/${UUID}~3/archive/zip/all.zip`
     )
   })
 
   it('group roots expose no image operations (type-level)', () => {
-    const root = cdn.group(`${UUID}~3`)
+    const root = myCdn.group(`${UUID}~3`)
     // @ts-expect-error image ops live on elements, not group roots
     void root.preview
   })
@@ -237,13 +256,16 @@ describe('cdn.proxy', () => {
 describe('cdn.video', () => {
   it('chains video ops into a REST path', () => {
     expect(
-      cdn.video(UUID).size({ width: 720, height: 540 }).format('webm').thumbs(5)
-        .path
+      myCdn
+        .video(UUID)
+        .size({ width: 720, height: 540 })
+        .format('webm')
+        .thumbs(5).path
     ).toBe(`/${UUID}/video/-/size/720x540/-/format/webm/-/thumbs~5/`)
   })
 
   it('exposes only video operations (type-level)', () => {
-    const chain = cdn.video(UUID)
+    const chain = myCdn.video(UUID)
     // @ts-expect-error preview is an image op, not a video op
     void chain.preview
   })
@@ -251,7 +273,7 @@ describe('cdn.video', () => {
 
 describe('cdn.document', () => {
   it('chains document ops into a REST path', () => {
-    expect(cdn.document(UUID).format('jpg').page(2).path).toBe(
+    expect(myCdn.document(UUID).format('jpg').page(2).path).toBe(
       `/${UUID}/document/-/format/jpg/-/page/2/`
     )
   })
@@ -259,7 +281,7 @@ describe('cdn.document', () => {
 
 describe('cdn.gif2video', () => {
   it('chains gif2video ops into a CDN url', () => {
-    expect(cdn.gif2video(UUID).format('webm').quality('better').href).toBe(
+    expect(myCdn.gif2video(UUID).format('webm').quality('better').href).toBe(
       `${CDN_BASE}/${UUID}/gif2video/-/format/webm/-/quality/better/`
     )
   })
@@ -275,15 +297,15 @@ describe('cdn.gif2video', () => {
 describe('validation passthrough', () => {
   it('creator validation still applies in chains (dev bundle)', () => {
     // @ts-expect-error invalid quality value
-    expect(() => cdn.file(UUID).quality('ultra')).toThrow(RangeError)
-    expect(() => cdn.video(UUID).size({ width: 721 })).toThrow(RangeError)
+    expect(() => myCdn.file(UUID).quality('ultra')).toThrow(RangeError)
+    expect(() => myCdn.video(UUID).size({ width: 721 })).toThrow(RangeError)
   })
 })
 
 describe('review regressions', () => {
   it('group element chains can set a filename', () => {
     expect(
-      cdn.group(`${UUID}~3`).nth(0).preview(300, 300).filename('a.jpg').href
+      myCdn.group(`${UUID}~3`).nth(0).preview(300, 300).filename('a.jpg').href
     ).toBe(`${CDN_BASE}/${UUID}~3/nth/0/-/preview/300x300/a.jpg`)
   })
 
@@ -292,27 +314,27 @@ describe('review regressions', () => {
       cdn
         .proxy('https://a.ucr.io', 'https://example.com/x.jpg')
         .preview()
-        .on('https://b.ucr.io/').href
+        .proxy('https://b.ucr.io/').href
     ).toBe('https://b.ucr.io/-/preview/https://example.com/x.jpg')
   })
 
   it('defaultProxyEndpoint is available from the fluent entry', async () => {
     const { defaultProxyEndpoint } = await import('./index')
     expect(
-      cdn.proxy(defaultProxyEndpoint('pubkey'), 'https://example.com/x.jpg')
+      myCdn.proxy(defaultProxyEndpoint('pubkey'), 'https://example.com/x.jpg')
         .href
     ).toBe('https://pubkey.ucr.io/https://example.com/x.jpg')
   })
 
   it('conversion chains stay kind-restricted (type-level)', () => {
     // @ts-expect-error quality of images does not exist on DocumentChain
-    void cdn.document(UUID).quality
+    void myCdn.document(UUID).quality
     // @ts-expect-error resize is not a gif2video operation
-    void cdn.gif2video(UUID).resize
+    void myCdn.gif2video(UUID).resize
   })
 
   it('nth() still validates eagerly in dev', () => {
-    expect(() => cdn.group(`${UUID}~3`).nth(3)).toThrow(RangeError)
+    expect(() => myCdn.group(`${UUID}~3`).nth(3)).toThrow(RangeError)
   })
 })
 
@@ -320,9 +342,10 @@ describe('fluent operation references', () => {
   it('withoutOp() accepts creators', async () => {
     const { preview, quality } = await import('../ops/index')
     expect(
-      cdn.file(UUID).preview(800, 600).quality('smart').withoutOp(preview).href
+      myCdn.file(UUID).preview(800, 600).quality('smart').withoutOp(preview)
+        .href
     ).toBe(`${CDN_BASE}/${UUID}/-/quality/smart/`)
-    expect(cdn.file(UUID).quality('smart').withoutOp(quality).href).toBe(
+    expect(myCdn.file(UUID).quality('smart').withoutOp(quality).href).toBe(
       `${CDN_BASE}/${UUID}/`
     )
   })
@@ -330,14 +353,14 @@ describe('fluent operation references', () => {
   it('withoutOp(thumbs) removes thumbs~N video ops', async () => {
     const { thumbs } = await import('../video/index')
     expect(
-      cdn.video(UUID).size({ width: 720 }).thumbs(5).withoutOp(thumbs).path
+      myCdn.video(UUID).size({ width: 720 }).thumbs(5).withoutOp(thumbs).path
     ).toBe(`/${UUID}/video/-/size/720x/`)
   })
 
   describe('chain inspection', () => {
     it('hasOp() and getOp() mirror the builder', async () => {
       const { preview, quality } = await import('../ops/index')
-      const chain = cdn.file(UUID).preview(800, 600).quality('smart')
+      const chain = myCdn.file(UUID).preview(800, 600).quality('smart')
       expect(chain.hasOp(quality)).toBe(true)
       expect(chain.hasOp('blur')).toBe(false)
       expect(chain.getOp(quality)).toEqual({
@@ -352,7 +375,7 @@ describe('fluent operation references', () => {
     })
 
     it('getAllOps() collects every match', () => {
-      const chain = cdn
+      const chain = myCdn
         .file(UUID)
         .op('overlay', UUID, '50p,50p')
         .preview(800, 600)
@@ -366,11 +389,11 @@ describe('fluent operation references', () => {
 
     it('replaceOp() swaps in place, appending when absent', async () => {
       const { quality, resize } = await import('../ops/index')
-      const chain = cdn.file(UUID).resize({ width: 300 }).quality('smart')
+      const chain = myCdn.file(UUID).resize({ width: 300 }).quality('smart')
       expect(chain.replaceOp(resize({ width: 500 })).href).toBe(
         `${CDN_BASE}/${UUID}/-/resize/500x/-/quality/smart/`
       )
-      expect(cdn.file(UUID).replaceOp(quality('best')).href).toBe(
+      expect(myCdn.file(UUID).replaceOp(quality('best')).href).toBe(
         `${CDN_BASE}/${UUID}/-/quality/best/`
       )
     })
@@ -378,12 +401,13 @@ describe('fluent operation references', () => {
     it('replaceOp() handles counted video ops', async () => {
       const { thumbs } = await import('../video/index')
       expect(
-        cdn.video(UUID).size({ width: 720 }).thumbs(5).replaceOp(thumbs(3)).path
+        myCdn.video(UUID).size({ width: 720 }).thumbs(5).replaceOp(thumbs(3))
+          .path
       ).toBe(`/${UUID}/video/-/size/720x/-/thumbs~3/`)
     })
 
     it('replaceAllOps() collapses duplicates into one', () => {
-      const chain = cdn
+      const chain = myCdn
         .file(UUID)
         .op('overlay', UUID, '50p,50p')
         .preview(800, 600)
@@ -397,7 +421,7 @@ describe('fluent operation references', () => {
     })
 
     it('updateOperations() replaces the nth match, keeping position', () => {
-      const chain = cdn
+      const chain = myCdn
         .file(UUID)
         .op('overlay', UUID, '50p,50p')
         .preview(800, 600)
@@ -430,18 +454,18 @@ describe('fluent operation references', () => {
     })
 
     it('updateOperations() preserves the chain subtype', () => {
-      const video = cdn.video(UUID).size({ width: 720 })
+      const video = myCdn.video(UUID).size({ width: 720 })
       expect(video.updateOperations((ops) => ops)).toBeInstanceOf(
         video.constructor
       )
-      const file = cdn.file(UUID).preview(800, 600)
+      const file = myCdn.file(UUID).preview(800, 600)
       expect(file.updateOperations((ops) => ops).href).toBe(file.href)
     })
 
     it('updateOperations() rejects a callback that returns no array', () => {
       expect(() =>
         // @ts-expect-error deliberately wrong callback shape
-        cdn
+        myCdn
           .file(UUID)
           .preview(800, 600)
           .updateOperations(() => undefined)
@@ -451,7 +475,7 @@ describe('fluent operation references', () => {
     it('updateOperations() rejects a callback that returns no array', () => {
       expect(() =>
         // @ts-expect-error deliberately wrong callback shape
-        cdn
+        myCdn
           .file(UUID)
           .preview(800, 600)
           .updateOperations(() => undefined)
@@ -459,7 +483,7 @@ describe('fluent operation references', () => {
     })
 
     it('updateOperations() hands the callback a defensive copy', () => {
-      const chain = cdn.file(UUID).preview(800, 600)
+      const chain = myCdn.file(UUID).preview(800, 600)
       chain.updateOperations((ops) => {
         ops.push({ name: 'quality', params: ['smart'] })
         return ops
@@ -468,7 +492,7 @@ describe('fluent operation references', () => {
     })
 
     it('inspection does not mutate the chain', () => {
-      const chain = cdn.file(UUID).preview(800, 600)
+      const chain = myCdn.file(UUID).preview(800, 600)
       chain.getAllOps('preview').length = 0
       chain.replaceAllOps({ name: 'preview', params: ['1x1'] })
       expect(chain.href).toBe(`${CDN_BASE}/${UUID}/-/preview/800x600/`)

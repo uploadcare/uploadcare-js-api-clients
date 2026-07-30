@@ -26,7 +26,7 @@ export class FileChain extends ImageChain<FileState> {
   public readonly kind = 'file' as const
 
   /** Rebases the chain onto another cdnBase (trailing slash tolerated). */
-  public on(cdnBase: string): this {
+  public base(cdnBase: string): this {
     return this._next({ cdnBase })
   }
 
@@ -63,7 +63,7 @@ export class GroupChain {
   public constructor(private readonly _s: GroupState) {}
 
   /** Rebases the chain onto another cdnBase (trailing slash tolerated). */
-  public on(cdnBase: string): GroupChain {
+  public base(cdnBase: string): GroupChain {
     return new GroupChain({ ...this._s, cdnBase })
   }
 
@@ -120,7 +120,7 @@ export class GroupElementChain extends ImageChain<GroupElementState> {
   public readonly kind = 'group-element' as const
 
   /** Rebases the chain onto another cdnBase (trailing slash tolerated). */
-  public on(cdnBase: string): this {
+  public base(cdnBase: string): this {
     return this._next({ cdnBase })
   }
 
@@ -151,8 +151,8 @@ export class ProxyChain extends ImageChain<ProxyState> {
   /** Discriminant for chains returned by `cdn.parse`. */
   public readonly kind = 'proxy' as const
 
-  /** Rebases the chain onto another proxy endpoint. */
-  public on(endpoint: string): this {
+  /** Rebases the chain onto another proxy endpoint (trailing slash tolerated). */
+  public proxy(endpoint: string): this {
     return this._next({ cdnBase: trimTrailingSlashes(endpoint) })
   }
 
@@ -250,7 +250,7 @@ export class Gif2VideoChain extends Chain<Gif2VideoState> {
   }
 
   /** Rebases the chain onto another cdnBase (trailing slash tolerated). */
-  public on(cdnBase: string): this {
+  public base(cdnBase: string): this {
     return this._next({ cdnBase })
   }
 

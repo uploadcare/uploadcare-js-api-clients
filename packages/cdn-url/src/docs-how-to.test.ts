@@ -5,7 +5,7 @@
 import { describe, expect, it } from 'vitest'
 
 import { CdnUrl } from './builder/index'
-import { base, prefixedCdnBase } from './fluent/index'
+import { cdn, prefixedCdnBase } from './fluent/index'
 import {
   joinModifiers,
   modifiers,
@@ -23,15 +23,15 @@ const uuid = 'c2499162-eb07-4b93-b31e-94a89a47e858'
 const CDN_BASE = 'https://1s4oyld5dc.ucarecd.net'
 const group = { uuid, count: 3 }
 
-const cdn = base(prefixedCdnBase('demopublickey'))
+const myCdn = cdn.base(prefixedCdnBase('demopublickey'))
 
 const fluentAvatar = (u: string, s: number) =>
-  cdn
+  myCdn
     .file(u)
     .scaleCrop(s, s, { type: 'smart_faces_objects' })
     .borderRadius('50p').href
 
-const fluentVariant = (u: string, w: number) => cdn.file(u).preview(w, w).href
+const fluentVariant = (u: string, w: number) => myCdn.file(u).preview(w, w).href
 
 const tinyAvatar = (u: string, s: number) =>
   tinyBuild({
@@ -148,7 +148,7 @@ describe('groups: addressing tabs agree', () => {
     const expected = `${CDN_BASE}/${uuid}~3/`
     expect(groupUrl(CDN_BASE, group)).toBe(expected)
     expect(new CdnUrl({ cdnBase: CDN_BASE, group }).href).toBe(expected)
-    expect(cdn.group(group).href).toBe(expected)
+    expect(myCdn.group(group).href).toBe(expected)
   })
 
   it('nth element with operations', () => {
@@ -162,7 +162,7 @@ describe('groups: addressing tabs agree', () => {
         operations: [preview(400, 400)]
       }).href
     ).toBe(expected)
-    expect(cdn.group(group).nth(1).preview(400, 400).href).toBe(expected)
+    expect(myCdn.group(group).nth(1).preview(400, 400).href).toBe(expected)
   })
 
   it('nth is zero-based', () => {
@@ -173,13 +173,13 @@ describe('groups: addressing tabs agree', () => {
     expect(archiveUrl(CDN_BASE, group, 'zip')).toBe(
       `${CDN_BASE}/${uuid}~3/archive/zip/`
     )
-    expect(cdn.group(group).archive('zip')).toBe(
+    expect(myCdn.group(group).archive('zip')).toBe(
       `${CDN_BASE}/${uuid}~3/archive/zip/`
     )
     expect(archiveUrl(CDN_BASE, group, 'tar', 'photos.tar')).toBe(
       `${CDN_BASE}/${uuid}~3/archive/tar/photos.tar`
     )
-    expect(cdn.group(group).archive('tar', 'photos.tar')).toBe(
+    expect(myCdn.group(group).archive('tar', 'photos.tar')).toBe(
       `${CDN_BASE}/${uuid}~3/archive/tar/photos.tar`
     )
     // the page says there is no builder tab because the method does not exist
@@ -195,6 +195,25 @@ describe('proxy: the three tabs agree', () => {
     expect(endpoint).toBe('https://YOUR_PUBLIC_KEY.ucr.io')
   })
 
+  it('the builder round-trips a proxy url and edits it', () => {
+    // a real key, lowercase: `new URL` normalizes host case, so an uppercase
+    // placeholder would not survive parse → serialize byte for byte
+    const stored = `https://demopublickey.ucr.io/-/preview/${source}?v=2`
+    expect(CdnUrl.parse(stored).href).toBe(stored)
+    expect(CdnUrl.parse(stored).toJSON().kind).toBe('proxy')
+    expect(CdnUrl.parse(stored).with(resize({ width: 500 })).href).toBe(
+      `https://demopublickey.ucr.io/-/preview/-/resize/500x/${source}?v=2`
+    )
+  })
+
+  it('the builder rebases onto another endpoint with base()', () => {
+    expect(
+      new CdnUrl({ cdnBase: endpoint, sourceUrl: source }).base(
+        'https://proxy.yourdomain.com/'
+      ).href
+    ).toBe(`https://proxy.yourdomain.com/${source}`)
+  })
+
   it('all three produce the documented URL', () => {
     const expected = `https://YOUR_PUBLIC_KEY.ucr.io/-/preview/-/resize/1280x/${source}`
     expect(
@@ -208,7 +227,7 @@ describe('proxy: the three tabs agree', () => {
       }).href
     ).toBe(expected)
     expect(
-      cdn.proxy(endpoint, source).preview().resize({ width: 1280 }).href
+      myCdn.proxy(endpoint, source).preview().resize({ width: 1280 }).href
     ).toBe(expected)
   })
 })

@@ -99,7 +99,7 @@ export abstract class Chain<S extends ChainState> {
    *
    * @example
    * ```ts
-   * cdn.file(uuid).quality('smart').hasOp(quality) // → true
+   * myCdn.file(uuid).quality('smart').hasOp(quality) // → true
    * ```
    */
   public hasOp(ref: OperationRef): boolean {
@@ -111,7 +111,7 @@ export abstract class Chain<S extends ChainState> {
    *
    * @example
    * ```ts
-   * cdn.file(uuid).quality('smart').getOp('quality')
+   * myCdn.file(uuid).quality('smart').getOp('quality')
    * // → { name: 'quality', params: ['smart'] }
    * ```
    */
@@ -137,7 +137,7 @@ export abstract class Chain<S extends ChainState> {
    *
    * @example
    * ```ts
-   * cdn.file(uuid).resize({ width: 300 }).replaceOp(resize({ width: 500 })).href
+   * myCdn.file(uuid).resize({ width: 300 }).replaceOp(resize({ width: 500 })).href
    * ```
    */
   public replaceOp(operation: CdnOperation): this {

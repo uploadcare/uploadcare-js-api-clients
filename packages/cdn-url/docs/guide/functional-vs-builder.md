@@ -32,10 +32,10 @@ import { preview, quality } from '@uploadcare/cdn-url/ops'
 const url = CdnUrl.parse(src)
   .without(quality)
   .with(preview(800, 600), quality('smart'))
-  .setCdnBase('https://1zlmtnsbgr.ucarecd.net').href
+  .base('https://1zlmtnsbgr.ucarecd.net').href
 ```
 
-`with`, `without`, `replace`, `replaceAll`, `has`, `get`, `getAll`, `updateOperations`, `setFilename`, `setCdnBase`: see the [builder reference](/reference/builder/).
+`with`, `without`, `replace`, `replaceAll`, `has`, `get`, `getAll`, `updateOperations`, `filename`, `base`: see the [builder reference](/reference/builder/).
 
 ### Inspecting and overriding a chain
 
@@ -74,18 +74,20 @@ The callback gets a defensive copy, so mutating it in place is safe. `with`, `wi
 
 ## The fluent mega-object
 
-Everything behind one import: every URL flavor, every operation, chainable end to end. Made for application code and REPL exploration where convenience beats bytes. `base()` binds the CDN base once — it is required, and `prefixedCdnBase` derives your project's from its public key. The object it returns is frozen.
+Everything behind one import: every URL flavor, every operation, chainable end to end. Made for application code and REPL exploration where convenience beats bytes.
+
+`cdn` arrives without a host. `base` binds one and hands back the full object; `file`, `group` and `gif2video` exist only there, so forgetting is a compile error rather than a broken URL. The starters that need no host — `video`, `document`, `proxy`, `parse` — work straight off `cdn`. Every object is frozen, and a single URL rebases with its own `base()`.
 
 ```ts
-import { base, prefixedCdnBase } from '@uploadcare/cdn-url/fluent'
+import { cdn, prefixedCdnBase } from '@uploadcare/cdn-url/fluent'
 
-const cdn = base(prefixedCdnBase('demopublickey'))
+const myCdn = cdn.base(prefixedCdnBase('demopublickey'))
 
-cdn.file(uuid).scaleCrop(96, 96, { type: 'smart' }).borderRadius('50p').href
+myCdn.file(uuid).scaleCrop(96, 96, { type: 'smart' }).borderRadius('50p').href
 cdn.parse(stored).kind // 'file' | 'group' | 'group-element' | 'proxy'; narrow, keep chaining
-cdn.group(groupId).nth(1).preview(300, 300).href
+myCdn.group(groupId).nth(1).preview(300, 300).href
 cdn.video(uuid).size({ width: 720, height: 540 }).thumbs(5).path
-cdn.base('https://cdn.example.com').file(uuid).preview().href
+myCdn.file(uuid).preview().base('https://cdn.example.com').href
 ```
 
 Each starter returns a kind-specific chain (video chains only offer video methods, group roots only `nth()`/`archive()`), so invalid combinations are compile-time errors. Chains are immutable and reuse the creators' development-bundle validation.
@@ -93,7 +95,7 @@ Each starter returns a kind-specific chain (video chains only offer video method
 The builder's inspection API is mirrored on every chain, with an `Op` suffix so the names can never collide with a transformation method:
 
 ```ts
-const chain = cdn.file(uuid).resize({ width: 300 }).quality('smart')
+const chain = myCdn.file(uuid).resize({ width: 300 }).quality('smart')
 
 chain.hasOp(quality) // → true
 chain.getOp(quality) // → { name: 'quality', params: ['smart'] } | null
@@ -123,7 +125,7 @@ Also available without a bundler at all, via the IIFE global build:
 <script src="https://unpkg.com/@uploadcare/cdn-url/dist/cdn-url.global.js"></script>
 <script>
   const cdn = UCCdnUrl.base(UCCdnUrl.prefixedCdnBase('YOUR_PUBLIC_KEY'))
-  cdn.file(uuid).preview(800, 600).href
+  myCdn.file(uuid).preview(800, 600).href
 </script>
 ```
 
@@ -168,13 +170,13 @@ What each entry costs when you import everything it exports, bundled and minifie
 | `tiny` (string level)                   | 0.9 kB   | 0.5 kB  |
 | `index` (everything below, re-exported) | 10.6 kB  | 4.2 kB  |
 | `ops` (all 47 creators)                 | 6.1 kB   | 2.2 kB  |
-| `fluent` (the `base()` mega-object)     | 19.8 kB  | 6.6 kB  |
+| `fluent` (the `cdn.base()` mega-object) | 19.8 kB  | 6.6 kB  |
 
-Both totals now carry `prefixedCdnBase` — the SHA-256 that derives your project's host, re-exported from `@uploadcare/cname-prefix`. It is 4.7 kB minified (2.1 kB gzipped) of that figure and drops entirely if you never name it: `base` plus one chain measures 15.0 kB minified, 4.4 kB gzipped. Compute the host once at build time or paste it as a literal and you pay nothing for the hashing.
+Both totals now carry `prefixedCdnBase` — the SHA-256 that derives your project's host, re-exported from `@uploadcare/cname-prefix`. It is 4.7 kB minified (2.1 kB gzipped) of that figure and drops entirely if you never name it: `cdn` plus one chain measures 15.0 kB minified, 4.4 kB gzipped. Compute the host once at build time or paste it as a literal and you pay nothing for the hashing.
 
 Importing everything is the worst case, and it is not what most code does. The core plus one creator is about 1.6 kB gzipped, not 2.2 plus 2.0, because the creators you don't name are dropped. The [string level](/guide/string-level-api) does the same job for 0.4 kB, and costs the same whether you import it from `/tiny` or from the root — 348 B versus 347 B brotli, measured.
 
-The `fluent` entry is the one exception to "you only pay for what you import": reaching for `base()` pulls in the whole library, and it cannot tree-shake by design. That's the deal: one import, full surface. If size matters, use the functional core or `builder` instead.
+The `fluent` entry is the one exception to "you only pay for what you import": reaching for `cdn.base()` pulls in the whole library, and it cannot tree-shake by design. That's the deal: one import, full surface. If size matters, use the functional core or `builder` instead.
 
 ## Which to use
 

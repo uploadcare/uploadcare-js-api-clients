@@ -7,7 +7,7 @@ import { describe, expect, it } from 'vitest'
 
 import { CdnUrl } from './builder/index'
 import {
-  base,
+  cdn,
   LEGACY_CDN_BASE,
   prefixedCdnBase,
   prefixedCdnBaseAsync
@@ -65,8 +65,8 @@ describe('cdn-base: the async variant', () => {
   )
 
   it.skipIf(!inBrowser)('feeds base() once awaited', async () => {
-    const cdn = base(await prefixedCdnBaseAsync('demopublickey'))
-    expect(cdn.file(uuid).preview(800, 600).href).toBe(
+    const awaited = cdn.base(await prefixedCdnBaseAsync('demopublickey'))
+    expect(awaited.file(uuid).preview(800, 600).href).toBe(
       `${PREFIXED}/${uuid}/-/preview/800x600/`
     )
   })
@@ -84,7 +84,7 @@ describe('cdn-base: the async variant', () => {
 describe('cdn-base: the legacy base', () => {
   it('builds on ucarecdn.com when named explicitly', () => {
     expect(LEGACY_CDN_BASE).toBe('https://ucarecdn.com')
-    expect(base(LEGACY_CDN_BASE).file(uuid).preview(800, 600).href).toBe(
+    expect(cdn.base(LEGACY_CDN_BASE).file(uuid).preview(800, 600).href).toBe(
       `https://ucarecdn.com/${uuid}/-/preview/800x600/`
     )
   })
@@ -92,25 +92,25 @@ describe('cdn-base: the legacy base', () => {
 
 describe('cdn-base: a custom CNAME', () => {
   it('is used as it stands, unprefixed', () => {
-    expect(base('https://cdn.example.com').file(uuid).href).toBe(
+    expect(cdn.base('https://cdn.example.com').file(uuid).href).toBe(
       `https://cdn.example.com/${uuid}/`
     )
   })
 })
 
 describe('cdn-base: passing it to each API layer', () => {
-  it('fluent — bind once, rebase per call', () => {
-    const cdn = base(prefixedCdnBase('demopublickey'))
+  it('fluent — bind once, rebase a single url with base()', () => {
+    const myCdn = cdn.base(prefixedCdnBase('demopublickey'))
 
-    expect(cdn.file(uuid).preview(800, 600).href).toBe(
+    expect(myCdn.file(uuid).preview(800, 600).href).toBe(
       `${PREFIXED}/${uuid}/-/preview/800x600/`
     )
-    expect(cdn.group(group).nth(1).href).toBe(`${PREFIXED}/${uuid}~3/nth/1/`)
-    expect(cdn.base('https://cdn.example.com').file(uuid).href).toBe(
+    expect(myCdn.group(group).nth(1).href).toBe(`${PREFIXED}/${uuid}~3/nth/1/`)
+    expect(myCdn.file(uuid).base('https://cdn.example.com').href).toBe(
       `https://cdn.example.com/${uuid}/`
     )
-    // rebasing leaves the original entry object alone
-    expect(cdn.file(uuid).href).toBe(`${PREFIXED}/${uuid}/`)
+    // rebasing one url leaves the entry object alone
+    expect(myCdn.file(uuid).href).toBe(`${PREFIXED}/${uuid}/`)
   })
 
   it('functional core — a field, or the first argument', () => {
@@ -122,7 +122,7 @@ describe('cdn-base: passing it to each API layer', () => {
     expect(groupUrl(cdnBase, group)).toBe(`${PREFIXED}/${uuid}~3/`)
   })
 
-  it('builder — constructor field, inherited by parse, replaced by setCdnBase', () => {
+  it('builder — constructor field, inherited by parse, replaced by base()', () => {
     const cdnBase = prefixedCdnBase('demopublickey')
     const stored = `https://ucarecdn.com/${uuid}/-/resize/300x/`
 
@@ -130,7 +130,7 @@ describe('cdn-base: passing it to each API layer', () => {
       `${PREFIXED}/${uuid}/-/preview/800x600/`
     )
     expect(CdnUrl.parse(stored).href).toBe(stored)
-    expect(CdnUrl.parse(stored).setCdnBase(cdnBase).href).toBe(
+    expect(CdnUrl.parse(stored).base(cdnBase).href).toBe(
       `${PREFIXED}/${uuid}/-/resize/300x/`
     )
   })
@@ -144,7 +144,9 @@ describe('cdn-base: passing it to each API layer', () => {
 
 describe('cdn-base: the two conveniences and the one strictness', () => {
   it('trims a trailing slash everywhere it is accepted', () => {
-    expect(base(`${PREFIXED}/`).file(uuid).href).toBe(`${PREFIXED}/${uuid}/`)
+    expect(cdn.base(`${PREFIXED}/`).file(uuid).href).toBe(
+      `${PREFIXED}/${uuid}/`
+    )
     expect(prefixedCdnBase('demopublickey', 'https://ucarecd.net/')).toBe(
       PREFIXED
     )
@@ -154,14 +156,14 @@ describe('cdn-base: the two conveniences and the one strictness', () => {
   })
 
   it('base() refuses an empty base in the dev bundle', () => {
-    expect(() => base('')).toThrow(TypeError)
+    expect(() => cdn.base('')).toThrow(TypeError)
   })
 
   it('two bases can coexist — the migration shape the page describes', () => {
-    const cdn = base(prefixedCdnBase('demopublickey'))
-    const legacy = base(LEGACY_CDN_BASE)
+    const myCdn = cdn.base(prefixedCdnBase('demopublickey'))
+    const legacy = cdn.base(LEGACY_CDN_BASE)
 
-    expect(cdn.file(uuid).href).toBe(`${PREFIXED}/${uuid}/`)
+    expect(myCdn.file(uuid).href).toBe(`${PREFIXED}/${uuid}/`)
     expect(legacy.file(uuid).href).toBe(`https://ucarecdn.com/${uuid}/`)
   })
 
@@ -186,9 +188,9 @@ describe('cdn-base: things that bite', () => {
 
     expect(proxyUrl(endpoint, source, [preview(800, 600)])).toBe(expected)
     // on a chain the endpoint is an argument; the bound base goes unused
-    expect(base(PREFIXED).proxy(endpoint, source).preview(800, 600).href).toBe(
-      expected
-    )
+    expect(
+      cdn.base(PREFIXED).proxy(endpoint, source).preview(800, 600).href
+    ).toBe(expected)
   })
 
   it('conversion paths carry no base at all', () => {
@@ -198,7 +200,7 @@ describe('cdn-base: things that bite', () => {
 
   it('a token survives a rebase — which is exactly why it stops verifying', () => {
     const signed = `https://ucarecdn.com/${uuid}/-/preview/?token=exp=1~hmac=x`
-    expect(CdnUrl.parse(signed).setCdnBase(PREFIXED).href).toBe(
+    expect(CdnUrl.parse(signed).base(PREFIXED).href).toBe(
       `${PREFIXED}/${uuid}/-/preview/?token=exp=1~hmac=x`
     )
   })
