@@ -41,8 +41,7 @@ const toIsoBounds = (
 /**
  * The API has no nested metadata object: it addresses one metadata key with a
  * literal `metadata[key]` key of `exact` itself. The caller's metadata keys are
- * copied into the brackets verbatim — only the fixed field names are
- * rewritten.
+ * copied into the brackets verbatim. Only the fixed field names are rewritten.
  */
 const toExact = ({
   uuid,

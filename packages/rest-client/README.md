@@ -214,9 +214,9 @@ page.results[0].uuid
 
 Full-text conditions are `query` (across searchable fields) and `phrase` (per
 field), both needing at least 4 characters, with `fuzziness: true` for typo
-tolerance. `exact` matches whole values, and its `metadata` keys are yours to
-name. Everything you write is camelCase; only your own metadata keys and tag
-values keep the spelling you gave them:
+tolerance. `exact` matches whole values. Everything you write is camelCase, and
+the client translates it to the API's own spelling; your metadata keys and tag
+values are the exception, and go out exactly as you wrote them:
 
 ```typescript
 const page = await searchFiles(
@@ -237,9 +237,9 @@ page.results[0].highlight?.originalFilename
 ```
 
 Pass `include: 'appdata'` to embed add-on data. A malformed or empty query
-rejects with a `RestClientValidationError`, which carries the server's
-complaints keyed by field. It extends `RestClientError`, so existing handling
-keeps working:
+rejects with a `RestClientValidationError`, which lists what the server objected
+to, keyed by field. It extends `RestClientError`, so a `catch` block that already
+checks for that still matches:
 
 ```typescript
 import {
@@ -258,12 +258,11 @@ try {
 ```
 
 Errors that span more than one field, and the empty-query case, arrive under
-`nonFieldErrors`. Field names are camelized like any other response, except a
-key naming your own metadata, which keeps the spelling you gave it.
+`nonFieldErrors`. Field names follow the same casing rule as the options.
 
 Results paginate through `limit` and `offset`, so `searchFiles` works with the
-[pagination helpers](#pagination) below — bearing in mind the API requires
-`offset + limit` to stay under 1000:
+[pagination helpers](#pagination) below. The API requires `offset + limit` to
+stay under 1000, which ends a walk at that point however many files match:
 
 ```typescript
 import { paginate, searchFiles } from '@uploadcare/rest-client'
@@ -278,10 +277,9 @@ for await (const page of pages) {
 }
 ```
 
-Newly uploaded files are indexed asynchronously, so a file may not be findable
-immediately after upload — expect a few seconds. See [docs][uc-file-search] for
-the full condition reference, and the [API Reference][api-reference] for every
-option and its type.
+Newly uploaded files are indexed asynchronously, so expect a few seconds before
+one turns up in results. See [docs][uc-file-search] for the full condition
+reference, and the [API Reference][api-reference] for every option and its type.
 
 ### Settings
 

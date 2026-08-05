@@ -62,7 +62,7 @@ export type SearchFilesSort = {
 }
 
 /**
- * At least one condition is required — `query`, `phrase`, `exact`,
+ * At least one condition is required: `query`, `phrase`, `exact`,
  * `datetimeUploaded`, `size`, `isImage` or `tags`. Conditions combine with
  * AND.
  */
@@ -81,7 +81,7 @@ export type SearchFilesOptions = {
   tags?: SearchFilesTags
   /** Up to 4 keys, applied in the order given. Defaults to relevance. */
   sort?: SearchFilesSort[]
-  /** 1–100, defaults to 20. */
+  /** 1 to 100, defaults to 20. */
   limit?: number
   /** `offset + limit` must stay under 1000. */
   offset?: number
