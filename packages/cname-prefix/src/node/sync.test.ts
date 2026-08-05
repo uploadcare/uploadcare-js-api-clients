@@ -2,17 +2,18 @@ import { createHash, randomBytes } from 'node:crypto'
 
 import { describe, expect, it } from 'vitest'
 
+import { PUBLIC_KEY_PREFIXES } from '../common/publicKeys.fixture'
 import { getCnamePrefixSync, getPrefixedCdnBaseSync } from './sync'
 
 const PREFIX_CDN_BASE = 'https://ucarecd.net'
 
 describe('node build: getCnamePrefixSync', () => {
-  it('produces the prefixes the browser build produces', () => {
-    expect(getCnamePrefixSync('demopublickey')).toBe('1s4oyld5dc')
-    expect(getCnamePrefixSync('c8c237984266090ff9b8')).toBe('127mbvwq3b')
-    expect(getCnamePrefixSync('3e6ba70c0670de3bef7a')).toBe('u51bthcx6t')
-    expect(getCnamePrefixSync('823a5ae6eb3afa5b353f')).toBe('ggiwfssv31')
-  })
+  it.each(PUBLIC_KEY_PREFIXES)(
+    'produces the prefix the other builds produce for %s',
+    (publicKey, prefix) => {
+      expect(getCnamePrefixSync(publicKey)).toBe(prefix)
+    }
+  )
 
   it('matches node:crypto for arbitrary inputs, including multi-block ones', () => {
     const expected = (input: string) =>
