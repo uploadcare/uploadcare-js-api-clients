@@ -261,14 +261,21 @@ Errors that span more than one field, and the empty-query case, arrive under
 `nonFieldErrors`. Field names follow the same casing rule as the options.
 
 Results paginate through `limit` and `offset`, so `searchFiles` works with the
-[pagination helpers](#pagination) below. The API requires `offset + limit` to
-stay under 1000, which ends a walk at that point however many files match:
+[pagination helpers](#pagination) below. Pass an explicit `sort` when you
+paginate: the default relevance order is not stable between pages, so a walk
+without one can hand back a file an earlier page already gave you. The API also
+requires `offset + limit` to stay under 1000, which ends a walk at that point
+however many files match:
 
 ```typescript
 import { paginate, searchFiles } from '@uploadcare/rest-client'
 
 const pages = paginate(searchFiles)(
-  { tags: { any: ['cat'] }, limit: 100 },
+  {
+    tags: { any: ['cat'] },
+    sort: [{ field: 'datetimeUploaded', order: 'desc' }],
+    limit: 100
+  },
   { authSchema }
 )
 

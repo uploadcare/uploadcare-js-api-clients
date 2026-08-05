@@ -79,7 +79,11 @@ export type SearchFilesOptions = {
   /** Typo tolerance for `query` and `phrase`. Slower. Defaults to `false`. */
   fuzziness?: boolean
   tags?: SearchFilesTags
-  /** Up to 4 keys, applied in the order given. Defaults to relevance. */
+  /**
+   * Up to 4 keys, applied in the order given. Defaults to relevance, which is
+   * not stable between pages: give an explicit sort when paginating, or a page
+   * can repeat a file an earlier one already returned.
+   */
   sort?: SearchFilesSort[]
   /** 1 to 100, defaults to 20. */
   limit?: number

@@ -20,8 +20,19 @@ const toFieldName = (segment: string) =>
 const isPlainObject = (value: unknown): value is Record<string, unknown> =>
   !!value && typeof value === 'object' && !Array.isArray(value)
 
-const isStringArray = (value: unknown): value is string[] =>
-  Array.isArray(value) && value.every((item) => typeof item === 'string')
+/**
+ * A field's complaints. Usually an array, but the API sometimes sends a bare
+ * string — `{"is_image": "Must be a boolean value."}` — so both are read and
+ * kept as an array, leaving callers one shape to handle.
+ */
+const toMessages = (value: unknown): string[] | undefined => {
+  if (typeof value === 'string') {
+    return [value]
+  }
+  return Array.isArray(value) && value.every((item) => typeof item === 'string')
+    ? value
+    : undefined
+}
 
 const formatErrors = (errors: ServerValidationErrorResponse) =>
   Object.entries(errors)
@@ -78,9 +89,10 @@ export class RestClientValidationError extends RestClientError {
       for (const [key, value] of Object.entries(node)) {
         const nextPath =
           key === SERVER_NON_FIELD_ERRORS ? path : [...path, toFieldName(key)]
-        if (isStringArray(value)) {
+        const messages = toMessages(value)
+        if (messages) {
           const field = nextPath.join('.') || NON_FIELD_ERRORS
-          errors[field] = [...(errors[field] ?? []), ...value]
+          errors[field] = [...(errors[field] ?? []), ...messages]
           continue
         }
         if (!collect(value, nextPath)) {

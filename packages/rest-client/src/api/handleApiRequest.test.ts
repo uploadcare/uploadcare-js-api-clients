@@ -130,16 +130,22 @@ describe('handleApiRequest', () => {
     }
   })
 
-  it('should fall back to the status when an error body is neither shape', async () => {
+  // A string or an array of them is a complaint about a field; anything else is
+  // some other kind of body, and the message stays what it was before this
+  // fallback existed: RestClientError does not repeat the status text.
+  it.each([
+    ['a value that is neither string nor array', { whatever: 42 }],
+    ['an array at the root', ['nope']],
+    ['a body with no keys', {}],
+    ['mixed leaves, one of them unreadable', { size: ['too small'], n: 42 }]
+  ])('should fall back to the status given %s', async (_name, body) => {
     expect.assertions(2)
     try {
       await handleApiRequest({
-        apiRequest: apiRequestOf({ whatever: 'not an array' }, 400),
+        apiRequest: apiRequestOf(body, 400),
         okCodes: [200]
       })
     } catch (error) {
-      // Unchanged from before this fallback existed: with no message to add,
-      // RestClientError does not repeat the status text.
       expect((error as RestClientError).message).toBe('[400] Bad Request')
       expect(isRestClientValidationError(error)).toBe(false)
     }
@@ -182,6 +188,41 @@ describe('handleApiRequest', () => {
       expect((error as RestClientValidationError).errors).toEqual({
         datetimeUploaded: ['Invalid date.'],
         'exact.metadata[my_key]': ['Not a list.']
+      })
+    }
+  })
+
+  it('should read a complaint sent as a bare string, not an array', async () => {
+    expect.assertions(2)
+    try {
+      await handleApiRequest({
+        apiRequest: apiRequestOf({ is_image: 'Must be a boolean value.' }, 400),
+        okCodes: [200]
+      })
+    } catch (error) {
+      const restClientError = error as RestClientValidationError
+      expect(restClientError.message).toBe(
+        '[400 Bad Request] isImage: Must be a boolean value.'
+      )
+      expect(restClientError.errors).toEqual({
+        isImage: ['Must be a boolean value.']
+      })
+    }
+  })
+
+  it('should read a complaint keyed by list index', async () => {
+    expect.assertions(1)
+    try {
+      await handleApiRequest({
+        apiRequest: apiRequestOf(
+          { sort: { 0: ['"nope" is not a valid choice.'] } },
+          400
+        ),
+        okCodes: [200]
+      })
+    } catch (error) {
+      expect((error as RestClientValidationError).errors).toEqual({
+        'sort.0': ['"nope" is not a valid choice.']
       })
     }
   })
