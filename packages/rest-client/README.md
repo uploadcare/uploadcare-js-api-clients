@@ -168,13 +168,78 @@ const result = await updateTags(
 
 See [docs][uc-file-tags] for normalization rules and limits.
 
+#### File search
+
+`searchFiles` queries the project's files. Every condition is optional, but at
+least one is required, and conditions combine with AND:
+
+```typescript
+import { searchFiles, UploadcareSimpleAuthSchema } from '@uploadcare/rest-client';
+
+const authSchema = new UploadcareSimpleAuthSchema({
+  publicKey: 'YOUR_PUBLIC_KEY',
+  secretKey: 'YOUR_SECRET_KEY',
+});
+
+const page = await searchFiles(
+  {
+    tags: { all: ['cat', 'animal'], none: ['draft'] },
+    isImage: true,
+    sort: [{ field: 'datetime_uploaded', order: 'desc' }, { field: 'size' }],
+    limit: 50
+  },
+  { authSchema }
+);
+
+page.total; // 42
+page.results[0].uuid;
+```
+
+Full-text conditions are `query` (across searchable fields) and `phrase` (per
+field), both needing at least 4 characters, with `fuzziness: true` for typo
+tolerance. `exact` matches whole values, and its `metadata` keys are yours to
+name:
+
+```typescript
+const page = await searchFiles(
+  {
+    exact: {
+      detectedMimeType: ['image/png'],
+      metadata: { color: ['red', 'blue'] }
+    },
+    phrase: { originalFilename: 'invoice' },
+    datetimeUploaded: { gte: new Date('2026-01-01') },
+    size: { gt: 1_000_000 }
+  },
+  { authSchema }
+);
+
+// tokens that matched, wrapped in <em>
+page.results[0].highlight?.originalFilename;
+```
+
+Pass `include: 'appdata'` to embed add-on data. A malformed query rejects with a
+`RestClientError` whose `errors` field carries the server's complaints per field:
+
+```typescript
+try {
+  await searchFiles({ query: 'abc' }, { authSchema });
+} catch (error) {
+  error.errors; // { query: ['ensure this value has at least 4 characters'] }
+}
+```
+
+Newly uploaded files are indexed asynchronously, so a file may not be findable
+immediately after upload. See [docs][uc-file-search] for the full condition
+reference.
+
 ### Settings
 
 List of all available Settings is available at the [rest-client API Reference](https://uploadcare.github.io/uploadcare-js-api-clients/rest-client/modules#UserSettings).
 
 ### Pagination
 
-We have the only two paginatable API methods - `listOfFiles` and `listOfGroups`. You can use one of those methods below to paginate over.
+Three API methods paginate: `listOfFiles`, `listOfGroups` and `searchFiles`. You can use one of those methods below to paginate over. Note that search caps `offset + limit` at 1000, so a walk over search results ends there however large `total` is.
 
 #### Using async generator and `paginate()` helper
 
@@ -326,3 +391,4 @@ request at [hello@uploadcare.com][uc-email-hello].
 [build-url]: https://github.com/uploadcare/uploadcare-js-api-clients/actions/workflows/checks.yml
 [uc-docs-rest-api]: https://uploadcare.com/api-refs/rest-api/v0.7.0/?utm_source=github&utm_campaign=uploadcare-js-api-clients
 [uc-file-tags]: https://uploadcare.com/docs/file-tags/
+[uc-file-search]: https://uploadcare.com/docs/file-search/

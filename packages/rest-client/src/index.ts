@@ -30,7 +30,10 @@ export { FileInfo, FileInfoVariations } from './types/FileInfo'
 export { GroupInfo, GroupInfoShort } from './types/GroupInfo'
 export { PaginatedList } from './types/PaginatedList'
 export { Problems } from './types/Problems'
-export { ServerErrorResponse } from './types/ServerErrorResponse'
+export {
+  ServerErrorResponse,
+  ServerValidationErrorResponse
+} from './types/ServerErrorResponse'
 export { Webhook } from './types/Webhook'
 export { WebhookEvent } from './types/WebhookEvent'
 export { StoreValue, CancelError } from '@uploadcare/api-client-utils'
@@ -137,6 +140,20 @@ export {
   ListOfFilesOrdering,
   ListOfFilesTotals
 } from './api/file/listOfFiles'
+export {
+  searchFiles,
+  SearchFilesOptions,
+  SearchFilesResponse,
+  SearchFilesResult,
+  SearchFilesExact,
+  SearchFilesExactMetadata,
+  SearchFilesHighlight,
+  SearchFilesPhrase,
+  SearchFilesRange,
+  SearchFilesSort,
+  SearchFilesSortField,
+  SearchFilesTags
+} from './api/file/searchFiles'
 export {
   storeFile,
   StoreFileResponse,
