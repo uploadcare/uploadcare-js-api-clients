@@ -48,16 +48,9 @@ const toExact = ({
     )
   })
 
-const toPhrase = ({
-  originalFilename,
-  detectedMimeType,
-  metadata
-}: SearchFilesPhrase): Record<string, string> =>
-  defined({
-    original_filename: originalFilename,
-    detected_mime_type: detectedMimeType,
-    metadata
-  })
+/** Field names already match the API, so only absent ones are dropped. */
+const toPhrase = (phrase: SearchFilesPhrase): Record<string, string> =>
+  defined(phrase)
 
 /**
  * Builds the `POST /files/search/` request body from the options.

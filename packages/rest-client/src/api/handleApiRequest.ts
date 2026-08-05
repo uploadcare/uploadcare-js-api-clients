@@ -11,7 +11,13 @@ type HandleResponseOptions = {
   camelize?: boolean
 }
 
-const CAMELIZE_IGNORE_KEYS = ['metadata', 'problems', 'appdata']
+/**
+ * Sub-objects whose keys are not ours to rewrite: `metadata` keys are the
+ * caller's own, `appdata` and `problems` mirror add-on payloads, and
+ * `highlight` names the same search fields that `phrase` and `exact` take, so
+ * rewriting it would spell one field two ways in a single round trip.
+ */
+const CAMELIZE_IGNORE_KEYS = ['metadata', 'problems', 'appdata', 'highlight']
 const NO_CONTENT_STATUS = 204
 
 const isJsonContentType = (type: string | null) =>

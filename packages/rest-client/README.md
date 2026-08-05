@@ -16,6 +16,7 @@
 [![Uploadcare stack on StackShare][badge-stack-img]][badge-stack-url]
 
 <!-- toc -->
+
 - [Install](#install)
 - [Usage](#usage)
   - [Authentication](#authentication)
@@ -54,12 +55,15 @@ With the [`Uploadcare.Simple`](https://uploadcare.com/api-refs/rest-api/v0.7.0/#
 Example:
 
 ```typescript
-import { listOfFiles, UploadcareSimpleAuthSchema } from '@uploadcare/rest-client';
+import {
+  listOfFiles,
+  UploadcareSimpleAuthSchema
+} from '@uploadcare/rest-client'
 
 const uploadcareSimpleAuthSchema = new UploadcareSimpleAuthSchema({
   publicKey: 'YOUR_PUBLIC_KEY',
-  secretKey: 'YOUR_SECRET_KEY',
-});
+  secretKey: 'YOUR_SECRET_KEY'
+})
 
 const result = await listOfFiles({}, { authSchema: uploadcareSimpleAuthSchema })
 ```
@@ -73,11 +77,11 @@ With the [`Uploadcare`](https://uploadcare.com/api-refs/rest-api/v0.7.0/#section
 You can use the builtin signature resolver, which automatically generates signature in-place using `crypto` module at Node.js or Web Crypto API at browsers.
 
 ```typescript
-import { UploadcareAuthSchema } from '@uploadcare/rest-client';
+import { UploadcareAuthSchema } from '@uploadcare/rest-client'
 
 new UploadcareAuthSchema({
   publicKey: 'YOUR_PUBLIC_KEY',
-  secretKey: 'YOUR_SECRET_KEY',
+  secretKey: 'YOUR_SECRET_KEY'
 })
 ```
 
@@ -88,7 +92,7 @@ new UploadcareAuthSchema({
 This option is useful on the client-side to avoid secret key leak. You need to implement some backend endpoint, which will generate signature. In this case, secret key will be stored on your server only and will not be disclosed.
 
 ```typescript
-import { UploadcareAuthSchema } from '@uploadcare/rest-client';
+import { UploadcareAuthSchema } from '@uploadcare/rest-client'
 
 new UploadcareAuthSchema({
   publicKey: 'YOUR_PUBLIC_KEY',
@@ -97,9 +101,11 @@ new UploadcareAuthSchema({
      * You need to make HTTPS request to your backend endpoint,
      * which should sign the `signString` using secret key.
      */
-    const response = await fetch(`/sign-request?signString=${encodeURIComponent(signString)}`);
-    const signature = await response.text();
-    return signature;
+    const response = await fetch(
+      `/sign-request?signString=${encodeURIComponent(signString)}`
+    )
+    const signature = await response.text()
+    return signature
   }
 })
 ```
@@ -107,13 +113,15 @@ new UploadcareAuthSchema({
 And then somewhere on your backend:
 
 ```javascript
-import { createSignature } from '@uploadcare/rest-client';
+import { createSignature } from '@uploadcare/rest-client'
 
 app.get('/sign-request', async (req, res) => {
-  const signature = await createSignature('YOUR_SECREY_KEY', req.query.signString);
-  res.send(signature);
+  const signature = await createSignature(
+    'YOUR_SECREY_KEY',
+    req.query.signString
+  )
+  res.send(signature)
 })
-
 ```
 
 ### API
@@ -121,12 +129,15 @@ app.get('/sign-request', async (req, res) => {
 You can use low-level wrappers to call the API endpoints directly:
 
 ```typescript
-import { listOfFiles, UploadcareSimpleAuthSchema } from '@uploadcare/rest-client';
+import {
+  listOfFiles,
+  UploadcareSimpleAuthSchema
+} from '@uploadcare/rest-client'
 
 const uploadcareSimpleAuthSchema = new UploadcareSimpleAuthSchema({
   publicKey: 'YOUR_PUBLIC_KEY',
-  secretKey: 'YOUR_SECRET_KEY',
-});
+  secretKey: 'YOUR_SECRET_KEY'
+})
 
 const result = await listOfFiles({}, { authSchema: uploadcareSimpleAuthSchema })
 ```
@@ -145,24 +156,27 @@ import {
   replaceTags,
   updateTags,
   UploadcareSimpleAuthSchema
-} from '@uploadcare/rest-client';
+} from '@uploadcare/rest-client'
 
 const authSchema = new UploadcareSimpleAuthSchema({
   publicKey: 'YOUR_PUBLIC_KEY',
-  secretKey: 'YOUR_SECRET_KEY',
-});
+  secretKey: 'YOUR_SECRET_KEY'
+})
 
 // Read the current tags
-const { tags } = await getTags({ uuid: 'FILE_UUID' }, { authSchema });
+const { tags } = await getTags({ uuid: 'FILE_UUID' }, { authSchema })
 
 // Replace the entire tag set
-await replaceTags({ uuid: 'FILE_UUID', tags: ['cat', 'animal'] }, { authSchema });
+await replaceTags(
+  { uuid: 'FILE_UUID', tags: ['cat', 'animal'] },
+  { authSchema }
+)
 
 // Add and remove tags at once (delete is applied before add)
 const result = await updateTags(
   { uuid: 'FILE_UUID', add: ['dog', 'outdoor'], delete: ['cat'] },
   { authSchema }
-);
+)
 // result: { tags, added, deleted }
 ```
 
@@ -174,12 +188,15 @@ See [docs][uc-file-tags] for normalization rules and limits.
 least one is required, and conditions combine with AND:
 
 ```typescript
-import { searchFiles, UploadcareSimpleAuthSchema } from '@uploadcare/rest-client';
+import {
+  searchFiles,
+  UploadcareSimpleAuthSchema
+} from '@uploadcare/rest-client'
 
 const authSchema = new UploadcareSimpleAuthSchema({
   publicKey: 'YOUR_PUBLIC_KEY',
-  secretKey: 'YOUR_SECRET_KEY',
-});
+  secretKey: 'YOUR_SECRET_KEY'
+})
 
 const page = await searchFiles(
   {
@@ -189,16 +206,17 @@ const page = await searchFiles(
     limit: 50
   },
   { authSchema }
-);
+)
 
-page.total; // 42
-page.results[0].uuid;
+page.total // 42
+page.results[0].uuid
 ```
 
 Full-text conditions are `query` (across searchable fields) and `phrase` (per
 field), both needing at least 4 characters, with `fuzziness: true` for typo
 tolerance. `exact` matches whole values, and its `metadata` keys are yours to
-name:
+name. Field names inside `phrase`, `exact`, `sort` and `highlight` are the API's
+own, so one vocabulary covers filtering, sorting and highlighting:
 
 ```typescript
 const page = await searchFiles(
@@ -207,15 +225,15 @@ const page = await searchFiles(
       detected_mime_type: ['image/png'],
       metadata: { color: ['red', 'blue'] }
     },
-    phrase: { originalFilename: 'invoice' },
+    phrase: { original_filename: 'invoice' },
     datetimeUploaded: { gte: new Date('2026-01-01') },
     size: { gt: 1_000_000 }
   },
   { authSchema }
-);
+)
 
 // tokens that matched, wrapped in <em>
-page.results[0].highlight?.originalFilename;
+page.results[0].highlight?.original_filename
 ```
 
 Pass `include: 'appdata'` to embed add-on data. A malformed or empty query
@@ -224,14 +242,17 @@ complaints keyed by field. It extends `RestClientError`, so existing handling
 keeps working:
 
 ```typescript
-import { isRestClientValidationError, searchFiles } from '@uploadcare/rest-client';
+import {
+  isRestClientValidationError,
+  searchFiles
+} from '@uploadcare/rest-client'
 
 try {
-  await searchFiles({ query: 'abc' }, { authSchema });
+  await searchFiles({ query: 'abc' }, { authSchema })
 } catch (error) {
   if (isRestClientValidationError(error)) {
-    error.errors; // { query: ['Must be at least 4 characters.'] }
-    error.message; // '[400 Bad Request] query: Must be at least 4 characters.'
+    error.errors // { query: ['Must be at least 4 characters.'] }
+    error.message // '[400 Bad Request] query: Must be at least 4 characters.'
   }
 }
 ```
@@ -259,11 +280,14 @@ import { listOfFiles, paginate } from '@uploadcare/rest-client'
 
 const uploadcareSimpleAuthSchema = new UploadcareSimpleAuthSchema({
   publicKey: 'YOUR_PUBLIC_KEY',
-  secretKey: 'YOUR_SECRET_KEY',
-});
+  secretKey: 'YOUR_SECRET_KEY'
+})
 
 const paginatedListOfFiles = paginate(listOfFiles)
-const pages = paginatedListOfFiles({}, { authSchema: uploadcareSimpleAuthSchema })
+const pages = paginatedListOfFiles(
+  {},
+  { authSchema: uploadcareSimpleAuthSchema }
+)
 
 for await (const page of pages) {
   console.log(page)
@@ -277,17 +301,21 @@ import { listOfFiles, Paginator } from '@uploadcare/rest-client'
 
 const uploadcareSimpleAuthSchema = new UploadcareSimpleAuthSchema({
   publicKey: 'YOUR_PUBLIC_KEY',
-  secretKey: 'YOUR_SECRET_KEY',
-});
+  secretKey: 'YOUR_SECRET_KEY'
+})
 
-const paginator = new Paginator(listOfFiles, {}, { authSchema: uploadcareSimpleAuthSchema })
+const paginator = new Paginator(
+  listOfFiles,
+  {},
+  { authSchema: uploadcareSimpleAuthSchema }
+)
 
-while(paginator.hasNextPage()) {
+while (paginator.hasNextPage()) {
   const page = await paginator.next()
   console.log(page)
 }
 
-while(paginator.hasPrevPage()) {
+while (paginator.hasPrevPage()) {
   const page = await paginator.prev()
   console.log(page)
 }
@@ -322,8 +350,8 @@ const jobs = await conversionJobPoller(
   {
     type: ConversionType.VIDEO,
     // type: ConversionType.DOCUMENT,
-    onRun: response => console.log(response), // called when job is started
-    onStatus: response => console.log(response), // called on every job status request
+    onRun: (response) => console.log(response), // called when job is started
+    onStatus: (response) => console.log(response), // called on every job status request
     paths: [':uuid/video/-/size/x720/', ':uuid/video/-/size/x360/'],
     store: false,
     pollOptions: {
@@ -360,8 +388,8 @@ const result = await addonJobPoller(
     addonName: AddonName.UC_CLAMAV_VIRUS_SCAN,
     // addonName: AddonName.AWS_REKOGNITION_DETECT_LABELS,
     // addonName: AddonName.REMOVE_BG,
-    onRun: response => console.log(response), // called when job is started
-    onStatus: response => console.log(response), // called on every job status request
+    onRun: (response) => console.log(response), // called when job is started
+    onStatus: (response) => console.log(response), // called on every job status request
     target: ':uuid',
     params: {
       purge_infected: false

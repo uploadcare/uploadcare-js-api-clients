@@ -31,11 +31,12 @@ export type SearchFilesExact = {
 
 /**
  * Full-text matching per field, each phrase at least 4 characters. A field used
- * here cannot also appear in {@link SearchFilesExact}.
+ * here cannot also appear in {@link SearchFilesExact}, and the field names are
+ * the same in both.
  */
 export type SearchFilesPhrase = {
-  originalFilename?: string
-  detectedMimeType?: string
+  original_filename?: string
+  detected_mime_type?: string
   /** One phrase, matched across metadata values. */
   metadata?: string
 }
@@ -91,11 +92,13 @@ export type SearchFilesOptions = {
 
 /**
  * Matched tokens, wrapped in `<em>`, for fields that matched a full-text
- * condition.
+ * condition. Keys are the API's own, the same names `phrase` and `exact` take:
+ * `highlight` is on the camelization ignore list, so one vocabulary covers
+ * filtering and highlighting alike.
  */
 export type SearchFilesHighlight = {
-  originalFilename?: string[]
-  detectedMimeType?: string[]
+  original_filename?: string[]
+  detected_mime_type?: string[]
   /** Matched tokens per metadata key. */
   metadata?: Metadata
 }

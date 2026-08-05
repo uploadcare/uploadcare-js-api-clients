@@ -21,8 +21,8 @@ describe('toSearchBody', () => {
     expect(
       toSearchBody({
         phrase: {
-          originalFilename: 'invoice',
-          detectedMimeType: 'image',
+          original_filename: 'invoice',
+          detected_mime_type: 'image',
           metadata: 'red'
         }
       })
