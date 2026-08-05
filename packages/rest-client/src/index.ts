@@ -82,9 +82,14 @@ export { getUserAgent } from '@uploadcare/api-client-utils'
 
 /** Tools */
 export {
+  isRestClientError,
   RestClientError,
   RestClientErrorOptions
 } from './tools/RestClientError'
+export {
+  isRestClientValidationError,
+  RestClientValidationError
+} from './tools/RestClientValidationError'
 export { paginate, Paginator } from './tools/paginate'
 export { addonJobPoller, AddonJobPollerOptions } from './tools/addonJobPoller'
 export {

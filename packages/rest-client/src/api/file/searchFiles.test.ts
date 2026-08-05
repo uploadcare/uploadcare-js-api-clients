@@ -1,7 +1,6 @@
 import { describe, expect, it } from '@jest/globals'
-import { makeApiRequest } from '../../makeApiRequest'
 import { Paginator } from '../../tools/paginate'
-import { RestClientError } from '../../tools/RestClientError'
+import { RestClientValidationError } from '../../tools/RestClientValidationError'
 import { searchFiles } from './searchFiles'
 
 import { testSettings } from '../../../test/helpers'
@@ -46,7 +45,7 @@ describe('searchFiles', () => {
     const response = await searchFiles(
       {
         exact: {
-          detectedMimeType: ['image/jpeg'],
+          detected_mime_type: ['image/jpeg'],
           metadata: { subsystem: ['uploader'] }
         },
         limit: 1
@@ -97,43 +96,28 @@ describe('searchFiles', () => {
     }
   })
 
-  // TEMPORARY: prints the real 400 body so the parser can be written against it
-  // rather than against the docs. Remove with the next commit.
-  it('DIAGNOSTIC: dumps the raw 400 response', async () => {
-    const { response } = await makeApiRequest(
-      { method: 'POST', path: '/files/search/', body: { size: 5 } },
-      testSettings
-    )
-
-    console.log('DIAGNOSTIC status:', response.status)
-    console.log(
-      'DIAGNOSTIC content-type:',
-      response.headers.get('content-type')
-    )
-    console.log('DIAGNOSTIC body:', await response.text())
-
-    const empty = await makeApiRequest(
-      { method: 'POST', path: '/files/search/', body: {} },
-      testSettings
-    )
-    console.log('DIAGNOSTIC empty status:', empty.response.status)
-    console.log('DIAGNOSTIC empty body:', await empty.response.text())
-
-    expect(response.status).toBe(400)
-  })
-
-  it('should reject with a 400 when a condition is malformed', async () => {
-    expect.assertions(2)
+  it('should reject with the offending field named when a condition is malformed', async () => {
+    expect.assertions(4)
     try {
       await searchFiles({ size: 5 as unknown as { gt: number } }, testSettings)
     } catch (error) {
-      const restClientError = error as RestClientError
-      expect(restClientError).toBeInstanceOf(RestClientError)
+      const restClientError = error as RestClientValidationError
+      expect(restClientError).toBeInstanceOf(RestClientValidationError)
       expect(restClientError.status).toBe(400)
+      expect(restClientError.message).toContain('size')
+      expect(restClientError.errors).toHaveProperty('size')
     }
   })
 
   it('should reject when no condition is given at all', async () => {
-    await expect(searchFiles({}, testSettings)).rejects.toThrow(RestClientError)
+    expect.assertions(3)
+    try {
+      await searchFiles({}, testSettings)
+    } catch (error) {
+      const restClientError = error as RestClientValidationError
+      expect(restClientError).toBeInstanceOf(RestClientValidationError)
+      expect(restClientError.status).toBe(400)
+      expect(restClientError.errors).toHaveProperty('non_field_errors')
+    }
   })
 })

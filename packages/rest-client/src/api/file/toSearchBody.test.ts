@@ -40,8 +40,8 @@ describe('toSearchBody', () => {
       toSearchBody({
         exact: {
           uuid: ['d8cb0d0b-7820-448a-804f-0770ca1894e7'],
-          detectedMimeType: ['image/png'],
-          originalFilename: ['logo.png'],
+          detected_mime_type: ['image/png'],
+          original_filename: ['logo.png'],
           metadata: { color: ['red', 'blue'], sku: ['A1'] }
         }
       })
@@ -112,7 +112,7 @@ describe('toSearchBody', () => {
       query: 'invoice',
       isImage: undefined,
       tags: undefined,
-      exact: { detectedMimeType: ['image/png'], originalFilename: undefined }
+      exact: { detected_mime_type: ['image/png'], original_filename: undefined }
     })
 
     expect(body).toEqual({

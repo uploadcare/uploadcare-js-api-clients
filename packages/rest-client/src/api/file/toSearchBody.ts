@@ -29,20 +29,17 @@ const toIsoBounds = (
   )
 
 /**
- * The API has no nested metadata object: it addresses one metadata key with a
- * literal `metadata[key]` key of `exact` itself. The caller's keys are copied
- * into the brackets verbatim — only the fixed field names are rewritten.
+ * Field names are already the API's own, so only `metadata` moves: the API has
+ * no nested metadata object, it addresses one metadata key with a literal
+ * `metadata[key]` key of `exact` itself. The caller's keys are copied into the
+ * brackets verbatim.
  */
 const toExact = ({
-  uuid,
-  detectedMimeType,
-  originalFilename,
-  metadata
+  metadata,
+  ...fields
 }: SearchFilesExact): Record<string, string[]> =>
   defined({
-    uuid,
-    detected_mime_type: detectedMimeType,
-    original_filename: originalFilename,
+    ...fields,
     ...Object.fromEntries(
       Object.entries(metadata ?? {}).map(([key, values]) => [
         `metadata[${key}]`,

@@ -18,11 +18,14 @@ export type SearchFilesExactMetadata = {
   [K in keyof Metadata]?: Metadata[K][]
 }
 
-/** Exact matching. A file matches a field if it equals any of its values. */
+/**
+ * Exact matching. A file matches a field if it equals any of its values. Field
+ * names are the API's own, as in `sort`.
+ */
 export type SearchFilesExact = {
   uuid?: string[]
-  detectedMimeType?: string[]
-  originalFilename?: string[]
+  detected_mime_type?: string[]
+  original_filename?: string[]
   metadata?: SearchFilesExactMetadata
 }
 

@@ -204,7 +204,7 @@ name:
 const page = await searchFiles(
   {
     exact: {
-      detectedMimeType: ['image/png'],
+      detected_mime_type: ['image/png'],
       metadata: { color: ['red', 'blue'] }
     },
     phrase: { originalFilename: 'invoice' },
@@ -218,16 +218,27 @@ const page = await searchFiles(
 page.results[0].highlight?.originalFilename;
 ```
 
-Pass `include: 'appdata'` to embed add-on data. A malformed query rejects with a
-`RestClientError` whose `errors` field carries the server's complaints per field:
+Pass `include: 'appdata'` to embed add-on data. A malformed or empty query
+rejects with a `RestClientValidationError`, which carries the server's
+complaints keyed by field. It extends `RestClientError`, so existing handling
+keeps working:
 
 ```typescript
+import { isRestClientValidationError, searchFiles } from '@uploadcare/rest-client';
+
 try {
   await searchFiles({ query: 'abc' }, { authSchema });
 } catch (error) {
-  error.errors; // { query: ['ensure this value has at least 4 characters'] }
+  if (isRestClientValidationError(error)) {
+    error.errors; // { query: ['Must be at least 4 characters.'] }
+    error.message; // '[400 Bad Request] query: Must be at least 4 characters.'
+  }
 }
 ```
+
+Errors that span more than one field, and the empty-query case, arrive under
+`non_field_errors`. Complaints the API nests under a structured field are
+flattened to a dotted path, so a bad `size` reads as `size`.
 
 Newly uploaded files are indexed asynchronously, so a file may not be findable
 immediately after upload. See [docs][uc-file-search] for the full condition
