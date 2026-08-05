@@ -33,9 +33,8 @@ npm install @uploadcare/cname-prefix
 ## Usage
 
 The package builds a subdomain-based (prefixed) CDN base from your public key.
-Two variants return the same string; the only difference is where the SHA-256
-comes from, and that is a question about your runtime rather than about your
-code.
+Two variants return the same string; they differ only in where the SHA-256 comes
+from.
 
 ```typescript
 import {
@@ -52,41 +51,40 @@ getPrefixedCdnBaseSync('demopublickey', 'https://ucarecd.net')
 
 Use `isPrefixedCdnBase(cdnBase, base)` to check whether a base is already
 prefixed. Whichever variant you pick, the answer never changes for a given
-public key — resolve it once at startup and keep the string, rather than
-recomputing it per URL.
+public key, so resolve it once at startup and keep the string instead of
+recomputing it for every URL.
 
 ### Which one to use
 
 | Runtime                       | Use      | Why                                                        |
 | ----------------------------- | -------- | ---------------------------------------------------------- |
-| Browser, Web/Service Worker   | `…Async` | WebCrypto is already there; nothing to bundle              |
-| Browser, when you can't await | `…Sync`  | works, and carries a SHA-256 with it — about a kilobyte    |
+| Browser, Web/Service Worker   | `…Async` | WebCrypto is already there, so nothing is bundled          |
+| Browser, when you can't await | `…Sync`  | works, and carries a SHA-256 with it (about a kilobyte)    |
 | Node.js                       | `…Sync`  | `node:crypto` is native _and_ synchronous                  |
 | React Native                  | `…Sync`  | no WebCrypto in Hermes; the portable build is the only one |
 
-**In a browser, prefer the async variant.** It calls
+In a browser, prefer the async variant. It calls
 [`crypto.subtle.digest`](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/digest),
-so the digest costs you a function call and no bundle weight. It needs a secure
-context — HTTPS or `localhost`; on a plain `http://` origin `crypto.subtle` is
-undefined.
+the platform's own implementation, so the digest adds nothing to your bundle. It
+needs a secure context, HTTPS or `localhost`; on a plain `http://` origin
+`crypto.subtle` is undefined and the call fails.
 
-**Reach for the sync variant when a `Promise` would infect the call site** — a
-config module's top-level export, a synchronous render path. It is not a
-mistake, it just means the SHA-256 ships with your app. That is the whole cost
-of the choice.
+Use the sync variant when a `Promise` would infect the call site, such as a
+config module's top-level export or a synchronous render path. It works in a
+browser and costs you the SHA-256 it carries, about a kilobyte.
 
-**On Node, use the sync one.** The `node` export condition — which Node.js,
-Vitest and bundlers targeting Node all resolve — swaps in a build backed by
-`node:crypto`, so the portable SHA-256 never reaches a server bundle. The import
-specifier does not change. The async variant is deliberately unavailable there:
-it rejects with a `TypeError` naming the sync alternative, because avoiding a
-bundled hash is a browser problem and Node does not have it.
+On Node, use the sync variant. The `node` export condition, which Node.js,
+Vitest and bundlers targeting Node all resolve, swaps in a build backed by
+`node:crypto`, so the portable SHA-256 never reaches a server bundle. Your
+import stays the same. The async variant rejects there with a `TypeError` naming
+the sync one, since bundling a hash is a browser problem that Node does not
+have.
 
-**On React Native, use the sync one**, via the `react-native` export condition
-that resolves to the portable build. Hermes has no `crypto.subtle` and no
-`node:crypto`, so this is the only variant that can work. It needs
-`TextEncoder`, which Hermes provides from React Native 0.74 / Expo SDK 51 — on
-anything older, add a `TextEncoder` polyfill.
+On React Native, use the sync variant too. The `react-native` condition resolves
+to the portable build, which is the only one that can run there: Hermes has
+neither `crypto.subtle` nor `node:crypto`. It needs `TextEncoder`, which Hermes
+provides from React Native 0.74 and Expo SDK 51. On anything older, add a
+polyfill.
 
 ### What it costs
 
@@ -99,9 +97,9 @@ Marginal cost of the helper, esbuild `--minify` over the published build:
 | `/sync` on Node (`node:crypto`)         | 290 B  | 249 B  | **209 B**  |
 | both, from the root entry, in a browser | 2082 B | 1247 B | **1081 B** |
 
-Brotli is what a CDN serves, so that is the column to read. Neither figure is
-large; the honest summary is that async is roughly a quarter of sync's cost in a
-browser, and that on Node the question does not arise.
+Brotli is the column to read, since that is what a CDN serves. In a browser the
+async variant costs about a quarter of the sync one. On Node both are small
+enough that the difference rarely matters.
 
 ### Entry points
 
@@ -112,9 +110,8 @@ browser, and that on Node the question does not arise.
 | `@uploadcare/cname-prefix/sync`  | the sync variant only                 |
 
 Import a subpath to keep the other variant out of the bundle. Each subpath
-carries `node` and `react-native` conditions, so the right implementation is
-selected by your bundler or runtime — you write one import and get the native
-digest on Node, the portable one on React Native.
+carries `node` and `react-native` conditions, so your bundler or runtime picks
+the implementation: the native digest on Node, the portable one on React Native.
 
 ## Security issues
 
