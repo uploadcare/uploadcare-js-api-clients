@@ -18,25 +18,21 @@ export type SearchFilesExactMetadata = {
   [K in keyof Metadata]?: Metadata[K][]
 }
 
-/**
- * Exact matching. A file matches a field if it equals any of its values. Field
- * names are the API's own, as in `sort`.
- */
+/** Exact matching. A file matches a field if it equals any of its values. */
 export type SearchFilesExact = {
   uuid?: string[]
-  detected_mime_type?: string[]
-  original_filename?: string[]
+  detectedMimeType?: string[]
+  originalFilename?: string[]
   metadata?: SearchFilesExactMetadata
 }
 
 /**
  * Full-text matching per field, each phrase at least 4 characters. A field used
- * here cannot also appear in {@link SearchFilesExact}, and the field names are
- * the same in both.
+ * here cannot also appear in {@link SearchFilesExact}.
  */
 export type SearchFilesPhrase = {
-  original_filename?: string
-  detected_mime_type?: string
+  originalFilename?: string
+  detectedMimeType?: string
   /** One phrase, matched across metadata values. */
   metadata?: string
 }
@@ -53,9 +49,9 @@ export type SearchFilesTags = {
 
 export type SearchFilesSortField =
   | 'score'
-  | 'datetime_uploaded'
+  | 'datetimeUploaded'
   | 'size'
-  | 'original_filename'
+  | 'originalFilename'
 
 export type SearchFilesSort = {
   field: SearchFilesSortField
@@ -92,13 +88,12 @@ export type SearchFilesOptions = {
 
 /**
  * Matched tokens, wrapped in `<em>`, for fields that matched a full-text
- * condition. Keys are the API's own, the same names `phrase` and `exact` take:
- * `highlight` is on the camelization ignore list, so one vocabulary covers
- * filtering and highlighting alike.
+ * condition. Field names arrive camelized like the rest of a response, while
+ * the keys inside `metadata` are yours and are left alone.
  */
 export type SearchFilesHighlight = {
-  original_filename?: string[]
-  detected_mime_type?: string[]
+  originalFilename?: string[]
+  detectedMimeType?: string[]
   /** Matched tokens per metadata key. */
   metadata?: Metadata
 }
@@ -123,7 +118,7 @@ export type SearchFilesResponse = PaginatedList<SearchFilesResult>
  *     {
  *       tags: { all: ['cat', 'animal'] },
  *       isImage: true,
- *       sort: [{ field: 'datetime_uploaded', order: 'desc' }]
+ *       sort: [{ field: 'datetimeUploaded', order: 'desc' }]
  *     },
  *     { authSchema }
  *   )

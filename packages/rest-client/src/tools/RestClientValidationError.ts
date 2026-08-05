@@ -1,8 +1,21 @@
+import { camelizeString } from '@uploadcare/api-client-utils'
 import { RestClientError, RestClientErrorOptions } from './RestClientError'
 import { ServerValidationErrorResponse } from '../types/ServerErrorResponse'
 
+/** As the server spells it; the key it becomes is {@link NON_FIELD_ERRORS}. */
+const SERVER_NON_FIELD_ERRORS = 'non_field_errors'
+
 /** Errors that belong to a level rather than to one of its fields. */
-const NON_FIELD_ERRORS = 'non_field_errors'
+const NON_FIELD_ERRORS = 'nonFieldErrors'
+
+/**
+ * Field names become camelCase like everything else the client hands back, with
+ * one exception: a segment addressing the caller's own data, `metadata[color]`,
+ * is theirs to spell. Camelizing it would produce `metadataColor` and lose both
+ * the key and the form.
+ */
+const toFieldName = (segment: string) =>
+  segment.includes('[') ? segment : camelizeString(segment)
 
 const isPlainObject = (value: unknown): value is Record<string, unknown> =>
   !!value && typeof value === 'object' && !Array.isArray(value)
@@ -47,9 +60,11 @@ export class RestClientValidationError extends RestClientError {
    * is not that shape, leaving the caller to fall back.
    *
    * The bodies nest: a field maps either to its messages or to its own fields,
-   * so `{"size": {"non_field_errors": [...]}}` is a complaint about `size`.
-   * Paths are flattened with dots, dropping `non_field_errors` segments because
-   * they name the level above rather than a field of it.
+   * so `{"size": {"non_field_errors": [...]}}` is a complaint about `size`
+   * itself. Those segments are dropped, since they name the level above rather
+   * than a field of it, which leaves `nonFieldErrors` only ever at the root.
+   * Anything deeper is flattened to a dotted path, and every segment is
+   * camelized except one naming the caller's own metadata.
    */
   static parse(json: unknown): ServerValidationErrorResponse | undefined {
     const errors: ServerValidationErrorResponse = {}
@@ -59,7 +74,8 @@ export class RestClientValidationError extends RestClientError {
         return false
       }
       for (const [key, value] of Object.entries(node)) {
-        const nextPath = key === NON_FIELD_ERRORS ? path : [...path, key]
+        const nextPath =
+          key === SERVER_NON_FIELD_ERRORS ? path : [...path, toFieldName(key)]
         if (isStringArray(value)) {
           const field = nextPath.join('.') || NON_FIELD_ERRORS
           errors[field] = [...(errors[field] ?? []), ...value]

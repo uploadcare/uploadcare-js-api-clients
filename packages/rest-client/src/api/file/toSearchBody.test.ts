@@ -21,8 +21,8 @@ describe('toSearchBody', () => {
     expect(
       toSearchBody({
         phrase: {
-          original_filename: 'invoice',
-          detected_mime_type: 'image',
+          originalFilename: 'invoice',
+          detectedMimeType: 'image',
           metadata: 'red'
         }
       })
@@ -40,8 +40,8 @@ describe('toSearchBody', () => {
       toSearchBody({
         exact: {
           uuid: ['d8cb0d0b-7820-448a-804f-0770ca1894e7'],
-          detected_mime_type: ['image/png'],
-          original_filename: ['logo.png'],
+          detectedMimeType: ['image/png'],
+          originalFilename: ['logo.png'],
           metadata: { color: ['red', 'blue'], sku: ['A1'] }
         }
       })
@@ -96,9 +96,9 @@ describe('toSearchBody', () => {
     expect(
       toSearchBody({
         sort: [
-          { field: 'datetime_uploaded', order: 'desc' },
+          { field: 'datetimeUploaded', order: 'desc' },
           { field: 'size' },
-          { field: 'original_filename', order: 'asc' },
+          { field: 'originalFilename', order: 'asc' },
           { field: 'score', order: 'desc' }
         ]
       })
@@ -112,7 +112,7 @@ describe('toSearchBody', () => {
       query: 'invoice',
       isImage: undefined,
       tags: undefined,
-      exact: { detected_mime_type: ['image/png'], original_filename: undefined }
+      exact: { detectedMimeType: ['image/png'], originalFilename: undefined }
     })
 
     expect(body).toEqual({
@@ -139,10 +139,7 @@ describe('toSearchBody', () => {
       toSearchBody({
         tags: { all: ['cat', 'animal'], none: ['draft'] },
         isImage: true,
-        sort: [
-          { field: 'datetime_uploaded', order: 'desc' },
-          { field: 'size' }
-        ],
+        sort: [{ field: 'datetimeUploaded', order: 'desc' }, { field: 'size' }],
         limit: 50
       })
     ).toEqual({

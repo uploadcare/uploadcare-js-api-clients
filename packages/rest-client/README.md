@@ -202,7 +202,7 @@ const page = await searchFiles(
   {
     tags: { all: ['cat', 'animal'], none: ['draft'] },
     isImage: true,
-    sort: [{ field: 'datetime_uploaded', order: 'desc' }, { field: 'size' }],
+    sort: [{ field: 'datetimeUploaded', order: 'desc' }, { field: 'size' }],
     limit: 50
   },
   { authSchema }
@@ -215,17 +215,17 @@ page.results[0].uuid
 Full-text conditions are `query` (across searchable fields) and `phrase` (per
 field), both needing at least 4 characters, with `fuzziness: true` for typo
 tolerance. `exact` matches whole values, and its `metadata` keys are yours to
-name. Field names inside `phrase`, `exact`, `sort` and `highlight` are the API's
-own, so one vocabulary covers filtering, sorting and highlighting:
+name. Everything you write is camelCase; only your own metadata keys and tag
+values keep the spelling you gave them:
 
 ```typescript
 const page = await searchFiles(
   {
     exact: {
-      detected_mime_type: ['image/png'],
+      detectedMimeType: ['image/png'],
       metadata: { color: ['red', 'blue'] }
     },
-    phrase: { original_filename: 'invoice' },
+    phrase: { originalFilename: 'invoice' },
     datetimeUploaded: { gte: new Date('2026-01-01') },
     size: { gt: 1_000_000 }
   },
@@ -233,7 +233,7 @@ const page = await searchFiles(
 )
 
 // tokens that matched, wrapped in <em>
-page.results[0].highlight?.original_filename
+page.results[0].highlight?.originalFilename
 ```
 
 Pass `include: 'appdata'` to embed add-on data. A malformed or empty query
@@ -258,8 +258,8 @@ try {
 ```
 
 Errors that span more than one field, and the empty-query case, arrive under
-`non_field_errors`. Complaints the API nests under a structured field are
-flattened to a dotted path, so a bad `size` reads as `size`.
+`nonFieldErrors`. Field names are camelized like any other response, except a
+key naming your own metadata, which keeps the spelling you gave it.
 
 Newly uploaded files are indexed asynchronously, so a file may not be findable
 immediately after upload. See [docs][uc-file-search] for the full condition

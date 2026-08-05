@@ -25,10 +25,7 @@ describe('searchFiles', () => {
       {
         tags: { any: ['cat', 'animal'] },
         isImage: true,
-        sort: [
-          { field: 'datetime_uploaded', order: 'desc' },
-          { field: 'size' }
-        ],
+        sort: [{ field: 'datetimeUploaded', order: 'desc' }, { field: 'size' }],
         limit: 5
       },
       testSettings
@@ -45,7 +42,7 @@ describe('searchFiles', () => {
     const response = await searchFiles(
       {
         exact: {
-          detected_mime_type: ['image/jpeg'],
+          detectedMimeType: ['image/jpeg'],
           metadata: { subsystem: ['uploader'] }
         },
         limit: 1
@@ -117,7 +114,7 @@ describe('searchFiles', () => {
       const restClientError = error as RestClientValidationError
       expect(restClientError).toBeInstanceOf(RestClientValidationError)
       expect(restClientError.status).toBe(400)
-      expect(restClientError.errors).toHaveProperty('non_field_errors')
+      expect(restClientError.errors).toHaveProperty('nonFieldErrors')
     }
   })
 })

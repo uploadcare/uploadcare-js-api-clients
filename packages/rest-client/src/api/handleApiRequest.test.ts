@@ -125,7 +125,7 @@ describe('handleApiRequest', () => {
         '[400 Bad Request] At least one search criterion must be specified.'
       )
       expect(restClientError.errors).toEqual({
-        non_field_errors: ['At least one search criterion must be specified.']
+        nonFieldErrors: ['At least one search criterion must be specified.']
       })
     }
   })
@@ -162,6 +162,27 @@ describe('handleApiRequest', () => {
       expect((error as RestClientValidationError).name).toBe(
         'RestClientValidationError'
       )
+    }
+  })
+
+  it('should camelize field names but leave metadata keys alone', async () => {
+    expect.assertions(1)
+    try {
+      await handleApiRequest({
+        apiRequest: apiRequestOf(
+          {
+            datetime_uploaded: { non_field_errors: ['Invalid date.'] },
+            exact: { 'metadata[my_key]': ['Not a list.'] }
+          },
+          400
+        ),
+        okCodes: [200]
+      })
+    } catch (error) {
+      expect((error as RestClientValidationError).errors).toEqual({
+        datetimeUploaded: ['Invalid date.'],
+        'exact.metadata[my_key]': ['Not a list.']
+      })
     }
   })
 })

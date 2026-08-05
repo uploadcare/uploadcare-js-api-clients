@@ -3,8 +3,17 @@ import type {
   SearchFilesOptions,
   SearchFilesPhrase,
   SearchFilesRange,
-  SearchFilesSort
+  SearchFilesSort,
+  SearchFilesSortField
 } from './searchFiles'
+
+/** The API's own sort tokens, which callers never have to spell. */
+const SORT_FIELDS: Record<SearchFilesSortField, string> = {
+  score: 'score',
+  datetimeUploaded: 'datetime_uploaded',
+  size: 'size',
+  originalFilename: 'original_filename'
+}
 
 /** Drops keys the caller left out, so a present key always means a condition. */
 const defined = <Value>(
@@ -14,9 +23,10 @@ const defined = <Value>(
     Object.entries(source).filter(([, value]) => value !== undefined)
   ) as Record<string, Value>
 
-/** `field` is already the API's own token, so only the direction is added. */
 const toSortTokens = (sort: SearchFilesSort[]): string[] =>
-  sort.map(({ field, order }) => `${order === 'desc' ? '-' : ''}${field}`)
+  sort.map(
+    ({ field, order }) => `${order === 'desc' ? '-' : ''}${SORT_FIELDS[field]}`
+  )
 
 const toIsoBounds = (
   range: SearchFilesRange<Date | string>
@@ -29,17 +39,21 @@ const toIsoBounds = (
   )
 
 /**
- * Field names are already the API's own, so only `metadata` moves: the API has
- * no nested metadata object, it addresses one metadata key with a literal
- * `metadata[key]` key of `exact` itself. The caller's keys are copied into the
- * brackets verbatim.
+ * The API has no nested metadata object: it addresses one metadata key with a
+ * literal `metadata[key]` key of `exact` itself. The caller's metadata keys are
+ * copied into the brackets verbatim — only the fixed field names are
+ * rewritten.
  */
 const toExact = ({
-  metadata,
-  ...fields
+  uuid,
+  detectedMimeType,
+  originalFilename,
+  metadata
 }: SearchFilesExact): Record<string, string[]> =>
   defined({
-    ...fields,
+    uuid,
+    detected_mime_type: detectedMimeType,
+    original_filename: originalFilename,
     ...Object.fromEntries(
       Object.entries(metadata ?? {}).map(([key, values]) => [
         `metadata[${key}]`,
@@ -48,9 +62,16 @@ const toExact = ({
     )
   })
 
-/** Field names already match the API, so only absent ones are dropped. */
-const toPhrase = (phrase: SearchFilesPhrase): Record<string, string> =>
-  defined(phrase)
+const toPhrase = ({
+  originalFilename,
+  detectedMimeType,
+  metadata
+}: SearchFilesPhrase): Record<string, string> =>
+  defined({
+    original_filename: originalFilename,
+    detected_mime_type: detectedMimeType,
+    metadata
+  })
 
 /**
  * Builds the `POST /files/search/` request body from the options.
