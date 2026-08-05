@@ -44,7 +44,11 @@ export function sha256EncodeSync(message: string): bigint {
   padded[bytes.length] = 0x80
 
   const view = new DataView(padded.buffer)
-  view.setBigUint64(padded.length - 8, BigInt(bytes.length) * 8n)
+  // Two 32-bit writes rather than one `setBigUint64`: that method's support in
+  // Hermes is unconfirmed, and this build is the one React Native runs.
+  const bitLength = bytes.length * 8
+  view.setUint32(padded.length - 8, Math.floor(bitLength / 2 ** 32))
+  view.setUint32(padded.length - 4, bitLength >>> 0)
 
   const state = [...INITIAL_STATE]
   const w = new Uint32Array(64)

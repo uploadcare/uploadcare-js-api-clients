@@ -9,6 +9,7 @@
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
+      "react-native": "./dist/index.js",
       "node": {
         "import": "./dist/node/index.js",
         "require": "./dist/node/index.cjs"
@@ -18,6 +19,7 @@
     },
     "./async": {
       "types": "./dist/async.d.ts",
+      "react-native": "./dist/async.js",
       "node": {
         "import": "./dist/node/async.js",
         "require": "./dist/node/async.cjs"
@@ -27,6 +29,7 @@
     },
     "./sync": {
       "types": "./dist/sync.d.ts",
+      "react-native": "./dist/sync.js",
       "node": {
         "import": "./dist/node/sync.js",
         "require": "./dist/node/sync.cjs"
