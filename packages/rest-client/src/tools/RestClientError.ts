@@ -1,13 +1,22 @@
 import { UploadcareError } from '@uploadcare/api-client-utils'
 
 export type RestClientErrorOptions = {
+  /** The signed request, when one was built. */
   request?: Request
+  /** The response, when one arrived; `status` is read from it. */
   response?: Response
 }
 
 const DEFAULT_MESSAGE = 'Unknown error'
 
 /**
+ * Anything that went wrong in a request: a transport failure, a non-2xx status,
+ * or a missing setting. `status` and `response` are absent for the failures
+ * that never reached the API.
+ *
+ * {@link RestClientValidationError} extends this for the case where the server
+ * rejected the request's contents and said which fields were at fault.
+ *
  * TODO: it's better to split errors into something like Runtime error and
  * ServerError (RestApiError)
  */
@@ -46,13 +55,14 @@ export class RestClientError extends UploadcareError {
  * True for subclasses too, {@link RestClientValidationError} among them.
  *
  * @example
- *   ;```ts
  *   catch (error) {
- *     if (isRestClientError(error)) {
- *       error.status // typed
- *     }
+ *   if (isRestClientError(error)) {
+ *   error.status // typed
  *   }
- *   ```
+ *   }
+ *
+ * @param error - Any caught value.
+ * @returns Whether it is a `RestClientError` or a subclass of one.
  */
 export const isRestClientError = (error: unknown): error is RestClientError =>
   error instanceof RestClientError

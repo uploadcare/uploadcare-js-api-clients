@@ -1,3 +1,4 @@
+/** How most endpoints report a failure: one human-readable sentence. */
 export type ServerErrorResponse = {
   detail: string
 }

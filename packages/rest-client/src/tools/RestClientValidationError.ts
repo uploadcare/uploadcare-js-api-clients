@@ -42,7 +42,6 @@ const formatErrors = (errors: ServerValidationErrorResponse) =>
  * that want to react per field instead of reading the message.
  *
  * @example
- *   ;```ts
  *   try {
  *     await searchFiles({ query: 'abc' }, { authSchema })
  *   } catch (error) {
@@ -50,7 +49,6 @@ const formatErrors = (errors: ServerValidationErrorResponse) =>
  *       error.errors // { query: ['Must be at least 4 characters.'] }
  *     }
  *   }
- *   ```
  */
 export class RestClientValidationError extends RestClientError {
   readonly errors: ServerValidationErrorResponse
@@ -65,6 +63,10 @@ export class RestClientValidationError extends RestClientError {
    * than a field of it, which leaves `nonFieldErrors` only ever at the root.
    * Anything deeper is flattened to a dotted path, and every segment is
    * camelized except one naming the caller's own metadata.
+   *
+   * @param json - A parsed response body.
+   * @returns Errors keyed by field, or `undefined` when the body is shaped some
+   *   other way.
    */
   static parse(json: unknown): ServerValidationErrorResponse | undefined {
     const errors: ServerValidationErrorResponse = {}
@@ -93,6 +95,11 @@ export class RestClientValidationError extends RestClientError {
       : undefined
   }
 
+  /**
+   * @param errors - Errors keyed by field, as {@link parse} returns them. The
+   *   message is derived from them, so the two cannot disagree.
+   * @param options - The request and response that produced them.
+   */
   constructor(
     errors: ServerValidationErrorResponse,
     options: RestClientErrorOptions = {}
@@ -110,13 +117,15 @@ export class RestClientValidationError extends RestClientError {
  * Narrows a caught value, which TypeScript types as `unknown`, without a cast.
  *
  * @example
- *   ;```ts
  *   catch (error) {
- *     if (isRestClientValidationError(error)) {
- *       error.errors.query // typed
- *     }
+ *   if (isRestClientValidationError(error)) {
+ *   error.errors.query // typed
  *   }
- *   ```
+ *   }
+ *
+ * @param error - Any caught value.
+ * @returns Whether the server rejected the request's contents, as opposed to
+ *   failing for some other reason.
  */
 export const isRestClientValidationError = (
   error: unknown

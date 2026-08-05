@@ -6,7 +6,7 @@
       alt="">
 </a>
 
-`@uploadcare/rest-client` is a JavaScript and TypeScript SDK for the Uploadcare [REST API][uc-docs-rest-api]. It covers file management (upload, delete, copy to local/remote storage, metadata, tags), groups, webhooks, media conversion (video and document), and add-ons (virus scanning, image recognition, background removal). Works in Node.js and browser. Supports Simple and signature-based authentication, async pagination with generators, automatic retry with exponential backoff for throttled requests, and job status polling for async operations.
+`@uploadcare/rest-client` is a JavaScript and TypeScript SDK for the Uploadcare [REST API][uc-docs-rest-api]. It covers file management (upload, delete, copy to local/remote storage, metadata, tags), full-text and faceted file search, groups, webhooks, media conversion (video and document), and add-ons (virus scanning, image recognition, background removal). Works in Node.js and browser. Supports Simple and signature-based authentication, async pagination with generators, automatic retry with exponential backoff for throttled requests, and job status polling for async operations.
 
 [API Reference](https://uploadcare.github.io/uploadcare-js-api-clients/rest-client/)
 
@@ -261,9 +261,27 @@ Errors that span more than one field, and the empty-query case, arrive under
 `nonFieldErrors`. Field names are camelized like any other response, except a
 key naming your own metadata, which keeps the spelling you gave it.
 
+Results paginate through `limit` and `offset`, so `searchFiles` works with the
+[pagination helpers](#pagination) below — bearing in mind the API requires
+`offset + limit` to stay under 1000:
+
+```typescript
+import { paginate, searchFiles } from '@uploadcare/rest-client'
+
+const pages = paginate(searchFiles)(
+  { tags: { any: ['cat'] }, limit: 100 },
+  { authSchema }
+)
+
+for await (const page of pages) {
+  console.log(page.results.length)
+}
+```
+
 Newly uploaded files are indexed asynchronously, so a file may not be findable
-immediately after upload. See [docs][uc-file-search] for the full condition
-reference.
+immediately after upload — expect a few seconds. See [docs][uc-file-search] for
+the full condition reference, and the [API Reference][api-reference] for every
+option and its type.
 
 ### Settings
 
@@ -431,3 +449,4 @@ request at [hello@uploadcare.com][uc-email-hello].
 [uc-docs-rest-api]: https://uploadcare.com/api-refs/rest-api/v0.7.0/?utm_source=github&utm_campaign=uploadcare-js-api-clients
 [uc-file-tags]: https://uploadcare.com/docs/file-tags/
 [uc-file-search]: https://uploadcare.com/docs/file-search/
+[api-reference]: https://uploadcare.github.io/uploadcare-js-api-clients/rest-client/

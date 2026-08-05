@@ -47,12 +47,14 @@ export type SearchFilesTags = {
   none?: Tags
 }
 
+/** Sort keys the API accepts, spelled as this client spells them. */
 export type SearchFilesSortField =
   | 'score'
   | 'datetimeUploaded'
   | 'size'
   | 'originalFilename'
 
+/** One sort key. Several are applied in the order given. */
 export type SearchFilesSort = {
   field: SearchFilesSortField
   /** Defaults to `'asc'`. */
@@ -98,10 +100,15 @@ export type SearchFilesHighlight = {
   metadata?: Metadata
 }
 
+/** A file as search returns it: the usual fields, plus what matched. */
 export type SearchFilesResult = FileInfo & {
   highlight?: SearchFilesHighlight
 }
 
+/**
+ * One page of results. Satisfies {@link Paginatable}, so {@link paginate} and
+ * {@link Paginator} accept {@link searchFiles}.
+ */
 export type SearchFilesResponse = PaginatedList<SearchFilesResult>
 
 /**
@@ -113,7 +120,6 @@ export type SearchFilesResponse = PaginatedList<SearchFilesResult>
  * away.
  *
  * @example
- *   ;```ts
  *   const page = await searchFiles(
  *     {
  *       tags: { all: ['cat', 'animal'] },
@@ -122,8 +128,15 @@ export type SearchFilesResponse = PaginatedList<SearchFilesResult>
  *     },
  *     { authSchema }
  *   )
- *   ```
  *
+ * @param options - Search conditions, and `limit`/`offset`/`include`. At least
+ *   one condition is required.
+ * @param userSettings - Auth schema and any request settings.
+ * @returns One page of matching files, newest-first by relevance unless `sort`
+ *   says otherwise.
+ * @throws {@link RestClientValidationError} When a condition is malformed or
+ *   none is given; its `errors` name the fields.
+ * @see https://uploadcare.com/docs/file-search/
  * @see https://uploadcare.com/docs/api/rest/file/search-files/
  */
 export async function searchFiles(
