@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { getCnamePrefixAsync, getPrefixedCdnBaseAsync } from './async'
+import { getPrefixedCdnBaseAsync } from './async'
 
 /**
  * The async API is the browser's: it exists because WebCrypto is the only
@@ -17,7 +17,10 @@ describe('node build: the async API is not available', () => {
   })
 
   it('rejects rather than throwing synchronously, so callers can catch it', async () => {
-    const promise = getCnamePrefixAsync('demopublickey')
+    const promise = getPrefixedCdnBaseAsync(
+      'demopublickey',
+      'https://ucarecd.net'
+    )
     expect(promise).toBeInstanceOf(Promise)
     await expect(promise).rejects.toThrow(TypeError)
   })
