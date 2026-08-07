@@ -32,17 +32,15 @@ npm install @uploadcare/cname-prefix
 
 ## Usage
 
-The package builds a subdomain-based (prefixed) CDN base from your public key. Two variants
-are available with identical output:
-
-- `getPrefixedCdnBaseAsync` uses the Web Crypto API (`window.crypto.subtle`),
-  returns a Promise, and works in browsers in a secure context (HTTPS or
-  `localhost`). It is not available in Node.js or non-secure contexts.
-- `getPrefixedCdnBaseSync` ships its own SHA-256, runs synchronously, and works
-  anywhere: browsers (any context), Node.js, web workers, and edge runtimes.
+The package builds a subdomain-based (prefixed) CDN base from your public key.
+Two variants return the same string; they differ only in where the SHA-256 comes
+from.
 
 ```typescript
-import { getPrefixedCdnBaseAsync, getPrefixedCdnBaseSync } from '@uploadcare/cname-prefix'
+import {
+  getPrefixedCdnBaseAsync,
+  getPrefixedCdnBaseSync
+} from '@uploadcare/cname-prefix'
 
 await getPrefixedCdnBaseAsync('demopublickey', 'https://ucarecd.net')
 // 'https://1s4oyld5dc.ucarecd.net'
@@ -51,9 +49,69 @@ getPrefixedCdnBaseSync('demopublickey', 'https://ucarecd.net')
 // 'https://1s4oyld5dc.ucarecd.net'
 ```
 
-Import from `@uploadcare/cname-prefix/async` or `/sync` to include just one
-variant. Use `isPrefixedCdnBase(cdnBase, base)` to check whether a CDN base is
-already prefixed.
+Use `isPrefixedCdnBase(cdnBase, base)` to check whether a base is already
+prefixed. Whichever variant you pick, the answer never changes for a given
+public key, so resolve it once at startup and keep the string instead of
+recomputing it for every URL.
+
+### Which one to use
+
+| Runtime                       | Use      | Why                                                        |
+| ----------------------------- | -------- | ---------------------------------------------------------- |
+| Browser, Web/Service Worker   | `…Async` | WebCrypto is already there, so nothing is bundled          |
+| Browser, when you can't await | `…Sync`  | works, and carries a SHA-256 with it (about a kilobyte)    |
+| Node.js                       | `…Sync`  | `node:crypto` is native _and_ synchronous                  |
+| React Native                  | `…Sync`  | no WebCrypto in Hermes; the portable build is the only one |
+
+In a browser, prefer the async variant. It calls
+[`crypto.subtle.digest`](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/digest),
+the platform's own implementation, so the digest adds nothing to your bundle. It
+needs a secure context, HTTPS or `localhost`; on a plain `http://` origin
+`crypto.subtle` is undefined and the call fails.
+
+Use the sync variant when a `Promise` would infect the call site, such as a
+config module's top-level export or a synchronous render path. It works in a
+browser and costs you the SHA-256 it carries, about a kilobyte.
+
+On Node, use the sync variant. The `node` export condition, which Node.js,
+Vitest and bundlers targeting Node all resolve, swaps in a build backed by
+`node:crypto`, so the portable SHA-256 never reaches a server bundle. Your
+import stays the same. The async variant rejects there with a `TypeError` naming
+the sync one, since bundling a hash is a browser problem that Node does not
+have.
+
+On React Native, use the sync variant too. The `react-native` condition resolves
+to the portable build, which is the only one that can run there: Hermes has
+neither `crypto.subtle` nor `node:crypto`. It needs `TextEncoder`, which Hermes
+provides from React Native 0.74 and Expo SDK 51. On anything older, add a
+polyfill.
+
+### What it costs
+
+Marginal cost of the helper, esbuild `--minify` over the published build:
+
+| Import                                  | min    | gzip   | brotli     |
+| --------------------------------------- | ------ | ------ | ---------- |
+| `/async` in a browser                   | 413 B  | 314 B  | **269 B**  |
+| `/sync` in a browser or React Native    | 1812 B | 1111 B | **968 B**  |
+| `/sync` on Node (`node:crypto`)         | 290 B  | 249 B  | **209 B**  |
+| both, from the root entry, in a browser | 2082 B | 1247 B | **1081 B** |
+
+Brotli is the column to read, since that is what a CDN serves. In a browser the
+async variant costs about a quarter of the sync one. On Node both are small
+enough that the difference rarely matters.
+
+### Entry points
+
+| Import                           | Contains                              |
+| -------------------------------- | ------------------------------------- |
+| `@uploadcare/cname-prefix`       | both variants and `isPrefixedCdnBase` |
+| `@uploadcare/cname-prefix/async` | the async variant only                |
+| `@uploadcare/cname-prefix/sync`  | the sync variant only                 |
+
+Import a subpath to keep the other variant out of the bundle. Each subpath
+carries `node` and `react-native` conditions, so your bundler or runtime picks
+the implementation: the native digest on Node, the portable one on React Native.
 
 ## Security issues
 
@@ -79,4 +137,3 @@ request at [hello@uploadcare.com][uc-email-hello].
 [npm-url]: https://www.npmjs.org/package/@uploadcare/cname-prefix
 [badge-build]: https://github.com/uploadcare/uploadcare-js-api-clients/actions/workflows/checks.yml/badge.svg
 [build-url]: https://github.com/uploadcare/uploadcare-js-api-clients/actions/workflows/checks.yml
-
