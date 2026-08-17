@@ -182,6 +182,21 @@ describe('poll', () => {
     expect(Date.now() - start).toBeLessThan(500)
   })
 
+  it('should reject rather than resolve with a result that lands after cancel', async () => {
+    const ctrl = new AbortController()
+    // Ignores the signal and succeeds right after the abort.
+    const check: PollCheckFunction<string> = async () => {
+      await delay(30)
+      return 'done'
+    }
+
+    setTimeout(() => ctrl.abort(), 10)
+
+    await expect(
+      poll({ check, interval: 10, signal: ctrl.signal })
+    ).rejects.toThrowError(new CancelError('Poll cancelled'))
+  })
+
   it('should handle errors', async () => {
     const error = new Error('test error')
     const job = longJob(3, error)

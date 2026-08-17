@@ -1,4 +1,41 @@
-import { camelizeKeys, camelizeString } from './camelizeKeys'
+import {
+  camelizeKeys,
+  camelizeString,
+  SnakeCasedPropertiesDeep
+} from './camelizeKeys'
+
+describe('SnakeCasedPropertiesDeep', () => {
+  it('should rewrite nested keys and keep collection shapes', () => {
+    type Source = {
+      isReady: boolean
+      imageInfo: { colorMode: string; dpi: readonly [number, number] }
+      contentInfo: { videoInfo: { audioTracks: { sampleRate: number }[] } }
+    }
+
+    type Expected = {
+      is_ready: boolean
+      image_info: { color_mode: string; dpi: readonly [number, number] }
+      content_info: { video_info: { audio_tracks: { sample_rate: number }[] } }
+    }
+
+    const raw: SnakeCasedPropertiesDeep<Source> = {
+      is_ready: true,
+      image_info: { color_mode: 'RGB', dpi: [72, 72] },
+      content_info: { video_info: { audio_tracks: [{ sample_rate: 44100 }] } }
+    }
+    // Assignable both ways, so widening the tuple to number[] or dropping its
+    // readonly would fail to compile rather than pass silently.
+    const asExpected: Expected = raw
+    const fromExpected: SnakeCasedPropertiesDeep<Source> = asExpected
+    void fromExpected
+
+    expect(camelizeKeys<Source>(raw)).toEqual({
+      isReady: true,
+      imageInfo: { colorMode: 'RGB', dpi: [72, 72] },
+      contentInfo: { videoInfo: { audioTracks: [{ sampleRate: 44100 }] } }
+    })
+  })
+})
 
 describe('camelizeString', () => {
   it('should work', () => {

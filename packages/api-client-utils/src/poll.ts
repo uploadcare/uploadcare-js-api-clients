@@ -12,8 +12,11 @@ const DEFAULT_INTERVAL = 500
  * milliseconds between attempts, and resolve with that value.
  *
  * Rejects with a `CancelError` when `signal` aborts or `timeout` elapses,
- * whichever happens first. Either one stops the loop for good: no further
- * `check` call is made, and a call already in flight is abandoned.
+ * whichever happens first. Either one ends the loop for good: no further
+ * `check` runs, and the result of one already in flight is discarded.
+ *
+ * A `check` in flight is still awaited before that rejection surfaces, so pass
+ * `signal` on to whatever the attempt does if cancellation should be prompt.
  *
  * @param check Runs one attempt; anything falsy means "not done yet". Receives
  *   `signal` so the attempt itself can be aborted.
@@ -50,6 +53,10 @@ const poll = async <T>({
     } catch (error) {
       // A rejection caused by our own abort is a cancellation, not a failure.
       throw signal?.aborted ? new CancelError('Poll cancelled') : error
+    }
+    // Cancellation wins over a result that landed while it was in flight.
+    if (signal?.aborted) {
+      throw new CancelError('Poll cancelled')
     }
     if (result) {
       return result

@@ -25,9 +25,12 @@ type SnakeCase<S extends string> = S extends `${infer Head}${infer Tail}`
  * Type-level inverse of {@link camelizeKeys}: recursively rewrite an object's
  * camelCase keys to snake_case. Lets a raw API frame be described as the
  * snake_case form of a camelCase type such as `FileInfo`.
+ *
+ * Arrays and tuples keep their own shape — length, labels and `readonly` — and
+ * only their element types are rewritten.
  */
-export type SnakeCasedPropertiesDeep<T> = T extends readonly (infer U)[]
-  ? SnakeCasedPropertiesDeep<U>[]
+export type SnakeCasedPropertiesDeep<T> = T extends readonly unknown[]
+  ? { [K in keyof T]: SnakeCasedPropertiesDeep<T[K]> }
   : T extends object
     ? {
         [K in keyof T as K extends string
