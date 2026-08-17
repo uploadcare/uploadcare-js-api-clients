@@ -55,9 +55,10 @@ export function camelizeArrayItems(
  *
  * The result is whatever the caller says it is: pass the camelCase type it
  * produces (`camelizeKeys<FileInfo>(raw)`) instead of casting the return value.
+ * Defaults to a plain record, so existing untyped calls keep compiling.
  * Non-objects pass through untouched.
  */
-export function camelizeKeys<T = unknown>(
+export function camelizeKeys<T = Record<string, unknown>>(
   source: unknown,
   { ignoreKeys }: CamelizeKeysOptions = { ignoreKeys: [] }
 ): T {
