@@ -148,6 +148,40 @@ describe('poll', () => {
     expect(job.spy.condition).toHaveBeenCalledTimes(conditionCallsCount)
   })
 
+  it('should stop polling when cancelled while a check is in flight', async () => {
+    const ctrl = new AbortController()
+    let runs = 0
+    const check: PollCheckFunction<boolean> = async () => {
+      runs += 1
+      await delay(30)
+      return false
+    }
+
+    setTimeout(() => ctrl.abort(), 10)
+
+    await expect(
+      poll({ check, interval: 10, signal: ctrl.signal })
+    ).rejects.toThrowError(new CancelError('Poll cancelled'))
+
+    const runsAtCancel = runs
+    await delay(60)
+    expect(runs).toBe(runsAtCancel)
+  })
+
+  it('should reject as soon as the signal aborts mid-interval', async () => {
+    const ctrl = new AbortController()
+    const job = longJob(100)
+
+    setTimeout(() => ctrl.abort(), 20)
+    const start = Date.now()
+
+    await expect(
+      poll({ check: job.isFinish, interval: 1000, signal: ctrl.signal })
+    ).rejects.toThrowError(new CancelError('Poll cancelled'))
+
+    expect(Date.now() - start).toBeLessThan(500)
+  })
+
   it('should handle errors', async () => {
     const error = new Error('test error')
     const job = longJob(3, error)
