@@ -13,6 +13,29 @@ export function camelizeString<T extends string>(text: T): T {
     .join('') as T
 }
 
+type SnakeCase<S extends string> = S extends `${infer Head}${infer Tail}`
+  ? Head extends Uppercase<Head>
+    ? Head extends Lowercase<Head>
+      ? `${Head}${SnakeCase<Tail>}` // digit or other non-letter — kept as-is
+      : `_${Lowercase<Head>}${SnakeCase<Tail>}` // uppercase letter — prefix an underscore
+    : `${Head}${SnakeCase<Tail>}` // lowercase letter
+  : S
+
+/**
+ * Type-level inverse of {@link camelizeKeys}: recursively rewrite an object's
+ * camelCase keys to snake_case. Lets a raw API frame be described as the
+ * snake_case form of a camelCase type such as `FileInfo`.
+ */
+export type SnakeCasedPropertiesDeep<T> = T extends readonly (infer U)[]
+  ? SnakeCasedPropertiesDeep<U>[]
+  : T extends object
+    ? {
+        [K in keyof T as K extends string
+          ? SnakeCase<K>
+          : K]: SnakeCasedPropertiesDeep<T[K]>
+      }
+    : T
+
 type CamelizeKeysOptions = {
   ignoreKeys: string[]
 }
