@@ -43,7 +43,7 @@ export async function handleApiRequest<ResponseType>(
     return json as ResponseType
   }
 
-  return camelizeKeys(json, {
+  return camelizeKeys<ResponseType>(json, {
     ignoreKeys: CAMELIZE_IGNORE_KEYS
-  }) as ResponseType
+  })
 }

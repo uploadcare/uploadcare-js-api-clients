@@ -102,7 +102,7 @@ export default function base(
         signal,
         onProgress
       }).then(({ data, headers, request }) => {
-        const response = camelizeKeys(JSON.parse(data)) as Response
+        const response = camelizeKeys<Response>(JSON.parse(data))
         if ('error' in response) {
           throw new UploadError(
             response.error.content,

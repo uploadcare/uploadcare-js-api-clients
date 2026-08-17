@@ -50,15 +50,22 @@ export function camelizeArrayItems(
   return array.map((item) => camelizeKeys(item, { ignoreKeys }))
 }
 
-export function camelizeKeys<T>(
-  source: Record<string, unknown> | T,
+/**
+ * Recursively rewrite an object's snake_case keys to camelCase.
+ *
+ * The result is whatever the caller says it is: pass the camelCase type it
+ * produces (`camelizeKeys<FileInfo>(raw)`) instead of casting the return value.
+ * Non-objects pass through untouched.
+ */
+export function camelizeKeys<T = unknown>(
+  source: unknown,
   { ignoreKeys }: CamelizeKeysOptions = { ignoreKeys: [] }
-): Record<string, unknown> | T {
+): T {
   if (Array.isArray(source)) {
-    return camelizeArrayItems(source, { ignoreKeys }) as unknown as T
+    return camelizeArrayItems(source, { ignoreKeys }) as T
   }
   if (!isObject(source)) {
-    return source
+    return source as T
   }
   const result: Record<string, unknown> = {}
   for (const key of Object.keys(source)) {
@@ -74,5 +81,5 @@ export function camelizeKeys<T>(
     }
     result[camelizeString(key)] = value
   }
-  return result
+  return result as T
 }
