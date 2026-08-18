@@ -1,3 +1,12 @@
+# [6.20.0](https://github.com/uploadcare/uploadcare-js-api-clients/compare/v6.19.0...v6.20.0) (2026-08-18)
+
+
+### Features
+
+* **rest-client:** searchFiles for POST /files/search/ ([#578](https://github.com/uploadcare/uploadcare-js-api-clients/issues/578)) ([b1139e3](https://github.com/uploadcare/uploadcare-js-api-clients/commit/b1139e3da042f0bc985f2e98d46cfd5c80025096))
+
+
+
 # [6.19.0](https://github.com/uploadcare/uploadcare-js-api-clients/compare/v6.18.4...v6.19.0) (2026-07-13)
 
 
