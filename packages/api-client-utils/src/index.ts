@@ -1,4 +1,8 @@
-export { camelizeKeys, camelizeString } from './camelizeKeys'
+export {
+  camelizeKeys,
+  camelizeString,
+  SnakeCasedPropertiesDeep
+} from './camelizeKeys'
 export { delay } from './delay'
 export {
   getUserAgent,

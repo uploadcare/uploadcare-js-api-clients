@@ -1,5 +1,5 @@
-import { onCancel } from './onCancel'
 import { CancelError } from './CancelError'
+import { delay } from './delay'
 
 type PollCheckFunction<T> = (
   signal?: AbortSignal
@@ -7,7 +7,24 @@ type PollCheckFunction<T> = (
 
 const DEFAULT_INTERVAL = 500
 
-const poll = <T>({
+/**
+ * Call `check` until it returns something truthy, waiting `interval`
+ * milliseconds between attempts, and resolve with that value.
+ *
+ * Rejects with a `CancelError` when `signal` aborts or `timeout` elapses,
+ * whichever happens first. Either one ends the loop for good: no further
+ * `check` runs, and the result of one already in flight is discarded.
+ *
+ * A `check` in flight is still awaited before that rejection surfaces, so pass
+ * `signal` on to whatever the attempt does if cancellation should be prompt.
+ *
+ * @param check Runs one attempt; anything falsy means "not done yet". Receives
+ *   `signal` so the attempt itself can be aborted.
+ * @param interval Milliseconds between attempts. Defaults to 500.
+ * @param timeout Milliseconds to keep trying for. Unbounded when omitted.
+ * @param signal Aborts the polling.
+ */
+const poll = async <T>({
   check,
   interval = DEFAULT_INTERVAL,
   timeout,
@@ -17,45 +34,37 @@ const poll = <T>({
   timeout?: number
   interval?: number
   signal?: AbortSignal
-}): Promise<T> =>
-  new Promise((resolve, reject) => {
-    let tickTimeoutId: NodeJS.Timeout
-    let timeoutId: NodeJS.Timeout
+}): Promise<T> => {
+  const startedAt = Date.now()
+  const timeLeft = (): number =>
+    timeout === undefined ? Infinity : timeout - (Date.now() - startedAt)
 
-    onCancel(signal, () => {
-      tickTimeoutId && clearTimeout(tickTimeoutId)
-      reject(new CancelError('Poll cancelled'))
-    })
-
-    if (timeout) {
-      timeoutId = setTimeout(() => {
-        tickTimeoutId && clearTimeout(tickTimeoutId)
-        reject(new CancelError('Timed out'))
-      }, timeout)
+  for (;;) {
+    if (signal?.aborted) {
+      throw new CancelError('Poll cancelled')
+    }
+    if (timeLeft() <= 0) {
+      throw new CancelError('Timed out')
     }
 
-    const tick = (): void => {
-      try {
-        Promise.resolve(check(signal))
-          .then((result) => {
-            if (result) {
-              timeoutId && clearTimeout(timeoutId)
-              resolve(result)
-            } else {
-              tickTimeoutId = setTimeout(tick, interval)
-            }
-          })
-          .catch((error) => {
-            timeoutId && clearTimeout(timeoutId)
-            reject(error)
-          })
-      } catch (error) {
-        timeoutId && clearTimeout(timeoutId)
-        reject(error)
-      }
+    let result: false | T
+    try {
+      result = await check(signal)
+    } catch (error) {
+      // A rejection caused by our own abort is a cancellation, not a failure.
+      throw signal?.aborted ? new CancelError('Poll cancelled') : error
+    }
+    // Cancellation wins over a result that landed while it was in flight.
+    if (signal?.aborted) {
+      throw new CancelError('Poll cancelled')
+    }
+    if (result) {
+      return result
     }
 
-    tickTimeoutId = setTimeout(tick, 0)
-  })
+    // Never sleep past the deadline, so the timeout is reported on time.
+    await delay(Math.min(interval, timeLeft()), signal)
+  }
+}
 
 export { poll, PollCheckFunction }

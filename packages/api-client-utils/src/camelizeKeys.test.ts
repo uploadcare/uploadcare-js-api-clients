@@ -1,4 +1,86 @@
-import { camelizeKeys, camelizeString } from './camelizeKeys'
+import { expectTypeOf } from 'expect-type'
+import {
+  camelizeKeys,
+  camelizeString,
+  SnakeCasedPropertiesDeep
+} from './camelizeKeys'
+
+type Source = {
+  isReady: boolean
+  imageInfo: { colorMode: string; dpi: readonly [number, number] }
+  contentInfo: { videoInfo: { audioTracks: { sampleRate: number }[] } }
+}
+
+type Raw = {
+  is_ready: boolean
+  image_info: { color_mode: string; dpi: readonly [number, number] }
+  content_info: { video_info: { audio_tracks: { sample_rate: number }[] } }
+}
+
+describe('SnakeCasedPropertiesDeep', () => {
+  it('should rewrite keys at every level', () => {
+    expectTypeOf<SnakeCasedPropertiesDeep<Source>>().toEqualTypeOf<Raw>()
+  })
+
+  it('should rewrite keys, not values', () => {
+    expectTypeOf<
+      SnakeCasedPropertiesDeep<{ mimeType: string }>
+    >().toEqualTypeOf<{ mime_type: string }>()
+    expectTypeOf<SnakeCasedPropertiesDeep<{ isImage: boolean }>>()
+      .toHaveProperty('is_image')
+      .toBeBoolean()
+  })
+
+  it('should keep digits attached rather than splitting them off', () => {
+    expectTypeOf<
+      SnakeCasedPropertiesDeep<{ s3Bucket: string }>
+    >().toEqualTypeOf<{
+      s3_bucket: string
+    }>()
+  })
+
+  it('should keep tuple shape and readonly-ness', () => {
+    expectTypeOf<
+      SnakeCasedPropertiesDeep<{ dpi: readonly [number, number] }>['dpi']
+    >().toEqualTypeOf<readonly [number, number]>()
+    // A homomorphic mapped type is what preserves these: the previous
+    // `SnakeCasedPropertiesDeep<U>[]` branch collapsed both to `number[]`.
+    expectTypeOf<
+      SnakeCasedPropertiesDeep<{ dpi: readonly [number, number] }>['dpi']
+    >().not.toEqualTypeOf<number[]>()
+  })
+
+  it('should rewrite the element type of arrays of objects', () => {
+    expectTypeOf<
+      SnakeCasedPropertiesDeep<{ videoInfo: { bitRate: number } }[]>
+    >().toEqualTypeOf<{ video_info: { bit_rate: number } }[]>()
+  })
+
+  it('should pass primitives and null through untouched', () => {
+    expectTypeOf<SnakeCasedPropertiesDeep<string>>().toEqualTypeOf<string>()
+    expectTypeOf<SnakeCasedPropertiesDeep<number>>().toEqualTypeOf<number>()
+    expectTypeOf<SnakeCasedPropertiesDeep<null>>().toEqualTypeOf<null>()
+  })
+})
+
+describe('camelizeKeys types', () => {
+  it('should return the type the caller asks for', () => {
+    expectTypeOf(camelizeKeys<Source>({} as Raw)).toEqualTypeOf<Source>()
+  })
+
+  it('should default to a plain record so untyped calls keep compiling', () => {
+    expectTypeOf(camelizeKeys({ a_b: 1 })).toEqualTypeOf<
+      Record<string, unknown>
+    >()
+  })
+
+  it('should accept any input, since a raw frame is not typed yet', () => {
+    expectTypeOf(camelizeKeys).parameter(0).toBeUnknown()
+    expectTypeOf(camelizeKeys<Source>)
+      .parameter(1)
+      .toEqualTypeOf<{ ignoreKeys: string[] } | undefined>()
+  })
+})
 
 describe('camelizeString', () => {
   it('should work', () => {

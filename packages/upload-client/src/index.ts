@@ -78,7 +78,12 @@ export {
   CustomUserAgentOptions,
   GetUserAgentOptions,
   CancelError,
-  UploadcareError
+  UploadcareError,
+  camelizeKeys,
+  camelizeString,
+  SnakeCasedPropertiesDeep,
+  poll,
+  PollCheckFunction
 } from '@uploadcare/api-client-utils'
 export { Queue, Task } from './tools/Queue'
 

@@ -13,6 +13,32 @@ export function camelizeString<T extends string>(text: T): T {
     .join('') as T
 }
 
+type SnakeCase<S extends string> = S extends `${infer Head}${infer Tail}`
+  ? Head extends Uppercase<Head>
+    ? Head extends Lowercase<Head>
+      ? `${Head}${SnakeCase<Tail>}` // digit or other non-letter — kept as-is
+      : `_${Lowercase<Head>}${SnakeCase<Tail>}` // uppercase letter — prefix an underscore
+    : `${Head}${SnakeCase<Tail>}` // lowercase letter
+  : S
+
+/**
+ * Type-level inverse of {@link camelizeKeys}: recursively rewrite an object's
+ * camelCase keys to snake_case. Lets a raw API frame be described as the
+ * snake_case form of a camelCase type such as `FileInfo`.
+ *
+ * Arrays and tuples keep their own shape — length, labels and `readonly` — and
+ * only their element types are rewritten.
+ */
+export type SnakeCasedPropertiesDeep<T> = T extends readonly unknown[]
+  ? { [K in keyof T]: SnakeCasedPropertiesDeep<T[K]> }
+  : T extends object
+    ? {
+        [K in keyof T as K extends string
+          ? SnakeCase<K>
+          : K]: SnakeCasedPropertiesDeep<T[K]>
+      }
+    : T
+
 type CamelizeKeysOptions = {
   ignoreKeys: string[]
 }
@@ -27,15 +53,23 @@ export function camelizeArrayItems(
   return array.map((item) => camelizeKeys(item, { ignoreKeys }))
 }
 
-export function camelizeKeys<T>(
-  source: Record<string, unknown> | T,
+/**
+ * Recursively rewrite an object's snake_case keys to camelCase.
+ *
+ * The result is whatever the caller says it is: pass the camelCase type it
+ * produces (`camelizeKeys<FileInfo>(raw)`) instead of casting the return value.
+ * Defaults to a plain record, so existing untyped calls keep compiling.
+ * Non-objects pass through untouched.
+ */
+export function camelizeKeys<T = Record<string, unknown>>(
+  source: unknown,
   { ignoreKeys }: CamelizeKeysOptions = { ignoreKeys: [] }
-): Record<string, unknown> | T {
+): T {
   if (Array.isArray(source)) {
-    return camelizeArrayItems(source, { ignoreKeys }) as unknown as T
+    return camelizeArrayItems(source, { ignoreKeys }) as T
   }
   if (!isObject(source)) {
-    return source
+    return source as T
   }
   const result: Record<string, unknown> = {}
   for (const key of Object.keys(source)) {
@@ -51,5 +85,5 @@ export function camelizeKeys<T>(
     }
     result[camelizeString(key)] = value
   }
-  return result
+  return result as T
 }
