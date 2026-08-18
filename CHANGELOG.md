@@ -1,3 +1,20 @@
+# [6.20.0](https://github.com/uploadcare/uploadcare-js-api-clients/compare/v6.19.0...v6.20.0) (2026-08-18)
+
+
+### Bug Fixes
+
+* **cname-prefix:** correct the portable SHA-256 for inputs over 55 bytes ([#577](https://github.com/uploadcare/uploadcare-js-api-clients/issues/577)) ([c365c8d](https://github.com/uploadcare/uploadcare-js-api-clients/commit/c365c8d1d5e64e87000720b500f3c53a35f56256)). Public keys are 20 characters, so no project prefix was affected.
+
+
+### Features
+
+* **rest-client:** searchFiles for POST /files/search/ ([#578](https://github.com/uploadcare/uploadcare-js-api-clients/issues/578)) ([b1139e3](https://github.com/uploadcare/uploadcare-js-api-clients/commit/b1139e3da042f0bc985f2e98d46cfd5c80025096))
+* **cname-prefix:** use `node:crypto` on the server, behind the `node` export condition ([#577](https://github.com/uploadcare/uploadcare-js-api-clients/issues/577)) ([c365c8d](https://github.com/uploadcare/uploadcare-js-api-clients/commit/c365c8d1d5e64e87000720b500f3c53a35f56256)). Import specifiers are unchanged; a server bundle no longer carries the portable implementation, and a browser one drops from 1840 B to 975 B brotli.
+* **upload-client:** export `camelizeKeys`, `camelizeString`, `SnakeCasedPropertiesDeep`, `poll` and `PollCheckFunction` ([#580](https://github.com/uploadcare/uploadcare-js-api-clients/issues/580)) ([b6fec48](https://github.com/uploadcare/uploadcare-js-api-clients/commit/b6fec48cb3ade8f5ba80615c887a4f7e081617d9))
+* **upload-client:** `camelizeKeys` returns the type you name — `camelizeKeys<FileInfo>(raw)` — defaulting to `Record<string, unknown>` ([#580](https://github.com/uploadcare/uploadcare-js-api-clients/issues/580)) ([b6fec48](https://github.com/uploadcare/uploadcare-js-api-clients/commit/b6fec48cb3ade8f5ba80615c887a4f7e081617d9))
+
+
+
 # [6.19.0](https://github.com/uploadcare/uploadcare-js-api-clients/compare/v6.18.4...v6.19.0) (2026-07-13)
 
 
