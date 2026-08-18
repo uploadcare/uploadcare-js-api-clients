@@ -35,7 +35,8 @@ const entries = {
   builder: resolve(__dirname, 'src/builder/index.ts'),
   fluent: resolve(__dirname, 'src/fluent/index.ts'),
   validate: resolve(__dirname, 'src/validate/index.ts'),
-  tiny: resolve(__dirname, 'src/tiny/index.ts')
+  tiny: resolve(__dirname, 'src/tiny/index.ts'),
+  'cdn-base': resolve(__dirname, 'src/cdn-base/index.ts')
 }
 
 /**
@@ -92,7 +93,19 @@ export default defineConfig(({ mode }) => {
         fileName: '[name]'
       },
       rollupOptions: {
-        treeshake: 'smallest'
+        treeshake: 'smallest',
+        /**
+         * Keep `@uploadcare/cname-prefix` an import rather than inlining it.
+         * It ships `node` and browser builds behind export conditions — native
+         * `node:crypto` on the server, `crypto.subtle` plus a portable digest in
+         * a browser — and bundling it here would freeze one of those into the
+         * published output, so every consumer would get whichever variant this
+         * build machine resolved. Left external, the consumer's bundler or
+         * runtime picks, and an app that also uses `upload-client` ships one copy
+         * instead of two. The IIFE build above must stay self-contained, so it
+         * keeps bundling it.
+         */
+        external: [/^@uploadcare\//]
       }
     }
   }

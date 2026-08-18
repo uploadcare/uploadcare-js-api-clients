@@ -8,7 +8,8 @@
 import { describe, expect, it } from 'vitest'
 
 import { CdnUrl } from './builder/index'
-import { cdn, prefixedCdnBase } from './fluent/index'
+import { cdn } from './fluent/index'
+import { prefixedCdnBase } from './cdn-base/index'
 import { gif2videoUrl } from './gif2video/index'
 import { archiveUrl, groupUrl, nthUrl } from './group/index'
 import {

@@ -6,12 +6,8 @@
 import { describe, expect, it } from 'vitest'
 
 import { CdnUrl } from './builder/index'
-import {
-  cdn,
-  LEGACY_CDN_BASE,
-  prefixedCdnBase,
-  prefixedCdnBaseAsync
-} from './fluent/index'
+import { cdn, LEGACY_CDN_BASE } from './fluent/index'
+import { prefixedCdnBase, prefixedCdnBaseAsync } from './cdn-base/index'
 import { groupUrl } from './group/index'
 import {
   detectDomainKind,

@@ -5,7 +5,8 @@
  *
  * Not part of any entry point — nothing imports this outside tests.
  */
-import { cdn, prefixedCdnBase } from './fluent/index'
+import { cdn } from './fluent/index'
+import { prefixedCdnBase } from './cdn-base/index'
 
 /** The uuid every page's examples use. */
 export const UUID = 'c2499162-eb07-4b93-b31e-94a89a47e858'

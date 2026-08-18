@@ -23,3 +23,6 @@ export * as proxy from './proxy/index'
 export * as validate from './validate/index'
 export { CdnUrl } from './builder/index'
 export * from './fluent/index'
+// The global build is self-contained, so it keeps the prefixed-host helpers
+// that bundler users import from '@uploadcare/cdn-url/cdn-base'.
+export * from './cdn-base/index'

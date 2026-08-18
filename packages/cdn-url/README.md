@@ -102,7 +102,8 @@ Everything behind one import, chainable end to end — for code that prefers
 convenience over tree-shaking (~14 kB minified):
 
 ```ts
-import { cdn, prefixedCdnBase } from '@uploadcare/cdn-url/fluent'
+import { cdn } from '@uploadcare/cdn-url/fluent'
+import { prefixedCdnBase } from '@uploadcare/cdn-url/cdn-base'
 
 // `prefixedCdnBase` computes your project's host from its public key
 const myCdn = cdn.base(prefixedCdnBase('demopublickey'))

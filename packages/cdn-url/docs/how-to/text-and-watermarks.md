@@ -9,7 +9,8 @@ Every snippet below assumes these bindings:
 ```ts
 import { serializeCdnUrl } from '@uploadcare/cdn-url'
 import { CdnUrl } from '@uploadcare/cdn-url/builder'
-import { cdn, prefixedCdnBase } from '@uploadcare/cdn-url/fluent'
+import { cdn } from '@uploadcare/cdn-url/fluent'
+import { prefixedCdnBase } from '@uploadcare/cdn-url/cdn-base'
 import {
   font,
   overlay,
@@ -61,7 +62,8 @@ new CdnUrl({ cdnBase, uuid }).with(
 ```
 
 ```ts [Fluent]
-import { cdn, prefixedCdnBase } from '@uploadcare/cdn-url/fluent'
+import { cdn } from '@uploadcare/cdn-url/fluent'
+import { prefixedCdnBase } from '@uploadcare/cdn-url/cdn-base'
 
 const myCdn = cdn.base(prefixedCdnBase('demopublickey'))
 

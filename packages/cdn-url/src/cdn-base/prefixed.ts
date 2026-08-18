@@ -1,3 +1,13 @@
+/**
+ * Deriving a project's CDN host from its public key. Reached through
+ * `@uploadcare/cdn-url/cdn-base`, never through a url-building entry.
+ *
+ * This is the only part of the package that needs a SHA-256, and it gets one
+ * from `@uploadcare/cname-prefix`, which is left external so the consumer's
+ * bundler or runtime picks the build for its environment. Keeping it off the
+ * url-building entries means nothing that only formats urls carries a digest,
+ * and nobody who pastes a host as a literal pays for one.
+ */
 import { getPrefixedCdnBaseAsync } from '@uploadcare/cname-prefix/async'
 import { getPrefixedCdnBaseSync } from '@uploadcare/cname-prefix/sync'
 
@@ -5,11 +15,14 @@ import { PREFIX_CDN_BASE } from './constants'
 import { trimTrailingSlashes } from '../grammar'
 
 /**
- * Your project's prefixed CDN base: `<prefix>.ucarecd.net`, computed with the
- * platform's own SHA-256 — `crypto.subtle` in a browser, `node:crypto` on the
- * server. **Prefer this one in a browser**: it adds ~0.3 kB to a bundle, against
- * ~1 kB for {@link prefixedCdnBase}, which has to carry a SHA-256 of its own to
- * be able to return without awaiting.
+ * Your project's prefixed CDN base: `<prefix>.ucarecd.net`, computed with
+ * WebCrypto. **A browser API** — and the one to prefer there, since it adds
+ * ~0.3 kB to a bundle against ~1 kB for {@link prefixedCdnBase}, which has to
+ * carry a SHA-256 of its own to be able to return without awaiting.
+ *
+ * On Node it rejects with a `TypeError` pointing at {@link prefixedCdnBase},
+ * which is native there and needs no await. Nothing is broken by importing it in
+ * code that runs in both places, as long as only the browser path calls it.
  *
  * Being async, it cannot be inlined into a `base(...)` call — resolve it once at
  * startup and keep the string.

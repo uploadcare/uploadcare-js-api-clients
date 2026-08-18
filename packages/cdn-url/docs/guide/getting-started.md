@@ -110,7 +110,8 @@ The package is split into atomic entry points, so you import only what you use:
 The fluent entry trades tree-shaking for convenience: the whole library behind a single chainable object.
 
 ```ts
-import { cdn, prefixedCdnBase } from '@uploadcare/cdn-url/fluent'
+import { cdn } from '@uploadcare/cdn-url/fluent'
+import { prefixedCdnBase } from '@uploadcare/cdn-url/cdn-base'
 
 const myCdn = cdn.base(prefixedCdnBase('demopublickey'))
 

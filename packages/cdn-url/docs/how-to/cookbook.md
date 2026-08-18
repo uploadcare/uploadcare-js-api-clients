@@ -66,7 +66,8 @@ const url = CdnUrl.parse(stored)
 
 ```ts [Fluent]
 import { operationMatches } from '@uploadcare/cdn-url'
-import { cdn, prefixedCdnBase } from '@uploadcare/cdn-url/fluent'
+import { cdn } from '@uploadcare/cdn-url/fluent'
+import { prefixedCdnBase } from '@uploadcare/cdn-url/cdn-base'
 import { blur, overlay, resize } from '@uploadcare/cdn-url/ops'
 
 const myCdn = cdn.base(prefixedCdnBase('demopublickey'))

@@ -54,7 +54,9 @@ check('core roundtrip (prod esm)', async () => {
 })
 
 check('fluent chain (prod cjs)', () => {
-  const { cdn, prefixedCdnBase } = require('../dist/prod/fluent.cjs')
+  const { cdn } = require('../dist/prod/fluent.cjs')
+  // The host helpers are their own entry now; the iife keeps them on the global.
+  const { prefixedCdnBase } = require('../dist/prod/cdn-base.cjs')
   const myCdn = cdn.base(prefixedCdnBase('demopublickey'))
   const href = myCdn.file(UUID).preview(800, 600).quality('smart').href
   const expected = `https://1s4oyld5dc.ucarecd.net/${UUID}/-/preview/800x600/-/quality/smart/`
@@ -96,6 +98,29 @@ check('dev bundle still validates (dev esm)', async () => {
     throw new Error('expected RangeError')
   } catch (e) {
     if (!(e instanceof RangeError)) throw e
+  }
+})
+
+check('cdn-base entry (prod esm + cjs, node condition)', async () => {
+  const esm = await import(distUrl('prod/cdn-base.js'))
+  const cjs = require('../dist/prod/cdn-base.cjs')
+  const expected = 'https://1s4oyld5dc.ucarecd.net'
+  for (const [flavor, mod] of [
+    ['esm', esm],
+    ['cjs', cjs]
+  ]) {
+    if (mod.prefixedCdnBase('demopublickey') !== expected)
+      throw new Error(`cdn-base ${flavor} mismatch`)
+    // node:crypto is synchronous, so the dependency's node build rejects the
+    // async helper. Reaching that message proves the node condition resolved.
+    await mod
+      .prefixedCdnBaseAsync('demopublickey')
+      .then(() => {
+        throw new Error(`cdn-base ${flavor} resolved the browser helper`)
+      })
+      .catch((error) => {
+        if (!/browsers only/.test(error.message)) throw error
+      })
   }
 })
 

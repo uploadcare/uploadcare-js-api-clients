@@ -34,7 +34,7 @@ export {
   unsafeOperation
 } from './tiny/index'
 export { detectDomainKind, isUploadcareDomain } from './domain'
-export * from './cdn-base/index'
+export * from './cdn-base/constants'
 export {
   type NamedOperationCreator,
   type OperationRef,

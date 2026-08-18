@@ -10,7 +10,7 @@ https://1s4oyld5dc.ucarecd.net/c2499162-…-47e858/-/preview/800x600/
 
 | Kind                                       | Host                   | Use it when                                            |
 | ------------------------------------------ | ---------------------- | ------------------------------------------------------ |
-| [prefixed](#the-prefixed-base-the-default) | `<prefix>.ucarecd.net` | almost always — it is your project's own subdomain     |
+| [prefixed](#the-cdn-base-the-default) | `<prefix>.ucarecd.net` | almost always — it is your project's own subdomain     |
 | [legacy](#the-legacy-base)                 | `ucarecdn.com`         | older accounts still delivering from the shared domain |
 | [custom](#a-custom-cname)                  | `cdn.example.com`      | you pointed your own domain at Uploadcare              |
 
@@ -23,7 +23,7 @@ See [CDN settings](https://uploadcare.com/docs/delivery/cdn/) in the platform do
 Your project delivers from a subdomain of `ucarecd.net` derived from its public key. `prefixedCdnBase` computes it:
 
 ```ts
-import { prefixedCdnBase } from '@uploadcare/cdn-url'
+import { prefixedCdnBase } from '@uploadcare/cdn-url/cdn-base'
 
 prefixedCdnBase('demopublickey')
 // → https://1s4oyld5dc.ucarecd.net
@@ -81,7 +81,8 @@ The base is required everywhere, but each of the four [API styles](/guide/functi
 ::: code-group
 
 ```ts [fluent]
-import { cdn, prefixedCdnBase } from '@uploadcare/cdn-url/fluent'
+import { cdn } from '@uploadcare/cdn-url/fluent'
+import { prefixedCdnBase } from '@uploadcare/cdn-url/cdn-base'
 
 // `cdn` has no host yet: file/group/gif2video are absent until one is bound
 const myCdn = cdn.base(prefixedCdnBase('demopublickey'))
@@ -94,7 +95,8 @@ myCdn.file(uuid).base('https://cdn.example.com').href
 ```
 
 ```ts [functional core]
-import { prefixedCdnBase, serializeCdnUrl } from '@uploadcare/cdn-url'
+import { serializeCdnUrl } from '@uploadcare/cdn-url'
+import { prefixedCdnBase } from '@uploadcare/cdn-url/cdn-base'
 import { groupUrl } from '@uploadcare/cdn-url/group'
 import { preview } from '@uploadcare/cdn-url/ops'
 
@@ -108,7 +110,7 @@ groupUrl(cdnBase, group)
 ```
 
 ```ts [builder]
-import { prefixedCdnBase } from '@uploadcare/cdn-url'
+import { prefixedCdnBase } from '@uploadcare/cdn-url/cdn-base'
 import { CdnUrl } from '@uploadcare/cdn-url/builder'
 import { preview } from '@uploadcare/cdn-url/ops'
 
@@ -121,7 +123,8 @@ CdnUrl.parse(stored).base(cdnBase).href
 ```
 
 ```ts [string level]
-import { prefixedCdnBase, tinyBuild } from '@uploadcare/cdn-url'
+import { tinyBuild } from '@uploadcare/cdn-url'
+import { prefixedCdnBase } from '@uploadcare/cdn-url/cdn-base'
 
 tinyBuild({ cdnBase: prefixedCdnBase('demopublickey'), uuid })
 ```
@@ -147,7 +150,7 @@ Both variants exist, they return the same string, and the only difference is
 where the SHA-256 comes from.
 
 ```ts
-import { prefixedCdnBase, prefixedCdnBaseAsync } from '@uploadcare/cdn-url'
+import { prefixedCdnBase, prefixedCdnBaseAsync } from '@uploadcare/cdn-url/cdn-base'
 
 prefixedCdnBase('demopublickey') // → https://1s4oyld5dc.ucarecd.net
 await prefixedCdnBaseAsync('demopublickey') // → the same string

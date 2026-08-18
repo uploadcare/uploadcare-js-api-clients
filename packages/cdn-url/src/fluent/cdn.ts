@@ -194,7 +194,7 @@ const needsBase = (name: string) => (): never => {
  * @example
  * ```ts
  * import { cdn } from '@uploadcare/cdn-url/fluent'
- * import { prefixedCdnBase } from '@uploadcare/cdn-url'
+ * import { prefixedCdnBase } from '@uploadcare/cdn-url/cdn-base'
  *
  * const my = cdn.base(prefixedCdnBase('demopublickey'))
  * my.file(uuid).preview(800, 600).quality('smart').href

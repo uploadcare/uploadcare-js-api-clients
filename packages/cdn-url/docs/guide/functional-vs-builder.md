@@ -79,7 +79,8 @@ Everything behind one import: every URL flavor, every operation, chainable end t
 `cdn` arrives without a host. `base` binds one and hands back the full object; `file`, `group` and `gif2video` exist only there, so forgetting is a compile error rather than a broken URL. The starters that need no host — `video`, `document`, `proxy`, `parse` — work straight off `cdn`. Every object is frozen, and a single URL rebases with its own `base()`.
 
 ```ts
-import { cdn, prefixedCdnBase } from '@uploadcare/cdn-url/fluent'
+import { cdn } from '@uploadcare/cdn-url/fluent'
+import { prefixedCdnBase } from '@uploadcare/cdn-url/cdn-base'
 
 const myCdn = cdn.base(prefixedCdnBase('demopublickey'))
 
@@ -178,7 +179,7 @@ What each entry costs when you import everything it exports, bundled and minifie
 | `ops` (all 47 creators)                 | 6.1 kB   | 2.2 kB  |
 | `fluent` (the `cdn` mega-object)        | 17.4 kB  | 5.9 kB  |
 
-Both totals now carry `prefixedCdnBase` — the SHA-256 that derives your project's host, re-exported from `@uploadcare/cname-prefix`. It is 1.9 kB minified (1.2 kB gzipped) of that figure and drops entirely if you never name it: `cdn` plus one chain measures 15.0 kB minified, 4.4 kB gzipped. Compute the host once at build time or paste it as a literal and you pay nothing for the hashing.
+No total above includes `prefixedCdnBase` — the SHA-256 that derives your project's host lives in its own entry, [`@uploadcare/cdn-url/cdn-base`](/guide/cdn-base), so a bundle carries it only if it imports that entry. Doing so adds 1.9 kB minified (1.2 kB gzipped): `cdn` plus one chain measures 15.0 kB minified, 4.4 kB gzipped on its own, and 17.0 kB (5.7 kB gzipped) once it derives the host. Compute the host at build time or paste it as a literal and you pay nothing for the hashing.
 
 Importing everything is the worst case, and it is not what most code does. The core plus one creator is about 1.6 kB gzipped, not 2.2 plus 2.0, because the creators you don't name are dropped. The [string level](/guide/string-level-api) does the same job for 0.4 kB, and costs the same whether you import it from `/tiny` or from the root — 348 B versus 347 B brotli, measured.
 

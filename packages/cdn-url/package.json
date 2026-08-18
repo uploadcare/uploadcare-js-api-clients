@@ -149,6 +149,19 @@
       },
       "import": "./dist/prod/tiny.js",
       "require": "./dist/prod/tiny.cjs"
+    },
+    "./cdn-base": {
+      "types": "./dist/types/cdn-base.d.ts",
+      "development": {
+        "import": "./dist/dev/cdn-base.js",
+        "require": "./dist/dev/cdn-base.cjs"
+      },
+      "production": {
+        "import": "./dist/prod/cdn-base.js",
+        "require": "./dist/prod/cdn-base.cjs"
+      },
+      "import": "./dist/prod/cdn-base.js",
+      "require": "./dist/prod/cdn-base.cjs"
     }
   },
   "sideEffects": false,
@@ -194,7 +207,7 @@
     "parser"
   ],
   "dependencies": {
-    "@uploadcare/cname-prefix": "^6.19.0"
+    "@uploadcare/cname-prefix": "^6.20.0"
   },
   "devDependencies": {
     "@vitest/browser": "^3.2.4",

@@ -6,4 +6,4 @@ export {
   groupUrl,
   nthUrl
 } from './group-urls'
-export * from '../cdn-base/index'
+export * from '../cdn-base/constants'

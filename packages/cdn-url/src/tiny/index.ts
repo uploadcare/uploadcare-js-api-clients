@@ -8,4 +8,4 @@ export {
   unsafeOperation
 } from './literals'
 export { tinyBuild, tinyParse, type TinyFileUrl } from './url'
-export * from '../cdn-base/index'
+export * from '../cdn-base/constants'

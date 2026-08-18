@@ -9,5 +9,5 @@ export {
   VideoChain
 } from './chains'
 export { cdn, type Cdn, parse, type ParsedChain, type UnboundCdn } from './cdn'
-export * from '../cdn-base/index'
+export * from '../cdn-base/constants'
 export { defaultProxyEndpoint } from '../proxy/endpoint'

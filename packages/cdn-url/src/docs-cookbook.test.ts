@@ -6,7 +6,8 @@
 import { describe, expect, it } from 'vitest'
 
 import { CdnUrl } from './builder/index'
-import { cdn, prefixedCdnBase } from './fluent/index'
+import { cdn } from './fluent/index'
+import { prefixedCdnBase } from './cdn-base/index'
 import {
   detectDomainKind,
   isUploadcareDomain,

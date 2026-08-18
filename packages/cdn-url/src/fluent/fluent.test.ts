@@ -1,12 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
-import {
-  cdn,
-  LEGACY_CDN_BASE,
-  parse,
-  PREFIX_CDN_BASE,
-  prefixedCdnBase
-} from './index'
+import { cdn, LEGACY_CDN_BASE, parse, PREFIX_CDN_BASE } from './index'
+import { prefixedCdnBase } from '../cdn-base/index'
 
 const UUID = 'c2499162-eb07-4b93-b31e-94a89a47e858'
 const PUBLIC_KEY = 'demopublickey'

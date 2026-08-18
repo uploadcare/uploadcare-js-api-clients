@@ -7,4 +7,4 @@ export {
   quality
 } from './operations'
 export { gif2videoUrl } from './gif2video-url'
-export * from '../cdn-base/index'
+export * from '../cdn-base/constants'

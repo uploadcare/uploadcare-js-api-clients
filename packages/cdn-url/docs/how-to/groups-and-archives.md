@@ -52,7 +52,8 @@ new CdnUrl({
 ```
 
 ```ts [Fluent]
-import { cdn, prefixedCdnBase } from '@uploadcare/cdn-url/fluent'
+import { cdn } from '@uploadcare/cdn-url/fluent'
+import { prefixedCdnBase } from '@uploadcare/cdn-url/cdn-base'
 
 const myCdn = cdn.base(prefixedCdnBase('demopublickey'))
 
@@ -95,7 +96,8 @@ archiveUrl('https://1s4oyld5dc.ucarecd.net', group, 'tar', 'photos.tar')
 ```
 
 ```ts [Fluent]
-import { cdn, prefixedCdnBase } from '@uploadcare/cdn-url/fluent'
+import { cdn } from '@uploadcare/cdn-url/fluent'
+import { prefixedCdnBase } from '@uploadcare/cdn-url/cdn-base'
 
 const myCdn = cdn.base(prefixedCdnBase('demopublickey'))
 
