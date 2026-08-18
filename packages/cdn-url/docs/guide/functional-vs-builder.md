@@ -178,7 +178,7 @@ What each entry costs when you import everything it exports, bundled and minifie
 | `ops` (all 47 creators)                 | 6.1 kB   | 2.2 kB  |
 | `fluent` (the `cdn` mega-object)        | 17.4 kB  | 5.9 kB  |
 
-Both totals now carry `prefixedCdnBase` — the SHA-256 that derives your project's host, re-exported from `@uploadcare/cname-prefix`. It is 4.7 kB minified (2.1 kB gzipped) of that figure and drops entirely if you never name it: `cdn` plus one chain measures 15.0 kB minified, 4.4 kB gzipped. Compute the host once at build time or paste it as a literal and you pay nothing for the hashing.
+Both totals now carry `prefixedCdnBase` — the SHA-256 that derives your project's host, re-exported from `@uploadcare/cname-prefix`. It is 1.9 kB minified (1.2 kB gzipped) of that figure and drops entirely if you never name it: `cdn` plus one chain measures 15.0 kB minified, 4.4 kB gzipped. Compute the host once at build time or paste it as a literal and you pay nothing for the hashing.
 
 Importing everything is the worst case, and it is not what most code does. The core plus one creator is about 1.6 kB gzipped, not 2.2 plus 2.0, because the creators you don't name are dropped. The [string level](/guide/string-level-api) does the same job for 0.4 kB, and costs the same whether you import it from `/tiny` or from the root — 348 B versus 347 B brotli, measured.
 
