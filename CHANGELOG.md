@@ -1,3 +1,12 @@
+# [6.21.0](https://github.com/uploadcare/uploadcare-js-api-clients/compare/v6.20.0...v6.21.0) (2026-08-18)
+
+
+### Features
+
+* **cname-prefix:** compute the async prefix on Node via node:crypto WebCrypto ([#582](https://github.com/uploadcare/uploadcare-js-api-clients/issues/582)) ([5f60e14](https://github.com/uploadcare/uploadcare-js-api-clients/commit/5f60e14b514ada24148c29065f67786a0b732c39))
+
+
+
 # [6.20.0](https://github.com/uploadcare/uploadcare-js-api-clients/compare/v6.19.0...v6.20.0) (2026-08-18)
 
 
