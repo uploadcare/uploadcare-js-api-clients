@@ -1,5 +1,6 @@
 import { expectTypeOf } from 'expect-type'
 import {
+  Camelize,
   camelizeKeys,
   camelizeString,
   SnakeCasedPropertiesDeep
@@ -79,6 +80,42 @@ describe('camelizeKeys types', () => {
     expectTypeOf(camelizeKeys<Source>)
       .parameter(1)
       .toEqualTypeOf<{ ignoreKeys: string[] } | undefined>()
+  })
+})
+
+describe('camelizeString types', () => {
+  it('should report the camelCase literal, so constants can be derived', () => {
+    expectTypeOf(
+      camelizeString('non_field_errors')
+    ).toEqualTypeOf<'nonFieldErrors'>()
+    expectTypeOf<
+      Camelize<'non_field_errors'>
+    >().toEqualTypeOf<'nonFieldErrors'>()
+  })
+
+  it('should cover every separator the runtime splits on in API keys', () => {
+    expectTypeOf<Camelize<'foo-bar'>>().toEqualTypeOf<'fooBar'>()
+    expectTypeOf<Camelize<'foo.bar'>>().toEqualTypeOf<'fooBar'>()
+    expectTypeOf<Camelize<'foo bar'>>().toEqualTypeOf<'fooBar'>()
+    expectTypeOf<Camelize<'a__b'>>().toEqualTypeOf<'aB'>()
+  })
+
+  it('should lower only the first character of the first segment', () => {
+    expectTypeOf<Camelize<'Foo_bar'>>().toEqualTypeOf<'fooBar'>()
+    expectTypeOf<
+      Camelize<'detected_MIME_type'>
+    >().toEqualTypeOf<'detectedMIMEType'>()
+  })
+
+  it('should leave a separator-free string alone', () => {
+    expectTypeOf<Camelize<'size'>>().toEqualTypeOf<'size'>()
+    expectTypeOf<Camelize<'alreadyCamel'>>().toEqualTypeOf<'alreadyCamel'>()
+  })
+
+  it('should stay a string for a non-literal input', () => {
+    // Not `toEqualTypeOf<string>`: with a non-literal argument the conditional
+    // never reduces, and expect-type cannot equate a deferred type.
+    expectTypeOf(camelizeString('' as string)).toBeString()
   })
 })
 

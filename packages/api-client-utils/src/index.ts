@@ -1,4 +1,5 @@
 export {
+  Camelize,
   camelizeKeys,
   camelizeString,
   SnakeCasedPropertiesDeep
