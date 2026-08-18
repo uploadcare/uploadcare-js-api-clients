@@ -60,7 +60,8 @@ recomputing it for every URL.
 | ----------------------------- | -------- | ---------------------------------------------------------- |
 | Browser, Web/Service Worker   | `…Async` | WebCrypto is already there, so nothing is bundled          |
 | Browser, when you can't await | `…Sync`  | works, and carries a SHA-256 with it (about a kilobyte)    |
-| Node.js                       | `…Sync`  | `node:crypto` is native _and_ synchronous                  |
+| Node.js (server code)         | `…Sync`  | `node:crypto` is native _and_ synchronous — no `Promise`   |
+| Node.js (isomorphic code)     | `…Async` | works too: WebCrypto via `node:crypto`, no runtime branch  |
 | React Native                  | `…Sync`  | no WebCrypto in Hermes; the portable build is the only one |
 
 In a browser, prefer the async variant. It calls
@@ -73,18 +74,40 @@ Use the sync variant when a `Promise` would infect the call site, such as a
 config module's top-level export or a synchronous render path. It works in a
 browser and costs you the SHA-256 it carries, about a kilobyte.
 
-On Node, use the sync variant. The `node` export condition, which Node.js,
+On Node, prefer the sync variant. The `node` export condition, which Node.js,
 Vitest and bundlers targeting Node all resolve, swaps in a build backed by
 `node:crypto`, so the portable SHA-256 never reaches a server bundle. Your
-import stays the same. The async variant rejects there with a `TypeError` naming
-the sync one, since bundling a hash is a browser problem that Node does not
-have.
+import stays the same, and the digest is native and synchronous — no `Promise`
+to await.
+
+The async variant works on Node too. Under the same `node` condition it takes
+WebCrypto from `node:crypto` rather than the global scope, and returns the same
+string the sync one does. Reach for it only to keep a single code path across
+browser and server: isomorphic or SSR code that already awaits
+`getPrefixedCdnBaseAsync` no longer has to branch on the runtime, and no
+`createHash` reaches the call path.
 
 On React Native, use the sync variant too. The `react-native` condition resolves
 to the portable build, which is the only one that can run there: Hermes has
 neither `crypto.subtle` nor `node:crypto`. It needs `TextEncoder`, which Hermes
 provides from React Native 0.74 and Expo SDK 51. On anything older, add a
 polyfill.
+
+### Node version compatibility
+
+Both variants run on every Node the package supports (`engines: node >=16`),
+and neither needs a flag:
+
+| API      | Backed by                  | Available since |
+| -------- | -------------------------- | --------------- |
+| `…Sync`  | `node:crypto` `createHash` | Node 0.x        |
+| `…Async` | `node:crypto` `webcrypto`  | Node 15.0.0     |
+
+The async build reads WebCrypto from `node:crypto` (its `webcrypto` export),
+not from `globalThis.crypto`. So it does not depend on the global `crypto`
+object — which became available by default only in Node 19 — and needs no
+`--experimental-global-webcrypto` flag. On every version this package targets,
+both APIs are present.
 
 ### What it costs
 
@@ -98,8 +121,12 @@ Marginal cost of the helper, esbuild `--minify` over the published build:
 | both, from the root entry, in a browser | 2082 B | 1247 B | **1081 B** |
 
 Brotli is the column to read, since that is what a CDN serves. In a browser the
-async variant costs about a quarter of the sync one. On Node both are small
-enough that the difference rarely matters.
+async variant costs about a quarter of the sync one. On Node the numbers change:
+the digest is `node:crypto`, external to the bundle, so the async variant is a
+few hundred bytes there too — about the same as `/sync` on Node above, not the
+kilobyte the portable sync build costs in a browser. Size is not the deciding
+factor on Node; pick `…Sync` to avoid a `Promise`, `…Async` to share code with
+the browser.
 
 ### Entry points
 
