@@ -44,6 +44,9 @@
     "README.md",
     "LICENSE"
   ],
+  "engines": {
+    "node": ">=16"
+  },
   "scripts": {
     "prepack": "cp ../../LICENSE ./LICENSE",
     "clean": "rimraf dist",

@@ -1,27 +1,54 @@
 import { describe, expect, it } from 'vitest'
 
+import { PUBLIC_KEY_PREFIXES } from '../common/publicKeys.fixture'
 import { getPrefixedCdnBaseAsync } from './async'
+import { getPrefixedCdnBaseSync } from './sync'
+
+const PREFIX_CDN_BASE = 'https://ucarecd.net'
 
 /**
- * The async API is the browser's: it exists because WebCrypto is the only
- * digest a browser offers without shipping an implementation. In Node the sync
- * API is already native, so reaching for the async one means a caller has the
- * environments mixed up — say so, instead of failing later with a
- * `ReferenceError` about `window`.
+ * The async API used to reject in Node; it now computes the prefix through
+ * `node:crypto`'s WebCrypto, so it must land on exactly what the other builds
+ * produce. The prefix is read back off the built base rather than from an
+ * internal, so these assertions run through what the `node` condition actually
+ * publishes.
  */
-describe('node build: the async API is not available', () => {
-  it('rejects with an explanation naming the sync alternative', async () => {
-    await expect(
-      getPrefixedCdnBaseAsync('demopublickey', 'https://ucarecd.net')
-    ).rejects.toThrow(/getPrefixedCdnBaseSync/)
+const prefixOf = async (publicKey: string): Promise<string> =>
+  new URL(
+    await getPrefixedCdnBaseAsync(publicKey, PREFIX_CDN_BASE)
+  ).hostname.split('.')[0] as string
+
+describe('node build: the async prefix', () => {
+  it.each(PUBLIC_KEY_PREFIXES)(
+    'is the one the other builds produce for %s',
+    async (publicKey, prefix) => {
+      expect(await prefixOf(publicKey)).toBe(prefix)
+    }
+  )
+
+  it('agrees with the native sync build for the same public key', async () => {
+    expect(
+      await getPrefixedCdnBaseAsync('demopublickey', PREFIX_CDN_BASE)
+    ).toBe(getPrefixedCdnBaseSync('demopublickey', PREFIX_CDN_BASE))
+  })
+})
+
+describe('node build: getPrefixedCdnBaseAsync', () => {
+  it('prefixes the zone with the project subdomain', async () => {
+    expect(
+      await getPrefixedCdnBaseAsync('demopublickey', PREFIX_CDN_BASE)
+    ).toBe('https://1s4oyld5dc.ucarecd.net')
   })
 
-  it('rejects rather than throwing synchronously, so callers can catch it', async () => {
-    const promise = getPrefixedCdnBaseAsync(
-      'demopublickey',
-      'https://ucarecd.net'
-    )
-    expect(promise).toBeInstanceOf(Promise)
-    await expect(promise).rejects.toThrow(TypeError)
+  it('tolerates a trailing slash and never leaves one behind', async () => {
+    expect(
+      await getPrefixedCdnBaseAsync('demopublickey', `${PREFIX_CDN_BASE}/`)
+    ).toBe('https://1s4oyld5dc.ucarecd.net')
+  })
+
+  it('prefixes a custom host as given', async () => {
+    expect(
+      await getPrefixedCdnBaseAsync('demopublickey', 'https://cdn.example.com')
+    ).toBe('https://1s4oyld5dc.cdn.example.com')
   })
 })
