@@ -2,6 +2,7 @@ import { camelizeKeys } from '@uploadcare/api-client-utils'
 import { ApiRequest } from '../makeApiRequest'
 import { getAcceptHeader } from '../tools/getAcceptHeader'
 import { RestClientError } from '../tools/RestClientError'
+import { RestClientValidationError } from '../tools/RestClientValidationError'
 import { ServerErrorResponse } from '../types/ServerErrorResponse'
 
 type HandleResponseOptions = {
@@ -10,6 +11,10 @@ type HandleResponseOptions = {
   camelize?: boolean
 }
 
+/**
+ * Sub-objects whose keys are the caller's own data rather than the API's
+ * vocabulary, so rewriting them would corrupt what the caller stored.
+ */
 const CAMELIZE_IGNORE_KEYS = ['metadata', 'problems', 'appdata']
 const NO_CONTENT_STATUS = 204
 
@@ -33,10 +38,12 @@ export async function handleApiRequest<ResponseType>(
   }
   const json: unknown = await response.json()
   if (!okCodes.includes(response.status)) {
-    throw new RestClientError((json as ServerErrorResponse).detail, {
-      response,
-      request
-    })
+    const { detail } = json as ServerErrorResponse
+    const errors = detail === undefined && RestClientValidationError.parse(json)
+    if (errors) {
+      throw new RestClientValidationError(errors, { response, request })
+    }
+    throw new RestClientError(detail, { response, request })
   }
 
   if (!camelize) {

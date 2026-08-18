@@ -6,7 +6,7 @@
       alt="">
 </a>
 
-`@uploadcare/rest-client` is a JavaScript and TypeScript SDK for the Uploadcare [REST API][uc-docs-rest-api]. It covers file management (upload, delete, copy to local/remote storage, metadata, tags), groups, webhooks, media conversion (video and document), and add-ons (virus scanning, image recognition, background removal). Works in Node.js and browser. Supports Simple and signature-based authentication, async pagination with generators, automatic retry with exponential backoff for throttled requests, and job status polling for async operations.
+`@uploadcare/rest-client` is a JavaScript and TypeScript SDK for the Uploadcare [REST API][uc-docs-rest-api]. It covers file management (upload, delete, copy to local/remote storage, metadata, tags), full-text and faceted file search, groups, webhooks, media conversion (video and document), and add-ons (virus scanning, image recognition, background removal). Works in Node.js and browser. Supports Simple and signature-based authentication, async pagination with generators, automatic retry with exponential backoff for throttled requests, and job status polling for async operations.
 
 [API Reference](https://uploadcare.github.io/uploadcare-js-api-clients/rest-client/)
 
@@ -16,6 +16,7 @@
 [![Uploadcare stack on StackShare][badge-stack-img]][badge-stack-url]
 
 <!-- toc -->
+
 - [Install](#install)
 - [Usage](#usage)
   - [Authentication](#authentication)
@@ -54,12 +55,15 @@ With the [`Uploadcare.Simple`](https://uploadcare.com/api-refs/rest-api/v0.7.0/#
 Example:
 
 ```typescript
-import { listOfFiles, UploadcareSimpleAuthSchema } from '@uploadcare/rest-client';
+import {
+  listOfFiles,
+  UploadcareSimpleAuthSchema
+} from '@uploadcare/rest-client'
 
 const uploadcareSimpleAuthSchema = new UploadcareSimpleAuthSchema({
   publicKey: 'YOUR_PUBLIC_KEY',
-  secretKey: 'YOUR_SECRET_KEY',
-});
+  secretKey: 'YOUR_SECRET_KEY'
+})
 
 const result = await listOfFiles({}, { authSchema: uploadcareSimpleAuthSchema })
 ```
@@ -73,11 +77,11 @@ With the [`Uploadcare`](https://uploadcare.com/api-refs/rest-api/v0.7.0/#section
 You can use the builtin signature resolver, which automatically generates signature in-place using `crypto` module at Node.js or Web Crypto API at browsers.
 
 ```typescript
-import { UploadcareAuthSchema } from '@uploadcare/rest-client';
+import { UploadcareAuthSchema } from '@uploadcare/rest-client'
 
 new UploadcareAuthSchema({
   publicKey: 'YOUR_PUBLIC_KEY',
-  secretKey: 'YOUR_SECRET_KEY',
+  secretKey: 'YOUR_SECRET_KEY'
 })
 ```
 
@@ -88,7 +92,7 @@ new UploadcareAuthSchema({
 This option is useful on the client-side to avoid secret key leak. You need to implement some backend endpoint, which will generate signature. In this case, secret key will be stored on your server only and will not be disclosed.
 
 ```typescript
-import { UploadcareAuthSchema } from '@uploadcare/rest-client';
+import { UploadcareAuthSchema } from '@uploadcare/rest-client'
 
 new UploadcareAuthSchema({
   publicKey: 'YOUR_PUBLIC_KEY',
@@ -97,9 +101,11 @@ new UploadcareAuthSchema({
      * You need to make HTTPS request to your backend endpoint,
      * which should sign the `signString` using secret key.
      */
-    const response = await fetch(`/sign-request?signString=${encodeURIComponent(signString)}`);
-    const signature = await response.text();
-    return signature;
+    const response = await fetch(
+      `/sign-request?signString=${encodeURIComponent(signString)}`
+    )
+    const signature = await response.text()
+    return signature
   }
 })
 ```
@@ -107,13 +113,15 @@ new UploadcareAuthSchema({
 And then somewhere on your backend:
 
 ```javascript
-import { createSignature } from '@uploadcare/rest-client';
+import { createSignature } from '@uploadcare/rest-client'
 
 app.get('/sign-request', async (req, res) => {
-  const signature = await createSignature('YOUR_SECREY_KEY', req.query.signString);
-  res.send(signature);
+  const signature = await createSignature(
+    'YOUR_SECREY_KEY',
+    req.query.signString
+  )
+  res.send(signature)
 })
-
 ```
 
 ### API
@@ -121,12 +129,15 @@ app.get('/sign-request', async (req, res) => {
 You can use low-level wrappers to call the API endpoints directly:
 
 ```typescript
-import { listOfFiles, UploadcareSimpleAuthSchema } from '@uploadcare/rest-client';
+import {
+  listOfFiles,
+  UploadcareSimpleAuthSchema
+} from '@uploadcare/rest-client'
 
 const uploadcareSimpleAuthSchema = new UploadcareSimpleAuthSchema({
   publicKey: 'YOUR_PUBLIC_KEY',
-  secretKey: 'YOUR_SECRET_KEY',
-});
+  secretKey: 'YOUR_SECRET_KEY'
+})
 
 const result = await listOfFiles({}, { authSchema: uploadcareSimpleAuthSchema })
 ```
@@ -145,28 +156,137 @@ import {
   replaceTags,
   updateTags,
   UploadcareSimpleAuthSchema
-} from '@uploadcare/rest-client';
+} from '@uploadcare/rest-client'
 
 const authSchema = new UploadcareSimpleAuthSchema({
   publicKey: 'YOUR_PUBLIC_KEY',
-  secretKey: 'YOUR_SECRET_KEY',
-});
+  secretKey: 'YOUR_SECRET_KEY'
+})
 
 // Read the current tags
-const { tags } = await getTags({ uuid: 'FILE_UUID' }, { authSchema });
+const { tags } = await getTags({ uuid: 'FILE_UUID' }, { authSchema })
 
 // Replace the entire tag set
-await replaceTags({ uuid: 'FILE_UUID', tags: ['cat', 'animal'] }, { authSchema });
+await replaceTags(
+  { uuid: 'FILE_UUID', tags: ['cat', 'animal'] },
+  { authSchema }
+)
 
 // Add and remove tags at once (delete is applied before add)
 const result = await updateTags(
   { uuid: 'FILE_UUID', add: ['dog', 'outdoor'], delete: ['cat'] },
   { authSchema }
-);
+)
 // result: { tags, added, deleted }
 ```
 
 See [docs][uc-file-tags] for normalization rules and limits.
+
+#### File search
+
+`searchFiles` queries the project's files. Every condition is optional, but at
+least one is required, and conditions combine with AND:
+
+```typescript
+import {
+  searchFiles,
+  UploadcareSimpleAuthSchema
+} from '@uploadcare/rest-client'
+
+const authSchema = new UploadcareSimpleAuthSchema({
+  publicKey: 'YOUR_PUBLIC_KEY',
+  secretKey: 'YOUR_SECRET_KEY'
+})
+
+const page = await searchFiles(
+  {
+    tags: { all: ['cat', 'animal'], none: ['draft'] },
+    isImage: true,
+    sort: [{ field: 'datetimeUploaded', order: 'desc' }, { field: 'size' }],
+    limit: 50
+  },
+  { authSchema }
+)
+
+page.total // 42
+page.results[0].uuid
+```
+
+Full-text conditions are `query` (across searchable fields) and `phrase` (per
+field), both needing at least 4 characters, with `fuzziness: true` for typo
+tolerance. `exact` matches whole values. Everything you write is camelCase, and
+the client translates it to the API's own spelling; your metadata keys and tag
+values are the exception, and go out exactly as you wrote them:
+
+```typescript
+const page = await searchFiles(
+  {
+    exact: {
+      detectedMimeType: ['image/png'],
+      metadata: { color: ['red', 'blue'] }
+    },
+    phrase: { originalFilename: 'invoice' },
+    datetimeUploaded: { gte: new Date('2026-01-01') },
+    size: { gt: 1_000_000 }
+  },
+  { authSchema }
+)
+
+// tokens that matched, wrapped in <em>
+page.results[0].highlight?.originalFilename
+```
+
+Pass `include: 'appdata'` to embed add-on data. A malformed or empty query
+rejects with a `RestClientValidationError`, which lists what the server objected
+to, keyed by field. It extends `RestClientError`, so a `catch` block that already
+checks for that still matches:
+
+```typescript
+import {
+  isRestClientValidationError,
+  searchFiles
+} from '@uploadcare/rest-client'
+
+try {
+  await searchFiles({ query: 'abc' }, { authSchema })
+} catch (error) {
+  if (isRestClientValidationError(error)) {
+    error.errors // { query: ['Must be at least 4 characters.'] }
+    error.message // '[400 Bad Request] query: Must be at least 4 characters.'
+  }
+}
+```
+
+Errors that span more than one field, and the empty-query case, arrive under
+`nonFieldErrors`. Field names follow the same casing rule as the options.
+
+Results paginate through `limit` and `offset`, so `searchFiles` works with the
+[pagination helpers](#pagination) below. Pass an explicit `sort` when you
+paginate: the default relevance order is not stable between pages, so a walk
+without one can hand back a file an earlier page already gave you. The API also
+requires `offset + limit` to stay under 1000, which ends a walk at that point
+however many files match:
+
+```typescript
+import { paginate, searchFiles } from '@uploadcare/rest-client'
+
+const pages = paginate(searchFiles)(
+  {
+    tags: { any: ['cat'] },
+    sort: [{ field: 'datetimeUploaded', order: 'desc' }],
+    limit: 100
+  },
+  { authSchema }
+)
+
+for await (const page of pages) {
+  console.log(page.results.length)
+}
+```
+
+Newly uploaded files are indexed asynchronously, so expect a few seconds before
+one turns up in results. See [docs][uc-file-search] for the full condition
+reference, and the [API Reference][api-reference] for every option and its type.
 
 ### Settings
 
@@ -174,7 +294,7 @@ List of all available Settings is available at the [rest-client API Reference](h
 
 ### Pagination
 
-We have the only two paginatable API methods - `listOfFiles` and `listOfGroups`. You can use one of those methods below to paginate over.
+Three API methods paginate: `listOfFiles`, `listOfGroups` and `searchFiles`. You can use one of those methods below to paginate over. Note that search caps `offset + limit` at 1000, so a walk over search results ends there however large `total` is.
 
 #### Using async generator and `paginate()` helper
 
@@ -183,11 +303,14 @@ import { listOfFiles, paginate } from '@uploadcare/rest-client'
 
 const uploadcareSimpleAuthSchema = new UploadcareSimpleAuthSchema({
   publicKey: 'YOUR_PUBLIC_KEY',
-  secretKey: 'YOUR_SECRET_KEY',
-});
+  secretKey: 'YOUR_SECRET_KEY'
+})
 
 const paginatedListOfFiles = paginate(listOfFiles)
-const pages = paginatedListOfFiles({}, { authSchema: uploadcareSimpleAuthSchema })
+const pages = paginatedListOfFiles(
+  {},
+  { authSchema: uploadcareSimpleAuthSchema }
+)
 
 for await (const page of pages) {
   console.log(page)
@@ -201,17 +324,21 @@ import { listOfFiles, Paginator } from '@uploadcare/rest-client'
 
 const uploadcareSimpleAuthSchema = new UploadcareSimpleAuthSchema({
   publicKey: 'YOUR_PUBLIC_KEY',
-  secretKey: 'YOUR_SECRET_KEY',
-});
+  secretKey: 'YOUR_SECRET_KEY'
+})
 
-const paginator = new Paginator(listOfFiles, {}, { authSchema: uploadcareSimpleAuthSchema })
+const paginator = new Paginator(
+  listOfFiles,
+  {},
+  { authSchema: uploadcareSimpleAuthSchema }
+)
 
-while(paginator.hasNextPage()) {
+while (paginator.hasNextPage()) {
   const page = await paginator.next()
   console.log(page)
 }
 
-while(paginator.hasPrevPage()) {
+while (paginator.hasPrevPage()) {
   const page = await paginator.prev()
   console.log(page)
 }
@@ -246,8 +373,8 @@ const jobs = await conversionJobPoller(
   {
     type: ConversionType.VIDEO,
     // type: ConversionType.DOCUMENT,
-    onRun: response => console.log(response), // called when job is started
-    onStatus: response => console.log(response), // called on every job status request
+    onRun: (response) => console.log(response), // called when job is started
+    onStatus: (response) => console.log(response), // called on every job status request
     paths: [':uuid/video/-/size/x720/', ':uuid/video/-/size/x360/'],
     store: false,
     pollOptions: {
@@ -284,8 +411,8 @@ const result = await addonJobPoller(
     addonName: AddonName.UC_CLAMAV_VIRUS_SCAN,
     // addonName: AddonName.AWS_REKOGNITION_DETECT_LABELS,
     // addonName: AddonName.REMOVE_BG,
-    onRun: response => console.log(response), // called when job is started
-    onStatus: response => console.log(response), // called on every job status request
+    onRun: (response) => console.log(response), // called when job is started
+    onStatus: (response) => console.log(response), // called on every job status request
     target: ':uuid',
     params: {
       purge_infected: false
@@ -326,3 +453,5 @@ request at [hello@uploadcare.com][uc-email-hello].
 [build-url]: https://github.com/uploadcare/uploadcare-js-api-clients/actions/workflows/checks.yml
 [uc-docs-rest-api]: https://uploadcare.com/api-refs/rest-api/v0.7.0/?utm_source=github&utm_campaign=uploadcare-js-api-clients
 [uc-file-tags]: https://uploadcare.com/docs/file-tags/
+[uc-file-search]: https://uploadcare.com/docs/file-search/
+[api-reference]: https://uploadcare.github.io/uploadcare-js-api-clients/rest-client/

@@ -80,6 +80,7 @@ export {
   CancelError,
   UploadcareError,
   camelizeKeys,
+  Camelize,
   camelizeString,
   SnakeCasedPropertiesDeep,
   poll,

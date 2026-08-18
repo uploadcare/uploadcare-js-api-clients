@@ -2,7 +2,36 @@ import { isObject } from './isObject'
 
 const SEPARATOR = /\W|_/g
 
-export function camelizeString<T extends string>(text: T): T {
+/**
+ * Joins the segments of a separated string, capitalising every one after the
+ * first — the type-level half of {@link camelizeString}.
+ *
+ * Covers the separators that appear in API keys (`_`, `-`, `.`, space). Any
+ * other non-word character is a separator at runtime but not here, so a string
+ * containing one keeps its own literal type rather than gaining a wrong one.
+ */
+type JoinSegments<S extends string> = S extends `${infer Head}_${infer Tail}`
+  ? `${Head}${Capitalize<JoinSegments<Tail>>}`
+  : S extends `${infer Head}-${infer Tail}`
+    ? `${Head}${Capitalize<JoinSegments<Tail>>}`
+    : S extends `${infer Head}.${infer Tail}`
+      ? `${Head}${Capitalize<JoinSegments<Tail>>}`
+      : S extends `${infer Head} ${infer Tail}`
+        ? `${Head}${Capitalize<JoinSegments<Tail>>}`
+        : S
+
+/** What {@link camelizeString} turns `S` into. */
+export type Camelize<S extends string> = Uncapitalize<JoinSegments<S>>
+
+/**
+ * Rewrite a separated string as camelCase: `non_field_errors` becomes
+ * `nonFieldErrors`.
+ *
+ * The return type follows the value, so a literal in gives the camelCase
+ * literal out and constants can be derived from the spelling they came from
+ * instead of being written twice.
+ */
+export function camelizeString<S extends string>(text: S): Camelize<S> {
   return text
     .split(SEPARATOR)
     .map(
@@ -10,7 +39,7 @@ export function camelizeString<T extends string>(text: T): T {
         word.charAt(0)[index > 0 ? 'toUpperCase' : 'toLowerCase']() +
         word.slice(1)
     )
-    .join('') as T
+    .join('') as Camelize<S>
 }
 
 type SnakeCase<S extends string> = S extends `${infer Head}${infer Tail}`
