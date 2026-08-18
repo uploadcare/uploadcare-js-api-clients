@@ -5,8 +5,12 @@ import { ServerValidationErrorResponse } from '../types/ServerErrorResponse'
 /** As the server spells it; the key it becomes is {@link NON_FIELD_ERRORS}. */
 const SERVER_NON_FIELD_ERRORS = 'non_field_errors'
 
-/** Errors that belong to a level rather than to one of its fields. */
-const NON_FIELD_ERRORS = 'nonFieldErrors'
+/**
+ * Errors that belong to a level rather than to one of its fields. Derived, so
+ * the two spellings cannot drift: `camelizeString` reports the camelCase
+ * literal, making this `'nonFieldErrors'` to the type system as well.
+ */
+const NON_FIELD_ERRORS = camelizeString(SERVER_NON_FIELD_ERRORS)
 
 /**
  * Field names become camelCase like everything else the client hands back, with
