@@ -1,0 +1,112 @@
+import { dirname, resolve } from 'node:path'
+import { fileURLToPath } from 'node:url'
+import { defineConfig } from 'vite'
+import dts from 'vite-plugin-dts'
+
+const __dirname = dirname(fileURLToPath(import.meta.url))
+
+/**
+ * Terser beats esbuild by ~13% gzip on these bundles (measured on the `fluent`
+ * entry: 4651 B → 4023 B). Only safe transforms are enabled — `unsafe*` buys
+ * another ~1% and is not worth the risk. The pure annotations on the operation
+ * creators are honored, so per-creator tree-shaking is unaffected.
+ */
+const terserOptions = {
+  compress: { passes: 3, pure_getters: true },
+  mangle: { toplevel: true },
+  format: { comments: false }
+}
+
+// The IIFE wrapper assigns the global as a top-level `var UCCdnUrl`, so the
+// global name must be reserved or top-level mangling renames it away.
+const iifeTerserOptions = {
+  ...terserOptions,
+  mangle: { toplevel: true, reserved: ['UCCdnUrl'] }
+}
+
+const entries = {
+  index: resolve(__dirname, 'src/index.ts'),
+  ops: resolve(__dirname, 'src/ops/index.ts'),
+  video: resolve(__dirname, 'src/video/index.ts'),
+  document: resolve(__dirname, 'src/document/index.ts'),
+  gif2video: resolve(__dirname, 'src/gif2video/index.ts'),
+  group: resolve(__dirname, 'src/group/index.ts'),
+  proxy: resolve(__dirname, 'src/proxy/index.ts'),
+  builder: resolve(__dirname, 'src/builder/index.ts'),
+  fluent: resolve(__dirname, 'src/fluent/index.ts'),
+  validate: resolve(__dirname, 'src/validate/index.ts'),
+  tiny: resolve(__dirname, 'src/tiny/index.ts'),
+  'cdn-base': resolve(__dirname, 'src/cdn-base/index.ts')
+}
+
+/**
+ * Two bundle flavors from one source:
+ * - `vite build --mode development` → dist/dev: readable, eager validation,
+ *   runtime checks and descriptive errors (`__DEV__` = true)
+ * - `vite build` (production) → dist/prod: minified, checks stripped by DCE
+ *   (`__DEV__` = false)
+ *
+ * Types are emitted once (production pass) into dist/types.
+ */
+export default defineConfig(({ mode }) => {
+  const isDev = mode === 'development'
+
+  // Third flavor: a single-file IIFE global for <script>-tag usage.
+  if (mode === 'iife') {
+    return {
+      define: { __DEV__: 'false' },
+      build: {
+        outDir: 'dist',
+        emptyOutDir: false,
+        minify: 'terser',
+        terserOptions: iifeTerserOptions,
+        lib: {
+          entry: resolve(__dirname, 'src/iife.ts'),
+          name: 'UCCdnUrl',
+          formats: ['iife'],
+          fileName: () => 'cdn-url.global.js'
+        }
+      }
+    }
+  }
+
+  return {
+    define: {
+      __DEV__: JSON.stringify(isDev)
+    },
+    plugins: isDev
+      ? []
+      : [
+          dts({
+            outDir: resolve(__dirname, 'dist/types'),
+            insertTypesEntry: true,
+            exclude: ['vitest.config.ts', '**/*.test.ts']
+          })
+        ],
+    build: {
+      outDir: isDev ? 'dist/dev' : 'dist/prod',
+      emptyOutDir: true,
+      minify: isDev ? false : 'terser',
+      terserOptions,
+      lib: {
+        entry: entries,
+        fileName: '[name]'
+      },
+      rollupOptions: {
+        treeshake: 'smallest',
+        /**
+         * Keep `@uploadcare/cname-prefix` an import rather than inlining it.
+         * It ships `node` and browser builds behind export conditions — native
+         * `node:crypto` on the server, `crypto.subtle` plus a portable digest in
+         * a browser — and bundling it here would freeze one of those into the
+         * published output, so every consumer would get whichever variant this
+         * build machine resolved. Left external, the consumer's bundler or
+         * runtime picks, and an app that also uses `upload-client` ships one copy
+         * instead of two. The IIFE build above must stay self-contained, so it
+         * keeps bundling it.
+         */
+        external: [/^@uploadcare\//]
+      }
+    }
+  }
+})
