@@ -17,9 +17,10 @@ import { retryIfFailed } from '../tools/retryIfFailed'
 import { FailedResponse } from '../request/types'
 import { getContentType } from '../tools/getContentType'
 import { getFileName } from '../tools/getFileName'
+import { getAuthHeaders } from '../tools/getAuthHeaders'
 import { getStoreValue } from '../tools/getStoreValue'
 import { getTagsValue } from '../tools/getTagsValue'
-import { SupportedFileInput } from '../types'
+import { AuthToken, SupportedFileInput } from '../types'
 import { ProgressCallback, Uuid } from './types'
 
 export type BaseResponse = {
@@ -35,6 +36,7 @@ export type BaseOptions = {
   baseURL?: string
   secureSignature?: string
   secureExpire?: string
+  authToken?: AuthToken
   store?: StoreValue
   contentType?: string
 
@@ -63,6 +65,7 @@ export default function base(
     baseURL = defaultSettings.baseURL,
     secureSignature,
     secureExpire,
+    authToken,
     store,
     signal,
     onProgress,
@@ -76,14 +79,19 @@ export default function base(
   }: BaseOptions
 ): Promise<BaseResponse> {
   return retryIfFailed(
-    () =>
+    async () =>
       request({
         method: 'POST',
         url: getUrl(baseURL, '/base/', {
           jsonerrors: 1
         }),
         headers: {
-          'X-UC-User-Agent': getUserAgent({ publicKey, integration, userAgent })
+          'X-UC-User-Agent': getUserAgent({
+            publicKey,
+            integration,
+            userAgent
+          }),
+          ...(await getAuthHeaders(authToken))
         },
         data: buildFormData({
           file: {
@@ -93,8 +101,8 @@ export default function base(
           },
           UPLOADCARE_PUB_KEY: publicKey,
           UPLOADCARE_STORE: getStoreValue(store),
-          signature: secureSignature,
-          expire: secureExpire,
+          signature: authToken ? undefined : secureSignature,
+          expire: authToken ? undefined : secureExpire,
           source: source,
           metadata,
           tags: getTagsValue(tags)
@@ -115,6 +123,10 @@ export default function base(
           return response
         }
       }),
-    { retryNetworkErrorMaxTimes, retryThrottledRequestMaxTimes }
+    {
+      retryNetworkErrorMaxTimes,
+      retryThrottledRequestMaxTimes,
+      canRetryExpiredToken: typeof authToken === 'function'
+    }
   )
 }

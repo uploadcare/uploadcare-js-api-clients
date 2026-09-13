@@ -2,6 +2,7 @@ import { UploadError } from './UploadError'
 import { retrier, NetworkError } from '@uploadcare/api-client-utils'
 
 const REQUEST_WAS_THROTTLED_CODE = 'RequestThrottledError'
+const TOKEN_EXPIRED_CODE = 'JwtTokenExpiredError'
 const DEFAULT_RETRY_AFTER_TIMEOUT = 15000
 const DEFAULT_NETWORK_ERROR_TIMEOUT = 1000
 
@@ -20,13 +21,23 @@ function getTimeoutFromThrottledRequest(error: UploadError): number {
 type RetryIfFailedOptions = {
   retryThrottledRequestMaxTimes: number
   retryNetworkErrorMaxTimes: number
+  /**
+   * Retry once on `JwtTokenExpiredError`. Only makes sense when `fn`
+   * re-resolves the auth token on each attempt (i.e. `authToken` is a resolver
+   * function); a plain token would just fail again.
+   */
+  canRetryExpiredToken?: boolean
 }
 
 export function retryIfFailed<T>(
   fn: () => Promise<T>,
   options: RetryIfFailedOptions
 ): Promise<T> {
-  const { retryThrottledRequestMaxTimes, retryNetworkErrorMaxTimes } = options
+  const {
+    retryThrottledRequestMaxTimes,
+    retryNetworkErrorMaxTimes,
+    canRetryExpiredToken
+  } = options
   return retrier(({ attempt, retry }) =>
     fn().catch((error: Error | UploadError | NetworkError) => {
       if (
@@ -35,6 +46,15 @@ export function retryIfFailed<T>(
         attempt < retryThrottledRequestMaxTimes
       ) {
         return retry(getTimeoutFromThrottledRequest(error))
+      }
+
+      if (
+        'response' in error &&
+        error?.code === TOKEN_EXPIRED_CODE &&
+        canRetryExpiredToken &&
+        attempt < 1
+      ) {
+        return retry(0)
       }
 
       if (

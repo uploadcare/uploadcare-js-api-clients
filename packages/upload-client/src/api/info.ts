@@ -5,10 +5,12 @@ import { getUserAgent } from '../tools/getUserAgent'
 import { camelizeKeys, CustomUserAgent } from '@uploadcare/api-client-utils'
 import { UploadError } from '../tools/UploadError'
 import { retryIfFailed } from '../tools/retryIfFailed'
+import { getAuthHeaders } from '../tools/getAuthHeaders'
 
 /* Types */
 import { Uuid, FileInfo } from './types'
 import { FailedResponse } from '../request/types'
+import { AuthToken } from '../types'
 
 type Response = FileInfo | FailedResponse
 
@@ -16,6 +18,7 @@ export type InfoOptions = {
   publicKey: string
 
   baseURL?: string
+  authToken?: AuthToken
 
   signal?: AbortSignal
 
@@ -33,6 +36,7 @@ export default function info(
   {
     publicKey,
     baseURL = defaultSettings.baseURL,
+    authToken,
     signal,
     source,
     integration,
@@ -42,11 +46,16 @@ export default function info(
   }: InfoOptions
 ): Promise<FileInfo> {
   return retryIfFailed(
-    () =>
+    async () =>
       request({
         method: 'GET',
         headers: {
-          'X-UC-User-Agent': getUserAgent({ publicKey, integration, userAgent })
+          'X-UC-User-Agent': getUserAgent({
+            publicKey,
+            integration,
+            userAgent
+          }),
+          ...(await getAuthHeaders(authToken))
         },
         url: getUrl(baseURL, '/info/', {
           jsonerrors: 1,
@@ -70,6 +79,10 @@ export default function info(
           return response
         }
       }),
-    { retryThrottledRequestMaxTimes, retryNetworkErrorMaxTimes }
+    {
+      retryThrottledRequestMaxTimes,
+      retryNetworkErrorMaxTimes,
+      canRetryExpiredToken: typeof authToken === 'function'
+    }
   )
 }

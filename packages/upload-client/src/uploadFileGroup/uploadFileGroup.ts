@@ -30,6 +30,7 @@ export function uploadFileGroup(
     baseURL = defaultSettings.baseURL,
     secureSignature,
     secureExpire,
+    authToken,
     store,
 
     signal,
@@ -97,6 +98,7 @@ export function uploadFileGroup(
             baseURL,
             secureSignature,
             secureExpire,
+            authToken,
             store,
 
             signal,
@@ -130,6 +132,7 @@ export function uploadFileGroup(
       jsonpCallback,
       secureSignature,
       secureExpire,
+      authToken,
       signal,
       source,
       integration,

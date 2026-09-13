@@ -98,12 +98,13 @@ export { UploadcareFile } from './tools/UploadcareFile'
 export { UploadcareGroup } from './tools/UploadcareGroup'
 export { UploadError, ErrorResponseInfo } from './tools/UploadError'
 export { ServerErrorCode } from './tools/ServerErrorCode'
+export { getAuthErrorKind, AuthErrorKind } from './tools/getAuthErrorKind'
 
 import { UploadError } from './tools/UploadError'
 /** @deprecated Please use UploadError instead. */
 export const UploadClientError = UploadError
 
-export { Settings, SupportedFileInput as SupportedFileInput } from './types'
+export { Settings, AuthToken, SupportedFileInput } from './types'
 export {
   NodeFile as NodeFile,
   BrowserFile as BrowserFile,

@@ -10,6 +10,8 @@ import { getUserAgent } from '../tools/getUserAgent'
 import { UploadError } from '../tools/UploadError'
 import { retryIfFailed } from '../tools/retryIfFailed'
 import buildFormData from '../tools/buildFormData'
+import { getAuthHeaders } from '../tools/getAuthHeaders'
+import { AuthToken } from '../types'
 
 export type GroupOptions = {
   publicKey: string
@@ -18,6 +20,7 @@ export type GroupOptions = {
   jsonpCallback?: string
   secureSignature?: string
   secureExpire?: string
+  authToken?: AuthToken
 
   signal?: AbortSignal
 
@@ -40,6 +43,7 @@ export default function group(
     jsonpCallback,
     secureSignature,
     secureExpire,
+    authToken,
     signal,
     source,
     integration,
@@ -49,11 +53,16 @@ export default function group(
   }: GroupOptions
 ): Promise<GroupInfo> {
   return retryIfFailed(
-    () =>
+    async () =>
       request({
         method: 'POST',
         headers: {
-          'X-UC-User-Agent': getUserAgent({ publicKey, integration, userAgent })
+          'X-UC-User-Agent': getUserAgent({
+            publicKey,
+            integration,
+            userAgent
+          }),
+          ...(await getAuthHeaders(authToken))
         },
         url: getUrl(baseURL, '/group/', {
           jsonerrors: 1
@@ -62,8 +71,8 @@ export default function group(
           files: uuids,
           callback: jsonpCallback,
           pub_key: publicKey,
-          signature: secureSignature,
-          expire: secureExpire,
+          signature: authToken ? undefined : secureSignature,
+          expire: authToken ? undefined : secureExpire,
           source
         }),
         signal
@@ -82,6 +91,10 @@ export default function group(
           return response
         }
       }),
-    { retryNetworkErrorMaxTimes, retryThrottledRequestMaxTimes }
+    {
+      retryNetworkErrorMaxTimes,
+      retryThrottledRequestMaxTimes,
+      canRetryExpiredToken: typeof authToken === 'function'
+    }
   )
 }

@@ -9,10 +9,13 @@ import defaultSettings from '../defaultSettings'
 import { getUserAgent } from '../tools/getUserAgent'
 import { retryIfFailed } from '../tools/retryIfFailed'
 import { UploadError } from '../tools/UploadError'
+import { getAuthHeaders } from '../tools/getAuthHeaders'
+import { AuthToken } from '../types'
 
 export type MultipartCompleteOptions = {
   publicKey: string
   baseURL?: string
+  authToken?: AuthToken
   signal?: AbortSignal
   source?: string
   integration?: string
@@ -29,6 +32,7 @@ export default function multipartComplete(
   {
     publicKey,
     baseURL = defaultSettings.baseURL,
+    authToken,
     source = 'local',
     signal,
     integration,
@@ -38,12 +42,17 @@ export default function multipartComplete(
   }: MultipartCompleteOptions
 ): Promise<FileInfo> {
   return retryIfFailed(
-    () =>
+    async () =>
       request({
         method: 'POST',
         url: getUrl(baseURL, '/multipart/complete/', { jsonerrors: 1 }),
         headers: {
-          'X-UC-User-Agent': getUserAgent({ publicKey, integration, userAgent })
+          'X-UC-User-Agent': getUserAgent({
+            publicKey,
+            integration,
+            userAgent
+          }),
+          ...(await getAuthHeaders(authToken))
         },
         data: buildFormData({
           uuid: uuid,
@@ -66,6 +75,10 @@ export default function multipartComplete(
           return response
         }
       }),
-    { retryThrottledRequestMaxTimes, retryNetworkErrorMaxTimes }
+    {
+      retryThrottledRequestMaxTimes,
+      retryNetworkErrorMaxTimes,
+      canRetryExpiredToken: typeof authToken === 'function'
+    }
   )
 }

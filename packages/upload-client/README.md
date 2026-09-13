@@ -312,6 +312,61 @@ of `API secret key` and `secureExpire`.
 
 Stands for the Unix time to which the signature is valid, e.g., `1454902434`.
 
+#### `authToken: string | (() => string | Promise<string>)`
+
+A JWT issued on your backend, sent with every Upload API request as an
+`Authorization: Bearer <token>` header. This is the successor of the legacy
+`secureSignature`/`secureExpire` scheme: the token carries an endpoint scope,
+an optional operation quota, and a max TTL of 24 hours.
+
+```javascript
+const client = new UploadClient({
+  publicKey: 'YOUR_PUBLIC_KEY',
+  authToken: 'YOUR_JWT'
+})
+```
+
+Instead of a plain token you can pass a resolver function (sync or async). It
+is called before **every** request, which lets long-running uploads (e.g.
+multipart) pick up a fresh token mid-flight:
+
+```javascript
+const client = new UploadClient({
+  publicKey: 'YOUR_PUBLIC_KEY',
+  authToken: () => myTokenCache.getOrFetch()
+})
+```
+
+Issuing, caching and refreshing tokens is your application's responsibility —
+the client never stores a token between calls. When the Upload API reports
+that the token has expired and `authToken` is a resolver, the client calls the
+resolver again and retries the request once.
+
+Precedence: when both `authToken` and `secureSignature`/`secureExpire` are
+provided, only the `Authorization` header is sent, and the signature
+parameters are dropped.
+
+Multipart uploads authorize the start and complete requests (and the file
+info polling) with the token; the individual part uploads go directly to
+presigned storage URLs and never carry the header.
+
+To react to auth errors, use the `getAuthErrorKind` helper — it returns
+`'token-expired'` (refresh and retry), `'quota-exhausted'` or `'scope-denied'`
+(final, don't retry), `'token-invalid'` (final), or `null` for any non-auth
+error:
+
+```javascript
+import { getAuthErrorKind } from '@uploadcare/upload-client'
+
+try {
+  await client.uploadFile(fileData)
+} catch (error) {
+  if (getAuthErrorKind(error) === 'token-expired') {
+    // refresh the token and retry
+  }
+}
+```
+
 #### `userAgent: string | CustomUserAgentFn`
 
 ```typescript

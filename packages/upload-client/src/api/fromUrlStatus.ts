@@ -10,6 +10,8 @@ import { getUserAgent } from '../tools/getUserAgent'
 import { UploadError } from '../tools/UploadError'
 import { retryIfFailed } from '../tools/retryIfFailed'
 import { ServerErrorCode } from '../tools/ServerErrorCode'
+import { getAuthHeaders } from '../tools/getAuthHeaders'
+import { AuthToken } from '../types'
 
 export enum Status {
   Unknown = 'unknown',
@@ -63,6 +65,7 @@ export type FromUrlStatusOptions = {
   publicKey?: string
 
   baseURL?: string
+  authToken?: AuthToken
 
   signal?: AbortSignal
 
@@ -79,6 +82,7 @@ export default function fromUrlStatus(
   {
     publicKey,
     baseURL = defaultSettings.baseURL,
+    authToken,
     signal,
     integration,
     userAgent,
@@ -87,18 +91,21 @@ export default function fromUrlStatus(
   }: FromUrlStatusOptions = {}
 ): Promise<FromUrlStatusResponse> {
   return retryIfFailed(
-    () =>
+    async () =>
       request({
         method: 'GET',
-        headers: publicKey
-          ? {
-              'X-UC-User-Agent': getUserAgent({
-                publicKey,
-                integration,
-                userAgent
-              })
-            }
-          : undefined,
+        headers: {
+          ...(publicKey
+            ? {
+                'X-UC-User-Agent': getUserAgent({
+                  publicKey,
+                  integration,
+                  userAgent
+                })
+              }
+            : {}),
+          ...(await getAuthHeaders(authToken))
+        },
         url: getUrl(baseURL, '/from_url/status/', {
           jsonerrors: 1,
           token
@@ -119,6 +126,10 @@ export default function fromUrlStatus(
           return response
         }
       }),
-    { retryNetworkErrorMaxTimes, retryThrottledRequestMaxTimes }
+    {
+      retryNetworkErrorMaxTimes,
+      retryThrottledRequestMaxTimes,
+      canRetryExpiredToken: typeof authToken === 'function'
+    }
   )
 }

@@ -19,8 +19,10 @@ import {
 import { getUserAgent } from '../tools/getUserAgent'
 import { retryIfFailed } from '../tools/retryIfFailed'
 import { UploadError } from '../tools/UploadError'
+import { getAuthHeaders } from '../tools/getAuthHeaders'
 import { getStoreValue } from '../tools/getStoreValue'
 import { getTagsValue } from '../tools/getTagsValue'
+import { AuthToken } from '../types'
 
 export type MultipartStartOptions = {
   publicKey: string
@@ -29,6 +31,7 @@ export type MultipartStartOptions = {
   baseURL?: string
   secureSignature?: string
   secureExpire?: string
+  authToken?: AuthToken
   store?: StoreValue
   multipartChunkSize?: number
   signal?: AbortSignal
@@ -61,6 +64,7 @@ export default function multipartStart(
     baseURL = '',
     secureSignature,
     secureExpire,
+    authToken,
     store,
     signal,
     source = 'local',
@@ -74,12 +78,17 @@ export default function multipartStart(
   }: MultipartStartOptions
 ): Promise<MultipartStartResponse> {
   return retryIfFailed(
-    () =>
+    async () =>
       request({
         method: 'POST',
         url: getUrl(baseURL, '/multipart/start/', { jsonerrors: 1 }),
         headers: {
-          'X-UC-User-Agent': getUserAgent({ publicKey, integration, userAgent })
+          'X-UC-User-Agent': getUserAgent({
+            publicKey,
+            integration,
+            userAgent
+          }),
+          ...(await getAuthHeaders(authToken))
         },
         data: buildFormData({
           filename: fileName || defaultFilename,
@@ -88,8 +97,8 @@ export default function multipartStart(
           part_size: multipartChunkSize,
           UPLOADCARE_STORE: getStoreValue(store),
           UPLOADCARE_PUB_KEY: publicKey,
-          signature: secureSignature,
-          expire: secureExpire,
+          signature: authToken ? undefined : secureSignature,
+          expire: authToken ? undefined : secureExpire,
           source: source,
           metadata,
           tags: getTagsValue(tags)
@@ -115,6 +124,10 @@ export default function multipartStart(
           return response
         }
       }),
-    { retryThrottledRequestMaxTimes, retryNetworkErrorMaxTimes }
+    {
+      retryThrottledRequestMaxTimes,
+      retryNetworkErrorMaxTimes,
+      canRetryExpiredToken: typeof authToken === 'function'
+    }
   )
 }

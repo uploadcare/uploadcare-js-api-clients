@@ -95,3 +95,8 @@ export type ServerErrorCode =
   | 'URLSchemeInvalidError' //	400	Invalid URL scheme.
   | 'URLSchemeRequiredError' //	400	No URL scheme supplied.
   | 'URLValidationError' //	400	Failed to validate URL.
+  // JWT (Bearer token) auth errors — names pending platform confirmation:
+  | 'JwtTokenExpiredError' //	403	Token has expired.
+  | 'JwtQuotaExceededError' //	403	Operation quota exhausted.
+  | 'JwtScopeDeniedError' //	403	Endpoint is not in the token scope.
+  | 'JwtInvalidError' //	403	Token is invalid.

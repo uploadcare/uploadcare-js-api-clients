@@ -9,10 +9,13 @@ import defaultSettings from '../defaultSettings'
 import { getUserAgent } from '../tools/getUserAgent'
 import { UploadError } from '../tools/UploadError'
 import { retryIfFailed } from '../tools/retryIfFailed'
+import { getAuthHeaders } from '../tools/getAuthHeaders'
+import { AuthToken } from '../types'
 
 export type GroupInfoOptions = {
   publicKey: string
   baseURL?: string
+  authToken?: AuthToken
 
   signal?: AbortSignal
 
@@ -32,6 +35,7 @@ export default function groupInfo(
   {
     publicKey,
     baseURL = defaultSettings.baseURL,
+    authToken,
     signal,
     source,
     integration,
@@ -41,11 +45,16 @@ export default function groupInfo(
   }: GroupInfoOptions
 ): Promise<GroupInfo> {
   return retryIfFailed(
-    () =>
+    async () =>
       request({
         method: 'GET',
         headers: {
-          'X-UC-User-Agent': getUserAgent({ publicKey, integration, userAgent })
+          'X-UC-User-Agent': getUserAgent({
+            publicKey,
+            integration,
+            userAgent
+          }),
+          ...(await getAuthHeaders(authToken))
         },
         url: getUrl(baseURL, '/group/info/', {
           jsonerrors: 1,
@@ -69,6 +78,10 @@ export default function groupInfo(
           return response
         }
       }),
-    { retryThrottledRequestMaxTimes, retryNetworkErrorMaxTimes }
+    {
+      retryThrottledRequestMaxTimes,
+      retryNetworkErrorMaxTimes,
+      canRetryExpiredToken: typeof authToken === 'function'
+    }
   )
 }

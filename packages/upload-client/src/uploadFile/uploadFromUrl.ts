@@ -15,11 +15,13 @@ import {
 import { UploadcareFile } from '../tools/UploadcareFile'
 import { toUploadcareFile } from '../tools/toUploadcareFile'
 import { FileInfo, ProgressCallback } from '../api/types'
+import { AuthToken } from '../types'
 
 function pollStrategy({
   token,
   publicKey,
   baseURL,
+  authToken,
   integration,
   userAgent,
   retryThrottledRequestMaxTimes,
@@ -30,6 +32,7 @@ function pollStrategy({
   token: string
   publicKey: string
   baseURL?: string
+  authToken?: AuthToken
   integration?: string
   userAgent?: CustomUserAgent
   retryThrottledRequestMaxTimes?: number
@@ -42,6 +45,7 @@ function pollStrategy({
       fromUrlStatus(token, {
         publicKey,
         baseURL,
+        authToken,
         integration,
         userAgent,
         retryThrottledRequestMaxTimes,
@@ -166,6 +170,7 @@ export const uploadFromUrl = (
     saveUrlForRecurrentUploads,
     secureSignature,
     secureExpire,
+    authToken,
     store,
     signal,
     onProgress,
@@ -188,6 +193,7 @@ export const uploadFromUrl = (
         saveUrlForRecurrentUploads,
         secureSignature,
         secureExpire,
+        authToken,
         store,
         signal,
         source,
@@ -214,6 +220,7 @@ export const uploadFromUrl = (
                 token: urlResponse.token,
                 publicKey,
                 baseURL,
+                authToken,
                 integration,
                 userAgent,
                 retryThrottledRequestMaxTimes,
@@ -244,6 +251,7 @@ export const uploadFromUrl = (
       return isReadyPoll(result.uuid, {
         publicKey,
         baseURL,
+        authToken,
         integration,
         userAgent,
         retryThrottledRequestMaxTimes,

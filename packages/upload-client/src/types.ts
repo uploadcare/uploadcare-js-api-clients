@@ -1,5 +1,16 @@
 import { CustomUserAgent, StoreValue } from '@uploadcare/api-client-utils'
 
+/**
+ * JWT for the Upload API `Authorization: Bearer <token>` scheme. Accepts a
+ * plain token or a resolver function; the resolver is called before every
+ * request, so long-running uploads (e.g. multipart) can supply a fresh token
+ * mid-flight. Token issuing and refreshing are the caller's responsibility.
+ *
+ * Takes precedence over legacy `secureSignature` / `secureExpire`: when both
+ * are provided, only the Authorization header is sent.
+ */
+export type AuthToken = string | (() => string | Promise<string>)
+
 export interface DefaultSettings {
   baseCDN: string
   /**
@@ -26,6 +37,7 @@ export interface Settings extends Partial<DefaultSettings> {
   store?: StoreValue
   secureSignature?: string
   secureExpire?: string
+  authToken?: AuthToken
   integration?: string
   userAgent?: CustomUserAgent
   checkForUrlDuplicates?: boolean

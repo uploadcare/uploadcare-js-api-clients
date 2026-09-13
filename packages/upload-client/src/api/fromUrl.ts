@@ -15,8 +15,10 @@ import defaultSettings from '../defaultSettings'
 import { getUserAgent } from '../tools/getUserAgent'
 import { UploadError } from '../tools/UploadError'
 import { retryIfFailed } from '../tools/retryIfFailed'
+import { getAuthHeaders } from '../tools/getAuthHeaders'
 import { getStoreValue } from '../tools/getStoreValue'
 import { getTagsValue } from '../tools/getTagsValue'
+import { AuthToken } from '../types'
 
 export enum TypeEnum {
   Token = 'token',
@@ -62,6 +64,7 @@ export type FromUrlOptions = {
   saveUrlForRecurrentUploads?: boolean
   secureSignature?: string
   secureExpire?: string
+  authToken?: AuthToken
 
   signal?: AbortSignal
 
@@ -87,6 +90,7 @@ export default function fromUrl(
     saveUrlForRecurrentUploads,
     secureSignature,
     secureExpire,
+    authToken,
     source = 'url',
     signal,
     integration,
@@ -98,11 +102,16 @@ export default function fromUrl(
   }: FromUrlOptions
 ): Promise<FromUrlSuccessResponse> {
   return retryIfFailed(
-    () =>
+    async () =>
       request({
         method: 'POST',
         headers: {
-          'X-UC-User-Agent': getUserAgent({ publicKey, integration, userAgent })
+          'X-UC-User-Agent': getUserAgent({
+            publicKey,
+            integration,
+            userAgent
+          }),
+          ...(await getAuthHeaders(authToken))
         },
         url: getUrl(baseURL, '/from_url/', {
           jsonerrors: 1,
@@ -112,8 +121,8 @@ export default function fromUrl(
           filename: fileName,
           check_URL_duplicates: checkForUrlDuplicates ? 1 : undefined,
           save_URL_duplicates: saveUrlForRecurrentUploads ? 1 : undefined,
-          signature: secureSignature,
-          expire: secureExpire,
+          signature: authToken ? undefined : secureSignature,
+          expire: authToken ? undefined : secureExpire,
           source: source,
           metadata,
           tags: getTagsValue(tags)
@@ -134,6 +143,10 @@ export default function fromUrl(
           return response
         }
       }),
-    { retryNetworkErrorMaxTimes, retryThrottledRequestMaxTimes }
+    {
+      retryNetworkErrorMaxTimes,
+      retryThrottledRequestMaxTimes,
+      canRetryExpiredToken: typeof authToken === 'function'
+    }
   )
 }
