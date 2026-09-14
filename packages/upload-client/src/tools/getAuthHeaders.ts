@@ -1,10 +1,14 @@
 import { AuthToken } from '../types'
 import { Headers } from '../request/types'
 
+export const isAuthTokenResolver = (
+  authToken: AuthToken | undefined
+): authToken is Exclude<AuthToken, string> => typeof authToken === 'function'
+
 export const resolveAuthToken = (
   authToken: AuthToken | undefined
 ): Promise<string | undefined> =>
-  Promise.resolve(typeof authToken === 'function' ? authToken() : authToken)
+  Promise.resolve(isAuthTokenResolver(authToken) ? authToken() : authToken)
 
 /**
  * Resolves the auth token (calling the resolver if one is given) and returns

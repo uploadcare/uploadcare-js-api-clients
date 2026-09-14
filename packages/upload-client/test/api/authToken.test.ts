@@ -3,7 +3,7 @@ import fromUrl from '../../src/api/fromUrl'
 import group from '../../src/api/group'
 import { uploadDirect } from '../../src/uploadFile/uploadDirect'
 import { uploadMultipart } from '../../src/uploadFile/uploadMultipart'
-import { getAuthErrorKind } from '../../src/tools/getAuthErrorKind'
+import { AuthError } from '../../src/tools/AuthError'
 import { UploadError } from '../../src/tools/UploadError'
 import * as factory from '../_fixtureFactory'
 import { getSettingsForTesting } from '../_helpers'
@@ -42,9 +42,9 @@ describeLocalOnly('authToken (JWT auth)', () => {
     )
 
     expect(error).toBeInstanceOf(UploadError)
+    expect(error).toBeInstanceOf(AuthError)
     expect(error?.message).toBe('Token is invalid.')
     expect(error?.code).toBe('JwtInvalidError')
-    expect(getAuthErrorKind(error)).toBe('token-invalid')
   })
 
   it('should authorize with a valid token even when the public key is invalid', async () => {
@@ -68,16 +68,24 @@ describeLocalOnly('authToken (JWT auth)', () => {
   })
 
   it('should drop legacy signature params when authToken is set', async () => {
-    // The mock server rejects requests carrying both auth schemes, so
-    // success here proves signature/expire were not sent.
-    const { file } = await base(fileToUpload.data, {
-      ...settings,
-      authToken: 'valid-jwt',
-      secureSignature: 'signature',
-      secureExpire: '1234567890'
-    })
+    const warnSpy = jest
+      .spyOn(console, 'warn')
+      .mockImplementation(() => undefined)
+    try {
+      // The mock server rejects requests carrying both auth schemes, so
+      // success here proves signature/expire were not sent.
+      const { file } = await base(fileToUpload.data, {
+        ...settings,
+        authToken: 'valid-jwt',
+        secureSignature: 'signature',
+        secureExpire: '1234567890'
+      })
 
-    expect(typeof file).toBe('string')
+      expect(typeof file).toBe('string')
+      expect(warnSpy).toHaveBeenCalledTimes(1)
+    } finally {
+      warnSpy.mockRestore()
+    }
   })
 
   it('should reject with JwtTokenExpiredError for a plain expired token', async () => {
@@ -85,8 +93,8 @@ describeLocalOnly('authToken (JWT auth)', () => {
       base(fileToUpload.data, { ...settings, authToken: 'expired-jwt' })
     )
 
+    expect(error).toBeInstanceOf(AuthError)
     expect(error?.code).toBe('JwtTokenExpiredError')
-    expect(getAuthErrorKind(error)).toBe('token-expired')
   })
 
   it('should re-resolve the token and retry once when it is expired', async () => {
@@ -114,18 +122,18 @@ describeLocalOnly('authToken (JWT auth)', () => {
   })
 
   it.each([
-    ['quota-jwt', 'JwtQuotaExceededError', 'quota-exhausted'],
-    ['scope-jwt', 'JwtScopeDeniedError', 'scope-denied']
+    ['quota-jwt', 'JwtQuotaExceededError'],
+    ['scope-jwt', 'JwtScopeDeniedError']
   ] as const)(
     'should not retry the final error %s even with a resolver',
-    async (jwt, code, kind) => {
+    async (jwt, code) => {
       const resolver = jest.fn(() => jwt)
       const error = await caught(
         base(fileToUpload.data, { ...settings, authToken: resolver })
       )
 
+      expect(error).toBeInstanceOf(AuthError)
       expect(error?.code).toBe(code)
-      expect(getAuthErrorKind(error)).toBe(kind)
       expect(resolver).toHaveBeenCalledTimes(1)
     }
   )

@@ -12,10 +12,11 @@ import request from '../request/request.node'
 import getUrl from '../tools/getUrl'
 
 import defaultSettings from '../defaultSettings'
-import { getUserAgent } from '../tools/getUserAgent'
-import { UploadError } from '../tools/UploadError'
+import { createUploadError } from '../tools/AuthError'
 import { retryIfFailed } from '../tools/retryIfFailed'
-import { getAuthHeaders } from '../tools/getAuthHeaders'
+import { isAuthTokenResolver } from '../tools/getAuthHeaders'
+import { getRequestHeaders } from '../tools/getRequestHeaders'
+import { getSecureParams } from '../tools/getSecureParams'
 import { getStoreValue } from '../tools/getStoreValue'
 import { getTagsValue } from '../tools/getTagsValue'
 import { AuthToken } from '../types'
@@ -105,14 +106,12 @@ export default function fromUrl(
     async () =>
       request({
         method: 'POST',
-        headers: {
-          'X-UC-User-Agent': getUserAgent({
-            publicKey,
-            integration,
-            userAgent
-          }),
-          ...(await getAuthHeaders(authToken))
-        },
+        headers: await getRequestHeaders({
+          publicKey,
+          integration,
+          userAgent,
+          authToken
+        }),
         url: getUrl(baseURL, '/from_url/', {
           jsonerrors: 1,
           pub_key: publicKey,
@@ -121,8 +120,7 @@ export default function fromUrl(
           filename: fileName,
           check_URL_duplicates: checkForUrlDuplicates ? 1 : undefined,
           save_URL_duplicates: saveUrlForRecurrentUploads ? 1 : undefined,
-          signature: authToken ? undefined : secureSignature,
-          expire: authToken ? undefined : secureExpire,
+          ...getSecureParams({ authToken, secureSignature, secureExpire }),
           source: source,
           metadata,
           tags: getTagsValue(tags)
@@ -132,7 +130,7 @@ export default function fromUrl(
         const response = camelizeKeys<Response>(JSON.parse(data))
 
         if ('error' in response) {
-          throw new UploadError(
+          throw createUploadError(
             response.error.content,
             response.error.errorCode,
             request,
@@ -146,7 +144,7 @@ export default function fromUrl(
     {
       retryNetworkErrorMaxTimes,
       retryThrottledRequestMaxTimes,
-      canRetryExpiredToken: typeof authToken === 'function'
+      canRetryExpiredToken: isAuthTokenResolver(authToken)
     }
   )
 }

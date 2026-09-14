@@ -8,16 +8,17 @@ import {
 import { defaultSettings } from '../defaultSettings'
 import request from '../request/request.node'
 import buildFormData from '../tools/buildFormData'
-import { UploadError } from '../tools/UploadError'
+import { createUploadError } from '../tools/AuthError'
 import getUrl from '../tools/getUrl'
-import { getUserAgent } from '../tools/getUserAgent'
 import { retryIfFailed } from '../tools/retryIfFailed'
 
 /* Types */
 import { FailedResponse } from '../request/types'
 import { getContentType } from '../tools/getContentType'
 import { getFileName } from '../tools/getFileName'
-import { getAuthHeaders } from '../tools/getAuthHeaders'
+import { isAuthTokenResolver } from '../tools/getAuthHeaders'
+import { getRequestHeaders } from '../tools/getRequestHeaders'
+import { getSecureParams } from '../tools/getSecureParams'
 import { getStoreValue } from '../tools/getStoreValue'
 import { getTagsValue } from '../tools/getTagsValue'
 import { AuthToken, SupportedFileInput } from '../types'
@@ -85,14 +86,12 @@ export default function base(
         url: getUrl(baseURL, '/base/', {
           jsonerrors: 1
         }),
-        headers: {
-          'X-UC-User-Agent': getUserAgent({
-            publicKey,
-            integration,
-            userAgent
-          }),
-          ...(await getAuthHeaders(authToken))
-        },
+        headers: await getRequestHeaders({
+          publicKey,
+          integration,
+          userAgent,
+          authToken
+        }),
         data: buildFormData({
           file: {
             data: file,
@@ -101,8 +100,7 @@ export default function base(
           },
           UPLOADCARE_PUB_KEY: publicKey,
           UPLOADCARE_STORE: getStoreValue(store),
-          signature: authToken ? undefined : secureSignature,
-          expire: authToken ? undefined : secureExpire,
+          ...getSecureParams({ authToken, secureSignature, secureExpire }),
           source: source,
           metadata,
           tags: getTagsValue(tags)
@@ -112,7 +110,7 @@ export default function base(
       }).then(({ data, headers, request }) => {
         const response = camelizeKeys<Response>(JSON.parse(data))
         if ('error' in response) {
-          throw new UploadError(
+          throw createUploadError(
             response.error.content,
             response.error.errorCode,
             request,
@@ -126,7 +124,7 @@ export default function base(
     {
       retryNetworkErrorMaxTimes,
       retryThrottledRequestMaxTimes,
-      canRetryExpiredToken: typeof authToken === 'function'
+      canRetryExpiredToken: isAuthTokenResolver(authToken)
     }
   )
 }

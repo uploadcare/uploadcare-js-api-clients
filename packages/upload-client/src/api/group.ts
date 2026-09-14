@@ -6,11 +6,12 @@ import request from '../request/request.node'
 import getUrl from '../tools/getUrl'
 
 import defaultSettings from '../defaultSettings'
-import { getUserAgent } from '../tools/getUserAgent'
-import { UploadError } from '../tools/UploadError'
+import { createUploadError } from '../tools/AuthError'
 import { retryIfFailed } from '../tools/retryIfFailed'
 import buildFormData from '../tools/buildFormData'
-import { getAuthHeaders } from '../tools/getAuthHeaders'
+import { isAuthTokenResolver } from '../tools/getAuthHeaders'
+import { getRequestHeaders } from '../tools/getRequestHeaders'
+import { getSecureParams } from '../tools/getSecureParams'
 import { AuthToken } from '../types'
 
 export type GroupOptions = {
@@ -56,14 +57,12 @@ export default function group(
     async () =>
       request({
         method: 'POST',
-        headers: {
-          'X-UC-User-Agent': getUserAgent({
-            publicKey,
-            integration,
-            userAgent
-          }),
-          ...(await getAuthHeaders(authToken))
-        },
+        headers: await getRequestHeaders({
+          publicKey,
+          integration,
+          userAgent,
+          authToken
+        }),
         url: getUrl(baseURL, '/group/', {
           jsonerrors: 1
         }),
@@ -71,8 +70,7 @@ export default function group(
           files: uuids,
           callback: jsonpCallback,
           pub_key: publicKey,
-          signature: authToken ? undefined : secureSignature,
-          expire: authToken ? undefined : secureExpire,
+          ...getSecureParams({ authToken, secureSignature, secureExpire }),
           source
         }),
         signal
@@ -80,7 +78,7 @@ export default function group(
         const response = camelizeKeys<Response>(JSON.parse(data))
 
         if ('error' in response) {
-          throw new UploadError(
+          throw createUploadError(
             response.error.content,
             response.error.errorCode,
             request,
@@ -94,7 +92,7 @@ export default function group(
     {
       retryNetworkErrorMaxTimes,
       retryThrottledRequestMaxTimes,
-      canRetryExpiredToken: typeof authToken === 'function'
+      canRetryExpiredToken: isAuthTokenResolver(authToken)
     }
   )
 }

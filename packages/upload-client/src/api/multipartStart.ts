@@ -16,10 +16,11 @@ import {
   defaultFilename,
   defaultContentType
 } from '../defaultSettings'
-import { getUserAgent } from '../tools/getUserAgent'
 import { retryIfFailed } from '../tools/retryIfFailed'
-import { UploadError } from '../tools/UploadError'
-import { getAuthHeaders } from '../tools/getAuthHeaders'
+import { createUploadError } from '../tools/AuthError'
+import { isAuthTokenResolver } from '../tools/getAuthHeaders'
+import { getRequestHeaders } from '../tools/getRequestHeaders'
+import { getSecureParams } from '../tools/getSecureParams'
 import { getStoreValue } from '../tools/getStoreValue'
 import { getTagsValue } from '../tools/getTagsValue'
 import { AuthToken } from '../types'
@@ -82,14 +83,12 @@ export default function multipartStart(
       request({
         method: 'POST',
         url: getUrl(baseURL, '/multipart/start/', { jsonerrors: 1 }),
-        headers: {
-          'X-UC-User-Agent': getUserAgent({
-            publicKey,
-            integration,
-            userAgent
-          }),
-          ...(await getAuthHeaders(authToken))
-        },
+        headers: await getRequestHeaders({
+          publicKey,
+          integration,
+          userAgent,
+          authToken
+        }),
         data: buildFormData({
           filename: fileName || defaultFilename,
           size: size,
@@ -97,8 +96,7 @@ export default function multipartStart(
           part_size: multipartChunkSize,
           UPLOADCARE_STORE: getStoreValue(store),
           UPLOADCARE_PUB_KEY: publicKey,
-          signature: authToken ? undefined : secureSignature,
-          expire: authToken ? undefined : secureExpire,
+          ...getSecureParams({ authToken, secureSignature, secureExpire }),
           source: source,
           metadata,
           tags: getTagsValue(tags)
@@ -108,7 +106,7 @@ export default function multipartStart(
         const response = camelizeKeys<Response>(JSON.parse(data))
 
         if ('error' in response) {
-          throw new UploadError(
+          throw createUploadError(
             response.error.content,
             response.error.errorCode,
             request,
@@ -127,7 +125,7 @@ export default function multipartStart(
     {
       retryThrottledRequestMaxTimes,
       retryNetworkErrorMaxTimes,
-      canRetryExpiredToken: typeof authToken === 'function'
+      canRetryExpiredToken: isAuthTokenResolver(authToken)
     }
   )
 }

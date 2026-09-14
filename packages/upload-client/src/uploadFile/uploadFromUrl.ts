@@ -1,6 +1,7 @@
 import fromUrlStatus, { Status } from '../api/fromUrlStatus'
 import fromUrl, { TypeEnum, FromUrlOptions } from '../api/fromUrl'
 import { UploadError } from '../tools/UploadError'
+import { createUploadError } from '../tools/AuthError'
 import { race } from '../tools/race'
 import { isReadyPoll } from '../tools/isReadyPoll'
 import defaultSettings from '../defaultSettings'
@@ -54,7 +55,7 @@ function pollStrategy({
       }).then((response) => {
         switch (response.status) {
           case Status.Error: {
-            return new UploadError(response.error, response.errorCode)
+            return createUploadError(response.error, response.errorCode)
           }
           case Status.Waiting: {
             return false
@@ -152,7 +153,7 @@ const pushStrategy = ({
 
         case Status.Error: {
           destroy()
-          reject(new UploadError(result.msg, result.error_code))
+          reject(createUploadError(result.msg, result.error_code))
         }
       }
     })

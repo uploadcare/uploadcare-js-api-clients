@@ -6,10 +6,10 @@ import request from '../request/request.node'
 import buildFormData from '../tools/buildFormData'
 import getUrl from '../tools/getUrl'
 import defaultSettings from '../defaultSettings'
-import { getUserAgent } from '../tools/getUserAgent'
 import { retryIfFailed } from '../tools/retryIfFailed'
-import { UploadError } from '../tools/UploadError'
-import { getAuthHeaders } from '../tools/getAuthHeaders'
+import { createUploadError } from '../tools/AuthError'
+import { isAuthTokenResolver } from '../tools/getAuthHeaders'
+import { getRequestHeaders } from '../tools/getRequestHeaders'
 import { AuthToken } from '../types'
 
 export type MultipartCompleteOptions = {
@@ -46,14 +46,12 @@ export default function multipartComplete(
       request({
         method: 'POST',
         url: getUrl(baseURL, '/multipart/complete/', { jsonerrors: 1 }),
-        headers: {
-          'X-UC-User-Agent': getUserAgent({
-            publicKey,
-            integration,
-            userAgent
-          }),
-          ...(await getAuthHeaders(authToken))
-        },
+        headers: await getRequestHeaders({
+          publicKey,
+          integration,
+          userAgent,
+          authToken
+        }),
         data: buildFormData({
           uuid: uuid,
           UPLOADCARE_PUB_KEY: publicKey,
@@ -64,7 +62,7 @@ export default function multipartComplete(
         const response = camelizeKeys<Response>(JSON.parse(data))
 
         if ('error' in response) {
-          throw new UploadError(
+          throw createUploadError(
             response.error.content,
             response.error.errorCode,
             request,
@@ -78,7 +76,7 @@ export default function multipartComplete(
     {
       retryThrottledRequestMaxTimes,
       retryNetworkErrorMaxTimes,
-      canRetryExpiredToken: typeof authToken === 'function'
+      canRetryExpiredToken: isAuthTokenResolver(authToken)
     }
   )
 }

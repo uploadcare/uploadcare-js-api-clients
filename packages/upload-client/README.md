@@ -344,24 +344,24 @@ resolver again and retries the request once.
 
 Precedence: when both `authToken` and `secureSignature`/`secureExpire` are
 provided, only the `Authorization` header is sent, and the signature
-parameters are dropped.
+parameters are dropped (with a one-time console warning).
 
 Multipart uploads authorize the start and complete requests (and the file
 info polling) with the token; the individual part uploads go directly to
 presigned storage URLs and never carry the header.
 
-To react to auth errors, use the `getAuthErrorKind` helper — it returns
-`'token-expired'` (refresh and retry), `'quota-exhausted'` or `'scope-denied'`
-(final, don't retry), `'token-invalid'` (final), or `null` for any non-auth
-error:
+Auth failures are thrown as `AuthError` (a subclass of `UploadError`) whose
+`code` holds the raw server error code: `JwtTokenExpiredError` (refresh the
+token and retry), `JwtQuotaExceededError` and `JwtScopeDeniedError` (final,
+don't retry), or `JwtInvalidError` (final):
 
 ```javascript
-import { getAuthErrorKind } from '@uploadcare/upload-client'
+import { AuthError } from '@uploadcare/upload-client'
 
 try {
   await client.uploadFile(fileData)
 } catch (error) {
-  if (getAuthErrorKind(error) === 'token-expired') {
+  if (error instanceof AuthError && error.code === 'JwtTokenExpiredError') {
     // refresh the token and retry
   }
 }

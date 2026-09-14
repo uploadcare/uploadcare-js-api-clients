@@ -6,10 +6,10 @@ import request from '../request/request.node'
 import getUrl from '../tools/getUrl'
 
 import defaultSettings from '../defaultSettings'
-import { getUserAgent } from '../tools/getUserAgent'
-import { UploadError } from '../tools/UploadError'
+import { createUploadError } from '../tools/AuthError'
 import { retryIfFailed } from '../tools/retryIfFailed'
-import { getAuthHeaders } from '../tools/getAuthHeaders'
+import { isAuthTokenResolver } from '../tools/getAuthHeaders'
+import { getRequestHeaders } from '../tools/getRequestHeaders'
 import { AuthToken } from '../types'
 
 export type GroupInfoOptions = {
@@ -48,14 +48,12 @@ export default function groupInfo(
     async () =>
       request({
         method: 'GET',
-        headers: {
-          'X-UC-User-Agent': getUserAgent({
-            publicKey,
-            integration,
-            userAgent
-          }),
-          ...(await getAuthHeaders(authToken))
-        },
+        headers: await getRequestHeaders({
+          publicKey,
+          integration,
+          userAgent,
+          authToken
+        }),
         url: getUrl(baseURL, '/group/info/', {
           jsonerrors: 1,
           pub_key: publicKey,
@@ -67,7 +65,7 @@ export default function groupInfo(
         const response = camelizeKeys<Response>(JSON.parse(data))
 
         if ('error' in response) {
-          throw new UploadError(
+          throw createUploadError(
             response.error.content,
             response.error.errorCode,
             request,
@@ -81,7 +79,7 @@ export default function groupInfo(
     {
       retryThrottledRequestMaxTimes,
       retryNetworkErrorMaxTimes,
-      canRetryExpiredToken: typeof authToken === 'function'
+      canRetryExpiredToken: isAuthTokenResolver(authToken)
     }
   )
 }

@@ -6,11 +6,11 @@ import request from '../request/request.node'
 import getUrl from '../tools/getUrl'
 
 import defaultSettings from '../defaultSettings'
-import { getUserAgent } from '../tools/getUserAgent'
-import { UploadError } from '../tools/UploadError'
+import { createUploadError } from '../tools/AuthError'
 import { retryIfFailed } from '../tools/retryIfFailed'
 import { ServerErrorCode } from '../tools/ServerErrorCode'
-import { getAuthHeaders } from '../tools/getAuthHeaders'
+import { isAuthTokenResolver } from '../tools/getAuthHeaders'
+import { getRequestHeaders } from '../tools/getRequestHeaders'
 import { AuthToken } from '../types'
 
 export enum Status {
@@ -94,18 +94,12 @@ export default function fromUrlStatus(
     async () =>
       request({
         method: 'GET',
-        headers: {
-          ...(publicKey
-            ? {
-                'X-UC-User-Agent': getUserAgent({
-                  publicKey,
-                  integration,
-                  userAgent
-                })
-              }
-            : {}),
-          ...(await getAuthHeaders(authToken))
-        },
+        headers: await getRequestHeaders({
+          publicKey,
+          integration,
+          userAgent,
+          authToken
+        }),
         url: getUrl(baseURL, '/from_url/status/', {
           jsonerrors: 1,
           token
@@ -115,7 +109,7 @@ export default function fromUrlStatus(
         const response = camelizeKeys<Response>(JSON.parse(data))
 
         if ('error' in response && !isErrorResponse(response)) {
-          throw new UploadError(
+          throw createUploadError(
             response.error.content,
             response.error.errorCode,
             request,
@@ -129,7 +123,7 @@ export default function fromUrlStatus(
     {
       retryNetworkErrorMaxTimes,
       retryThrottledRequestMaxTimes,
-      canRetryExpiredToken: typeof authToken === 'function'
+      canRetryExpiredToken: isAuthTokenResolver(authToken)
     }
   )
 }

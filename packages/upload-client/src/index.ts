@@ -98,7 +98,7 @@ export { UploadcareFile } from './tools/UploadcareFile'
 export { UploadcareGroup } from './tools/UploadcareGroup'
 export { UploadError, ErrorResponseInfo } from './tools/UploadError'
 export { ServerErrorCode } from './tools/ServerErrorCode'
-export { getAuthErrorKind, AuthErrorKind } from './tools/getAuthErrorKind'
+export { AuthError, AuthErrorCode } from './tools/AuthError'
 
 import { UploadError } from './tools/UploadError'
 /** @deprecated Please use UploadError instead. */
