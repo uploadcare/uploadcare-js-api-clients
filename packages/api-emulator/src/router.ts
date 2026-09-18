@@ -15,18 +15,19 @@ export const route = (method: string, path: string, handler: RouteHandler) => {
   routes.push({ method, segments: path.split('/').filter(Boolean), handler })
 }
 
-const match = (route: Route, method: string, pathname: string) => {
-  if (route.method !== method) return undefined
+const match = (candidate: Route, method: string, pathname: string) => {
+  if (candidate.method !== method) return undefined
   const actual = pathname.split('/').filter(Boolean)
   const params: Record<string, string> = {}
-  for (const [index, expected] of route.segments.entries()) {
+  for (const [index, expected] of candidate.segments.entries()) {
     if (expected === '*')
       return { ...params, rest: actual.slice(index).join('/') }
-    if (index >= actual.length) return undefined
-    if (expected.startsWith(':')) params[expected.slice(1)] = actual[index]
-    else if (expected !== actual[index]) return undefined
+    const value = actual[index]
+    if (value === undefined) return undefined
+    if (expected.startsWith(':')) params[expected.slice(1)] = value
+    else if (expected !== value) return undefined
   }
-  return actual.length === route.segments.length ? params : undefined
+  return actual.length === candidate.segments.length ? params : undefined
 }
 
 /** The Upload API answers with or without the trailing slash, and so must this. */

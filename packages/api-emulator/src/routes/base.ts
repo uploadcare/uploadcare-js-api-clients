@@ -4,7 +4,8 @@ import { route } from '../router.js'
 import { sessionOf, store } from '../store.js'
 
 /** `store=auto` leaves it to project settings, and the demo project stores. */
-const storedBy = (value: string | null) => value !== '0' && value !== 'false'
+const storedBy = (value: FormDataEntryValue | null) =>
+  value !== '0' && value !== 'false'
 
 /**
  * Direct upload. The file part is kept whole, because the CDN has to serve it
@@ -24,7 +25,7 @@ route('POST', '/base/', async ({ request }) => {
     mimeType: part.type || 'application/octet-stream',
     bytes,
     image: imageSize(bytes),
-    isStored: storedBy(form.get('UPLOADCARE_STORE') as string | null)
+    isStored: storedBy(form.get('UPLOADCARE_STORE'))
   })
 
   return Response.json({ file: stored.uuid })

@@ -3,14 +3,24 @@
   "version": "6.21.0",
   "type": "module",
   "main": "./src/index.ts",
-  "exports": { ".": "./src/index.ts" },
+  "exports": {
+    ".": "./src/index.ts"
+  },
   "engines": {
     "node": ">=18"
   },
   "scripts": {
-    "test": "vitest --run"
+    "test": "vitest --run",
+    "tsc": "tsc --noEmit",
+    "lint": "oxlint src",
+    "lint:fix": "oxlint src --fix",
+    "format": "oxfmt .",
+    "format:check": "oxfmt --check ."
   },
   "devDependencies": {
+    "oxfmt": "^0.53.0",
+    "oxlint": "^1.68.0",
+    "oxlint-tsgolint": "^0.23.0",
     "vitest": "^3.2.4"
   }
 }
