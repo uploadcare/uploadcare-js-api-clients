@@ -15,6 +15,16 @@ export type EmulatorServerOptions = {
    * was made with.
    */
   tls?: { key: string; cert: string }
+  /**
+   * Milliseconds to wait before answering each request. A same-process,
+   * in-memory handler answers before the event loop even turns over, which
+   * starves a race the real API always loses: an `AbortController` fired right
+   * after the request goes out never wins against a response that's already
+   * there. Defaults to 30, matching the old Koa mock server's `delayer`
+   * middleware. A caller that doesn't need the race won — a suite driving
+   * hundreds of requests through this server, say — passes 0.
+   */
+  delayMs?: number
 }
 
 const bodyOf = async (request: IncomingMessage) => {
@@ -35,15 +45,6 @@ const headersOf = (request: IncomingMessage) => {
   return headers
 }
 
-/**
- * A same-process, in-memory handler answers before the event loop even turns
- * over, which starves races the real API always loses: an `AbortController`
- * fired right after the request goes out never wins against a response that's
- * already there. The old Koa mock server added this same delay for the same
- * reason. 0 skips it, for callers (like the `handle()` unit tests) that don't
- * need it.
- */
-const RESPONSE_DELAY_MS = 30
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 
 export const createEmulatorServer = async (
@@ -55,7 +56,7 @@ export const createEmulatorServer = async (
   ) => {
     const protocol = options.tls ? 'https' : 'http'
     const url = `${protocol}://${request.headers.host ?? 'localhost'}${request.url ?? '/'}`
-    await delay(RESPONSE_DELAY_MS)
+    await delay(options.delayMs ?? 30)
     const answer = await handle(
       new Request(url, {
         method: request.method,

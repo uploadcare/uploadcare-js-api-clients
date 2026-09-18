@@ -36,3 +36,15 @@ it('allows any origin, because every consumer is cross-origin', async () => {
   )
   expect(response.headers.get('access-control-allow-origin')).toBe('*')
 })
+
+it('answers correctly with the response delay turned off', async () => {
+  const fast = await createEmulatorServer({ delayMs: 0 })
+  try {
+    const response = await fetch(
+      `${fast.origin}/info/?pub_key=demopublickey&file_id=nope`
+    )
+    expect(response.status).toBe(404)
+  } finally {
+    await fast.close()
+  }
+})
