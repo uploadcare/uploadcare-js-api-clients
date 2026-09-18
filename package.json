@@ -6,6 +6,7 @@
   "license": "MIT",
   "workspaces": [
     "packages/api-client-utils",
+    "packages/api-emulator",
     "packages/cname-prefix",
     "packages/upload-client",
     "packages/rest-client",
