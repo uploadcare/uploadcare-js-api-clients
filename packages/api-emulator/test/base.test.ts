@@ -65,6 +65,26 @@ it('describes the file that was actually uploaded', async () => {
   })
 })
 
+it('reports image_info: null for a non-image upload', async () => {
+  const { file } = await upload('note.txt')
+  const response = await handle(
+    new Request(
+      `https://upload.uploadcare.com/info/?pub_key=demopublickey&file_id=${file}`
+    )
+  )
+  const parsed = (await response!.clone().json()) as {
+    is_image: boolean
+    image_info: unknown
+  }
+  // Deliberately not run through assertMatchesSpec: components.schemas.fileUploadInfo
+  // requires `image_info` and doesn't mark it nullable (unlike its video_info/
+  // content_info siblings — see README.md), so the spec can't express this response,
+  // even though it's exactly what the real API returns for a non-image. This test
+  // asserts the emulator's behaviour directly instead.
+  expect(parsed.is_image).toBe(false)
+  expect(parsed.image_info).toBeNull()
+})
+
 it('404s for a file nobody uploaded', async () => {
   const response = await handle(
     new Request(
