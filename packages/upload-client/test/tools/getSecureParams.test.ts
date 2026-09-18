@@ -28,9 +28,10 @@ describe('getSecureParams', () => {
     expect(warnSpy).not.toHaveBeenCalled()
   })
 
-  // The warning is deduplicated per process, so its two aspects (fires on the
-  // first conflict, stays silent afterwards) must be tested in this order.
-  it('should warn on the first conflict between the auth schemes', () => {
+  // The warning is deduplicated with module-level state that nothing resets, so
+  // both halves live in one test: split across two, the second would pass only
+  // because the first ran before it, and fail on its own or under a filter.
+  it('should warn once on a conflict between the auth schemes, then stay silent', () => {
     const params = getSecureParams({
       authToken: 'jwt',
       secureSignature: 'signature',
@@ -40,11 +41,9 @@ describe('getSecureParams', () => {
     expect(params).toEqual({})
     expect(warnSpy).toHaveBeenCalledTimes(1)
     expect(warnSpy.mock.calls[0][0]).toContain('`authToken` takes precedence')
-  })
 
-  it('should not warn again on subsequent conflicts', () => {
     getSecureParams({ authToken: 'jwt', secureSignature: 'signature' })
 
-    expect(warnSpy).not.toHaveBeenCalled()
+    expect(warnSpy).toHaveBeenCalledTimes(1)
   })
 })
