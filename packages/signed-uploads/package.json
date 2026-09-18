@@ -64,14 +64,14 @@
     "test:watch": "vitest",
     "prebuild": "npm run clean",
     "build": "tsc && vite build",
-    "postbuild": "npm run smoke:dist && npm run check:exports && npm run lint:size",
+    "postbuild": "npm run test:bundle && npm run check:exports && npm run lint:size",
     "check:exports": "attw --pack . && publint --strict",
     "lint": "oxlint src",
     "lint:fix": "oxlint src --fix",
     "format": "oxfmt .",
     "format:check": "oxfmt --check .",
-    "smoke:dist": "node scripts/smoke-dist.mjs",
-    "lint:size": "size-limit"
+    "lint:size": "size-limit",
+    "test:bundle": "vitest --run --config vitest.bundle.config.ts"
   },
   "repository": {
     "type": "git",
