@@ -15,7 +15,8 @@ route('POST', '/base/', async ({ request }) => {
   const form = await request.formData()
   const part = form.get('file')
   if (!(part instanceof File)) {
-    return apiError(400, 'file is required')
+    // schema: filesRequiredError
+    return apiError(request, 400, 'Request does not contain files.')
   }
 
   const bytes = new Uint8Array(await part.arrayBuffer())

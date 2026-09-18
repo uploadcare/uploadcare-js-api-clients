@@ -16,12 +16,17 @@
     "lint": "oxlint src",
     "lint:fix": "oxlint src --fix",
     "format": "oxfmt .",
-    "format:check": "oxfmt --check ."
+    "format:check": "oxfmt --check .",
+    "spec:refresh": "node scripts/spec-refresh.ts",
+    "spec:check": "node scripts/spec-check.ts"
   },
   "devDependencies": {
+    "ajv": "^8.17.1",
+    "ajv-formats": "^3.0.1",
     "oxfmt": "^0.53.0",
     "oxlint": "^1.68.0",
     "oxlint-tsgolint": "^0.23.0",
-    "vitest": "^3.2.4"
+    "vitest": "^3.2.4",
+    "yaml": "^2.9.1"
   }
 }
