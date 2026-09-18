@@ -33,6 +33,15 @@ const isObject = (value: unknown): value is JsonObject =>
  * a `null` type union, and the annotation-only keywords Ajv would otherwise
  * just ignore are dropped for clarity. Applied to the whole document once, up
  * front, so every `$ref` inside it resolves to an already-converted node.
+ *
+ * Deliberately does not handle other OpenAPI-3.0-vs-JSON-Schema divergences
+ * this document doesn't happen to use: draft-04-style boolean
+ * `exclusiveMinimum`/`exclusiveMaximum` (JSON Schema draft-07+, which Ajv 8
+ * expects, wants a number instead), `readOnly`/`writeOnly` direction filtering,
+ * and OpenAPI's separate top-level `components.examples` (as opposed to the
+ * inline `example`/`examples` keywords this function does strip). If a future
+ * spec refresh introduces any of these, expect a confusing Ajv failure rather
+ * than a silent one — extend this function rather than the callers.
  */
 const toJsonSchema = (node: unknown): unknown => {
   if (Array.isArray(node)) return node.map(toJsonSchema)
@@ -91,6 +100,39 @@ const resolveRef = (doc: unknown, node: unknown): unknown => {
     .split('/')
     .map(decodePointerSegment)
   return resolveRef(doc, get(doc, segments))
+}
+
+/**
+ * Steps from an already-known-to-exist `pointer` through `segments`, following
+ * any `$ref` found along the way _before_ taking the next step. Every response
+ * object in this spec — and several of its schemas — is a `$ref` into
+ * `components.*` rather than an inline object, so a plain property walk (`get`)
+ * falls through to `undefined` the moment it meets one: it doesn't fail loudly,
+ * it just stops finding anything, which is exactly the silent-pass shape a
+ * vacuous validator would take. Returns the value alongside the pointer it
+ * actually ended up at, since that's a real location in `doc` (unlike the
+ * pointer we started descending from), which a caller can still hand to Ajv for
+ * it to resolve further nested `$ref`s (e.g. `fileUploadInfo` → `imageInfo`)
+ * against the whole document.
+ */
+const descend = (
+  doc: unknown,
+  pointer: readonly string[],
+  segments: readonly string[]
+): { value: unknown; pointer: string[] } => {
+  let trail = [...pointer]
+  let node = get(doc, trail)
+  for (const segment of segments) {
+    while (isObject(node) && typeof node.$ref === 'string') {
+      trail = node.$ref.replace(/^#\//, '').split('/').map(decodePointerSegment)
+      node = get(doc, trail)
+    }
+    if (!isObject(node))
+      return { value: undefined, pointer: [...trail, segment] }
+    trail = [...trail, segment]
+    node = node[segment]
+  }
+  return { value: node, pointer: trail }
 }
 
 /**
@@ -170,17 +212,24 @@ export const assertMatchesSpec = async (args: {
     )
   }
 
-  const contentBase = ['paths', path, method, 'responses', statusKey, 'content']
+  const responseBase = ['paths', path, method, 'responses', statusKey]
 
   if (status >= 200 && status < 300) {
-    const segments = [...contentBase, 'application/json', 'schema']
-    if (get(specDocument, segments) === undefined) return
-    validateAgainst(toJsonPointer(segments), body, method, path, status)
+    const { value: schema, pointer } = descend(specDocument, responseBase, [
+      'content',
+      'application/json',
+      'schema'
+    ])
+    if (schema === undefined) return
+    validateAgainst(toJsonPointer(pointer), body, method, path, status)
     return
   }
 
-  const plainSegments = [...contentBase, 'text/plain', 'schema']
-  const plainSchema = get(specDocument, plainSegments)
+  const { value: plainSchema, pointer: plainPointer } = descend(
+    specDocument,
+    responseBase,
+    ['content', 'text/plain', 'schema']
+  )
   if (plainSchema === undefined) return
 
   const contentType = response.headers
@@ -210,5 +259,5 @@ export const assertMatchesSpec = async (args: {
     return
   }
 
-  validateAgainst(toJsonPointer(plainSegments), body, method, path, status)
+  validateAgainst(toJsonPointer(plainPointer), body, method, path, status)
 }
