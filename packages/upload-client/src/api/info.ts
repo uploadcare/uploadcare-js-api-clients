@@ -2,9 +2,9 @@ import request from '../request/request.node'
 import getUrl from '../tools/getUrl'
 import defaultSettings from '../defaultSettings'
 import { camelizeKeys, CustomUserAgent } from '@uploadcare/api-client-utils'
-import { createUploadError } from '../tools/AuthError'
+import { createUploadError } from '../tools/createUploadError'
 import { retryIfFailed } from '../tools/retryIfFailed'
-import { isAuthTokenResolver } from '../tools/getAuthHeaders'
+import { isAuthTokenResolver } from '../tools/resolveAuthToken'
 import { getRequestHeaders } from '../tools/getRequestHeaders'
 
 /* Types */

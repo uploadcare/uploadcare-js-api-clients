@@ -17,8 +17,8 @@ import {
   defaultContentType
 } from '../defaultSettings'
 import { retryIfFailed } from '../tools/retryIfFailed'
-import { createUploadError } from '../tools/AuthError'
-import { isAuthTokenResolver } from '../tools/getAuthHeaders'
+import { createUploadError } from '../tools/createUploadError'
+import { isAuthTokenResolver } from '../tools/resolveAuthToken'
 import { getRequestHeaders } from '../tools/getRequestHeaders'
 import { getSecureParams } from '../tools/getSecureParams'
 import { getStoreValue } from '../tools/getStoreValue'

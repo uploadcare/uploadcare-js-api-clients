@@ -2,12 +2,17 @@ import { Headers, ErrorRequestInfo } from '../request/types'
 import type { ServerErrorCode } from './ServerErrorCode'
 import { UploadError, ErrorResponseInfo } from './UploadError'
 
+/**
+ * `satisfies` rather than a bare `as const`: these are the strings the Upload
+ * API actually sends, so a typo or a renamed server code fails to compile here
+ * instead of silently never matching a response.
+ */
 export const AUTH_ERROR_CODES = [
   'TokenExpiredError',
   'TokenOperationsExhaustedError',
   'TokenScopeForbiddenError',
   'TokenInvalidError'
-] as const
+] as const satisfies readonly ServerErrorCode[]
 
 export type AuthErrorCode = (typeof AUTH_ERROR_CODES)[number]
 
@@ -37,32 +42,4 @@ export class AuthError extends UploadError {
 
     Object.setPrototypeOf(this, AuthError.prototype)
   }
-
-  static fromUploadError(error: UploadError): AuthError | null {
-    if (!isAuthErrorCode(error.code)) {
-      return null
-    }
-    return new AuthError(
-      error.message,
-      error.code,
-      error.request,
-      error.response,
-      error.headers
-    )
-  }
 }
-
-/**
- * Builds the error for a failed Upload API response: an `AuthError` when the
- * server error code is a JWT auth code, a plain `UploadError` otherwise.
- */
-export const createUploadError = (
-  message: string,
-  code?: ServerErrorCode,
-  request?: ErrorRequestInfo,
-  response?: ErrorResponseInfo,
-  headers?: Headers
-): UploadError =>
-  isAuthErrorCode(code)
-    ? new AuthError(message, code, request, response, headers)
-    : new UploadError(message, code, request, response, headers)

@@ -1,7 +1,7 @@
 import fromUrlStatus, { Status } from '../api/fromUrlStatus'
 import fromUrl, { TypeEnum, FromUrlOptions } from '../api/fromUrl'
 import { UploadError } from '../tools/UploadError'
-import { createUploadError } from '../tools/AuthError'
+import { createUploadError } from '../tools/createUploadError'
 import { race } from '../tools/race'
 import { isReadyPoll } from '../tools/isReadyPoll'
 import defaultSettings from '../defaultSettings'

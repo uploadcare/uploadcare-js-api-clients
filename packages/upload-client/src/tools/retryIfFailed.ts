@@ -1,8 +1,12 @@
+import type { ServerErrorCode } from './ServerErrorCode'
 import { UploadError } from './UploadError'
 import { retrier, NetworkError } from '@uploadcare/api-client-utils'
 
-const REQUEST_WAS_THROTTLED_CODE = 'RequestThrottledError'
-const TOKEN_EXPIRED_CODE = 'TokenExpiredError'
+// `satisfies` so a renamed or mistyped server code fails to compile rather
+// than quietly never matching a response.
+const REQUEST_WAS_THROTTLED_CODE =
+  'RequestThrottledError' satisfies ServerErrorCode
+const TOKEN_EXPIRED_CODE = 'TokenExpiredError' satisfies ServerErrorCode
 const DEFAULT_RETRY_AFTER_TIMEOUT = 15000
 const DEFAULT_NETWORK_ERROR_TIMEOUT = 1000
 
