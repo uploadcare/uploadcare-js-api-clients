@@ -1,3 +1,4 @@
+import { describe, it, expect } from 'vitest'
 import { getUserAgent } from '../../src/tools/getUserAgent'
 import version from '../../src/version'
 

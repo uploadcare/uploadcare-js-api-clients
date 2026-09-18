@@ -1,11 +1,10 @@
+import { vi, expect, describe, it } from 'vitest'
 import * as factory from '../_fixtureFactory'
 import { getSettingsForTesting, assertComputableProgress } from '../_helpers'
 import { UploadError } from '../../src/tools/UploadError'
 import { uploadMultipart } from '../../src/uploadFile/uploadMultipart'
 import info from '../../src/api/info'
-import { jest, expect } from '@jest/globals'
-
-jest.setTimeout(60000)
+vi.setConfig({ testTimeout: 60000 })
 
 // TODO: add tests for metadata
 describe('uploadMultipart', () => {
@@ -72,7 +71,7 @@ describe('uploadMultipart', () => {
   })
 
   it('should be able to handle progress', async () => {
-    const onProgress = jest.fn()
+    const onProgress = vi.fn()
     const upload = uploadMultipart(fileToUpload, {
       ...settings,
       onProgress
