@@ -30,6 +30,9 @@
         "import/extensions": [".ts", ".js"],
         "import/parsers": {
           "@typescript-eslint/parser": [".ts", ".js"]
+        },
+        "import/resolver": {
+          "typescript": true
         }
       }
     },
@@ -56,6 +59,9 @@
         "import/extensions": [".ts", ".js"],
         "import/parsers": {
           "@typescript-eslint/parser": [".ts", ".js"]
+        },
+        "import/resolver": {
+          "typescript": true
         }
       }
     },

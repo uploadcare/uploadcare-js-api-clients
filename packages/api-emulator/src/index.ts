@@ -1,6 +1,6 @@
-export const handle = async (
-  request: Request
-): Promise<Response | undefined> =>
-  new URL(request.url).pathname === '/ping/'
-    ? Response.json({ pong: true })
-    : undefined
+import './routes/base.js'
+import './routes/info.js'
+
+export { handle } from './router.js'
+export { resetSession, sessionOf } from './store.js'
+export type { Session, StoredFile, StoredImage } from './store.js'
