@@ -8,7 +8,7 @@
 
 `@uploadcare/signed-uploads` secures uploads to Uploadcare's [Signed Uploads][uc-docs-signed-uploads] feature. It has two halves:
 
-- **`@uploadcare/signed-uploads`** — Node only. Mints the credentials the Upload API accepts: a **JWT** for the `Authorization: Bearer` scheme (with optional endpoint scope and operation limits), or the legacy `{secureSignature, secureExpire}` pair. Both need your project secret key, so both belong on your server.
+- **`@uploadcare/signed-uploads`** — Node only. Mints the credentials the Upload API accepts: a **JWT** for the `Authorization: Bearer` scheme (with optional endpoint scope and operation limits), or the [signature and expire pair][uc-docs-signature]. Both need your project secret key, so both belong on your server.
 - **`@uploadcare/signed-uploads/client`** — browser-first, and runs in Node too. Caches a token minted by your server and replaces it before it expires. Never touches the secret key.
 
 Zero dependencies, full TypeScript support.
@@ -178,5 +178,6 @@ request at [hello@uploadcare.com][uc-email-hello].
 [npm-url]: https://www.npmjs.org/package/@uploadcare/signed-uploads
 [badge-build]: https://github.com/uploadcare/uploadcare-js-api-clients/actions/workflows/checks.yml/badge.svg
 [build-url]: https://github.com/uploadcare/uploadcare-js-api-clients/actions/workflows/checks.yml
-[uc-docs-signed-uploads]: https://uploadcare.com/docs/security/secure-uploads/#signed-uploads?utm_source=github&utm_campaign=uploadcare-js-api-clients
+[uc-docs-signed-uploads]: https://uploadcare.com/docs/security/secure-uploads-auth-token/?utm_source=github&utm_campaign=uploadcare-js-api-clients
+[uc-docs-signature]: https://uploadcare.com/docs/security/secure-uploads/?utm_source=github&utm_campaign=uploadcare-js-api-clients
 [upload-client-secure-options]: https://github.com/uploadcare/uploadcare-js-api-clients/blob/master/packages/upload-client/README.md#securesignature-string
