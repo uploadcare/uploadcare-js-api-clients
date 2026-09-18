@@ -44,7 +44,7 @@ describeLocalOnly('authToken (JWT auth)', () => {
     expect(error).toBeInstanceOf(UploadError)
     expect(error).toBeInstanceOf(AuthError)
     expect(error?.message).toBe('Token is invalid.')
-    expect(error?.code).toBe('JwtInvalidError')
+    expect(error?.code).toBe('TokenInvalidError')
   })
 
   it('should authorize with a valid token even when the public key is invalid', async () => {
@@ -88,13 +88,13 @@ describeLocalOnly('authToken (JWT auth)', () => {
     }
   })
 
-  it('should reject with JwtTokenExpiredError for a plain expired token', async () => {
+  it('should reject with TokenExpiredError for a plain expired token', async () => {
     const error = await caught(
       base(fileToUpload.data, { ...settings, authToken: 'expired-jwt' })
     )
 
     expect(error).toBeInstanceOf(AuthError)
-    expect(error?.code).toBe('JwtTokenExpiredError')
+    expect(error?.code).toBe('TokenExpiredError')
   })
 
   it('should re-resolve the token and retry once when it is expired', async () => {
@@ -117,13 +117,13 @@ describeLocalOnly('authToken (JWT auth)', () => {
       base(fileToUpload.data, { ...settings, authToken: resolver })
     )
 
-    expect(error?.code).toBe('JwtTokenExpiredError')
+    expect(error?.code).toBe('TokenExpiredError')
     expect(resolver).toHaveBeenCalledTimes(2)
   })
 
   it.each([
-    ['quota-jwt', 'JwtQuotaExceededError'],
-    ['scope-jwt', 'JwtScopeDeniedError']
+    ['quota-jwt', 'TokenOperationsExhaustedError'],
+    ['scope-jwt', 'TokenScopeForbiddenError']
   ] as const)(
     'should not retry the final error %s even with a resolver',
     async (jwt, code) => {

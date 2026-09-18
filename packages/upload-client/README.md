@@ -328,19 +328,36 @@ const client = new UploadClient({
 
 Instead of a plain token you can pass a resolver function (sync or async). It
 is called before **every** request, which lets long-running uploads (e.g.
-multipart) pick up a fresh token mid-flight:
+multipart) pick up a fresh token mid-flight.
+
+This client never stores a token between calls, so a resolver that fetches on
+each call would hit your backend once per request. Use `AuthTokenCache` from
+[`@uploadcare/signed-uploads/client`][signed-uploads] — it holds the token,
+replaces it shortly before `exp`, and shares one request between concurrent
+callers. Its `getToken` is bound, so pass it directly:
 
 ```javascript
+import { AuthTokenCache } from '@uploadcare/signed-uploads/client'
+
+const tokens = new AuthTokenCache({
+  fetchToken: async () => {
+    const response = await fetch('/uploadcare-token')
+    return (await response.json()).token
+  }
+})
+
 const client = new UploadClient({
   publicKey: 'YOUR_PUBLIC_KEY',
-  authToken: () => myTokenCache.getOrFetch()
+  authToken: tokens.getToken
 })
 ```
 
-Issuing, caching and refreshing tokens is your application's responsibility —
-the client never stores a token between calls. When the Upload API reports
-that the token has expired and `authToken` is a resolver, the client calls the
-resolver again and retries the request once.
+Mint the token on your own server with `generateAuthToken` from
+[`@uploadcare/signed-uploads`][signed-uploads]; it needs your project secret
+key, which must never reach a browser.
+
+When the Upload API reports that the token has expired and `authToken` is a
+resolver, the client calls the resolver again and retries the request once.
 
 Precedence: when both `authToken` and `secureSignature`/`secureExpire` are
 provided, only the `Authorization` header is sent, and the signature
@@ -351,9 +368,9 @@ info polling) with the token; the individual part uploads go directly to
 presigned storage URLs and never carry the header.
 
 Auth failures are thrown as `AuthError` (a subclass of `UploadError`) whose
-`code` holds the raw server error code: `JwtTokenExpiredError` (refresh the
-token and retry), `JwtQuotaExceededError` and `JwtScopeDeniedError` (final,
-don't retry), or `JwtInvalidError` (final):
+`code` holds the raw server error code: `TokenExpiredError` (refresh the
+token and retry), `TokenOperationsExhaustedError` and `TokenScopeForbiddenError` (final,
+don't retry), or `TokenInvalidError` (final):
 
 ```javascript
 import { AuthError } from '@uploadcare/upload-client'
@@ -361,7 +378,7 @@ import { AuthError } from '@uploadcare/upload-client'
 try {
   await client.uploadFile(fileData)
 } catch (error) {
-  if (error instanceof AuthError && error.code === 'JwtTokenExpiredError') {
+  if (error instanceof AuthError && error.code === 'TokenExpiredError') {
     // refresh the token and retry
   }
 }
@@ -656,6 +673,7 @@ prior to any public disclosure.
 Issues and PRs are welcome. You can provide your feedback or drop us a support
 request at [hello@uploadcare.com][uc-email-hello].
 
+[signed-uploads]: https://github.com/uploadcare/uploadcare-js-api-clients/tree/main/packages/signed-uploads
 [uc-email-bounty]: mailto:bugbounty@uploadcare.com
 [uc-email-hello]: mailto:hello@uploadcare.com
 [github-releases]: https://github.com/uploadcare/uploadcare-js-api-clients/releases

@@ -9,12 +9,12 @@ import { UploadError } from '../../src/tools/UploadError'
 
 describe('AuthError', () => {
   it('should be an UploadError with the raw server code', () => {
-    const error = new AuthError('Token has expired.', 'JwtTokenExpiredError')
+    const error = new AuthError('Token has expired.', 'TokenExpiredError')
 
     expect(error).toBeInstanceOf(AuthError)
     expect(error).toBeInstanceOf(UploadError)
     expect(error.name).toBe('AuthError')
-    expect(error.code).toBe('JwtTokenExpiredError')
+    expect(error.code).toBe('TokenExpiredError')
   })
 
   describe('fromUploadError', () => {
@@ -22,7 +22,7 @@ describe('AuthError', () => {
       const headers = { 'x-request-id': 'test' }
       const source = new UploadError(
         'Token is invalid.',
-        'JwtInvalidError',
+        'TokenInvalidError',
         undefined,
         undefined,
         headers
@@ -31,7 +31,7 @@ describe('AuthError', () => {
 
       expect(error).toBeInstanceOf(AuthError)
       expect(error?.message).toBe('Token is invalid.')
-      expect(error?.code).toBe('JwtInvalidError')
+      expect(error?.code).toBe('TokenInvalidError')
       expect(error?.headers).toBe(headers)
     })
 
@@ -60,11 +60,11 @@ describe('createUploadError', () => {
   it('should create an AuthError for JWT auth codes', () => {
     const error = createUploadError(
       'Operation quota exhausted.',
-      'JwtQuotaExceededError'
+      'TokenOperationsExhaustedError'
     )
 
     expect(error).toBeInstanceOf(AuthError)
-    expect(error.code).toBe('JwtQuotaExceededError')
+    expect(error.code).toBe('TokenOperationsExhaustedError')
   })
 
   it('should create a plain UploadError otherwise', () => {

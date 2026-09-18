@@ -61,15 +61,15 @@ const VALID_JWT = 'valid-jwt'
 const JWT_ERRORS: Record<string, { statusText: string; errorCode: string }> = {
   'expired-jwt': {
     statusText: 'Token has expired.',
-    errorCode: 'JwtTokenExpiredError'
+    errorCode: 'TokenExpiredError'
   },
   'quota-jwt': {
     statusText: 'Operation quota exhausted.',
-    errorCode: 'JwtQuotaExceededError'
+    errorCode: 'TokenOperationsExhaustedError'
   },
   'scope-jwt': {
     statusText: 'Endpoint is not in the token scope.',
-    errorCode: 'JwtScopeDeniedError'
+    errorCode: 'TokenScopeForbiddenError'
   }
 }
 
@@ -90,7 +90,7 @@ const bearerAuth = (ctx: Parameters<Middleware>[0]): boolean => {
       status: 403,
       statusText:
         'Do not use signature parameters together with a Bearer token.',
-      errorCode: 'JwtInvalidError'
+      errorCode: 'TokenInvalidError'
     })
     return false
   }
@@ -99,7 +99,7 @@ const bearerAuth = (ctx: Parameters<Middleware>[0]): boolean => {
     error(ctx, {
       status: 403,
       statusText: 'Invalid Authorization header format.',
-      errorCode: 'JwtInvalidError'
+      errorCode: 'TokenInvalidError'
     })
     return false
   }
@@ -115,7 +115,7 @@ const bearerAuth = (ctx: Parameters<Middleware>[0]): boolean => {
     error(ctx, {
       status: 403,
       statusText: 'Token is invalid.',
-      errorCode: 'JwtInvalidError'
+      errorCode: 'TokenInvalidError'
     })
     return false
   }

@@ -2,7 +2,7 @@ import { UploadError } from './UploadError'
 import { retrier, NetworkError } from '@uploadcare/api-client-utils'
 
 const REQUEST_WAS_THROTTLED_CODE = 'RequestThrottledError'
-const TOKEN_EXPIRED_CODE = 'JwtTokenExpiredError'
+const TOKEN_EXPIRED_CODE = 'TokenExpiredError'
 const DEFAULT_RETRY_AFTER_TIMEOUT = 15000
 const DEFAULT_NETWORK_ERROR_TIMEOUT = 1000
 
@@ -22,9 +22,9 @@ type RetryIfFailedOptions = {
   retryThrottledRequestMaxTimes: number
   retryNetworkErrorMaxTimes: number
   /**
-   * Retry once on `JwtTokenExpiredError`. Only makes sense when `fn`
-   * re-resolves the auth token on each attempt (i.e. `authToken` is a resolver
-   * function); a plain token would just fail again.
+   * Retry once on `TokenExpiredError`. Only makes sense when `fn` re-resolves
+   * the auth token on each attempt (i.e. `authToken` is a resolver function); a
+   * plain token would just fail again.
    */
   canRetryExpiredToken?: boolean
 }
