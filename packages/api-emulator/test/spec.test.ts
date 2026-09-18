@@ -127,6 +127,79 @@ it('rejects a /base/ upload with no file, jsonerrors=1', async () => {
   })
 })
 
+it('rejects an /info/ 200 body missing a required field', async () => {
+  const uuid = await upload()
+  const response = await handle(
+    new Request(
+      `https://upload.uploadcare.com/info/?jsonerrors=1&pub_key=demopublickey&file_id=${uuid}`
+    )
+  )
+  const body = (await response!.clone().json()) as Record<string, unknown>
+  delete body.is_image // one of the spec's 15 required fields
+
+  await expect(
+    assertMatchesSpec({
+      method: 'get',
+      path: '/info/',
+      status: 200,
+      response: response!,
+      body
+    })
+  ).rejects.toThrow()
+})
+
+it('rejects an /info/ 200 body with a required field of the wrong type', async () => {
+  const uuid = await upload()
+  const response = await handle(
+    new Request(
+      `https://upload.uploadcare.com/info/?jsonerrors=1&pub_key=demopublickey&file_id=${uuid}`
+    )
+  )
+  const body = (await response!.clone().json()) as Record<string, unknown>
+  body.is_image = 'yes' // spec says boolean
+
+  await expect(
+    assertMatchesSpec({
+      method: 'get',
+      path: '/info/',
+      status: 200,
+      response: response!,
+      body
+    })
+  ).rejects.toThrow()
+})
+
+it('names the operation, the status, and the failing field when a body fails validation', async () => {
+  const uuid = await upload()
+  const response = await handle(
+    new Request(
+      `https://upload.uploadcare.com/info/?jsonerrors=1&pub_key=demopublickey&file_id=${uuid}`
+    )
+  )
+  const body = (await response!.clone().json()) as Record<string, unknown>
+  delete body.is_image
+
+  let thrown: unknown
+  try {
+    await assertMatchesSpec({
+      method: 'get',
+      path: '/info/',
+      status: 200,
+      response: response!,
+      body
+    })
+  } catch (error) {
+    thrown = error
+  }
+
+  expect(thrown).toBeInstanceOf(Error)
+  const message = (thrown as Error).message
+  expect(message).toContain('GET')
+  expect(message).toContain('/info/')
+  expect(message).toContain('200')
+  expect(message).toContain('is_image')
+})
+
 it('rejects a /base/ upload with no file, no jsonerrors', async () => {
   const form = new FormData()
   form.set('UPLOADCARE_PUB_KEY', 'demopublickey')

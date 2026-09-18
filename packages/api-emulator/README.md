@@ -43,7 +43,7 @@ presigned S3 URL that expires after 7 days — so neither runs as part of
 records the `info.version`, a SHA-256 of the downloaded bytes, the date, and
 the URL with its `X-Amz-*` signature parameters stripped.
 
-Two things the spec doesn't model, which the validator accommodates rather
+Three things the spec doesn't model, which the validator accommodates rather
 than "fixing" the emulator to match literally:
 
 - The `/base/` success schema describes a `{ "<filename>": "<uuid>" }` map,
@@ -53,3 +53,9 @@ than "fixing" the emulator to match literally:
   mentioned by the spec at all. Without it, error responses are the
   `text/plain` sentence the spec documents; with it, they're the JSON
   envelope upload-client expects, checked against the same sentences.
+- `fileUploadInfo.image_info` isn't marked `nullable` in the spec, unlike its
+  `video_info`/`content_info` siblings — but a non-image upload genuinely has
+  no image info, and the emulator answers `null` for one, matching the real
+  API. Tests that need a non-image round trip through `/info/` shouldn't
+  assert it against the spec's `image_info` schema; tests that do assert
+  against it upload something `imageSize()` actually recognizes.

@@ -6,6 +6,15 @@ const PIXEL = new Uint8Array([
   0xff, 0xd8, 0xff, 0xe0, 0x00, 0x10, 0x4a, 0x46, 0x49, 0x46
 ])
 
+// Long enough to reach a start-of-frame marker (`imageSize`, unlike PIXEL
+// above, decodes this as an actual 1×1 JPEG) — needed for the /info/ round
+// trip below, since the spec's `imageInfo` schema (unlike its `video_info`/
+// `content_info` siblings) isn't marked nullable, so a non-image's
+// `image_info: null` doesn't validate against it. See README.md.
+const JPEG = new Uint8Array([
+  0xff, 0xd8, 0xff, 0xc0, 0x00, 0x11, 0x08, 0x00, 0x01, 0x00, 0x01, 0xff, 0xd9
+])
+
 const upload = async (name = 'pixel.jpg', bytes = PIXEL) => {
   const body = new FormData()
   body.set('UPLOADCARE_PUB_KEY', 'demopublickey')
@@ -34,7 +43,7 @@ it('hands back a new id for every upload', async () => {
 })
 
 it('describes the file that was actually uploaded', async () => {
-  const { file } = await upload('holiday.jpg')
+  const { file } = await upload('holiday.jpg', JPEG)
   const response = await handle(
     new Request(
       `https://upload.uploadcare.com/info/?pub_key=demopublickey&file_id=${file}`
@@ -51,7 +60,7 @@ it('describes the file that was actually uploaded', async () => {
   expect(parsed).toMatchObject({
     uuid: file,
     original_filename: 'holiday.jpg',
-    size: PIXEL.byteLength,
+    size: JPEG.byteLength,
     mime_type: 'image/jpeg'
   })
 })
