@@ -56,6 +56,8 @@ than "fixing" the emulator to match literally:
 - `fileUploadInfo.image_info` isn't marked `nullable` in the spec, unlike its
   `video_info`/`content_info` siblings — but a non-image upload genuinely has
   no image info, and the emulator answers `null` for one, matching the real
-  API. Tests that need a non-image round trip through `/info/` shouldn't
-  assert it against the spec's `image_info` schema; tests that do assert
-  against it upload something `imageSize()` actually recognizes.
+  API. The `test/base.test.ts` test named `reports image_info: null for a
+non-image upload` asserts that behaviour directly, deliberately without
+  `assertMatchesSpec`, since the spec can't express it; the `/info/`
+  round-trip test that goes through `assertMatchesSpec` uploads something
+  `imageSize()` recognizes as an image instead.
