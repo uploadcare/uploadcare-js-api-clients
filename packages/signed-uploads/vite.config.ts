@@ -31,6 +31,18 @@ export default defineConfig({
     })
   ],
   build: {
+    minify: 'terser',
+    terserOptions: {
+      mangle: {
+        // Rename `_`-prefixed properties. They are the codebase's marker for
+        // "private", and TypeScript's `private` is erased at build time, so
+        // without this the internals of every class ship under their source
+        // names. Nothing crosses a module boundary on an underscore here, and
+        // `scripts/smoke-dist.mjs` exercises the built bundles to catch it if
+        // that ever stops being true.
+        properties: { regex: /^_/ }
+      }
+    },
     lib: {
       // `index` re-exports `server`, so the root stays the Node API it has
       // always been; `client` is the only entry a browser bundle pulls in.

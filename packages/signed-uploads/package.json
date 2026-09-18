@@ -64,12 +64,14 @@
     "test:watch": "vitest",
     "prebuild": "npm run clean",
     "build": "tsc && vite build",
-    "postbuild": "npm run check:exports",
+    "postbuild": "npm run smoke:dist && npm run check:exports && npm run lint:size",
     "check:exports": "attw --pack . && publint --strict",
     "lint": "oxlint src",
     "lint:fix": "oxlint src --fix",
     "format": "oxfmt .",
-    "format:check": "oxfmt --check ."
+    "format:check": "oxfmt --check .",
+    "smoke:dist": "node scripts/smoke-dist.mjs",
+    "lint:size": "size-limit"
   },
   "repository": {
     "type": "git",
@@ -95,12 +97,36 @@
   ],
   "devDependencies": {
     "@arethetypeswrong/cli": "^0.18.2",
+    "@size-limit/preset-small-lib": "^12.1.0",
     "oxfmt": "^0.53.0",
     "oxlint": "^1.68.0",
     "oxlint-tsgolint": "^0.23.0",
     "publint": "^0.3.12",
+    "size-limit": "^12.1.0",
+    "terser": "^5.51.2",
     "vite": "^7.0.0",
     "vite-plugin-dts": "^4.5.4",
     "vitest": "^3.2.4"
-  }
+  },
+  "size-limit": [
+    {
+      "name": "client entry (ships to browsers)",
+      "path": "dist/client.js",
+      "limit": "600 B"
+    },
+    {
+      "name": "AuthTokenCache alone",
+      "path": "dist/client.js",
+      "import": "{ AuthTokenCache }",
+      "limit": "520 B"
+    },
+    {
+      "name": "server entry",
+      "path": "dist/server.js",
+      "ignore": [
+        "node:crypto"
+      ],
+      "limit": "1.1 KB"
+    }
+  ]
 }
