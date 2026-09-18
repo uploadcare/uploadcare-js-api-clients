@@ -1,0 +1,17 @@
+{
+  "$schema": "../../node_modules/oxlint/configuration_schema.json",
+  "categories": {
+    "correctness": "error",
+    "suspicious": "error"
+  },
+  "plugins": ["typescript", "import", "unicorn", "oxc"],
+  "options": {
+    "typeAware": true
+  },
+  "rules": {
+    "typescript/consistent-type-imports": "error",
+    "import/no-cycle": "error",
+    "import/no-unassigned-import": ["error", { "allow": ["./routes/*.js"] }]
+  },
+  "ignorePatterns": ["dist/**", "node_modules/**"]
+}

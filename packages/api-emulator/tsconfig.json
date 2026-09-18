@@ -1,0 +1,14 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "types": ["vitest"],
+    "noUncheckedIndexedAccess": true,
+    // Restated rather than left to inherit: oxlint's tsconfig resolver reads
+    // this file directly and doesn't follow `extends` for it, so the
+    // `./foo.js` specifiers pointing at `foo.ts` source (this package's whole
+    // export surface) read as unresolved without it.
+    "moduleResolution": "bundler"
+  },
+  "include": ["src", "test"]
+}
