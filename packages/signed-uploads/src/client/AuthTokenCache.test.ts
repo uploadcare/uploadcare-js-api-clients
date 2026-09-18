@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { AuthTokenCache, getAuthHeaders, getTokenExpiration } from './client'
+import { AuthTokenCache } from './AuthTokenCache'
 
 const NOW = 1678359840000
 const now = () => Math.floor(NOW / 1000)
@@ -11,33 +11,6 @@ const tokenExpiringIn = (seconds: number, label = 'token') => {
   ).toString('base64url')
   return `header.${payload}.signature`
 }
-
-describe('getTokenExpiration', () => {
-  it('reads `exp`', () => {
-    expect(getTokenExpiration(tokenExpiringIn(60))).toBe(now() + 60)
-  })
-
-  it.each([
-    ['a token with no payload segment', 'notajwt'],
-    ['an unparseable payload', 'header.@@@.signature'],
-    [
-      'a payload without exp',
-      `header.${Buffer.from('{"a":1}').toString('base64url')}.signature`
-    ]
-  ])('returns undefined for %s', (_name, token) => {
-    expect(getTokenExpiration(token)).toBeUndefined()
-  })
-})
-
-describe('getAuthHeaders', () => {
-  it('builds the bearer header', () => {
-    expect(getAuthHeaders('eyJ')).toEqual({ Authorization: 'Bearer eyJ' })
-  })
-
-  it('is spreadable when there is no token', () => {
-    expect(getAuthHeaders(undefined)).toEqual({})
-  })
-})
 
 describe('AuthTokenCache', () => {
   beforeEach(() => {

@@ -6,7 +6,7 @@
 export {
   generateSecureSignature,
   type GenerateSecureSignatureOptions
-} from './generateSecureSignature'
+} from './server/generateSecureSignature'
 
 export {
   generateAuthToken,
@@ -14,4 +14,4 @@ export {
   type AuthTokenExpiration,
   type AuthTokenRestrictions,
   type AuthTokenClaims
-} from './generateAuthToken'
+} from './server/generateAuthToken'
