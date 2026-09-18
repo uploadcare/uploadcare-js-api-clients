@@ -104,8 +104,8 @@ export class AuthTokenCache {
       return Promise.resolve(this.#token)
     }
 
-    // Concurrent callers — a multipart upload asks per chunk — share one
-    // request rather than each starting their own.
+    // Concurrent callers share one request rather than each starting their
+    // own.
     this.#inflight ??= Promise.resolve()
       .then(() => this.fetchToken())
       .then((token) => {

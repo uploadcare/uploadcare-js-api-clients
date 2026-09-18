@@ -89,7 +89,7 @@ await uploadFile(file, {
 })
 ```
 
-Concurrent callers — a multipart upload asks once per chunk — share a single request rather than each starting their own.
+Concurrent callers share a single request rather than each starting their own.
 
 **With SSR**, hand the cache a token you already minted while rendering, so the first upload needs no round-trip:
 
