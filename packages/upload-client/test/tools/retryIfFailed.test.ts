@@ -1,4 +1,4 @@
-import { expect, jest } from '@jest/globals'
+import { vi, expect, describe, it } from 'vitest'
 import { NetworkError } from '@uploadcare/api-client-utils'
 import { retryIfFailed } from '../../src/tools/retryIfFailed'
 import { UploadError } from '../../src/tools/UploadError'
@@ -17,7 +17,7 @@ const failWith = (code: ServerErrorCode) =>
 /** Fails the first call with `code`, succeeds on every call after it. */
 const failingOnce = (code: ServerErrorCode) => {
   let calls = 0
-  return jest.fn(async () => {
+  return vi.fn(async () => {
     calls += 1
     if (calls === 1) throw failWith(code)
     return 'uploaded'
@@ -30,7 +30,7 @@ describe('retryIfFailed, auth failures', () => {
   ][])(
     'should retry %s once with a provider, dropping the refused token first',
     async (code) => {
-      const invalidate = jest.fn()
+      const invalidate = vi.fn()
       const fn = failingOnce(code)
 
       await expect(
@@ -67,8 +67,8 @@ describe('retryIfFailed, auth failures', () => {
   })
 
   it('should give up after one retry, however many times the token is refused', async () => {
-    const invalidate = jest.fn()
-    const fn = jest.fn(async () => {
+    const invalidate = vi.fn()
+    const fn = vi.fn(async () => {
       throw failWith('OperationsLimitExceededError')
     })
 
@@ -84,12 +84,12 @@ describe('retryIfFailed, auth failures', () => {
   })
 
   it('should spend one budget across both codes, not one each', async () => {
-    const invalidate = jest.fn()
+    const invalidate = vi.fn()
     const codes: ServerErrorCode[] = [
       'AccessTokenExpiredError',
       'OperationsLimitExceededError'
     ]
-    const fn = jest.fn(async () => {
+    const fn = vi.fn(async () => {
       const code = codes.shift()
       if (code) throw failWith(code)
       return 'uploaded'
@@ -106,7 +106,7 @@ describe('retryIfFailed, auth failures', () => {
   })
 
   it('should not retry a scope refusal, which a new token would repeat', async () => {
-    const invalidate = jest.fn()
+    const invalidate = vi.fn()
     const fn = failingOnce('ScopeForbiddenError')
 
     await expect(
@@ -121,8 +121,8 @@ describe('retryIfFailed, auth failures', () => {
   })
 
   it('should not invalidate for a failure unrelated to the token', async () => {
-    const invalidate = jest.fn()
-    const fn = jest.fn(async () => {
+    const invalidate = vi.fn()
+    const fn = vi.fn(async () => {
       throw new NetworkError({} as never)
     })
 

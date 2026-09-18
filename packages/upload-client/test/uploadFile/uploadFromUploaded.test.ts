@@ -1,10 +1,9 @@
+import { vi, expect, describe, it } from 'vitest'
 import * as factory from '../_fixtureFactory'
 import { getSettingsForTesting, assertComputableProgress } from '../_helpers'
 import { UploadError } from '../../src/tools/UploadError'
 import { uploadFromUploaded } from '../../src/uploadFile/uploadFromUploaded'
 import info from '../../src/api/info'
-import { jest, expect } from '@jest/globals'
-
 describe('uploadFromUploaded', () => {
   const uuid = factory.uuid('image')
   const settings = getSettingsForTesting({
@@ -48,7 +47,7 @@ describe('uploadFromUploaded', () => {
   })
 
   it('should be able to handle progress', async () => {
-    const onProgress = jest.fn()
+    const onProgress = vi.fn()
     const settings = getSettingsForTesting({
       publicKey: factory.publicKey('image'),
       onProgress

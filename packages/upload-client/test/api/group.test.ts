@@ -1,3 +1,4 @@
+import { describe, it, expect } from 'vitest'
 import * as factory from '../_fixtureFactory'
 import { getSettingsForTesting } from '../_helpers'
 import group from '../../src/api/group'

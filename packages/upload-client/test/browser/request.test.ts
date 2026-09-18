@@ -1,10 +1,8 @@
-/** @jest-environment jsdom */
-
+/** @vitest-environment jsdom */
+import { vi, expect, describe, it } from 'vitest'
 import { UploadError } from '../../src/tools/UploadError'
 import request from '../../src/request/request.browser'
 import getUrl from '../../src/tools/getUrl'
-import { jest, expect } from '@jest/globals'
-
 describe('request', () => {
   it('should post', async () => {
     const response = await request({
@@ -57,7 +55,7 @@ describe('request', () => {
   })
 
   it('should handle progress', async () => {
-    const onProgress = jest.fn()
+    const onProgress = vi.fn()
     const response = await request({
       method: 'POST',
       url: getUrl('https://upload.uploadcare.com', '/base/', {

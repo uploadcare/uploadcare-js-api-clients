@@ -1,3 +1,4 @@
+import { describe, it, expect } from 'vitest'
 import { UploadcareFile } from '../../src/tools/UploadcareFile'
 import { FileInfo, GroupFileInfo } from '../../src/api/types'
 

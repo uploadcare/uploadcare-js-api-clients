@@ -1,3 +1,4 @@
+import { describe, it, expect } from 'vitest'
 import base from '../../src/api/base'
 import info from '../../src/api/info'
 import * as factory from '../_fixtureFactory'
