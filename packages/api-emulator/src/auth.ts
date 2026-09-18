@@ -19,17 +19,22 @@ const ALLOWED_PUBLIC_KEYS = [
  * it.
  */
 export const requirePublicKey = (
+  request: Request,
   publicKey: string | null,
   paramName = 'pub_key'
 ) => {
   if (!publicKey)
+    // schema: publicKeyRequiredError / uploadcarePublicKeyRequiredError
     return apiError(
+      request,
       403,
       `${paramName} is required.`,
       'ProjectPublicKeyInvalidError'
     )
   if (!ALLOWED_PUBLIC_KEYS.includes(publicKey))
+    // schema: publicKeyInvalidError / uploadcarePublicKeyInvalidError
     return apiError(
+      request,
       403,
       `${paramName} is invalid.`,
       'ProjectPublicKeyInvalidError'
