@@ -45,10 +45,10 @@ export class AuthTokenCache {
    */
   fetchToken: FetchAuthToken
 
-  readonly #skew: number
-  #token: string | undefined
-  #expiresAt: number | undefined
-  #inflight: Promise<string> | undefined
+  private readonly _skew: number
+  private _token: string | undefined
+  private _expiresAt: number | undefined
+  private _inflight: Promise<string> | undefined
 
   constructor({
     fetchToken,
@@ -56,46 +56,46 @@ export class AuthTokenCache {
     initialToken
   }: AuthTokenCacheOptions) {
     this.fetchToken = fetchToken
-    this.#skew = skew
-    if (initialToken) this.#store(initialToken)
+    this._skew = skew
+    if (initialToken) this._store(initialToken)
   }
 
   getToken = (): Promise<string> => {
-    if (this.#token !== undefined && !this.#isStale()) {
-      return Promise.resolve(this.#token)
+    if (this._token !== undefined && !this._isStale()) {
+      return Promise.resolve(this._token)
     }
 
     // Concurrent callers share one request rather than each starting their
     // own.
-    this.#inflight ??= Promise.resolve()
+    this._inflight ??= Promise.resolve()
       .then(() => this.fetchToken())
       .then((token) => {
-        this.#store(token)
+        this._store(token)
         return token
       })
       .finally(() => {
-        this.#inflight = undefined
+        this._inflight = undefined
       })
 
-    return this.#inflight
+    return this._inflight
   }
 
   /** Drop the cached token, so the next `getToken()` fetches a new one. */
   invalidate(): void {
-    this.#token = undefined
-    this.#expiresAt = undefined
+    this._token = undefined
+    this._expiresAt = undefined
   }
 
-  #store(token: string): void {
-    this.#token = token
-    this.#expiresAt = getTokenExpiration(token)
+  private _store(token: string): void {
+    this._token = token
+    this._expiresAt = getTokenExpiration(token)
   }
 
-  #isStale(): boolean {
+  private _isStale(): boolean {
     // ponytail: a token whose `exp` we could not read is used until the Upload
     // API refuses it. Refreshing on every request instead would turn one
     // unreadable token into a request storm. Call `invalidate()` to force one.
-    if (this.#expiresAt === undefined) return false
-    return Date.now() / 1000 >= this.#expiresAt - this.#skew
+    if (this._expiresAt === undefined) return false
+    return Date.now() / 1000 >= this._expiresAt - this._skew
   }
 }

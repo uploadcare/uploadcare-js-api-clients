@@ -10,7 +10,13 @@
   },
   "rules": {
     "typescript/consistent-type-imports": "error",
-    "import/no-cycle": "error"
+    "import/no-cycle": "error",
+    "no-underscore-dangle": [
+      "error",
+      {
+        "allowAfterThis": true
+      }
+    ]
   },
   "ignorePatterns": ["dist/**", "node_modules/**"]
 }
