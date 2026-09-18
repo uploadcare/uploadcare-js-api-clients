@@ -1,3 +1,4 @@
+import { warnOnce } from '@uploadcare/api-client-utils'
 import { AuthToken } from '../types'
 
 type SecureOptions = {
@@ -5,8 +6,6 @@ type SecureOptions = {
   secureSignature?: string
   secureExpire?: string
 }
-
-let warned = false
 
 /**
  * Returns the legacy signed-upload form fields. When `authToken` is also
@@ -22,9 +21,8 @@ export const getSecureParams = ({
   if (!authToken) {
     return { signature: secureSignature, expire: secureExpire }
   }
-  if ((secureSignature || secureExpire) && !warned) {
-    warned = true
-    console.warn(
+  if (secureSignature || secureExpire) {
+    warnOnce(
       '[@uploadcare/upload-client] Both `authToken` and `secureSignature`/`secureExpire` are provided. ' +
         'These are mutually exclusive auth schemes; `authToken` takes precedence and the signature parameters are ignored.'
     )
