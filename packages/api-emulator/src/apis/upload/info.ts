@@ -1,7 +1,7 @@
-import { requirePublicKey } from '../auth.js'
-import { apiError } from '../responses.js'
-import { route } from '../router.js'
-import { fileInfo, sessionOf } from '../store.js'
+import { apiError } from '../../core/responses.js'
+import { route } from '../../core/router.js'
+import { fileInfo, sessionOf } from '../../state/store.js'
+import { requirePublicKey } from './auth.js'
 
 route('GET', '/info/', ({ request }) => {
   const params = new URL(request.url).searchParams

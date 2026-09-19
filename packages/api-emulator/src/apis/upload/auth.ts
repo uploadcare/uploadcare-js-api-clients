@@ -1,4 +1,4 @@
-import { apiError } from './responses.js'
+import { apiError } from '../../core/responses.js'
 
 /**
  * The public keys the demo project recognises, mirroring the old mock server's

@@ -1,6 +1,10 @@
-import './routes/base.js'
-import './routes/info.js'
+// Upload API must register before the CDN: the CDN's route pattern matches a
+// uuid in the first path segment, which would also match `/base/` and
+// `/info/`. Importing it first here is what keeps upload endpoints from being
+// shadowed — don't alphabetise these imports.
+import './apis/upload/index.js'
+import './apis/cdn/index.js'
 
-export { handle } from './router.js'
-export { resetSession, sessionOf } from './store.js'
-export type { Session, StoredFile, StoredImage } from './store.js'
+export { handle } from './core/router.js'
+export { resetSession, sessionOf } from './state/store.js'
+export type { Session, StoredFile, StoredImage } from './state/store.js'

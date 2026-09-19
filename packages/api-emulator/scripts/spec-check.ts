@@ -17,7 +17,8 @@ const specPath = path.join(
   import.meta.dirname,
   '..',
   'test',
-  'upload-api-spec.json'
+  'specs',
+  'upload-api.json'
 )
 const committed = readFileSync(specPath, 'utf8')
 
@@ -38,12 +39,12 @@ try {
 
 if (fresh !== committed) {
   console.error(
-    `test/upload-api-spec.json is stale (published info.version is ${version}). ` +
+    `test/specs/upload-api.json is stale (published info.version is ${version}). ` +
       'Run `npm run spec:refresh -- <url>` and commit the result.'
   )
   process.exit(1)
 }
 
 console.log(
-  `test/upload-api-spec.json matches the published spec (info.version ${version}).`
+  `test/specs/upload-api.json matches the published spec (info.version ${version}).`
 )

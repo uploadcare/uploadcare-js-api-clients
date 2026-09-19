@@ -1,6 +1,6 @@
 /**
- * Validates emulator responses against Uploadcare's published Upload API
- * OpenAPI document (`upload-api-spec.json`, vendored by `spec:refresh` — see
+ * Validates emulator responses against Uploadcare's published API OpenAPI
+ * documents (`specs/<name>.json`, vendored by `spec:refresh` — see
  * `../scripts/spec-refresh.ts`). This is the contract from Task 2.5 on: the
  * document is the authority for every response shape this package produces.
  *
@@ -21,7 +21,11 @@
  */
 import Ajv, { type ErrorObject, type ValidateFunction } from 'ajv'
 import addFormats from 'ajv-formats'
-import specDocument from './upload-api-spec.json'
+import uploadApiSpec from './specs/upload-api.json'
+
+/** The specs `assertMatchesSpec` can select by name — `upload-api` today. */
+const specs = { 'upload-api': uploadApiSpec } as const
+export type SpecName = keyof typeof specs
 
 type JsonObject = Record<string, unknown>
 
@@ -70,11 +74,11 @@ const toJsonSchema = (node: unknown): unknown => {
   return { anyOf: [output, { type: 'null' }] }
 }
 
-const converted = toJsonSchema(specDocument) as JsonObject
-
 const ajv = new Ajv({ strict: false, allErrors: true })
 addFormats(ajv)
-ajv.addSchema(converted, 'spec')
+for (const [name, document] of Object.entries(specs)) {
+  ajv.addSchema(toJsonSchema(document) as JsonObject, name)
+}
 
 /** Reads `doc[a][b][c]…`, returning `undefined` for any missing step. */
 const get = (doc: unknown, segments: readonly string[]): unknown =>
@@ -150,11 +154,12 @@ const collectDefaults = (doc: unknown, schema: unknown): string[] => {
 
 const validators = new Map<string, ValidateFunction>()
 
-const validatorAt = (pointer: string): ValidateFunction => {
-  const cached = validators.get(pointer)
+const validatorAt = (name: SpecName, pointer: string): ValidateFunction => {
+  const key = `${name}${pointer}`
+  const cached = validators.get(key)
   if (cached) return cached
-  const validate = ajv.compile({ $ref: `spec#${pointer}` })
-  validators.set(pointer, validate)
+  const validate = ajv.compile({ $ref: `${name}#${pointer}` })
+  validators.set(key, validate)
   return validate
 }
 
@@ -168,13 +173,14 @@ const describe = (method: string, path: string, status: number) =>
   `${method.toUpperCase()} ${path} → ${status}`
 
 const validateAgainst = (
+  name: SpecName,
   pointer: string,
   body: unknown,
   method: string,
   path: string,
   status: number
 ) => {
-  const validate = validatorAt(pointer)
+  const validate = validatorAt(name, pointer)
   if (validate(body)) return
   const detail = (validate.errors ?? [])
     .map(
@@ -192,9 +198,13 @@ export const assertMatchesSpec = async (args: {
   status: number
   response: Response
   body: unknown
+  /** Which spec to validate against — `test/specs/<spec>.json`. */
+  spec?: SpecName
 }): Promise<void> => {
   const method = args.method.toLowerCase()
   const { path, status, response, body } = args
+  const name = args.spec ?? 'upload-api'
+  const specDocument = specs[name]
 
   const operation = get(specDocument, ['paths', path, method])
   if (!isObject(operation)) {
@@ -221,7 +231,7 @@ export const assertMatchesSpec = async (args: {
       'schema'
     ])
     if (schema === undefined) return
-    validateAgainst(toJsonPointer(pointer), body, method, path, status)
+    validateAgainst(name, toJsonPointer(pointer), body, method, path, status)
     return
   }
 
@@ -259,5 +269,5 @@ export const assertMatchesSpec = async (args: {
     return
   }
 
-  validateAgainst(toJsonPointer(plainPointer), body, method, path, status)
+  validateAgainst(name, toJsonPointer(plainPointer), body, method, path, status)
 }
