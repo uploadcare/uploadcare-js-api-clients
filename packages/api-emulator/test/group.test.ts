@@ -79,6 +79,26 @@ it('refuses a group containing a file nobody uploaded', async () => {
   expect(response.status).toBe(400)
 })
 
+it('refuses a group with a non-string files[N] entry, rather than dropping it', async () => {
+  const uuid = await upload('a.jpg')
+  const body = new FormData()
+  body.set('pub_key', 'secret_public_key')
+  body.set('files[0]', uuid)
+  body.set('files[1]', new File([new Uint8Array()], 'not-a-uuid.txt'))
+  const response = await handle(
+    new Request('https://upload.uploadcare.com/group/?jsonerrors=1', {
+      method: 'POST',
+      body
+    })
+  )
+  expect(response!.status).toBe(400)
+  const parsed = await response!.json()
+  expect(parsed).toMatchObject({
+    error: { content: 'This is not valid file url: [object File].' }
+  })
+  expect(parsed).not.toHaveProperty('id')
+})
+
 it('builds a group out of a CDN url with operations, keeping default_effects', async () => {
   const uuid = await upload('a.jpg')
   const response = await createGroup([`${uuid}/-/resize/x800/`])
