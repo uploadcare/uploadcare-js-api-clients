@@ -92,6 +92,12 @@ export type Session = {
   files: Map<string, StoredFile>
   groups: Map<string, string[]>
   fromUrlJobs: Map<string, FromUrlJob>
+  /**
+   * Source url → the uuid it was last stored as, for `check_URL_duplicates`.
+   * Only written when `save_URL_duplicates` asked for it, which is what the
+   * real API keys its dedup index on.
+   */
+  fromUrlSources: Map<string, string>
   multipart: Map<string, MultipartUpload>
   issued: number
   /** `/throttle/`'s per-session request count — see throttle.ts. */
@@ -112,6 +118,7 @@ export const resetSession = (id = 'default') => {
     files: new Map(),
     groups: new Map(),
     fromUrlJobs: new Map(),
+    fromUrlSources: new Map(),
     multipart: new Map(),
     issued: 0,
     throttled: 0

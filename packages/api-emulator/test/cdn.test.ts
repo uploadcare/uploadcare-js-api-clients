@@ -50,3 +50,19 @@ it('404s for a file nobody uploaded', async () => {
   )
   expect(response!.status).toBe(404)
 })
+
+it('does not let the CDN route swallow an Upload API GET', async () => {
+  // `router.ts`'s `match` returns as soon as it reaches a `*` segment, so
+  // `GET /info/` really does match the CDN's `/:uuid/*` — and the CDN_ID guard
+  // then returns `undefined`, which `handle()` reads as "handled, no response"
+  // rather than "try the next route". Import order in `src/index.ts` is the
+  // only thing keeping every Upload API GET off that path, and nothing else
+  // pins it. A 502 in a consumer is what regressing it looks like.
+  const response = await handle(
+    new Request(
+      'https://upload.uploadcare.com/info/?pub_key=demopublickey&file_id=nope'
+    )
+  )
+  expect(response).toBeDefined()
+  expect(response!.status).toBe(404)
+})

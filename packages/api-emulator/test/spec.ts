@@ -19,6 +19,7 @@
  *   and `example`/`examples`/`discriminator` are dropped. Ajv runs with
  *   `strict: false`.
  */
+import { expect } from 'vitest'
 import Ajv, { type ErrorObject, type ValidateFunction } from 'ajv'
 import addFormats from 'ajv-formats'
 import uploadApiSpec from './specs/upload-api.json'
@@ -186,21 +187,75 @@ const collectDefaults = (doc: unknown, schema: unknown): string[] => {
   return [...anyOf, ...oneOf].flatMap((branch) => collectDefaults(doc, branch))
 }
 
+class SpecMismatchError extends Error {}
+
+const fail = (message: string): never => {
+  throw new SpecMismatchError(message)
+}
+
 const validators = new Map<string, ValidateFunction>()
+
+/**
+ * Pointers in the published document whose schema accepts `{}` — every property
+ * optional, no `required`, no `additionalProperties: false`. A validator
+ * compiled from one of these asserts _nothing_: `assertMatchesSpec` against
+ * such a response passes for any object at all, including one with every
+ * documented field deleted.
+ *
+ * They are listed here by name, rather than left to look like coverage, because
+ * the fix is not in this file: a route whose 200 lands on one of these needs
+ * direct assertions in its own test (see the `cdn_url`/`url`/`datetime_*`
+ * assertions in `test/group.test.ts`, which exist for exactly this reason).
+ *
+ * `validatorAt` checks the list both ways, so it can't rot: a pointer here that
+ * starts rejecting `{}` after a `spec:refresh` fails just as loudly as one that
+ * starts accepting it without being listed.
+ */
+const VACUOUS_SCHEMAS = new Set<string>([
+  // `baseUploadSuccessful` — an object with no `required` and no
+  // `additionalProperties: false`. Covered directly by `test/base.test.ts`
+  // ("hands back a new id for every upload") and `test/spec.test.ts`.
+  'upload-api/components/responses/baseUploadSuccessful/content/application~1json/schema',
+  // `groupInfo`, reached by both `/group/`'s and `/group/info/`'s 200 — no
+  // `required` at all. `test/group.test.ts` asserts `id`, `files_count`,
+  // `cdn_url`, `url`, `datetime_created`, `datetime_stored` and `files[]`
+  // itself, because nothing here does.
+  'upload-api/components/responses/createFilesGroupSuccessful/content/application~1json/schema',
+  'upload-api/components/responses/filesGroupInfoSuccessful/content/application~1json/schema',
+  // `/from_url/`'s 200 — a `oneOf` of the token and file-info shapes, neither
+  // of which forbids extra properties. `test/from-url.test.ts` asserts `type`
+  // and `token`/`original_filename` directly.
+  'upload-api/components/responses/fromURLUploadResponseSuccessful/content/application~1json/schema',
+  // `/from_url/status/`'s 200 — an `anyOf` whose branches include ones with no
+  // `required`, so every object satisfies one. `test/from-url.test.ts` asserts
+  // `status`, `total`/`done` and `original_filename` directly.
+  'upload-api/components/responses/fromURLUploadStatusSuccessful/content/application~1json/schema'
+])
+
+const assertNotVacuous = (key: string, validate: ValidateFunction) => {
+  const acceptsEmpty = validate({})
+  const listed = VACUOUS_SCHEMAS.has(key)
+  if (acceptsEmpty && !listed)
+    fail(
+      `${key} accepts {} — it asserts nothing. Either the schema gained a ` +
+        `\`required\`, or this pointer belongs in VACUOUS_SCHEMAS with a test ` +
+        `that checks the fields directly.`
+    )
+  if (!acceptsEmpty && listed)
+    fail(
+      `${key} no longer accepts {} — it is a real assertion now, so drop it ` +
+        `from VACUOUS_SCHEMAS.`
+    )
+}
 
 const validatorAt = (name: SpecName, pointer: string): ValidateFunction => {
   const key = `${name}${pointer}`
   const cached = validators.get(key)
   if (cached) return cached
   const validate = ajv.compile({ $ref: `${name}#${pointer}` })
+  assertNotVacuous(key, validate)
   validators.set(key, validate)
   return validate
-}
-
-class SpecMismatchError extends Error {}
-
-const fail = (message: string): never => {
-  throw new SpecMismatchError(message)
 }
 
 const describe = (method: string, path: string, status: number) =>
@@ -264,7 +319,17 @@ export const assertMatchesSpec = async (args: {
       'application/json',
       'schema'
     ])
-    if (schema === undefined) return
+    if (schema === undefined) {
+      // Not a silent pass: an operation the document declares but gives no
+      // JSON schema for (`PUT /<presigned-url-x>`'s `2XX`, which has no
+      // `content` at all) validates nothing, so saying so is the only honest
+      // outcome. Add the case to the document, or assert the body directly.
+      fail(
+        `${describe(method, path, status)}: the spec declares this response but no ` +
+          `application/json schema for it, so there is nothing to validate against`
+      )
+      return
+    }
     validateAgainst(name, toJsonPointer(pointer), body, method, path, status)
     return
   }
@@ -274,7 +339,14 @@ export const assertMatchesSpec = async (args: {
     responseBase,
     ['content', 'text/plain', 'schema']
   )
-  if (plainSchema === undefined) return
+  if (plainSchema === undefined) {
+    // Same reasoning as the 2xx branch above.
+    fail(
+      `${describe(method, path, status)}: the spec declares this response but no ` +
+        `text/plain schema for it, so there is nothing to validate against`
+    )
+    return
+  }
 
   const contentType = response.headers
     .get('content-type')
@@ -304,4 +376,18 @@ export const assertMatchesSpec = async (args: {
   }
 
   validateAgainst(name, toJsonPointer(plainPointer), body, method, path, status)
+}
+
+/**
+ * `jsonerrors=1` answers **HTTP 200** and carries the real code in the envelope
+ * — see `src/core/responses.ts`. Asserting `response.status` directly on such a
+ * response would pin the wrong thing, so every error test goes through here.
+ */
+export const jsonError = async (response: Response) => {
+  expect(response.status).toBe(200)
+  expect(response.headers.get('content-type')).toMatch(/^application\/json/)
+  const body = (await response.clone().json()) as {
+    error: { status_code: number; content: string; error_code?: string }
+  }
+  return body.error
 }

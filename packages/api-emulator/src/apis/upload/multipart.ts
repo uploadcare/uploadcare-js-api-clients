@@ -36,7 +36,16 @@ route(
     const partNumber = Number(
       new URL(request.url).searchParams.get('partNumber')
     )
-    if (upload && Number.isInteger(partNumber) && partNumber >= 1) {
+    // Bounded on both sides: a `partNumber` past the count `/multipart/start/`
+    // handed out would otherwise extend `parts` and leave holes in it, and
+    // `/multipart/complete/`'s `bytes.set(part, …)` throws on the first one —
+    // a rejection that escapes `handle()` rather than answering anything.
+    if (
+      upload &&
+      Number.isInteger(partNumber) &&
+      partNumber >= 1 &&
+      partNumber <= upload.parts.length
+    ) {
       upload.parts[partNumber - 1] = new Uint8Array(await request.arrayBuffer())
     }
     return new Response(null, { status: 200 })
@@ -116,6 +125,12 @@ route(
       // schema: uuidInvalidError — no /multipart/start/ session by this uuid.
       return apiError(request, 400, 'uuid is invalid.')
 
+    // The completed file's `size` is the bytes actually received, not the
+    // `upload.size` `/multipart/start/` was told to expect. That's deliberate:
+    // a test that PUTs short parts (as this package's own does) should see the
+    // file it really assembled, and `/info/` and the CDN then agree with it.
+    // It does mean `upload.size` is written and never read — it stays only
+    // because `/multipart/start/` needs it to work out the part count.
     const bytes = new Uint8Array(
       upload.parts.reduce((total, part) => total + part.byteLength, 0)
     )

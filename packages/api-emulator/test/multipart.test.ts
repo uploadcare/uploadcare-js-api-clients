@@ -188,3 +188,28 @@ it('drops the connection on a part PUT that carries an Authorization header', as
     })
   ).rejects.toThrow()
 })
+
+it('ignores a partNumber past the part count, instead of crashing /complete/', async () => {
+  const { uuid, parts } = (await (
+    await start({
+      filename: 'big.jpg',
+      size: String(BIG),
+      content_type: 'image/jpeg'
+    })
+  ).json()) as { parts: string[]; uuid: string }
+  expect(parts).toHaveLength(3)
+
+  const stray = await handle(
+    new Request(
+      `https://upload.uploadcare.com/multipart/upload/${uuid}/original?partNumber=10`,
+      { method: 'PUT', body: new Uint8Array([1]) }
+    )
+  )
+  expect(stray!.status).toBe(200)
+
+  // Before the bound, the out-of-range write left holes in `parts` and
+  // `/complete/`'s `bytes.set(undefined, …)` rejected out of `handle()`.
+  const completed = await complete(uuid)
+  expect(completed.status).toBe(200)
+  expect(await completed.json()).toMatchObject({ uuid, size: 0 })
+})

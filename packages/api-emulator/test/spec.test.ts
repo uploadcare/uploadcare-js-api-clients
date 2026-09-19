@@ -1,6 +1,6 @@
 import { beforeEach, expect, it } from 'vitest'
 import { handle, resetSession } from '../src/index.js'
-import { assertMatchesSpec } from './spec.js'
+import { assertMatchesSpec, jsonError } from './spec.js'
 
 const JPEG = new Uint8Array([
   0xff, 0xd8, 0xff, 0xc0, 0x00, 0x11, 0x08, 0x00, 0x01, 0x00, 0x01, 0xff, 0xd9
@@ -56,10 +56,12 @@ it('uses a status code the spec documents when the file is unknown', async () =>
       'https://upload.uploadcare.com/info/?jsonerrors=1&pub_key=demopublickey&file_id=nope'
     )
   )
+  // The HTTP status is 200 under `jsonerrors=1`; the status the spec
+  // documents is the one inside the envelope.
   await assertMatchesSpec({
     method: 'get',
     path: '/info/',
-    status: response!.status,
+    status: (await jsonError(response!)).status_code,
     response: response!,
     body: await response!.clone().json()
   })
@@ -74,8 +76,10 @@ it('answers an unknown file with the spec-declared sentence, jsonerrors=1', asyn
   const body = (await response!.clone().json()) as {
     error: { content: string }
   }
-  expect(response!.status).toBe(404)
-  expect(body.error.content).toBe('File is not found.')
+  expect(await jsonError(response!)).toMatchObject({
+    status_code: 404,
+    content: 'File is not found.'
+  })
   await assertMatchesSpec({
     method: 'get',
     path: '/info/',
@@ -116,8 +120,10 @@ it('rejects a /base/ upload with no file, jsonerrors=1', async () => {
   const body = (await response!.clone().json()) as {
     error: { content: string }
   }
-  expect(response!.status).toBe(400)
-  expect(body.error.content).toBe('Request does not contain files.')
+  expect(await jsonError(response!)).toMatchObject({
+    status_code: 400,
+    content: 'Request does not contain files.'
+  })
   await assertMatchesSpec({
     method: 'post',
     path: '/base/',
