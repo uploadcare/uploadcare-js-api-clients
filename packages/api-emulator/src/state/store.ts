@@ -88,6 +88,16 @@ export const DEMO_FILES = [
   '90e06e59-8055-4435-9291-c005a98cf098'
 ]
 
+/**
+ * A telemetry event body, exactly as `POST /api/v1/events` received it.
+ * Deliberately untyped beyond "some JSON object": telemetry is fire-and-forget
+ * from the uploader's side, there's no spec to validate it against (see
+ * `apis/telemetry/index.ts`), and a strict shape here would fail a test over
+ * the emulator's opinion of the payload rather than anything the uploader
+ * actually got wrong.
+ */
+export type TelemetryEvent = Record<string, unknown>
+
 export type Session = {
   files: Map<string, StoredFile>
   groups: Map<string, string[]>
@@ -102,6 +112,8 @@ export type Session = {
   issued: number
   /** `/throttle/`'s per-session request count — see throttle.ts. */
   throttled: number
+  /** Every `POST /api/v1/events` body received, in arrival order. */
+  telemetry: TelemetryEvent[]
 }
 
 /** Names the session on every redirected request; set by the caller. */
@@ -121,7 +133,8 @@ export const resetSession = (id = 'default') => {
     fromUrlSources: new Map(),
     multipart: new Map(),
     issued: 0,
-    throttled: 0
+    throttled: 0,
+    telemetry: []
   }
   for (const uuid of DEMO_FILES) {
     session.files.set(uuid, {
