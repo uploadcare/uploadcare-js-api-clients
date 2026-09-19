@@ -90,13 +90,17 @@ const bearerAuth = (ctx: Parameters<Middleware>[0]): boolean => {
   // Both parameters, not just `signature`: the client drops the pair together,
   // so a request carrying either one alongside a Bearer token means something
   // leaked, and the mock has to fail loudly for the test to catch it.
-  const legacyParam = ['signature', 'expire'].find(
+  const hasLegacyParam = ['signature', 'expire'].some(
     (name) => ctx.query[name] || (ctx.request.body && ctx.request.body[name])
   )
-  if (legacyParam) {
+  if (hasLegacyParam) {
+    // A constant message. Naming the offending parameter would put a
+    // request-derived value into the response body, which is worth avoiding
+    // even in a mock and which Snyk flags as XSS.
     error(ctx, {
       status: 403,
-      statusText: `Do not use \`${legacyParam}\` together with a Bearer token.`,
+      statusText:
+        'Do not use `signature` or `expire` together with a Bearer token.',
       errorCode: 'TokenInvalidError'
     })
     return false
