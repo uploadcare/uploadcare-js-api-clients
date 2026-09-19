@@ -3,20 +3,99 @@
 An in-process, stateful emulator of the Uploadcare Upload API, for tests that
 need real request/response round-trips without hitting the network.
 
-```ts
-import { handle, resetSession } from '@uploadcare/api-emulator'
+## Browser-safe by design
 
-resetSession() // start from an empty store
-const response = await handle(new Request('https://upload.uploadcare.com/base/', ...))
-```
+`@uploadcare/api-emulator` (the `.` export: `handle`, `resetSession`,
+`sessionOf`, `SESSION_HEADER`) runs anywhere `Request`/`Response` exist,
+including inside a browser page — that's what lets it back an in-browser MSW
+worker. `@uploadcare/api-emulator/listen` is Node-only: it speaks raw HTTP
+sockets (`node:http`/`node:https`, `Buffer`) to give a suite a real origin to
+point a `baseURL` at. The split exists so the core can be bundled into a page
+without dragging Node built-ins with it; `test/browser-safe.test.ts` asserts
+the `.` export's source never regresses that.
 
-Or served over HTTP, for tests that need a real origin:
+Three ways to run it, in increasing order of how "real" the transport needs
+to be:
+
+### 1. As a server
+
+For tests that need a real origin — this is what `upload-client`'s suite
+does, pointing its `baseURL`/`baseCDN` at the emulator instead of the real
+API:
 
 ```ts
 import { createEmulatorServer } from '@uploadcare/api-emulator/listen'
 
-const { origin, close } = await createEmulatorServer()
+const { origin, close } = await createEmulatorServer({ port: 0, delayMs: 30 })
+// point the client under test at `origin`, e.g.:
+// new UploadClient({ baseURL: origin, baseCDN: origin })
+
+await close()
 ```
+
+### 2. As a function
+
+`handle(request)` returns `Response | undefined`. `undefined` means "not an
+endpoint this emulator implements," so the caller decides what happens next
+— this is the shape Playwright's `page.route` wants:
+
+```ts
+import { handle } from '@uploadcare/api-emulator'
+
+await page.route('https://upload.uploadcare.com/**', async (route) => {
+  const response = await handle(route.request())
+  if (!response) return route.fallback()
+  await route.fulfill({
+    status: response.status,
+    headers: Object.fromEntries(response.headers),
+    body: Buffer.from(await response.arrayBuffer())
+  })
+})
+```
+
+### 3. With MSW, in Node or in the browser
+
+One handler, delegating to `handle`, works for both `msw/node` and
+`msw/browser` — `handle` returning `undefined` for a request it doesn't
+implement is exactly what makes `passthrough()` the right fallback: it hands
+the request back to whatever `setupServer`/`setupWorker` would otherwise have
+done with it, instead of the emulator having an opinion about traffic that
+isn't its own.
+
+```ts
+import { http, passthrough } from 'msw'
+import { setupServer } from 'msw/node' // or: import { setupWorker } from 'msw/browser'
+import { handle } from '@uploadcare/api-emulator'
+
+const uploadcare = http.all('*', async ({ request }) => (await handle(request)) ?? passthrough())
+
+const server = setupServer(uploadcare)
+```
+
+## Sessions
+
+The emulator is stateful, and state is scoped to a *session* rather than
+shared globally, so that a test suite running its files in parallel against
+one emulator doesn't see one file's upload answered by another's. A fresh
+session starts out empty — no files, no groups — as if nothing had ever been
+uploaded to it.
+
+- `resetSession(id?)` clears (or starts) a session. Call it between tests
+  that share an emulator instance so each test starts from an empty store.
+  With no `id`, it resets the `'default'` session.
+- The `x-uploadcare-emulator-session` header (exported as `SESSION_HEADER`)
+  names which session a request belongs to. Set it on every request from a
+  given test file to keep that file's uploads isolated from every other file
+  running against the same emulator at the same time. A request with no
+  session header, or one nobody has reset yet, gets the `'default'` session,
+  created on demand.
+
+## What's implemented today
+
+Only the Upload API's `POST /base/` (single-file upload) and `GET /info/`
+(file metadata) endpoints exist right now. More endpoints — `from_url`,
+groups, multipart, and the CDN — are on the way; this README will grow a
+section for each as it lands rather than promising them ahead of time.
 
 ## The spec is the authority
 
