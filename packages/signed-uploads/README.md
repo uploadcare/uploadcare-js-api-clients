@@ -114,6 +114,25 @@ tokens.fetchToken = props.fetchToken // cached token is kept
 tokens.invalidate() // call this when the change is real, e.g. on sign-out
 ```
 
+If your `fetchToken` throws or rejects, `getToken()` rejects with an
+`AuthTokenResolverError` carrying the original failure on `cause`. Nothing is
+cached, so the next call tries again:
+
+```typescript
+import { AuthTokenResolverError } from '@uploadcare/signed-uploads/client'
+
+try {
+  await tokens.getToken()
+} catch (error) {
+  if (error instanceof AuthTokenResolverError) {
+    // your token endpoint failed; `error.cause` says how
+  }
+}
+```
+
+`@uploadcare/upload-client` throws the same class when you pass it a token
+function directly, and re-exports it.
+
 To authenticate your own requests, `getAuthHeaders` builds the header and returns `{}` for an absent token, so it can be spread unconditionally:
 
 ```typescript

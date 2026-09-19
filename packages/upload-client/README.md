@@ -384,6 +384,25 @@ try {
 }
 ```
 
+A resolver that throws is a different failure: nothing was sent, so there is no
+server code. It surfaces as `AuthTokenResolverError` with the original throw on
+`cause`, and nothing retries it, since only your own code can fix it:
+
+```javascript
+import { AuthTokenResolverError } from '@uploadcare/upload-client'
+
+try {
+  await client.uploadFile(fileData)
+} catch (error) {
+  if (error instanceof AuthTokenResolverError) {
+    // your token endpoint failed; `error.cause` says how
+  }
+}
+```
+
+The class lives in [`@uploadcare/signed-uploads`][signed-uploads], which also
+throws it from `AuthTokenCache`, and is re-exported here.
+
 #### `userAgent: string | CustomUserAgentFn`
 
 ```typescript
