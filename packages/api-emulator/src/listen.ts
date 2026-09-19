@@ -77,6 +77,25 @@ export const createEmulatorServer = async (
     request.on('error', () => {})
     response.on('error', () => {})
 
+    // CORS preflight, answered here rather than by a route: it's transport, not
+    // an emulated endpoint — `handle()` matches no `OPTIONS` route and would
+    // 502 it. Every consumer is cross-origin, and one that sets `SESSION_HEADER`
+    // (or any other custom header) is preflighted by the browser before its
+    // real request is ever sent. Mirrors what `@koa/cors` did for the old mock
+    // server.
+    if (request.method === 'OPTIONS') {
+      response
+        .writeHead(204, {
+          'access-control-allow-origin': '*',
+          'access-control-allow-methods': 'GET, POST, PUT, HEAD, OPTIONS',
+          'access-control-allow-headers':
+            request.headers['access-control-request-headers'] ?? '*',
+          'access-control-max-age': '86400'
+        })
+        .end()
+      return
+    }
+
     const protocol = options.tls ? 'https' : 'http'
     const url = `${protocol}://${request.headers.host ?? 'localhost'}${request.url ?? '/'}`
     await delay(options.delayMs ?? 30)

@@ -106,6 +106,13 @@ uploaded to it.
   running against the same emulator at the same time. A request with no
   session header, or one nobody has reset yet, gets the `'default'` session,
   created on demand.
+- **The header only matters in `./listen` server mode.** Under MSW in a
+  browser, every page is its own module realm with its own copy of the store,
+  so two pages are already isolated whether or not they set the header — and
+  one page's own requests all belong to the same store regardless of what they
+  set it to. It is worth setting anyway, so the same consumer code works
+  against a shared server, but on the MSW path it is a no-op.
+  `test/session.test.ts` pins the server-mode behaviour.
 
 ## What's implemented today
 
@@ -210,7 +217,15 @@ than "fixing" the emulator to match literally:
 
 - The `/base/` success schema describes a `{ "<filename>": "<uuid>" }` map,
   because that's the real API's shape; the emulator answers `{ "file": "<uuid>" }`,
-  which is what upload-client reads.
+  which is what upload-client reads. **This divergence is not caught, and not
+  waived either** — the spec's `baseUploadSuccessful` declares no `required`
+  and no `additionalProperties: false`, so the validator accepts any object at
+  all for it, including `{}`. The same is true of `/group/`, `/group/info/`,
+  `/from_url/` and `/from_url/status/`. Those five pointers are named in
+  `VACUOUS_SCHEMAS` (`test/spec.ts`), which fails if one of them ever starts
+  asserting something — or if any other response schema stops. A route on that
+  list needs field-by-field assertions in its own test file; `assertMatchesSpec`
+  will not do it.
 - `jsonerrors=1`, which upload-client sends on every request, isn't
   mentioned by the spec at all. Without it, error responses are the
   `text/plain` sentence the spec documents; with it, they're the JSON

@@ -1,6 +1,6 @@
 import { beforeEach, expect, it } from 'vitest'
 import { handle, resetSession } from '../src/index.js'
-import { assertMatchesSpec } from './spec.js'
+import { assertMatchesSpec, jsonError } from './spec.js'
 
 // Long enough to decode as a real 1×1 JPEG (see base.test.ts) — needed so
 // `image_info` comes back non-null, since the spec's `imageInfo` schema isn't
@@ -46,6 +46,10 @@ it('builds a group out of files it holds', async () => {
   const group = (await response.clone().json()) as {
     id: string
     files_count: number
+    cdn_url: string
+    url: string
+    datetime_created: string
+    datetime_stored: string | null
   }
   await assertMatchesSpec({
     method: 'post',
@@ -57,6 +61,14 @@ it('builds a group out of files it holds', async () => {
 
   expect(group.id).toMatch(/~2$/)
   expect(group.files_count).toBe(2)
+  // Asserted here rather than left to `assertMatchesSpec`: the spec's
+  // `groupInfo` schema declares no `required`, so it accepts `{}` and would
+  // not notice any of these four going missing. See `VACUOUS_SCHEMAS` in
+  // `test/spec.ts`.
+  expect(group.cdn_url).toBe(`https://ucarecdn.com/${group.id}/`)
+  expect(group.url).toBe(`https://api.uploadcare.com/groups/${group.id}/`)
+  expect(group.datetime_created).toBe(new Date(0).toISOString())
+  expect(group.datetime_stored).toBeNull()
 
   const info = await handle(
     new Request(
@@ -64,7 +76,14 @@ it('builds a group out of files it holds', async () => {
     )
   )
   const infoBody = await info!.clone().json()
-  expect(infoBody).toMatchObject({ id: group.id, files_count: 2 })
+  expect(infoBody).toMatchObject({
+    id: group.id,
+    files_count: 2,
+    cdn_url: group.cdn_url,
+    url: group.url,
+    datetime_created: group.datetime_created,
+    datetime_stored: null
+  })
   await assertMatchesSpec({
     method: 'get',
     path: '/group/info/',
@@ -76,7 +95,7 @@ it('builds a group out of files it holds', async () => {
 
 it('refuses a group containing a file nobody uploaded', async () => {
   const response = await createGroup([await upload('a.jpg'), 'not-a-real-uuid'])
-  expect(response.status).toBe(400)
+  expect((await jsonError(response)).status_code).toBe(400)
 })
 
 it('refuses a group with a non-string files[N] entry, rather than dropping it', async () => {
@@ -91,7 +110,7 @@ it('refuses a group with a non-string files[N] entry, rather than dropping it', 
       body
     })
   )
-  expect(response!.status).toBe(400)
+  expect((await jsonError(response!)).status_code).toBe(400)
   const parsed = await response!.json()
   expect(parsed).toMatchObject({
     error: { content: 'This is not valid file url: [object File].' }
@@ -134,9 +153,9 @@ it('fails every time for the "files not found" key, regardless of membership', a
       body
     })
   )
-  expect(response!.status).toBe(400)
-  expect(await response!.json()).toMatchObject({
-    error: { content: 'Some files not found.' }
+  expect(await jsonError(response!)).toMatchObject({
+    status_code: 400,
+    content: 'Some files not found.'
   })
 })
 
@@ -149,7 +168,7 @@ it('refuses a request with no pub_key', async () => {
       body
     })
   )
-  expect(response!.status).toBe(403)
+  expect((await jsonError(response!)).status_code).toBe(403)
 })
 
 it('refuses a request with no files[N] parameters', async () => {
@@ -161,9 +180,9 @@ it('refuses a request with no files[N] parameters', async () => {
       body
     })
   )
-  expect(response!.status).toBe(400)
-  expect(await response!.json()).toMatchObject({
-    error: { content: 'No files[N] parameters found.' }
+  expect(await jsonError(response!)).toMatchObject({
+    status_code: 400,
+    content: 'No files[N] parameters found.'
   })
 })
 
@@ -173,8 +192,8 @@ it('reports a 404 for a group nobody created', async () => {
       'https://upload.uploadcare.com/group/info/?pub_key=secret_public_key&group_id=not-a-real-group&jsonerrors=1'
     )
   )
-  expect(response!.status).toBe(404)
-  expect(await response!.json()).toMatchObject({
-    error: { content: 'group_id is invalid.' }
+  expect(await jsonError(response!)).toMatchObject({
+    status_code: 404,
+    content: 'group_id is invalid.'
   })
 })

@@ -23,7 +23,7 @@
     "build:docs:signed-uploads": "typedoc --out docs/signed-uploads packages/signed-uploads/src/index.ts --readme packages/signed-uploads/README.md  --options ./typedoc.json",
     "build:docs:image-shrink": "typedoc --out docs/image-shrink packages/image-shrink/src/index.ts --readme packages/image-shrink/README.md  --options ./typedoc.json",
     "build:docs": "rimraf docs && run-s build:docs:* && touch docs/.nojekyll",
-    "build": "npm run build --workspaces",
+    "build": "npm run build --workspaces --if-present",
     "lint": "run-s eslint prettier",
     "lint:fix": "run-s eslint:fix prettier:fix",
     "eslint:fix": "eslint ./ --ext=ts,js --fix",

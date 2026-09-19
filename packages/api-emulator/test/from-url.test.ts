@@ -1,6 +1,6 @@
 import { beforeEach, expect, it } from 'vitest'
 import { handle, resetSession } from '../src/index.js'
-import { assertMatchesSpec } from './spec.js'
+import { assertMatchesSpec, jsonError } from './spec.js'
 
 // `jsonerrors=1`, exactly as `upload-client` always sends it — without it
 // `apiError` answers `text/plain`, which the brief's own test snippet for this
@@ -36,7 +36,7 @@ beforeEach(() => resetSession())
 
 it('refuses a request with no source_url', async () => {
   const response = await post('pub_key=demopublickey')
-  expect(response.status).toBe(400)
+  expect((await jsonError(response)).status_code).toBe(400)
   const parsed = await response.clone().json()
   expect(parsed).toMatchObject({
     error: { content: 'source_url is required.' }
@@ -54,9 +54,9 @@ it('refuses a host that does not exist', async () => {
   const response = await post(
     'pub_key=demopublickey&source_url=https%3A%2F%2F1.com%2F1.jpg'
   )
-  expect(response.status).toBe(400)
-  expect(await response.json()).toMatchObject({
-    error: { content: 'Host does not exist.' }
+  expect(await jsonError(response)).toMatchObject({
+    status_code: 400,
+    content: 'Host does not exist.'
   })
 })
 
@@ -64,9 +64,9 @@ it('refuses a private address', async () => {
   const response = await post(
     'pub_key=demopublickey&source_url=http%3A%2F%2F192.168.0.1%2Fa.jpg'
   )
-  expect(response.status).toBe(400)
-  expect(await response.json()).toMatchObject({
-    error: { content: 'Only public IPs are allowed.' }
+  expect(await jsonError(response)).toMatchObject({
+    status_code: 400,
+    content: 'Only public IPs are allowed.'
   })
 })
 
@@ -126,10 +126,15 @@ it('reports unknown totals for the unknown-progress key', async () => {
   expect(await response.json()).toMatchObject({ total: 'unknown' })
 })
 
-it('shortcuts to the file info when duplicate checking is on', async () => {
-  const response = await post(
-    `pub_key=demopublickey&source_url=${encodeURIComponent(SOURCE)}&check_URL_duplicates=1&save_URL_duplicates=1`
-  )
+it('shortcuts to the file info only once the source has been seen before', async () => {
+  const query = `pub_key=demopublickey&source_url=${encodeURIComponent(SOURCE)}&check_URL_duplicates=1&save_URL_duplicates=1`
+
+  // First time: no duplicate to find, so the ordinary token/poll path — which
+  // dedup used to make unreachable.
+  const first = await post(query)
+  expect(await first.clone().json()).toMatchObject({ type: 'token' })
+
+  const response = await post(query)
   const parsed = (await response.clone().json()) as Record<string, unknown>
   await assertMatchesSpec({
     method: 'post',
@@ -142,6 +147,36 @@ it('shortcuts to the file info when duplicate checking is on', async () => {
     type: 'file_info',
     original_filename: 'holiday.jpg'
   })
+})
+
+it('does not dedupe a source that was never saved for duplicates', async () => {
+  const query = `pub_key=demopublickey&source_url=${encodeURIComponent(SOURCE)}&check_URL_duplicates=1`
+  expect(await (await post(query)).json()).toMatchObject({ type: 'token' })
+  expect(await (await post(query)).json()).toMatchObject({ type: 'token' })
+})
+
+it('serves a from_url upload as bytes an image decoder can actually read', async () => {
+  const { token } = (await post(
+    `pub_key=demopublickey&source_url=${encodeURIComponent(SOURCE)}`
+  ).then((r) => r.json())) as { token: string }
+
+  let last = await poll(token)
+  while (last.status === 'progress') last = await poll(token)
+  // Read off the real bytes, not hardcoded — a 13-byte hand-written JPEG
+  // header would have reported 1×1 here and still failed to decode in a page.
+  expect(last).toMatchObject({
+    is_image: true,
+    image_info: { width: 136, height: 150, format: 'JPEG' }
+  })
+
+  const delivered = (await handle(
+    new Request(`https://ucarecdn.com/${(last as { uuid: string }).uuid}/`)
+  ))!
+  expect(await delivered.arrayBuffer()).toEqual(
+    await (await handle(
+      new Request('https://ucarecdn.com/49b4c5a1-31b3-4349-ba07-d97a2d883c37/')
+    ))!.arrayBuffer()
+  )
 })
 
 it('fails at poll time for a host outside REACHABLE_HOSTS, rather than at POST time', async () => {

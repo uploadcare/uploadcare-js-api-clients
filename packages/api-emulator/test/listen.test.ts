@@ -42,6 +42,26 @@ it('allows any origin, because every consumer is cross-origin', async () => {
   expect(response.headers.get('access-control-allow-origin')).toBe('*')
 })
 
+it('answers a CORS preflight, including the session header', async () => {
+  // A browser sends this before any request carrying a custom header — which
+  // `SESSION_HEADER` is, and which README.md tells consumers to set on every
+  // request. Without it the real request is never sent at all.
+  const response = await fetch(`${server.origin}/base/`, {
+    method: 'OPTIONS',
+    headers: {
+      origin: 'https://example.test',
+      'access-control-request-method': 'POST',
+      'access-control-request-headers': 'x-uploadcare-emulator-session'
+    }
+  })
+  expect(response.status).toBe(204)
+  expect(response.headers.get('access-control-allow-origin')).toBe('*')
+  expect(response.headers.get('access-control-allow-methods')).toContain('POST')
+  expect(response.headers.get('access-control-allow-headers')).toContain(
+    'x-uploadcare-emulator-session'
+  )
+})
+
 it('answers correctly with the response delay turned off', async () => {
   const fast = await createEmulatorServer({ delayMs: 0 })
   try {

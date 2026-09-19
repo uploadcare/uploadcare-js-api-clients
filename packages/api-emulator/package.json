@@ -1,6 +1,19 @@
 {
   "name": "@uploadcare/api-emulator",
   "version": "6.21.0",
+  "description": "An in-process, stateful emulator of the Uploadcare Upload API and CDN, for tests that need real request/response round-trips without the network.",
+  "keywords": [
+    "uploadcare",
+    "upload",
+    "api",
+    "emulator",
+    "mock",
+    "testing",
+    "msw"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
   "type": "module",
   "main": "./src/index.ts",
   "exports": {
@@ -8,21 +21,34 @@
     "./listen": "./src/listen.ts"
   },
   "files": [
-    "src"
+    "src",
+    "README.md",
+    "LICENSE"
   ],
   "engines": {
     "node": ">=18"
   },
   "scripts": {
+    "prepack": "cp ../../LICENSE ./LICENSE",
     "test": "vitest --run",
     "tsc": "tsc --noEmit",
-    "lint": "oxlint src",
-    "lint:fix": "oxlint src --fix",
+    "lint": "oxlint src test scripts",
+    "lint:fix": "oxlint src test scripts --fix",
     "format": "oxfmt .",
     "format:check": "oxfmt --check .",
     "spec:refresh": "node scripts/spec-refresh.ts",
     "spec:check": "node scripts/spec-check.ts"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/uploadcare/uploadcare-js-api-clients.git"
+  },
+  "author": "Uploadcare",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/uploadcare/uploadcare-js-api-clients/issues"
+  },
+  "homepage": "https://github.com/uploadcare/uploadcare-js-api-clients#readme",
   "devDependencies": {
     "ajv": "^8.17.1",
     "ajv-formats": "^3.0.1",

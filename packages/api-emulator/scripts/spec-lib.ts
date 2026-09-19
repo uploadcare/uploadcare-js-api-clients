@@ -34,9 +34,12 @@ export type FetchedSpec = {
 
 const stripSignature = (url: string) => {
   const parsed = new URL(url)
-  for (const key of [...parsed.searchParams.keys()]) {
-    if (key.toLowerCase().startsWith('x-amz-')) parsed.searchParams.delete(key)
-  }
+  // Collected first, then deleted: `delete` mutates the same collection, and a
+  // live iterator skips the entry after each removal.
+  const signatureKeys = Array.from(parsed.searchParams.keys()).filter((key) =>
+    key.toLowerCase().startsWith('x-amz-')
+  )
+  for (const key of signatureKeys) parsed.searchParams.delete(key)
   return parsed.toString()
 }
 
@@ -55,7 +58,8 @@ export const fetchSpec = async (url: string): Promise<FetchedSpec> => {
     response = await fetch(url)
   } catch (cause) {
     throw new Error(
-      expiredMessage(`Could not reach ${url}: ${(cause as Error).message}.`)
+      expiredMessage(`Could not reach ${url}: ${String(cause)}.`),
+      { cause }
     )
   }
   if (!response.ok) {
@@ -72,7 +76,8 @@ export const fetchSpec = async (url: string): Promise<FetchedSpec> => {
     document = parseYaml(text)
   } catch (cause) {
     throw new Error(
-      `Downloaded file is not valid YAML (${(cause as Error).message}). Is this the right asset?`
+      `Downloaded file is not valid YAML (${String(cause)}). Is this the right asset?`,
+      { cause }
     )
   }
 

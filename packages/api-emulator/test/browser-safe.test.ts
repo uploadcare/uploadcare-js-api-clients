@@ -14,6 +14,11 @@ import { expect, it } from 'vitest'
  * or without the `node:` prefix, so it can't drift from what Node actually
  * considers built in.
  */
+/**
+ * Exempt paths, _relative to `src/`_ rather than by basename: a basename set
+ * would silently exempt a future `src/apis/cdn/cli.ts` too, which has nothing
+ * to do with the Node-only `./listen` export.
+ */
 const NODE_ONLY = new Set(['listen.ts', 'cli.ts'])
 const BUILTIN_IMPORT = new RegExp(
   `\\bimport\\b[^'"]*['"](?:node:)?(?:${builtinModules.join('|')})['"]`
@@ -21,23 +26,29 @@ const BUILTIN_IMPORT = new RegExp(
 const FORBIDDEN = [
   BUILTIN_IMPORT,
   /\bBuffer\b/,
-  /\bprocess\.\w/,
-  /\b__dirname\b/
+  // `process` in any shape, not just `process.foo`: `const { env } = process`
+  // and `globalThis.process` are just as fatal in a bundle.
+  /\bprocess\b/,
+  /\bglobal\b(?!This)/,
+  /\brequire\s*\(/,
+  /\b__dirname\b/,
+  /\b__filename\b/
 ]
 
-const sourceFiles = (dir: string): string[] =>
+const sourceFiles = (dir: string, prefix = ''): string[] =>
   readdirSync(dir).flatMap((entry) => {
     const full = path.join(dir, entry)
-    if (statSync(full).isDirectory()) return sourceFiles(full)
-    return full.endsWith('.ts') && !NODE_ONLY.has(entry) ? [full] : []
+    const relative = prefix ? `${prefix}/${entry}` : entry
+    if (statSync(full).isDirectory()) return sourceFiles(full, relative)
+    return full.endsWith('.ts') && !NODE_ONLY.has(relative) ? [full] : []
   })
 
+const root = path.join(import.meta.dirname, '../src')
+
 it('keeps every module behind the "." export free of node built-ins', () => {
-  const offenders = sourceFiles(
-    path.join(import.meta.dirname, '../src')
-  ).flatMap((file) =>
+  const offenders = sourceFiles(root).flatMap((file) =>
     FORBIDDEN.filter((pattern) => pattern.test(readFileSync(file, 'utf8'))).map(
-      (pattern) => `${path.basename(file)} matches ${pattern}`
+      (pattern) => `${path.relative(root, file)} matches ${pattern}`
     )
   )
   expect(offenders).toEqual([])
