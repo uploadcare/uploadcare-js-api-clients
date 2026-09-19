@@ -1,3 +1,5 @@
 dist
 node_modules
 docs
+# Uses oxlint (see packages/signed-uploads/.oxlintrc.json)
+packages/signed-uploads

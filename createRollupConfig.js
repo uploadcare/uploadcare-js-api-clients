@@ -39,10 +39,22 @@ export const createRollupConfig = ({ targetEnv, cwd, exclude }) =>
             }
           ]
         }),
-        // Uncomment when we will ready to use @uploadcare/api-client-utils as external dependency
-        // for browsers.
-        // nodeExternals({ include: /@uploadcare/ }),
-        nodeExternals({ exclude: /@uploadcare/ }),
+        /**
+         * `@uploadcare/api-client-utils` is inlined because it is not
+         * published: a consumer could not install it, so it has to travel
+         * inside whatever depends on it.
+         *
+         * Every other `@uploadcare/*` package is published, so it stays an
+         * import. They ship node and browser builds behind export conditions,
+         * and inlining one here would freeze whichever variant this build
+         * machine happened to resolve into the published output, for every
+         * consumer. Left external, the consumer's bundler or runtime picks,
+         * and an app using two of our packages ships one copy rather than two.
+         *
+         * A package externalised this way has to be a real `dependency`, not a
+         * devDependency, or consumers get an unresolved import.
+         */
+        nodeExternals({ exclude: /@uploadcare\/api-client-utils/ }),
         nodeResolve(),
         typescript({
           tsconfig: path.join(cwd, 'tsconfig.build.json'),
