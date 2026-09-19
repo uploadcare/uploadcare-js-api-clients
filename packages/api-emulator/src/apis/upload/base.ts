@@ -8,6 +8,9 @@ import { requirePublicKey } from './auth.js'
 const storedBy = (value: FormDataEntryValue | null) =>
   value !== '0' && value !== 'false'
 
+const asString = (value: FormDataEntryValue | null) =>
+  typeof value === 'string' ? value : null
+
 /**
  * Direct upload. The file part is kept whole, because the CDN has to serve it
  * back.
@@ -23,7 +26,7 @@ route('POST', '/base/', async ({ request }) => {
   const form = await request.formData()
   const authError = requirePublicKey(
     request,
-    form.get('UPLOADCARE_PUB_KEY') as string | null,
+    asString(form.get('UPLOADCARE_PUB_KEY')),
     'UPLOADCARE_PUB_KEY'
   )
   if (authError) return authError

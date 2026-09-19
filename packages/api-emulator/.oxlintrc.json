@@ -18,6 +18,7 @@
           "./apis/*/index.js",
           "./base.js",
           "./from-url.js",
+          "./group.js",
           "./info.js"
         ]
       }

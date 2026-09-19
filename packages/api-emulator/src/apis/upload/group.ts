@@ -68,10 +68,9 @@ const groupEnvelope = (session: Session, id: string, members: string[]) => ({
     // Every member was already validated at creation time (`parseMember`
     // below), so this can't fail — a group's membership never changes once
     // created (see the spec's "Groups are immutable" note).
-    const { uuid, effects } = parseMember(raw) as {
-      uuid: string
-      effects: string
-    }
+    const parsed = parseMember(raw)
+    if (!parsed) throw new Error(`unreachable: invalid group member ${raw}`)
+    const { uuid, effects } = parsed
     return {
       ...fileInfo(session.files.get(uuid) ?? stubFile(uuid)),
       default_effects: effects
@@ -90,7 +89,8 @@ route('POST', '/group/', async ({ request }) => {
 
   const members = [...form.entries(), ...query.entries()]
     .filter(([key]) => MEMBER_KEY.test(key))
-    .map(([, value]) => String(value))
+    .map(([, value]) => asString(value))
+    .filter((value): value is string => value !== null)
 
   if (members.length === 0)
     // schema: groupFileURLParsingFailedError
