@@ -87,13 +87,16 @@ const JWT_ERRORS: Record<
 const bearerAuth = (ctx: Parameters<Middleware>[0]): boolean => {
   const authHeader = ctx.get('Authorization')
 
-  const signature =
-    ctx.query.signature || (ctx.request.body && ctx.request.body.signature)
-  if (signature) {
+  // Both parameters, not just `signature`: the client drops the pair together,
+  // so a request carrying either one alongside a Bearer token means something
+  // leaked, and the mock has to fail loudly for the test to catch it.
+  const legacyParam = ['signature', 'expire'].find(
+    (name) => ctx.query[name] || (ctx.request.body && ctx.request.body[name])
+  )
+  if (legacyParam) {
     error(ctx, {
       status: 403,
-      statusText:
-        'Do not use signature parameters together with a Bearer token.',
+      statusText: `Do not use \`${legacyParam}\` together with a Bearer token.`,
       errorCode: 'TokenInvalidError'
     })
     return false
@@ -133,7 +136,11 @@ const auth: Middleware = (ctx, next) => {
   const urlWithSlash = ctx.url.split('?').shift()!
   const url = urlWithSlash.substring(0, urlWithSlash.length - 1)
 
-  if (isProtected(url) && ctx.get('Authorization')) {
+  // Keyed off the header, not `isProtected`. A real server validates a token
+  // wherever one is sent, and the client sends it on unprotected routes too,
+  // such as the `/from_url/status` poller. Gating on `isProtected` meant those
+  // requests were never checked and an expired token sailed through.
+  if (ctx.get('Authorization')) {
     if (bearerAuth(ctx)) {
       next()
     }

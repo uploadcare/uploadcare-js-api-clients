@@ -9,6 +9,8 @@ const REQUEST_WAS_THROTTLED_CODE =
 const TOKEN_EXPIRED_CODE = 'TokenExpiredError' satisfies ServerErrorCode
 const DEFAULT_RETRY_AFTER_TIMEOUT = 15000
 const DEFAULT_NETWORK_ERROR_TIMEOUT = 1000
+/** One refresh is enough: a second expiry means the new token is bad too. */
+const MAX_EXPIRED_TOKEN_RETRIES = 1
 
 function getTimeoutFromThrottledRequest(error: UploadError): number {
   const { headers } = error || {}
@@ -42,6 +44,12 @@ export function retryIfFailed<T>(
     retryNetworkErrorMaxTimes,
     canRetryExpiredToken
   } = options
+  // Counted separately from `attempt`, which the retrier shares with the
+  // throttle and network branches. Keyed off `attempt` instead, a token that
+  // expired after a throttle retry would never be refreshed, because `attempt`
+  // is already past the budget by the time the expiry is seen.
+  let expiredTokenRetries = 0
+
   return retrier(({ attempt, retry }) =>
     fn().catch((error: Error | UploadError | NetworkError) => {
       if (
@@ -56,8 +64,9 @@ export function retryIfFailed<T>(
         'response' in error &&
         error?.code === TOKEN_EXPIRED_CODE &&
         canRetryExpiredToken &&
-        attempt < 1
+        expiredTokenRetries < MAX_EXPIRED_TOKEN_RETRIES
       ) {
+        expiredTokenRetries += 1
         return retry(0)
       }
 

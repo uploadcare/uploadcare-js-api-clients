@@ -1,5 +1,6 @@
 import base from '../../src/api/base'
 import fromUrl from '../../src/api/fromUrl'
+import fromUrlStatus from '../../src/api/fromUrlStatus'
 import group from '../../src/api/group'
 import { uploadDirect } from '../../src/uploadFile/uploadDirect'
 import { uploadMultipart } from '../../src/uploadFile/uploadMultipart'
@@ -166,6 +167,20 @@ describeLocalOnly('authToken (JWT auth)', () => {
     })
 
     expect(file.uuid).toBeTruthy()
+  })
+
+  it('should validate the token on the from_url status poller', async () => {
+    // `/from_url/status` is an unprotected route, so the mock used to skip the
+    // bearer check there and an invalid token sailed through the poller.
+    const error = await caught(
+      fromUrlStatus(factory.token('valid'), {
+        ...settings,
+        authToken: 'invalid-jwt'
+      })
+    )
+
+    expect(error).toBeInstanceOf(AuthError)
+    expect(error?.code).toBe('TokenInvalidError')
   })
 
   it('should authorize multipart start/complete but keep part uploads bare', async () => {
