@@ -26,13 +26,5 @@
       }
     ]
   },
-  "ignorePatterns": ["dist/**", "node_modules/**"],
-  "overrides": [
-    {
-      "files": ["src/apis/cdn/index.ts"],
-      "rules": {
-        "unicorn/no-empty-file": "off"
-      }
-    }
-  ]
+  "ignorePatterns": ["dist/**", "node_modules/**"]
 }
