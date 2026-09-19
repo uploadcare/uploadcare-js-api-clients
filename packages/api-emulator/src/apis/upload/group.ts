@@ -17,17 +17,30 @@ import { GROUP_FILES_NOT_FOUND_KEY } from './scenarios.js'
  */
 const MEMBER_KEY = /^files\[\d*]$/
 
-/** A bare file uuid, or a CDN url with image-processing operations tacked on. */
+/**
+ * A bare file uuid, or a group reference (`<uuid>~N`, matching the group-id
+ * shape `nextUuid`/`groupEnvelope` mint below) — either can stand as a
+ * `files[]` member.
+ */
 const MEMBER_UUID =
-  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}(~[1-9][0-9]*)?$/i
+
+/**
+ * A `files[]` member may be a full CDN url (`https://ucarecdn.com/<uuid>/…`) —
+ * the file-uploader builds groups from `cdnUrl` values, not bare uuids. Strip
+ * the scheme and host so what's left parses exactly like the bare/`-/`-effects
+ * forms below, whether or not the url carries a trailing slash.
+ */
+const CDN_URL_PREFIX = /^https?:\/\/[^/]+\//i
 
 const parseMember = (
   raw: string
 ): { uuid: string; effects: string } | undefined => {
-  const [uuid = '', ...rest] = raw.split('/')
+  const path = raw.replace(CDN_URL_PREFIX, '')
+  const [uuid = '', ...rest] = path.split('/')
   if (!MEMBER_UUID.test(uuid)) return undefined
-  const path = rest.join('/')
-  return { uuid, effects: path.startsWith('-/') ? path.slice(2) : '' }
+  const tail = rest.join('/')
+  return { uuid, effects: tail.startsWith('-/') ? tail.slice(2) : '' }
 }
 
 /**
@@ -110,13 +123,22 @@ route(
       // schema: groupFileURLParsingFailedError
       return apiError(request, 400, 'No files[N] parameters found.')
 
+    let anyMemberMissing = false
     for (const raw of members) {
-      if (!parseMember(raw))
+      const parsed = parseMember(raw)
+      if (!parsed)
         // schema: groupFilesInvalidError
         return apiError(request, 400, `This is not valid file url: ${raw}.`)
+      if (!session.files.has(parsed.uuid)) anyMemberMissing = true
     }
 
-    if (publicKey === GROUP_FILES_NOT_FOUND_KEY)
+    // GROUP_FILES_NOT_FOUND_KEY only fakes "not found" for members the
+    // emulator was never told about (see scenarios.ts) — a genuinely
+    // uploaded file must still group successfully under that key, the same
+    // as it does under any other one. A blanket key-based 400 was reporting
+    // real, existing uuids as missing (defect: `/info/` finds them, `/group/`
+    // doesn't) purely because of which public key asked.
+    if (publicKey === GROUP_FILES_NOT_FOUND_KEY && anyMemberMissing)
       // schema: groupFilesNotFoundError — see scenarios.ts.
       return apiError(request, 400, 'Some files not found.')
 

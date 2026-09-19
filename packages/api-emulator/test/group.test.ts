@@ -143,10 +143,14 @@ it('accepts a member nobody actually uploaded, matching the old mock server', as
   expect(group.files[0].uuid).toBe(wellFormedButUnknown)
 })
 
-it('fails every time for the "files not found" key, regardless of membership', async () => {
+it('fails for the "files not found" key when the member was never uploaded', async () => {
+  // Distinct from the "accepts a member nobody actually uploaded" test above:
+  // that one uses an ordinary key, where the stub path is meant to stand in
+  // silently; `demopublickey` is the one key that must instead surface it as
+  // "not found" (`upload-client`'s own `group.test.ts` depends on this).
   const body = new FormData()
   body.set('pub_key', 'demopublickey')
-  body.set('files[0]', await upload('a.jpg'))
+  body.set('files[0]', '392e3aa3-5ed6-4ad6-a67e-b3a7c1d5b9e9')
   const response = await handle(
     new Request('https://upload.uploadcare.com/group/?jsonerrors=1', {
       method: 'POST',
@@ -157,6 +161,79 @@ it('fails every time for the "files not found" key, regardless of membership', a
     status_code: 400,
     content: 'Some files not found.'
   })
+})
+
+it('groups a real upload under the "files not found" key by bare uuid, unlike the stub case above', async () => {
+  // Defect: `/group/` used to 400 "Some files not found." for this key no
+  // matter what, even a uuid `/info/` finds — and `demopublickey` is exactly
+  // the public key file-uploader's own e2e suite uses for real uploads, so
+  // every group-output test there timed out. The member existence check must
+  // key off whether the file is actually in the session, not off the public
+  // key alone.
+  const uuid = await upload('a.jpg')
+  const body = new FormData()
+  body.set('pub_key', 'demopublickey')
+  body.set('files[0]', uuid)
+  const response = await handle(
+    new Request('https://upload.uploadcare.com/group/?jsonerrors=1', {
+      method: 'POST',
+      body
+    })
+  )
+  expect(response!.status).toBe(200)
+  const group = (await response!.json()) as {
+    files: Array<{ uuid: string; original_filename: string }>
+  }
+  expect(group.files[0].uuid).toBe(uuid)
+  expect(group.files[0].original_filename).toBe('a.jpg')
+})
+
+it('groups a real upload under the "files not found" key by CDN url', async () => {
+  const uuid = await upload('b.jpg')
+  const body = new FormData()
+  body.set('pub_key', 'demopublickey')
+  body.set('files[0]', `https://ucarecdn.com/${uuid}/`)
+  const response = await handle(
+    new Request('https://upload.uploadcare.com/group/?jsonerrors=1', {
+      method: 'POST',
+      body
+    })
+  )
+  expect(response!.status).toBe(200)
+  const group = (await response!.json()) as {
+    files: Array<{ uuid: string; original_filename: string }>
+  }
+  expect(group.files[0].uuid).toBe(uuid)
+  expect(group.files[0].original_filename).toBe('b.jpg')
+})
+
+it('accepts a CDN url member without a trailing slash', async () => {
+  const uuid = await upload('c.jpg')
+  const response = await createGroup([`https://ucarecdn.com/${uuid}`])
+  const group = (await response.json()) as { files: Array<{ uuid: string }> }
+  expect(group.files[0].uuid).toBe(uuid)
+})
+
+it('accepts a CDN url member carrying -/ effects', async () => {
+  const uuid = await upload('d.jpg')
+  const response = await createGroup([
+    `https://ucarecdn.com/${uuid}/-/resize/x800/`
+  ])
+  const group = (await response.json()) as {
+    files: Array<{ uuid: string; default_effects: string }>
+  }
+  expect(group.files[0]).toMatchObject({
+    uuid,
+    default_effects: 'resize/x800/'
+  })
+})
+
+it('accepts a <uuid>~N group reference as a member', async () => {
+  const uuid = await upload('e.jpg')
+  const first = await createGroup([uuid])
+  const firstGroup = (await first.json()) as { id: string }
+  const response = await createGroup([firstGroup.id])
+  expect(response.status).toBe(200)
 })
 
 it('refuses a request with no pub_key', async () => {
