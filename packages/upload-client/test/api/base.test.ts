@@ -1,9 +1,8 @@
+import { vi, expect, describe, it } from 'vitest'
 import base from '../../src/api/base'
 import * as factory from '../_fixtureFactory'
 import { UploadError } from '../../src/tools/UploadError'
 import { assertComputableProgress } from '../_helpers'
-import { jest, expect } from '@jest/globals'
-
 describe('API - base', () => {
   const fileToUpload = factory.image('blackSquare')
 
@@ -15,7 +14,7 @@ describe('API - base', () => {
   })
 
   it('should be able to cancel uploading', async () => {
-    const timeout = jest.fn()
+    const timeout = vi.fn()
     const publicKey = factory.publicKey('demo')
     const controller = new AbortController()
     const directUpload = base(fileToUpload.data, {
@@ -35,7 +34,7 @@ describe('API - base', () => {
 
   it('should be able to handle progress', async () => {
     const publicKey = factory.publicKey('demo')
-    const onProgress = jest.fn()
+    const onProgress = vi.fn()
 
     await base(fileToUpload.data, { publicKey, onProgress })
 

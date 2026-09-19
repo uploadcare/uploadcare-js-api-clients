@@ -1,9 +1,9 @@
 import NodeFormData from 'form-data'
 
-import http from 'http'
-import https from 'https'
-import { Readable, Transform, TransformCallback } from 'stream'
-import { parse } from 'url'
+import http from 'node:http'
+import https from 'node:https'
+import { Readable, Transform, TransformCallback } from 'node:stream'
+import { parse } from 'node:url'
 
 import { CancelError, onCancel } from '@uploadcare/api-client-utils'
 import { ProgressCallback } from '../api/types'

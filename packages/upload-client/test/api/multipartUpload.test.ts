@@ -1,13 +1,13 @@
+import { vi, expect, describe, it, beforeAll } from 'vitest'
 import * as factory from '../_fixtureFactory'
 import multipartUpload from '../../src/api/multipartUpload'
 import { getSettingsForTesting, assertComputableProgress } from '../_helpers'
 import multipartStart from '../../src/api/multipartStart'
 import { UploadError } from '../../src/tools/UploadError'
-import { jest, expect } from '@jest/globals'
-
+import { CancelError } from '@uploadcare/api-client-utils'
 let parts: [string, Blob | Buffer][] = []
 
-jest.setTimeout(60000)
+vi.setConfig({ testTimeout: 60000 })
 
 beforeAll(async () => {
   const file = factory.file(11)
@@ -50,12 +50,12 @@ describe('API - multipartUpload', () => {
     })
 
     await expect(multipartUpload(part, url, options)).rejects.toThrowError(
-      new UploadError('Request canceled')
+      new CancelError('Request canceled')
     )
   })
 
   it('should be able to handle progress', async () => {
-    const onProgress = jest.fn()
+    const onProgress = vi.fn()
     const options = getSettingsForTesting({
       publicKey: factory.publicKey('multipart'),
       onProgress

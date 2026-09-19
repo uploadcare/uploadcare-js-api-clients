@@ -1,3 +1,5 @@
+import { describe, it, expect } from 'vitest'
+import base from '../../src/api/base'
 import info from '../../src/api/info'
 import * as factory from '../_fixtureFactory'
 import { getSettingsForTesting } from '../_helpers'
@@ -5,13 +7,17 @@ import { UploadError } from '../../src/tools/UploadError'
 
 describe('API - info', () => {
   it('should return file info', async () => {
+    // The mock server used to answer `/info/` with a hardcoded fixture no matter which
+    // file_id was asked for; the emulator answers about the file that was actually
+    // uploaded, so the test has to upload one first.
     const settings = getSettingsForTesting({
       publicKey: factory.publicKey('image')
     })
-    const uuid = factory.uuid('image')
+    const fileToUpload = factory.image('blackSquare')
+    const { file: uuid } = await base(fileToUpload.data, settings)
     const data = await info(uuid, settings)
 
-    expect(data.uuid).toBeTruthy()
+    expect(data.uuid).toEqual(uuid)
   })
 
   it('should be rejected with bad options', async () => {

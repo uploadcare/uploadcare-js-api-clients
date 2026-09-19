@@ -1,11 +1,11 @@
+import { vi, expect, describe, it } from 'vitest'
 import multipartStart from '../../src/api/multipartStart'
 import multipartUpload from '../../src/api/multipartUpload'
 import multipartComplete from '../../src/api/multipartComplete'
 import * as factory from '../_fixtureFactory'
 import { getSettingsForTesting } from '../_helpers'
 import { UploadError } from '../../src/tools/UploadError'
-import { jest, expect } from '@jest/globals'
-
+import { CancelError } from '@uploadcare/api-client-utils'
 const getChunk = (
   file: Buffer | Blob,
   index: number,
@@ -18,7 +18,7 @@ const getChunk = (
   return file.slice(start, end)
 }
 
-jest.setTimeout(60000)
+vi.setConfig({ testTimeout: 60000 })
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const naiveMultipart = (file, parts, options): Promise<any> =>
@@ -74,7 +74,7 @@ describe('API - multipartComplete', () => {
 
     await expect(
       multipartComplete(completedUuid, settings)
-    ).rejects.toThrowError(new UploadError('Request canceled'))
+    ).rejects.toThrowError(new CancelError('Request canceled'))
 
     expect(Date.now() - time).toBeLessThan(200) // could be slow on ci
   })
@@ -86,9 +86,15 @@ describe('API - multipartComplete', () => {
 
     const upload = multipartComplete('', settings)
 
-    await expect(upload).rejects.toThrowError(
-      new UploadError('uuid is required.')
-    )
+    // Not `toThrowError(new UploadError('uuid is required.'))`: vitest 3's
+    // `toThrowError`, given an Error instance, compares the whole object, and
+    // a real `UploadError` always carries `request`/`response`/`headers`
+    // populated from the actual round trip, which that literal never would.
+    // Message-only comparison (as jest's equivalent matcher did) is what this
+    // test means to check — see the "should be able to cancel uploading" fix
+    // above for the same class of bug.
+    await expect(upload).rejects.toThrow(UploadError)
+    await expect(upload).rejects.toThrow('uuid is required.')
   })
 
   it('should be rejected with error code if failed', async () => {

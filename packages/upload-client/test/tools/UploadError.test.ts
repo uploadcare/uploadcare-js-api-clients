@@ -1,3 +1,4 @@
+import { describe, it, expect } from 'vitest'
 import { UploadcareError } from '@uploadcare/api-client-utils'
 import { UploadError } from '../../src/tools/UploadError'
 

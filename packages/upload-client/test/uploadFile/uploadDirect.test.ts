@@ -1,10 +1,9 @@
+import { vi, expect, describe, it } from 'vitest'
 import * as factory from '../_fixtureFactory'
 import { getSettingsForTesting, assertComputableProgress } from '../_helpers'
 import { UploadError } from '../../src/tools/UploadError'
 import { uploadDirect } from '../../src/uploadFile/uploadDirect'
 import info from '../../src/api/info'
-import { jest, expect } from '@jest/globals'
-
 // TODO: add tests for metadata
 describe('uploadDirect', () => {
   it('should resolves when file is ready on CDN', async () => {
@@ -81,7 +80,7 @@ describe('uploadDirect', () => {
   })
 
   it('should be able to handle progress', async () => {
-    const onProgress = jest.fn()
+    const onProgress = vi.fn()
     const fileToUpload = factory.image('blackSquare').data
     const settings = getSettingsForTesting({
       publicKey: factory.publicKey('image'),

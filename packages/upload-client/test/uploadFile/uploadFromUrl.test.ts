@@ -1,3 +1,4 @@
+import { vi, expect, describe, it } from 'vitest'
 import * as factory from '../_fixtureFactory'
 import {
   getSettingsForTesting,
@@ -5,13 +6,12 @@ import {
   assertUnknownProgress
 } from '../_helpers'
 import { UploadError } from '../../src/tools/UploadError'
-import http from 'http'
-import https, { RequestOptions } from 'https'
+import { CancelError } from '@uploadcare/api-client-utils'
+import http from 'node:http'
+import https, { RequestOptions } from 'node:https'
 import { uploadFromUrl } from '../../src/uploadFile/uploadFromUrl'
 import info from '../../src/api/info'
-import { jest, expect } from '@jest/globals'
-
-jest.setTimeout(60000)
+vi.setConfig({ testTimeout: 60000 })
 
 // TODO: add tests for metadata
 describe('uploadFromUrl', () => {
@@ -60,7 +60,7 @@ describe('uploadFromUrl', () => {
 
     const protocol = settings.baseURL.includes('https') ? 'https' : 'http'
     const isHttpsProtocol = protocol === 'https'
-    const spy = jest.spyOn(isHttpsProtocol ? https : http, 'request')
+    const spy = vi.spyOn(isHttpsProtocol ? https : http, 'request')
     await uploadFromUrl(sourceUrl, settings)
 
     const uploadRequest = spy.mock.calls.find(
@@ -81,7 +81,7 @@ describe('uploadFromUrl', () => {
 
     const protocol = settings.baseURL.includes('https') ? 'https' : 'http'
     const isHttpsProtocol = protocol === 'https'
-    const spy = jest.spyOn(isHttpsProtocol ? https : http, 'request')
+    const spy = vi.spyOn(isHttpsProtocol ? https : http, 'request')
     await uploadFromUrl(sourceUrl, settings)
 
     const uploadRequest = spy.mock.calls.find(
@@ -106,7 +106,7 @@ describe('uploadFromUrl', () => {
     })
 
     await expect(uploadFromUrl(sourceUrl, settings)).rejects.toThrowError(
-      new UploadError('Request canceled')
+      new CancelError('Request canceled')
     )
   })
 
@@ -123,7 +123,7 @@ describe('uploadFromUrl', () => {
   })
 
   it('should be able to handle computable progress', async () => {
-    const onProgress = jest.fn()
+    const onProgress = vi.fn()
     const sourceUrl = factory.imageUrl('valid')
     const settings = getSettingsForTesting({
       publicKey: factory.publicKey('image'),
@@ -137,7 +137,7 @@ describe('uploadFromUrl', () => {
 
   process.env.TEST_ENV !== 'production' &&
     it('should be able to handle non-computable unknown progress', async () => {
-      const onProgress = jest.fn()
+      const onProgress = vi.fn()
       const sourceUrl = factory.imageUrl('valid')
       const settings = getSettingsForTesting({
         publicKey: factory.publicKey('unknownProgress'),

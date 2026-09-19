@@ -1,10 +1,10 @@
+import { vi, expect, describe, it } from 'vitest'
 import * as factory from '../_fixtureFactory'
 import { getSettingsForTesting, assertComputableProgress } from '../_helpers'
 import { UploadError } from '../../src/tools/UploadError'
+import { CancelError } from '@uploadcare/api-client-utils'
 import { uploadFromUploaded } from '../../src/uploadFile/uploadFromUploaded'
 import info from '../../src/api/info'
-import { jest, expect } from '@jest/globals'
-
 describe('uploadFromUploaded', () => {
   const uuid = factory.uuid('image')
   const settings = getSettingsForTesting({
@@ -33,7 +33,7 @@ describe('uploadFromUploaded', () => {
 
     ctrl.abort()
 
-    await expect(upload).rejects.toThrowError(new UploadError('Poll cancelled'))
+    await expect(upload).rejects.toThrowError(new CancelError('Poll cancelled'))
   })
 
   it('should accept new file name setting', async () => {
@@ -48,7 +48,7 @@ describe('uploadFromUploaded', () => {
   })
 
   it('should be able to handle progress', async () => {
-    const onProgress = jest.fn()
+    const onProgress = vi.fn()
     const settings = getSettingsForTesting({
       publicKey: factory.publicKey('image'),
       onProgress

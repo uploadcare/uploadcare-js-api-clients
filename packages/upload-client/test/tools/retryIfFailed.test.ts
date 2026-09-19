@@ -1,6 +1,6 @@
+import { vi, expect, describe, it } from 'vitest'
 import { retryIfFailed } from '../../src/tools/retryIfFailed'
 import { UploadError } from '../../src/tools/UploadError'
-import { jest, expect } from '@jest/globals'
 import { NetworkError } from '@uploadcare/api-client-utils'
 
 const createRunner = ({
@@ -13,7 +13,7 @@ const createRunner = ({
   resolve?: number
 }) => {
   let runs = 0
-  const spy = jest.fn()
+  const spy = vi.fn()
 
   const task = () =>
     Promise.resolve().then(() => {

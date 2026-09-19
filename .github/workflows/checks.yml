@@ -28,6 +28,11 @@ jobs:
             upload-client:
               - 'packages/upload-client/**'
               - 'packages/api-client-utils/**'
+              # The whole suite runs against the emulator (`mock:start`), so an
+              # emulator-only change has to re-run it.
+              - 'packages/api-emulator/**'
+            api-emulator:
+              - 'packages/api-emulator/**'
             api-client-utils:
               - 'packages/api-client-utils/**'
             signed-uploads:
@@ -47,6 +52,10 @@ jobs:
       - name: Run lint
         working-directory: ./
         run: npm run lint
+
+      - name: Run `api-emulator` tests
+        if: steps.changes.outputs.api-emulator == 'true'
+        run: npm run test -w packages/api-emulator
 
       - name: Run `upload-client` mock tests
         if: steps.changes.outputs.upload-client == 'true'
