@@ -22,7 +22,17 @@ export default defineConfig({
       fileName: '[name]'
     },
     rollupOptions: {
-      treeshake: 'smallest',
+      // Same as the 'smallest' preset, except `moduleSideEffects`: 'smallest'
+      // sets that to `false`, which drops the side-effect-only imports in
+      // `index.ts` that register every route — the built bundle answered zero
+      // requests. 'no-external' keeps side effects for our own modules while
+      // still treeshaking dependencies as aggressively as before.
+      treeshake: {
+        moduleSideEffects: 'no-external',
+        propertyReadSideEffects: false,
+        tryCatchDeoptimization: false,
+        unknownGlobalSideEffects: false
+      },
       // Keep these runtime imports rather than trying to bundle them; only
       // `listen.js` ever pulls them in, which is what keeps the "." entry
       // browser-safe.

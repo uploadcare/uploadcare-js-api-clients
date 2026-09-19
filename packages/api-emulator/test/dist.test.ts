@@ -85,3 +85,40 @@ it.runIf(existsSync(distRoot))(
     expect(offenders).toEqual([])
   }
 )
+
+/**
+ * The regression this repo actually shipped (PR #586): `sideEffects: false`
+ * plus Rollup's `treeshake: 'smallest'` preset (which sets `moduleSideEffects:
+ * false`) tree-shook away the side-effect-only imports in `index.ts` that
+ * register every route. `dist/index.js` built clean, exported `handle`,
+ * typechecked — and answered nothing. A source-level test can't catch this:
+ * `src/index.ts` still has the imports, tree-shaking is a build step. This has
+ * to import the actual built artifact and prove it answers.
+ */
+it.runIf(existsSync(distRoot))(
+  'answers real requests from the built "." bundle, across all three APIs',
+  async () => {
+    const { handle } = await import(path.join(distRoot, 'index.js'))
+    // Seeded by every fresh session (see DEMO_FILES in state/store.ts) —
+    // exists without needing an upload first.
+    const seededUuid = '49b4c5a1-31b3-4349-ba07-d97a2d883c37'
+
+    const cdn = await handle(new Request(`https://ucarecdn.com/${seededUuid}/`))
+    expect(cdn?.status).toBe(200)
+
+    const uploadInfo = await handle(
+      new Request(
+        `https://upload.uploadcare.com/info/?pub_key=demopublickey&file_id=${seededUuid}`
+      )
+    )
+    expect(uploadInfo?.status).toBe(200)
+
+    const telemetry = await handle(
+      new Request('https://tlm.uploadcare.com/api/v1/events', {
+        method: 'POST',
+        body: JSON.stringify({ event: 'test' })
+      })
+    )
+    expect(telemetry?.status).toBe(200)
+  }
+)
