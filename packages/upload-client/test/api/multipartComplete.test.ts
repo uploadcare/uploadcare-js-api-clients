@@ -5,6 +5,7 @@ import multipartComplete from '../../src/api/multipartComplete'
 import * as factory from '../_fixtureFactory'
 import { getSettingsForTesting } from '../_helpers'
 import { UploadError } from '../../src/tools/UploadError'
+import { CancelError } from '@uploadcare/api-client-utils'
 const getChunk = (
   file: Buffer | Blob,
   index: number,
@@ -73,7 +74,7 @@ describe('API - multipartComplete', () => {
 
     await expect(
       multipartComplete(completedUuid, settings)
-    ).rejects.toThrowError(new UploadError('Request canceled'))
+    ).rejects.toThrowError(new CancelError('Request canceled'))
 
     expect(Date.now() - time).toBeLessThan(200) // could be slow on ci
   })

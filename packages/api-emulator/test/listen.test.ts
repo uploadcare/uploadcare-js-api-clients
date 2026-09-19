@@ -8,7 +8,7 @@ beforeAll(async () => {
 })
 afterAll(() => server.close())
 
-it('answers over HTTP on the port it picked', async () => {
+const fileUploadBody = () => {
   const body = new FormData()
   body.set(
     'file',
@@ -16,9 +16,13 @@ it('answers over HTTP on the port it picked', async () => {
       type: 'application/octet-stream'
     })
   )
+  return body
+}
+
+it('answers over HTTP on the port it picked', async () => {
   const response = await fetch(`${server.origin}/base/`, {
     method: 'POST',
-    body
+    body: fileUploadBody()
   })
   expect(await response.json()).toHaveProperty('file')
 })
@@ -47,4 +51,24 @@ it('answers correctly with the response delay turned off', async () => {
   } finally {
     await fast.close()
   }
+})
+
+it('survives a client aborting mid-request and still answers the next one', async () => {
+  const controller = new AbortController()
+  const aborted = fetch(`${server.origin}/base/`, {
+    method: 'POST',
+    body: fileUploadBody(),
+    signal: controller.signal
+  })
+  // The listener's own response delay (default 30ms) gives this time to
+  // land before the server starts reading the body, which is what puts it
+  // on the path this test exists for — see listen.ts's `bodyOf`.
+  controller.abort()
+  await expect(aborted).rejects.toThrow()
+
+  const response = await fetch(`${server.origin}/base/`, {
+    method: 'POST',
+    body: fileUploadBody()
+  })
+  expect(await response.json()).toHaveProperty('file')
 })

@@ -7,6 +7,7 @@ import {
 } from '../_helpers'
 import { uploadFileGroup } from '../../src/uploadFileGroup'
 import { UploadError } from '../../src/tools/UploadError'
+import { CancelError } from '@uploadcare/api-client-utils'
 describe('groupFrom Url[]', () => {
   const sourceUrl = factory.imageUrl('valid')
   const files = [sourceUrl, sourceUrl]
@@ -41,7 +42,7 @@ describe('groupFrom Url[]', () => {
     ctrl.abort()
 
     await expect(upload).rejects.toThrowError(
-      new UploadError('Request canceled')
+      new CancelError('Request canceled')
     )
   })
 

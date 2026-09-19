@@ -2,6 +2,7 @@ import { vi, expect, describe, it } from 'vitest'
 import * as factory from '../_fixtureFactory'
 import { getSettingsForTesting, assertComputableProgress } from '../_helpers'
 import { UploadError } from '../../src/tools/UploadError'
+import { CancelError } from '@uploadcare/api-client-utils'
 import { uploadMultipart } from '../../src/uploadFile/uploadMultipart'
 import info from '../../src/api/info'
 vi.setConfig({ testTimeout: 60000 })
@@ -55,7 +56,7 @@ describe('uploadMultipart', () => {
     ctrl.abort()
 
     await expect(upload).rejects.toThrowError(
-      new UploadError('Request canceled')
+      new CancelError('Request canceled')
     )
   })
 

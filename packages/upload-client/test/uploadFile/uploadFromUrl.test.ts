@@ -6,6 +6,7 @@ import {
   assertUnknownProgress
 } from '../_helpers'
 import { UploadError } from '../../src/tools/UploadError'
+import { CancelError } from '@uploadcare/api-client-utils'
 import http from 'node:http'
 import https, { RequestOptions } from 'node:https'
 import { uploadFromUrl } from '../../src/uploadFile/uploadFromUrl'
@@ -105,7 +106,7 @@ describe('uploadFromUrl', () => {
     })
 
     await expect(uploadFromUrl(sourceUrl, settings)).rejects.toThrowError(
-      new UploadError('Request canceled')
+      new CancelError('Request canceled')
     )
   })
 
