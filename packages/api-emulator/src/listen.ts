@@ -30,8 +30,21 @@ export type EmulatorServerOptions = {
 const bodyOf = async (request: IncomingMessage) => {
   if (request.method === 'GET' || request.method === 'HEAD') return null
   const chunks: Buffer[] = []
-  for await (const chunk of request) {
-    chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk))
+  try {
+    for await (const chunk of request) {
+      chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk))
+    }
+  } catch (error) {
+    // A client that disconnects mid-request (an aborted `fetch`, a dropped
+    // connection) ends the body stream early — Node's http server throws an
+    // `aborted`/`ECONNRESET` error into whatever is consuming that stream,
+    // here the `for await`. That's a normal event, not a bug: there is no
+    // client left to answer, so the caller (the `listener` below) checks
+    // `request.aborted` and skips responding instead of this rejecting into
+    // it. (`request.destroyed` is *not* the right check here — the stream
+    // auto-destroys itself after a completely normal read too.)
+    if (request.aborted) return null
+    throw error
   }
   return new Uint8Array(Buffer.concat(chunks))
 }
@@ -54,27 +67,48 @@ export const createEmulatorServer = async (
     request: IncomingMessage,
     response: ServerResponse
   ) => {
+    // Neither side should ever crash the process over a disconnect: an
+    // aborted client is an ordinary event for an HTTP server, handled below
+    // by simply not responding, not an error. These are a last-resort net
+    // for whatever's left — an EventEmitter with no 'error' listener throws
+    // on one, which would otherwise take the whole server down over, say, a
+    // write to a socket that closed a moment after we checked it.
+    request.on('error', () => {})
+    response.on('error', () => {})
+
     const protocol = options.tls ? 'https' : 'http'
     const url = `${protocol}://${request.headers.host ?? 'localhost'}${request.url ?? '/'}`
     await delay(options.delayMs ?? 30)
+    const body = await bodyOf(request)
+    if (request.aborted) return
+
     const answer = await handle(
       new Request(url, {
         method: request.method,
         headers: headersOf(request),
-        body: await bodyOf(request)
+        body
       })
     )
-    if (!answer) {
-      response
-        .writeHead(502, { 'access-control-allow-origin': '*' })
-        .end('not handled by the emulator')
-      return
+    if (request.aborted) return
+
+    try {
+      if (!answer) {
+        response
+          .writeHead(502, { 'access-control-allow-origin': '*' })
+          .end('not handled by the emulator')
+        return
+      }
+      response.writeHead(answer.status, {
+        ...Object.fromEntries(answer.headers),
+        'access-control-allow-origin': '*'
+      })
+      response.end(Buffer.from(await answer.arrayBuffer()))
+    } catch (error) {
+      // The client disconnected between our check above and the write
+      // itself — same "nothing to answer" case, just lost the race.
+      if (request.aborted) return
+      throw error
     }
-    response.writeHead(answer.status, {
-      ...Object.fromEntries(answer.headers),
-      'access-control-allow-origin': '*'
-    })
-    response.end(Buffer.from(await answer.arrayBuffer()))
   }
 
   const server = options.tls

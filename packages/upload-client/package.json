@@ -52,7 +52,7 @@
     "prepack": "cp ../../LICENSE ./LICENSE",
     "mock:start": "tsx ../api-emulator/src/cli.ts --silent",
     "clean": "rimraf dist",
-    "test": "start-server-and-test mock:start :3000 test:vitest",
+    "test": "start-server-and-test mock:start tcp:3000 test:vitest",
     "test:production": "TEST_ENV=production npm run test:vitest",
     "test:vitest": "vitest run",
     "prebuild": "npm run clean",

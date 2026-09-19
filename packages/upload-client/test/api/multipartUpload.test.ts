@@ -4,6 +4,7 @@ import multipartUpload from '../../src/api/multipartUpload'
 import { getSettingsForTesting, assertComputableProgress } from '../_helpers'
 import multipartStart from '../../src/api/multipartStart'
 import { UploadError } from '../../src/tools/UploadError'
+import { CancelError } from '@uploadcare/api-client-utils'
 let parts: [string, Blob | Buffer][] = []
 
 vi.setConfig({ testTimeout: 60000 })
@@ -49,7 +50,7 @@ describe('API - multipartUpload', () => {
     })
 
     await expect(multipartUpload(part, url, options)).rejects.toThrowError(
-      new UploadError('Request canceled')
+      new CancelError('Request canceled')
     )
   })
 

@@ -3,6 +3,7 @@ import multipartStart from '../../src/api/multipartStart'
 import * as factory from '../_fixtureFactory'
 import { getSettingsForTesting } from '../_helpers'
 import { UploadError } from '../../src/tools/UploadError'
+import { CancelError } from '@uploadcare/api-client-utils'
 
 describe('API - multipartStart', () => {
   const size = factory.file(12).size
@@ -32,7 +33,7 @@ describe('API - multipartStart', () => {
     })
 
     await expect(upload).rejects.toThrowError(
-      new UploadError('Request canceled')
+      new CancelError('Request canceled')
     )
   })
 

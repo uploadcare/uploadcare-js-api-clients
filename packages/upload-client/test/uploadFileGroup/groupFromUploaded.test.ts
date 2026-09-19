@@ -3,6 +3,7 @@ import * as factory from '../_fixtureFactory'
 import { getSettingsForTesting, assertComputableProgress } from '../_helpers'
 import { uploadFileGroup } from '../../src/uploadFileGroup'
 import { UploadError } from '../../src/tools/UploadError'
+import { CancelError } from '@uploadcare/api-client-utils'
 describe('groupFrom Uploaded[]', () => {
   const files = factory.groupOfFiles('valid')
   const settings = getSettingsForTesting({
@@ -42,7 +43,7 @@ describe('groupFrom Uploaded[]', () => {
     ctrl.abort()
 
     await expect(upload).rejects.toThrowError(
-      new UploadError('Request canceled')
+      new CancelError('Request canceled')
     )
   })
 
