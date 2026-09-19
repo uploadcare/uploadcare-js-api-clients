@@ -12,5 +12,5 @@
   "trailingComma": "none",
   "useTabs": false,
   "sortPackageJson": false,
-  "ignorePatterns": ["dist/**"]
+  "ignorePatterns": ["dist/**", "**/*.md"]
 }

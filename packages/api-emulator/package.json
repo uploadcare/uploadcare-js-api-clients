@@ -7,6 +7,9 @@
     ".": "./src/index.ts",
     "./listen": "./src/listen.ts"
   },
+  "files": [
+    "src"
+  ],
   "engines": {
     "node": ">=18"
   },

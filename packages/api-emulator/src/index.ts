@@ -6,5 +6,5 @@ import './apis/upload/index.js'
 import './apis/cdn/index.js'
 
 export { handle } from './core/router.js'
-export { resetSession, sessionOf } from './state/store.js'
+export { resetSession, sessionOf, SESSION_HEADER } from './state/store.js'
 export type { Session, StoredFile, StoredImage } from './state/store.js'
