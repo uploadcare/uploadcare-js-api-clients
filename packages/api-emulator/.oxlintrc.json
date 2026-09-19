@@ -13,7 +13,14 @@
     "import/no-cycle": "error",
     "import/no-unassigned-import": [
       "error",
-      { "allow": ["./apis/*/index.js", "./base.js", "./info.js"] }
+      {
+        "allow": [
+          "./apis/*/index.js",
+          "./base.js",
+          "./from-url.js",
+          "./info.js"
+        ]
+      }
     ]
   },
   "ignorePatterns": ["dist/**", "node_modules/**"],

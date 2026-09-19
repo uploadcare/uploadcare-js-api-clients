@@ -22,8 +22,22 @@ export type StoredFile = {
   isStored: boolean
 }
 
-/** Filled in by Task 3. */
-export type FromUrlJob = { uuid: string; polls: number }
+/**
+ * A `/from_url/` job in flight. `uuid` names the stored file this job's poll
+ * answers with — empty for a source whose host isn't in `REACHABLE_HOSTS`, so
+ * the poll route can tell "still fetching" apart from "never going to exist" by
+ * whether that lookup finds a file, without a field of its own. `computable`
+ * mirrors whether the request used `UNKNOWN_PROGRESS_KEY`: `false` reports
+ * `total: 'unknown'` on every progress poll instead of a byte count.
+ * `total`/`done` track the simulated transfer.
+ */
+export type FromUrlJob = {
+  uuid: string
+  polls: number
+  computable: boolean
+  total: number
+  done: number
+}
 
 /** Filled in by Task 5. */
 export type MultipartUpload = Record<string, never>
