@@ -1,4 +1,5 @@
 import { apiError } from '../../core/responses.js'
+import { NO_STORING_KEY, UNKNOWN_PROGRESS_KEY } from './scenarios.js'
 
 /**
  * The public keys the demo project recognises, mirroring the old mock server's
@@ -7,8 +8,8 @@ import { apiError } from '../../core/responses.js'
 const ALLOWED_PUBLIC_KEYS = [
   'demopublickey',
   'secret_public_key',
-  'pub_test__no_storing',
-  'pub_test__unknown_progress'
+  NO_STORING_KEY,
+  UNKNOWN_PROGRESS_KEY
 ]
 
 /**
