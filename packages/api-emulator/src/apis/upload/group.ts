@@ -54,6 +54,18 @@ const asString = (value: FormDataEntryValue | null) =>
   typeof value === 'string' ? value : null
 
 /**
+ * A `files[N]` entry is a string on every real client — but `FormData` lets one
+ * be a `File` too. That must still 400 the whole request as an invalid member
+ * (matching what a malformed string already does below), not vanish from it:
+ * silently dropping it would hand back a group smaller than the one asked for,
+ * which looks fine and is wrong. `String(value)` would trip `no-base-to-string`
+ * for no benefit — the literal below is exactly the `[object File]` `String()`
+ * would have produced anyway.
+ */
+const memberToken = (value: FormDataEntryValue) =>
+  typeof value === 'string' ? value : '[object File]'
+
+/**
  * `/group/` and `/group/info/` answer with the same shape, built fresh each
  * time.
  */
@@ -89,8 +101,7 @@ route('POST', '/group/', async ({ request }) => {
 
   const members = [...form.entries(), ...query.entries()]
     .filter(([key]) => MEMBER_KEY.test(key))
-    .map(([, value]) => asString(value))
-    .filter((value): value is string => value !== null)
+    .map(([, value]) => memberToken(value))
 
   if (members.length === 0)
     // schema: groupFileURLParsingFailedError
