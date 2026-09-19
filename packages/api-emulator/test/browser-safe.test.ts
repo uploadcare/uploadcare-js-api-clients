@@ -1,4 +1,4 @@
-import { readdirSync, readFileSync, statSync } from 'node:fs'
+import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs'
 import { builtinModules } from 'node:module'
 import path from 'node:path'
 import { expect, it } from 'vitest'
@@ -53,3 +53,35 @@ it('keeps every module behind the "." export free of node built-ins', () => {
   )
   expect(offenders).toEqual([])
 })
+
+/**
+ * The source-level check above can't see what bundling actually pulls in: a
+ * shared chunk that only looks fine in isolation could still end up reachable
+ * from both entry points once Rollup merges things. So walk the real `dist/`
+ * import graph from `index.js`, the same way a consumer's bundler would, and
+ * scan exactly what that reaches.
+ */
+const distRoot = path.join(import.meta.dirname, '../dist')
+
+const distGraph = (entry: string, seen = new Set<string>()): Set<string> => {
+  if (seen.has(entry)) return seen
+  seen.add(entry)
+  const source = readFileSync(entry, 'utf8')
+  for (const match of source.matchAll(/from\s*["'](\.\/[^"']+)["']/g)) {
+    distGraph(path.join(path.dirname(entry), match[1]), seen)
+  }
+  return seen
+}
+
+it.runIf(existsSync(distRoot))(
+  'keeps the built "." bundle free of node built-ins',
+  () => {
+    const files = distGraph(path.join(distRoot, 'index.js'))
+    const offenders = [...files].flatMap((file) =>
+      FORBIDDEN.filter((pattern) =>
+        pattern.test(readFileSync(file, 'utf8'))
+      ).map((pattern) => `${path.relative(distRoot, file)} matches ${pattern}`)
+    )
+    expect(offenders).toEqual([])
+  }
+)
