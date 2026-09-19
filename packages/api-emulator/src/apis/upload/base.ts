@@ -1,7 +1,7 @@
-import { imageSize } from '../image-size.js'
-import { apiError } from '../responses.js'
-import { route } from '../router.js'
-import { sessionOf, store } from '../store.js'
+import { apiError } from '../../core/responses.js'
+import { route } from '../../core/router.js'
+import { imageSize } from '../../state/image-size.js'
+import { sessionOf, store } from '../../state/store.js'
 
 /** `store=auto` leaves it to project settings, and the demo project stores. */
 const storedBy = (value: FormDataEntryValue | null) =>

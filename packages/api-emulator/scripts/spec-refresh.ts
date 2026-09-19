@@ -11,9 +11,9 @@ import path from 'node:path'
 import { fetchSpec, formatWithOxfmt, requireUrlArg } from './spec-lib.ts'
 
 const url = requireUrlArg('spec:refresh', process.argv)
-const testDir = path.join(import.meta.dirname, '..', 'test')
-const specPath = path.join(testDir, 'upload-api-spec.json')
-const metaPath = path.join(testDir, 'upload-api-spec.meta.json')
+const specsDir = path.join(import.meta.dirname, '..', 'test', 'specs')
+const specPath = path.join(specsDir, 'upload-api.json')
+const metaPath = path.join(specsDir, 'upload-api.meta.json')
 
 const { document, version, sha256, strippedUrl } = await fetchSpec(url)
 
