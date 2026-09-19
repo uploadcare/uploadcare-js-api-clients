@@ -2,6 +2,7 @@ import { ROUTES, RouteType } from '../routes'
 import { ALLOWED_PUBLIC_KEYS } from '../config'
 import error from '../utils/error'
 import { type Middleware } from 'koa'
+import type { ServerErrorCode } from '../../src/tools/ServerErrorCode'
 
 /** Routes protected by auth. */
 const protectedRoutes: Array<string> = ROUTES.filter((route: RouteType) => {
@@ -58,7 +59,10 @@ const isAuthorized = ({ url, publicKey }: IsAuthorizedParams) => {
 
 /** JWTs recognized by the mock server. */
 const VALID_JWT = 'valid-jwt'
-const JWT_ERRORS: Record<string, { statusText: string; errorCode: string }> = {
+const JWT_ERRORS: Record<
+  string,
+  { statusText: string; errorCode: ServerErrorCode }
+> = {
   'expired-jwt': {
     statusText: 'Token has expired.',
     errorCode: 'TokenExpiredError'
