@@ -1,7 +1,6 @@
 import { apiError } from '../../core/responses.js'
 import { route } from '../../core/router.js'
 import { fileInfo, nextUuid, sessionOf, store } from '../../state/store.js'
-import { requirePublicKey } from './auth.js'
 import {
   isPrivateSourceUrl,
   REACHABLE_HOSTS,
@@ -34,67 +33,69 @@ const STOCK_IMAGE = new Uint8Array([
 const truthy = (value: FormDataEntryValue | string | null) =>
   value === '1' || value === 'true'
 
-route('POST', '/from_url/', ({ request }) => {
-  const session = sessionOf(request)
-  const params = new URL(request.url).searchParams
-  const authError = requirePublicKey(request, params.get('pub_key'))
-  if (authError) return authError
+route(
+  'POST',
+  '/from_url/',
+  ({ request }) => {
+    const session = sessionOf(request)
+    const params = new URL(request.url).searchParams
+    const sourceUrl = params.get('source_url')
+    if (!sourceUrl)
+      // schema: sourceURLRequiredError
+      return apiError(request, 400, 'source_url is required.')
 
-  const sourceUrl = params.get('source_url')
-  if (!sourceUrl)
-    // schema: sourceURLRequiredError
-    return apiError(request, 400, 'source_url is required.')
+    if (sourceUrl === UNREACHABLE_SOURCE_URL)
+      // schema: hostnameNotFoundError — the one host that fails synchronously;
+      // see scenarios.ts.
+      return apiError(request, 400, 'Host does not exist.')
 
-  if (sourceUrl === UNREACHABLE_SOURCE_URL)
-    // schema: hostnameNotFoundError — the one host that fails synchronously;
-    // see scenarios.ts.
-    return apiError(request, 400, 'Host does not exist.')
+    if (isPrivateSourceUrl(sourceUrl))
+      // schema: urlHostPrivateIPForbiddenError
+      return apiError(request, 400, 'Only public IPs are allowed.')
 
-  if (isPrivateSourceUrl(sourceUrl))
-    // schema: urlHostPrivateIPForbiddenError
-    return apiError(request, 400, 'Only public IPs are allowed.')
+    // The client's `fileName` option overrides the name the URL would
+    // otherwise imply.
+    const name = params.get('filename') ?? nameFromUrl(sourceUrl)
 
-  // The client's `fileName` option overrides the name the URL would
-  // otherwise imply.
-  const name = params.get('filename') ?? nameFromUrl(sourceUrl)
+    const checkForDuplicates = truthy(params.get('check_URL_duplicates'))
+    const saveForDuplicates = truthy(params.get('save_URL_duplicates'))
+    if (checkForDuplicates && saveForDuplicates) {
+      const stored = store(session, {
+        name,
+        size: STOCK_IMAGE.byteLength,
+        mimeType: 'image/jpeg',
+        bytes: STOCK_IMAGE,
+        image: { width: 1, height: 1, format: 'JPEG' },
+        isStored: true
+      })
+      return Response.json({ type: 'file_info', ...fileInfo(stored) })
+    }
 
-  const checkForDuplicates = truthy(params.get('check_URL_duplicates'))
-  const saveForDuplicates = truthy(params.get('save_URL_duplicates'))
-  if (checkForDuplicates && saveForDuplicates) {
-    const stored = store(session, {
-      name,
-      size: STOCK_IMAGE.byteLength,
-      mimeType: 'image/jpeg',
-      bytes: STOCK_IMAGE,
-      image: { width: 1, height: 1, format: 'JPEG' },
-      isStored: true
+    const host = URL.parse(sourceUrl)?.host
+    const uuid =
+      host && REACHABLE_HOSTS.includes(host)
+        ? store(session, {
+            name,
+            size: STOCK_IMAGE.byteLength,
+            mimeType: 'image/jpeg',
+            bytes: STOCK_IMAGE,
+            image: { width: 1, height: 1, format: 'JPEG' },
+            isStored: params.get('store') !== '0'
+          }).uuid
+        : ''
+
+    const token = nextUuid(session)
+    session.fromUrlJobs.set(token, {
+      uuid,
+      polls: 0,
+      computable: params.get('pub_key') !== UNKNOWN_PROGRESS_KEY,
+      total: STOCK_IMAGE.byteLength,
+      done: 0
     })
-    return Response.json({ type: 'file_info', ...fileInfo(stored) })
-  }
-
-  const host = URL.parse(sourceUrl)?.host
-  const uuid =
-    host && REACHABLE_HOSTS.includes(host)
-      ? store(session, {
-          name,
-          size: STOCK_IMAGE.byteLength,
-          mimeType: 'image/jpeg',
-          bytes: STOCK_IMAGE,
-          image: { width: 1, height: 1, format: 'JPEG' },
-          isStored: params.get('store') !== '0'
-        }).uuid
-      : ''
-
-  const token = nextUuid(session)
-  session.fromUrlJobs.set(token, {
-    uuid,
-    polls: 0,
-    computable: params.get('pub_key') !== UNKNOWN_PROGRESS_KEY,
-    total: STOCK_IMAGE.byteLength,
-    done: 0
-  })
-  return Response.json({ type: 'token', token })
-})
+    return Response.json({ type: 'token', token })
+  },
+  { protected: true }
+)
 
 route('GET', '/from_url/status/', ({ request }) => {
   const session = sessionOf(request)

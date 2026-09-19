@@ -20,7 +20,8 @@
           "./from-url.js",
           "./group.js",
           "./info.js",
-          "./multipart.js"
+          "./multipart.js",
+          "./throttle.js"
         ]
       }
     ]
