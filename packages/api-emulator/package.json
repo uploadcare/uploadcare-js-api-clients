@@ -28,7 +28,6 @@
       "default": "./dist/listen.js"
     }
   },
-  "sideEffects": false,
   "files": [
     "dist",
     "README.md",
