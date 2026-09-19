@@ -75,11 +75,15 @@ export const REACHABLE_HOSTS = [
 /**
  * `upload-client`'s `group.test.ts` ("should fail with [HTTP 400] Some files
  * not found.") uses this public key — otherwise a perfectly ordinary allowed
- * key (see `auth.ts`) — to make `POST /group/` fail every time, regardless of
- * whether its members exist. Mirrors the old mock server's
- * `controllers/group.ts` hack (`publicKey === 'demopublickey'`), scoped to
- * `/group/` alone so every other route's use of the same key as "a normal demo
- * project" is unaffected.
+ * key (see `auth.ts`) — with hardcoded uuids it never uploads first, to make
+ * `POST /group/` fail with `groupFilesNotFoundError`. Mirrors the old mock
+ * server's `controllers/group.ts` hack (`publicKey === 'demopublickey'`),
+ * scoped to `/group/` alone so every other route's use of the same key as "a
+ * normal demo project" is unaffected — and, unlike that hack, scoped further to
+ * members `group.ts` can't actually find in the session, so a real upload
+ * grouped under this same key (as file-uploader's e2e suite does — it's a
+ * widely used real demo public key, not a magic value it invented) still
+ * succeeds instead of being reported missing.
  */
 export const GROUP_FILES_NOT_FOUND_KEY = 'demopublickey'
 
