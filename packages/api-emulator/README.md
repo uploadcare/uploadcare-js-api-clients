@@ -37,14 +37,28 @@ await close()
 
 `handle(request)` returns `Response | undefined`. `undefined` means "not an
 endpoint this emulator implements," so the caller decides what happens next
-— this is the shape Playwright's `page.route` wants:
+— this is the shape Playwright's `page.route` wants. `handle` needs a real
+WHATWG `Request`, not Playwright's own request object (its `.url` is a
+method, not a string, and it has no `.headers`/`.arrayBuffer()` of the web
+shape), so the route handler builds one first:
 
 ```ts
 import { handle } from '@uploadcare/api-emulator'
 
-await page.route('https://upload.uploadcare.com/**', async (route) => {
-  const response = await handle(route.request())
-  if (!response) return route.fallback()
+await page.route(/^https?:\/\//, async (route) => {
+  const request = route.request()
+  const method = request.method()
+  const body = method === 'GET' || method === 'HEAD' ? null : request.postDataBuffer()
+
+  const response = await handle(
+    new Request(request.url(), {
+      method,
+      headers: request.headers(),
+      body: body && new Uint8Array(body)
+    })
+  )
+
+  if (!response) return route.abort() // nothing the emulator implements
   await route.fulfill({
     status: response.status,
     headers: Object.fromEntries(response.headers),
@@ -52,6 +66,9 @@ await page.route('https://upload.uploadcare.com/**', async (route) => {
   })
 })
 ```
+
+(The `Buffer` above is the caller's Node/Playwright code, not the emulator's
+— the browser-safe guard only scans `src/`.)
 
 ### 3. With MSW, in Node or in the browser
 
