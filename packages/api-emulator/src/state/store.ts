@@ -39,8 +39,24 @@ export type FromUrlJob = {
   done: number
 }
 
-/** Filled in by Task 5. */
-export type MultipartUpload = Record<string, never>
+/**
+ * A `/multipart/start/` session in flight, keyed by its own `uuid` — the same
+ * one `/multipart/complete/` assembles into a stored file and `/info/` then
+ * answers about. `parts` is pre-sized to the part count `/multipart/start/`
+ * handed out (see `scenarios.ts`'s `MULTIPART_CHUNK_SIZE`); each part `PUT`
+ * fills in its own index, empty until then. `isStored` carries the
+ * `UPLOADCARE_STORE` field from `/multipart/start/` through to
+ * `/multipart/complete/` — `multipartComplete.ts` (upload-client) never resends
+ * it, so the only place to learn it is here.
+ */
+export type MultipartUpload = {
+  uuid: string
+  name: string
+  size: number
+  mimeType: string
+  isStored: boolean
+  parts: Uint8Array[]
+}
 
 export type Session = {
   files: Map<string, StoredFile>

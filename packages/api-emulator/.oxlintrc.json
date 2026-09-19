@@ -19,7 +19,8 @@
           "./base.js",
           "./from-url.js",
           "./group.js",
-          "./info.js"
+          "./info.js",
+          "./multipart.js"
         ]
       }
     ]

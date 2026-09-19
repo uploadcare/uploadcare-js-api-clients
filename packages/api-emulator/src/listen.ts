@@ -6,6 +6,7 @@ import {
 import { createServer as createHttpsServer } from 'node:https'
 // Registers the routes as a side effect; `router.js` alone knows nothing about them.
 import { handle } from './index.js'
+import { DROP_CONNECTION_MARKER } from './apis/upload/scenarios.js'
 
 export type EmulatorServerOptions = {
   /** 0, the default, takes whatever port is free. */
@@ -90,6 +91,16 @@ export const createEmulatorServer = async (
       })
     )
     if (request.aborted) return
+
+    // See DROP_CONNECTION_MARKER (scenarios.ts): a part PUT that leaked an
+    // Authorization header answers with this marker instead of a normal
+    // status, since the client ignores the status of a part PUT anyway —
+    // only actually dropping the connection, as the real presigned-URL
+    // endpoint would, fails a test over it.
+    if (answer?.headers.has(DROP_CONNECTION_MARKER)) {
+      request.socket.destroy()
+      return
+    }
 
     try {
       if (!answer) {

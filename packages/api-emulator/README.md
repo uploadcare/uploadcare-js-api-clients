@@ -109,10 +109,29 @@ uploaded to it.
 
 ## What's implemented today
 
-Only the Upload API's `POST /base/` (single-file upload) and `GET /info/`
-(file metadata) endpoints exist right now. More endpoints — `from_url`,
-groups, multipart, and the CDN — are on the way; this README will grow a
-section for each as it lands rather than promising them ahead of time.
+The Upload API's `POST /base/` (single-file upload), `GET /info/` (file
+metadata), `POST /from_url/` / `GET /from_url/status/`, `POST /group/` /
+`GET /group/info/`, and multipart upload (`POST /multipart/start/`, the part
+`PUT`, `POST /multipart/complete/`) all exist today. The CDN is on the way;
+this README will grow a section for it as it lands rather than promising it
+ahead of time.
+
+## Caveats
+
+- **The part-PUT `Authorization` check only bites in server mode.** Part
+  uploads go to presigned storage URLs and must never carry an `Authorization`
+  header — and `upload-client` ignores the status code of a part `PUT`
+  entirely, so answering with an error status wouldn't fail a test over a
+  leaked header. `handle()` can't touch a socket (it has to stay browser-safe
+  for the MSW path), so a part `PUT` that carries the header instead answers
+  with an ordinary `Response` carrying the `x-emulator-drop-connection` marker
+  header (`DROP_CONNECTION_MARKER` in `scenarios.ts`). `listen.ts` — the one
+  place that owns the raw socket — recognises that marker and destroys the
+  connection instead of writing the response, reproducing the old mock
+  server's `ctx.req.destroy()`. Under MSW, or any other consumer of the `.`
+  export, there is no socket to drop: the marker response is delivered as an
+  ordinary response, so this check only actually drops a connection when the
+  emulator is run via `@uploadcare/api-emulator/listen`.
 
 ## The spec is the authority
 
