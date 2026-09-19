@@ -23,6 +23,21 @@ import Ajv, { type ErrorObject, type ValidateFunction } from 'ajv'
 import addFormats from 'ajv-formats'
 import uploadApiSpec from './specs/upload-api.json'
 
+/**
+ * `groupInfo.files[].default_effects` is declared `format: uri`, but that's
+ * simply wrong: neither the spec's own example for it (`"resize/x800/"`) nor
+ * the real API's actual value for a file with no operations applied (an empty
+ * string) is a URI by that format's own rules (no scheme — ajv-formats rejects
+ * both). Patched out in place, before either `toJsonSchema` (below) compiles it
+ * into the registered ajv schema, or `descend`/`collectDefaults` (further down)
+ * walk this same object for `$ref` pointers — both need the one, single
+ * document this file loads.
+ */
+delete (
+  uploadApiSpec.components.schemas.groupInfo.properties.files.allOf[0]
+    ?.properties as { default_effects?: { format?: string } } | undefined
+)?.default_effects?.format
+
 /** The specs `assertMatchesSpec` can select by name — `upload-api` today. */
 const specs = { 'upload-api': uploadApiSpec } as const
 export type SpecName = keyof typeof specs
@@ -46,6 +61,14 @@ const isObject = (value: unknown): value is JsonObject =>
  * inline `example`/`examples` keywords this function does strip). If a future
  * spec refresh introduces any of these, expect a confusing Ajv failure rather
  * than a silent one — extend this function rather than the callers.
+ *
+ * One more, found by Task 4's `groupInfo.files`: `type: array` with an
+ * `allOf`/`oneOf`/`anyOf` as a _sibling_ of `type`, rather than nested under
+ * `items` — the document just omits the `items` wrapper. Taken literally, that
+ * requires the array itself (not its elements) to also satisfy those branches,
+ * which no array ever can. Moving the sibling into `items` is the only reading
+ * that makes the schema satisfiable at all, and matches what the spec's prose
+ * plainly means ("an array … may contain null values").
  */
 const toJsonSchema = (node: unknown): unknown => {
   if (Array.isArray(node)) return node.map(toJsonSchema)
@@ -56,6 +79,17 @@ const toJsonSchema = (node: unknown): unknown => {
     if (key === 'example' || key === 'examples' || key === 'discriminator')
       continue
     output[key] = toJsonSchema(value)
+  }
+
+  if (output.type === 'array' && !('items' in output)) {
+    const items: JsonObject = {}
+    for (const key of ['allOf', 'oneOf', 'anyOf'] as const) {
+      if (key in output) {
+        items[key] = output[key]
+        delete output[key]
+      }
+    }
+    if (Object.keys(items).length > 0) output.items = items
   }
 
   if (output.nullable !== true) return output

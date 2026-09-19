@@ -2,4 +2,5 @@
 // nothing about them.
 import './base.js'
 import './from-url.js'
+import './group.js'
 import './info.js'

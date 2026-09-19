@@ -10,6 +10,7 @@ afterAll(() => server.close())
 
 const fileUploadBody = () => {
   const body = new FormData()
+  body.set('UPLOADCARE_PUB_KEY', 'demopublickey')
   body.set(
     'file',
     new File([new Uint8Array([1, 2, 3])], 'a.bin', {
