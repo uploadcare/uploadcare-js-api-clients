@@ -64,6 +64,8 @@ export type Session = {
   fromUrlJobs: Map<string, FromUrlJob>
   multipart: Map<string, MultipartUpload>
   issued: number
+  /** `/throttle/`'s per-session request count — see throttle.ts. */
+  throttled: number
 }
 
 /** Names the session on every redirected request; set by the caller. */
@@ -81,7 +83,8 @@ export const resetSession = (id = 'default') => {
     groups: new Map(),
     fromUrlJobs: new Map(),
     multipart: new Map(),
-    issued: 0
+    issued: 0,
+    throttled: 0
   }
   sessions.set(id, session)
   return session
