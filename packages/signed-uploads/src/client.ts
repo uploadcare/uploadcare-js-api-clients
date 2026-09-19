@@ -9,5 +9,9 @@ export {
   type AuthTokenCacheOptions,
   type FetchAuthToken
 } from './client/AuthTokenCache'
+export {
+  AuthTokenResolverError,
+  asAuthTokenResolverError
+} from './client/AuthTokenResolverError'
 export { getAuthHeaders } from './client/getAuthHeaders'
 export { getTokenExpiration } from './client/getTokenExpiration'

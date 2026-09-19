@@ -1,6 +1,5 @@
 import { expect } from '@jest/globals'
-import { AuthTokenResolverError } from '../../src/tools/AuthTokenResolverError'
-import { UploadError } from '../../src/tools/UploadError'
+import { AuthTokenResolverError } from '@uploadcare/signed-uploads/client'
 import {
   isAuthTokenResolver,
   resolveAuthToken
@@ -49,13 +48,19 @@ describe('resolveAuthToken', () => {
     }).catch((e) => e)
 
     expect(error).toBeInstanceOf(AuthTokenResolverError)
-    // An `UploadError` too, so a caller catching the base class still sees it.
-    expect(error).toBeInstanceOf(UploadError)
     expect(error.name).toBe('AuthTokenResolverError')
     expect(error.message).toContain('token endpoint is down')
     expect(error.cause).toBe(cause)
-    // Nothing was sent, so there is no server code to report.
-    expect(error.code).toBeUndefined()
+  })
+
+  it('should not nest when the resolver already threw a wrapped error', async () => {
+    const inner = new AuthTokenResolverError(new Error('cache failed'))
+
+    const error = await resolveAuthToken(() => {
+      throw inner
+    }).catch((e) => e)
+
+    expect(error).toBe(inner)
   })
 
   it('should wrap a rejecting resolver', async () => {

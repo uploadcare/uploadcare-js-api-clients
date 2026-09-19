@@ -1,5 +1,5 @@
+import { asAuthTokenResolverError } from '@uploadcare/signed-uploads/client'
 import { AuthToken } from '../types'
-import { AuthTokenResolverError } from './AuthTokenResolverError'
 
 /**
  * Whether `authToken` is a resolver rather than a token already in hand.
@@ -26,6 +26,6 @@ export const resolveAuthToken = async (
   try {
     return await authToken()
   } catch (cause) {
-    throw new AuthTokenResolverError(cause)
+    throw asAuthTokenResolverError(cause)
   }
 }

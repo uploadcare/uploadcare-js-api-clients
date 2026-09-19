@@ -1,3 +1,4 @@
+import { asAuthTokenResolverError } from './AuthTokenResolverError'
 import { getTokenExpiration } from './getTokenExpiration'
 
 /** Fetches a freshly minted token, usually from your own backend. */
@@ -69,10 +70,15 @@ export class AuthTokenCache {
     // own.
     this._inflight ??= Promise.resolve()
       .then(() => this.fetchToken())
-      .then((token) => {
-        this._store(token)
-        return token
-      })
+      .then(
+        (token) => {
+          this._store(token)
+          return token
+        },
+        (cause) => {
+          throw asAuthTokenResolverError(cause)
+        }
+      )
       .finally(() => {
         this._inflight = undefined
       })

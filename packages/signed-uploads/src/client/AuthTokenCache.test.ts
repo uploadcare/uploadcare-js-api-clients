@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { AuthTokenCache } from './AuthTokenCache'
+import { AuthTokenResolverError } from './AuthTokenResolverError'
 
 const NOW = 1678359840000
 const now = () => Math.floor(NOW / 1000)
@@ -134,5 +135,24 @@ describe('AuthTokenCache', () => {
 
     expect(await cache.getToken()).toBe('opaque-token')
     expect(fetchToken).toHaveBeenCalledTimes(1)
+  })
+  it('wraps a failing fetchToken and stays usable afterwards', async () => {
+    const cause = new Error('token endpoint is down')
+    const token = tokenExpiringIn(60)
+    const fetchToken = vi
+      .fn<() => string>()
+      .mockImplementationOnce(() => {
+        throw cause
+      })
+      .mockImplementation(() => token)
+    const cache = new AuthTokenCache({ fetchToken })
+
+    const error = await cache.getToken().catch((e) => e)
+
+    expect(error).toBeInstanceOf(AuthTokenResolverError)
+    expect(error.cause).toBe(cause)
+    // The failed fetch must not be left in flight, or every later call would
+    // wait on a promise that already rejected.
+    expect(await cache.getToken()).toBe(token)
   })
 })

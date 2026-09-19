@@ -99,7 +99,10 @@ export { UploadcareGroup } from './tools/UploadcareGroup'
 export { UploadError, ErrorResponseInfo } from './tools/UploadError'
 export { ServerErrorCode } from './tools/ServerErrorCode'
 export { AuthError, AuthErrorCode } from './tools/AuthError'
-export { AuthTokenResolverError } from './tools/AuthTokenResolverError'
+// Thrown where the token function is called, which is `@uploadcare/signed-uploads`
+// in the `AuthTokenCache` case and here otherwise. Re-exported so catching it
+// needs no second package.
+export { AuthTokenResolverError } from '@uploadcare/signed-uploads/client'
 // An `authToken` may be a plain token or a resolver, so anything that
 // authenticates its own requests alongside this client needs to collapse the
 // two the same way.
