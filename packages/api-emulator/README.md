@@ -112,9 +112,39 @@ uploaded to it.
 The Upload API's `POST /base/` (single-file upload), `GET /info/` (file
 metadata), `POST /from_url/` / `GET /from_url/status/`, `POST /group/` /
 `GET /group/info/`, and multipart upload (`POST /multipart/start/`, the part
-`PUT`, `POST /multipart/complete/`) all exist today. The CDN is on the way;
-this README will grow a section for it as it lands rather than promising it
-ahead of time.
+`PUT`, `POST /multipart/complete/`) all exist today, and so does the CDN.
+
+## The CDN
+
+`GET https://ucarecdn.com/<uuid>/...` and the per-project cnames under
+`*.ucarecd.net` are served by `src/apis/cdn/index.ts`, matched on path alone
+(the listening server already answers on its own host — there's no host to
+tell projects apart by, unlike the browser suite's MSW handler this was
+ported from). It answers three ways:
+
+- A bare `/<uuid>/-/<any operations>/` delivers the bytes that were
+  uploaded, whatever the operations ask for — no image codec runs here, so a
+  resize or crop gets back the original bytes at their original size. If the
+  suite you're pointing at this ever needs the delivered size to actually be
+  real, this is where one would go.
+- `/<uuid>/-/json/` answers with the metadata envelope (dimensions, format,
+  `dpi`, …) read off the stored bytes, the same numbers `/info/`'s
+  `image_info` reports.
+- `/<group>~<count>/nth/<i>/...` resolves through the group created by
+  `POST /group/` to its `i`-th member, then serves that the same way.
+
+A uuid nobody uploaded, or a group member the store never got, 404s.
+
+### Demo-project files
+
+A fresh session isn't empty — it starts with a handful of files already
+"in" the demo project, addressable by uuid without uploading them first,
+because both `upload-client`'s own fixtures and the browser suite's e2e
+tests point straight at fixed uuids. See `DEMO_FILES` in `src/state/store.ts`
+for the list and which consumer needs each one; all of them serve the same
+bytes, `STOCK_IMAGE` (`src/state/stock-image.ts`) — a real, decodable JPEG,
+base64-encoded and decoded at module load so the package stays loadable
+outside Node.
 
 ## Caveats
 
@@ -132,6 +162,23 @@ ahead of time.
   export, there is no socket to drop: the marker response is delivered as an
   ordinary response, so this check only actually drops a connection when the
   emulator is run via `@uploadcare/api-emulator/listen`.
+
+## Scenarios: magic values a test relies on
+
+Every public key, url, and other magic value a test uses to steer the
+emulator into a specific scenario is named in `src/apis/upload/scenarios.ts`,
+with a comment there naming the consumer. Summarised:
+
+| Value | What it's for |
+| --- | --- |
+| `UNKNOWN_PROGRESS_KEY` (`pub_test__unknown_progress`) | A `/from_url/` public key whose poll answers report `total: 'unknown'` instead of a byte count. |
+| `NO_STORING_KEY` (`pub_test__no_storing`) | The public key `upload-client`'s multipart fixtures use. |
+| `UNREACHABLE_SOURCE_URL` (`https://1.com/1.jpg`) | A `from_url` source that fails synchronously, at `POST /from_url/` itself, with a 400 — instead of only failing once the job is polled. |
+| `REACHABLE_HOSTS` | The only hosts a `from_url` upload can actually "fetch" from; anything else resolves to a poll-time `Host does not exist` failure. Includes the emulator's own default origin (`localhost:3000`). |
+| `isPrivateSourceUrl()` | Flags a `from_url` source as a private/local address (`192.168.*`, `localhost` other than the emulator's own), which `POST /from_url/` rejects. |
+| `GROUP_FILES_NOT_FOUND_KEY` (`demopublickey`) | Scoped to `POST /group/` alone: makes group creation fail with "Some files not found." regardless of whether the members exist. Everywhere else, this is just an ordinary allowed public key. |
+| `MULTIPART_CHUNK_SIZE` (5 MB) | The part size `/multipart/start/` hands out, matching the real Upload API rather than the client's own chunk-size setting. |
+| `DROP_CONNECTION_MARKER` | The header a part `PUT` carrying a leaked `Authorization` header gets answered with; only `listen.ts` (server mode) acts on it by destroying the connection — see the caveat above. |
 
 ## The spec is the authority
 

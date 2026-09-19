@@ -9,6 +9,9 @@
  * to ask about.
  */
 
+import { imageSize } from './image-size.js'
+import { STOCK_IMAGE } from './stock-image.js'
+
 export type StoredImage = { width: number; height: number; format: string }
 
 export type StoredFile = {
@@ -58,6 +61,33 @@ export type MultipartUpload = {
   parts: Uint8Array[]
 }
 
+/**
+ * Files the tests address by uuid without uploading them first — they exist in
+ * the demo project, so a fresh session starts with them already stored.
+ *
+ * - `49b4c5a1-31b3-4349-ba07-d97a2d883c37` — `upload-client`'s
+ *   `test/_fixtureFactory.ts` (`uuid('image')`/`uuid('token')`), polled by
+ *   `uploadFromUploaded.test.ts`, `api/info.test.ts` and `uploadFile.test.ts`.
+ *   The real API has this file; nothing in the suite uploads it first.
+ * - `7124ae98-344c-42b2-ae2a-bd9aa79d76d8` — the browser suite's
+ *   `adaptive-image.e2e.test.tsx` (`<uc-img>`).
+ * - `f4dc9ebc-ed6d-4b4d-83d1-863bf1e4bb7f` — the browser suite's
+ *   `cloud-image-editor.e2e.test.tsx` / `editor-filters.e2e.test.tsx` /
+ *   `telemetry/editor-and-sources.e2e.test.tsx` (`<uc-cloud-image-editor>`).
+ * - `90e06e59-8055-4435-9291-c005a98cf098` — the browser suite's
+ *   `solutions/bundles.e2e.test.tsx` (both `<uc-cloud-image-editor>` and
+ *   `<uc-img>`).
+ *
+ * Mirrors `blocks:tests/utils/fake-uploadcare/files.ts`'s `DEMO_FILES`, plus
+ * the one uuid `upload-client` alone still needs.
+ */
+export const DEMO_FILES = [
+  '49b4c5a1-31b3-4349-ba07-d97a2d883c37',
+  '7124ae98-344c-42b2-ae2a-bd9aa79d76d8',
+  'f4dc9ebc-ed6d-4b4d-83d1-863bf1e4bb7f',
+  '90e06e59-8055-4435-9291-c005a98cf098'
+]
+
 export type Session = {
   files: Map<string, StoredFile>
   groups: Map<string, string[]>
@@ -74,8 +104,8 @@ export const SESSION_HEADER = 'x-uploadcare-emulator-session'
 const sessions = new Map<string, Session>()
 
 /**
- * Empties a session, or starts one: a freshly reset session holds no files at
- * all.
+ * Empties a session, or starts one: a freshly reset session holds no files
+ * beyond the demo project's own (`DEMO_FILES`, above).
  */
 export const resetSession = (id = 'default') => {
   const session: Session = {
@@ -85,6 +115,17 @@ export const resetSession = (id = 'default') => {
     multipart: new Map(),
     issued: 0,
     throttled: 0
+  }
+  for (const uuid of DEMO_FILES) {
+    session.files.set(uuid, {
+      uuid,
+      name: 'demo.jpg',
+      size: STOCK_IMAGE.byteLength,
+      mimeType: 'image/jpeg',
+      bytes: STOCK_IMAGE,
+      image: imageSize(STOCK_IMAGE),
+      isStored: true
+    })
   }
   sessions.set(id, session)
   return session
