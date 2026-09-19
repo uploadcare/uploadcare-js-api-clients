@@ -85,6 +85,36 @@ it('reports image_info: null for a non-image upload', async () => {
   expect(parsed.image_info).toBeNull()
 })
 
+it('refuses an upload with no UPLOADCARE_PUB_KEY', async () => {
+  const body = new FormData()
+  body.set('file', new File([PIXEL], 'pixel.jpg', { type: 'image/jpeg' }))
+  const response = await handle(
+    new Request('https://upload.uploadcare.com/base/', { method: 'POST', body })
+  )
+  expect(response!.status).toBe(403)
+  await assertMatchesSpec({
+    method: 'post',
+    path: '/base/',
+    status: 403,
+    response: response!,
+    body: await response!.clone().text()
+  })
+})
+
+it('names UPLOADCARE_PUB_KEY, not pub_key, in that error', async () => {
+  const body = new FormData()
+  body.set('file', new File([PIXEL], 'pixel.jpg', { type: 'image/jpeg' }))
+  const response = await handle(
+    new Request('https://upload.uploadcare.com/base/?jsonerrors=1', {
+      method: 'POST',
+      body
+    })
+  )
+  expect(await response!.json()).toMatchObject({
+    error: { content: 'UPLOADCARE_PUB_KEY is required.' }
+  })
+})
+
 it('404s for a file nobody uploaded', async () => {
   const response = await handle(
     new Request(
