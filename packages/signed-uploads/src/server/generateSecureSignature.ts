@@ -1,4 +1,4 @@
-import { createHmac } from 'crypto'
+import { createHmac } from 'node:crypto'
 
 export type GenerateSecureSignatureOptions =
   | {
