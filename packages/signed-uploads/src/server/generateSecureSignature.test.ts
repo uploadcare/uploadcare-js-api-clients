@@ -3,7 +3,8 @@ import { describe, it, expect, beforeAll, vi } from 'vitest'
 
 const FIXTURE_SECRET = 'YOUR_SECRET_KEY'
 const FIXTURE_DATE = new Date(1678359840000)
-const FIXTURE_LIFETIME = 60 * 30 * 1000 // 30 minutes
+// 30 minutes
+const FIXTURE_LIFETIME = 60 * 30 * 1000
 const EXPECTED_SIGNATURE =
   '93b69d086a487fbdfc36172b96a5d7f5afa7cb209e43e5f25890bc037e638584'
 const EXPECTED_EXPIRE = '1678361640'

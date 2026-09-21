@@ -4,6 +4,8 @@ import { fileURLToPath } from 'node:url'
 import { defineConfig } from 'vite'
 import dts from 'vite-plugin-dts'
 
+// The name is the point: this is the `__dirname` an ESM module does not get.
+// oxlint-disable-next-line no-underscore-dangle, unicorn/prefer-import-meta-properties
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
 const ENTRY_NAMES = ['index', 'server', 'client']
@@ -38,9 +40,9 @@ export default defineConfig({
         // "private", and TypeScript's `private` is erased at build time, so
         // without this the internals of every class ship under their source
         // names. Nothing crosses a module boundary on an underscore here, and
-        // `scripts/smoke-dist.mjs` exercises the built bundles to catch it if
-        // that ever stops being true.
-        properties: { regex: /^_/ }
+        // `tests/bundle/smoke.test.ts` exercises the built bundles to catch it
+        // if that ever stops being true.
+        properties: { regex: /^_/u }
       }
     },
     lib: {

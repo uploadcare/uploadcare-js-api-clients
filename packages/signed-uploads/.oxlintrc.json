@@ -1,10 +1,24 @@
 {
   "$schema": "../../node_modules/oxlint/configuration_schema.json",
+  // Everything oxlint offers except `style` and `restriction`, which are not
+  // strictness so much as a different house style: they want `one-var`,
+  // `sort-keys`, no ternaries and no named exports, and they account for 433 of
+  // the 447 findings the two of them add.
   "categories": {
     "correctness": "error",
-    "suspicious": "error"
+    "suspicious": "error",
+    "pedantic": "error",
+    "perf": "error"
   },
-  "plugins": ["typescript", "import", "unicorn", "oxc"],
+  "plugins": [
+    "typescript",
+    "import",
+    "unicorn",
+    "oxc",
+    "promise",
+    "node",
+    "vitest"
+  ],
   "options": {
     "typeAware": true
   },
@@ -16,7 +30,48 @@
       {
         "allowAfterThis": true
       }
-    ]
+    ],
+    // An absent token and an empty one are deliberately the same case here, so
+    // truthiness is the check we want rather than an oversight.
+    "typescript/strict-boolean-expressions": [
+      "error",
+      {
+        "allowString": true,
+        "allowNullableString": true
+      }
+    ],
+    // Would push `readonly` through the public option types, which buys
+    // nothing: the values are read once at call time and never held.
+    "typescript/prefer-readonly-parameter-types": "off",
+    // Every validation failure in `generateAuthToken` throws `Error`. Promoting
+    // the one type-shaped check to `TypeError` would split that family for no
+    // gain to the caller.
+    "unicorn/prefer-type-error": "off"
   },
-  "ignorePatterns": ["dist/**", "node_modules/**"]
+  "overrides": [
+    {
+      "files": ["**/*.test.ts"],
+      "rules": {
+        // The `no-unsafe-*` family cannot see through a file that imports
+        // `vitest`: globals such as `Buffer` resolve to an error type there and
+        // every use of one is reported, though `tsc` types the same file fine.
+        // They stay on for everything that ships.
+        "typescript/no-unsafe-argument": "off",
+        "typescript/no-unsafe-assignment": "off",
+        "typescript/no-unsafe-call": "off",
+        "typescript/no-unsafe-member-access": "off",
+        "typescript/no-unsafe-return": "off",
+        // `vi.fn(impl)` already infers from the implementation.
+        "vitest/require-mock-type-parameters": "off",
+        // A `describe` block is one function to the linter.
+        "max-lines-per-function": "off",
+        // Both fire on deliberate per-test setup: a placeholder a test reassigns
+        // must stay inside it, and passing `undefined` explicitly is the case
+        // under test.
+        "unicorn/consistent-function-scoping": "off",
+        "unicorn/no-useless-undefined": "off"
+      }
+    }
+  ],
+  "ignorePatterns": ["**/dist/**", "**/node_modules/**"]
 }

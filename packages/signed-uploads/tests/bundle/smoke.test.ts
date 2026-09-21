@@ -132,7 +132,7 @@ describe('server entry', () => {
   it('still enforces the lifetime ceiling in the bundle', () => {
     expect(() =>
       generateAuthToken('secret', { lifetime: 25 * 60 * 60 * 1000 })
-    ).toThrow(/86400/)
+    ).toThrow(/86400/u)
   })
 
   it('still generates a legacy signature', () => {
@@ -143,7 +143,7 @@ describe('server entry', () => {
       }
     )
 
-    expect(secureSignature).toMatch(/^[a-f0-9]{64}$/)
-    expect(secureExpire).toMatch(/^\d+$/)
+    expect(secureSignature).toMatch(/^[a-f0-9]{64}$/u)
+    expect(secureExpire).toMatch(/^\d+$/u)
   })
 })

@@ -18,7 +18,7 @@ describe('base64urlDecode', () => {
     // base64url replaces with `-` and `_`.
     const text = '<<??>>~~ÿ'
     const segment = encode(text)
-    expect(segment).not.toMatch(/[+/=]/)
+    expect(segment).not.toMatch(/[+/=]/u)
     expect(base64urlDecode(segment)).toBe(text)
   })
 

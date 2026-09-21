@@ -156,7 +156,7 @@ describe('AuthTokenCache', () => {
       .mockImplementation(() => fresh)
     const cache = new AuthTokenCache({ fetchToken })
 
-    cache.getToken()
+    void cache.getToken()
     await tick()
     cache.invalidate()
     expect(await cache.getToken()).toBe(fresh)
