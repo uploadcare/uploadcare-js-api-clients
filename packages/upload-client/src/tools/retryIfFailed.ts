@@ -1,9 +1,16 @@
+import type { ServerErrorCode } from './ServerErrorCode'
 import { UploadError } from './UploadError'
 import { retrier, NetworkError } from '@uploadcare/api-client-utils'
 
-const REQUEST_WAS_THROTTLED_CODE = 'RequestThrottledError'
+// `satisfies` so a renamed or mistyped server code fails to compile rather
+// than quietly never matching a response.
+const REQUEST_WAS_THROTTLED_CODE =
+  'RequestThrottledError' satisfies ServerErrorCode
+const TOKEN_EXPIRED_CODE = 'TokenExpiredError' satisfies ServerErrorCode
 const DEFAULT_RETRY_AFTER_TIMEOUT = 15000
 const DEFAULT_NETWORK_ERROR_TIMEOUT = 1000
+/** One refresh is enough: a second expiry means the new token is bad too. */
+const MAX_EXPIRED_TOKEN_RETRIES = 1
 
 function getTimeoutFromThrottledRequest(error: UploadError): number {
   const { headers } = error || {}
@@ -20,13 +27,29 @@ function getTimeoutFromThrottledRequest(error: UploadError): number {
 type RetryIfFailedOptions = {
   retryThrottledRequestMaxTimes: number
   retryNetworkErrorMaxTimes: number
+  /**
+   * Retry once on `TokenExpiredError`. Only makes sense when `fn` re-resolves
+   * the auth token on each attempt (i.e. `authToken` is a resolver function); a
+   * plain token would just fail again.
+   */
+  canRetryExpiredToken?: boolean
 }
 
 export function retryIfFailed<T>(
   fn: () => Promise<T>,
   options: RetryIfFailedOptions
 ): Promise<T> {
-  const { retryThrottledRequestMaxTimes, retryNetworkErrorMaxTimes } = options
+  const {
+    retryThrottledRequestMaxTimes,
+    retryNetworkErrorMaxTimes,
+    canRetryExpiredToken
+  } = options
+  // Counted separately from `attempt`, which the retrier shares with the
+  // throttle and network branches. Keyed off `attempt` instead, a token that
+  // expired after a throttle retry would never be refreshed, because `attempt`
+  // is already past the budget by the time the expiry is seen.
+  let expiredTokenRetries = 0
+
   return retrier(({ attempt, retry }) =>
     fn().catch((error: Error | UploadError | NetworkError) => {
       if (
@@ -35,6 +58,16 @@ export function retryIfFailed<T>(
         attempt < retryThrottledRequestMaxTimes
       ) {
         return retry(getTimeoutFromThrottledRequest(error))
+      }
+
+      if (
+        'response' in error &&
+        error?.code === TOKEN_EXPIRED_CODE &&
+        canRetryExpiredToken &&
+        expiredTokenRetries < MAX_EXPIRED_TOKEN_RETRIES
+      ) {
+        expiredTokenRetries += 1
+        return retry(0)
       }
 
       if (

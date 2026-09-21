@@ -2,6 +2,7 @@ import { ROUTES, RouteType } from '../routes'
 import { ALLOWED_PUBLIC_KEYS } from '../config'
 import error from '../utils/error'
 import { type Middleware } from 'koa'
+import type { ServerErrorCode } from '../../src/tools/ServerErrorCode'
 
 /** Routes protected by auth. */
 const protectedRoutes: Array<string> = ROUTES.filter((route: RouteType) => {
@@ -56,11 +57,99 @@ const isAuthorized = ({ url, publicKey }: IsAuthorizedParams) => {
   return !!(publicKey && ALLOWED_PUBLIC_KEYS.includes(publicKey))
 }
 
+/** JWTs recognized by the mock server. */
+const VALID_JWT = 'valid-jwt'
+const JWT_ERRORS: Record<
+  string,
+  { statusText: string; errorCode: ServerErrorCode }
+> = {
+  'expired-jwt': {
+    statusText: 'Token has expired.',
+    errorCode: 'TokenExpiredError'
+  },
+  'quota-jwt': {
+    statusText: 'Operation quota exhausted.',
+    errorCode: 'TokenOperationsExhaustedError'
+  },
+  'scope-jwt': {
+    statusText: 'Endpoint is not in the token scope.',
+    errorCode: 'TokenScopeForbiddenError'
+  }
+}
+
+/**
+ * Bearer token auth. Runs before the pub_key check whenever the header is
+ * present, so tests can prove the header actually reached the server (an
+ * invalid pub_key + valid JWT must succeed, an invalid JWT must fail even with
+ * a valid pub_key). Rejects requests carrying both auth schemes to lock in the
+ * client-side precedence rule (header wins, signature params dropped).
+ */
+const bearerAuth = (ctx: Parameters<Middleware>[0]): boolean => {
+  const authHeader = ctx.get('Authorization')
+
+  // Both parameters, not just `signature`: the client drops the pair together,
+  // so a request carrying either one alongside a Bearer token means something
+  // leaked, and the mock has to fail loudly for the test to catch it.
+  const hasLegacyParam = ['signature', 'expire'].some(
+    (name) => ctx.query[name] || (ctx.request.body && ctx.request.body[name])
+  )
+  if (hasLegacyParam) {
+    // A constant message. Naming the offending parameter would put a
+    // request-derived value into the response body, which is worth avoiding
+    // even in a mock and which Snyk flags as XSS.
+    error(ctx, {
+      status: 403,
+      statusText:
+        'Do not use `signature` or `expire` together with a Bearer token.',
+      errorCode: 'TokenInvalidError'
+    })
+    return false
+  }
+
+  if (!authHeader.startsWith('Bearer ')) {
+    error(ctx, {
+      status: 403,
+      statusText: 'Invalid Authorization header format.',
+      errorCode: 'TokenInvalidError'
+    })
+    return false
+  }
+
+  const jwt = authHeader.slice('Bearer '.length)
+
+  if (JWT_ERRORS[jwt]) {
+    error(ctx, { status: 403, ...JWT_ERRORS[jwt] })
+    return false
+  }
+
+  if (jwt !== VALID_JWT) {
+    error(ctx, {
+      status: 403,
+      statusText: 'Token is invalid.',
+      errorCode: 'TokenInvalidError'
+    })
+    return false
+  }
+
+  return true
+}
+
 /** Uploadcare Auth middleware. */
 const auth: Middleware = (ctx, next) => {
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const urlWithSlash = ctx.url.split('?').shift()!
   const url = urlWithSlash.substring(0, urlWithSlash.length - 1)
+
+  // Keyed off the header, not `isProtected`. A real server validates a token
+  // wherever one is sent, and the client sends it on unprotected routes too,
+  // such as the `/from_url/status` poller. Gating on `isProtected` meant those
+  // requests were never checked and an expired token sailed through.
+  if (ctx.get('Authorization')) {
+    if (bearerAuth(ctx)) {
+      next()
+    }
+    return
+  }
 
   let key = 'pub_key'
   const params: IsAuthorizedParams = {
