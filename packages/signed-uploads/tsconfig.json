@@ -2,7 +2,9 @@
   "extends": "../../tsconfig.json",
   "compilerOptions": {
     "noEmit": true,
-    "types": ["vitest"],
+    // `node` is explicit: the server entry imports `node:crypto`, and vitest 4
+    // no longer drags the Node types in on its own.
+    "types": ["vitest", "node"],
     "noUncheckedIndexedAccess": true
   },
   // `vite.config.ts` is deliberately out: `vite-plugin-dts` ships declarations
