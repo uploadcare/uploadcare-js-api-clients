@@ -9,7 +9,6 @@ import defaultSettings from '../defaultSettings'
 import { createUploadError } from '../tools/createUploadError'
 import { retryIfFailed } from '../tools/retryIfFailed'
 import buildFormData from '../tools/buildFormData'
-import { isAuthTokenResolver } from '../tools/resolveAuthToken'
 import { getRequestHeaders } from '../tools/getRequestHeaders'
 import { getSecureParams } from '../tools/getSecureParams'
 import { AuthToken } from '../types'
@@ -92,7 +91,7 @@ export default function group(
     {
       retryNetworkErrorMaxTimes,
       retryThrottledRequestMaxTimes,
-      canRetryExpiredToken: isAuthTokenResolver(authToken)
+      authToken
     }
   )
 }

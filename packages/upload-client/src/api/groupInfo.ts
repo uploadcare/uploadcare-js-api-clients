@@ -8,7 +8,6 @@ import getUrl from '../tools/getUrl'
 import defaultSettings from '../defaultSettings'
 import { createUploadError } from '../tools/createUploadError'
 import { retryIfFailed } from '../tools/retryIfFailed'
-import { isAuthTokenResolver } from '../tools/resolveAuthToken'
 import { getRequestHeaders } from '../tools/getRequestHeaders'
 import { AuthToken } from '../types'
 
@@ -79,7 +78,7 @@ export default function groupInfo(
     {
       retryThrottledRequestMaxTimes,
       retryNetworkErrorMaxTimes,
-      canRetryExpiredToken: isAuthTokenResolver(authToken)
+      authToken
     }
   )
 }

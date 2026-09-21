@@ -9,7 +9,6 @@ import defaultSettings from '../defaultSettings'
 import { createUploadError } from '../tools/createUploadError'
 import { retryIfFailed } from '../tools/retryIfFailed'
 import { ServerErrorCode } from '../tools/ServerErrorCode'
-import { isAuthTokenResolver } from '../tools/resolveAuthToken'
 import { getRequestHeaders } from '../tools/getRequestHeaders'
 import { AuthToken } from '../types'
 
@@ -123,7 +122,7 @@ export default function fromUrlStatus(
     {
       retryNetworkErrorMaxTimes,
       retryThrottledRequestMaxTimes,
-      canRetryExpiredToken: isAuthTokenResolver(authToken)
+      authToken
     }
   )
 }

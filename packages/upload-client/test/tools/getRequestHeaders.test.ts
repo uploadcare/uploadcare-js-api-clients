@@ -1,4 +1,4 @@
-import { expect } from '@jest/globals'
+import { expect, jest } from '@jest/globals'
 import { getRequestHeaders } from '../../src/tools/getRequestHeaders'
 
 describe('getRequestHeaders', () => {
@@ -14,6 +14,18 @@ describe('getRequestHeaders', () => {
     const headers = await getRequestHeaders({ authToken: 'jwt' })
 
     expect(headers).toEqual({ Authorization: 'Bearer jwt' })
+  })
+
+  it('should call a sync resolver', async () => {
+    const resolver = jest.fn(() => 'jwt-token')
+    const headers = await getRequestHeaders({ authToken: resolver })
+
+    expect(headers).toEqual({ Authorization: 'Bearer jwt-token' })
+    expect(resolver).toHaveBeenCalledTimes(1)
+  })
+
+  it('should send no Authorization header when the resolver returns nothing', async () => {
+    expect(await getRequestHeaders({ authToken: () => '' })).toEqual({})
   })
 
   it('should resolve an auth token resolver per call', async () => {

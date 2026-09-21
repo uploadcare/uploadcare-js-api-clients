@@ -8,7 +8,6 @@ import getUrl from '../tools/getUrl'
 import defaultSettings from '../defaultSettings'
 import { retryIfFailed } from '../tools/retryIfFailed'
 import { createUploadError } from '../tools/createUploadError'
-import { isAuthTokenResolver } from '../tools/resolveAuthToken'
 import { getRequestHeaders } from '../tools/getRequestHeaders'
 import { AuthToken } from '../types'
 
@@ -76,7 +75,7 @@ export default function multipartComplete(
     {
       retryThrottledRequestMaxTimes,
       retryNetworkErrorMaxTimes,
-      canRetryExpiredToken: isAuthTokenResolver(authToken)
+      authToken
     }
   )
 }

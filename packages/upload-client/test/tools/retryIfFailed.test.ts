@@ -214,7 +214,7 @@ describe('retryIfFailed', () => {
         retryIfFailed<number>(task, {
           retryThrottledRequestMaxTimes: 10,
           retryNetworkErrorMaxTimes: 0,
-          canRetryExpiredToken: true
+          authToken: () => 'jwt-token'
         })
       ).resolves.toBe(0)
       expect(spy).toHaveBeenCalledTimes(3)
@@ -250,20 +250,20 @@ describe('retryIfFailed', () => {
         retryIfFailed<number>(task, {
           retryThrottledRequestMaxTimes: 0,
           retryNetworkErrorMaxTimes: 0,
-          canRetryExpiredToken: true
+          authToken: () => 'jwt-token'
         })
       ).resolves.toBe(0)
       expect(spy).toHaveBeenCalledTimes(2)
     })
 
-    it('should not retry without a resolver, since the token cannot change', async () => {
+    it('should not retry a plain token, since it cannot change', async () => {
       const { spy, task } = createRunner({ error: expiredTokenError })
 
       await expect(
         retryIfFailed<number>(task, {
           retryThrottledRequestMaxTimes: 0,
           retryNetworkErrorMaxTimes: 0,
-          canRetryExpiredToken: false
+          authToken: 'jwt-token'
         })
       ).rejects.toThrowError(expiredTokenError)
       expect(spy).toHaveBeenCalledTimes(1)
@@ -276,7 +276,7 @@ describe('retryIfFailed', () => {
         retryIfFailed<number>(task, {
           retryThrottledRequestMaxTimes: 0,
           retryNetworkErrorMaxTimes: 0,
-          canRetryExpiredToken: true
+          authToken: () => 'jwt-token'
         })
       ).rejects.toThrowError(expiredTokenError)
       expect(spy).toHaveBeenCalledTimes(2)

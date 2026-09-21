@@ -4,7 +4,6 @@ import defaultSettings from '../defaultSettings'
 import { camelizeKeys, CustomUserAgent } from '@uploadcare/api-client-utils'
 import { createUploadError } from '../tools/createUploadError'
 import { retryIfFailed } from '../tools/retryIfFailed'
-import { isAuthTokenResolver } from '../tools/resolveAuthToken'
 import { getRequestHeaders } from '../tools/getRequestHeaders'
 
 /* Types */
@@ -80,7 +79,7 @@ export default function info(
     {
       retryThrottledRequestMaxTimes,
       retryNetworkErrorMaxTimes,
-      canRetryExpiredToken: isAuthTokenResolver(authToken)
+      authToken
     }
   )
 }

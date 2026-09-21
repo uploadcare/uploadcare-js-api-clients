@@ -16,7 +16,6 @@ import { retryIfFailed } from '../tools/retryIfFailed'
 import { FailedResponse } from '../request/types'
 import { getContentType } from '../tools/getContentType'
 import { getFileName } from '../tools/getFileName'
-import { isAuthTokenResolver } from '../tools/resolveAuthToken'
 import { getRequestHeaders } from '../tools/getRequestHeaders'
 import { getSecureParams } from '../tools/getSecureParams'
 import { getStoreValue } from '../tools/getStoreValue'
@@ -124,7 +123,7 @@ export default function base(
     {
       retryNetworkErrorMaxTimes,
       retryThrottledRequestMaxTimes,
-      canRetryExpiredToken: isAuthTokenResolver(authToken)
+      authToken
     }
   )
 }

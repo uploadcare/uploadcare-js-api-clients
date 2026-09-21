@@ -1,5 +1,7 @@
 import type { ServerErrorCode } from './ServerErrorCode'
+import { isAuthTokenResolver } from './resolveAuthToken'
 import { UploadError } from './UploadError'
+import type { AuthToken } from '../types'
 import { retrier, NetworkError } from '@uploadcare/api-client-utils'
 
 // `satisfies` so a renamed or mistyped server code fails to compile rather
@@ -28,11 +30,11 @@ type RetryIfFailedOptions = {
   retryThrottledRequestMaxTimes: number
   retryNetworkErrorMaxTimes: number
   /**
-   * Retry once on `TokenExpiredError`. Only makes sense when `fn` re-resolves
-   * the auth token on each attempt (i.e. `authToken` is a resolver function); a
-   * plain token would just fail again.
+   * The request's auth token, if it has one. Only a resolver can produce a
+   * fresh one, so it is what decides whether an expired token is worth
+   * retrying; a plain token would just fail again.
    */
-  canRetryExpiredToken?: boolean
+  authToken?: AuthToken
 }
 
 export function retryIfFailed<T>(
@@ -42,8 +44,9 @@ export function retryIfFailed<T>(
   const {
     retryThrottledRequestMaxTimes,
     retryNetworkErrorMaxTimes,
-    canRetryExpiredToken
+    authToken
   } = options
+  const canRetryExpiredToken = isAuthTokenResolver(authToken)
   // Counted separately from `attempt`, which the retrier shares with the
   // throttle and network branches. Keyed off `attempt` instead, a token that
   // expired after a throttle retry would never be refreshed, because `attempt`
@@ -53,16 +56,16 @@ export function retryIfFailed<T>(
   return retrier(({ attempt, retry }) =>
     fn().catch((error: Error | UploadError | NetworkError) => {
       if (
-        'response' in error &&
-        error?.code === REQUEST_WAS_THROTTLED_CODE &&
+        error instanceof UploadError &&
+        error.code === REQUEST_WAS_THROTTLED_CODE &&
         attempt < retryThrottledRequestMaxTimes
       ) {
         return retry(getTimeoutFromThrottledRequest(error))
       }
 
       if (
-        'response' in error &&
-        error?.code === TOKEN_EXPIRED_CODE &&
+        error instanceof UploadError &&
+        error.code === TOKEN_EXPIRED_CODE &&
         canRetryExpiredToken &&
         expiredTokenRetries < MAX_EXPIRED_TOKEN_RETRIES
       ) {
