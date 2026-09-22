@@ -21,9 +21,19 @@ type Claims = {
   uc?: { restrictions?: { scope?: unknown; limits?: { operations?: unknown } } }
 }
 
-export type TokenRejection = { statusText: string; errorCode: ServerErrorCode }
+/**
+ * Statuses are the ones the Upload API answers with, measured rather than
+ * assumed: 401 for a token it will not accept at all, 403 for one it accepts
+ * but whose restrictions forbid the request.
+ */
+export type TokenRejection = {
+  status: number
+  statusText: string
+  errorCode: ServerErrorCode
+}
 
 const invalid = (reason: string): TokenRejection => ({
+  status: 401,
   statusText: `Invalid token. Reason: ${reason}`,
   errorCode: 'AccessTokenInvalidError'
 })
@@ -91,6 +101,7 @@ export const verifyAuthToken = (
   }
   if (claims.exp + CLOCK_LEEWAY_SECONDS < Date.now() / 1000) {
     return {
+      status: 401,
       statusText: 'Expired token.',
       errorCode: 'AccessTokenExpiredError'
     }
@@ -99,6 +110,7 @@ export const verifyAuthToken = (
   const { scope, limits } = claims.uc?.restrictions ?? {}
   if (Array.isArray(scope) && !isInScope(scope as string[], path)) {
     return {
+      status: 403,
       statusText: '`uc.restrictions.scope` does not allow this endpoint.',
       errorCode: 'ScopeForbiddenError'
     }
@@ -110,6 +122,7 @@ export const verifyAuthToken = (
     operationsSpent.set(token, spent)
     if (spent > operations) {
       return {
+        status: 403,
         statusText: 'The operation limit of the token is exhausted.',
         errorCode: 'OperationsLimitExceededError'
       }

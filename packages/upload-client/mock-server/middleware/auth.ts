@@ -98,7 +98,7 @@ const bearerAuth = (ctx: Parameters<Middleware>[0], path: string): boolean => {
 
   if (!authHeader.startsWith('Bearer ')) {
     error(ctx, {
-      status: 403,
+      status: 401,
       statusText: 'Invalid Authorization header format.',
       errorCode: 'AccessTokenInvalidError'
     })
@@ -107,7 +107,7 @@ const bearerAuth = (ctx: Parameters<Middleware>[0], path: string): boolean => {
 
   const rejection = verifyAuthToken(authHeader.slice('Bearer '.length), path)
   if (rejection) {
-    error(ctx, { status: 403, ...rejection })
+    error(ctx, rejection)
     return false
   }
 
@@ -157,7 +157,7 @@ const auth: Middleware = (ctx, next) => {
   // integration tests run against does.
   if (params.publicKey === SIGNED_UPLOADS_PUBLIC_KEY) {
     error(ctx, {
-      status: 403,
+      status: 400,
       statusText: '`signature` is required.',
       errorCode: 'SignatureRequiredError'
     })

@@ -7,6 +7,7 @@ import group from '../../src/api/group'
 import { uploadDirect } from '../../src/uploadFile/uploadDirect'
 import { uploadFile } from '../../src/uploadFile/uploadFile'
 import { uploadMultipart } from '../../src/uploadFile/uploadMultipart'
+import { AuthTokenResolverError } from '@uploadcare/signed-uploads/client'
 import { AuthError } from '../../src/tools/AuthError'
 import { UploadError } from '../../src/tools/UploadError'
 import {
@@ -200,6 +201,66 @@ describeContract('authToken', () => {
 
     expect(error).toBeInstanceOf(AuthError)
     expect(error?.code).toBe('OperationsLimitExceededError')
+  })
+
+  it('should report an auth failure as an UploadError carrying its response', async () => {
+    const error = await caught(
+      base(fileToUpload.data, { ...settings, authToken: 'not-a-jwt' })
+    )
+
+    // `AuthError` extends `UploadError`, which is the documented way to catch
+    // every failure this client throws.
+    expect(error).toBeInstanceOf(UploadError)
+    expect(error?.message).toEqual(expect.any(String))
+    expect(error?.message).not.toBe('')
+    // The context the error type exists to carry, rather than a bare code.
+    expect(error?.request).toBeDefined()
+    expect(error?.response?.error?.errorCode).toBe(error?.code)
+    // 401 for a token the API will not accept at all; scope and operation
+    // failures answer 403, and a missing credential 400.
+    expect(error?.response?.error?.statusCode).toBe(401)
+  })
+
+  it('should surface a throwing token function as AuthTokenResolverError', async () => {
+    // The failure every integrator meets first: their own token endpoint is
+    // down. Nothing was sent, so there is no server code and nothing to retry.
+    const cause = new Error('token endpoint is down')
+    const resolver = jest.fn(() => {
+      throw cause
+    })
+
+    const error = await caught(
+      base(fileToUpload.data, { ...settings, authToken: resolver })
+    )
+
+    expect(error).toBeInstanceOf(AuthTokenResolverError)
+    expect((error as unknown as { cause: unknown })?.cause).toBe(cause)
+    expect(error?.code).toBeUndefined()
+    expect(resolver).toHaveBeenCalledTimes(1)
+  })
+
+  it('should reject a rejecting token function the same way', async () => {
+    const error = await caught(
+      base(fileToUpload.data, {
+        ...settings,
+        authToken: async () => {
+          throw new Error('401 from the token endpoint')
+        }
+      })
+    )
+
+    expect(error).toBeInstanceOf(AuthTokenResolverError)
+    expect(error?.message).toContain('401 from the token endpoint')
+  })
+
+  it('should treat an empty token as no token at all', async () => {
+    // `getAuthHeaders` sends no header for an empty string, so this reaches the
+    // server unauthenticated rather than with `Bearer `.
+    const error = await caught(
+      base(fileToUpload.data, { ...settings, authToken: () => '' })
+    )
+
+    expect(error?.code).toBe('SignatureRequiredError')
   })
 
   it('should authenticate a from_url request', async () => {
