@@ -26,6 +26,13 @@ const isProtected = (url: string) =>
   !!protectedRoutes.filter((path: string) => url === path).length
 
 /**
+ * Endpoints the Upload API does not authenticate even when a token is sent.
+ * `/from_url/status/` is keyed by the from_url token in the query string and
+ * ignores the `Authorization` header entirely.
+ */
+const isTokenExempt = (path: string) => path === '/from_url/status/'
+
+/**
  * Get public key value from request.
  *
  * @param {Record<string, string>} source
@@ -113,11 +120,11 @@ const auth: Middleware = (ctx, next) => {
   const urlWithSlash = ctx.url.split('?').shift()!
   const url = urlWithSlash.substring(0, urlWithSlash.length - 1)
 
-  // Keyed off the header, not `isProtected`. A real server validates a token
-  // wherever one is sent, and the client sends it on unprotected routes too,
-  // such as the `/from_url/status` poller. Gating on `isProtected` meant those
-  // requests were never checked and an expired token sailed through.
-  if (ctx.get('Authorization')) {
+  // Keyed off the header rather than `isProtected`, so a token is checked
+  // wherever one is sent — with the one exemption the Upload API itself makes.
+  // Verified against it: `/from_url/status/` answers identically with a
+  // rubbish Bearer token and with none at all.
+  if (ctx.get('Authorization') && !isTokenExempt(urlWithSlash)) {
     if (bearerAuth(ctx, urlWithSlash)) {
       next()
     }

@@ -3,7 +3,6 @@ import { generateAuthToken } from '@uploadcare/signed-uploads'
 import { expect, jest } from '@jest/globals'
 import base from '../../src/api/base'
 import fromUrl from '../../src/api/fromUrl'
-import fromUrlStatus from '../../src/api/fromUrlStatus'
 import group from '../../src/api/group'
 import { uploadDirect } from '../../src/uploadFile/uploadDirect'
 import { uploadFile } from '../../src/uploadFile/uploadFile'
@@ -202,21 +201,63 @@ describeContract('authToken', () => {
     expect(error).toBeInstanceOf(AuthError)
     expect(error?.code).toBe('OperationsLimitExceededError')
   })
-})
 
-/**
- * Cases that need a server willing to answer with a public key it would
- * otherwise refuse: an invalid one plus a valid token must succeed, which is
- * what proves the header reached the server and was used. Production has no
- * such project, so these stay on the mock.
- */
-describeMockOnly('authToken (mock server only)', () => {
-  const fileToUpload = factory.image('blackSquare')
-  const settings = getSettingsForTesting({
-    publicKey: SIGNED_UPLOADS_PUBLIC_KEY
+  it('should authenticate a from_url request', async () => {
+    const { uuid, cdnUrl } = await uploadFile(fileToUpload.data, {
+      ...settings,
+      authToken: mintToken()
+    })
+    expect(uuid).toEqual(expect.any(String))
+
+    // Re-uploading a file we just put there keeps this self-contained: the
+    // source is a URL the project itself serves.
+    const response = await fromUrl(cdnUrl, {
+      ...settings,
+      authToken: mintToken()
+    })
+    expect(response.type).toBeDefined()
+
+    // Deliberately nothing about `/from_url/status/`: the Upload API answers it
+    // identically with a rubbish Bearer token and with none at all, so there is
+    // no behaviour there for either server to hold to.
   })
-  const settingsWithInvalidKey = getSettingsForTesting({
-    publicKey: factory.publicKey('invalid')
+
+  it('should authenticate group creation', async () => {
+    const { uuid } = await uploadFile(fileToUpload.data, {
+      ...settings,
+      authToken: mintToken()
+    })
+
+    const groupInfo = await group([uuid], {
+      ...settings,
+      authToken: mintToken()
+    })
+
+    expect(groupInfo.id).toBeTruthy()
+  })
+
+  it('should authenticate the info requests a poller makes', async () => {
+    // uploadDirect = base + isReadyPoll(info). The upload alone would pass with
+    // an unauthenticated poll, so this only completes if `/info/` carried the
+    // token as well.
+    const file = await uploadDirect(fileToUpload.data, {
+      ...settings,
+      authToken: mintToken()
+    })
+
+    expect(file.uuid).toBeTruthy()
+  })
+
+  it('should authenticate multipart start and complete, and leave the parts bare', async () => {
+    // Part uploads go to presigned storage URLs, which reject a request
+    // carrying an `Authorization` header of their own, so completing proves
+    // both halves of that: start/complete authenticated, parts not.
+    const file = await uploadMultipart(factory.file(12).data, {
+      ...settings,
+      authToken: mintToken()
+    })
+
+    expect(file.cdnUrl).toBeTruthy()
   })
 
   it('should drop legacy signature params when authToken is set', async () => {
@@ -224,8 +265,8 @@ describeMockOnly('authToken (mock server only)', () => {
       .spyOn(console, 'warn')
       .mockImplementation(() => undefined)
     try {
-      // The mock rejects requests carrying both auth schemes, so success here
-      // proves signature/expire were not sent.
+      // A request carrying both is checked the old way, and these values are
+      // nonsense, so success proves `signature`/`expire` were never sent.
       const { file } = await base(fileToUpload.data, {
         ...settings,
         authToken: mintToken(),
@@ -239,61 +280,20 @@ describeMockOnly('authToken (mock server only)', () => {
       warnSpy.mockRestore()
     }
   })
+})
 
-  it('should send the header on from_url requests', async () => {
-    const response = await fromUrl(factory.imageUrl('valid'), {
-      ...settingsWithInvalidKey,
+/**
+ * The one thing production cannot answer: a public key it would refuse,
+ * carrying a valid token. Succeeding there is what proves the header is read
+ * before the key, and no real project will play along.
+ */
+describeMockOnly('authToken (mock server only)', () => {
+  it('should check the header before the public key', async () => {
+    const { file } = await base(factory.image('blackSquare').data, {
+      ...getSettingsForTesting({ publicKey: factory.publicKey('invalid') }),
       authToken: mintToken()
     })
 
-    expect(response.type).toBeDefined()
-  })
-
-  it('should send the header on group creation', async () => {
-    const groupInfo = await group(factory.groupOfFiles('valid'), {
-      ...settingsWithInvalidKey,
-      authToken: mintToken()
-    })
-
-    expect(groupInfo.id).toBeTruthy()
-  })
-
-  it('should send the header on the info requests the pollers make', async () => {
-    // uploadDirect = base + isReadyPoll(info); both are protected routes, so
-    // completing with an invalid public key proves the poller carried the
-    // token too.
-    const file = await uploadDirect(fileToUpload.data, {
-      ...settingsWithInvalidKey,
-      authToken: mintToken()
-    })
-
-    expect(file.uuid).toBeTruthy()
-  })
-
-  it('should validate the token on the from_url status poller', async () => {
-    // `/from_url/status` is an unprotected route, so the mock used to skip the
-    // bearer check there and an invalid token sailed through the poller.
-    const error = await caught(
-      fromUrlStatus(factory.token('valid'), {
-        ...settings,
-        authToken: 'not-a-jwt'
-      })
-    )
-
-    expect(error).toBeInstanceOf(AuthError)
-    expect(error?.code).toBe('AccessTokenInvalidError')
-  })
-
-  it('should authorize multipart start/complete but keep part uploads bare', async () => {
-    // The mock storage endpoint drops the connection when it receives an
-    // Authorization header, so this only completes if start/complete carry the
-    // token (invalid public key otherwise) and the part PUTs do not.
-    const bigFile = factory.file(12).data
-    const file = await uploadMultipart(bigFile, {
-      ...settingsWithInvalidKey,
-      authToken: mintToken()
-    })
-
-    expect(file.cdnUrl).toBeTruthy()
+    expect(typeof file).toBe('string')
   })
 })
