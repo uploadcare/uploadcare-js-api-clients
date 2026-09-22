@@ -7,9 +7,9 @@
   "workspaces": [
     "packages/api-client-utils",
     "packages/cname-prefix",
+    "packages/signed-uploads",
     "packages/upload-client",
     "packages/rest-client",
-    "packages/signed-uploads",
     "packages/image-shrink",
     "packages/quality-insights"
   ],

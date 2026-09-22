@@ -25,7 +25,7 @@ import {
 import { getContentType } from '../tools/getContentType'
 import { getFileName } from '../tools/getFileName'
 import { getFileSize } from '../tools/getFileSize'
-import { SupportedFileInput } from '../types'
+import { AuthToken, SupportedFileInput } from '../types'
 
 export type MultipartOptions = {
   publicKey: string
@@ -36,6 +36,7 @@ export type MultipartOptions = {
   baseURL?: string
   secureSignature?: string
   secureExpire?: string
+  authToken?: AuthToken
   store?: StoreValue
   signal?: AbortSignal
   onProgress?: ProgressCallback<ComputableProgressInfo>
@@ -84,6 +85,7 @@ export const uploadMultipart = async (
     baseURL,
     secureSignature,
     secureExpire,
+    authToken,
     store,
 
     signal,
@@ -142,6 +144,7 @@ export const uploadMultipart = async (
     baseURL,
     secureSignature,
     secureExpire,
+    authToken,
     store,
     signal,
     source,
@@ -178,6 +181,7 @@ export const uploadMultipart = async (
       multipartComplete(uuid, {
         publicKey,
         baseURL,
+        authToken,
         source,
         integration,
         userAgent,
@@ -192,6 +196,7 @@ export const uploadMultipart = async (
       return isReadyPoll(fileInfo.uuid, {
         publicKey,
         baseURL,
+        authToken,
         source,
         integration,
         userAgent,

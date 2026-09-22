@@ -45,6 +45,19 @@ const throttledError = new UploadError(
   { 'retry-after': '1' }
 )
 
+const expiredTokenError = new UploadError(
+  'Expired token.',
+  'AccessTokenExpiredError',
+  undefined,
+  {
+    error: {
+      statusCode: 403,
+      content: 'Expired token.',
+      errorCode: 'AccessTokenExpiredError'
+    }
+  }
+)
+
 const networkError = new NetworkError(
   new Event('ProgressEvent') as ProgressEvent
 )
@@ -183,6 +196,30 @@ describe('retryIfFailed', () => {
       expect(spy).toHaveBeenCalledTimes(1)
     })
 
+    it('should retry an expired token after a throttle retry', async () => {
+      // `attempt` is shared with the throttle branch, so keying the refresh off
+      // it meant a token that expired on a later attempt was never refreshed.
+      let runs = 0
+      const spy = jest.fn()
+      const task = () =>
+        Promise.resolve().then(() => {
+          spy()
+          runs += 1
+          if (runs === 1) throw throttledError
+          if (runs === 2) throw expiredTokenError
+          return 0
+        })
+
+      await expect(
+        retryIfFailed<number>(task, {
+          retryThrottledRequestMaxTimes: 10,
+          retryNetworkErrorMaxTimes: 0,
+          authToken: () => 'jwt-token'
+        })
+      ).resolves.toBe(0)
+      expect(spy).toHaveBeenCalledTimes(3)
+    })
+
     it('should increase timeout by 1 second on each attempt', async () => {
       const { task } = createRunner({ error: networkError, attempts: 4 })
 
@@ -200,6 +237,49 @@ describe('retryIfFailed', () => {
       expect(diff).toBeGreaterThanOrEqual(10000)
       // expect max ~4s spent on doing requests, it could be slow on CI and needs to be tested
       expect(diff).toBeLessThan(14000)
+    })
+  })
+  describe('Expired token', () => {
+    it('should retry once with a resolver', async () => {
+      const { spy, task } = createRunner({
+        attempts: 1,
+        error: expiredTokenError
+      })
+
+      await expect(
+        retryIfFailed<number>(task, {
+          retryThrottledRequestMaxTimes: 0,
+          retryNetworkErrorMaxTimes: 0,
+          authToken: () => 'jwt-token'
+        })
+      ).resolves.toBe(0)
+      expect(spy).toHaveBeenCalledTimes(2)
+    })
+
+    it('should not retry a plain token, since it cannot change', async () => {
+      const { spy, task } = createRunner({ error: expiredTokenError })
+
+      await expect(
+        retryIfFailed<number>(task, {
+          retryThrottledRequestMaxTimes: 0,
+          retryNetworkErrorMaxTimes: 0,
+          authToken: 'jwt-token'
+        })
+      ).rejects.toThrowError(expiredTokenError)
+      expect(spy).toHaveBeenCalledTimes(1)
+    })
+
+    it('should give up after one refresh, so a bad token cannot loop', async () => {
+      const { spy, task } = createRunner({ error: expiredTokenError })
+
+      await expect(
+        retryIfFailed<number>(task, {
+          retryThrottledRequestMaxTimes: 0,
+          retryNetworkErrorMaxTimes: 0,
+          authToken: () => 'jwt-token'
+        })
+      ).rejects.toThrowError(expiredTokenError)
+      expect(spy).toHaveBeenCalledTimes(2)
     })
   })
 })

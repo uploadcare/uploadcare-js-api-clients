@@ -8,18 +8,19 @@ import {
 import { defaultSettings } from '../defaultSettings'
 import request from '../request/request.node'
 import buildFormData from '../tools/buildFormData'
-import { UploadError } from '../tools/UploadError'
+import { createUploadError } from '../tools/createUploadError'
 import getUrl from '../tools/getUrl'
-import { getUserAgent } from '../tools/getUserAgent'
 import { retryIfFailed } from '../tools/retryIfFailed'
 
 /* Types */
 import { FailedResponse } from '../request/types'
 import { getContentType } from '../tools/getContentType'
 import { getFileName } from '../tools/getFileName'
+import { getRequestHeaders } from '../tools/getRequestHeaders'
+import { getSecureParams } from '../tools/getSecureParams'
 import { getStoreValue } from '../tools/getStoreValue'
 import { getTagsValue } from '../tools/getTagsValue'
-import { SupportedFileInput } from '../types'
+import { AuthToken, SupportedFileInput } from '../types'
 import { ProgressCallback, Uuid } from './types'
 
 export type BaseResponse = {
@@ -35,6 +36,7 @@ export type BaseOptions = {
   baseURL?: string
   secureSignature?: string
   secureExpire?: string
+  authToken?: AuthToken
   store?: StoreValue
   contentType?: string
 
@@ -63,6 +65,7 @@ export default function base(
     baseURL = defaultSettings.baseURL,
     secureSignature,
     secureExpire,
+    authToken,
     store,
     signal,
     onProgress,
@@ -76,15 +79,18 @@ export default function base(
   }: BaseOptions
 ): Promise<BaseResponse> {
   return retryIfFailed(
-    () =>
+    async () =>
       request({
         method: 'POST',
         url: getUrl(baseURL, '/base/', {
           jsonerrors: 1
         }),
-        headers: {
-          'X-UC-User-Agent': getUserAgent({ publicKey, integration, userAgent })
-        },
+        headers: await getRequestHeaders({
+          publicKey,
+          integration,
+          userAgent,
+          authToken
+        }),
         data: buildFormData({
           file: {
             data: file,
@@ -93,8 +99,7 @@ export default function base(
           },
           UPLOADCARE_PUB_KEY: publicKey,
           UPLOADCARE_STORE: getStoreValue(store),
-          signature: secureSignature,
-          expire: secureExpire,
+          ...getSecureParams({ authToken, secureSignature, secureExpire }),
           source: source,
           metadata,
           tags: getTagsValue(tags)
@@ -104,7 +109,7 @@ export default function base(
       }).then(({ data, headers, request }) => {
         const response = camelizeKeys<Response>(JSON.parse(data))
         if ('error' in response) {
-          throw new UploadError(
+          throw createUploadError(
             response.error.content,
             response.error.errorCode,
             request,
@@ -115,6 +120,10 @@ export default function base(
           return response
         }
       }),
-    { retryNetworkErrorMaxTimes, retryThrottledRequestMaxTimes }
+    {
+      retryNetworkErrorMaxTimes,
+      retryThrottledRequestMaxTimes,
+      authToken
+    }
   )
 }

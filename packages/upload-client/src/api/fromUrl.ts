@@ -12,11 +12,13 @@ import request from '../request/request.node'
 import getUrl from '../tools/getUrl'
 
 import defaultSettings from '../defaultSettings'
-import { getUserAgent } from '../tools/getUserAgent'
-import { UploadError } from '../tools/UploadError'
+import { createUploadError } from '../tools/createUploadError'
 import { retryIfFailed } from '../tools/retryIfFailed'
+import { getRequestHeaders } from '../tools/getRequestHeaders'
+import { getSecureParams } from '../tools/getSecureParams'
 import { getStoreValue } from '../tools/getStoreValue'
 import { getTagsValue } from '../tools/getTagsValue'
+import { AuthToken } from '../types'
 
 export enum TypeEnum {
   Token = 'token',
@@ -62,6 +64,7 @@ export type FromUrlOptions = {
   saveUrlForRecurrentUploads?: boolean
   secureSignature?: string
   secureExpire?: string
+  authToken?: AuthToken
 
   signal?: AbortSignal
 
@@ -87,6 +90,7 @@ export default function fromUrl(
     saveUrlForRecurrentUploads,
     secureSignature,
     secureExpire,
+    authToken,
     source = 'url',
     signal,
     integration,
@@ -98,12 +102,15 @@ export default function fromUrl(
   }: FromUrlOptions
 ): Promise<FromUrlSuccessResponse> {
   return retryIfFailed(
-    () =>
+    async () =>
       request({
         method: 'POST',
-        headers: {
-          'X-UC-User-Agent': getUserAgent({ publicKey, integration, userAgent })
-        },
+        headers: await getRequestHeaders({
+          publicKey,
+          integration,
+          userAgent,
+          authToken
+        }),
         url: getUrl(baseURL, '/from_url/', {
           jsonerrors: 1,
           pub_key: publicKey,
@@ -112,8 +119,7 @@ export default function fromUrl(
           filename: fileName,
           check_URL_duplicates: checkForUrlDuplicates ? 1 : undefined,
           save_URL_duplicates: saveUrlForRecurrentUploads ? 1 : undefined,
-          signature: secureSignature,
-          expire: secureExpire,
+          ...getSecureParams({ authToken, secureSignature, secureExpire }),
           source: source,
           metadata,
           tags: getTagsValue(tags)
@@ -123,7 +129,7 @@ export default function fromUrl(
         const response = camelizeKeys<Response>(JSON.parse(data))
 
         if ('error' in response) {
-          throw new UploadError(
+          throw createUploadError(
             response.error.content,
             response.error.errorCode,
             request,
@@ -134,6 +140,10 @@ export default function fromUrl(
           return response
         }
       }),
-    { retryNetworkErrorMaxTimes, retryThrottledRequestMaxTimes }
+    {
+      retryNetworkErrorMaxTimes,
+      retryThrottledRequestMaxTimes,
+      authToken
+    }
   )
 }

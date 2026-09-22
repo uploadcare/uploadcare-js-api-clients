@@ -6,10 +6,12 @@ import request from '../request/request.node'
 import getUrl from '../tools/getUrl'
 
 import defaultSettings from '../defaultSettings'
-import { getUserAgent } from '../tools/getUserAgent'
-import { UploadError } from '../tools/UploadError'
+import { createUploadError } from '../tools/createUploadError'
 import { retryIfFailed } from '../tools/retryIfFailed'
 import buildFormData from '../tools/buildFormData'
+import { getRequestHeaders } from '../tools/getRequestHeaders'
+import { getSecureParams } from '../tools/getSecureParams'
+import { AuthToken } from '../types'
 
 export type GroupOptions = {
   publicKey: string
@@ -18,6 +20,7 @@ export type GroupOptions = {
   jsonpCallback?: string
   secureSignature?: string
   secureExpire?: string
+  authToken?: AuthToken
 
   signal?: AbortSignal
 
@@ -40,6 +43,7 @@ export default function group(
     jsonpCallback,
     secureSignature,
     secureExpire,
+    authToken,
     signal,
     source,
     integration,
@@ -49,12 +53,15 @@ export default function group(
   }: GroupOptions
 ): Promise<GroupInfo> {
   return retryIfFailed(
-    () =>
+    async () =>
       request({
         method: 'POST',
-        headers: {
-          'X-UC-User-Agent': getUserAgent({ publicKey, integration, userAgent })
-        },
+        headers: await getRequestHeaders({
+          publicKey,
+          integration,
+          userAgent,
+          authToken
+        }),
         url: getUrl(baseURL, '/group/', {
           jsonerrors: 1
         }),
@@ -62,8 +69,7 @@ export default function group(
           files: uuids,
           callback: jsonpCallback,
           pub_key: publicKey,
-          signature: secureSignature,
-          expire: secureExpire,
+          ...getSecureParams({ authToken, secureSignature, secureExpire }),
           source
         }),
         signal
@@ -71,7 +77,7 @@ export default function group(
         const response = camelizeKeys<Response>(JSON.parse(data))
 
         if ('error' in response) {
-          throw new UploadError(
+          throw createUploadError(
             response.error.content,
             response.error.errorCode,
             request,
@@ -82,6 +88,10 @@ export default function group(
           return response
         }
       }),
-    { retryNetworkErrorMaxTimes, retryThrottledRequestMaxTimes }
+    {
+      retryNetworkErrorMaxTimes,
+      retryThrottledRequestMaxTimes,
+      authToken
+    }
   )
 }
