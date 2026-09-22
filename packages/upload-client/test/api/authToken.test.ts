@@ -349,6 +349,37 @@ describeContract('authToken', () => {
  * before the key, and no real project will play along.
  */
 describeMockOnly('authToken (mock server only)', () => {
+  it('should refresh an expired token that surfaces after a throttle retry', async () => {
+    // The sequence that made the refresh unreachable: the retrier's `attempt`
+    // counter is shared, so keying the refresh off it meant a token which
+    // expired on any attempt after the first was never replaced. Throttling is
+    // what puts another attempt in front of the expiry, and it cannot be
+    // provoked on demand against the Upload API.
+    let calls = 0
+    const resolver = jest.fn(() => {
+      calls += 1
+      // Valid for the throttled attempt, expired for the one after it.
+      return calls === 2 ? mintExpiredToken() : mintToken()
+    })
+
+    const startedAt = Date.now()
+    const { file } = await base(factory.image('blackSquare').data, {
+      ...getSettingsForTesting({ publicKey: SIGNED_UPLOADS_PUBLIC_KEY }),
+      authToken: resolver,
+      // Unique per run: the mock spends a throttle key once per process, and
+      // a fixed one would quietly stop throttling on the second run against the
+      // same server.
+      metadata: { mock_throttle: `auth-token-retry-${Date.now()}` },
+      retryThrottledRequestMaxTimes: 1
+    })
+
+    expect(typeof file).toBe('string')
+    // Throttled, expired, then accepted.
+    expect(resolver).toHaveBeenCalledTimes(3)
+    // `retry-after: 1`, so an immediate retry would land well under a second.
+    expect(Date.now() - startedAt).toBeGreaterThanOrEqual(1000)
+  })
+
   it('should check the header before the public key', async () => {
     const { file } = await base(factory.image('blackSquare').data, {
       ...getSettingsForTesting({ publicKey: factory.publicKey('invalid') }),
