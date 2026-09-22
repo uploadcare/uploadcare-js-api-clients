@@ -7,11 +7,11 @@ describe('createUploadError', () => {
   it('should create an AuthError for JWT auth codes', () => {
     const error = createUploadError(
       'Operation quota exhausted.',
-      'TokenOperationsExhaustedError'
+      'OperationsLimitExceededError'
     )
 
     expect(error).toBeInstanceOf(AuthError)
-    expect(error.code).toBe('TokenOperationsExhaustedError')
+    expect(error.code).toBe('OperationsLimitExceededError')
   })
 
   it('should create a plain UploadError otherwise', () => {
@@ -28,7 +28,7 @@ describe('createUploadError', () => {
     const headers = { 'x-request-id': 'test' }
     const error = createUploadError(
       'Token is invalid.',
-      'TokenInvalidError',
+      'AccessTokenInvalidError',
       undefined,
       undefined,
       headers

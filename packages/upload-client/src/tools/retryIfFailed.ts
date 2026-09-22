@@ -8,7 +8,7 @@ import { retrier, NetworkError } from '@uploadcare/api-client-utils'
 // than quietly never matching a response.
 const REQUEST_WAS_THROTTLED_CODE =
   'RequestThrottledError' satisfies ServerErrorCode
-const TOKEN_EXPIRED_CODE = 'TokenExpiredError' satisfies ServerErrorCode
+const TOKEN_EXPIRED_CODE = 'AccessTokenExpiredError' satisfies ServerErrorCode
 const DEFAULT_RETRY_AFTER_TIMEOUT = 15000
 const DEFAULT_NETWORK_ERROR_TIMEOUT = 1000
 /** One refresh is enough: a second expiry means the new token is bad too. */

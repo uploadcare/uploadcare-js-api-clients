@@ -13,6 +13,11 @@ jobs:
       UPLOAD_CLIENT_DEFAULT_PUBLIC_KEY: ${{ secrets.UPLOAD_CLIENT_DEFAULT_PUBLIC_KEY }}
       REST_CLIENT_DEFAULT_PUBLIC_KEY: ${{ secrets.REST_CLIENT_DEFAULT_PUBLIC_KEY }}
       REST_CLIENT_DEFAULT_SECRET_KEY: ${{ secrets.REST_CLIENT_DEFAULT_SECRET_KEY }}
+      # A project with Signed Uploads enabled, which rejects every unsigned
+      # request, so it cannot be the default one. Absent them, the JWT
+      # integration tests skip rather than fail.
+      UPLOAD_CLIENT_SECURE_UPLOADS_PUBLIC_KEY: ${{ secrets.UPLOAD_CLIENT_SECURE_UPLOADS_PUBLIC_KEY }}
+      UPLOAD_CLIENT_SECURE_UPLOADS_SECRET_KEY: ${{ secrets.UPLOAD_CLIENT_SECURE_UPLOADS_SECRET_KEY }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4

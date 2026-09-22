@@ -8,12 +8,12 @@ import { UploadError } from '../../src/tools/UploadError'
 
 describe('AuthError', () => {
   it('should be an UploadError with the raw server code', () => {
-    const error = new AuthError('Token has expired.', 'TokenExpiredError')
+    const error = new AuthError('Token has expired.', 'AccessTokenExpiredError')
 
     expect(error).toBeInstanceOf(AuthError)
     expect(error).toBeInstanceOf(UploadError)
     expect(error.name).toBe('AuthError')
-    expect(error.code).toBe('TokenExpiredError')
+    expect(error.code).toBe('AccessTokenExpiredError')
   })
 })
 

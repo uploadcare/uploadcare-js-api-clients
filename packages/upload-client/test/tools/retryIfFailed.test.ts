@@ -47,13 +47,13 @@ const throttledError = new UploadError(
 
 const expiredTokenError = new UploadError(
   'Expired token.',
-  'TokenExpiredError',
+  'AccessTokenExpiredError',
   undefined,
   {
     error: {
       statusCode: 403,
       content: 'Expired token.',
-      errorCode: 'TokenExpiredError'
+      errorCode: 'AccessTokenExpiredError'
     }
   }
 )

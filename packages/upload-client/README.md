@@ -368,9 +368,9 @@ info polling) with the token; the individual part uploads go directly to
 presigned storage URLs and never carry the header.
 
 Auth failures are thrown as `AuthError` (a subclass of `UploadError`) whose
-`code` holds the raw server error code: `TokenExpiredError` (refresh the
-token and retry), `TokenOperationsExhaustedError` and `TokenScopeForbiddenError` (final,
-don't retry), or `TokenInvalidError` (final):
+`code` holds the raw server error code: `AccessTokenExpiredError` (refresh the
+token and retry), `OperationsLimitExceededError` and `ScopeForbiddenError` (final,
+don't retry), or `AccessTokenInvalidError` (final):
 
 ```javascript
 import { AuthError } from '@uploadcare/upload-client'
@@ -378,7 +378,7 @@ import { AuthError } from '@uploadcare/upload-client'
 try {
   await client.uploadFile(fileData)
 } catch (error) {
-  if (error instanceof AuthError && error.code === 'TokenExpiredError') {
+  if (error instanceof AuthError && error.code === 'AccessTokenExpiredError') {
     // refresh the token and retry
   }
 }

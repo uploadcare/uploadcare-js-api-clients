@@ -8,10 +8,10 @@ import { UploadError, ErrorResponseInfo } from './UploadError'
  * instead of silently never matching a response.
  */
 export const AUTH_ERROR_CODES = [
-  'TokenExpiredError',
-  'TokenOperationsExhaustedError',
-  'TokenScopeForbiddenError',
-  'TokenInvalidError'
+  'AccessTokenExpiredError',
+  'OperationsLimitExceededError',
+  'ScopeForbiddenError',
+  'AccessTokenInvalidError'
 ] as const satisfies readonly ServerErrorCode[]
 
 export type AuthErrorCode = (typeof AUTH_ERROR_CODES)[number]
@@ -23,8 +23,8 @@ export const isAuthErrorCode = (
 
 /**
  * A JWT (Bearer token) auth failure reported by the Upload API. `code` always
- * holds the raw server error code: `TokenExpiredError` is the only one worth
- * refreshing the token and retrying for; the rest are final.
+ * holds the raw server error code: `AccessTokenExpiredError` is the only one
+ * worth refreshing the token and retrying for; the rest are final.
  */
 export class AuthError extends UploadError {
   declare readonly code: AuthErrorCode
