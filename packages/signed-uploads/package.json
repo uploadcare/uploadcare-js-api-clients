@@ -1,6 +1,6 @@
 {
   "name": "@uploadcare/signed-uploads",
-  "version": "6.21.0",
+  "version": "6.22.0",
   "description": "@uploadcare/signed-uploads secures uploads to Uploadcare. On the server it mints the credentials the Upload API expects: JWTs for the `Authorization: Bearer` scheme, with optional endpoint scope and operation limits, and the legacy {secureSignature, secureExpire} pair. In the browser, @uploadcare/signed-uploads/client caches a token and replaces it before it expires. Zero dependencies, full TypeScript support.",
   "type": "module",
   "main": "./dist/index.cjs",
