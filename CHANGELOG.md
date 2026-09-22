@@ -1,11 +1,6 @@
 # [6.22.0](https://github.com/uploadcare/uploadcare-js-api-clients/compare/v6.21.0...v6.22.0) (2026-09-22)
 
 
-### Bug Fixes
-
-* keep build configs out of the typedoc program ([#588](https://github.com/uploadcare/uploadcare-js-api-clients/issues/588)) ([e77f5d3](https://github.com/uploadcare/uploadcare-js-api-clients/commit/e77f5d35e52eddd4c8f0efd206d50f4387f14935))
-
-
 ### Features
 
 * JWT auth for the Upload API, minted and cached by @uploadcare/signed-uploads ([#587](https://github.com/uploadcare/uploadcare-js-api-clients/issues/587)) ([5073dba](https://github.com/uploadcare/uploadcare-js-api-clients/commit/5073dbaab4dcb1b4bade529cc32bd814db636469))
