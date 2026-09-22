@@ -1,4 +1,17 @@
 {
   "extends": "./tsconfig.json",
-  "exclude": ["**/node_modules/**", "**/*.test.ts", "**/test/**"],
+  // Without an `include`, the program is every file under the repo root. The
+  // build configs are in it only by accident, they pull in `vitest/config`, and
+  // two vitest majors in one tree (signed-uploads is on 4, the rest on 3)
+  // declare `test?:` on Vite's config incompatibly — which broke the docs build
+  // rather than anything the docs describe.
+  "exclude": [
+    "**/node_modules/**",
+    "**/*.test.ts",
+    "**/test/**",
+    "**/tests/**",
+    "**/vite.config.ts",
+    "**/vitest.config.ts",
+    "**/vitest.*.config.ts"
+  ],
 }
