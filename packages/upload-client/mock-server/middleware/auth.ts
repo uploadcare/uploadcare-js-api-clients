@@ -1,8 +1,8 @@
 import { ROUTES, RouteType } from '../routes'
-import { ALLOWED_PUBLIC_KEYS } from '../config'
+import { ALLOWED_PUBLIC_KEYS, SIGNED_UPLOADS_PUBLIC_KEY } from '../config'
 import error from '../utils/error'
+import { verifyAuthToken } from '../utils/verifyAuthToken'
 import { type Middleware } from 'koa'
-import type { ServerErrorCode } from '../../src/tools/ServerErrorCode'
 
 /** Routes protected by auth. */
 const protectedRoutes: Array<string> = ROUTES.filter((route: RouteType) => {
@@ -57,34 +57,17 @@ const isAuthorized = ({ url, publicKey }: IsAuthorizedParams) => {
   return !!(publicKey && ALLOWED_PUBLIC_KEYS.includes(publicKey))
 }
 
-/** JWTs recognized by the mock server. */
-const VALID_JWT = 'valid-jwt'
-const JWT_ERRORS: Record<
-  string,
-  { statusText: string; errorCode: ServerErrorCode }
-> = {
-  'expired-jwt': {
-    statusText: 'Token has expired.',
-    errorCode: 'AccessTokenExpiredError'
-  },
-  'quota-jwt': {
-    statusText: 'Operation quota exhausted.',
-    errorCode: 'OperationsLimitExceededError'
-  },
-  'scope-jwt': {
-    statusText: 'Endpoint is not in the token scope.',
-    errorCode: 'ScopeForbiddenError'
-  }
-}
-
 /**
  * Bearer token auth. Runs before the pub_key check whenever the header is
  * present, so tests can prove the header actually reached the server (an
  * invalid pub_key + valid JWT must succeed, an invalid JWT must fail even with
  * a valid pub_key). Rejects requests carrying both auth schemes to lock in the
  * client-side precedence rule (header wins, signature params dropped).
+ *
+ * The token itself is verified for real by `verifyAuthToken`, so the same tests
+ * can run against this server and against the Upload API.
  */
-const bearerAuth = (ctx: Parameters<Middleware>[0]): boolean => {
+const bearerAuth = (ctx: Parameters<Middleware>[0], path: string): boolean => {
   const authHeader = ctx.get('Authorization')
 
   // Both parameters, not just `signature`: the client drops the pair together,
@@ -115,19 +98,9 @@ const bearerAuth = (ctx: Parameters<Middleware>[0]): boolean => {
     return false
   }
 
-  const jwt = authHeader.slice('Bearer '.length)
-
-  if (JWT_ERRORS[jwt]) {
-    error(ctx, { status: 403, ...JWT_ERRORS[jwt] })
-    return false
-  }
-
-  if (jwt !== VALID_JWT) {
-    error(ctx, {
-      status: 403,
-      statusText: 'Token is invalid.',
-      errorCode: 'AccessTokenInvalidError'
-    })
+  const rejection = verifyAuthToken(authHeader.slice('Bearer '.length), path)
+  if (rejection) {
+    error(ctx, { status: 403, ...rejection })
     return false
   }
 
@@ -145,7 +118,7 @@ const auth: Middleware = (ctx, next) => {
   // such as the `/from_url/status` poller. Gating on `isProtected` meant those
   // requests were never checked and an expired token sailed through.
   if (ctx.get('Authorization')) {
-    if (bearerAuth(ctx)) {
+    if (bearerAuth(ctx, urlWithSlash)) {
       next()
     }
     return
@@ -170,6 +143,18 @@ const auth: Middleware = (ctx, next) => {
   ) {
     key = 'UPLOADCARE_PUB_KEY'
     params.publicKey = getPublicKeyFromSource(ctx.request.body, key)
+  }
+
+  // The stand-in for a project with Signed Uploads on: no credential, no
+  // upload, whatever the endpoint. Mirrors what the real project the
+  // integration tests run against does.
+  if (params.publicKey === SIGNED_UPLOADS_PUBLIC_KEY) {
+    error(ctx, {
+      status: 403,
+      statusText: '`signature` is required.',
+      errorCode: 'SignatureRequiredError'
+    })
+    return
   }
 
   if (isAuthorized(params)) {

@@ -1,107 +1,160 @@
+import { createHash, createHmac } from 'node:crypto'
+import { generateAuthToken } from '@uploadcare/signed-uploads'
+import { expect, jest } from '@jest/globals'
 import base from '../../src/api/base'
 import fromUrl from '../../src/api/fromUrl'
 import fromUrlStatus from '../../src/api/fromUrlStatus'
 import group from '../../src/api/group'
 import { uploadDirect } from '../../src/uploadFile/uploadDirect'
+import { uploadFile } from '../../src/uploadFile/uploadFile'
 import { uploadMultipart } from '../../src/uploadFile/uploadMultipart'
 import { AuthError } from '../../src/tools/AuthError'
 import { UploadError } from '../../src/tools/UploadError'
+import {
+  SIGNED_UPLOADS_PUBLIC_KEY,
+  SIGNED_UPLOADS_SECRET_KEY
+} from '../../mock-server/config'
 import * as factory from '../_fixtureFactory'
 import { getSettingsForTesting } from '../_helpers'
-import { jest, expect } from '@jest/globals'
 
 jest.setTimeout(60000)
 
-// The mock server implements the JWT auth scheme with well-known fake tokens
-// ('valid-jwt', 'expired-jwt', ...); production does not, so these run
-// against the mock server only.
-const describeLocalOnly =
-  process.env.TEST_ENV === 'production' ? describe.skip : describe
+/**
+ * One suite for both servers.
+ *
+ * Tokens are minted with `generateAuthToken` and the project secret key, and
+ * both servers verify them for real, so these cases say the same thing whether
+ * they run against the mock or against `upload.uploadcare.com`. That is the
+ * point: the codes this client branches on have twice been names nobody had
+ * checked against the API, and a mock that recognizes well-known fake tokens
+ * cannot catch that.
+ *
+ * Both need a project that enforces signed uploads — `pub_test__signed_uploads`
+ * on the mock, `UPLOAD_CLIENT_SECURE_UPLOADS_*` in production, where the keys
+ * are a dedicated project because enabling the feature rejects every unsigned
+ * request to it.
+ */
+const isProduction = process.env.TEST_ENV === 'production'
+const publicKey = isProduction
+  ? process.env.UPLOAD_CLIENT_SECURE_UPLOADS_PUBLIC_KEY
+  : SIGNED_UPLOADS_PUBLIC_KEY
+const secretKey = isProduction
+  ? process.env.UPLOAD_CLIENT_SECURE_UPLOADS_SECRET_KEY
+  : SIGNED_UPLOADS_SECRET_KEY
 
-// Trap for errors: resolves to the thrown error, or null on success.
+/** Skipped rather than failed where the production keys are not configured. */
+const describeContract = publicKey && secretKey ? describe : describe.skip
+const describeMockOnly = isProduction ? describe.skip : describe
+
+/** Trap for errors: resolves to the thrown error, or null on success. */
 const caught = (promise: Promise<unknown>): Promise<UploadError | null> =>
   promise.then(
     () => null,
     (error) => error
   )
 
-describeLocalOnly('authToken (JWT auth)', () => {
+const mintToken = (
+  options: Parameters<typeof generateAuthToken>[1] = { lifetime: 60_000 }
+) => generateAuthToken(secretKey as string, options)
+
+/**
+ * `generateAuthToken` refuses to mint a token that is already expired, which is
+ * the right call for a minting API and leaves this the only way to get one.
+ * Signed properly, so both servers reject it for its `exp` rather than for the
+ * signature, and far enough back to clear the 30 second clock leeway.
+ */
+const mintExpiredToken = (): string => {
+  const issuedAt = Math.floor(Date.now() / 1000) - 3600
+  const encode = (value: object) =>
+    Buffer.from(JSON.stringify(value)).toString('base64url')
+  const header = encode({ alg: 'HS256', typ: 'JWT' })
+  const payload = encode({ iat: issuedAt, exp: issuedAt + 60 })
+  const key = createHash('sha256')
+    .update(secretKey as string, 'utf8')
+    .digest()
+  const signature = createHmac('sha256', key)
+    .update(`${header}.${payload}`)
+    .digest('base64url')
+
+  return `${header}.${payload}.${signature}`
+}
+
+describeContract('authToken', () => {
   const fileToUpload = factory.image('blackSquare')
+  // `store: false` so production uploads expire on their own rather than
+  // piling up in the project.
   const settings = getSettingsForTesting({
-    publicKey: factory.publicKey('demo')
-  })
-  // The bearer branch runs before the pub_key check on the mock server, so a
-  // request that succeeds with an invalid public key proves the header was
-  // actually sent and used.
-  const settingsWithInvalidKey = getSettingsForTesting({
-    publicKey: factory.publicKey('invalid')
+    publicKey: publicKey as string,
+    store: false as const
   })
 
-  it('should send the Authorization header (invalid token fails despite valid public key)', async () => {
-    const error = await caught(
-      base(fileToUpload.data, { ...settings, authToken: 'wrong-jwt' })
-    )
+  it('should refuse an upload carrying no credential at all', async () => {
+    // Without this the rest proves nothing: a project that does not enforce
+    // signed uploads would accept every request below, token or not.
+    const error = await caught(base(fileToUpload.data, settings))
 
     expect(error).toBeInstanceOf(UploadError)
-    expect(error).toBeInstanceOf(AuthError)
-    expect(error?.message).toBe('Token is invalid.')
-    expect(error?.code).toBe('AccessTokenInvalidError')
+    expect(error?.code).toBe('SignatureRequiredError')
   })
 
-  it('should authorize with a valid token even when the public key is invalid', async () => {
+  it('should upload with a minted token', async () => {
     const { file } = await base(fileToUpload.data, {
-      ...settingsWithInvalidKey,
-      authToken: 'valid-jwt'
+      ...settings,
+      authToken: mintToken()
     })
 
     expect(typeof file).toBe('string')
   })
 
-  it('should accept an async resolver and call it once per request', async () => {
-    const resolver = jest.fn(async () => 'valid-jwt')
-    const { file } = await base(fileToUpload.data, {
+  it('should authenticate every request of an upload from a resolver', async () => {
+    // `uploadFile` uploads and then polls `/info/`, so a resolver called once
+    // would mean a request went out unauthenticated.
+    const resolver = jest.fn(() => mintToken())
+    const fileInfo = await uploadFile(fileToUpload.data, {
       ...settings,
       authToken: resolver
     })
 
-    expect(typeof file).toBe('string')
-    expect(resolver).toHaveBeenCalledTimes(1)
+    expect(fileInfo.uuid).toEqual(expect.any(String))
+    expect(resolver.mock.calls.length).toBeGreaterThan(1)
   })
 
-  it('should drop legacy signature params when authToken is set', async () => {
-    const warnSpy = jest
-      .spyOn(console, 'warn')
-      .mockImplementation(() => undefined)
-    try {
-      // The mock server rejects requests carrying both auth schemes, so
-      // success here proves signature/expire were not sent.
-      const { file } = await base(fileToUpload.data, {
-        ...settings,
-        authToken: 'valid-jwt',
-        secureSignature: 'signature',
-        secureExpire: '1234567890'
-      })
-
-      expect(typeof file).toBe('string')
-      expect(warnSpy).toHaveBeenCalledTimes(1)
-    } finally {
-      warnSpy.mockRestore()
-    }
-  })
-
-  it('should reject with AccessTokenExpiredError for a plain expired token', async () => {
+  it('should reject a token signed with the wrong secret key', async () => {
     const error = await caught(
-      base(fileToUpload.data, { ...settings, authToken: 'expired-jwt' })
+      base(fileToUpload.data, {
+        ...settings,
+        authToken: generateAuthToken('not-the-project-secret-key', {
+          lifetime: 60_000
+        })
+      })
+    )
+
+    expect(error).toBeInstanceOf(AuthError)
+    expect(error?.code).toBe('AccessTokenInvalidError')
+  })
+
+  it('should reject anything that is not a JWT', async () => {
+    const error = await caught(
+      base(fileToUpload.data, { ...settings, authToken: 'not-a-jwt' })
+    )
+
+    expect(error).toBeInstanceOf(AuthError)
+    expect(error?.code).toBe('AccessTokenInvalidError')
+  })
+
+  it('should reject an expired token', async () => {
+    const error = await caught(
+      base(fileToUpload.data, { ...settings, authToken: mintExpiredToken() })
     )
 
     expect(error).toBeInstanceOf(AuthError)
     expect(error?.code).toBe('AccessTokenExpiredError')
   })
 
-  it('should re-resolve the token and retry once when it is expired', async () => {
+  it('should re-resolve the token and retry once when it has expired', async () => {
     let calls = 0
     const resolver = jest.fn(() =>
-      ++calls === 1 ? 'expired-jwt' : 'valid-jwt'
+      ++calls === 1 ? mintExpiredToken() : mintToken()
     )
     const { file } = await base(fileToUpload.data, {
       ...settings,
@@ -113,7 +166,7 @@ describeLocalOnly('authToken (JWT auth)', () => {
   })
 
   it('should give up when the token is still expired after a refresh', async () => {
-    const resolver = jest.fn(() => 'expired-jwt')
+    const resolver = jest.fn(() => mintExpiredToken())
     const error = await caught(
       base(fileToUpload.data, { ...settings, authToken: resolver })
     )
@@ -122,27 +175,75 @@ describeLocalOnly('authToken (JWT auth)', () => {
     expect(resolver).toHaveBeenCalledTimes(2)
   })
 
-  it.each([
-    ['quota-jwt', 'OperationsLimitExceededError'],
-    ['scope-jwt', 'ScopeForbiddenError']
-  ] as const)(
-    'should not retry the final error %s even with a resolver',
-    async (jwt, code) => {
-      const resolver = jest.fn(() => jwt)
-      const error = await caught(
-        base(fileToUpload.data, { ...settings, authToken: resolver })
-      )
+  it('should reject an endpoint the token scope does not cover', async () => {
+    const resolver = jest.fn(() =>
+      mintToken({ lifetime: 60_000, scope: ['/multipart/*'] })
+    )
+    const error = await caught(
+      base(fileToUpload.data, { ...settings, authToken: resolver })
+    )
 
-      expect(error).toBeInstanceOf(AuthError)
-      expect(error?.code).toBe(code)
-      expect(resolver).toHaveBeenCalledTimes(1)
+    expect(error).toBeInstanceOf(AuthError)
+    expect(error?.code).toBe('ScopeForbiddenError')
+    // Final, so no refresh is attempted: a new token would be refused too.
+    expect(resolver).toHaveBeenCalledTimes(1)
+  })
+
+  it('should spend the operation limit and then refuse', async () => {
+    const authToken = mintToken({ lifetime: 60_000, operations: 1 })
+
+    const { file } = await base(fileToUpload.data, { ...settings, authToken })
+    expect(typeof file).toBe('string')
+
+    const error = await caught(
+      base(fileToUpload.data, { ...settings, authToken })
+    )
+
+    expect(error).toBeInstanceOf(AuthError)
+    expect(error?.code).toBe('OperationsLimitExceededError')
+  })
+})
+
+/**
+ * Cases that need a server willing to answer with a public key it would
+ * otherwise refuse: an invalid one plus a valid token must succeed, which is
+ * what proves the header reached the server and was used. Production has no
+ * such project, so these stay on the mock.
+ */
+describeMockOnly('authToken (mock server only)', () => {
+  const fileToUpload = factory.image('blackSquare')
+  const settings = getSettingsForTesting({
+    publicKey: SIGNED_UPLOADS_PUBLIC_KEY
+  })
+  const settingsWithInvalidKey = getSettingsForTesting({
+    publicKey: factory.publicKey('invalid')
+  })
+
+  it('should drop legacy signature params when authToken is set', async () => {
+    const warnSpy = jest
+      .spyOn(console, 'warn')
+      .mockImplementation(() => undefined)
+    try {
+      // The mock rejects requests carrying both auth schemes, so success here
+      // proves signature/expire were not sent.
+      const { file } = await base(fileToUpload.data, {
+        ...settings,
+        authToken: mintToken(),
+        secureSignature: 'signature',
+        secureExpire: '1234567890'
+      })
+
+      expect(typeof file).toBe('string')
+      expect(warnSpy).toHaveBeenCalledTimes(1)
+    } finally {
+      warnSpy.mockRestore()
     }
-  )
+  })
 
   it('should send the header on from_url requests', async () => {
     const response = await fromUrl(factory.imageUrl('valid'), {
       ...settingsWithInvalidKey,
-      authToken: 'valid-jwt'
+      authToken: mintToken()
     })
 
     expect(response.type).toBeDefined()
@@ -151,7 +252,7 @@ describeLocalOnly('authToken (JWT auth)', () => {
   it('should send the header on group creation', async () => {
     const groupInfo = await group(factory.groupOfFiles('valid'), {
       ...settingsWithInvalidKey,
-      authToken: 'valid-jwt'
+      authToken: mintToken()
     })
 
     expect(groupInfo.id).toBeTruthy()
@@ -163,7 +264,7 @@ describeLocalOnly('authToken (JWT auth)', () => {
     // token too.
     const file = await uploadDirect(fileToUpload.data, {
       ...settingsWithInvalidKey,
-      authToken: 'valid-jwt'
+      authToken: mintToken()
     })
 
     expect(file.uuid).toBeTruthy()
@@ -175,7 +276,7 @@ describeLocalOnly('authToken (JWT auth)', () => {
     const error = await caught(
       fromUrlStatus(factory.token('valid'), {
         ...settings,
-        authToken: 'invalid-jwt'
+        authToken: 'not-a-jwt'
       })
     )
 
@@ -185,12 +286,12 @@ describeLocalOnly('authToken (JWT auth)', () => {
 
   it('should authorize multipart start/complete but keep part uploads bare', async () => {
     // The mock storage endpoint drops the connection when it receives an
-    // Authorization header, so this only completes if start/complete carry
-    // the token (invalid public key otherwise) and the part PUTs do not.
+    // Authorization header, so this only completes if start/complete carry the
+    // token (invalid public key otherwise) and the part PUTs do not.
     const bigFile = factory.file(12).data
     const file = await uploadMultipart(bigFile, {
       ...settingsWithInvalidKey,
-      authToken: 'valid-jwt'
+      authToken: mintToken()
     })
 
     expect(file.cdnUrl).toBeTruthy()
