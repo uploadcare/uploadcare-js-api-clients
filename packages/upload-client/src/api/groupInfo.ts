@@ -6,13 +6,15 @@ import request from '../request/request.node'
 import getUrl from '../tools/getUrl'
 
 import defaultSettings from '../defaultSettings'
-import { getUserAgent } from '../tools/getUserAgent'
-import { UploadError } from '../tools/UploadError'
+import { createUploadError } from '../tools/createUploadError'
 import { retryIfFailed } from '../tools/retryIfFailed'
+import { getRequestHeaders } from '../tools/getRequestHeaders'
+import { AuthToken } from '../types'
 
 export type GroupInfoOptions = {
   publicKey: string
   baseURL?: string
+  authToken?: AuthToken
 
   signal?: AbortSignal
 
@@ -32,6 +34,7 @@ export default function groupInfo(
   {
     publicKey,
     baseURL = defaultSettings.baseURL,
+    authToken,
     signal,
     source,
     integration,
@@ -41,12 +44,15 @@ export default function groupInfo(
   }: GroupInfoOptions
 ): Promise<GroupInfo> {
   return retryIfFailed(
-    () =>
+    async () =>
       request({
         method: 'GET',
-        headers: {
-          'X-UC-User-Agent': getUserAgent({ publicKey, integration, userAgent })
-        },
+        headers: await getRequestHeaders({
+          publicKey,
+          integration,
+          userAgent,
+          authToken
+        }),
         url: getUrl(baseURL, '/group/info/', {
           jsonerrors: 1,
           pub_key: publicKey,
@@ -58,7 +64,7 @@ export default function groupInfo(
         const response = camelizeKeys<Response>(JSON.parse(data))
 
         if ('error' in response) {
-          throw new UploadError(
+          throw createUploadError(
             response.error.content,
             response.error.errorCode,
             request,
@@ -69,6 +75,10 @@ export default function groupInfo(
           return response
         }
       }),
-    { retryThrottledRequestMaxTimes, retryNetworkErrorMaxTimes }
+    {
+      retryThrottledRequestMaxTimes,
+      retryNetworkErrorMaxTimes,
+      authToken
+    }
   )
 }

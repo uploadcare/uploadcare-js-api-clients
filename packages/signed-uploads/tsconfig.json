@@ -1,3 +1,14 @@
 {
   "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "noEmit": true,
+    // `node` is explicit: the server entry imports `node:crypto`, and vitest 4
+    // no longer drags the Node types in on its own.
+    "types": ["vitest", "node"],
+    "noUncheckedIndexedAccess": true
+  },
+  // `vite.config.ts` is deliberately out: `vite-plugin-dts` ships declarations
+  // that reference `typescript` namespace members TypeScript 7 no longer
+  // exposes, and it is build tooling rather than shipped code.
+  "include": ["src"]
 }

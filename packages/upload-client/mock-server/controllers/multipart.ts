@@ -40,6 +40,13 @@ const start: Middleware = (ctx) => {
 
 /** '/multipart/upload/' */
 const upload: Middleware = (ctx) => {
+  // Part uploads go to presigned storage URLs and must never carry the
+  // Authorization header. The client ignores the status code of part PUTs,
+  // so drop the connection to make a leaked header fail tests loudly.
+  if (ctx.get('Authorization')) {
+    ctx.req.destroy()
+    return
+  }
   ctx.status = 200
 }
 

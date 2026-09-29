@@ -14,6 +14,7 @@ import koaBody from 'koa-body'
 import logger from './middleware/logger'
 import delayer from './middleware/delayer'
 import auth from './middleware/auth'
+import throttleOnce from './middleware/throttleOnce'
 
 // Config
 import { PORT } from './config'
@@ -39,6 +40,8 @@ app.use(
     textLimit: 50 * 1024 * 1024
   })
 )
+// Before `auth`, so a throttled request is throttled whatever its token is.
+app.use(throttleOnce)
 app.use(auth)
 
 // Routes

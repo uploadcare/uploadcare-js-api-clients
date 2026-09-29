@@ -2,14 +2,14 @@
   "name": "@uploadcare/api-clients",
   "private": true,
   "type": "module",
-  "version": "6.21.0",
+  "version": "6.22.0",
   "license": "MIT",
   "workspaces": [
     "packages/api-client-utils",
     "packages/cname-prefix",
+    "packages/signed-uploads",
     "packages/upload-client",
     "packages/rest-client",
-    "packages/signed-uploads",
     "packages/image-shrink",
     "packages/quality-insights"
   ],
