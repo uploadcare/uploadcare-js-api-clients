@@ -16,6 +16,22 @@ describe('createWebhook', () => {
     expect(response.id).toBeTruthy()
   })
 
+  it.each(Object.values(WebhookEvent))(
+    'should work for event %s on API version 0.7',
+    async (event) => {
+      const response = await createWebhook(
+        {
+          targetUrl: randomTargetUrl(),
+          event,
+          version: '0.7'
+        },
+        testSettings
+      )
+      expect(response.id).toBeTruthy()
+      expect(response.event).toBe(event)
+    }
+  )
+
   it('should throw error if non-200 status received', async () => {
     await expect(
       createWebhook(
