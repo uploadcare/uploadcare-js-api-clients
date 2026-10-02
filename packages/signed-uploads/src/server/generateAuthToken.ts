@@ -25,8 +25,8 @@ export type AuthTokenExpiration =
 export type AuthTokenRestrictions = {
   /**
    * Upload API endpoints this token reaches, as paths. An item matches exactly
-   * or, with a trailing `*` after a `/`, as a whole-segment prefix (`/*` and
-   * `*` match everything). Omit to allow every signed endpoint.
+   * or, with a trailing `*` after a `/`, as a whole-segment prefix (`/*`
+   * matches everything). Omit to allow every signed endpoint.
    *
    * @example ['/base/', '/multipart/*']
    */
@@ -85,10 +85,6 @@ const validateScope = (scope: string[]) => {
       throw new Error(
         `\`scope\` can not contain items longer than ${MAX_SCOPE_ITEM_LENGTH} symbols`
       )
-    }
-
-    if (item === '*') {
-      continue
     }
 
     if (!item.startsWith('/')) {
