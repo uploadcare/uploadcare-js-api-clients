@@ -253,14 +253,14 @@ describeContract('authToken', () => {
     expect(error?.message).toContain('401 from the token endpoint')
   })
 
-  it('should treat an empty token as no token at all', async () => {
-    // `getAuthHeaders` sends no header for an empty string, so this reaches the
-    // server unauthenticated rather than with `Bearer `.
+  it('should reject an empty token before sending anything', async () => {
+    // Rejected like a throwing token function, rather than sent unsigned.
     const error = await caught(
       base(fileToUpload.data, { ...settings, authToken: () => '' })
     )
 
-    expect(error?.code).toBe('SignatureRequiredError')
+    expect(error).toBeInstanceOf(AuthTokenResolverError)
+    expect(error?.message).toContain('token function returned no token')
   })
 
   it('should authenticate a from_url request', async () => {

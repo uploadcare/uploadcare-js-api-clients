@@ -1,5 +1,6 @@
 /**
- * Your token function threw or rejected, so there is no token to send.
+ * Your token function threw, rejected, or returned no token, so there is no
+ * token to send. For unsigned requests, leave `authToken` unset instead.
  *
  * This is the one auth failure that never reaches the Upload API: nothing was
  * requested, and retrying is pointless because the source of the token is your
