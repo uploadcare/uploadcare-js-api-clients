@@ -32,3 +32,15 @@ export const asAuthTokenResolverError = (
   cause instanceof AuthTokenResolverError
     ? cause
     : new AuthTokenResolverError(cause)
+
+/**
+ * The token a token function returned, or a throw when it returned nothing:
+ * otherwise the request would go out with no `Authorization` header. Callers
+ * wrap the throw with `asAuthTokenResolverError`.
+ */
+export const requireAuthToken = (token: unknown): string => {
+  if (typeof token !== 'string' || !token) {
+    throw new Error('token function returned no token')
+  }
+  return token
+}

@@ -113,13 +113,13 @@
     {
       "name": "client entry (ships to browsers)",
       "path": "dist/client.js",
-      "limit": "600 B"
+      "limit": "620 B"
     },
     {
       "name": "AuthTokenCache alone",
       "path": "dist/client.js",
       "import": "{ AuthTokenCache }",
-      "limit": "560 B"
+      "limit": "580 B"
     },
     {
       "name": "server entry",

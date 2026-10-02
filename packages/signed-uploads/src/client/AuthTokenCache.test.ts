@@ -233,6 +233,7 @@ describe('AuthTokenCache', () => {
 
       expect(error).toBeInstanceOf(AuthTokenResolverError)
       expect(error.message).toContain('token function returned no token')
+      expect(error.cause).toBeInstanceOf(Error)
       expect(await cache.getToken()).toBe(token)
     }
   )
