@@ -24,6 +24,17 @@ describe('getRequestHeaders', () => {
     expect(resolver).toHaveBeenCalledTimes(1)
   })
 
+  it.each([undefined, null, ''])(
+    'should send no Authorization header when authToken is %p',
+    async (value) => {
+      const headers = await getRequestHeaders({
+        authToken: value as unknown as string
+      })
+
+      expect(headers.Authorization).toBeUndefined()
+    }
+  )
+
   it('should reject a resolver that returns nothing rather than send no header', async () => {
     await expect(getRequestHeaders({ authToken: () => '' })).rejects.toThrow(
       'token function returned no token'
