@@ -384,9 +384,11 @@ try {
 }
 ```
 
-A resolver that throws is a different failure: nothing was sent, so there is no
-server code. It surfaces as `AuthTokenResolverError` with the original throw on
-`cause`, and nothing retries it, since only your own code can fix it:
+A resolver that throws or returns no token is a different failure: nothing was
+sent, so there is no server code. It surfaces as `AuthTokenResolverError` with
+the original failure on `cause`, and nothing retries it, since only your own
+code can fix it. For unsigned requests, leave `authToken` unset rather than
+returning an empty token:
 
 ```javascript
 import { AuthTokenResolverError } from '@uploadcare/upload-client'

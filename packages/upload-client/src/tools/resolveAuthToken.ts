@@ -1,4 +1,7 @@
-import { asAuthTokenResolverError } from '@uploadcare/signed-uploads/client'
+import {
+  asAuthTokenResolverError,
+  requireAuthToken
+} from '@uploadcare/signed-uploads/client'
 import { AuthToken } from '../types'
 
 /**
@@ -24,7 +27,7 @@ export const resolveAuthToken = async (
   // rejected the token", which need different fixes and look identical once
   // the throw has bubbled up through an upload.
   try {
-    return await authToken()
+    return requireAuthToken(await authToken())
   } catch (cause) {
     throw asAuthTokenResolverError(cause)
   }

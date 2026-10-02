@@ -63,6 +63,18 @@ describe('resolveAuthToken', () => {
     expect(error).toBe(inner)
   })
 
+  it.each([undefined, '', null])(
+    'should reject a resolver that returns %p rather than send no header',
+    async (value) => {
+      const error = await resolveAuthToken(
+        () => value as unknown as string
+      ).catch((e) => e)
+
+      expect(error).toBeInstanceOf(AuthTokenResolverError)
+      expect(error.message).toContain('token function returned no token')
+    }
+  )
+
   it('should wrap a rejecting resolver', async () => {
     const error = await resolveAuthToken(async () => {
       throw 'nope'

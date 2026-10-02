@@ -114,9 +114,9 @@ tokens.fetchToken = props.fetchToken // cached token is kept
 tokens.invalidate() // call this when the change is real, e.g. on sign-out
 ```
 
-If your `fetchToken` throws or rejects, `getToken()` rejects with an
-`AuthTokenResolverError` carrying the original failure on `cause`. Nothing is
-cached, so the next call tries again:
+If your `fetchToken` throws, rejects, or returns no token (`undefined`, `null`
+or `''`), `getToken()` rejects with an `AuthTokenResolverError` carrying the
+original failure on `cause`. Nothing is cached, so the next call tries again:
 
 ```typescript
 import { AuthTokenResolverError } from '@uploadcare/signed-uploads/client'

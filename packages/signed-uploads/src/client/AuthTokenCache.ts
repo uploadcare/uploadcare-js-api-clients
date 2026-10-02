@@ -1,4 +1,7 @@
-import { asAuthTokenResolverError } from './AuthTokenResolverError'
+import {
+  asAuthTokenResolverError,
+  requireAuthToken
+} from './AuthTokenResolverError'
 import { getTokenExpiration } from './getTokenExpiration'
 
 /** Fetches a freshly minted token, usually from your own backend. */
@@ -78,6 +81,8 @@ export class AuthTokenCache {
 
     this._inflight ??= Promise.resolve()
       .then(() => this.fetchToken())
+      // Its own step, so the rejection handler below wraps the throw.
+      .then(requireAuthToken)
       .then(
         (token) => {
           // Dropped when `invalidate()` ran while this was in flight: the token
