@@ -78,6 +78,14 @@ export class AuthTokenCache {
 
     this._inflight ??= Promise.resolve()
       .then(() => this.fetchToken())
+      // Checked in its own step so the rejection handler below wraps it: a
+      // missing token is the token function failing, not a token to store.
+      .then((token) => {
+        if (typeof token !== 'string' || !token) {
+          throw new Error('token function returned no token')
+        }
+        return token
+      })
       .then(
         (token) => {
           // Dropped when `invalidate()` ran while this was in flight: the token

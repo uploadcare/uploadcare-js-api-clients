@@ -218,4 +218,22 @@ describe('AuthTokenCache', () => {
     // wait on a promise that already rejected.
     expect(await cache.getToken()).toBe(token)
   })
+
+  it.each([undefined, '', null])(
+    'rejects a token function that returns %p, caching nothing',
+    async (value) => {
+      const token = tokenExpiringIn(3600)
+      const fetchToken = vi
+        .fn<() => string>()
+        .mockImplementationOnce(() => value as unknown as string)
+        .mockImplementation(() => token)
+      const cache = new AuthTokenCache({ fetchToken })
+
+      const error = await cache.getToken().catch((e) => e)
+
+      expect(error).toBeInstanceOf(AuthTokenResolverError)
+      expect(error.message).toContain('token function returned no token')
+      expect(await cache.getToken()).toBe(token)
+    }
+  )
 })

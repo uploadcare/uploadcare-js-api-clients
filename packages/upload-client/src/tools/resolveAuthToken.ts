@@ -24,7 +24,12 @@ export const resolveAuthToken = async (
   // rejected the token", which need different fixes and look identical once
   // the throw has bubbled up through an upload.
   try {
-    return await authToken()
+    const token = await authToken()
+    // Otherwise the request would go out with no `Authorization` header.
+    if (typeof token !== 'string' || !token) {
+      throw new Error('token function returned no token')
+    }
+    return token
   } catch (cause) {
     throw asAuthTokenResolverError(cause)
   }
