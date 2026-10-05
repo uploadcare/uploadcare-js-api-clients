@@ -59,9 +59,9 @@ which is what the server has the secret key for.</p>
 <pre><code class="typescript"><span class="hl-4">tokens</span><span class="hl-1">.</span><span class="hl-4">fetchToken</span><span class="hl-1"> = </span><span class="hl-4">props</span><span class="hl-1">.</span><span class="hl-4">fetchToken</span><span class="hl-1"> </span><span class="hl-5">// cached token is kept</span><br/><span class="hl-4">tokens</span><span class="hl-1">.</span><span class="hl-0">invalidate</span><span class="hl-1">() </span><span class="hl-5">// call this when the change is real, e.g. on sign-out</span>
 </code><button type="button">Copy</button></pre>
 
-<p>If your <code>fetchToken</code> throws or rejects, <code>getToken()</code> rejects with an
-<code>AuthTokenResolverError</code> carrying the original failure on <code>cause</code>. Nothing is
-cached, so the next call tries again:</p>
+<p>If your <code>fetchToken</code> throws, rejects, or returns no token (<code>undefined</code>, <code>null</code>
+or <code>''</code>), <code>getToken()</code> rejects with an <code>AuthTokenResolverError</code> carrying the
+original failure on <code>cause</code>. Nothing is cached, so the next call tries again:</p>
 <pre><code class="typescript"><span class="hl-3">import</span><span class="hl-1"> { </span><span class="hl-4">AuthTokenResolverError</span><span class="hl-1"> } </span><span class="hl-3">from</span><span class="hl-1"> </span><span class="hl-2">&#39;@uploadcare/signed-uploads/client&#39;</span><br/><br/><span class="hl-3">try</span><span class="hl-1"> {</span><br/><span class="hl-1">  </span><span class="hl-3">await</span><span class="hl-1"> </span><span class="hl-4">tokens</span><span class="hl-1">.</span><span class="hl-0">getToken</span><span class="hl-1">()</span><br/><span class="hl-1">} </span><span class="hl-3">catch</span><span class="hl-1"> (</span><span class="hl-4">error</span><span class="hl-1">) {</span><br/><span class="hl-1">  </span><span class="hl-3">if</span><span class="hl-1"> (</span><span class="hl-4">error</span><span class="hl-1"> </span><span class="hl-6">instanceof</span><span class="hl-1"> </span><span class="hl-9">AuthTokenResolverError</span><span class="hl-1">) {</span><br/><span class="hl-1">    </span><span class="hl-5">// your token endpoint failed; `error.cause` says how</span><br/><span class="hl-1">  }</span><br/><span class="hl-1">}</span>
 </code><button type="button">Copy</button></pre>
 
