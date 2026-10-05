@@ -7,7 +7,10 @@ import group from '../../src/api/group'
 import { uploadDirect } from '../../src/uploadFile/uploadDirect'
 import { uploadFile } from '../../src/uploadFile/uploadFile'
 import { uploadMultipart } from '../../src/uploadFile/uploadMultipart'
-import { AuthTokenResolverError } from '@uploadcare/signed-uploads/client'
+import {
+  AuthTokenCache,
+  AuthTokenResolverError
+} from '@uploadcare/signed-uploads/client'
 import { AuthError } from '../../src/tools/AuthError'
 import { UploadError } from '../../src/tools/UploadError'
 import {
@@ -237,6 +240,72 @@ describeContract('authToken', () => {
     expect(error?.code).toBe('OperationsLimitExceededError')
   })
 
+  it('should refuse a spent limit without a way to get another token', async () => {
+    // A resolver that keeps handing back the same spent token: the retry
+    // happens, and fails the same way, which is the end of it.
+    //
+    // `tokenId` because two tokens minted in the same second with the same
+    // claims are the same string, and an operation count is per token. It is
+    // the same reason the API reference recommends `jti` or `sub` for tokens
+    // issued to different clients.
+    const spent = mintToken({
+      lifetime: 60_000,
+      operations: 1,
+      tokenId: 'spent-no-recovery'
+    })
+    const resolver = jest.fn(() => spent)
+
+    await base(fileToUpload.data, { ...settings, authToken: resolver })
+    const error = await caught(
+      base(fileToUpload.data, { ...settings, authToken: resolver })
+    )
+
+    expect(error).toBeInstanceOf(AuthError)
+    expect(error?.code).toBe('OperationsLimitExceededError')
+  })
+
+  it('should recover from a spent limit with a cache it can invalidate', async () => {
+    // One operation per token, so the second upload starts out refused. The
+    // provider lets the client drop the spent token and ask for another.
+    let minted = 0
+    const fetchToken = jest.fn(() =>
+      mintToken({
+        lifetime: 60_000,
+        operations: 1,
+        tokenId: `spent-recovery-${++minted}`
+      })
+    )
+    const tokens = new AuthTokenCache({ fetchToken })
+
+    const first = await base(fileToUpload.data, {
+      ...settings,
+      authToken: tokens
+    })
+    expect(typeof first.file).toBe('string')
+
+    const second = await base(fileToUpload.data, {
+      ...settings,
+      authToken: tokens
+    })
+    expect(typeof second.file).toBe('string')
+
+    // One for each upload: the cached token is dropped when the API refuses
+    // it, not kept and re-sent.
+    expect(fetchToken).toHaveBeenCalledTimes(2)
+  })
+
+  it('should keep the cached token when the failure is not about the token', async () => {
+    const fetchToken = jest.fn(() =>
+      mintToken({ lifetime: 60_000, tokenId: 'kept-across-uploads' })
+    )
+    const tokens = new AuthTokenCache({ fetchToken })
+
+    await base(fileToUpload.data, { ...settings, authToken: tokens })
+    await base(fileToUpload.data, { ...settings, authToken: tokens })
+
+    expect(fetchToken).toHaveBeenCalledTimes(1)
+  })
+
   it('should report an auth failure as an UploadError carrying its response', async () => {
     const error = await caught(
       base(fileToUpload.data, { ...settings, authToken: 'not-a-jwt' })
@@ -287,14 +356,14 @@ describeContract('authToken', () => {
     expect(error?.message).toContain('401 from the token endpoint')
   })
 
-  it('should treat an empty token as no token at all', async () => {
-    // `getAuthHeaders` sends no header for an empty string, so this reaches the
-    // server unauthenticated rather than with `Bearer `.
+  it('should reject an empty token before sending anything', async () => {
+    // Rejected like a throwing token function, rather than sent unsigned.
     const error = await caught(
       base(fileToUpload.data, { ...settings, authToken: () => '' })
     )
 
-    expect(error?.code).toBe('SignatureRequiredError')
+    expect(error).toBeInstanceOf(AuthTokenResolverError)
+    expect(error?.message).toContain('token function returned no token')
   })
 
   it('should authenticate a from_url request', async () => {

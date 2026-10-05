@@ -1,5 +1,6 @@
 /**
- * Your token function threw or rejected, so there is no token to send.
+ * Your token function threw, rejected, or returned no token, so there is no
+ * token to send. For unsigned requests, leave `authToken` unset instead.
  *
  * This is the one auth failure that never reaches the Upload API: nothing was
  * requested, and retrying is pointless because the source of the token is your
@@ -32,3 +33,15 @@ export const asAuthTokenResolverError = (
   cause instanceof AuthTokenResolverError
     ? cause
     : new AuthTokenResolverError(cause)
+
+/**
+ * The token a token function returned, or a throw when it returned nothing:
+ * otherwise the request would go out with no `Authorization` header. Callers
+ * wrap the throw with `asAuthTokenResolverError`.
+ */
+export const requireAuthToken = (token: unknown): string => {
+  if (typeof token !== 'string' || !token) {
+    throw new Error('token function returned no token')
+  }
+  return token
+}

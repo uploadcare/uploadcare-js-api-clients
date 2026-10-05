@@ -11,7 +11,8 @@ export {
 } from './client/AuthTokenCache'
 export {
   AuthTokenResolverError,
-  asAuthTokenResolverError
+  asAuthTokenResolverError,
+  requireAuthToken
 } from './client/AuthTokenResolverError'
 export { getAuthHeaders } from './client/getAuthHeaders'
 export { getTokenExpiration } from './client/getTokenExpiration'

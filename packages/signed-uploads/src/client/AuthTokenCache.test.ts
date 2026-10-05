@@ -218,4 +218,41 @@ describe('AuthTokenCache', () => {
     // wait on a promise that already rejected.
     expect(await cache.getToken()).toBe(token)
   })
+
+  it.each([undefined, '', null])(
+    'rejects a token function that returns %p, caching nothing',
+    async (value) => {
+      const token = tokenExpiringIn(3600)
+      const fetchToken = vi
+        .fn<() => string>()
+        .mockImplementationOnce(() => value as unknown as string)
+        .mockImplementation(() => token)
+      const cache = new AuthTokenCache({ fetchToken })
+
+      const error = await cache.getToken().catch((e) => e)
+
+      expect(error).toBeInstanceOf(AuthTokenResolverError)
+      expect(error.message).toContain('token function returned no token')
+      expect(error.cause).toBeInstanceOf(Error)
+      expect(await cache.getToken()).toBe(token)
+    }
+  )
+
+  it('should keep the function a fetch started with when `fetchToken` is swapped', async () => {
+    // Both calls land in the same turn, before either fetch runs. The second
+    // caller joins the first one's request, so the token must come from the
+    // function that was set when that request started.
+    const first = vi.fn(async () => tokenExpiringIn(3600))
+    const second = vi.fn(async () => tokenExpiringIn(3600))
+    const cache = new AuthTokenCache({ fetchToken: first })
+
+    const started = cache.getToken()
+    cache.fetchToken = second
+    const joined = cache.getToken()
+
+    await Promise.all([started, joined])
+
+    expect(first).toHaveBeenCalledTimes(1)
+    expect(second).not.toHaveBeenCalled()
+  })
 })
