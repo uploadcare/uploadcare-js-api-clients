@@ -58,17 +58,18 @@ const mintToken = (
 ) => generateAuthToken(secretKey as string, options)
 
 /**
- * `generateAuthToken` refuses to mint a token that is already expired, which is
- * the right call for a minting API and leaves this the only way to get one.
- * Signed properly, so both servers reject it for its `exp` rather than for the
- * signature, and far enough back to clear the 30 second clock leeway.
+ * Signs whatever claims it is given, the way the Upload API expects. Needed
+ * because `generateAuthToken` validates before signing, and some of these cases
+ * are exactly the tokens it refuses to mint: an already expired one, or a scope
+ * item the API calls malformed. A token can still arrive from another backend,
+ * so both servers have to answer for it.
  */
-const mintExpiredToken = (): string => {
-  const issuedAt = Math.floor(Date.now() / 1000) - 3600
+const signTokenWithClaims = (claims: object): string => {
+  const issuedAt = Math.floor(Date.now() / 1000)
   const encode = (value: object) =>
     Buffer.from(JSON.stringify(value)).toString('base64url')
   const header = encode({ alg: 'HS256', typ: 'JWT' })
-  const payload = encode({ iat: issuedAt, exp: issuedAt + 60 })
+  const payload = encode({ iat: issuedAt, exp: issuedAt + 600, ...claims })
   const key = createHash('sha256')
     .update(secretKey as string, 'utf8')
     .digest()
@@ -77,6 +78,15 @@ const mintExpiredToken = (): string => {
     .digest('base64url')
 
   return `${header}.${payload}.${signature}`
+}
+
+/**
+ * Expired far enough back to clear the 30 second clock leeway, so both servers
+ * reject it for its `exp` rather than for the signature.
+ */
+const mintExpiredToken = (): string => {
+  const issuedAt = Math.floor(Date.now() / 1000) - 3600
+  return signTokenWithClaims({ iat: issuedAt, exp: issuedAt + 60 })
 }
 
 describeContract('authToken', () => {
@@ -173,6 +183,30 @@ describeContract('authToken', () => {
 
     expect(error?.code).toBe('AccessTokenExpiredError')
     expect(resolver).toHaveBeenCalledTimes(2)
+  })
+
+  it('should reject a scope item the Upload API calls malformed', async () => {
+    // `generateAuthToken` refuses to mint this, but a token can come from
+    // anywhere, so both the mock and production have to refuse it. Measured
+    // against production: `uc.restrictions.scope items must start with \`/\``.
+    const bareWildcard = signTokenWithClaims({
+      uc: { restrictions: { scope: ['*'] } }
+    })
+
+    const error = await caught(
+      base(fileToUpload.data, { ...settings, authToken: bareWildcard })
+    )
+
+    expect(error).toBeInstanceOf(AuthError)
+    expect(error?.code).toBe('AccessTokenInvalidError')
+  })
+
+  it('should allow every endpoint with a `/*` scope', async () => {
+    const authToken = mintToken({ lifetime: 60_000, scope: ['/*'] })
+
+    const { file } = await base(fileToUpload.data, { ...settings, authToken })
+
+    expect(typeof file).toBe('string')
   })
 
   it('should reject an endpoint the token scope does not cover', async () => {

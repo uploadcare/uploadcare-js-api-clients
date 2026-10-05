@@ -10,8 +10,9 @@ type SecureOptions = {
 /**
  * Returns the legacy signed-upload form fields. When `authToken` is also
  * provided, the Bearer header takes precedence and the signature params are
- * dropped — the server rejects requests carrying both auth schemes. Warns once
- * per process so the drop is not silent.
+ * dropped: on upload endpoints the server checks a `signature` whenever one is
+ * present and ignores the header, so sending both would silently skip the
+ * token. Warns once per process so the drop is not silent.
  */
 export const getSecureParams = ({
   authToken,

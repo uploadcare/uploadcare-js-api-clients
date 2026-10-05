@@ -180,9 +180,15 @@ describe('generateAuthToken', () => {
       ).toThrow(message)
     })
 
-    it('accepts a bare `*` scope', () => {
+    it('rejects a bare `*` scope, which the Upload API refuses', () => {
       expect(() =>
         generateAuthToken(FIXTURE_SECRET, { lifetime: HOUR, scope: ['*'] })
+      ).toThrow('`scope` items must start with `/`')
+    })
+
+    it('accepts `/*` for every endpoint', () => {
+      expect(() =>
+        generateAuthToken(FIXTURE_SECRET, { lifetime: HOUR, scope: ['/*'] })
       ).not.toThrow()
     })
   })

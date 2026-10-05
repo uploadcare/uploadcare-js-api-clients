@@ -64,14 +64,24 @@ const hasValidSignature = (
 }
 
 /**
+ * The first scope item the Upload API would refuse, or `undefined` when they
+ * all pass. Checked before matching, as the API does: a malformed item makes
+ * the whole token invalid rather than simply matching nothing.
+ *
+ * A bare `*` is malformed. `generateAuthToken` refuses to mint one, but a token
+ * can arrive from anywhere, so the stand-in has to refuse it too or a test
+ * passes against something production rejects.
+ */
+const malformedScopeItem = (scope: string[]): string | undefined =>
+  scope.find((item) => !item.startsWith('/'))
+
+/**
  * `scope` items match a path exactly, or as a whole-segment prefix when they
- * end in `*` directly after a `/`. A bare `*` matches everything.
+ * end in `*` directly after a `/`, so `/*` matches everything.
  */
 const isInScope = (scope: string[], path: string): boolean =>
   scope.some((item) =>
-    item === '*' || item.endsWith('/*')
-      ? path.startsWith(item.slice(0, -1))
-      : item === path
+    item.endsWith('/*') ? path.startsWith(item.slice(0, -1)) : item === path
   )
 
 /** `undefined` when the token passes; the rejection to answer with otherwise. */
@@ -108,6 +118,14 @@ export const verifyAuthToken = (
   }
 
   const { scope, limits } = claims.uc?.restrictions ?? {}
+  if (Array.isArray(scope) && malformedScopeItem(scope as string[])) {
+    return {
+      status: 401,
+      statusText:
+        'Invalid token. Reason: uc.restrictions.scope items must start with `/`',
+      errorCode: 'AccessTokenInvalidError'
+    }
+  }
   if (Array.isArray(scope) && !isInScope(scope as string[], path)) {
     return {
       status: 403,
