@@ -79,8 +79,13 @@ export class AuthTokenCache {
     const generation = this._generation
     const isCurrent = () => generation === this._generation
 
+    // Read now, not in the microtask below. A host that reassigns
+    // `fetchToken` before this fetch starts would otherwise have its new
+    // function serve a request that began under the old one.
+    const fetchToken = this.fetchToken
+
     this._inflight ??= Promise.resolve()
-      .then(() => this.fetchToken())
+      .then(() => fetchToken())
       // Its own step, so the rejection handler below wraps the throw.
       .then(requireAuthToken)
       .then(
