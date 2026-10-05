@@ -12,6 +12,7 @@
     "**/tests/**",
     "**/vite.config.ts",
     "**/vitest.config.ts",
-    "**/vitest.*.config.ts"
+    "**/vitest.*.config.ts",
+    "**/api-emulator/scripts/**"
   ],
 }
