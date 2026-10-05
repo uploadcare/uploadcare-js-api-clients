@@ -6,10 +6,11 @@ import request from '../request/request.node'
 import getUrl from '../tools/getUrl'
 
 import defaultSettings from '../defaultSettings'
-import { getUserAgent } from '../tools/getUserAgent'
-import { UploadError } from '../tools/UploadError'
+import { createUploadError } from '../tools/createUploadError'
 import { retryIfFailed } from '../tools/retryIfFailed'
 import { ServerErrorCode } from '../tools/ServerErrorCode'
+import { getRequestHeaders } from '../tools/getRequestHeaders'
+import { AuthToken } from '../types'
 
 export enum Status {
   Unknown = 'unknown',
@@ -63,6 +64,7 @@ export type FromUrlStatusOptions = {
   publicKey?: string
 
   baseURL?: string
+  authToken?: AuthToken
 
   signal?: AbortSignal
 
@@ -79,6 +81,7 @@ export default function fromUrlStatus(
   {
     publicKey,
     baseURL = defaultSettings.baseURL,
+    authToken,
     signal,
     integration,
     userAgent,
@@ -87,18 +90,15 @@ export default function fromUrlStatus(
   }: FromUrlStatusOptions = {}
 ): Promise<FromUrlStatusResponse> {
   return retryIfFailed(
-    () =>
+    async () =>
       request({
         method: 'GET',
-        headers: publicKey
-          ? {
-              'X-UC-User-Agent': getUserAgent({
-                publicKey,
-                integration,
-                userAgent
-              })
-            }
-          : undefined,
+        headers: await getRequestHeaders({
+          publicKey,
+          integration,
+          userAgent,
+          authToken
+        }),
         url: getUrl(baseURL, '/from_url/status/', {
           jsonerrors: 1,
           token
@@ -108,7 +108,7 @@ export default function fromUrlStatus(
         const response = camelizeKeys<Response>(JSON.parse(data))
 
         if ('error' in response && !isErrorResponse(response)) {
-          throw new UploadError(
+          throw createUploadError(
             response.error.content,
             response.error.errorCode,
             request,
@@ -119,6 +119,10 @@ export default function fromUrlStatus(
           return response
         }
       }),
-    { retryNetworkErrorMaxTimes, retryThrottledRequestMaxTimes }
+    {
+      retryNetworkErrorMaxTimes,
+      retryThrottledRequestMaxTimes,
+      authToken
+    }
   )
 }

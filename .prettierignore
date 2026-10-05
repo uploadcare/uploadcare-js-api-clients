@@ -1,2 +1,4 @@
 node_modules
 dist
+# Uses oxfmt (see packages/signed-uploads/.oxfmtrc.json)
+packages/signed-uploads

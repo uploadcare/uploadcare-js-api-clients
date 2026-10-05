@@ -1,6 +1,6 @@
 {
   "name": "@uploadcare/api-emulator",
-  "version": "6.21.0",
+  "version": "6.23.0",
   "description": "An in-process, stateful emulator of the Uploadcare Upload API and CDN, for tests that need real request/response round-trips without the network.",
   "keywords": [
     "uploadcare",
@@ -34,7 +34,7 @@
     "LICENSE"
   ],
   "engines": {
-    "node": ">=18"
+    "node": ">=20"
   },
   "scripts": {
     "prepack": "cp ../../LICENSE ./LICENSE",

@@ -1,4 +1,5 @@
-import { requirePublicKey } from '../apis/upload/auth.js'
+import { authorize } from '../apis/upload/auth.js'
+import { sessionOf } from '../state/store.js'
 
 export type RouteHandler = (context: {
   request: Request
@@ -101,8 +102,14 @@ export const handle = async (
       if (candidate.protected) {
         const paramName = candidate.protected.paramName ?? 'pub_key'
         const publicKey = await extractPublicKey(request, candidate.protected)
-        const authError = requirePublicKey(request, publicKey, paramName)
-        if (authError) return authError
+        const gateError = await authorize(
+          request,
+          publicKey,
+          paramName,
+          pathname.endsWith('/') ? pathname : `${pathname}/`,
+          sessionOf(request)
+        )
+        if (gateError) return gateError
       }
       return (await candidate.handler({ request, params })) ?? undefined
     }
