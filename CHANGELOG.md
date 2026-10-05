@@ -3,12 +3,15 @@
 
 ### Bug Fixes
 
-* reject a token function that returns no token ([#591](https://github.com/uploadcare/uploadcare-js-api-clients/issues/591)) ([e499706](https://github.com/uploadcare/uploadcare-js-api-clients/commit/e4997065131d8a9f93462778e0005bf75c32c169)), closes [uploadcare/file-uploader#1094](https://github.com/uploadcare/file-uploader/issues/1094)
+* **upload-client:** reject a token function that returns no token, instead of sending a request with no `Authorization` header ([#591](https://github.com/uploadcare/uploadcare-js-api-clients/issues/591)) ([e499706](https://github.com/uploadcare/uploadcare-js-api-clients/commit/e4997065131d8a9f93462778e0005bf75c32c169))
+* **signed-uploads:** a token fetch keeps the `fetchToken` it started with, so swapping the function mid-flight no longer serves the new one to the request that began under the old ([#591](https://github.com/uploadcare/uploadcare-js-api-clients/issues/591)) ([e499706](https://github.com/uploadcare/uploadcare-js-api-clients/commit/e4997065131d8a9f93462778e0005bf75c32c169))
 * **signed-uploads:** reject a bare `*` scope the Upload API refuses ([#592](https://github.com/uploadcare/uploadcare-js-api-clients/issues/592)) ([54cd4ea](https://github.com/uploadcare/uploadcare-js-api-clients/commit/54cd4eac0626e0e3540fc1880fa9d6286b3e4415))
 
 
 ### Features
 
+* **upload-client:** `authToken` accepts a provider (`{ getToken, invalidate }`) alongside a token and a function, so an `AuthTokenCache` can be passed directly ([#591](https://github.com/uploadcare/uploadcare-js-api-clients/issues/591)) ([e499706](https://github.com/uploadcare/uploadcare-js-api-clients/commit/e4997065131d8a9f93462778e0005bf75c32c169))
+* **upload-client:** retry once with a fresh token when the Upload API refuses one as expired or out of operations. Needs the provider form: a bare function has nothing to invalidate ([#591](https://github.com/uploadcare/uploadcare-js-api-clients/issues/591)) ([e499706](https://github.com/uploadcare/uploadcare-js-api-clients/commit/e4997065131d8a9f93462778e0005bf75c32c169))
 * **rest-client:** add missing WebhookEvent values ([#585](https://github.com/uploadcare/uploadcare-js-api-clients/issues/585)) ([c76ce73](https://github.com/uploadcare/uploadcare-js-api-clients/commit/c76ce73c14a45ca840b5296f86301a3ab0dbfeff))
 
 
