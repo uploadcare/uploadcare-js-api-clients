@@ -106,13 +106,23 @@ export { AuthTokenResolverError } from '@uploadcare/signed-uploads/client'
 // An `authToken` may be a plain token or a resolver, so anything that
 // authenticates its own requests alongside this client needs to collapse the
 // two the same way.
-export { resolveAuthToken, isAuthTokenResolver } from './tools/resolveAuthToken'
+export {
+  resolveAuthToken,
+  isAuthTokenResolver,
+  normalizeAuthToken
+} from './tools/resolveAuthToken'
 
 import { UploadError } from './tools/UploadError'
 /** @deprecated Please use UploadError instead. */
 export const UploadClientError = UploadError
 
-export { Settings, AuthToken, SupportedFileInput } from './types'
+export {
+  Settings,
+  AuthToken,
+  AuthTokenProvider,
+  AuthTokenResolver,
+  SupportedFileInput
+} from './types'
 export {
   NodeFile as NodeFile,
   BrowserFile as BrowserFile,

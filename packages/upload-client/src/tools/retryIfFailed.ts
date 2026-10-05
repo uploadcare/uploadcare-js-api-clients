@@ -1,5 +1,5 @@
 import type { ServerErrorCode } from './ServerErrorCode'
-import { isAuthTokenResolver } from './resolveAuthToken'
+import { isAuthTokenResolver, normalizeAuthToken } from './resolveAuthToken'
 import { UploadError } from './UploadError'
 import type { AuthToken } from '../types'
 import { retrier, NetworkError } from '@uploadcare/api-client-utils'
@@ -8,11 +8,19 @@ import { retrier, NetworkError } from '@uploadcare/api-client-utils'
 // than quietly never matching a response.
 const REQUEST_WAS_THROTTLED_CODE =
   'RequestThrottledError' satisfies ServerErrorCode
-const TOKEN_EXPIRED_CODE = 'AccessTokenExpiredError' satisfies ServerErrorCode
+/**
+ * Auth failures a different token can fix. An expired token needs a newer one;
+ * a spent operation limit needs a token with its own budget. A scope refusal is
+ * not here: a reissued token carries the same scope.
+ */
+const AUTH_RETRY_CODES: readonly ServerErrorCode[] = [
+  'AccessTokenExpiredError',
+  'OperationsLimitExceededError'
+]
 const DEFAULT_RETRY_AFTER_TIMEOUT = 15000
 const DEFAULT_NETWORK_ERROR_TIMEOUT = 1000
-/** One refresh is enough: a second expiry means the new token is bad too. */
-const MAX_EXPIRED_TOKEN_RETRIES = 1
+/** One refresh is enough: a second refusal means the new token is bad too. */
+const MAX_AUTH_RETRIES = 1
 
 function getTimeoutFromThrottledRequest(error: UploadError): number {
   const { headers } = error || {}
@@ -46,12 +54,17 @@ export function retryIfFailed<T>(
     retryNetworkErrorMaxTimes,
     authToken
   } = options
-  const canRetryExpiredToken = isAuthTokenResolver(authToken)
+  const resolver = isAuthTokenResolver(authToken)
+    ? normalizeAuthToken(authToken)
+    : undefined
   // Counted separately from `attempt`, which the retrier shares with the
-  // throttle and network branches. Keyed off `attempt` instead, a token that
-  // expired after a throttle retry would never be refreshed, because `attempt`
-  // is already past the budget by the time the expiry is seen.
-  let expiredTokenRetries = 0
+  // throttle and network branches. Keyed off `attempt` instead, a token
+  // refused after a throttle retry would never be replaced, because `attempt`
+  // is already past the budget by the time the refusal is seen.
+  //
+  // One budget for both codes, so a token endpoint handing out bad tokens
+  // costs one extra round trip per request rather than one per reason.
+  let authRetries = 0
 
   return retrier(({ attempt, retry }) =>
     fn().catch((error: Error | UploadError | NetworkError) => {
@@ -65,11 +78,16 @@ export function retryIfFailed<T>(
 
       if (
         error instanceof UploadError &&
-        error.code === TOKEN_EXPIRED_CODE &&
-        canRetryExpiredToken &&
-        expiredTokenRetries < MAX_EXPIRED_TOKEN_RETRIES
+        !!error.code &&
+        AUTH_RETRY_CODES.includes(error.code) &&
+        resolver &&
+        authRetries < MAX_AUTH_RETRIES
       ) {
-        expiredTokenRetries += 1
+        authRetries += 1
+        // Without this a cache hands back the token the server just refused,
+        // and the retry fails the same way. A resolver with nothing cached
+        // has no `invalidate`, and needs none.
+        resolver.invalidate?.()
         return retry(0)
       }
 
