@@ -127,7 +127,7 @@ export function publicKey(id: string): string {
 }
 
 export function imageUrl(id: string): string {
-  const images = {
+  const images: Record<string, string> = {
     valid: `${settings.baseCDN}/49b4c5a1-31b3-4349-ba07-d97a2d883c37/20200721174713.png`,
     doesNotExist: 'https://1.com/1.jpg',
     privateIP: 'http://192.168.1.10/1.jpg'
@@ -137,7 +137,7 @@ export function imageUrl(id: string): string {
 }
 
 export function token(id: string): string {
-  const tokens = {
+  const tokens: Record<string, string> = {
     valid: '49b4c5a1-31b3-4349-ba07-d97a2d883c37',
     empty: ''
   }
@@ -146,7 +146,7 @@ export function token(id: string): string {
 }
 
 export function groupId(id: string): string {
-  const groupIds = {
+  const groupIds: Record<string, string> = {
     valid: '0b14f2f6-6d30-482b-a6d6-da2d434779d3~2',
     invalid: '123ebb27-1fd6-46c6-a859-b9893'
   }
@@ -155,7 +155,7 @@ export function groupId(id: string): string {
 }
 
 export function groupOfFiles(id: string): Array<string> {
-  const groupOfFiles = {
+  const groupOfFiles: Record<string, string[]> = {
     valid: [
       '392e3aa3-5ed6-4ad6-a67e-b3a7c1d5b9e9',
       '49b4c5a1-31b3-4349-ba07-d97a2d883c37/-/resize/x800/'

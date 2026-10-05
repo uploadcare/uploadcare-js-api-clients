@@ -17,7 +17,8 @@ export enum Environment {
 }
 
 export const getSettingsForTesting = <T>(options: T): T & DefaultSettings => {
-  const selectedEnvironment = process.env.TEST_ENV || Environment.Development
+  const selectedEnvironment = (process.env.TEST_ENV ||
+    Environment.Development) as Environment
 
   const allEnvironments = {
     development: {
