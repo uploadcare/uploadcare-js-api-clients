@@ -1,3 +1,18 @@
+# [6.23.0](https://github.com/uploadcare/uploadcare-js-api-clients/compare/v6.22.0...v6.23.0) (2026-10-05)
+
+
+### Bug Fixes
+
+* reject a token function that returns no token ([#591](https://github.com/uploadcare/uploadcare-js-api-clients/issues/591)) ([e499706](https://github.com/uploadcare/uploadcare-js-api-clients/commit/e4997065131d8a9f93462778e0005bf75c32c169)), closes [uploadcare/file-uploader#1094](https://github.com/uploadcare/file-uploader/issues/1094)
+* **signed-uploads:** reject a bare `*` scope the Upload API refuses ([#592](https://github.com/uploadcare/uploadcare-js-api-clients/issues/592)) ([54cd4ea](https://github.com/uploadcare/uploadcare-js-api-clients/commit/54cd4eac0626e0e3540fc1880fa9d6286b3e4415))
+
+
+### Features
+
+* **rest-client:** add missing WebhookEvent values ([#585](https://github.com/uploadcare/uploadcare-js-api-clients/issues/585)) ([c76ce73](https://github.com/uploadcare/uploadcare-js-api-clients/commit/c76ce73c14a45ca840b5296f86301a3ab0dbfeff))
+
+
+
 # [6.22.0](https://github.com/uploadcare/uploadcare-js-api-clients/compare/v6.21.0...v6.22.0) (2026-09-22)
 
 
