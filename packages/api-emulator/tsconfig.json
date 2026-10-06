@@ -2,7 +2,7 @@
   "extends": "../../tsconfig.json",
   "compilerOptions": {
     "noEmit": true,
-    "types": ["vitest"],
+    "types": ["vitest", "node"],
     "noUncheckedIndexedAccess": true,
     // `scripts/*.ts` run directly via `node`, which has no bundler-style
     // extensionless/`.js`-for-`.ts` resolution, so they import each other

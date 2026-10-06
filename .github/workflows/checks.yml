@@ -66,6 +66,12 @@ jobs:
         if: steps.changes.outputs.api-emulator == 'true'
         run: npm run format:check -w packages/api-emulator
 
+      # `./browser`'s tests run in a real Chromium (Vitest browser mode).
+      - name: Install Chromium for `api-emulator`
+        if: steps.changes.outputs.api-emulator == 'true'
+        run: npx playwright install --with-deps chromium
+        working-directory: ./packages/api-emulator
+
       - name: Run `api-emulator` tests
         if: steps.changes.outputs.api-emulator == 'true'
         run: npm run test -w packages/api-emulator
