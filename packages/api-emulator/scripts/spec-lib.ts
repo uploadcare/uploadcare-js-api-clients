@@ -59,7 +59,9 @@ export const fetchSpec = async (url: string): Promise<FetchedSpec> => {
     response = await fetch(url)
   } catch (cause) {
     throw new Error(
-      expiredMessage(`Could not reach ${url}: ${String(cause)}.`),
+      expiredMessage(
+        `Could not reach ${stripSignature(url)}: ${String(cause)}.`
+      ),
       { cause }
     )
   }

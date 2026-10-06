@@ -113,6 +113,7 @@ export const SIGNED_UPLOADS_PUBLIC_KEY = 'pub_test__signed_uploads'
  * them) against. `upload-client`'s `test/api/authToken.test.ts` mints real
  * tokens with it, so one suite runs against both the emulator and production.
  */
+// Public test fixture, documented in the README — not a real credential.
 export const SIGNED_UPLOADS_SECRET_KEY = 'mock_secret_key'
 
 /**
