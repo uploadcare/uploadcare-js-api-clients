@@ -1,4 +1,5 @@
 import { authorize } from '../apis/upload/auth.js'
+import { bodyFields } from './body.js'
 import { sessionOf } from '../state/store.js'
 
 export type RouteHandler = (context: {
@@ -13,7 +14,8 @@ export type RouteHandler = (context: {
  * under, since that's where each client actually puts it. Defaults to
  * `pub_key`, read from the query string, which is every other protected route's
  * shape. `'both'` is `/group/`'s: `upload-client` sends `pub_key` in the body,
- * the old mock server's fake sends it in the query string.
+ * the old mock server's fake sends it in the query string. A body is a form or,
+ * for the derivative endpoints, JSON — see `bodyFields`.
  */
 export type ProtectedConfig = {
   paramName?: string
@@ -66,19 +68,8 @@ const match = (candidate: Route, method: string, pathname: string) => {
   return actual.length === candidate.segments.length ? params : undefined
 }
 
-/**
- * The body's public key, read from a _clone_ of the request — the handler still
- * needs to read the real body itself afterwards, and a `Request`'s body can
- * only be consumed once.
- */
-const bodyPublicKey = async (request: Request, paramName: string) => {
-  const form = await request
-    .clone()
-    .formData()
-    .catch(() => undefined)
-  const value = form?.get(paramName)
-  return typeof value === 'string' ? value : null
-}
+const bodyPublicKey = async (request: Request, paramName: string) =>
+  (await bodyFields(request)).get(paramName) ?? null
 
 const extractPublicKey = async (
   request: Request,

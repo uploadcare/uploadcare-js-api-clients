@@ -1,6 +1,6 @@
 /**
  * What the fake Uploadcare keeps: the files uploaded to it, the groups built
- * from them, and the `from_url` jobs still being polled.
+ * from them, and the `from_url` and derivative jobs still being polled.
  *
  * All of it is per session, and a session is one test file's page. The suite
  * runs its files in parallel against one fake, so a single shared store would
@@ -62,6 +62,21 @@ export type MultipartUpload = {
 }
 
 /**
+ * A derivative (AI generate/edit) job in flight, keyed by the `job_id` the POST
+ * handed out. `polls` drives the status sequence (see `derivative.ts`);
+ * `failure` is the scenario error the job ends in instead of a file (see
+ * `scenarios.ts`); `file` is the stored result, set by the first poll that
+ * reports `success`.
+ */
+export type DerivativeJob = {
+  polls: number
+  name: string
+  isStored: boolean
+  failure?: { code: string; message: string }
+  file?: StoredFile
+}
+
+/**
  * Files the tests address by uuid without uploading them first — they exist in
  * the demo project, so a fresh session starts with them already stored.
  *
@@ -109,6 +124,7 @@ export type Session = {
    */
   fromUrlSources: Map<string, string>
   multipart: Map<string, MultipartUpload>
+  derivativeJobs: Map<string, DerivativeJob>
   issued: number
   /** `/throttle/`'s per-session request count — see throttle.ts. */
   throttled: number
@@ -136,6 +152,7 @@ export const resetSession = (id = 'default') => {
     fromUrlJobs: new Map(),
     fromUrlSources: new Map(),
     multipart: new Map(),
+    derivativeJobs: new Map(),
     issued: 0,
     throttled: 0,
     telemetry: [],
@@ -224,3 +241,26 @@ export const fileInfo = (file: StoredFile) => {
     metadata: {}
   }
 }
+
+/**
+ * A stand-in for a file the emulator never really gets — a `from_url` source
+ * nothing ever fetches, a derivative no model ever draws — so each resolves to
+ * the same bytes as every demo-project file, under the name the request asked
+ * for rather than one implied by the bytes. These have to be the _shared_
+ * `STOCK_IMAGE` (a real, decodable JPEG), not a hand-written header: the CDN
+ * serves them back as `image/jpeg`, and an `<img>` in a browser consumer fires
+ * `error` rather than `load` on anything a decoder can't read.
+ */
+export const storeStockImage = (
+  session: Session,
+  name: string,
+  isStored: boolean
+) =>
+  store(session, {
+    name,
+    size: STOCK_IMAGE.byteLength,
+    mimeType: 'image/jpeg',
+    bytes: STOCK_IMAGE,
+    image: imageSize(STOCK_IMAGE),
+    isStored
+  })

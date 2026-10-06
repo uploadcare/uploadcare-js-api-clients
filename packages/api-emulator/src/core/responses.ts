@@ -15,7 +15,10 @@
  * production. The `text/plain` branch keeps the real status.
  *
  * `jsonerrors` is truthy-matched, not `=== '1'`: the old mock server this
- * replaced accepted any non-empty value, and so does the real API.
+ * replaced accepted any non-empty value, and so does the real API. With no
+ * `jsonerrors` at all, `Accept: application/json` asks for the envelope too —
+ * ai-image-editor's derivative client relies on that and never sends
+ * `jsonerrors`. An explicit `jsonerrors` wins over the header.
  */
 export const apiError = (
   request: Request,
@@ -26,7 +29,11 @@ export const apiError = (
   headers?: Record<string, string>
 ): Response => {
   const jsonerrors = new URL(request.url).searchParams.get('jsonerrors')
-  if (!jsonerrors || jsonerrors === '0') {
+  const json =
+    jsonerrors === null
+      ? Boolean(request.headers.get('accept')?.includes('application/json'))
+      : jsonerrors !== '' && jsonerrors !== '0'
+  if (!json) {
     return new Response(content, {
       status,
       headers: { 'content-type': 'text/plain', ...headers }

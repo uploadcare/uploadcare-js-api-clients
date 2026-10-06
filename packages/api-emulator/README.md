@@ -121,6 +121,34 @@ metadata), `POST /from_url/` / `GET /from_url/status/`, `POST /group/` /
 `GET /group/info/`, and multipart upload (`POST /multipart/start/`, the part
 `PUT`, `POST /multipart/complete/`) all exist today, and so does the CDN.
 
+So do the AI derivative endpoints, `POST /derivative/image/generate/`,
+`POST /derivative/image/edit/` and `GET /derivative/status/`
+(`src/apis/upload/derivative.ts`). **These are validated against their client,
+not the OpenAPI spec**: the published document doesn't describe them, so they
+are modelled on ai-image-editor's `UploadcareApiClient` (and its dev-only Zod
+schemas) and listed in `UNSPECIFIED_OPERATIONS` (`test/spec.ts`);
+`test/derivative.test.ts` asserts their shapes directly. In short:
+
+- Both POSTs take a JSON body with `pub_key` (the query string works too),
+  `prompt`, `filename`, `aspect_ratio` (`[w, h]`, positive integers; required
+  for generate, optional for edit), optional `store` (`false` leaves the result
+  unstored) and, for edit, `source` — the uuid of a file in the session, which
+  must be an image. They answer `{ "type": "job", "job_id": "…" }`. The gate is
+  every other protected route's: public key, Bearer token (scoped by the
+  derivative path), signed uploads and throttle-once (`metadata.mock_throttle`
+  in the JSON body).
+- Polling `GET /derivative/status/?pub_key=…&job_id=…` walks the job through
+  `processing`, `uploading`, `success` with `is_ready: false`, then `success`
+  with `is_ready: true` for good. The success frame is the `/info/` payload
+  plus `status`: the result is a real stored file (the stock image under the
+  requested `filename`), so `/info/` and the CDN serve it.
+- Refusals are the JSON error envelope with a snake_case `error_code`:
+  `invalid_request`, `invalid_aspect_ratio`, `source_not_found`,
+  `source_not_image`, `derivative_disabled`, `job_id_required`,
+  `job_not_found`. The client sends `Accept: application/json` instead of
+  `jsonerrors=1`, so with no `jsonerrors` parameter that header alone asks
+  for the envelope on every route; an explicit `jsonerrors` still wins.
+
 ## The CDN
 
 `GET https://ucarecdn.com/<uuid>/...` and the per-project cnames under
@@ -188,7 +216,10 @@ with a comment there naming the consumer. Summarised:
 | `DROP_CONNECTION_MARKER` | The header a part `PUT` carrying a leaked `Authorization` header gets answered with; only `listen.ts` (server mode) acts on it by destroying the connection — see the caveat above. |
 | `SIGNED_UPLOADS_PUBLIC_KEY` (`pub_test__signed_uploads`) | A project with Signed Uploads on: any protected request under it without a Bearer token gets `400 SignatureRequiredError`. Exported from `.`. |
 | `SIGNED_UPLOADS_SECRET_KEY` (`mock_secret_key`) | The secret Bearer tokens are verified against (HS256 keyed with `sha256(secret)`, as `generateAuthToken` mints them). Exported from `.`, so a test can mint tokens the emulator accepts. |
-| `THROTTLE_ONCE_FIELD` (`metadata[mock_throttle]`) | The first protected request carrying a given value is answered `429 RequestThrottledError` with `retry-after: 1`; later ones with the same value pass. Spent per session. |
+| `THROTTLE_ONCE_FIELD` (`metadata[mock_throttle]`) | The first protected request carrying a given value is answered `429 RequestThrottledError` with `retry-after: 1`; later ones with the same value pass. Spent per session. In a JSON body (the derivative endpoints) it's `metadata.mock_throttle`. |
+| `DERIVATIVE_DISABLED_PUBLIC_KEY` (`pub_test__derivative_disabled`) | A project without AI generation: both derivative POSTs answer `403 derivative_disabled`. Exported from `.`. |
+| `CONTENT_MODERATED_PROMPT` (`mock_content_moderated`) | A derivative job with this prompt reports `processing` once, then an `error` frame with `error_source: 'ai_gateway'`, `error_code: 'content_moderated'`. Exported from `.`. |
+| `PROVIDER_UNAVAILABLE_PROMPT` (`mock_provider_unavailable`) | The same, with `error_code: 'provider_unavailable'`. Exported from `.`. |
 
 ### Bearer tokens
 

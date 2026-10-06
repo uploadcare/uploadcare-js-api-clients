@@ -8,6 +8,9 @@ import './apis/telemetry/index.js'
 
 export { handle } from './core/router.js'
 export {
+  CONTENT_MODERATED_PROMPT,
+  DERIVATIVE_DISABLED_PUBLIC_KEY,
+  PROVIDER_UNAVAILABLE_PROMPT,
   SIGNED_UPLOADS_PUBLIC_KEY,
   SIGNED_UPLOADS_SECRET_KEY
 } from './apis/upload/scenarios.js'

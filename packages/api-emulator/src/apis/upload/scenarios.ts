@@ -145,3 +145,38 @@ export const SIGNED_UPLOADS_SECRET_KEY = 'mock_secret_key'
  * old mock server's `middleware/throttleOnce.ts`.
  */
 export const THROTTLE_ONCE_FIELD = 'metadata[mock_throttle]'
+
+/**
+ * Ai-image-editor's `errorCodes.ts` (`derivative_disabled`): a project without
+ * AI generation. `POST /derivative/image/generate/` and `.../edit/` under this
+ * otherwise ordinary allowed key (see `auth.ts`) answer `derivative_disabled`
+ * before a job exists. Exported from `.`.
+ */
+export const DERIVATIVE_DISABLED_PUBLIC_KEY = 'pub_test__derivative_disabled'
+
+/**
+ * Prompts whose derivative job fails at poll time instead of producing a file —
+ * the AI-gateway failures ai-image-editor maps to its own messages
+ * (`content_moderated`, `provider_unavailable`). The job reports `processing`
+ * once, then the error frame for good. Exported from `.`.
+ */
+export const CONTENT_MODERATED_PROMPT = 'mock_content_moderated'
+export const PROVIDER_UNAVAILABLE_PROMPT = 'mock_provider_unavailable'
+
+/** Keyed by prompt. A `Map`, so a prompt like `constructor` matches nothing. */
+export const DERIVATIVE_FAILURES = new Map([
+  [
+    CONTENT_MODERATED_PROMPT,
+    {
+      code: 'content_moderated',
+      message: 'The request was rejected by content moderation.'
+    }
+  ],
+  [
+    PROVIDER_UNAVAILABLE_PROMPT,
+    {
+      code: 'provider_unavailable',
+      message: 'The image generation provider is unavailable.'
+    }
+  ]
+])

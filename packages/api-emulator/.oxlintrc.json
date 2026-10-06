@@ -17,6 +17,7 @@
         "allow": [
           "./apis/*/index.js",
           "./base.js",
+          "./derivative.js",
           "./from-url.js",
           "./group.js",
           "./info.js",
