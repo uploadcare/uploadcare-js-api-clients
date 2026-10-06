@@ -124,10 +124,10 @@ The worker script is `/mockServiceWorker.js`. `@vitest/browser` serves it from
 `msw` itself, so a Vitest browser suite needs nothing else; anywhere else,
 copy it into the public directory with `npx msw init <publicDir>`.
 
-Per-chunk upload progress needs `@mswjs/interceptors` 0.45 or later, which is
-why it's a peer of its own: `msw` 2.15 depends on `^0.41`, a copy
-that fires a single upload `progress` event. Depend on `@mswjs/interceptors`
-directly so your install resolves the 0.45 one.
+Per-chunk upload progress needs `@mswjs/interceptors` 0.45.7 or a later 0.45.x
+(the peer range is `^0.45.7`), which is why it's a peer of its own: `msw` 2.15
+depends on `^0.41`, a copy that fires a single upload `progress` event. Depend
+on `@mswjs/interceptors` directly so your install resolves the 0.45 one.
 
 For a different transport policy, or MSW in Node, skip `./browser` and
 delegate to `handle` yourself — `undefined` from it is exactly what makes
