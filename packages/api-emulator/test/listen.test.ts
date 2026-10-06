@@ -109,10 +109,16 @@ it('survives a client aborting mid-request and still answers the next one', asyn
 })
 
 it('answers 500 when a route throws, instead of crashing the process', async () => {
+  const logged = vi.spyOn(console, 'error').mockImplementation(() => {})
   const response = await fetch(`${server.origin}/throws/`)
   expect(response.status).toBe(500)
   expect(response.headers.get('access-control-allow-origin')).toBe('*')
   expect(await response.text()).toContain('route blew up')
+  expect(logged).toHaveBeenCalledWith(
+    '[api-emulator] GET /throws/ threw:',
+    expect.any(Error)
+  )
+  logged.mockRestore()
 
   const next = await fetch(
     `${server.origin}/info/?pub_key=demopublickey&file_id=nope`
@@ -132,4 +138,16 @@ it('can stop holding the process open, for a caller with no teardown hook', asyn
   } finally {
     await detached.close()
   }
+})
+
+it('answers 502, naming the request, for a path no route handles', async () => {
+  const logged = vi.spyOn(console, 'warn').mockImplementation(() => {})
+  const response = await fetch(`${server.origin}/no-such-route/`)
+  expect(response.status).toBe(502)
+  expect(response.headers.get('access-control-allow-origin')).toBe('*')
+  expect(await response.text()).toBe(
+    'not handled by the emulator: GET /no-such-route/'
+  )
+  expect(logged).toHaveBeenCalledOnce()
+  logged.mockRestore()
 })
