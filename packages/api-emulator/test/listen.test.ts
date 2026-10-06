@@ -1,5 +1,19 @@
-import { afterAll, beforeAll, expect, it } from 'vitest'
+import { afterAll, beforeAll, expect, it, vi } from 'vitest'
+import type * as Emulator from '../src/index.js'
 import { createEmulatorServer } from '../src/listen.js'
+
+// A route that throws, so the listener's own error path can be reached; no
+// real route is supposed to, which is exactly why it needs a net.
+vi.mock('../src/index.js', async (importOriginal) => {
+  const actual = await importOriginal<typeof Emulator>()
+  return {
+    ...actual,
+    handle: (request: Request) =>
+      new URL(request.url).pathname === '/throws/'
+        ? Promise.reject(new Error('route blew up'))
+        : actual.handle(request)
+  }
+})
 
 let server: Awaited<ReturnType<typeof createEmulatorServer>>
 
@@ -92,4 +106,16 @@ it('survives a client aborting mid-request and still answers the next one', asyn
     body: fileUploadBody()
   })
   expect(await response.json()).toHaveProperty('file')
+})
+
+it('answers 500 when a route throws, instead of crashing the process', async () => {
+  const response = await fetch(`${server.origin}/throws/`)
+  expect(response.status).toBe(500)
+  expect(response.headers.get('access-control-allow-origin')).toBe('*')
+  expect(await response.text()).toContain('route blew up')
+
+  const next = await fetch(
+    `${server.origin}/info/?pub_key=demopublickey&file_id=nope`
+  )
+  expect(next.status).toBe(404)
 })
