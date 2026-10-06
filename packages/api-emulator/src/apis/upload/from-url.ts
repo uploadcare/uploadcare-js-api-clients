@@ -1,8 +1,12 @@
 import { apiError } from '../../core/responses.js'
 import { route } from '../../core/router.js'
-import { imageSize } from '../../state/image-size.js'
 import { STOCK_IMAGE } from '../../state/stock-image.js'
-import { fileInfo, nextUuid, sessionOf, store } from '../../state/store.js'
+import {
+  fileInfo,
+  nextUuid,
+  sessionOf,
+  storeStockImage
+} from '../../state/store.js'
 import {
   hostOf,
   isPrivateSourceUrl,
@@ -23,29 +27,6 @@ const nameFromUrl = (sourceUrl: string) => {
     'file'
   )
 }
-
-/**
- * A stand-in for whatever the source URL points at — nothing is ever really
- * fetched, so every reachable `from_url` upload resolves to the same bytes as
- * every demo-project file, named after the URL rather than after the bytes.
- * These have to be the _shared_ `STOCK_IMAGE` (a real, decodable JPEG), not a
- * hand-written header: the CDN serves them back as `image/jpeg`, and an `<img>`
- * in a browser consumer fires `error` rather than `load` on anything a decoder
- * can't read.
- */
-const storeStockImage = (
-  session: Parameters<typeof store>[0],
-  name: string,
-  isStored: boolean
-) =>
-  store(session, {
-    name,
-    size: STOCK_IMAGE.byteLength,
-    mimeType: 'image/jpeg',
-    bytes: STOCK_IMAGE,
-    image: imageSize(STOCK_IMAGE),
-    isStored
-  })
 
 const truthy = (value: FormDataEntryValue | string | null) =>
   value === '1' || value === 'true'

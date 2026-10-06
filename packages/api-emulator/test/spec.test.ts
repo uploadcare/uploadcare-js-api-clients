@@ -1,6 +1,7 @@
 import { beforeEach, expect, it } from 'vitest'
 import { handle, resetSession } from '../src/index.js'
-import { assertMatchesSpec, jsonError } from './spec.js'
+import { assertMatchesSpec, jsonError, UNSPECIFIED_OPERATIONS } from './spec.js'
+import uploadApiSpec from './specs/upload-api.json'
 
 const JPEG = new Uint8Array([
   0xff, 0xd8, 0xff, 0xc0, 0x00, 0x11, 0x08, 0x00, 0x01, 0x00, 0x01, 0xff, 0xd9
@@ -226,4 +227,49 @@ it('rejects a /base/ upload with no file, no jsonerrors', async () => {
     response: response!,
     body
   })
+})
+
+it('answers the JSON envelope for Accept: application/json, without jsonerrors', async () => {
+  const response = await handle(
+    new Request(
+      'https://upload.uploadcare.com/info/?pub_key=demopublickey&file_id=nope',
+      { headers: { Accept: 'application/json' } }
+    )
+  )
+  expect(await jsonError(response!)).toMatchObject({
+    status_code: 404,
+    content: 'File is not found.'
+  })
+})
+
+it('lets an explicit jsonerrors=0 win over Accept: application/json', async () => {
+  const response = await handle(
+    new Request(
+      'https://upload.uploadcare.com/info/?jsonerrors=0&pub_key=demopublickey&file_id=nope',
+      { headers: { Accept: 'application/json' } }
+    )
+  )
+  expect(response!.status).toBe(404)
+  expect(await response!.text()).toBe('File is not found.')
+})
+
+it.each([...UNSPECIFIED_OPERATIONS])(
+  'lists %s as unspecified only while the spec lacks it',
+  (operation) => {
+    const [method, path] = operation.split(' ') as [string, string]
+    const paths = uploadApiSpec.paths as Record<string, Record<string, unknown>>
+    expect(paths[path]?.[method.toLowerCase()]).toBeUndefined()
+  }
+)
+
+it('refuses to validate an unspecified operation, naming why', async () => {
+  await expect(
+    assertMatchesSpec({
+      method: 'get',
+      path: '/derivative/status/',
+      status: 200,
+      response: Response.json({}),
+      body: {}
+    })
+  ).rejects.toThrow(/UNSPECIFIED_OPERATIONS/)
 })

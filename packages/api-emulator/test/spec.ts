@@ -232,6 +232,24 @@ const VACUOUS_SCHEMAS = new Set<string>([
   'upload-api/components/responses/fromURLUploadStatusSuccessful/content/application~1json/schema'
 ])
 
+/**
+ * Operations the emulator serves that the published document doesn't describe
+ * at all, so `assertMatchesSpec` has nothing to validate them against. Listed
+ * by name, like `VACUOUS_SCHEMAS`, rather than left to fail as an unknown
+ * operation: these were modelled on the client that calls them instead, and
+ * their own test file asserts every field directly.
+ *
+ * The derivative endpoints are ai-image-editor's (`UploadcareApiClient` and its
+ * dev-only Zod schemas); `test/derivative.test.ts` checks the shapes that
+ * client sends and reads. `test/spec.test.ts` fails once the document gains
+ * one, so the entry gets dropped and the route validated for real.
+ */
+export const UNSPECIFIED_OPERATIONS = new Set<string>([
+  'POST /derivative/image/generate/',
+  'POST /derivative/image/edit/',
+  'GET /derivative/status/'
+])
+
 const assertNotVacuous = (key: string, validate: ValidateFunction) => {
   const acceptsEmpty = validate({})
   const listed = VACUOUS_SCHEMAS.has(key)
@@ -294,6 +312,14 @@ export const assertMatchesSpec = async (args: {
   const { path, status, response, body } = args
   const name = args.spec ?? 'upload-api'
   const specDocument = specs[name]
+
+  if (UNSPECIFIED_OPERATIONS.has(`${method.toUpperCase()} ${path}`)) {
+    fail(
+      `${method.toUpperCase()} ${path} is in UNSPECIFIED_OPERATIONS: the spec ` +
+        `doesn't describe it, so assert the body directly instead`
+    )
+    return
+  }
 
   const operation = get(specDocument, ['paths', path, method])
   if (!isObject(operation)) {

@@ -1,6 +1,8 @@
+import { bodyFields } from '../../core/body.js'
 import { apiError } from '../../core/responses.js'
 import type { Session } from '../../state/store.js'
 import {
+  DERIVATIVE_DISABLED_PUBLIC_KEY,
   NO_STORING_KEY,
   SIGNED_UPLOADS_PUBLIC_KEY,
   SIGNED_UPLOADS_SECRET_KEY,
@@ -17,7 +19,8 @@ const ALLOWED_PUBLIC_KEYS = [
   'secret_public_key',
   NO_STORING_KEY,
   UNKNOWN_PROGRESS_KEY,
-  SIGNED_UPLOADS_PUBLIC_KEY
+  SIGNED_UPLOADS_PUBLIC_KEY,
+  DERIVATIVE_DISABLED_PUBLIC_KEY
 ]
 
 /**
@@ -189,14 +192,8 @@ export const authorize = async (
   session: Session
 ) => {
   const query = new URL(request.url).searchParams
-  const form = await request
-    .clone()
-    .formData()
-    .catch(() => undefined)
-  const field = (name: string) => {
-    const value = form?.get(name) ?? query.get(name)
-    return typeof value === 'string' ? value : null
-  }
+  const body = await bodyFields(request)
+  const field = (name: string) => body.get(name) ?? query.get(name)
 
   const throttleKey = field(THROTTLE_ONCE_FIELD)
   if (throttleKey && !session.throttledOnce.has(throttleKey)) {
