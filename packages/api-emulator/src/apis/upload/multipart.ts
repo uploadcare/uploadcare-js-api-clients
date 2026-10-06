@@ -1,3 +1,4 @@
+import { storedBy } from '../../core/body.js'
 import { apiError, dropConnection } from '../../core/responses.js'
 import { route } from '../../core/router.js'
 import { imageSize } from '../../state/image-size.js'
@@ -20,13 +21,6 @@ const MULTIPART_MAX_SIZE = 100 * 1024 ** 3
 
 const asString = (value: FormDataEntryValue | null) =>
   typeof value === 'string' ? value : null
-
-/**
- * `UPLOADCARE_STORE=auto` (the default, like `base.ts`'s) leaves it to project
- * settings, and the demo project stores.
- */
-const storedBy = (value: FormDataEntryValue | null) =>
-  value !== '0' && value !== 'false'
 
 /**
  * `/multipart/upload/:uuid/original` — the part `PUT`'s own path segment, not a

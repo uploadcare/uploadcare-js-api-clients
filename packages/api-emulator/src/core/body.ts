@@ -1,3 +1,10 @@
+/**
+ * An upload's `store`/`UPLOADCARE_STORE` field. `auto` (the default) leaves it
+ * to project settings, and the demo project stores.
+ */
+export const storedBy = (value: FormDataEntryValue | null) =>
+  value !== '0' && value !== 'false'
+
 export const isRecord = (value: unknown): value is Record<string, unknown> =>
   value !== null && typeof value === 'object' && !Array.isArray(value)
 

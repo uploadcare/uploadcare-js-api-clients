@@ -1,11 +1,8 @@
+import { storedBy } from '../../core/body.js'
 import { apiError } from '../../core/responses.js'
 import { route } from '../../core/router.js'
 import { imageSize } from '../../state/image-size.js'
 import { sessionOf, store } from '../../state/store.js'
-
-/** `store=auto` leaves it to project settings, and the demo project stores. */
-const storedBy = (value: FormDataEntryValue | null) =>
-  value !== '0' && value !== 'false'
 
 /**
  * Direct upload. The file part is kept whole, because the CDN has to serve it
