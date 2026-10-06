@@ -1,8 +1,6 @@
+import { isRecord } from '../../core/body.js'
 import { route } from '../../core/router.js'
-import { sessionOf, type TelemetryEvent } from '../../state/store.js'
-
-const isRecord = (value: unknown): value is TelemetryEvent =>
-  typeof value === 'object' && value !== null && !Array.isArray(value)
+import { sessionOf } from '../../state/store.js'
 
 /**
  * `https://tlm.uploadcare.com/api/v1/events` — the uploader's telemetry sink.

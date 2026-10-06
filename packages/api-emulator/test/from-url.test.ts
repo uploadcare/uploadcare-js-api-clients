@@ -120,6 +120,16 @@ it('names the file from the last path segment when there is no dl param', async 
   expect(last).toMatchObject({ original_filename: 'photo-2.jpg' })
 })
 
+it('reads store=false the way /base/ does', async () => {
+  const { token } = (await post(
+    `pub_key=demopublickey&store=false&source_url=${encodeURIComponent(SOURCE)}`
+  ).then((r) => r.json())) as { token: string }
+
+  let last = await poll(token)
+  while (last.status === 'progress') last = await poll(token)
+  expect(last).toMatchObject({ status: 'success', is_stored: false })
+})
+
 it('reports unknown totals for the unknown-progress key', async () => {
   const { token } = (await post(
     `pub_key=pub_test__unknown_progress&source_url=${encodeURIComponent(SOURCE)}`

@@ -1,3 +1,4 @@
+import { storedBy } from '../../core/body.js'
 import { apiError } from '../../core/responses.js'
 import { route } from '../../core/router.js'
 import { STOCK_IMAGE } from '../../state/stock-image.js'
@@ -82,7 +83,7 @@ route(
     const host = hostOf(sourceUrl)
     const uuid =
       host && REACHABLE_HOSTS.includes(host)
-        ? storeStockImage(session, name, params.get('store') !== '0').uuid
+        ? storeStockImage(session, name, storedBy(params.get('store'))).uuid
         : ''
 
     if (saveForDuplicates && uuid) session.fromUrlSources.set(sourceUrl, uuid)
