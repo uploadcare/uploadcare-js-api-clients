@@ -10,9 +10,12 @@ need real request/response round-trips without hitting the network.
 including inside a browser page — that's what lets it back an in-browser MSW
 worker. `@uploadcare/api-emulator/listen` is Node-only: it speaks raw HTTP
 sockets (`node:http`/`node:https`, `Buffer`) to give a suite a real origin to
-point a `baseURL` at. The split exists so the core can be bundled into a page
-without dragging Node built-ins with it; `test/dist.test.ts` asserts
-neither the `.` export's source nor its built chunks regress that.
+point a `baseURL` at. `@uploadcare/api-emulator/browser` is page-only, and the
+one export that needs MSW (see [3. In the browser](#3-in-the-browser-with-msw)).
+The split exists so the core can be bundled into a page without dragging Node
+built-ins with it, and used from Node without installing MSW;
+`test/dist.test.ts` asserts neither the `.` nor the `./browser` export's
+source or built chunks regress that, and that only `./browser` imports MSW.
 
 Three ways to run it, in increasing order of how "real" the transport needs
 to be:
@@ -76,23 +79,68 @@ await page.route(/^https?:\/\//, async (route) => {
 (The `Buffer` above is the caller's Node/Playwright code, not the emulator's
 — the browser-safe guard only scans `src/`.)
 
-### 3. With MSW, in Node or in the browser
+### 3. In the browser, with MSW
 
-One handler, delegating to `handle`, works for both `msw/node` and
-`msw/browser` — `handle` returning `undefined` for a request it doesn't
-implement is exactly what makes `passthrough()` the right fallback: it hands
-the request back to whatever `setupServer`/`setupWorker` would otherwise have
-done with it, instead of the emulator having an opinion about traffic that
-isn't its own.
+`@uploadcare/api-emulator/browser` answers a page's Uploadcare traffic for a
+browser-mode test suite (Vitest browser mode, for one). `msw` and
+`@mswjs/interceptors` are optional peer dependencies: install them next to it.
+
+```ts
+import { setupEmulator } from '@uploadcare/api-emulator/browser'
+
+const emulator = setupEmulator({ cdnHosts: ['cdn.example.com'] })
+
+beforeEach(() => emulator.reset()) // starts it once, then a fresh session
+afterAll(() => emulator.stop())    // optional
+```
+
+Two ways in, one state: an `XMLHttpRequestInterceptor` answers XHR (every
+upload) in the page, so `xhr.upload` fires a `progress` event per body chunk,
+and an MSW Service Worker answers `fetch` and resource loads like `<img>`,
+which nothing in the page can reach. One emulator per page.
+
+Where a request goes depends on its host, since `handle` routes by path alone:
+
+- Uploadcare's hosts (`upload.uploadcare.com`, `ucarecdn.com`, `ucarecd.net`
+  and its `<prefix>.ucarecd.net` subdomains, `tlm.uploadcare.com`) and any
+  `cdnHosts` you pass are emulated. A path the emulator has no route for
+  fails as a network error, with a `console.warn` naming the method and URL,
+  rather than reaching the real API.
+- The page's own origin (the dev server) always passes through.
+- Any other origin follows `unhandled`. `'error'`, the default, fails it as a
+  network error and names the URL in a `console.error`, so a new or mistyped
+  endpoint can't quietly reach a real service. `'passthrough'` lets it out to
+  the network, for a suite that does load something real (an image to import
+  from a URL, say).
+
+An emulated XHR is held back by one macrotask (`setTimeout(0)`) before it is
+answered. Answered in the page, the whole request would otherwise be able to
+complete within microtasks of `send()`, before a store that flushes on
+`setTimeout(0)` (file-uploader's) has run, and its upload-start/progress
+events would never fire. A real network can't answer that fast. `fetch` has
+no upload events and gets no hold.
+
+The worker script is `/mockServiceWorker.js`. `@vitest/browser` serves it from
+`msw` itself, so a Vitest browser suite needs nothing else; anywhere else,
+copy it into the public directory with `npx msw init <publicDir>`.
+
+Per-chunk upload progress needs `@mswjs/interceptors` 0.45 or later, which is
+why it's a peer of its own: `msw` 2.15 depends on `^0.41`, a copy
+that fires a single upload `progress` event. Depend on `@mswjs/interceptors`
+directly so your install resolves the 0.45 one.
+
+For a different transport policy, or MSW in Node, skip `./browser` and
+delegate to `handle` yourself — `undefined` from it is exactly what makes
+`passthrough()` the right fallback:
 
 ```ts
 import { http, passthrough } from 'msw'
-import { setupServer } from 'msw/node' // or: import { setupWorker } from 'msw/browser'
+import { setupServer } from 'msw/node'
 import { handle } from '@uploadcare/api-emulator'
 
-const uploadcare = http.all('*', async ({ request }) => (await handle(request)) ?? passthrough())
-
-const server = setupServer(uploadcare)
+const server = setupServer(
+  http.all('*', async ({ request }) => (await handle(request)) ?? passthrough())
+)
 ```
 
 ## Sessions

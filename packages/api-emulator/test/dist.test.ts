@@ -45,7 +45,22 @@ const sourceFiles = (dir: string, prefix = ''): string[] =>
 
 const root = path.join(import.meta.dirname, '../src')
 
-it('keeps every module behind the "." export free of node built-ins', () => {
+/**
+ * MSW is an optional peer of `./browser` alone: a `.` consumer (`./listen`, a
+ * Playwright route) never installs it, so any other module importing it is a
+ * bundle that won't resolve.
+ */
+const MSW_IMPORT = /\bfrom\s*['"](?:msw|@mswjs\/)/
+
+it('keeps msw out of every module but "./browser"', () => {
+  const offenders = sourceFiles(root)
+    .filter((file) => path.relative(root, file) !== 'browser.ts')
+    .filter((file) => MSW_IMPORT.test(readFileSync(file, 'utf8')))
+    .map((file) => path.relative(root, file))
+  expect(offenders).toEqual([])
+})
+
+it('keeps every module behind the "." and "./browser" exports free of node built-ins', () => {
   const offenders = sourceFiles(root).flatMap((file) =>
     FORBIDDEN.filter((pattern) => pattern.test(readFileSync(file, 'utf8'))).map(
       (pattern) => `${path.relative(root, file)} matches ${pattern}`
@@ -73,18 +88,23 @@ const distGraph = (entry: string, seen = new Set<string>()): Set<string> => {
   return seen
 }
 
-it.runIf(existsSync(distRoot))(
-  'keeps the built "." bundle free of node built-ins',
-  () => {
-    const files = distGraph(path.join(distRoot, 'index.js'))
-    const offenders = [...files].flatMap((file) =>
-      FORBIDDEN.filter((pattern) =>
-        pattern.test(readFileSync(file, 'utf8'))
-      ).map((pattern) => `${path.relative(distRoot, file)} matches ${pattern}`)
-    )
-    expect(offenders).toEqual([])
+const offendersFrom = (entry: string, patterns: RegExp[]) =>
+  [...distGraph(path.join(distRoot, entry))].flatMap((file) =>
+    patterns
+      .filter((pattern) => pattern.test(readFileSync(file, 'utf8')))
+      .map((pattern) => `${path.relative(distRoot, file)} matches ${pattern}`)
+  )
+
+it.runIf(existsSync(distRoot)).each(['index.js', 'browser.js'])(
+  'keeps the built %s bundle free of node built-ins',
+  (entry) => {
+    expect(offendersFrom(entry, FORBIDDEN)).toEqual([])
   }
 )
+
+it.runIf(existsSync(distRoot))('keeps the built "." bundle free of msw', () => {
+  expect(offendersFrom('index.js', [MSW_IMPORT])).toEqual([])
+})
 
 /**
  * The regression this repo actually shipped (PR #586): `sideEffects: false`

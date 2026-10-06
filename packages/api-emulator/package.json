@@ -26,6 +26,10 @@
     "./listen": {
       "types": "./dist/listen.d.ts",
       "default": "./dist/listen.js"
+    },
+    "./browser": {
+      "types": "./dist/browser.d.ts",
+      "default": "./dist/browser.js"
     }
   },
   "files": [
@@ -58,6 +62,18 @@
     "url": "https://github.com/uploadcare/uploadcare-js-api-clients/issues"
   },
   "homepage": "https://github.com/uploadcare/uploadcare-js-api-clients#readme",
+  "peerDependencies": {
+    "@mswjs/interceptors": "^0.45.7",
+    "msw": "^2.15.0"
+  },
+  "peerDependenciesMeta": {
+    "@mswjs/interceptors": {
+      "optional": true
+    },
+    "msw": {
+      "optional": true
+    }
+  },
   "devDependencies": {
     "@mswjs/interceptors": "^0.45.7",
     "@vitest/browser-playwright": "^4.1.11",
