@@ -263,7 +263,7 @@ with a comment there naming the consumer. Summarised:
 | `NO_STORING_KEY` (`pub_test__no_storing`) | The public key `upload-client`'s multipart fixtures use. |
 | `UNREACHABLE_SOURCE_URL` (`https://1.com/1.jpg`) | A `from_url` source that fails synchronously, at `POST /from_url/` itself, with a 400 — instead of only failing once the job is polled. |
 | `REACHABLE_HOSTS` | The only hosts a `from_url` upload can actually "fetch" from; anything else resolves to a poll-time `Host does not exist` failure. Includes the emulator's own default origin (`127.0.0.1:3000`). |
-| `isPrivateSourceUrl()` | Flags a `from_url` source as a private/local address (`192.168.*`, `localhost` other than the emulator's own), which `POST /from_url/` rejects. |
+| `isPrivateSourceUrl()` | Flags a `from_url` source as a private/local address (`192.168.*` or any `localhost` host; the CLI's own `127.0.0.1:3000` is in `REACHABLE_HOSTS`), which `POST /from_url/` rejects. |
 | `STUB_GROUP_MEMBER` (`392e3aa3-…`) | The one uuid `POST /group/` accepts without it being uploaded, as a 0-byte stand-in, for `upload-client`'s hardcoded group fixtures. Any other member the session doesn't hold is "Some files not found.". |
 | `GROUP_FILES_NOT_FOUND_KEY` (`demopublickey`) | Scoped to `POST /group/` alone: under this key even `STUB_GROUP_MEMBER` counts as missing. Real uploads still group. Everywhere else, this is just an ordinary allowed public key. |
 | `SIGNED_UPLOADS_PUBLIC_KEY` (`pub_test__signed_uploads`) | A project with Signed Uploads on: any protected request under it without a Bearer token gets `400 SignatureRequiredError`. Exported from `.`. |
