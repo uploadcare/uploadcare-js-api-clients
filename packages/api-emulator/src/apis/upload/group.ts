@@ -4,6 +4,7 @@ import {
   fileInfo,
   nextUuid,
   sessionOf,
+  type GroupMember,
   type Session,
   type StoredFile
 } from '../../state/store.js'
@@ -33,9 +34,7 @@ const MEMBER_UUID =
  */
 const CDN_URL_PREFIX = /^https?:\/\/[^/]+\//i
 
-const parseMember = (
-  raw: string
-): { uuid: string; effects: string } | undefined => {
+const parseMember = (raw: string): GroupMember | undefined => {
   const path = raw.replace(CDN_URL_PREFIX, '')
   const [uuid = '', ...rest] = path.split('/')
   if (!MEMBER_UUID.test(uuid)) return undefined
@@ -81,25 +80,21 @@ const memberToken = (value: FormDataEntryValue) =>
  * `/group/` and `/group/info/` answer with the same shape, built fresh each
  * time.
  */
-const groupEnvelope = (session: Session, id: string, members: string[]) => ({
+const groupEnvelope = (
+  session: Session,
+  id: string,
+  members: GroupMember[]
+) => ({
   id,
   datetime_created: new Date(0).toISOString(),
   datetime_stored: null,
   files_count: members.length,
   cdn_url: `https://ucarecdn.com/${id}/`,
   url: `https://api.uploadcare.com/groups/${id}/`,
-  files: members.map((raw) => {
-    // Every member was already validated at creation time (`parseMember`
-    // below), so this can't fail — a group's membership never changes once
-    // created (see the spec's "Groups are immutable" note).
-    const parsed = parseMember(raw)
-    if (!parsed) throw new Error(`unreachable: invalid group member ${raw}`)
-    const { uuid, effects } = parsed
-    return {
-      ...fileInfo(session.files.get(uuid) ?? stubFile(uuid)),
-      default_effects: effects
-    }
-  })
+  files: members.map(({ uuid, effects }) => ({
+    ...fileInfo(session.files.get(uuid) ?? stubFile(uuid)),
+    default_effects: effects
+  }))
 })
 
 route(
@@ -115,22 +110,25 @@ route(
     // } }`).
     const publicKey = asString(form.get('pub_key')) ?? query.get('pub_key')
 
-    const members = [...form.entries(), ...query.entries()]
+    const tokens = [...form.entries(), ...query.entries()]
       .filter(([key]) => MEMBER_KEY.test(key))
       .map(([, value]) => memberToken(value))
 
-    if (members.length === 0)
+    if (tokens.length === 0)
       // schema: groupFileURLParsingFailedError
       return apiError(request, 400, 'No files[N] parameters found.')
 
-    let anyMemberMissing = false
-    for (const raw of members) {
+    const members: GroupMember[] = []
+    for (const raw of tokens) {
       const parsed = parseMember(raw)
       if (!parsed)
         // schema: groupFilesInvalidError
         return apiError(request, 400, `This is not valid file url: ${raw}.`)
-      if (!session.files.has(parsed.uuid)) anyMemberMissing = true
+      members.push(parsed)
     }
+    const anyMemberMissing = members.some(
+      ({ uuid }) => !session.files.has(uuid)
+    )
 
     // GROUP_FILES_NOT_FOUND_KEY only fakes "not found" for members the
     // emulator was never told about (see scenarios.ts) — a genuinely

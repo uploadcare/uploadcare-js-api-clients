@@ -115,9 +115,12 @@ export const DEMO_FILES = [
  */
 export type TelemetryEvent = Record<string, unknown>
 
+/** A `files[]` member, parsed once when its group is created. */
+export type GroupMember = { uuid: string; effects: string }
+
 export type Session = {
   files: Map<string, StoredFile>
-  groups: Map<string, string[]>
+  groups: Map<string, GroupMember[]>
   fromUrlJobs: Map<string, FromUrlJob>
   /**
    * Source url → the uuid it was last stored as, for `check_URL_duplicates`.

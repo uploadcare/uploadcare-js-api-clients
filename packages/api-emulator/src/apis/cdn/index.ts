@@ -36,11 +36,8 @@ const resolve = (session: Session, id: string, pathname: string) => {
   if (!id.includes('~')) return session.files.get(id)
   const members = session.groups.get(id)
   const nth = Number(pathname.match(NTH)?.[1] ?? 0)
-  const member = members?.[nth]
-  if (!member) return undefined
-  // A group member may carry `/-/effects/` after its uuid (see `group.ts`'s
-  // `parseMember`) — only the uuid identifies the stored file.
-  return session.files.get(member.split('/')[0] ?? member)
+  const uuid = members?.[nth]?.uuid
+  return uuid === undefined ? undefined : session.files.get(uuid)
 }
 
 /**

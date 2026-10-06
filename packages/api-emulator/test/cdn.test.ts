@@ -5,12 +5,12 @@ const JPEG_1X1 = new Uint8Array([
   0xff, 0xd8, 0xff, 0xc0, 0x00, 0x11, 0x08, 0x00, 0x01, 0x00, 0x01, 0xff, 0xd9
 ])
 
-const upload = async () => {
+const upload = async (bytes: Uint8Array = JPEG_1X1, type = 'image/jpeg') => {
   const body = new FormData()
   // `/base/` requires `UPLOADCARE_PUB_KEY` in the body — the brief's original
   // snippet omitted it, which 403s the upload before the CDN is ever reached.
   body.set('UPLOADCARE_PUB_KEY', 'demopublickey')
-  body.set('file', new File([JPEG_1X1], 'a.jpg', { type: 'image/jpeg' }))
+  body.set('file', new File([bytes], 'a.jpg', { type }))
   const response = await handle(
     new Request('https://upload.uploadcare.com/base/', {
       method: 'POST',
@@ -19,6 +19,26 @@ const upload = async () => {
   )
   return ((await response!.json()) as { file: string }).file
 }
+
+const createGroup = async (members: string[]) => {
+  const body = new FormData()
+  body.set('pub_key', 'demopublickey')
+  members.forEach((member, index) => body.set(`files[${index}]`, member))
+  const response = await handle(
+    new Request('https://upload.uploadcare.com/group/', {
+      method: 'POST',
+      body
+    })
+  )
+  return ((await response!.json()) as { id: string }).id
+}
+
+const cdnBytes = async (path: string) =>
+  new Uint8Array(
+    await (await handle(
+      new Request(`https://ucarecdn.com/${path}`)
+    ))!.arrayBuffer()
+  )
 
 beforeEach(() => resetSession())
 
@@ -62,4 +82,10 @@ it('does not let the CDN route swallow an Upload API GET', async () => {
   )
   expect(response).toBeDefined()
   expect(response!.status).toBe(404)
+})
+
+it('resolves a group member given as a CDN url', async () => {
+  const uuid = await upload()
+  const group = await createGroup([`https://ucarecdn.com/${uuid}/`])
+  expect(await cdnBytes(`${group}/nth/0/`)).toEqual(JPEG_1X1)
 })
