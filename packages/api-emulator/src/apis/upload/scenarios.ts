@@ -1,7 +1,7 @@
 /**
- * Every magic value `/from_url/` (and the public-key gate in `auth.ts`) tests
- * against, named here so a route file never carries a bare string a test
- * elsewhere is quietly relying on.
+ * Every magic value a test steers the emulator with — public keys, source urls,
+ * prompts, and the secret test tokens are signed with — named here so a route
+ * file never carries a bare string a test elsewhere is quietly relying on.
  */
 
 /**
@@ -14,8 +14,8 @@ export const UNKNOWN_PROGRESS_KEY = 'pub_test__unknown_progress'
 /**
  * `upload-client`'s multipart fixtures (`_fixtureFactory.ts`'s `multipart`
  * entry) use this public key. Not read by `/from_url/` itself — kept here so
- * `auth.ts`'s allow-list and Task 5's multipart routes share one spelling
- * instead of two.
+ * `auth.ts`'s allow-list and the multipart routes share one spelling instead of
+ * two.
  */
 export const NO_STORING_KEY = 'pub_test__no_storing'
 
@@ -93,32 +93,6 @@ export const REACHABLE_HOSTS = [
  * succeeds instead of being reported missing.
  */
 export const GROUP_FILES_NOT_FOUND_KEY = 'demopublickey'
-
-/**
- * The part size `/multipart/start/` hands out, matching the real Upload API
- * (Decision D5) rather than the client's own `multipartChunkSize` setting — the
- * emulator always cuts a file into 5MB parts regardless of what the caller
- * asked for, since nothing here is actually uploaded to S3 and the chunking
- * only has to produce the right _number_ of part URLs. Consumed by
- * `multipart.ts`.
- */
-export const MULTIPART_CHUNK_SIZE = 5 * 1024 * 1024
-
-/**
- * A part `PUT` that carries an `Authorization` header is a client bug: part
- * uploads go to presigned storage URLs and must never carry it, and the real S3
- * endpoint would reject the request at the socket rather than with an ordinary
- * HTTP error. `upload-client` ignores the status code of a part `PUT` entirely
- * (see `multipartUpload.ts`), so answering with an error status would not fail
- * a test over a leaked header — only dropping the connection does. `handle()`
- * can't touch a socket (it has to stay browser-safe for the MSW path), so
- * `multipart.ts`'s part route instead answers with an ordinary `Response`
- * carrying this marker header, and `listen.ts` — the one place that owns the
- * raw socket — recognises it and destroys the connection instead of writing the
- * response. Under MSW there is no socket, so the marker response is delivered
- * as-is; see the README's caveats.
- */
-export const DROP_CONNECTION_MARKER = 'x-emulator-drop-connection'
 
 /**
  * `upload-client`'s `test/api/authToken.test.ts` uses this public key as the
