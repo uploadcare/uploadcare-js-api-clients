@@ -51,6 +51,13 @@ it('delivers the bytes that were uploaded, whatever the operations ask for', asy
   expect(response!.headers.get('content-type')).toBe('image/jpeg')
 })
 
+it('sandboxes a file served back under the type its uploader claimed', async () => {
+  const uuid = await upload(new TextEncoder().encode('<script>'), 'text/html')
+  const response = await handle(new Request(`https://ucarecdn.com/${uuid}/`))
+  expect(response!.headers.get('content-type')).toBe('text/html')
+  expect(response!.headers.get('content-security-policy')).toBe('sandbox')
+})
+
 it('answers -/json/ with the dimensions it read from the bytes', async () => {
   const uuid = await upload()
   const response = await handle(

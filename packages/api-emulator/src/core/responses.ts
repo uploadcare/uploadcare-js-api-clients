@@ -36,7 +36,11 @@ export const apiError = (
   if (!json) {
     return new Response(content, {
       status,
-      headers: { 'content-type': 'text/plain', ...headers }
+      headers: {
+        'content-type': 'text/plain',
+        'x-content-type-options': 'nosniff',
+        ...headers
+      }
     })
   }
   return Response.json(

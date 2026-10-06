@@ -59,6 +59,15 @@ const headersOf = (request: IncomingMessage) => {
   return headers
 }
 
+/**
+ * The emulator's own 500/502 bodies echo the request path and the thrown error;
+ * as plain text a browser never renders them as markup.
+ */
+const PLAIN_TEXT = {
+  'content-type': 'text/plain; charset=utf-8',
+  'x-content-type-options': 'nosniff'
+}
+
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 
 export const createEmulatorServer = async (
@@ -113,7 +122,7 @@ export const createEmulatorServer = async (
         return
       }
       response
-        .writeHead(500, { 'access-control-allow-origin': '*' })
+        .writeHead(500, { ...PLAIN_TEXT, 'access-control-allow-origin': '*' })
         .end(String(error))
     }
   }
@@ -151,12 +160,13 @@ export const createEmulatorServer = async (
       const message = `not handled by the emulator: ${request.method} ${new URL(url).pathname}`
       console.warn(`[api-emulator] ${message}`)
       response
-        .writeHead(502, { 'access-control-allow-origin': '*' })
+        .writeHead(502, { ...PLAIN_TEXT, 'access-control-allow-origin': '*' })
         .end(message)
       return
     }
     response.writeHead(answer.status, {
       ...Object.fromEntries(answer.headers),
+      'x-content-type-options': 'nosniff',
       'access-control-allow-origin': '*',
       // `retry-after` (throttling) isn't CORS-safelisted; without this a
       // browser client can't read it and falls back to its default delay.

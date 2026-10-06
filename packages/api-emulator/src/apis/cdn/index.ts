@@ -70,7 +70,14 @@ route('GET', '/:uuid/*', ({ request, params }) => {
     return info ? Response.json(info) : apiError(request, 400, 'Not an image')
   }
 
+  // `mimeType` is whatever the uploader claimed, `text/html` included; the
+  // sandbox keeps such a file from running script on the emulator's origin.
+  // `<img>` and `fetch` consumers are unaffected.
   return new Response(file.bytes, {
-    headers: { 'content-type': file.mimeType }
+    headers: {
+      'content-type': file.mimeType,
+      'content-security-policy': 'sandbox',
+      'x-content-type-options': 'nosniff'
+    }
   })
 })

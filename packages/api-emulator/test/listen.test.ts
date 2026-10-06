@@ -161,6 +161,7 @@ it('answers 502, naming the request, for a path no route handles', async () => {
   const response = await fetch(`${server.origin}/no-such-route/`)
   expect(response.status).toBe(502)
   expect(response.headers.get('access-control-allow-origin')).toBe('*')
+  expect(response.headers.get('content-type')).toContain('text/plain')
   expect(await response.text()).toBe(
     'not handled by the emulator: GET /no-such-route/'
   )

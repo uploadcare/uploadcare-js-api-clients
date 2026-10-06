@@ -17,6 +17,7 @@ import {
  */
 const ALLOWED_PUBLIC_KEYS = [
   'demopublickey',
+  // Public test fixture (the old mock server's), not a real credential.
   'secret_public_key',
   NO_STORING_KEY,
   UNKNOWN_PROGRESS_KEY,
