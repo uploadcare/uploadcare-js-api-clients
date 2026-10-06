@@ -80,17 +80,22 @@ export const REACHABLE_HOSTS = [
 ]
 
 /**
+ * The one uuid `POST /group/` accepts without it being in the session:
+ * `upload-client`'s `factory.groupOfFiles('valid')` groups it without ever
+ * uploading it first (`group.test.ts`' "should create group of files",
+ * `uploadFileGroup/groupFromUploaded.test.ts`), as the old mock server — which
+ * never checked a store — allowed. It stands in as a 0-byte file. Every other
+ * unknown member is "Some files not found.", as the real API answers.
+ */
+export const STUB_GROUP_MEMBER = '392e3aa3-5ed6-4ad6-a67e-b3a7c1d5b9e9'
+
+/**
  * `upload-client`'s `group.test.ts` ("should fail with [HTTP 400] Some files
- * not found.") uses this public key — otherwise a perfectly ordinary allowed
- * key (see `auth.ts`) — with hardcoded uuids it never uploads first, to make
- * `POST /group/` fail with `groupFilesNotFoundError`. Mirrors the old mock
- * server's `controllers/group.ts` hack (`publicKey === 'demopublickey'`),
- * scoped to `/group/` alone so every other route's use of the same key as "a
- * normal demo project" is unaffected — and, unlike that hack, scoped further to
- * members `group.ts` can't actually find in the session, so a real upload
- * grouped under this same key (as file-uploader's e2e suite does — it's a
- * widely used real demo public key, not a magic value it invented) still
- * succeeds instead of being reported missing.
+ * not found.") groups `STUB_GROUP_MEMBER` under this public key and expects
+ * `groupFilesNotFoundError` — so under this key, and only on `POST /group/`,
+ * even the stub counts as missing. A real upload grouped under it still
+ * succeeds (file-uploader's e2e suite does exactly that; it's a widely used
+ * real demo public key). Everywhere else it's an ordinary allowed key.
  */
 export const GROUP_FILES_NOT_FOUND_KEY = 'demopublickey'
 

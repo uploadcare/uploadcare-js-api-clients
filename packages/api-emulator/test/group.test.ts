@@ -130,24 +130,27 @@ it('builds a group out of a CDN url with operations, keeping default_effects', a
   })
 })
 
-it('accepts a member nobody actually uploaded, matching the old mock server', async () => {
-  // `upload-client`'s `group.test.ts` ("should create group of files") and
-  // `uploadFileGroup/groupFromUploaded.test.ts` group hardcoded uuids no test
-  // ever uploads first — see the `stubFile` comment in `group.ts`.
-  const wellFormedButUnknown = '392e3aa3-5ed6-4ad6-a67e-b3a7c1d5b9e9'
-  const response = await createGroup([wellFormedButUnknown])
+it('refuses a well-formed member nobody uploaded', async () => {
+  const response = await createGroup(['00000000-0000-4000-8000-000000000000'])
+  expect(await jsonError(response)).toMatchObject({
+    status_code: 400,
+    content: 'Some files not found.'
+  })
+})
+
+it('stands in for STUB_GROUP_MEMBER, which upload-client groups unuploaded', async () => {
+  const response = await createGroup(['392e3aa3-5ed6-4ad6-a67e-b3a7c1d5b9e9'])
   expect(response.status).toBe(200)
   const group = (await response.json()) as {
     files: Array<{ uuid: string }>
   }
-  expect(group.files[0].uuid).toBe(wellFormedButUnknown)
+  expect(group.files[0].uuid).toBe('392e3aa3-5ed6-4ad6-a67e-b3a7c1d5b9e9')
 })
 
 it('fails for the "files not found" key when the member was never uploaded', async () => {
-  // Distinct from the "accepts a member nobody actually uploaded" test above:
-  // that one uses an ordinary key, where the stub path is meant to stand in
-  // silently; `demopublickey` is the one key that must instead surface it as
-  // "not found" (`upload-client`'s own `group.test.ts` depends on this).
+  // Unlike the STUB_GROUP_MEMBER test above, under an ordinary key:
+  // `demopublickey` must surface even the stub as "not found"
+  // (`upload-client`'s own `group.test.ts` depends on this).
   const body = new FormData()
   body.set('pub_key', 'demopublickey')
   body.set('files[0]', '392e3aa3-5ed6-4ad6-a67e-b3a7c1d5b9e9')

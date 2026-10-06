@@ -8,7 +8,7 @@ import {
   type Session,
   type StoredFile
 } from '../../state/store.js'
-import { GROUP_FILES_NOT_FOUND_KEY } from './scenarios.js'
+import { GROUP_FILES_NOT_FOUND_KEY, STUB_GROUP_MEMBER } from './scenarios.js'
 
 /**
  * `upload-client` sends a member per repeated `files[]` (`buildFormData`'s
@@ -43,14 +43,8 @@ const parseMember = (raw: string): GroupMember | undefined => {
 }
 
 /**
- * A stand-in for a member the emulator never actually stored. `upload-client`'s
- * `group.test.ts` ("should create group of files") and the whole of
- * `uploadFileGroup/groupFromUploaded.test.ts` group hardcoded, well-formed
- * uuids that no test ever uploads first — the old mock server never checked a
- * store at all (`data/group.ts`'s canned file, echoed back with the input uuid
- * swapped in), and those tests assert on the response shape rather than on an
- * upload happening first. The emulator answers the same way rather than
- * breaking a suite of passing tests over a file it was never told about.
+ * What a member that isn't a stored file reports as: `STUB_GROUP_MEMBER`, or a
+ * `<uuid>~N` group reference.
  */
 const stubFile = (uuid: string): StoredFile => ({
   uuid,
@@ -105,7 +99,7 @@ route(
     const form = await request.formData().catch(() => new FormData())
     const query = new URL(request.url).searchParams
 
-    // Only for the GROUP_FILES_NOT_FOUND_KEY scenario check below — the
+    // Only for the STUB_GROUP_MEMBER scenario check below — the
     // public-key gate itself is the router's (`{ protected: { source: 'both'
     // } }`).
     const publicKey = asString(form.get('pub_key')) ?? query.get('pub_key')
@@ -126,17 +120,13 @@ route(
         return apiError(request, 400, `This is not valid file url: ${raw}.`)
       members.push(parsed)
     }
-    const anyMemberMissing = members.some(
-      ({ uuid }) => !session.files.has(uuid)
-    )
+    const stubAllowed = publicKey !== GROUP_FILES_NOT_FOUND_KEY
+    const isKnown = ({ uuid }: GroupMember) =>
+      session.files.has(uuid) ||
+      session.groups.has(uuid) ||
+      (stubAllowed && uuid === STUB_GROUP_MEMBER)
 
-    // GROUP_FILES_NOT_FOUND_KEY only fakes "not found" for members the
-    // emulator was never told about (see scenarios.ts) — a genuinely
-    // uploaded file must still group successfully under that key, the same
-    // as it does under any other one. A blanket key-based 400 was reporting
-    // real, existing uuids as missing (defect: `/info/` finds them, `/group/`
-    // doesn't) purely because of which public key asked.
-    if (publicKey === GROUP_FILES_NOT_FOUND_KEY && anyMemberMissing)
+    if (!members.every(isKnown))
       // schema: groupFilesNotFoundError — see scenarios.ts.
       return apiError(request, 400, 'Some files not found.')
 
