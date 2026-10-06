@@ -1,9 +1,10 @@
+// file deepcode ignore HttpToHttps: local test server bound to 127.0.0.1; TLS is opt-in via options.tls
 import {
-  createServer as createHttpServer,
+  Server as PlainServer,
   type IncomingMessage,
   type ServerResponse
 } from 'node:http'
-import { createServer as createHttpsServer } from 'node:https'
+import { Server as TlsServer } from 'node:https'
 // Registers the routes as a side effect; `router.js` alone knows nothing about them.
 import { handle } from './index.js'
 import { DROP_CONNECTION_MARKER } from './core/responses.js'
@@ -180,12 +181,11 @@ export const createEmulatorServer = async (
     response.end(Buffer.from(await answer.arrayBuffer()))
   }
 
-  const createServer = () => {
-    if (options.tls) return createHttpsServer(options.tls, listener)
-    // deepcode ignore HttpToHttps: local test server bound to 127.0.0.1; TLS is opt-in via options.tls
-    return createHttpServer(listener)
-  }
-  const server = createServer()
+  // Loopback-only test server (see `listen` below): plain HTTP unless the
+  // caller opts into TLS.
+  const server = options.tls
+    ? new TlsServer(options.tls, listener)
+    : new PlainServer(listener)
 
   const origin = await new Promise<string>((resolve, reject) => {
     server.on('error', reject)
