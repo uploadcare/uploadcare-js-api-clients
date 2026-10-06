@@ -89,3 +89,26 @@ it('resolves a group member given as a CDN url', async () => {
   const group = await createGroup([`https://ucarecdn.com/${uuid}/`])
   expect(await cdnBytes(`${group}/nth/0/`)).toEqual(JPEG_1X1)
 })
+
+it('picks a group member by nth/, defaulting to the first', async () => {
+  const first = await upload(new Uint8Array([1]), 'text/plain')
+  const second = await upload(new Uint8Array([2]), 'text/plain')
+  const group = await createGroup([first, `${second}/-/resize/x800/`])
+
+  expect(await cdnBytes(`${group}/-/preview/`)).toEqual(new Uint8Array([1]))
+  expect(await cdnBytes(`${group}/nth/1/-/preview/`)).toEqual(
+    new Uint8Array([2])
+  )
+  const outOfRange = await handle(
+    new Request(`https://ucarecdn.com/${group}/nth/5/-/preview/`)
+  )
+  expect(outOfRange!.status).toBe(404)
+})
+
+it('400s -/json/ for a file that is not an image', async () => {
+  const uuid = await upload(new Uint8Array([1]), 'text/plain')
+  const response = await handle(
+    new Request(`https://ucarecdn.com/${uuid}/-/json/`)
+  )
+  expect(response!.status).toBe(400)
+})
