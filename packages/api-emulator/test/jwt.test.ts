@@ -25,8 +25,12 @@ const encode = (value: object) =>
   Buffer.from(JSON.stringify(value)).toString('base64url')
 
 /** HS256 keyed with `sha256(secret)`, the way `generateAuthToken` signs. */
-const sign = (claims: object, secret = SIGNED_UPLOADS_SECRET_KEY) => {
-  const header = encode({ alg: 'HS256', typ: 'JWT' })
+const sign = (
+  claims: object,
+  secret = SIGNED_UPLOADS_SECRET_KEY,
+  protectedHeader: object = { alg: 'HS256', typ: 'JWT' }
+) => {
+  const header = encode(protectedHeader)
   const payload = encode(claims)
   const key = createHash('sha256').update(secret, 'utf8').digest()
   const signature = createHmac('sha256', key)
@@ -102,6 +106,17 @@ it('rejects a token signed with the wrong secret', async () => {
     401,
     'AccessTokenInvalidError',
     'Invalid token. Reason: signature does not match'
+  )
+})
+
+it('rejects a correctly signed token whose `alg` is not HS256', async () => {
+  await expectRejected(
+    await bearer(
+      sign({ exp: now() + 600 }, SIGNED_UPLOADS_SECRET_KEY, { alg: 'none' })
+    ),
+    401,
+    'AccessTokenInvalidError',
+    'Invalid token. Reason: `alg` must be HS256'
   )
 })
 

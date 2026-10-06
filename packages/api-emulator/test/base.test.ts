@@ -115,6 +115,21 @@ it('names UPLOADCARE_PUB_KEY, not pub_key, in that error', async () => {
   })
 })
 
+it('400s for /info/ without a file_id', async () => {
+  const response = await handle(
+    new Request('https://upload.uploadcare.com/info/?pub_key=demopublickey')
+  )
+  expect(response!.status).toBe(400)
+  await assertMatchesSpec({
+    method: 'get',
+    path: '/info/',
+    status: response!.status,
+    response: response!,
+    body: await response!.clone().text()
+  })
+  expect(await response!.clone().text()).toContain('file_id is required.')
+})
+
 it('404s for a file nobody uploaded', async () => {
   const response = await handle(
     new Request(

@@ -7,7 +7,10 @@ route(
   '/info/',
   ({ request }) => {
     const params = new URL(request.url).searchParams
-    const id = params.get('file_id') ?? ''
+    const id = params.get('file_id')
+    if (!id)
+      // schema: fileIdRequiredError
+      return apiError(request, 400, 'file_id is required.')
     const file = sessionOf(request).files.get(id)
     // schema: fileNotFoundError
     return file
