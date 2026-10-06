@@ -101,7 +101,13 @@ export const createEmulatorServer = async (
     } catch (error) {
       // A route that throws is an emulator bug, but it should fail the one
       // request that hit it, not reject out of a request listener and take
-      // the consumer's process (and its whole test run) down with it.
+      // the consumer's process (and its whole test run) down with it. Logged
+      // either way, so a consumer's CI failure can be told apart from a
+      // client regression.
+      console.error(
+        `[api-emulator] ${request.method} ${request.url} threw:`,
+        error
+      )
       if (request.aborted || response.destroyed || response.headersSent) {
         response.destroy()
         return
@@ -142,9 +148,11 @@ export const createEmulatorServer = async (
     }
 
     if (!answer) {
+      const message = `not handled by the emulator: ${request.method} ${new URL(url).pathname}`
+      console.warn(`[api-emulator] ${message}`)
       response
         .writeHead(502, { 'access-control-allow-origin': '*' })
-        .end('not handled by the emulator')
+        .end(message)
       return
     }
     response.writeHead(answer.status, {
