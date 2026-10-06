@@ -11,7 +11,8 @@ import { parse as parseYaml } from 'yaml'
 export const formatWithOxfmt = (filePath: string): void => {
   execFileSync('npx', ['oxfmt', filePath], {
     cwd: path.join(import.meta.dirname, '..'),
-    stdio: 'ignore'
+    // stderr through, so a failing oxfmt says why.
+    stdio: ['ignore', 'ignore', 'inherit']
   })
 }
 
