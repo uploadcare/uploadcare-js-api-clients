@@ -46,9 +46,8 @@ route(
       new URL(request.url).searchParams.get('partNumber')
     )
     // Bounded on both sides: a `partNumber` past the count `/multipart/start/`
-    // handed out would otherwise extend `parts` and leave holes in it, and
-    // `/multipart/complete/`'s `bytes.set(part, …)` throws on the first one —
-    // a rejection that escapes `handle()` rather than answering anything.
+    // handed out would otherwise grow `parts`, and `/multipart/complete/`
+    // would then wait for parts the client was never told about.
     if (
       upload &&
       Number.isInteger(partNumber) &&
@@ -104,7 +103,7 @@ route(
       size,
       mimeType: contentType,
       isStored: storedBy(form.get('UPLOADCARE_STORE')),
-      parts: Array.from({ length: partCount }, () => new Uint8Array())
+      parts: Array.from({ length: partCount }, () => undefined)
     })
 
     // Built from the request's own origin, never hardcoded — the
@@ -138,6 +137,17 @@ route(
       // schema: uuidInvalidError — no /multipart/start/ session by this uuid.
       return apiError(request, 400, 'uuid is invalid.')
 
+    const received = upload.parts.filter(
+      (part): part is Uint8Array => part !== undefined
+    )
+    if (received.length < upload.parts.length)
+      // schema: multipartUploadSizeTooSmallError — a part was never PUT.
+      return apiError(
+        request,
+        400,
+        'File size mismatch. Not all parts uploaded?'
+      )
+
     // The completed file's `size` is the bytes actually received, not the
     // `upload.size` `/multipart/start/` was told to expect. That's deliberate:
     // a test that PUTs short parts (as this package's own does) should see the
@@ -145,10 +155,10 @@ route(
     // It does mean `upload.size` is written and never read — it stays only
     // because `/multipart/start/` needs it to work out the part count.
     const bytes = new Uint8Array(
-      upload.parts.reduce((total, part) => total + part.byteLength, 0)
+      received.reduce((total, part) => total + part.byteLength, 0)
     )
     let offset = 0
-    for (const part of upload.parts) {
+    for (const part of received) {
       bytes.set(part, offset)
       offset += part.byteLength
     }
