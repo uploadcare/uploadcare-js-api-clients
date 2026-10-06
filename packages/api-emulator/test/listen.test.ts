@@ -129,9 +129,13 @@ it('answers 500 when a route throws, instead of crashing the process', async () 
   const response = await fetch(`${server.origin}/throws/`)
   expect(response.status).toBe(500)
   expect(response.headers.get('access-control-allow-origin')).toBe('*')
-  expect(await response.text()).toContain('route blew up')
+  // The error stays in the server log; the body is fixed, so nothing thrown
+  // inside the emulator reaches the client.
+  expect(await response.text()).toBe('emulator error')
   expect(logged).toHaveBeenCalledWith(
-    '[api-emulator] GET /throws/ threw:',
+    '[api-emulator] %s %s threw:',
+    'GET',
+    '/throws/',
     expect.any(Error)
   )
   logged.mockRestore()
@@ -156,15 +160,17 @@ it('can stop holding the process open, for a caller with no teardown hook', asyn
   }
 })
 
-it('answers 502, naming the request, for a path no route handles', async () => {
+it('answers 502 for a path no route handles, naming it only in the log', async () => {
   const logged = vi.spyOn(console, 'warn').mockImplementation(() => {})
   const response = await fetch(`${server.origin}/no-such-route/`)
   expect(response.status).toBe(502)
   expect(response.headers.get('access-control-allow-origin')).toBe('*')
   expect(response.headers.get('content-type')).toContain('text/plain')
-  expect(await response.text()).toBe(
-    'not handled by the emulator: GET /no-such-route/'
+  expect(await response.text()).toBe('not handled by the emulator')
+  expect(logged).toHaveBeenCalledExactlyOnceWith(
+    '[api-emulator] not handled by the emulator: %s %s',
+    'GET',
+    '/no-such-route/'
   )
-  expect(logged).toHaveBeenCalledOnce()
   logged.mockRestore()
 })

@@ -60,8 +60,8 @@ const headersOf = (request: IncomingMessage) => {
 }
 
 /**
- * The emulator's own 500/502 bodies echo the request path and the thrown error;
- * as plain text a browser never renders them as markup.
+ * The emulator's own 500/502 bodies are fixed strings: the request and the
+ * thrown error go to the server log, never back to the client.
  */
 const PLAIN_TEXT = {
   'content-type': 'text/plain; charset=utf-8',
@@ -114,7 +114,9 @@ export const createEmulatorServer = async (
       // either way, so a consumer's CI failure can be told apart from a
       // client regression.
       console.error(
-        `[api-emulator] ${request.method} ${request.url} threw:`,
+        '[api-emulator] %s %s threw:',
+        request.method,
+        request.url,
         error
       )
       if (request.aborted || response.destroyed || response.headersSent) {
@@ -123,7 +125,7 @@ export const createEmulatorServer = async (
       }
       response
         .writeHead(500, { ...PLAIN_TEXT, 'access-control-allow-origin': '*' })
-        .end(String(error))
+        .end('emulator error')
     }
   }
 
@@ -157,11 +159,14 @@ export const createEmulatorServer = async (
     }
 
     if (!answer) {
-      const message = `not handled by the emulator: ${request.method} ${new URL(url).pathname}`
-      console.warn(`[api-emulator] ${message}`)
+      console.warn(
+        '[api-emulator] not handled by the emulator: %s %s',
+        request.method,
+        new URL(url).pathname
+      )
       response
         .writeHead(502, { ...PLAIN_TEXT, 'access-control-allow-origin': '*' })
-        .end(message)
+        .end('not handled by the emulator')
       return
     }
     response.writeHead(answer.status, {
@@ -177,7 +182,8 @@ export const createEmulatorServer = async (
 
   const server = options.tls
     ? createHttpsServer(options.tls, listener)
-    : createHttpServer(listener)
+    : // deepcode ignore HttpToHttps: local test server bound to 127.0.0.1; TLS is opt-in via options.tls
+      createHttpServer(listener)
 
   const origin = await new Promise<string>((resolve, reject) => {
     server.on('error', reject)
