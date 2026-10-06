@@ -1,3 +1,5 @@
+import { once } from 'node:events'
+import { connect } from 'node:net'
 import { afterAll, beforeAll, expect, it, vi } from 'vitest'
 import type * as Emulator from '../src/index.js'
 import { createEmulatorServer } from '../src/listen.js'
@@ -89,25 +91,38 @@ it('answers correctly with the response delay turned off', async () => {
   }
 })
 
-it('survives a client aborting mid-request and still answers the next one', async () => {
-  const controller = new AbortController()
-  const aborted = fetch(`${server.origin}/base/`, {
-    method: 'POST',
-    body: fileUploadBody(),
-    signal: controller.signal
-  })
-  // The listener's own response delay (default 30ms) gives this time to
-  // land before the server starts reading the body, which is what puts it
-  // on the path this test exists for — see listen.ts's `bodyOf`.
-  controller.abort()
-  await expect(aborted).rejects.toThrow()
+// A raw socket, because `fetch` + `abort()` tears the request down before a
+// single byte reaches the server. This one sends the headers and part of the
+// body, then hangs up — during the listener's 30ms delay, or after it, while
+// `bodyOf` is reading.
+const abortMidBody = async (hangUpAfterMs: number) => {
+  const { port } = new URL(server.origin)
+  const socket = connect(Number(port), '127.0.0.1')
+  await once(socket, 'connect')
+  socket.write(
+    'POST /base/ HTTP/1.1\r\nhost: 127.0.0.1\r\ncontent-type: text/plain\r\ncontent-length: 1000\r\n\r\npartial'
+  )
+  await new Promise((resolve) => setTimeout(resolve, hangUpAfterMs))
+  socket.destroy()
+}
 
-  const response = await fetch(`${server.origin}/base/`, {
-    method: 'POST',
-    body: fileUploadBody()
-  })
-  expect(await response.json()).toHaveProperty('file')
-})
+it.each([10, 60])(
+  'survives a client hanging up mid-body after %sms and still answers the next one',
+  async (hangUpAfterMs) => {
+    const logged = vi.spyOn(console, 'error').mockImplementation(() => {})
+    await abortMidBody(hangUpAfterMs)
+    await new Promise((resolve) => setTimeout(resolve, 50))
+
+    const response = await fetch(`${server.origin}/base/`, {
+      method: 'POST',
+      body: fileUploadBody()
+    })
+    expect(await response.json()).toHaveProperty('file')
+    // An aborted request is ordinary, not a route error to report.
+    expect(logged).not.toHaveBeenCalled()
+    logged.mockRestore()
+  }
+)
 
 it('answers 500 when a route throws, instead of crashing the process', async () => {
   const logged = vi.spyOn(console, 'error').mockImplementation(() => {})
