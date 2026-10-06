@@ -100,6 +100,20 @@ export const setupEmulator = ({
   }
 
   const start = async () => {
+    const worker = setupWorker(
+      http.all('*', async ({ request }) => {
+        const decision = decide(request)
+        if (decision.kind === 'passthrough') return passthrough()
+        if (decision.kind === 'refuse') return Response.error()
+        return (await answer(request)) ?? Response.error()
+      })
+    )
+    // `http.all('*')` handles every request, so `onUnhandledRequest` never
+    // fires. The worker script is `/mockServiceWorker.js`: @vitest/browser
+    // serves it from msw itself; anywhere else, `npx msw init <publicDir>`.
+    await worker.start({ quiet: true })
+
+    // Only after the worker is up, so a failed start leaves nothing applied.
     const xhr = new XMLHttpRequestInterceptor()
     xhr.on('request', async ({ request, controller }) => {
       const decision = decide(request)
@@ -120,19 +134,6 @@ export const setupEmulator = ({
       controller.respondWith(response)
     })
     xhr.apply()
-
-    const worker = setupWorker(
-      http.all('*', async ({ request }) => {
-        const decision = decide(request)
-        if (decision.kind === 'passthrough') return passthrough()
-        if (decision.kind === 'refuse') return Response.error()
-        return (await answer(request)) ?? Response.error()
-      })
-    )
-    // `http.all('*')` handles every request, so `onUnhandledRequest` never
-    // fires. The worker script is `/mockServiceWorker.js`: @vitest/browser
-    // serves it from msw itself; anywhere else, `npx msw init <publicDir>`.
-    await worker.start({ quiet: true })
     return () => {
       xhr.dispose()
       worker.stop()
