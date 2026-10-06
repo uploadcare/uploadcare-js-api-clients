@@ -11,6 +11,13 @@ import { fileInfo, nextUuid, sessionOf } from '../../state/store.js'
  */
 const MULTIPART_CHUNK_SIZE = 5 * 1024 * 1024
 
+/**
+ * The emulator's own ceiling, not the real API's: `/multipart/start/` answers
+ * one url per part, so an absurd `size` would otherwise build millions of them.
+ * ponytail: 100 GiB (20480 parts); raise it if a test ever needs bigger.
+ */
+const MULTIPART_MAX_SIZE = 100 * 1024 ** 3
+
 const asString = (value: FormDataEntryValue | null) =>
   typeof value === 'string' ? value : null
 
@@ -67,11 +74,11 @@ route(
       return apiError(request, 400, 'filename is required.')
 
     const sizeRaw = asString(form.get('size'))
-    if (!sizeRaw)
+    const size = sizeRaw ? Number(sizeRaw) : NaN
+    if (!Number.isSafeInteger(size))
       // schema: multipartSizeInvalidError
       return apiError(request, 400, 'size should be integer.')
 
-    const size = Number(sizeRaw)
     if (size < 10485760)
       // schema: multipartFileSizeTooSmallError
       return apiError(
@@ -79,6 +86,10 @@ route(
         400,
         'File size can not be less than 10485760 bytes. Please use direct upload instead of multipart.'
       )
+
+    if (size > MULTIPART_MAX_SIZE)
+      // schema: multipartFileSizeLimitExceededError
+      return apiError(request, 400, 'File size exceeds project limit.')
 
     const contentType = asString(form.get('content_type'))
     if (!contentType)
