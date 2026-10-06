@@ -109,14 +109,13 @@ session holds only the demo project's files (see [Demo-project files](#demo-proj
   names which session a request belongs to. Set it on every request from a
   given test file to keep that file's uploads isolated from every other file
   running against the same emulator at the same time. A request with no
-  session header, or one nobody has reset yet, gets the `'default'` session,
-  created on demand.
-- **The header only matters in `./listen` server mode.** Under MSW in a
-  browser, every page is its own module realm with its own copy of the store,
-  so two pages are already isolated whether or not they set the header — and
-  one page's own requests all belong to the same store regardless of what they
-  set it to. It is worth setting anyway, so the same consumer code works
-  against a shared server, but on the MSW path it is a no-op.
+  session header gets the `'default'` session; a header naming a session
+  nobody has reset yet gets a fresh session under that id, created on demand.
+- The header picks the session on every request, in `./listen` server mode
+  and under MSW alike, so within one module realm (one page under MSW, one
+  process running `./listen`) different header values mean different
+  sessions. Under MSW each page also has its own copy of the session map, so
+  separate pages are isolated even when they send the same header value.
   `test/session.test.ts` pins the server-mode behaviour.
 
 ## What's implemented today
