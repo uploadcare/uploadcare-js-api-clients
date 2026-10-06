@@ -180,10 +180,12 @@ export const createEmulatorServer = async (
     response.end(Buffer.from(await answer.arrayBuffer()))
   }
 
-  const server = options.tls
-    ? createHttpsServer(options.tls, listener)
-    : // deepcode ignore HttpToHttps: local test server bound to 127.0.0.1; TLS is opt-in via options.tls
-      createHttpServer(listener)
+  const createServer = () => {
+    if (options.tls) return createHttpsServer(options.tls, listener)
+    // deepcode ignore HttpToHttps: local test server bound to 127.0.0.1; TLS is opt-in via options.tls
+    return createHttpServer(listener)
+  }
+  const server = createServer()
 
   const origin = await new Promise<string>((resolve, reject) => {
     server.on('error', reject)
