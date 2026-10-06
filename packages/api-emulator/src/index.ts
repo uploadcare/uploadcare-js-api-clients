@@ -14,10 +14,21 @@ export {
   SIGNED_UPLOADS_PUBLIC_KEY,
   SIGNED_UPLOADS_SECRET_KEY
 } from './apis/upload/scenarios.js'
-export { resetSession, sessionOf, SESSION_HEADER } from './state/store.js'
-export type {
-  Session,
-  StoredFile,
-  StoredImage,
-  TelemetryEvent
-} from './state/store.js'
+import * as store from './state/store.js'
+import type { StoredFile, TelemetryEvent } from './state/store.js'
+
+export { SESSION_HEADER } from './state/store.js'
+export type { StoredFile, StoredImage, TelemetryEvent } from './state/store.js'
+
+/**
+ * What a test may read back from a session. The store's own layout (jobs,
+ * counters, the uuid sequence) stays internal, so changing it isn't a breaking
+ * change.
+ */
+export type SessionView = {
+  readonly files: ReadonlyMap<string, StoredFile>
+  readonly telemetry: readonly TelemetryEvent[]
+}
+
+export const resetSession: (id?: string) => SessionView = store.resetSession
+export const sessionOf: (request: Request) => SessionView = store.sessionOf
