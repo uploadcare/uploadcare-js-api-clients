@@ -57,7 +57,8 @@ import { handle } from '@uploadcare/api-emulator'
 await page.route(/^https?:\/\//, async (route) => {
   const request = route.request()
   const method = request.method()
-  const body = method === 'GET' || method === 'HEAD' ? null : request.postDataBuffer()
+  const body =
+    method === 'GET' || method === 'HEAD' ? null : request.postDataBuffer()
 
   const response = await handle(
     new Request(request.url(), {
@@ -91,7 +92,7 @@ import { setupEmulator } from '@uploadcare/api-emulator/browser'
 const emulator = setupEmulator({ cdnHosts: ['cdn.example.com'] })
 
 beforeEach(() => emulator.reset()) // starts it once, then a fresh session
-afterAll(() => emulator.stop())    // optional
+afterAll(() => emulator.stop()) // optional
 ```
 
 Two ways in, one state: an `XMLHttpRequestInterceptor` answers XHR (every
@@ -106,6 +107,8 @@ Where a request goes depends on its host, since `handle` routes by path alone:
   `cdnHosts` you pass are emulated. A path the emulator has no route for
   fails as a network error, with a `console.warn` naming the method and URL,
   rather than reaching the real API.
+- Any other Uploadcare host (`api.uploadcare.com`, `<sub>.ucarecdn.com`, …)
+  fails as a network error with a `console.error`, whatever `unhandled` says.
 - The page's own origin (the dev server) always passes through.
 - Any other origin follows `unhandled`. `'error'`, the default, fails it as a
   network error and names the URL in a `console.error`, so a new or mistyped
@@ -145,7 +148,7 @@ const server = setupServer(
 
 ## Sessions
 
-The emulator is stateful, and state is scoped to a *session* rather than
+The emulator is stateful, and state is scoped to a _session_ rather than
 shared globally, so that a test suite running its files in parallel against
 one emulator doesn't see one file's upload answered by another's. A fresh
 session holds only the demo project's files (see [Demo-project files](#demo-project-files))
@@ -257,22 +260,22 @@ Every public key, url, and other magic value a test uses to steer the
 emulator into a specific scenario is named in `src/apis/upload/scenarios.ts`,
 with a comment there naming the consumer. Summarised:
 
-| Value | What it's for |
-| --- | --- |
-| `UNKNOWN_PROGRESS_KEY` (`pub_test__unknown_progress`) | A `/from_url/` public key whose poll answers report `total: 'unknown'` instead of a byte count. |
-| `NO_STORING_KEY` (`pub_test__no_storing`) | The public key `upload-client`'s multipart fixtures use. |
-| `UNREACHABLE_SOURCE_URL` (`https://1.com/1.jpg`) | A `from_url` source that fails synchronously, at `POST /from_url/` itself, with a 400 — instead of only failing once the job is polled. |
-| `REACHABLE_HOSTS` | The only hosts a `from_url` upload can actually "fetch" from; anything else resolves to a poll-time `Host does not exist` failure. Includes the emulator's own default origin (`127.0.0.1:3000`). |
-| `isPrivateSourceUrl()` | Flags a `from_url` source as a private/local address (`192.168.*` or any `localhost` host; the CLI's own `127.0.0.1:3000` is in `REACHABLE_HOSTS`), which `POST /from_url/` rejects. |
-| `STUB_GROUP_MEMBER` (`392e3aa3-…`) | The one uuid `POST /group/` accepts without it being uploaded, as a 0-byte stand-in, for `upload-client`'s hardcoded group fixtures. Any other member the session doesn't hold is "Some files not found.". |
-| `GROUP_FILES_NOT_FOUND_KEY` (`demopublickey`) | Scoped to `POST /group/` alone: under this key even `STUB_GROUP_MEMBER` counts as missing. Real uploads still group. Everywhere else, this is just an ordinary allowed public key. |
-| `SIGNED_UPLOADS_PUBLIC_KEY` (`pub_test__signed_uploads`) | A project with Signed Uploads on: any protected request under it without a Bearer token gets `400 SignatureRequiredError`. Exported from `.`. |
-| `SIGNED_UPLOADS_SECRET_KEY` (`mock_secret_key`) | The secret Bearer tokens are verified against (HS256 keyed with `sha256(secret)`, as `generateAuthToken` mints them). Exported from `.`, so a test can mint tokens the emulator accepts. |
-| `THROTTLE_ONCE_FIELD` (`metadata[mock_throttle]`) | The first protected request carrying a given value is answered `429 RequestThrottledError` with `retry-after: 1`; later ones with the same value pass. Spent per session. In a JSON body (the derivative endpoints) it's `metadata.mock_throttle`. |
-| `DERIVATIVE_DISABLED_PUBLIC_KEY` (`pub_test__derivative_disabled`) | A project without AI generation: both derivative POSTs answer `403 derivative_disabled`. Exported from `.`. |
-| `DERIVATIVE_INSTANT_PUBLIC_KEY` (`pub_test__derivative_instant`) | A project whose derivative jobs answer their first status poll with the terminal frame (a ready `success`, or a scenario prompt's error) instead of walking `processing` → `uploading` → `success` not ready. For a browser suite whose client polls on a fixed interval it can't shorten. Exported from `.`. |
-| `CONTENT_MODERATED_PROMPT` (`mock_content_moderated`) | A derivative job with this prompt reports `processing` once, then an `error` frame with `error_source: 'ai_gateway'`, `error_code: 'content_moderated'`. Exported from `.`. |
-| `PROVIDER_UNAVAILABLE_PROMPT` (`mock_provider_unavailable`) | The same, with `error_code: 'provider_unavailable'`. Exported from `.`. |
+| Value                                                              | What it's for                                                                                                                                                                                                                                                                                                 |
+| ------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `UNKNOWN_PROGRESS_KEY` (`pub_test__unknown_progress`)              | A `/from_url/` public key whose poll answers report `total: 'unknown'` instead of a byte count.                                                                                                                                                                                                               |
+| `NO_STORING_KEY` (`pub_test__no_storing`)                          | The public key `upload-client`'s multipart fixtures use.                                                                                                                                                                                                                                                      |
+| `UNREACHABLE_SOURCE_URL` (`https://1.com/1.jpg`)                   | A `from_url` source that fails synchronously, at `POST /from_url/` itself, with a 400 — instead of only failing once the job is polled.                                                                                                                                                                       |
+| `REACHABLE_HOSTS`                                                  | The only hosts a `from_url` upload can actually "fetch" from; anything else resolves to a poll-time `Host does not exist` failure. Includes the emulator's own default origin (`127.0.0.1:3000`).                                                                                                             |
+| `isPrivateSourceUrl()`                                             | Flags a `from_url` source as a private/local address (`192.168.*` or any `localhost` host; the CLI's own `127.0.0.1:3000` is in `REACHABLE_HOSTS`), which `POST /from_url/` rejects.                                                                                                                          |
+| `STUB_GROUP_MEMBER` (`392e3aa3-…`)                                 | The one uuid `POST /group/` accepts without it being uploaded, as a 0-byte stand-in, for `upload-client`'s hardcoded group fixtures. Any other member the session doesn't hold is "Some files not found.".                                                                                                    |
+| `GROUP_FILES_NOT_FOUND_KEY` (`demopublickey`)                      | Scoped to `POST /group/` alone: under this key even `STUB_GROUP_MEMBER` counts as missing. Real uploads still group. Everywhere else, this is just an ordinary allowed public key.                                                                                                                            |
+| `SIGNED_UPLOADS_PUBLIC_KEY` (`pub_test__signed_uploads`)           | A project with Signed Uploads on: any protected request under it without a Bearer token gets `400 SignatureRequiredError`. Exported from `.`.                                                                                                                                                                 |
+| `SIGNED_UPLOADS_SECRET_KEY` (`mock_secret_key`)                    | The secret Bearer tokens are verified against (HS256 keyed with `sha256(secret)`, as `generateAuthToken` mints them). Exported from `.`, so a test can mint tokens the emulator accepts.                                                                                                                      |
+| `THROTTLE_ONCE_FIELD` (`metadata[mock_throttle]`)                  | The first protected request carrying a given value is answered `429 RequestThrottledError` with `retry-after: 1`; later ones with the same value pass. Spent per session. In a JSON body (the derivative endpoints) it's `metadata.mock_throttle`.                                                            |
+| `DERIVATIVE_DISABLED_PUBLIC_KEY` (`pub_test__derivative_disabled`) | A project without AI generation: both derivative POSTs answer `403 derivative_disabled`. Exported from `.`.                                                                                                                                                                                                   |
+| `DERIVATIVE_INSTANT_PUBLIC_KEY` (`pub_test__derivative_instant`)   | A project whose derivative jobs answer their first status poll with the terminal frame (a ready `success`, or a scenario prompt's error) instead of walking `processing` → `uploading` → `success` not ready. For a browser suite whose client polls on a fixed interval it can't shorten. Exported from `.`. |
+| `CONTENT_MODERATED_PROMPT` (`mock_content_moderated`)              | A derivative job with this prompt reports `processing` once, then an `error` frame with `error_source: 'ai_gateway'`, `error_code: 'content_moderated'`. Exported from `.`.                                                                                                                                   |
+| `PROVIDER_UNAVAILABLE_PROMPT` (`mock_provider_unavailable`)        | The same, with `error_code: 'provider_unavailable'`. Exported from `.`.                                                                                                                                                                                                                                       |
 
 ### Bearer tokens
 
