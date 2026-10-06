@@ -155,6 +155,15 @@ export const THROTTLE_ONCE_FIELD = 'metadata[mock_throttle]'
 export const DERIVATIVE_DISABLED_PUBLIC_KEY = 'pub_test__derivative_disabled'
 
 /**
+ * Ai-image-editor's browser suite: its editor polls `derivative/status/` every
+ * 1.5s and can't be told otherwise, so the default walk (four frames) would
+ * keep each generation waiting about 4.5s. A derivative job under this
+ * otherwise ordinary allowed key answers its first poll with its terminal
+ * frame: a ready `success`, or a scenario prompt's error. Exported from `.`.
+ */
+export const DERIVATIVE_INSTANT_PUBLIC_KEY = 'pub_test__derivative_instant'
+
+/**
  * Prompts whose derivative job fails at poll time instead of producing a file —
  * the AI-gateway failures ai-image-editor maps to its own messages
  * (`content_moderated`, `provider_unavailable`). The job reports `processing`

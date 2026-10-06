@@ -218,6 +218,7 @@ with a comment there naming the consumer. Summarised:
 | `SIGNED_UPLOADS_SECRET_KEY` (`mock_secret_key`) | The secret Bearer tokens are verified against (HS256 keyed with `sha256(secret)`, as `generateAuthToken` mints them). Exported from `.`, so a test can mint tokens the emulator accepts. |
 | `THROTTLE_ONCE_FIELD` (`metadata[mock_throttle]`) | The first protected request carrying a given value is answered `429 RequestThrottledError` with `retry-after: 1`; later ones with the same value pass. Spent per session. In a JSON body (the derivative endpoints) it's `metadata.mock_throttle`. |
 | `DERIVATIVE_DISABLED_PUBLIC_KEY` (`pub_test__derivative_disabled`) | A project without AI generation: both derivative POSTs answer `403 derivative_disabled`. Exported from `.`. |
+| `DERIVATIVE_INSTANT_PUBLIC_KEY` (`pub_test__derivative_instant`) | A project whose derivative jobs answer their first status poll with the terminal frame (a ready `success`, or a scenario prompt's error) instead of walking `processing` → `uploading` → `success` not ready. For a browser suite whose client polls on a fixed interval it can't shorten. Exported from `.`. |
 | `CONTENT_MODERATED_PROMPT` (`mock_content_moderated`) | A derivative job with this prompt reports `processing` once, then an `error` frame with `error_source: 'ai_gateway'`, `error_code: 'content_moderated'`. Exported from `.`. |
 | `PROVIDER_UNAVAILABLE_PROMPT` (`mock_provider_unavailable`) | The same, with `error_code: 'provider_unavailable'`. Exported from `.`. |
 

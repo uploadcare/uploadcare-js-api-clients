@@ -72,6 +72,8 @@ export type DerivativeJob = {
   polls: number
   name: string
   isStored: boolean
+  /** Terminal on the first poll — see `DERIVATIVE_INSTANT_PUBLIC_KEY`. */
+  instant: boolean
   failure?: { code: string; message: string }
   file?: StoredFile
 }
