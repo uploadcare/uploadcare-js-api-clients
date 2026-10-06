@@ -36,7 +36,8 @@ await close()
 When the server is started lazily from somewhere with no teardown hook, call
 `unref()` on the returned handle instead, so it doesn't keep the process
 alive. A route that throws answers that one request `500` rather than taking
-the process down.
+the process down, and a request no route handles answers `502`; both bodies are
+fixed strings, with the method, path and error logged to the console.
 
 ### 2. As a function
 
