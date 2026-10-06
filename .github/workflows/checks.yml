@@ -58,6 +58,14 @@ jobs:
         working-directory: ./
         run: npm run lint
 
+      - name: Lint `api-emulator`
+        if: steps.changes.outputs.api-emulator == 'true'
+        run: npm run lint -w packages/api-emulator
+
+      - name: Check `api-emulator` formatting
+        if: steps.changes.outputs.api-emulator == 'true'
+        run: npm run format:check -w packages/api-emulator
+
       - name: Run `api-emulator` tests
         if: steps.changes.outputs.api-emulator == 'true'
         run: npm run test -w packages/api-emulator

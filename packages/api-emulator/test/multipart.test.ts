@@ -1,4 +1,4 @@
-import { beforeAll, beforeEach, expect, it } from 'vitest'
+import { afterAll, beforeAll, beforeEach, expect, it } from 'vitest'
 import { handle, resetSession } from '../src/index.js'
 import { createEmulatorServer } from '../src/listen.js'
 import { assertMatchesSpec } from './spec.js'
@@ -194,6 +194,7 @@ let server: Awaited<ReturnType<typeof createEmulatorServer>>
 beforeAll(async () => {
   server = await createEmulatorServer()
 })
+afterAll(() => server.close())
 
 it('drops the connection on a part PUT that carries an Authorization header', async () => {
   const startResponse = await fetch(`${server.origin}/multipart/start/`, {
