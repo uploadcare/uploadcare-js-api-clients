@@ -157,7 +157,10 @@ export const createEmulatorServer = async (
     }
     response.writeHead(answer.status, {
       ...Object.fromEntries(answer.headers),
-      'access-control-allow-origin': '*'
+      'access-control-allow-origin': '*',
+      // `retry-after` (throttling) isn't CORS-safelisted; without this a
+      // browser client can't read it and falls back to its default delay.
+      'access-control-expose-headers': '*'
     })
     response.end(Buffer.from(await answer.arrayBuffer()))
   }

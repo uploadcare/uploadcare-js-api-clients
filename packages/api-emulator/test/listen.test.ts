@@ -54,6 +54,7 @@ it('allows any origin, because every consumer is cross-origin', async () => {
     `${server.origin}/info/?pub_key=demopublickey&file_id=nope`
   )
   expect(response.headers.get('access-control-allow-origin')).toBe('*')
+  expect(response.headers.get('access-control-expose-headers')).toBe('*')
 })
 
 it('answers a CORS preflight, including the session header', async () => {
