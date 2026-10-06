@@ -96,6 +96,26 @@ export const createEmulatorServer = async (
       return
     }
 
+    try {
+      await respond(request, response)
+    } catch (error) {
+      // A route that throws is an emulator bug, but it should fail the one
+      // request that hit it, not reject out of a request listener and take
+      // the consumer's process (and its whole test run) down with it.
+      if (request.aborted || response.destroyed || response.headersSent) {
+        response.destroy()
+        return
+      }
+      response
+        .writeHead(500, { 'access-control-allow-origin': '*' })
+        .end(String(error))
+    }
+  }
+
+  const respond = async (
+    request: IncomingMessage,
+    response: ServerResponse
+  ) => {
     const protocol = options.tls ? 'https' : 'http'
     const url = `${protocol}://${request.headers.host ?? 'localhost'}${request.url ?? '/'}`
     await delay(options.delayMs ?? 30)
@@ -121,24 +141,17 @@ export const createEmulatorServer = async (
       return
     }
 
-    try {
-      if (!answer) {
-        response
-          .writeHead(502, { 'access-control-allow-origin': '*' })
-          .end('not handled by the emulator')
-        return
-      }
-      response.writeHead(answer.status, {
-        ...Object.fromEntries(answer.headers),
-        'access-control-allow-origin': '*'
-      })
-      response.end(Buffer.from(await answer.arrayBuffer()))
-    } catch (error) {
-      // The client disconnected between our check above and the write
-      // itself — same "nothing to answer" case, just lost the race.
-      if (request.aborted) return
-      throw error
+    if (!answer) {
+      response
+        .writeHead(502, { 'access-control-allow-origin': '*' })
+        .end('not handled by the emulator')
+      return
     }
+    response.writeHead(answer.status, {
+      ...Object.fromEntries(answer.headers),
+      'access-control-allow-origin': '*'
+    })
+    response.end(Buffer.from(await answer.arrayBuffer()))
   }
 
   const server = options.tls
