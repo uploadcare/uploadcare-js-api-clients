@@ -42,6 +42,14 @@ route(
       // schema: sourceURLRequiredError
       return apiError(request, 400, 'source_url is required.')
 
+    if (!URL.canParse(sourceUrl))
+      return apiError(
+        request,
+        400,
+        'Failed to parse URL.',
+        'URLParsingFailedError'
+      )
+
     if (sourceUrl === UNREACHABLE_SOURCE_URL)
       // schema: hostnameNotFoundError — the one host that fails synchronously;
       // see scenarios.ts.
