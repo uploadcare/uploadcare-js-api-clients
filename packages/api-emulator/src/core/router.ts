@@ -53,7 +53,7 @@ export const route = (
   })
 }
 
-const match = (candidate: Route, method: string, pathname: string) => {
+const matchRoute = (candidate: Route, method: string, pathname: string) => {
   if (candidate.method !== method) return undefined
   const actual = pathname.split('/').filter(Boolean)
   const params: Record<string, string> = {}
@@ -88,7 +88,7 @@ export const handle = async (
 ): Promise<Response | undefined> => {
   const { pathname } = new URL(request.url)
   for (const candidate of routes) {
-    const params = match(candidate, request.method, pathname)
+    const params = matchRoute(candidate, request.method, pathname)
     if (params) {
       if (candidate.protected) {
         const paramName = candidate.protected.paramName ?? 'pub_key'
