@@ -1,0 +1,103 @@
+import { afterAll, beforeEach, expect, it, vi } from 'vitest'
+import { setupEmulator } from '../../src/browser.js'
+import {
+  foreignOrigin,
+  loadImage,
+  pngOf,
+  sendXhr,
+  uploadForm
+} from './helpers.js'
+
+const emulator = setupEmulator({ cdnHosts: ['cdn.example.com'] })
+
+beforeEach(() => emulator.reset())
+afterAll(() => emulator.stop())
+
+const upload = async (file: Blob) => {
+  const result = await sendXhr(
+    'POST',
+    'https://upload.uploadcare.com/base/',
+    uploadForm(file)
+  )
+  expect(result.status).toBe(200)
+  return { ...result, uuid: (JSON.parse(result.body) as { file: string }).file }
+}
+
+// The macrotask is the contract file-uploader's progress events depend on (see
+// the hold in `src/browser.ts`). Chromium's body reads already span tasks, so
+// this passes without the hold too; file-uploader's
+// `upload-progress.e2e.test.tsx` is what caught its absence.
+it('answers an XHR upload with per-chunk upload progress, a macrotask after send()', async () => {
+  const result = await upload(new Blob([new Uint8Array(5 * 1024 * 1024)]))
+
+  expect(
+    result.uploadEvents.filter((type) => type === 'progress').length
+  ).toBeGreaterThan(1)
+  expect(result.uploadEvents.at(-1)).toBe('loadend')
+  expect(result.macrotaskBeforeUpload).toBe(true)
+})
+
+it('serves the uploaded bytes to an <img> from every CDN host', async () => {
+  const { uuid } = await upload(await pngOf(3, 2))
+
+  for (const host of [
+    'ucarecdn.com',
+    'abcdef1234.ucarecd.net',
+    'cdn.example.com'
+  ]) {
+    const img = await loadImage(`https://${host}/${uuid}/`)
+    expect([host, img.naturalWidth, img.naturalHeight]).toEqual([host, 3, 2])
+  }
+})
+
+it('answers fetch on the emulated hosts too', async () => {
+  const response = await fetch('https://tlm.uploadcare.com/api/v1/events', {
+    method: 'POST',
+    body: JSON.stringify({ event: 'test' })
+  })
+  expect(response.status).toBe(200)
+})
+
+it('fails an Uploadcare path it has no route for, naming it', async () => {
+  const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+
+  await expect(fetch('https://upload.uploadcare.com/nope/')).rejects.toThrow(
+    TypeError
+  )
+  const xhr = await sendXhr('POST', 'https://ucarecdn.com/not-a-uuid/', 'x')
+  expect(xhr.error).toBe(true)
+
+  expect(warn.mock.calls.map(([message]) => message)).toEqual([
+    expect.stringContaining('GET https://upload.uploadcare.com/nope/'),
+    expect.stringContaining('POST https://ucarecdn.com/not-a-uuid/')
+  ])
+  warn.mockRestore()
+})
+
+it('refuses a foreign origin by default, naming it', async () => {
+  const error = vi.spyOn(console, 'error').mockImplementation(() => {})
+  const url = `${foreignOrigin()}/package.json`
+
+  await expect(fetch(url)).rejects.toThrow(TypeError)
+  expect((await sendXhr('GET', url)).error).toBe(true)
+
+  expect(error.mock.calls.map(([message]) => message)).toEqual([
+    expect.stringContaining(url),
+    expect.stringContaining(url)
+  ])
+  error.mockRestore()
+})
+
+it('passes the page’s own origin through', async () => {
+  expect((await fetch('/package.json')).status).toBe(200)
+  expect((await sendXhr('GET', '/package.json')).status).toBe(200)
+})
+
+it('starts each test from a fresh session', async () => {
+  const { uuid } = await upload(await pngOf(1, 1))
+  expect((await fetch(`https://ucarecdn.com/${uuid}/`)).status).toBe(200)
+
+  await emulator.reset()
+
+  expect((await fetch(`https://ucarecdn.com/${uuid}/`)).status).toBe(404)
+})
