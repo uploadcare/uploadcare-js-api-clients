@@ -31,14 +31,15 @@ export const NO_STORING_KEY = 'pub_test__no_storing'
 export const UNREACHABLE_SOURCE_URL = 'https://1.com/1.jpg'
 
 /**
- * The emulator's own default origin (`cli.ts`'s default `PORT`).
- * `upload-client`'s dev settings point `baseCDN`/`baseURL` at exactly this
- * host, and its "valid" `from_url` fixture (`_fixtureFactory.ts`'s
- * `imageUrl('valid')`) is a URL on it — so the private-address rule below must
- * not reject it, the same exemption the old mock server carved out for its own
- * `PORT`.
+ * The emulator's own default origin: `cli.ts`'s default `PORT` on the
+ * `127.0.0.1` that `listen.ts` binds. `upload-client`'s dev settings point
+ * `baseCDN`/`baseURL` at exactly this host, and its "valid" `from_url` fixture
+ * (`_fixtureFactory.ts`'s `imageUrl('valid')`) is a URL on it — so it has to be
+ * reachable. It is `127.0.0.1` rather than `localhost` because `localhost` can
+ * resolve to `::1` first, where another dev server on port 3000 would answer
+ * instead of the IPv4-only emulator.
  */
-const EMULATOR_OWN_HOST = 'localhost:3000'
+const EMULATOR_OWN_HOST = '127.0.0.1:3000'
 
 /**
  * `URL.parse(url)?.host`, spelled with `canParse` because the repo's root
@@ -50,12 +51,10 @@ export const hostOf = (url: string) =>
 /**
  * `upload-client`'s `fromUrl.test.ts` ("should be rejected with image from
  * private IP") and `_fixtureFactory.ts`'s `imageUrl('privateIP')`
- * (`http://192.168.1.10/1.jpg`), plus any `localhost` host other than the
- * emulator's own (see `EMULATOR_OWN_HOST`).
+ * (`http://192.168.1.10/1.jpg`), plus any `localhost` host.
  */
 export const isPrivateSourceUrl = (sourceUrl: string): boolean => {
   const host = hostOf(sourceUrl) ?? ''
-  if (host === EMULATOR_OWN_HOST) return false
   return host.includes('192.168.') || host.includes('localhost')
 }
 
@@ -65,7 +64,7 @@ export const isPrivateSourceUrl = (sourceUrl: string): boolean => {
  * implies — so the emulator has no other way to learn that a host doesn't
  * resolve the way the real service would; it has to be told.
  *
- * `localhost:3000` covers `upload-client`'s own dev-settings host (see
+ * `127.0.0.1:3000` covers `upload-client`'s own dev-settings host (see
  * `EMULATOR_OWN_HOST`). The rest mirror the browser fake's list
  * (`tests/utils/fake-uploadcare/upload-api.ts` in the file-uploader repo): that
  * suite's from-url validation tests point at a host that is deliberately _not_

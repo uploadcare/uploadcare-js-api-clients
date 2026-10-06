@@ -23,8 +23,8 @@ export const getSettingsForTesting = <T>(options: T): T & DefaultSettings => {
   const allEnvironments = {
     development: {
       ...defaultSettings,
-      baseCDN: 'http://localhost:3000',
-      baseURL: 'http://localhost:3000',
+      baseCDN: 'http://127.0.0.1:3000',
+      baseURL: 'http://127.0.0.1:3000',
       multipartMinFileSize: 10 * 1024 * 1024,
       ...options
     },
