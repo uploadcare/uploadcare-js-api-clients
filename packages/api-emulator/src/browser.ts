@@ -16,6 +16,8 @@ const UPLOADCARE_HOSTS = [
   'ucarecd.net'
 ]
 const PREFIXED_CDN = /\.ucarecd\.net$/
+/** Any other Uploadcare host is refused even under `unhandled: 'passthrough'`. */
+const UPLOADCARE_DOMAIN = /(^|\.)(uploadcare\.com|ucarecdn\.com|ucarecd\.net)$/
 
 export type EmulatorOptions = {
   /**
@@ -29,7 +31,9 @@ export type EmulatorOptions = {
    *
    * - `'error'` (default): fail it as a network error and `console.error` its
    *   URL, so a new or mistyped endpoint can't quietly reach a real service.
-   * - `'passthrough'`: let it go out to the network.
+   * - `'passthrough'`: let it go out to the network, unless it's an Uploadcare
+   *   host the emulator doesn't answer (`api.uploadcare.com`, …): that is still
+   *   refused.
    */
   unhandled?: 'error' | 'passthrough'
 }
@@ -91,10 +95,14 @@ export const setupEmulator = ({
     if (emulated.has(url.hostname) || PREFIXED_CDN.test(url.hostname)) {
       return { kind: 'emulate' }
     }
-    if (url.origin === location.origin || unhandled === 'passthrough') {
+    if (url.origin === location.origin) return { kind: 'passthrough' }
+    const uploadcare = UPLOADCARE_DOMAIN.test(url.hostname)
+    if (!uploadcare && unhandled === 'passthrough') {
       return { kind: 'passthrough' }
     }
-    const message = `@uploadcare/api-emulator: ${request.method} ${request.url} is neither Uploadcare nor this page's origin`
+    const message = uploadcare
+      ? `@uploadcare/api-emulator does not emulate ${request.method} ${request.url}`
+      : `@uploadcare/api-emulator: ${request.method} ${request.url} is neither Uploadcare nor this page's origin`
     console.error(message)
     return { kind: 'refuse', error: new TypeError(message) }
   }
