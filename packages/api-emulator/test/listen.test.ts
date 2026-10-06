@@ -119,3 +119,17 @@ it('answers 500 when a route throws, instead of crashing the process', async () 
   )
   expect(next.status).toBe(404)
 })
+
+it('can stop holding the process open, for a caller with no teardown hook', async () => {
+  const detached = await createEmulatorServer({ delayMs: 0 })
+  try {
+    detached.unref()
+    // Still serves while something else keeps the process alive.
+    const response = await fetch(
+      `${detached.origin}/info/?pub_key=demopublickey&file_id=nope`
+    )
+    expect(response.status).toBe(404)
+  } finally {
+    await detached.close()
+  }
+})

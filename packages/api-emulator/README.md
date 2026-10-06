@@ -33,6 +33,9 @@ const { origin, close } = await createEmulatorServer({ port: 0, delayMs: 30 })
 await close()
 ```
 
+Started lazily from somewhere with no teardown hook, call `unref()` on the
+returned handle instead, so the server doesn't keep the process alive.
+
 ### 2. As a function
 
 `handle(request)` returns `Response | undefined`. `undefined` means "not an

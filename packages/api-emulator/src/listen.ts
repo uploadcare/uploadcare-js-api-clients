@@ -173,6 +173,15 @@ export const createEmulatorServer = async (
 
   return {
     origin,
-    close: () => new Promise<void>((done) => server.close(() => done()))
+    close: () => new Promise<void>((done) => server.close(() => done())),
+    /**
+     * Let the process exit while the server is still listening, for a caller
+     * that starts it lazily and has nowhere to call `close()` from — a Vitest
+     * browser command, say, where a referenced server keeps the run hanging
+     * after the last test.
+     */
+    unref: () => {
+      server.unref()
+    }
   }
 }
