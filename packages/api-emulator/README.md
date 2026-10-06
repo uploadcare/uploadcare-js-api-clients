@@ -99,11 +99,11 @@ const server = setupServer(uploadcare)
 The emulator is stateful, and state is scoped to a *session* rather than
 shared globally, so that a test suite running its files in parallel against
 one emulator doesn't see one file's upload answered by another's. A fresh
-session starts out empty — no files, no groups — as if nothing had ever been
-uploaded to it.
+session holds only the demo project's files (see [Demo-project files](#demo-project-files))
+— no groups, no jobs, nothing uploaded.
 
 - `resetSession(id?)` clears (or starts) a session. Call it between tests
-  that share an emulator instance so each test starts from an empty store.
+  that share an emulator instance so each test starts from a fresh store.
   With no `id`, it resets the `'default'` session.
 - The `x-uploadcare-emulator-session` header (exported as `SESSION_HEADER`)
   names which session a request belongs to. Set it on every request from a
