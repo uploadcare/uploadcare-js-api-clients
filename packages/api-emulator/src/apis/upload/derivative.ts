@@ -23,7 +23,8 @@ import {
 } from '../../state/store.js'
 import {
   DERIVATIVE_DISABLED_PUBLIC_KEY,
-  DERIVATIVE_FAILURES
+  DERIVATIVE_FAILURES,
+  DERIVATIVE_INSTANT_PUBLIC_KEY
 } from './scenarios.js'
 
 type Body = Record<string, unknown>
@@ -100,6 +101,7 @@ const startJob =
       polls: 0,
       name: body.filename,
       isStored: body.store !== false,
+      instant: publicKey === DERIVATIVE_INSTANT_PUBLIC_KEY,
       failure: DERIVATIVE_FAILURES.get(body.prompt)
     })
     return Response.json({ type: 'job', job_id: jobId })
@@ -151,11 +153,13 @@ route(
  * is still being ingested — not CDN-ready yet), then `success` with `is_ready:
  * true` for good. A scenario job (`DERIVATIVE_FAILURES`) reports `processing`
  * once and then its error frame for good. The client keeps polling on every
- * frame but an error or a ready success, so this walks it through each.
+ * frame but an error or a ready success, so this walks it through each. An
+ * `instant` job skips straight to its terminal frame.
  */
 const frame = (session: Session, job: DerivativeJob) => {
   job.polls += 1
-  if (job.polls === 1) return { type: 'job', status: 'processing' }
+  if (job.polls === 1 && !job.instant)
+    return { type: 'job', status: 'processing' }
   if (job.failure)
     return {
       type: 'job',
@@ -164,9 +168,14 @@ const frame = (session: Session, job: DerivativeJob) => {
       error_code: job.failure.code,
       error: job.failure.message
     }
-  if (job.polls === 2) return { type: 'job', status: 'uploading' }
+  if (job.polls === 2 && !job.instant)
+    return { type: 'job', status: 'uploading' }
   job.file ??= storeStockImage(session, job.name, job.isStored)
-  return { status: 'success', ...fileInfo(job.file), is_ready: job.polls > 3 }
+  return {
+    status: 'success',
+    ...fileInfo(job.file),
+    is_ready: job.instant || job.polls > 3
+  }
 }
 
 route(

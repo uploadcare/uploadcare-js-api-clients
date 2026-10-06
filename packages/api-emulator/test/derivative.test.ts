@@ -3,6 +3,7 @@ import { beforeEach, expect, it } from 'vitest'
 import {
   CONTENT_MODERATED_PROMPT,
   DERIVATIVE_DISABLED_PUBLIC_KEY,
+  DERIVATIVE_INSTANT_PUBLIC_KEY,
   handle,
   PROVIDER_UNAVAILABLE_PROMPT,
   resetSession,
@@ -276,6 +277,34 @@ it('fails an edit job the same way', async () => {
     status: 'error',
     error_code: 'content_moderated'
   })
+})
+
+it('finishes a job on its first poll for the instant-derivatives project', async () => {
+  const jobId = await jobIdOf(
+    await generate({ pub_key: DERIVATIVE_INSTANT_PUBLIC_KEY })
+  )
+  const frames = await pollToEnd(jobId)
+  expect(frames).toHaveLength(1)
+  expect(frames[0]).toMatchObject({
+    status: 'success',
+    is_ready: true,
+    original_filename: 'generated.png'
+  })
+})
+
+it('still fails a scenario prompt on the instant-derivatives project, on its first poll', async () => {
+  const jobId = await jobIdOf(
+    await edit({
+      pub_key: DERIVATIVE_INSTANT_PUBLIC_KEY,
+      prompt: CONTENT_MODERATED_PROMPT
+    })
+  )
+  expect(await pollToEnd(jobId)).toEqual([
+    expect.objectContaining({
+      status: 'error',
+      error_code: 'content_moderated'
+    })
+  ])
 })
 
 it('refuses both job kinds for a project with derivatives disabled', async () => {
