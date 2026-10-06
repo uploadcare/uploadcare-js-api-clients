@@ -121,20 +121,24 @@ it('describes the finished file once the upload is completed', async () => {
     })
   ).json()) as { parts: string[]; uuid: string }
 
-  for (const [index, part] of parts.entries()) {
-    // The real file is only ever this one small JPEG; what matters for the
-    // emulator's contract is that every part's bytes land in the completed
-    // file in order.
-    const chunk = index === 0 ? JPEG : new Uint8Array()
+  // Distinct bytes per part, PUT out of order: every part's bytes must land
+  // in the completed file by partNumber, not by arrival.
+  const chunks = [JPEG, new Uint8Array([2, 2, 2]), new Uint8Array([3])]
+  for (const index of [2, 0, 1]) {
     const response = await handle(
-      new Request(part, { method: 'PUT', body: chunk })
+      new Request(parts[index], { method: 'PUT', body: chunks[index] })
     )
     expect(response!.status).toBe(200)
   }
+  const assembled = new Uint8Array([...JPEG, 2, 2, 2, 3])
 
   const completed = await complete(uuid)
   const body = await completed.clone().json()
-  expect(body).toMatchObject({ uuid, original_filename: 'big.jpg' })
+  expect(body).toMatchObject({
+    uuid,
+    original_filename: 'big.jpg',
+    size: assembled.byteLength
+  })
   await assertMatchesSpec({
     method: 'post',
     path: '/multipart/complete/',
@@ -154,6 +158,8 @@ it('describes the finished file once the upload is completed', async () => {
     uuid,
     original_filename: 'big.jpg'
   })
+  const delivered = await handle(new Request(`https://ucarecdn.com/${uuid}/`))
+  expect(new Uint8Array(await delivered!.arrayBuffer())).toEqual(assembled)
 })
 
 it('refuses to complete a uuid no /multipart/start/ ever issued', async () => {
