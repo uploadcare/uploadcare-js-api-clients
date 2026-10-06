@@ -6,13 +6,13 @@ need real request/response round-trips without hitting the network.
 ## Browser-safe by design
 
 `@uploadcare/api-emulator` (the `.` export: `handle`, `resetSession`,
-`sessionOf`, `SESSION_HEADER`) runs anywhere `Request`/`Response` exist,
+`sessionOf`, `SESSION_HEADER` and the scenario constants) runs anywhere `Request`/`Response` exist,
 including inside a browser page — that's what lets it back an in-browser MSW
 worker. `@uploadcare/api-emulator/listen` is Node-only: it speaks raw HTTP
 sockets (`node:http`/`node:https`, `Buffer`) to give a suite a real origin to
 point a `baseURL` at. The split exists so the core can be bundled into a page
-without dragging Node built-ins with it; `test/browser-safe.test.ts` asserts
-the `.` export's source never regresses that.
+without dragging Node built-ins with it; `test/dist.test.ts` asserts
+neither the `.` export's source nor its built chunks regress that.
 
 Three ways to run it, in increasing order of how "real" the transport needs
 to be:
@@ -33,8 +33,10 @@ const { origin, close } = await createEmulatorServer({ port: 0, delayMs: 30 })
 await close()
 ```
 
-Started lazily from somewhere with no teardown hook, call `unref()` on the
-returned handle instead, so the server doesn't keep the process alive.
+When the server is started lazily from somewhere with no teardown hook, call
+`unref()` on the returned handle instead, so it doesn't keep the process
+alive. A route that throws answers that one request `500` rather than taking
+the process down.
 
 ### 2. As a function
 
