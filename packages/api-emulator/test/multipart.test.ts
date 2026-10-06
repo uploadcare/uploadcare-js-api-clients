@@ -209,7 +209,7 @@ it('drops the connection on a part PUT that carries an Authorization header', as
   ).rejects.toThrow()
 })
 
-it('ignores a partNumber past the part count, instead of crashing /complete/', async () => {
+it('refuses to complete an upload missing a part, ignoring a stray partNumber', async () => {
   const { uuid, parts } = (await (
     await start({
       filename: 'big.jpg',
@@ -227,9 +227,10 @@ it('ignores a partNumber past the part count, instead of crashing /complete/', a
   )
   expect(stray!.status).toBe(200)
 
-  // Before the bound, the out-of-range write left holes in `parts` and
-  // `/complete/`'s `bytes.set(undefined, …)` rejected out of `handle()`.
+  // The out-of-range write lands nowhere, so none of the three parts arrived.
   const completed = await complete(uuid)
-  expect(completed.status).toBe(200)
-  expect(await completed.json()).toMatchObject({ uuid, size: 0 })
+  expect(completed.status).toBe(400)
+  expect(await completed.text()).toBe(
+    'File size mismatch. Not all parts uploaded?'
+  )
 })
