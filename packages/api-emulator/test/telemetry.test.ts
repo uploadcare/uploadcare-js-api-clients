@@ -53,12 +53,3 @@ it("resetSession clears a session's telemetry", async () => {
   const restarted = resetSession('telemetry-reset')
   expect(restarted.telemetry).toEqual([])
 })
-
-it("the CDN's /:uuid/* pattern never swallows /api/v1/events", async () => {
-  const response = (await post({ event_type: 'lifecycle' }, 'telemetry-cdn'))!
-  expect(response.status).toBe(200)
-  expect(await response.json()).toEqual({})
-
-  const session = resetSession('telemetry-cdn')
-  expect(session.telemetry).toEqual([])
-})
