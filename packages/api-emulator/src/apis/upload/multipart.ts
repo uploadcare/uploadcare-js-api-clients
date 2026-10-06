@@ -1,8 +1,15 @@
-import { apiError } from '../../core/responses.js'
+import { apiError, dropConnection } from '../../core/responses.js'
 import { route } from '../../core/router.js'
 import { imageSize } from '../../state/image-size.js'
 import { fileInfo, nextUuid, sessionOf } from '../../state/store.js'
-import { DROP_CONNECTION_MARKER, MULTIPART_CHUNK_SIZE } from './scenarios.js'
+
+/**
+ * The part size `/multipart/start/` hands out, matching the real Upload API
+ * rather than the client's own `multipartChunkSize` setting — nothing here is
+ * actually uploaded to S3, so the chunking only has to produce the right
+ * _number_ of part URLs.
+ */
+const MULTIPART_CHUNK_SIZE = 5 * 1024 * 1024
 
 const asString = (value: FormDataEntryValue | null) =>
   typeof value === 'string' ? value : null
@@ -24,13 +31,8 @@ route(
   '/multipart/upload/:uuid/original',
   async ({ request, params }) => {
     // The check this route exists for: see `DROP_CONNECTION_MARKER` in
-    // scenarios.ts for why a marker response, not an error status.
-    if (request.headers.has('authorization')) {
-      return new Response(null, {
-        status: 200,
-        headers: { [DROP_CONNECTION_MARKER]: '1' }
-      })
-    }
+    // core/responses.ts for why a marker response, not an error status.
+    if (request.headers.has('authorization')) return dropConnection()
 
     const upload = sessionOf(request).multipart.get(params.uuid ?? '')
     const partNumber = Number(
@@ -94,7 +96,7 @@ route(
       parts: Array.from({ length: partCount }, () => new Uint8Array())
     })
 
-    // Built from the request's own origin (Decision D5), never hardcoded — the
+    // Built from the request's own origin, never hardcoded — the
     // emulator's port is only known once it's actually listening.
     const origin = new URL(request.url).origin
     const parts = Array.from(

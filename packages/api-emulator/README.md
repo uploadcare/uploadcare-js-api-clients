@@ -195,7 +195,7 @@ outside Node.
   leaked header. `handle()` can't touch a socket (it has to stay browser-safe
   for the MSW path), so a part `PUT` that carries the header instead answers
   with an ordinary `Response` carrying the `x-emulator-drop-connection` marker
-  header (`DROP_CONNECTION_MARKER` in `scenarios.ts`). `listen.ts` — the one
+  header (`DROP_CONNECTION_MARKER` in `src/core/responses.ts`). `listen.ts` — the one
   place that owns the raw socket — recognises that marker and destroys the
   connection instead of writing the response, reproducing the old mock
   server's `ctx.req.destroy()`. Under MSW, or any other consumer of the `.`
@@ -217,8 +217,6 @@ with a comment there naming the consumer. Summarised:
 | `REACHABLE_HOSTS` | The only hosts a `from_url` upload can actually "fetch" from; anything else resolves to a poll-time `Host does not exist` failure. Includes the emulator's own default origin (`localhost:3000`). |
 | `isPrivateSourceUrl()` | Flags a `from_url` source as a private/local address (`192.168.*`, `localhost` other than the emulator's own), which `POST /from_url/` rejects. |
 | `GROUP_FILES_NOT_FOUND_KEY` (`demopublickey`) | Scoped to `POST /group/` alone: makes group creation fail with "Some files not found." regardless of whether the members exist. Everywhere else, this is just an ordinary allowed public key. |
-| `MULTIPART_CHUNK_SIZE` (5 MB) | The part size `/multipart/start/` hands out, matching the real Upload API rather than the client's own chunk-size setting. |
-| `DROP_CONNECTION_MARKER` | The header a part `PUT` carrying a leaked `Authorization` header gets answered with; only `listen.ts` (server mode) acts on it by destroying the connection — see the caveat above. |
 | `SIGNED_UPLOADS_PUBLIC_KEY` (`pub_test__signed_uploads`) | A project with Signed Uploads on: any protected request under it without a Bearer token gets `400 SignatureRequiredError`. Exported from `.`. |
 | `SIGNED_UPLOADS_SECRET_KEY` (`mock_secret_key`) | The secret Bearer tokens are verified against (HS256 keyed with `sha256(secret)`, as `generateAuthToken` mints them). Exported from `.`, so a test can mint tokens the emulator accepts. |
 | `THROTTLE_ONCE_FIELD` (`metadata[mock_throttle]`) | The first protected request carrying a given value is answered `429 RequestThrottledError` with `retry-after: 1`; later ones with the same value pass. Spent per session. In a JSON body (the derivative endpoints) it's `metadata.mock_throttle`. |

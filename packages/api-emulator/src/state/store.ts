@@ -46,7 +46,7 @@ export type FromUrlJob = {
  * A `/multipart/start/` session in flight, keyed by its own `uuid` — the same
  * one `/multipart/complete/` assembles into a stored file and `/info/` then
  * answers about. `parts` is pre-sized to the part count `/multipart/start/`
- * handed out (see `scenarios.ts`'s `MULTIPART_CHUNK_SIZE`); each part `PUT`
+ * handed out (see `multipart.ts`'s `MULTIPART_CHUNK_SIZE`); each part `PUT`
  * fills in its own index, empty until then. `isStored` carries the
  * `UPLOADCARE_STORE` field from `/multipart/start/` through to
  * `/multipart/complete/` — `multipartComplete.ts` (upload-client) never resends
