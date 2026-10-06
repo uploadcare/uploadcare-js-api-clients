@@ -102,7 +102,10 @@ export const handle = async (
         )
         if (gateError) return gateError
       }
-      return (await candidate.handler({ request, params })) ?? undefined
+      // `undefined` is "not mine after all" — keep looking, so a broad
+      // pattern (the CDN's `/:uuid/*`) can't shadow a later, narrower route.
+      const answer = await candidate.handler({ request, params })
+      if (answer) return answer
     }
   }
   return undefined

@@ -12,11 +12,8 @@ import { type Session, type StoredFile, sessionOf } from '../../state/store.js'
  *
  * The browser fake matches by host, since every project has its own cname and
  * there's no route table to register into. Here there is one, and the listening
- * server already answers on its own host — so this matches on path alone. That
- * also keeps a bare `/:uuid/*` pattern from swallowing the Upload API's own
- * paths: `index.ts` registers the Upload API first, and every route below
- * requires `/-/` or `/-/json/` after the id, which `/base/` and `/info/` never
- * have.
+ * server already answers on its own host — so this matches on path alone, and
+ * `CDN_ID` below keeps the bare `/:uuid/*` pattern off the Upload API's paths.
  *
  * Ponytail: ops ignored. If a test ever needs the delivered size to be real,
  * this is where a codec would go.
@@ -25,10 +22,9 @@ import { type Session, type StoredFile, sessionOf } from '../../state/store.js'
 /**
  * A bare file uuid, or a group id (`<uuid>~<count>`). Checked before anything
  * else below: the route pattern's `:uuid` segment is just "whatever's first,"
- * which would otherwise let this route claim `/base/` or `/info/` if it were
- * ever registered ahead of the Upload API (see `index.ts`'s import order) —
- * returning `undefined` here is "not a CDN request" as far as the router's
- * concerned, same as a path this route never matched at all.
+ * which also matches `/base/` and `/info/` — returning `undefined` hands the
+ * request on to the next matching route, same as a path this route never
+ * matched at all.
  */
 const CDN_ID =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}(~\d+)?$/i
