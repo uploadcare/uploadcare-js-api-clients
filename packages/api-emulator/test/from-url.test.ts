@@ -79,11 +79,13 @@ it('refuses a private address', async () => {
   })
 })
 
-it('allows a source_url on the emulator itself, despite being "localhost"', async () => {
+it("fetches a source_url on the CLI's own origin (127.0.0.1:3000)", async () => {
   const response = await post(
-    `pub_key=demopublickey&source_url=${encodeURIComponent('http://localhost:3000/49b4c5a1-31b3-4349-ba07-d97a2d883c37/x.png')}`
+    `pub_key=demopublickey&source_url=${encodeURIComponent('http://127.0.0.1:3000/49b4c5a1-31b3-4349-ba07-d97a2d883c37/x.png')}`
   )
   expect(response.status).toBe(200)
+  const { token } = (await response.json()) as { token: string }
+  expect(await poll(token)).not.toMatchObject({ status: 'error' })
 })
 
 it('reports progress before it succeeds, and names the file from the url', async () => {
