@@ -318,22 +318,23 @@ describe('retryIfFailed', () => {
     })
 
     it('should increase timeout by 1 second on each attempt', async () => {
-      const { task } = createRunner({ error: networkError, attempts: 4 })
-
-      const start = Date.now()
-      await expect(
-        retryIfFailed<number>(task, {
+      vi.useFakeTimers()
+      try {
+        const { spy, task } = createRunner({ error: networkError, attempts: 4 })
+        const p = retryIfFailed<number>(task, {
           retryNetworkErrorMaxTimes: 10,
           retryThrottledRequestMaxTimes: 0
         })
-      ).resolves.toBe(0)
-      const end = Date.now()
-      const diff = end - start
 
-      // 1+2+3+4=10
-      expect(diff).toBeGreaterThanOrEqual(10000)
-      // expect max ~4s spent on doing requests, it could be slow on CI and needs to be tested
-      expect(diff).toBeLessThan(14000)
+        // 1+2+3+4=10
+        await vi.advanceTimersByTimeAsync(9999)
+        expect(spy).toHaveBeenCalledTimes(4)
+        await vi.advanceTimersByTimeAsync(1)
+        await expect(p).resolves.toBe(0)
+        expect(spy).toHaveBeenCalledTimes(5)
+      } finally {
+        vi.useRealTimers()
+      }
     })
   })
 })

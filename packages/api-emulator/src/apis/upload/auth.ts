@@ -96,8 +96,8 @@ type Claims = {
  * with `sha256(SIGNED_UPLOADS_SECRET_KEY)`, as `generateAuthToken` mints them —
  * rather than recognising canned token strings, so `upload-client`'s
  * `authToken.test.ts` says the same thing against the emulator and against
- * production. WebCrypto, not `node:crypto`, so this entry stays browser-safe;
- * `subtle.verify` is constant-time.
+ * production. The header's `alg` must be `HS256`. WebCrypto, not `node:crypto`,
+ * so this entry stays browser-safe; `subtle.verify` is constant-time.
  *
  * `path` is the request path with a trailing slash (`/base/`), which is what
  * `uc.restrictions.scope` items match: exactly, or as a prefix when they end in
@@ -114,15 +114,18 @@ export const verifyAuthToken = async (
   if (!header || !payload || !signature || extra !== undefined)
     return invalid('unreadable or not a JWT')
 
+  let protectedHeader: { alg?: unknown }
   let claims: Claims
   let signatureBytes: Uint8Array
   try {
-    decodeSegment(header)
+    protectedHeader = (decodeSegment(header) ?? {}) as { alg?: unknown }
     claims = (decodeSegment(payload) ?? {}) as Claims
     signatureBytes = base64urlBytes(signature)
   } catch {
     return invalid('unreadable or not a JWT')
   }
+
+  if (protectedHeader.alg !== 'HS256') return invalid('`alg` must be HS256')
 
   const { subtle } = globalThis.crypto
   const key = await subtle.importKey(
