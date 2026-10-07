@@ -4,6 +4,7 @@ import {
   type ScenarioMatch,
   type ScenarioOptions
 } from './core/scenarios.js'
+import { applyPreset, type PresetArgsOf, type PresetName } from './presets.js'
 import * as store from './state/store.js'
 import type { StoredFile, TelemetryEvent } from './state/store.js'
 
@@ -28,6 +29,8 @@ export type EmulatorSession = SessionView & {
     handler: ScenarioHandler,
     options?: ScenarioOptions
   ): EmulatorSession
+  /** Applies a preset (see `PresetArgs`). Answers the session, for chaining. */
+  use<N extends PresetName>(name: N, ...args: PresetArgsOf<N>): EmulatorSession
 }
 
 const handles = new WeakMap<store.Session, EmulatorSession>()
@@ -41,6 +44,10 @@ export const handleOf = (session: store.Session): EmulatorSession => {
     telemetry: session.telemetry,
     on(match, handler, options) {
       session.scenarios.push(scenario(match, handler, options))
+      return handle
+    },
+    use(name, ...args) {
+      applyPreset(session, handle, name, args[0])
       return handle
     }
   }

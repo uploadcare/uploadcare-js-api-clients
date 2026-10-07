@@ -122,12 +122,8 @@ export type Session = {
   multipart: Map<string, MultipartUpload>
   derivativeJobs: Map<string, DerivativeJob>
   issued: number
-  /** `/throttle/`'s per-session request count — see throttle.ts. */
-  throttled: number
   /** Every `POST /api/v1/events` body received, in arrival order. */
   telemetry: TelemetryEvent[]
-  /** `THROTTLE_ONCE_FIELD` values already throttled — see auth.ts. */
-  throttledOnce: Set<string>
   /** Operations spent per bearer token, for `limits.operations` — see auth.ts. */
   tokenOperations: Map<string, number>
   /** `session.on()`'s, in registration order — see core/scenarios.ts. */
@@ -152,9 +148,7 @@ export const resetSession = (id = 'default') => {
     multipart: new Map(),
     derivativeJobs: new Map(),
     issued: 0,
-    throttled: 0,
     telemetry: [],
-    throttledOnce: new Set(),
     tokenOperations: new Map(),
     scenarios: []
   }

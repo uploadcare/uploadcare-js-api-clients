@@ -20,6 +20,7 @@ export { SESSION_HEADER } from './state/store.js'
 export type { StoredFile, StoredImage, TelemetryEvent } from './state/store.js'
 export { resetSession, sessionOf } from './session.js'
 export type { EmulatorSession, SessionView } from './session.js'
+export type { PresetArgs, PresetArgsOf, PresetName } from './presets.js'
 export type {
   ScenarioContext,
   ScenarioHandler,

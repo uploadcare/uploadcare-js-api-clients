@@ -7,8 +7,8 @@ import { call } from './emulator.js'
  * exercise the unauthenticated case (`base.test.ts`, `group.test.ts` and
  * `multipart.test.ts` each cover their own route already — see those files).
  * `/info/`, `/from_url/`, `/group/info/` and `/multipart/complete/` are covered
- * here instead of duplicating a test per file. Bearer tokens, signed uploads
- * and throttle-once are `jwt.test.ts`'s.
+ * here instead of duplicating a test per file. Bearer tokens and signed uploads
+ * are `jwt.test.ts`'s.
  */
 
 beforeEach(() => resetSession())
@@ -66,24 +66,4 @@ it('does not require a pub_key on a part PUT', async () => {
   // The upload session doesn't exist, but the route still ran unauthenticated
   // — no 403.
   expect(response.status).toBe(200)
-})
-
-it('/throttle/ answers 429 then 200, per session', async () => {
-  const url = 'https://upload.uploadcare.com/throttle/?pub_key=demopublickey'
-  const first = await call(url, { method: 'POST' })
-  expect(first.status).toBe(429)
-  expect(await first.clone().text()).toBe('Request was throttled.')
-
-  const second = await call(url, { method: 'POST' })
-  expect(second.status).toBe(200)
-
-  const third = await call(url, { method: 'POST' })
-  expect(third.status).toBe(429)
-})
-
-it('refuses /throttle/ with no pub_key', async () => {
-  const response = await call('https://upload.uploadcare.com/throttle/', {
-    method: 'POST'
-  })
-  expect(response.status).toBe(403)
 })

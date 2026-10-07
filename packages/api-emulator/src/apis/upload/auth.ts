@@ -8,7 +8,6 @@ import {
   NO_STORING_KEY,
   SIGNED_UPLOADS_PUBLIC_KEY,
   SIGNED_UPLOADS_SECRET_KEY,
-  THROTTLE_ONCE_FIELD,
   UNKNOWN_PROGRESS_KEY
 } from './scenarios.js'
 
@@ -54,9 +53,6 @@ const requirePublicKey = (
 
 /** Matches the Upload API's own tolerance for clock drift. */
 const CLOCK_LEEWAY_SECONDS = 30
-
-/** Seconds, echoed in throttle-once's `retry-after` so the wait is observable. */
-const RETRY_AFTER_SECONDS = 1
 
 /** `[status, content, errorCode]`, ready for `apiError`. */
 type Rejection = [number, string, string]
@@ -172,15 +168,13 @@ const verifyAuthToken = async (
 /**
  * A protected route's whole gate, in order:
  *
- * 1. Throttle-once (`THROTTLE_ONCE_FIELD`) — first, so a throttled request is
- *    throttled whatever its credential.
- * 2. A Bearer token, when an `Authorization` header is sent — checked instead of
+ * 1. A Bearer token, when an `Authorization` header is sent — checked instead of
  *    the public key, so an invalid key with a valid token succeeds (which is
  *    how a test proves the header reached the server). Sending `signature` or
  *    `expire` alongside it is refused: the client drops them when it sends a
  *    token, so either one arriving means something leaked.
- * 3. `SIGNED_UPLOADS_PUBLIC_KEY` with no token: `SignatureRequiredError`.
- * 4. The ordinary public-key check.
+ * 2. `SIGNED_UPLOADS_PUBLIC_KEY` with no token: `SignatureRequiredError`.
+ * 3. The ordinary public-key check.
  *
  * Unprotected routes (`/from_url/status/`, the part `PUT`, CDN, telemetry)
  * never get here, so they ignore `Authorization` the way the Upload API does.
@@ -190,20 +184,6 @@ const authorize = async (
   field: (name: string) => string | null,
   paramName: string
 ) => {
-  const session = sessionOf(request)
-  const throttleKey = field(THROTTLE_ONCE_FIELD)
-  if (throttleKey && !session.throttledOnce.has(throttleKey)) {
-    session.throttledOnce.add(throttleKey)
-    // schema: requestWasThrottledError
-    return apiError(
-      request,
-      429,
-      'Request was throttled.',
-      'RequestThrottledError',
-      { 'retry-after': String(RETRY_AFTER_SECONDS) }
-    )
-  }
-
   const authorization = request.headers.get('authorization')
   if (authorization) {
     // A constant message: naming the offending parameter would echo a
@@ -226,7 +206,7 @@ const authorize = async (
     const rejection = await verifyAuthToken(
       authorization.slice('Bearer '.length),
       pathname.endsWith('/') ? pathname : `${pathname}/`,
-      session
+      sessionOf(request)
     )
     return rejection && apiError(request, ...rejection)
   }

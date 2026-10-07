@@ -8,8 +8,8 @@ import { call, now, sign, token } from './emulator.js'
 import { assertMatchesSpec, jsonError } from './spec.js'
 
 /**
- * Bearer-token auth, the signed-uploads key and throttle-once — the gate
- * `auth.ts`'s `protect` puts in front of every protected route.
+ * Bearer-token auth and the signed-uploads key — the gate `auth.ts`'s `protect`
+ * puts in front of every protected route.
  *
  * Token rejections are asserted directly rather than through
  * `assertMatchesSpec`: the vendored 2024-02-12 spec documents no 401 and none
@@ -195,28 +195,6 @@ it('requires a signature for the signed-uploads key without a token', async () =
     error_code: 'SignatureRequiredError'
   })
   await assertMatchesSpec(response, { method: 'post', path: '/base/' })
-})
-
-it('throttles the first request with a throttle key, once per session', async () => {
-  const throttled = () =>
-    base({
-      publicKey: 'demopublickey',
-      fields: { 'metadata[mock_throttle]': 'case' }
-    })
-
-  const first = await throttled()
-  expect(first.headers.get('retry-after')).toBe('1')
-  const error = await jsonError(first)
-  expect(error).toMatchObject({
-    status_code: 429,
-    error_code: 'RequestThrottledError'
-  })
-  await assertMatchesSpec(first, { method: 'post', path: '/base/' })
-
-  await expectUploaded(await throttled())
-
-  resetSession()
-  expect((await jsonError(await throttled())).status_code).toBe(429)
 })
 
 it('forgets spent operations on resetSession', async () => {
