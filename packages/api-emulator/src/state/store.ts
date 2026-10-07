@@ -164,17 +164,8 @@ export const resetSession = (id = 'default') => {
     throttledOnce: new Set(),
     tokenOperations: new Map()
   }
-  for (const uuid of DEMO_FILES) {
-    session.files.set(uuid, {
-      uuid,
-      name: 'demo.jpg',
-      size: STOCK_IMAGE.byteLength,
-      mimeType: 'image/jpeg',
-      bytes: STOCK_IMAGE,
-      image: imageSize(STOCK_IMAGE),
-      isStored: true
-    })
-  }
+  for (const uuid of DEMO_FILES)
+    storeStockImage(session, 'demo.jpg', true, uuid)
   sessions.set(id, session)
   return session
 }
@@ -196,9 +187,19 @@ export const sessionOf = (request: Request) => {
 export const nextUuid = (session: Session) =>
   `${(++session.issued).toString(16).padStart(8, '0')}-0000-4000-8000-000000000000`
 
-export const store = (session: Session, file: Omit<StoredFile, 'uuid'>) => {
-  const stored = { ...file, uuid: nextUuid(session) }
-  session.files.set(stored.uuid, stored)
+/** Keeps `file` under `uuid` (a fresh one by default), sized from its bytes. */
+export const store = (
+  session: Session,
+  file: Omit<StoredFile, 'uuid' | 'size' | 'image'>,
+  uuid = nextUuid(session)
+): StoredFile => {
+  const stored = {
+    ...file,
+    uuid,
+    size: file.bytes.byteLength,
+    image: imageSize(file.bytes)
+  }
+  session.files.set(uuid, stored)
   return stored
 }
 
@@ -259,13 +260,11 @@ export const fileInfo = (file: StoredFile) => {
 export const storeStockImage = (
   session: Session,
   name: string,
-  isStored: boolean
+  isStored: boolean,
+  uuid?: string
 ) =>
-  store(session, {
-    name,
-    size: STOCK_IMAGE.byteLength,
-    mimeType: 'image/jpeg',
-    bytes: STOCK_IMAGE,
-    image: imageSize(STOCK_IMAGE),
-    isStored
-  })
+  store(
+    session,
+    { name, mimeType: 'image/jpeg', bytes: STOCK_IMAGE, isStored },
+    uuid
+  )

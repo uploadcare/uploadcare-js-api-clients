@@ -2,8 +2,7 @@ import { storedBy } from '../../core/body.js'
 import { apiError, dropConnection } from '../../core/responses.js'
 import { route, type Route } from '../../core/router.js'
 import { protect } from './auth.js'
-import { imageSize } from '../../state/image-size.js'
-import { fileInfo, nextUuid, sessionOf } from '../../state/store.js'
+import { fileInfo, nextUuid, sessionOf, store } from '../../state/store.js'
 
 /**
  * The part size `/multipart/start/` hands out, matching the real Upload API
@@ -158,20 +157,18 @@ export const multipartRoutes: Route[] = [
         offset += part.byteLength
       }
 
-      // Stored like any other file, so /info/ and the CDN can answer about it —
-      // under the same uuid /multipart/start/ already handed out, not a freshly
-      // minted one, so this round-trips through session.files directly rather
-      // than through store() (which always mints its own).
-      const stored = {
-        uuid,
-        name: upload.name,
-        size: bytes.byteLength,
-        mimeType: upload.mimeType,
-        bytes,
-        image: imageSize(bytes),
-        isStored: upload.isStored
-      }
-      session.files.set(uuid, stored)
+      // Under the uuid /multipart/start/ handed out, so /info/ and the CDN
+      // answer for it.
+      const stored = store(
+        session,
+        {
+          name: upload.name,
+          mimeType: upload.mimeType,
+          bytes,
+          isStored: upload.isStored
+        },
+        uuid
+      )
 
       return Response.json(fileInfo(stored))
     }, 'UPLOADCARE_PUB_KEY')
