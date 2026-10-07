@@ -14,8 +14,8 @@ point a `baseURL` at. `@uploadcare/api-emulator/browser` is page-only, and the
 one export that needs MSW (see [3. In the browser](#3-in-the-browser-with-msw)).
 The split exists so the core can be bundled into a page without dragging Node
 built-ins with it, and used from Node without installing MSW;
-`test/dist.test.ts` asserts neither the `.` nor the `./browser` export's
-source or built chunks regress that, and that only `./browser` imports MSW.
+`test/dist.test.ts` asserts the built `.` and `./browser` bundles don't regress
+that, and that only `./browser` reaches MSW.
 
 Three ways to run it, in increasing order of how "real" the transport needs
 to be:

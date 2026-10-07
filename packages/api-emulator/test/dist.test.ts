@@ -1,4 +1,4 @@
-import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs'
+import { readFileSync } from 'node:fs'
 import { builtinModules } from 'node:module'
 import path from 'node:path'
 import { expect, it } from 'vitest'
@@ -14,12 +14,6 @@ import { expect, it } from 'vitest'
  * or without the `node:` prefix, so it can't drift from what Node actually
  * considers built in.
  */
-/**
- * Exempt paths, _relative to `src/`_ rather than by basename: a basename set
- * would silently exempt a future `src/apis/cdn/cli.ts` too, which has nothing
- * to do with the Node-only `./listen` export.
- */
-const NODE_ONLY = new Set(['listen.ts', 'cli.ts'])
 const BUILTIN_IMPORT = new RegExp(
   `\\bimport\\b[^'"]*['"](?:node:)?(?:${builtinModules.join('|')})['"]`
 )
@@ -35,46 +29,19 @@ const FORBIDDEN = [
   /\b__filename\b/
 ]
 
-const sourceFiles = (dir: string, prefix = ''): string[] =>
-  readdirSync(dir).flatMap((entry) => {
-    const full = path.join(dir, entry)
-    const relative = prefix ? `${prefix}/${entry}` : entry
-    if (statSync(full).isDirectory()) return sourceFiles(full, relative)
-    return full.endsWith('.ts') && !NODE_ONLY.has(relative) ? [full] : []
-  })
-
-const root = path.join(import.meta.dirname, '../src')
-
 /**
- * MSW is an optional peer of `./browser` alone: a `.` consumer (`./listen`, a
- * Playwright route) never installs it, so any other module importing it is a
- * bundle that won't resolve.
+ * MSW is an optional peer of `./browser` alone: a `.` or `./listen` consumer
+ * never installs it, so any other entry reaching it is a bundle that won't
+ * resolve.
  */
 const MSW_IMPORT = /\bfrom\s*['"](?:msw|@mswjs\/)/
 
-it('keeps msw out of every module but "./browser"', () => {
-  const offenders = sourceFiles(root)
-    .filter((file) => path.relative(root, file) !== 'browser.ts')
-    .filter((file) => MSW_IMPORT.test(readFileSync(file, 'utf8')))
-    .map((file) => path.relative(root, file))
-  expect(offenders).toEqual([])
-})
-
-it('keeps every module behind the "." and "./browser" exports free of node built-ins', () => {
-  const offenders = sourceFiles(root).flatMap((file) =>
-    FORBIDDEN.filter((pattern) => pattern.test(readFileSync(file, 'utf8'))).map(
-      (pattern) => `${path.relative(root, file)} matches ${pattern}`
-    )
-  )
-  expect(offenders).toEqual([])
-})
-
 /**
- * The source-level check above can't see what bundling actually pulls in: a
- * shared chunk that only looks fine in isolation could still end up reachable
- * from both entry points once Rollup merges things. So walk the real `dist/`
- * import graph from `index.js`, the same way a consumer's bundler would, and
- * scan exactly what that reaches.
+ * Walk the built `dist/` import graph from an entry, the way a consumer's
+ * bundler would, and scan exactly what that reaches: a shared chunk Rollup
+ * merges can pull Node-only code in even when every source module looks fine.
+ * `pretest` builds `dist/` first, so a missing build fails here rather than
+ * skipping.
  */
 const distRoot = path.join(import.meta.dirname, '../dist')
 
@@ -95,47 +62,46 @@ const offendersFrom = (entry: string, patterns: RegExp[]) =>
       .map((pattern) => `${path.relative(distRoot, file)} matches ${pattern}`)
   )
 
-it.runIf(existsSync(distRoot)).each(['index.js', 'browser.js'])(
+it.each(['index.js', 'browser.js'])(
   'keeps the built %s bundle free of node built-ins',
   (entry) => {
     expect(offendersFrom(entry, FORBIDDEN)).toEqual([])
   }
 )
 
-it.runIf(existsSync(distRoot))('keeps the built "." bundle free of msw', () => {
-  expect(offendersFrom('index.js', [MSW_IMPORT])).toEqual([])
-})
-
-/**
- * The regression this repo actually shipped (PR #586): a tree-shaking setting
- * dropped every route from `dist/index.js`, which built clean, exported
- * `handle`, typechecked — and answered nothing. A source-level test can't catch
- * that; only importing the built artifact can.
- */
-it.runIf(existsSync(distRoot))(
-  'answers real requests from the built "." bundle, across all three APIs',
-  async () => {
-    const { handle } = await import(path.join(distRoot, 'index.js'))
-    // Seeded by every fresh session (see DEMO_FILES in state/store.ts) —
-    // exists without needing an upload first.
-    const seededUuid = '49b4c5a1-31b3-4349-ba07-d97a2d883c37'
-
-    const cdn = await handle(new Request(`https://ucarecdn.com/${seededUuid}/`))
-    expect(cdn?.status).toBe(200)
-
-    const uploadInfo = await handle(
-      new Request(
-        `https://upload.uploadcare.com/info/?pub_key=demopublickey&file_id=${seededUuid}`
-      )
-    )
-    expect(uploadInfo?.status).toBe(200)
-
-    const telemetry = await handle(
-      new Request('https://tlm.uploadcare.com/api/v1/events', {
-        method: 'POST',
-        body: JSON.stringify({ event: 'test' })
-      })
-    )
-    expect(telemetry?.status).toBe(200)
+it.each(['index.js', 'listen.js'])(
+  'keeps the built %s bundle free of msw',
+  (entry) => {
+    expect(offendersFrom(entry, [MSW_IMPORT])).toEqual([])
   }
 )
+
+/**
+ * A tree-shaking setting can drop every route from `dist/index.js` while it
+ * still builds clean, exports `handle` and typechecks. Only importing the built
+ * artifact catches that.
+ */
+it('answers real requests from the built "." bundle, across all three APIs', async () => {
+  const { handle } = await import(path.join(distRoot, 'index.js'))
+  // Seeded by every fresh session (see DEMO_FILES in state/store.ts) —
+  // exists without needing an upload first.
+  const seededUuid = '49b4c5a1-31b3-4349-ba07-d97a2d883c37'
+
+  const cdn = await handle(new Request(`https://ucarecdn.com/${seededUuid}/`))
+  expect(cdn?.status).toBe(200)
+
+  const uploadInfo = await handle(
+    new Request(
+      `https://upload.uploadcare.com/info/?pub_key=demopublickey&file_id=${seededUuid}`
+    )
+  )
+  expect(uploadInfo?.status).toBe(200)
+
+  const telemetry = await handle(
+    new Request('https://tlm.uploadcare.com/api/v1/events', {
+      method: 'POST',
+      body: JSON.stringify({ event: 'test' })
+    })
+  )
+  expect(telemetry?.status).toBe(200)
+})

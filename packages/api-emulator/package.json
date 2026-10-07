@@ -44,6 +44,7 @@
   "scripts": {
     "prepack": "cp ../../LICENSE ./LICENSE",
     "build": "tsc && vite build",
+    "pretest": "vite build",
     "test": "vitest --run",
     "tsc": "tsc --noEmit",
     "lint": "oxlint src test scripts",
