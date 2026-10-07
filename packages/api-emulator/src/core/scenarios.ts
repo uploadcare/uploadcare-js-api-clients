@@ -34,7 +34,11 @@ export type ScenarioOptions = {
 }
 
 export type Scenario = {
-  matches: (request: Request) => Record<string, string> | undefined
+  /**
+   * The path params when `request` is this scenario's, `undefined` when it
+   * isn't.
+   */
+  paramsFor: (request: Request) => Record<string, string> | undefined
   handler: ScenarioHandler
   /** Uses left, claimed when a request matches; unlimited when absent. */
   remaining?: number
@@ -59,14 +63,14 @@ export const scenario = (
   const { method, path, host } =
     typeof match === 'string' ? parseMatch(match) : match
   const segments = path === undefined ? undefined : segmentsOf(path)
-  const matches = (request: Request) => {
+  const paramsFor = (request: Request) => {
     const url = new URL(request.url)
     if (method !== undefined && method.toUpperCase() !== request.method)
       return undefined
     if (host !== undefined && host !== url.host) return undefined
     return segments ? matchPath(segments, url.pathname) : {}
   }
-  return { matches, handler, remaining: times }
+  return { paramsFor, handler, remaining: times }
 }
 
 /**
@@ -85,7 +89,7 @@ export const runScenarios = (
   const run = async (from: number): Promise<Response | undefined> => {
     for (let index = from; index < chain.length; index += 1) {
       const current = chain[index]!
-      const params = current.matches(request)
+      const params = current.paramsFor(request)
       if (!params || current.remaining === 0) continue
       if (current.remaining !== undefined) current.remaining -= 1
 
