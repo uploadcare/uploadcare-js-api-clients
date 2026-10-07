@@ -21,13 +21,15 @@ export const route = (
   method: string,
   path: string,
   handler: RouteHandler
-): Route => ({ method, segments: path.split('/').filter(Boolean), handler })
+): Route => ({ method, segments: segmentsOf(path), handler })
 
-const matchRoute = (candidate: Route, method: string, pathname: string) => {
-  if (candidate.method !== method) return undefined
-  const actual = pathname.split('/').filter(Boolean)
+export const segmentsOf = (path: string) => path.split('/').filter(Boolean)
+
+/** The params `segments` (see `route`) capture from `pathname`, if it matches. */
+export const matchPath = (segments: readonly string[], pathname: string) => {
+  const actual = segmentsOf(pathname)
   const params: Record<string, string> = {}
-  for (const [index, expected] of candidate.segments.entries()) {
+  for (const [index, expected] of segments.entries()) {
     if (expected === '*')
       return { ...params, rest: actual.slice(index).join('/') }
     const value = actual[index]
@@ -35,7 +37,7 @@ const matchRoute = (candidate: Route, method: string, pathname: string) => {
     if (expected.startsWith(':')) params[expected.slice(1)] = value
     else if (expected !== value) return undefined
   }
-  return actual.length === candidate.segments.length ? params : undefined
+  return actual.length === segments.length ? params : undefined
 }
 
 /**
@@ -47,7 +49,8 @@ export const createRouter =
   async (request: Request): Promise<Response | undefined> => {
     const { pathname } = new URL(request.url)
     for (const candidate of routes) {
-      const params = matchRoute(candidate, request.method, pathname)
+      if (candidate.method !== request.method) continue
+      const params = matchPath(candidate.segments, pathname)
       if (!params) continue
       // `undefined` is "not mine after all" — keep looking, so a broad
       // pattern (the CDN's `/:uuid/*`) can't shadow a later, narrower route.
