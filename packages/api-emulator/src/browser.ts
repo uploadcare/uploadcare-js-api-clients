@@ -129,7 +129,7 @@ export const setupEmulator = ({
       if (decision.kind === 'refuse')
         return controller.errorWith(decision.error)
       const response = await answer(request)
-      if (!response) {
+      if (!response || response.type === 'error') {
         return controller.errorWith(new TypeError('Failed to fetch'))
       }
       // One macrotask between `send()` and the first upload event. In-page the

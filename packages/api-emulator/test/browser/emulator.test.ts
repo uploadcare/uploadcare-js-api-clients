@@ -93,6 +93,28 @@ it('passes the page’s own origin through', async () => {
   expect((await sendXhr('GET', '/package.json')).status).toBe(200)
 })
 
+it('fails a part PUT that leaks an Authorization header, over XHR and fetch', async () => {
+  const form = new FormData()
+  form.set('UPLOADCARE_PUB_KEY', 'demopublickey')
+  form.set('filename', 'big.jpg')
+  form.set('size', String(11 * 1024 * 1024))
+  form.set('content_type', 'image/jpeg')
+  const started = await fetch(
+    'https://upload.uploadcare.com/multipart/start/',
+    {
+      method: 'POST',
+      body: form
+    }
+  )
+  const { parts } = (await started.json()) as { parts: string[] }
+  const leaked = { authorization: 'Bearer leaked' }
+
+  expect((await sendXhr('PUT', parts[0], 'x', leaked)).error).toBe(true)
+  await expect(
+    fetch(parts[0], { method: 'PUT', headers: leaked, body: 'x' })
+  ).rejects.toThrow(TypeError)
+})
+
 it('starts each test from a fresh session', async () => {
   const { uuid } = await upload(await pngOf(1, 1))
   expect((await fetch(`https://ucarecdn.com/${uuid}/`)).status).toBe(200)

@@ -14,7 +14,8 @@ export type XhrResult = {
 export const sendXhr = (
   method: string,
   url: string,
-  body?: XMLHttpRequestBodyInit
+  body?: XMLHttpRequestBodyInit,
+  headers: Record<string, string> = {}
 ): Promise<XhrResult> =>
   new Promise((resolve) => {
     const xhr = new XMLHttpRequest()
@@ -38,6 +39,8 @@ export const sendXhr = (
     xhr.addEventListener('load', done(false))
     xhr.addEventListener('error', done(true))
     xhr.open(method, url)
+    for (const [name, value] of Object.entries(headers))
+      xhr.setRequestHeader(name, value)
     xhr.send(body)
     setTimeout(() => {
       macrotask = true

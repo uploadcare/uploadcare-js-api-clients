@@ -6,7 +6,6 @@ import {
 } from 'node:http'
 import { Server as TlsServer } from 'node:https'
 import { handle } from './index.js'
-import { DROP_CONNECTION_MARKER } from './core/responses.js'
 
 export type EmulatorServerOptions = {
   /** 0, the default, takes whatever port is free. */
@@ -148,12 +147,8 @@ export const createEmulatorServer = async (
     )
     if (request.aborted) return
 
-    // See DROP_CONNECTION_MARKER (core/responses.ts): a part PUT that leaked an
-    // Authorization header answers with this marker instead of a normal
-    // status, since the client ignores the status of a part PUT anyway —
-    // only actually dropping the connection, as the real presigned-URL
-    // endpoint would, fails a test over it.
-    if (answer?.headers.has(DROP_CONNECTION_MARKER)) {
+    // `Response.error()` — see `dropConnection` (core/responses.ts).
+    if (answer?.type === 'error') {
       request.socket.destroy()
       return
     }

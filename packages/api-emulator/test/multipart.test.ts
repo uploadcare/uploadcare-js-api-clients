@@ -167,7 +167,7 @@ it('refuses to complete a uuid no /multipart/start/ ever issued', async () => {
   expect(response.status).toBe(400)
 })
 
-it('marks a part PUT that leaks an Authorization header, instead of answering it plainly', async () => {
+it('fails a part PUT that leaks an Authorization header as a network error', async () => {
   const { uuid, parts } = (await (
     await start({
       filename: 'big.jpg',
@@ -184,10 +184,7 @@ it('marks a part PUT that leaks an Authorization header, instead of answering it
       body: new Uint8Array([1])
     })
   )
-  // `handle()` never touches a socket — see listen.test.ts for the part that
-  // actually drops the connection. Here it's only the marker that must be
-  // set.
-  expect(response!.headers.get('x-emulator-drop-connection')).toBe('1')
+  expect(response!.type).toBe('error')
 })
 
 let server: Awaited<ReturnType<typeof createEmulatorServer>>

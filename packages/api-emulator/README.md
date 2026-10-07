@@ -68,7 +68,9 @@ await page.route(/^https?:\/\//, async (route) => {
     })
   )
 
-  if (!response) return route.abort() // nothing the emulator implements
+  // Nothing the emulator implements, or a deliberate network error (which
+  // `route.fulfill` can't send: it rejects status 0).
+  if (!response || response.type === 'error') return route.abort()
   await route.fulfill({
     status: response.status,
     headers: Object.fromEntries(response.headers),
@@ -175,7 +177,9 @@ session holds only the demo project's files (see [Demo-project files](#demo-proj
 The Upload API's `POST /base/` (single-file upload), `GET /info/` (file
 metadata), `POST /from_url/` / `GET /from_url/status/`, `POST /group/` /
 `GET /group/info/`, and multipart upload (`POST /multipart/start/`, the part
-`PUT`, `POST /multipart/complete/`) all exist today, and so does the CDN.
+`PUT`, `POST /multipart/complete/`) all exist today, and so does the CDN. A
+part `PUT` carrying an `Authorization` header fails as a network error, as the
+real presigned storage URL does.
 
 So do the AI derivative endpoints, `POST /derivative/image/generate/`,
 `POST /derivative/image/edit/` and `GET /derivative/status/`
@@ -236,23 +240,6 @@ for the list and which consumer needs each one; all of them serve the same
 bytes, `STOCK_IMAGE` (`src/state/stock-image.ts`) — a real, decodable JPEG,
 base64-encoded and decoded at module load so the package stays loadable
 outside Node.
-
-## Caveats
-
-- **The part-PUT `Authorization` check only bites in server mode.** Part
-  uploads go to presigned storage URLs and must never carry an `Authorization`
-  header — and `upload-client` ignores the status code of a part `PUT`
-  entirely, so answering with an error status wouldn't fail a test over a
-  leaked header. `handle()` can't touch a socket (it has to stay browser-safe
-  for the MSW path), so a part `PUT` that carries the header instead answers
-  with an ordinary `Response` carrying the `x-emulator-drop-connection` marker
-  header (`DROP_CONNECTION_MARKER` in `src/core/responses.ts`). `listen.ts` — the one
-  place that owns the raw socket — recognises that marker and destroys the
-  connection instead of writing the response, reproducing the old mock
-  server's `ctx.req.destroy()`. Under MSW, or any other consumer of the `.`
-  export, there is no socket to drop: the marker response is delivered as an
-  ordinary response, so this check only actually drops a connection when the
-  emulator is run via `@uploadcare/api-emulator/listen`.
 
 ## Scenarios: magic values a test relies on
 
