@@ -1,6 +1,6 @@
 import { apiError } from '../../core/responses.js'
 import { route, type Route } from '../../core/router.js'
-import { type Session, type StoredFile, sessionOf } from '../../state/store.js'
+import { type Session, imageInfo, sessionOf } from '../../state/store.js'
 
 /**
  * https://ucarecdn.com and the per-project cnames under `*.ucarecd.net`. Ported
@@ -40,24 +40,6 @@ const resolve = (session: Session, id: string, pathname: string) => {
   return uuid === undefined ? undefined : session.files.get(uuid)
 }
 
-/**
- * `-/json/` is metadata, not a rendition — the shape `fileInfo`'s image_info
- * uses.
- */
-const jsonInfo = (file: StoredFile) =>
-  file.image && {
-    id: file.uuid,
-    format: file.image.format,
-    width: file.image.width,
-    height: file.image.height,
-    sequence: false,
-    dpi: [72, 72],
-    color_mode: 'RGB',
-    orientation: null,
-    geo_location: null,
-    datetime_original: null
-  }
-
 export const cdnRoutes: Route[] = [
   route('GET', '/:uuid/*', ({ request, params }) => {
     if (!CDN_ID.test(params.uuid ?? '')) return undefined
@@ -67,8 +49,11 @@ export const cdnRoutes: Route[] = [
     if (!file) return apiError(request, 404, 'File not found')
 
     if (pathname.includes('/-/json/')) {
-      const info = jsonInfo(file)
-      return info ? Response.json(info) : apiError(request, 400, 'Not an image')
+      // Metadata, not a rendition: `/info/`'s `image_info`, plus the id.
+      const info = imageInfo(file)
+      return info
+        ? Response.json({ id: file.uuid, ...info })
+        : apiError(request, 400, 'Not an image')
     }
 
     // `mimeType` is whatever the uploader claimed, `text/html` included; the
