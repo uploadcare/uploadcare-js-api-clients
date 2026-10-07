@@ -12,13 +12,10 @@ import {
   UNKNOWN_PROGRESS_KEY
 } from './scenarios.js'
 
-/**
- * The public keys the demo project recognises, mirroring the old mock server's
- * list.
- */
+/** The public keys the demo project recognises. */
 const ALLOWED_PUBLIC_KEYS = [
   'demopublickey',
-  // Public test fixture (the old mock server's), not a real credential.
+  // Public test fixture, not a real credential.
   'secret_public_key',
   NO_STORING_KEY,
   UNKNOWN_PROGRESS_KEY,
@@ -173,7 +170,7 @@ const verifyAuthToken = async (
 }
 
 /**
- * A protected route's whole gate, in the order the old mock server applied it:
+ * A protected route's whole gate, in order:
  *
  * 1. Throttle-once (`THROTTLE_ONCE_FIELD`) — first, so a throttled request is
  *    throttled whatever its credential.

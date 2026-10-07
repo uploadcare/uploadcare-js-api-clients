@@ -3,8 +3,7 @@ import { handle, resetSession } from '../src/index.js'
 import { assertMatchesSpec, jsonError } from './spec.js'
 
 // `jsonerrors=1`, exactly as `upload-client` always sends it — without it
-// `apiError` answers `text/plain`, which the brief's own test snippet for this
-// task overlooked (see task-3-report.md).
+// `apiError` answers `text/plain`.
 const post = async (query: string) =>
   (await handle(
     new Request(
@@ -138,8 +137,8 @@ it('reports unknown totals for the unknown-progress key', async () => {
   ).then((r) => r.json())) as { token: string }
   // Deliberately not run through assertMatchesSpec/poll: the spec's
   // `fileUploadInfoProgressStatus` schema types `total` as `number | null`,
-  // so it can't express the `'unknown'` string this pins — the old mock
-  // server's, and upload-client's test's, exact expectation for this key.
+  // so it can't express the `'unknown'` string this pins — upload-client's
+  // test's exact expectation for this key.
   // Same shape of gap as base.test.ts's non-image `image_info: null` case.
   const response = (await handle(
     new Request(`https://upload.uploadcare.com/from_url/status/?token=${token}`)
@@ -150,8 +149,7 @@ it('reports unknown totals for the unknown-progress key', async () => {
 it('shortcuts to the file info only once the source has been seen before', async () => {
   const query = `pub_key=demopublickey&source_url=${encodeURIComponent(SOURCE)}&check_URL_duplicates=1&save_URL_duplicates=1`
 
-  // First time: no duplicate to find, so the ordinary token/poll path — which
-  // dedup used to make unreachable.
+  // First time: no duplicate to find, so the ordinary token/poll path.
   const first = await post(query)
   expect(await first.clone().json()).toMatchObject({ type: 'token' })
 

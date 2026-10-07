@@ -87,9 +87,6 @@ export type DerivativeJob = {
  * - `90e06e59-8055-4435-9291-c005a98cf098` — the browser suite's
  *   `solutions/bundles.e2e.test.tsx` (both `<uc-cloud-image-editor>` and
  *   `<uc-img>`).
- *
- * Mirrors `blocks:tests/utils/fake-uploadcare/files.ts`'s `DEMO_FILES`, plus
- * the one uuid `upload-client` alone still needs.
  */
 export const DEMO_FILES = [
   '49b4c5a1-31b3-4349-ba07-d97a2d883c37',

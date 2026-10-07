@@ -35,8 +35,7 @@ it('does not require a pub_key on /from_url/status/', async () => {
   const response = await handle(
     new Request('https://upload.uploadcare.com/from_url/status/?token=nope')
   )
-  // Answers 'unknown' rather than 403 — this route was never protected in the
-  // old mock server either.
+  // Answers 'unknown' rather than 403: the route isn't protected.
   expect(response!.status).toBe(200)
 })
 

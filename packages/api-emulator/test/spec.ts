@@ -1,8 +1,8 @@
 /**
  * Validates emulator responses against Uploadcare's published API OpenAPI
  * documents (`specs/<name>.json`, vendored by `spec:refresh` — see
- * `../scripts/spec-refresh.ts`). This is the contract from Task 2.5 on: the
- * document is the authority for every response shape this package produces.
+ * `../scripts/spec-refresh.ts`). The document is the authority for every
+ * response shape this package produces.
  *
  * Two things it deliberately does not do, because the document itself doesn't
  * model them:
@@ -63,7 +63,7 @@ const isObject = (value: unknown): value is JsonObject =>
  * spec refresh introduces any of these, expect a confusing Ajv failure rather
  * than a silent one — extend this function rather than the callers.
  *
- * One more, found by Task 4's `groupInfo.files`: `type: array` with an
+ * One more, e.g. `groupInfo.files`: `type: array` with an
  * `allOf`/`oneOf`/`anyOf` as a _sibling_ of `type`, rather than nested under
  * `items` — the document just omits the `items` wrapper. Taken literally, that
  * requires the array itself (not its elements) to also satisfy those branches,

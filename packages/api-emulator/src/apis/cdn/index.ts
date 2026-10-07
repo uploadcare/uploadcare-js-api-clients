@@ -3,17 +3,14 @@ import { route, type Route } from '../../core/router.js'
 import { type Session, imageInfo, sessionOf } from '../../state/store.js'
 
 /**
- * https://ucarecdn.com and the per-project cnames under `*.ucarecd.net`. Ported
- * from `blocks:tests/utils/fake-uploadcare/cdn.ts` — see that file for the
- * "operations are parsed but not applied" rationale, which holds here too:
- * `-/resize/500x/` gets the original bytes back at whatever size they were
- * uploaded, because the suites this backs assert on request URLs and response
- * shapes, never on pixels.
+ * https://ucarecdn.com and the per-project cnames under `*.ucarecd.net`.
+ * Operations are parsed but not applied: `-/resize/500x/` gets the original
+ * bytes back at whatever size they were uploaded, because the suites this backs
+ * assert on request URLs and response shapes, never on pixels.
  *
- * The browser fake matches by host, since every project has its own cname and
- * there's no route table to register into. Here there is one, and the listening
- * server already answers on its own host — so this matches on path alone, and
- * `CDN_ID` below keeps the bare `/:uuid/*` pattern off the Upload API's paths.
+ * Every project has its own cname, and the listening server answers on its own
+ * host, so this matches on path alone; `CDN_ID` below keeps the bare `/:uuid/*`
+ * pattern off the Upload API's paths.
  *
  * Ponytail: ops ignored. If a test ever needs the delivered size to be real,
  * this is where a codec would go.

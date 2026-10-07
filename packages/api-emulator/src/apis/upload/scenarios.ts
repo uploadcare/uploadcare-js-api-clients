@@ -24,9 +24,8 @@ export const NO_STORING_KEY = 'pub_test__no_storing'
  * not exists") and `_fixtureFactory.ts`'s `imageUrl('doesNotExist')`. This one
  * host fails fast, at `POST /from_url/` itself, with a 400 — unlike an ordinary
  * unreachable host (see `REACHABLE_HOSTS` below), which only fails once the job
- * is polled. The real API doesn't actually special-case this URL; the old mock
- * server did, and `upload-client`'s test asserts on the synchronous rejection,
- * so the emulator preserves it.
+ * is polled. The real API doesn't special-case this URL; `upload-client`'s test
+ * asserts on the synchronous rejection, so the emulator does.
  */
 export const UNREACHABLE_SOURCE_URL = 'https://1.com/1.jpg'
 
@@ -66,12 +65,11 @@ export const isPrivateSourceUrl = (sourceUrl: string): boolean => {
  * implies — so the emulator has no other way to learn that a host doesn't
  * resolve the way the real service would; it has to be told.
  *
- * `EMULATOR_OWN_HOST` covers `upload-client`'s own dev-settings host. The rest
- * mirror the browser fake's list (`tests/utils/fake-uploadcare/upload-api.ts`
- * in the file-uploader repo): that suite's from-url validation tests point at a
- * host that is deliberately _not_ in this list to get the poll-time `Host does
- * not exist` failure (see `from-url.ts`), rather than the fast, synchronous one
- * `UNREACHABLE_SOURCE_URL` triggers above.
+ * `EMULATOR_OWN_HOST` covers `upload-client`'s own dev-settings host; the rest
+ * are the hosts file-uploader's e2e suite uploads from. Its from-url validation
+ * tests point at a host that is deliberately _not_ in this list to get the
+ * poll-time `Host does not exist` failure (see `from-url.ts`), rather than the
+ * fast, synchronous one `UNREACHABLE_SOURCE_URL` triggers above.
  */
 export const REACHABLE_HOSTS = [
   EMULATOR_OWN_HOST,
@@ -83,9 +81,9 @@ export const REACHABLE_HOSTS = [
  * The one uuid `POST /group/` accepts without it being in the session:
  * `upload-client`'s `factory.groupOfFiles('valid')` groups it without ever
  * uploading it first (`group.test.ts`' "should create group of files",
- * `uploadFileGroup/groupFromUploaded.test.ts`), as the old mock server — which
- * never checked a store — allowed. It stands in as a 0-byte file. Every other
- * unknown member is "Some files not found.", as the real API answers.
+ * `uploadFileGroup/groupFromUploaded.test.ts`). It stands in as a 0-byte file.
+ * Every other unknown member is "Some files not found.", as the real API
+ * answers.
  */
 export const STUB_GROUP_MEMBER = '392e3aa3-5ed6-4ad6-a67e-b3a7c1d5b9e9'
 
@@ -103,7 +101,7 @@ export const GROUP_FILES_NOT_FOUND_KEY = 'demopublickey'
  * `upload-client`'s `test/api/authToken.test.ts` uses this public key as the
  * stand-in for a project with Signed Uploads switched on: a request under it
  * that carries no Bearer token is refused with `SignatureRequiredError`,
- * whatever the endpoint. Mirrors the old mock server's `config.ts`.
+ * whatever the endpoint.
  */
 export const SIGNED_UPLOADS_PUBLIC_KEY = 'pub_test__signed_uploads'
 
@@ -121,8 +119,7 @@ export const SIGNED_UPLOADS_SECRET_KEY = 'mock_secret_key'
  * token that surfaces after a throttle retry") sends `metadata: {
  * mock_throttle: '<key>' }` to have the first request carrying a given key
  * answered 429 with `retry-after: 1`; every later one with the same key passes.
- * The key is spent per session — tests use a unique one per run. Mirrors the
- * old mock server's `middleware/throttleOnce.ts`.
+ * The key is spent per session — tests use a unique one per run.
  */
 export const THROTTLE_ONCE_FIELD = 'metadata[mock_throttle]'
 

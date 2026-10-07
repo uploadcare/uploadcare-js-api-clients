@@ -14,11 +14,10 @@
  * envelope, which is also what `test/browser/request.test.ts` asserts against
  * production. The `text/plain` branch keeps the real status.
  *
- * `jsonerrors` is truthy-matched, not `=== '1'`: the old mock server this
- * replaced accepted any non-empty value, and so does the real API. With no
- * `jsonerrors` at all, `Accept: application/json` asks for the envelope too —
- * ai-image-editor's derivative client relies on that and never sends
- * `jsonerrors`. An explicit `jsonerrors` wins over the header.
+ * `jsonerrors` is truthy-matched, not `=== '1'`: the real API accepts any
+ * non-empty value. With no `jsonerrors` at all, `Accept: application/json` asks
+ * for the envelope too — ai-image-editor's derivative client relies on that and
+ * never sends `jsonerrors`. An explicit `jsonerrors` wins over the header.
  */
 export const apiError = (
   request: Request,
