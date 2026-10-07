@@ -1,9 +1,13 @@
 # Uploadcare REST API Client
 
 <a href="https://uploadcare.com/?utm_source=github&utm_campaign=uploadcare-js-api-clients">
-    <img align="right" width="64" height="64"
-      src="https://ucarecdn.com/edfdf045-34c0-4087-bbdd-e3834921f890/userpiccircletransparent.svg"
-      alt="">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="https://ucarecdn.com/0c643d09-f5cb-47f5-ac55-8e5273819476/uploadcare-logo-mark-inverted.svg">
+      <source media="(prefers-color-scheme: light)" srcset="https://ucarecdn.com/4f546650-8772-4222-baf3-2ad2d5a855b0/uploadcare-logo-mark.svg">
+      <img align="right" width="64" height="64"
+        src="https://ucarecdn.com/4f546650-8772-4222-baf3-2ad2d5a855b0/uploadcare-logo-mark.svg"
+        alt="">
+    </picture>
 </a>
 
 `@uploadcare/rest-client` is a JavaScript and TypeScript SDK for the Uploadcare [REST API][uc-docs-rest-api]. It covers file management (upload, delete, copy to local/remote storage, metadata, tags), full-text and faceted file search, groups, webhooks, media conversion (video and document), and add-ons (virus scanning, image recognition, background removal). Works in Node.js and browser. Supports Simple and signature-based authentication, async pagination with generators, automatic retry with exponential backoff for throttled requests, and job status polling for async operations.
