@@ -13,6 +13,7 @@
 import { isRecord } from '../../core/body.js'
 import { apiError } from '../../core/responses.js'
 import { route, type Route } from '../../core/router.js'
+import { protect } from './auth.js'
 import {
   type DerivativeJob,
   type Session,
@@ -51,20 +52,17 @@ const readBody = async (request: Request): Promise<Body | undefined> => {
  * require, and the job they start. `validate` is the kind-specific rest, a
  * refusal or nothing.
  */
-const startJob =
-  (
-    kind: 'generate' | 'edit',
-    validate: (request: Request, body: Body) => Response | undefined
-  ) =>
-  async ({ request }: { request: Request }) => {
+const startJob = (
+  kind: 'generate' | 'edit',
+  validate: (request: Request, body: Body) => Response | undefined
+) =>
+  protect(async ({ request, publicKey }) => {
     const body = await readBody(request)
     if (!body)
       return refuse(request, 400, 'invalid_request', 'Request body is invalid.')
 
     // The gate has already accepted the key; this one is a project without
     // derivatives, refused before any validation.
-    const publicKey =
-      body.pub_key ?? new URL(request.url).searchParams.get('pub_key')
     if (publicKey === DERIVATIVE_DISABLED_PUBLIC_KEY)
       return refuse(
         request,
@@ -105,14 +103,7 @@ const startJob =
       failure: DERIVATIVE_FAILURES.get(body.prompt)
     })
     return Response.json({ type: 'job', job_id: jobId })
-  }
-
-/**
- * `pub_key` in the JSON body, as the client sends it; the query string as a
- * fallback, so a body too broken to read still reaches the handler's own
- * `invalid_request` rather than a missing-key refusal.
- */
-const POST_GATE = { protected: { source: 'both' } } as const
+  })
 
 /**
  * One frame per poll: `processing`, then `uploading`, then `success` with
@@ -149,8 +140,7 @@ export const derivativeRoutes: Route[] = [
   route(
     'POST',
     '/derivative/image/generate/',
-    startJob('generate', () => undefined),
-    POST_GATE
+    startJob('generate', () => undefined)
   ),
   route(
     'POST',
@@ -174,13 +164,12 @@ export const derivativeRoutes: Route[] = [
           'Source file is not an image.'
         )
       return undefined
-    }),
-    POST_GATE
+    })
   ),
   route(
     'GET',
     '/derivative/status/',
-    ({ request }) => {
+    protect(({ request }) => {
       const session = sessionOf(request)
       const jobId = new URL(request.url).searchParams.get('job_id')
       if (!jobId)
@@ -194,7 +183,6 @@ export const derivativeRoutes: Route[] = [
           'Derivative job is not found.'
         )
       return Response.json(frame(session, job))
-    },
-    { protected: true }
+    })
   )
 ]

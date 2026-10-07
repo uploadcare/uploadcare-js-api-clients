@@ -1,6 +1,7 @@
 import { bodyFields } from '../../core/body.js'
 import { apiError } from '../../core/responses.js'
-import type { Session } from '../../state/store.js'
+import type { RouteContext, RouteHandler } from '../../core/router.js'
+import { type Session, sessionOf } from '../../state/store.js'
 import {
   DERIVATIVE_DISABLED_PUBLIC_KEY,
   DERIVATIVE_INSTANT_PUBLIC_KEY,
@@ -29,14 +30,11 @@ const ALLOWED_PUBLIC_KEYS = [
 /**
  * The Upload API checks the public key before it looks at anything else in the
  * request, so an unrelated 404 never masks a missing or invalid key.
- * `paramName` differs by route: query-string routes report on `pub_key`,
- * `/base/` reports on `UPLOADCARE_PUB_KEY` since that's where the client puts
- * it.
  */
-export const requirePublicKey = (
+const requirePublicKey = (
   request: Request,
   publicKey: string | null,
-  paramName = 'pub_key'
+  paramName: string
 ) => {
   if (!publicKey)
     // schema: publicKeyRequiredError / uploadcarePublicKeyRequiredError
@@ -105,7 +103,7 @@ type Claims = {
  * token invalid rather than simply matching nothing, as the API does.
  * Operations are counted per token, per session.
  */
-export const verifyAuthToken = async (
+const verifyAuthToken = async (
   token: string,
   path: string,
   session: Session
@@ -190,17 +188,12 @@ export const verifyAuthToken = async (
  * Unprotected routes (`/from_url/status/`, the part `PUT`, CDN, telemetry)
  * never get here, so they ignore `Authorization` the way the Upload API does.
  */
-export const authorize = async (
+const authorize = async (
   request: Request,
-  publicKey: string | null,
-  paramName: string,
-  path: string,
-  session: Session
+  field: (name: string) => string | null,
+  paramName: string
 ) => {
-  const query = new URL(request.url).searchParams
-  const body = await bodyFields(request)
-  const field = (name: string) => body.get(name) ?? query.get(name)
-
+  const session = sessionOf(request)
   const throttleKey = field(THROTTLE_ONCE_FIELD)
   if (throttleKey && !session.throttledOnce.has(throttleKey)) {
     session.throttledOnce.add(throttleKey)
@@ -232,14 +225,16 @@ export const authorize = async (
         'Invalid Authorization header format.',
         'AccessTokenInvalidError'
       )
+    const { pathname } = new URL(request.url)
     const rejection = await verifyAuthToken(
       authorization.slice('Bearer '.length),
-      path,
+      pathname.endsWith('/') ? pathname : `${pathname}/`,
       session
     )
     return rejection && apiError(request, ...rejection)
   }
 
+  const publicKey = field(paramName)
   if (publicKey === SIGNED_UPLOADS_PUBLIC_KEY)
     return apiError(
       request,
@@ -250,3 +245,28 @@ export const authorize = async (
 
   return requirePublicKey(request, publicKey, paramName)
 }
+
+/**
+ * Puts the Upload API's gate in front of `handler`, which then gets the
+ * request's public key too (`null` when a Bearer token stood in for it).
+ *
+ * `paramName` is both where the key is read from and the name a missing or
+ * invalid one is reported under: `UPLOADCARE_PUB_KEY` for `/base/` and the
+ * multipart routes, `pub_key` everywhere else. Every field — the key included —
+ * is read from the body first (a form, or the derivative endpoints' JSON; see
+ * `bodyFields`), then the query string.
+ */
+export const protect =
+  (
+    handler: (
+      context: RouteContext & { publicKey: string | null }
+    ) => ReturnType<RouteHandler>,
+    paramName = 'pub_key'
+  ): RouteHandler =>
+  async (context) => {
+    const body = await bodyFields(context.request)
+    const query = new URL(context.request.url).searchParams
+    const field = (name: string) => body.get(name) ?? query.get(name)
+    const rejection = await authorize(context.request, field, paramName)
+    return rejection ?? handler({ ...context, publicKey: field(paramName) })
+  }

@@ -1,53 +1,27 @@
-import { authorize } from '../apis/upload/auth.js'
-import { bodyFields } from './body.js'
-import { sessionOf } from '../state/store.js'
-
-export type RouteHandler = (context: {
+export type RouteContext = {
   request: Request
   params: Record<string, string>
-}) => Response | undefined | Promise<Response | undefined>
-
-/**
- * A protected route's public-key gate. `paramName` is also the field the public
- * key is read from on a body-sourced route (`UPLOADCARE_PUB_KEY` for `/base/`
- * and the multipart routes) — the same name a missing/invalid key is reported
- * under, since that's where each client actually puts it. Defaults to
- * `pub_key`, read from the query string, which is every other protected route's
- * shape. `'both'` is `/group/`'s: `upload-client` sends `pub_key` in the body,
- * the old mock server's fake sends it in the query string. A body is a form or,
- * for the derivative endpoints, JSON — see `bodyFields`.
- */
-export type ProtectedConfig = {
-  paramName?: string
-  source?: 'query' | 'body' | 'both'
 }
+
+export type RouteHandler = (
+  context: RouteContext
+) => Response | undefined | Promise<Response | undefined>
 
 export type Route = {
   method: string
   segments: string[]
   handler: RouteHandler
-  protected?: ProtectedConfig
 }
 
 /**
  * `/multipart/upload/:uuid/original/` — `:name` captures one segment, a
  * trailing `*` captures the rest.
- *
- * `options.protected` marks a route the Upload API checks a public key on
- * before anything else — `true` for the query-string default, or a
- * `ProtectedConfig` for a route whose key lives in the body (or either).
  */
 export const route = (
   method: string,
   path: string,
-  handler: RouteHandler,
-  options?: { protected?: ProtectedConfig | true }
-): Route => ({
-  method,
-  segments: path.split('/').filter(Boolean),
-  handler,
-  protected: options?.protected === true ? {} : options?.protected
-})
+  handler: RouteHandler
+): Route => ({ method, segments: path.split('/').filter(Boolean), handler })
 
 const matchRoute = (candidate: Route, method: string, pathname: string) => {
   if (candidate.method !== method) return undefined
@@ -64,20 +38,6 @@ const matchRoute = (candidate: Route, method: string, pathname: string) => {
   return actual.length === candidate.segments.length ? params : undefined
 }
 
-const bodyPublicKey = async (request: Request, paramName: string) =>
-  (await bodyFields(request)).get(paramName) ?? null
-
-const extractPublicKey = async (
-  request: Request,
-  { paramName = 'pub_key', source = 'query' }: ProtectedConfig
-): Promise<string | null> => {
-  const fromQuery = () => new URL(request.url).searchParams.get('pub_key')
-  if (source === 'query') return fromQuery()
-  if (source === 'body') return bodyPublicKey(request, paramName)
-  // 'both': body first, query as a fallback — what `/group/` did by hand.
-  return (await bodyPublicKey(request, paramName)) ?? fromQuery()
-}
-
 /**
  * The first answer from `routes`, tried in order. The Upload API answers with
  * or without the trailing slash, and so must this.
@@ -88,24 +48,11 @@ export const createRouter =
     const { pathname } = new URL(request.url)
     for (const candidate of routes) {
       const params = matchRoute(candidate, request.method, pathname)
-      if (params) {
-        if (candidate.protected) {
-          const paramName = candidate.protected.paramName ?? 'pub_key'
-          const publicKey = await extractPublicKey(request, candidate.protected)
-          const gateError = await authorize(
-            request,
-            publicKey,
-            paramName,
-            pathname.endsWith('/') ? pathname : `${pathname}/`,
-            sessionOf(request)
-          )
-          if (gateError) return gateError
-        }
-        // `undefined` is "not mine after all" — keep looking, so a broad
-        // pattern (the CDN's `/:uuid/*`) can't shadow a later, narrower route.
-        const answer = await candidate.handler({ request, params })
-        if (answer) return answer
-      }
+      if (!params) continue
+      // `undefined` is "not mine after all" — keep looking, so a broad
+      // pattern (the CDN's `/:uuid/*`) can't shadow a later, narrower route.
+      const answer = await candidate.handler({ request, params })
+      if (answer) return answer
     }
     return undefined
   }
