@@ -19,13 +19,8 @@ const upload = async (name: string) => {
   return ((await response!.json()) as { file: string }).file
 }
 
-// The brief's own snippet for this task built this request with no `pub_key`
-// at all and expected a 200/400 rather than the 403 `requirePublicKey` would
-// answer with — but `/group/` is a protected route in the old mock server
-// (`mock-server/routes.ts`'s `isProtected: true`), and upload-client's own
-// `group.test.ts` ("should be rejected with error code if failed") depends on
-// that 403 actually firing. Fixed here to send one, like every other test file
-// in this package does.
+// `/group/` requires `pub_key` (403 otherwise); upload-client's `group.test.ts`
+// ("should be rejected with error code if failed") relies on that 403.
 const createGroup = async (uuids: string[]) => {
   const body = new FormData()
   body.set('pub_key', 'secret_public_key')
@@ -167,12 +162,9 @@ it('fails for the "files not found" key when the member was never uploaded', asy
 })
 
 it('groups a real upload under the "files not found" key by bare uuid, unlike the stub case above', async () => {
-  // Defect: `/group/` used to 400 "Some files not found." for this key no
-  // matter what, even a uuid `/info/` finds — and `demopublickey` is exactly
-  // the public key file-uploader's own e2e suite uses for real uploads, so
-  // every group-output test there timed out. The member existence check must
-  // key off whether the file is actually in the session, not off the public
-  // key alone.
+  // `demopublickey` is the public key file-uploader's e2e suite uses for real
+  // uploads, so the member existence check must key off whether the file is
+  // in the session, not off the public key alone.
   const uuid = await upload('a.jpg')
   const body = new FormData()
   body.set('pub_key', 'demopublickey')

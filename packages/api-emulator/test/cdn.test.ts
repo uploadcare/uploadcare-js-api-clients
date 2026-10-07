@@ -7,8 +7,7 @@ const JPEG_1X1 = new Uint8Array([
 
 const upload = async (bytes: Uint8Array = JPEG_1X1, type = 'image/jpeg') => {
   const body = new FormData()
-  // `/base/` requires `UPLOADCARE_PUB_KEY` in the body — the brief's original
-  // snippet omitted it, which 403s the upload before the CDN is ever reached.
+  // `/base/` requires `UPLOADCARE_PUB_KEY`; without it the upload 403s.
   body.set('UPLOADCARE_PUB_KEY', 'demopublickey')
   body.set('file', new File([bytes], 'a.jpg', { type }))
   const response = await handle(

@@ -20,9 +20,8 @@ export type EmulatorServerOptions = {
    * in-memory handler answers before the event loop even turns over, which
    * starves a race the real API always loses: an `AbortController` fired right
    * after the request goes out never wins against a response that's already
-   * there. Defaults to 30, matching the old Koa mock server's `delayer`
-   * middleware. A caller that doesn't need the race won — a suite driving
-   * hundreds of requests through this server, say — passes 0.
+   * there. Defaults to 30. A caller that doesn't need the race won — a suite
+   * driving hundreds of requests through this server, say — passes 0.
    */
   delayMs?: number
 }
@@ -89,8 +88,7 @@ export const createEmulatorServer = async (
     // an emulated endpoint — `handle()` matches no `OPTIONS` route and would
     // 502 it. Every consumer is cross-origin, and one that sets `SESSION_HEADER`
     // (or any other custom header) is preflighted by the browser before its
-    // real request is ever sent. Mirrors what `@koa/cors` did for the old mock
-    // server.
+    // real request is ever sent.
     if (request.method === 'OPTIONS') {
       response
         .writeHead(204, {
