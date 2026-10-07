@@ -5,8 +5,7 @@ import { type Session, sessionOf } from '../../state/store.js'
 import {
   DERIVATIVE_DISABLED_PUBLIC_KEY,
   DERIVATIVE_INSTANT_PUBLIC_KEY,
-  NO_STORING_KEY,
-  UNKNOWN_PROGRESS_KEY
+  NO_STORING_KEY
 } from './scenarios.js'
 
 /**
@@ -27,7 +26,6 @@ const ALLOWED_PUBLIC_KEYS = [
   // Public test fixture, not a real credential.
   'secret_public_key',
   NO_STORING_KEY,
-  UNKNOWN_PROGRESS_KEY,
   DERIVATIVE_DISABLED_PUBLIC_KEY,
   DERIVATIVE_INSTANT_PUBLIC_KEY
 ]

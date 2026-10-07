@@ -145,3 +145,81 @@ it('signedUploads: refuses a publicKey that is not a string', () => {
     TypeError
   )
 })
+
+const SOURCE = 'https://images.unsplash.com/photo-1?dl=holiday.jpg'
+
+const fromUrl = (query: string) =>
+  call(`https://upload.uploadcare.com/from_url/?jsonerrors=1&${query}`, {
+    method: 'POST'
+  })
+
+const pollAll = async (pubKey = 'demopublickey') => {
+  const { token: jobToken } = (await (
+    await fromUrl(`pub_key=${pubKey}&source_url=${encodeURIComponent(SOURCE)}`)
+  ).json()) as { token: string }
+  const frames: Record<string, unknown>[] = []
+  for (let poll = 0; poll < 10; poll += 1) {
+    const frame = (await (
+      await call(
+        `https://upload.uploadcare.com/from_url/status/?token=${jobToken}`
+      )
+    ).json()) as Record<string, unknown>
+    frames.push(frame)
+    if (frame.status !== 'progress') return frames
+  }
+  throw new Error('never finished')
+}
+
+it('unknownProgress: reports progress with an unknown total, then the file', async () => {
+  session.use('unknownProgress')
+  const frames = await pollAll()
+  expect(frames.length).toBeGreaterThan(1)
+  for (const frame of frames.slice(0, -1))
+    expect(frame).toMatchObject({ status: 'progress', total: 'unknown' })
+  expect(frames.at(-1)).toMatchObject({
+    status: 'success',
+    original_filename: 'holiday.jpg'
+  })
+})
+
+it('unknownProgress: with a publicKey, for that project alone, which it makes known', async () => {
+  session.use('unknownProgress', { publicKey: 'pub_unknown' })
+  expect((await pollAll('pub_unknown'))[0]).toMatchObject({ total: 'unknown' })
+  expect((await pollAll())[0]).toMatchObject({ total: expect.any(Number) })
+})
+
+it('hostNotFound: refuses every source at POST time', async () => {
+  session.use('hostNotFound')
+  expect(
+    await jsonError(
+      await fromUrl(
+        `pub_key=demopublickey&source_url=${encodeURIComponent(SOURCE)}`
+      )
+    )
+  ).toMatchObject({ status_code: 400, content: 'Host does not exist.' })
+})
+
+it('hostNotFound: with a sourceUrl, refuses that one alone', async () => {
+  session.use('hostNotFound', { sourceUrl: 'https://1.com/1.jpg' })
+  expect(
+    await jsonError(
+      await fromUrl(
+        `pub_key=demopublickey&source_url=${encodeURIComponent('https://1.com/1.jpg')}`
+      )
+    )
+  ).toMatchObject({ content: 'Host does not exist.' })
+  expect(
+    await (
+      await fromUrl(
+        `pub_key=demopublickey&source_url=${encodeURIComponent(SOURCE)}`
+      )
+    ).json()
+  ).toMatchObject({ type: 'token' })
+})
+
+it('hostNotFound: leaves a request without a source_url to the route', async () => {
+  session.use('hostNotFound')
+  expect(await jsonError(await fromUrl('pub_key=demopublickey'))).toMatchObject(
+    { content: 'source_url is required.' }
+  )
+})

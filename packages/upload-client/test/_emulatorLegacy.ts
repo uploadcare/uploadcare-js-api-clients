@@ -13,6 +13,8 @@ export const legacyScenarios = () => {
   const spentThrottleKeys = new Set<string>()
   resetSession()
     .use('signedUploads', { publicKey: SIGNED_UPLOADS_PUBLIC_KEY })
+    .use('unknownProgress', { publicKey: 'pub_test__unknown_progress' })
+    .use('hostNotFound', { sourceUrl: 'https://1.com/1.jpg' })
     .on('POST /base/', async ({ request }) => {
       const key = (await request.formData()).get('metadata[mock_throttle]')
       if (typeof key !== 'string' || spentThrottleKeys.has(key))
