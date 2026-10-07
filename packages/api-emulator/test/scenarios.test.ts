@@ -185,3 +185,11 @@ it('keeps the SessionView readable from the handle', async () => {
   expect(session.files.get(uuid)?.name).toBe('a.jpg')
   expect(session.telemetry).toEqual([])
 })
+
+it('keeps a handle taken before a reset live: on() still steers, files are current', async () => {
+  const uuid = await upload()
+  resetSession()
+  expect(session.files.has(uuid)).toBe(false)
+  session.on('GET /info/', () => new Response(null, { status: 503 }))
+  expect((await call(INFO)).status).toBe(503)
+})
