@@ -308,18 +308,17 @@ union; `PresetArgs` types each one's args.
 | --------------------- | ------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `throttle`            | `{ match, times = 1, retryAfter = 1 }`     | The next `times` requests `match` covers answer `429 RequestThrottledError` with `retry-after: retryAfter`, before any credential is checked.                                                                                 |
 | `signedUploads`       | `{ publicKey? }`                           | Signed Uploads on: a protected request with no Bearer token gets `400 SignatureRequiredError`, after the public-key check. Mint tokens with `mintAuthToken()`.                                                                |
-| `unknownProgress`     | `{ publicKey? }`                           | `/from_url/` jobs report `total: 'unknown'` while in progress, as for a source that sends no `Content-Length`.                                                                                                               |
+| `unknownProgress`     | none                                       | `/from_url/` jobs report `total: 'unknown'` while in progress, as for a source that sends no `Content-Length`.                                                                                                               |
 | `hostNotFound`        | `{ sourceUrl? }`                           | `POST /from_url/` refuses the source at once with `Host does not exist.`, instead of the poll-time failure an unreachable host gets. Every source without `sourceUrl`.                                                        |
 | `storedFile`          | `{ uuid, publicKey? }`                     | The stock image, stored under `uuid`, as if uploaded before the test.                                                                                                                                                         |
 | `derivativesDisabled` | none                                       | Both derivative POSTs answer `403 derivative_disabled`.                                                                                                                                                                       |
 | `derivativesInstant`  | none                                       | A derivative status poll answers the job's terminal frame, for a client that polls on an interval it can't shorten. It wraps the scenarios registered before it: after `derivativeFailure`, the error comes on the first poll. |
 | `derivativeFailure`   | `{ code }`                                 | Every derivative job started after it reports `processing` once, then an `error` frame (`error_source: 'ai_gateway'`) with `code`: `content_moderated` or `provider_unavailable`. No file is stored.                        |
 
-A `publicKey` scopes a preset to one project, for a suite whose test files
-share one session (upload-client's, over `./listen`), and adds that project
-to the session's known keys; without one, the preset covers every project.
-A file `storedFile` puts in a project isn't found by another project's
-`/info/` or `/group/`.
+A `publicKey` models project ownership: it scopes the preset to that one
+project, and adds the project to the session's known keys. Without one, the
+preset covers every project. A file `storedFile` puts in a project isn't
+found by another project's `/info/` or `/group/`.
 
 `mintAuthToken({ lifetime?, tokenId?, scope?, operations? })` mints a Bearer
 token the emulator accepts (a minute long by default), with WebCrypto, so it
