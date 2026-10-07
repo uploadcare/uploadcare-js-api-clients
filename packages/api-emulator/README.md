@@ -6,7 +6,7 @@ need real request/response round-trips without hitting the network.
 ## Browser-safe by design
 
 `@uploadcare/api-emulator` (the `.` export: `handle`, `resetSession`,
-`sessionOf`, `SESSION_HEADER` and the scenario constants) runs anywhere `Request`/`Response` exist,
+`sessionOf`, `SESSION_HEADER`, `mintAuthToken` and the rest) runs anywhere `Request`/`Response` exist,
 including inside a browser page — that's what lets it back an in-browser MSW
 worker. `@uploadcare/api-emulator/listen` is Node-only: it speaks raw HTTP
 sockets (`node:http`/`node:https`, `Buffer`) to give a suite a real origin to
@@ -35,6 +35,9 @@ const { origin, close } = await createEmulatorServer({ port: 0, delayMs: 30 })
 
 await close()
 ```
+
+A test in another process steers the server's sessions through its control
+endpoint; see [From another process](#from-another-process).
 
 When the server is started lazily from somewhere with no teardown hook, call
 `unref()` on the returned handle instead, so it doesn't keep the process
@@ -95,7 +98,16 @@ const emulator = setupEmulator({ cdnHosts: ['cdn.example.com'] })
 
 beforeEach(() => emulator.reset()) // starts it once, then a fresh session
 afterAll(() => emulator.stop()) // optional
+
+it('retries a throttled upload', async () => {
+  const session = await emulator.reset()
+  session.use('throttle', { match: 'POST /base/' })
+  // ...
+})
 ```
+
+`reset()` answers the session's handle; see
+[Per-test scenarios](#per-test-scenarios).
 
 Two ways in, one state: an `XMLHttpRequestInterceptor` answers XHR (every
 upload) in the page, so `xhr.upload` fires a `progress` event per body chunk,
@@ -156,9 +168,10 @@ one emulator doesn't see one file's upload answered by another's. A fresh
 session holds only the demo project's files (see [Demo-project files](#demo-project-files))
 — no groups, no jobs, nothing uploaded.
 
-- `resetSession(id?)` clears (or starts) a session. Call it between tests
-  that share an emulator instance so each test starts from a fresh store.
-  With no `id`, it resets the `'default'` session.
+- `resetSession(id?)` clears (or starts) a session, its scenarios included,
+  and answers its handle (see [Per-test scenarios](#per-test-scenarios)).
+  Call it between tests that share an emulator instance so each test starts
+  from a fresh store. With no `id`, it resets the `'default'` session.
 - The `x-uploadcare-emulator-session` header (exported as `SESSION_HEADER`)
   names which session a request belongs to. Set it on every request from a
   given test file to keep that file's uploads isolated from every other file
@@ -195,8 +208,7 @@ schemas) and listed in `UNSPECIFIED_OPERATIONS` (`test/spec.ts`);
   unstored) and, for edit, `source` — the uuid of a file in the session, which
   must be an image. They answer `{ "type": "job", "job_id": "…" }`. The gate is
   every other protected route's: public key, Bearer token (scoped by the
-  derivative path), signed uploads and throttle-once (`metadata.mock_throttle`
-  in the JSON body).
+  derivative path), and the `signedUploads` and `throttle` presets.
 - Polling `GET /derivative/status/?pub_key=…&job_id=…` walks the job through
   `processing`, `uploading`, `success` with `is_ready: false`, then `success`
   with `is_ready: true` for good. The success frame is the `/info/` payload
@@ -235,35 +247,132 @@ A uuid nobody uploaded, or a group member the store never got, 404s.
 A fresh session isn't empty — it starts with a handful of files already
 "in" the demo project, addressable by uuid without uploading them first,
 because both `upload-client`'s own fixtures and the browser suite's e2e
-tests point straight at fixed uuids. See `DEMO_FILES` in `src/state/store.ts`
-for the list and which consumer needs each one; all of them serve the same
+tests point straight at fixed uuids. See `DEMO_FILES` (exported from `.`;
+`src/state/store.ts`) for the list and which consumer needs each one; all of them serve the same
 bytes, `STOCK_IMAGE` (`src/state/stock-image.ts`) — a real, decodable JPEG,
 base64-encoded and decoded at module load so the package stays loadable
 outside Node.
 
-## Scenarios: magic values a test relies on
+## Per-test scenarios
 
-Every public key, url, and other magic value a test uses to steer the
-emulator into a specific scenario is named in `src/apis/upload/scenarios.ts`,
-with a comment there naming the consumer. Summarised:
+A test that needs the emulator to answer something its own inputs can't
+provoke (a throttle, an outage, a project with Signed Uploads on) registers
+a _scenario_ on its session. Scenarios live on the session, so they are
+per-test by construction: `resetSession()` (or `./browser`'s `reset()`)
+clears them, and both answer the session's handle to register them on.
 
-| Value                                                              | What it's for                                                                                                                                                                                                                                                                                                 |
-| ------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `UNKNOWN_PROGRESS_KEY` (`pub_test__unknown_progress`)              | A `/from_url/` public key whose poll answers report `total: 'unknown'` instead of a byte count.                                                                                                                                                                                                               |
-| `NO_STORING_KEY` (`pub_test__no_storing`)                          | The public key `upload-client`'s multipart fixtures use.                                                                                                                                                                                                                                                      |
-| `UNREACHABLE_SOURCE_URL` (`https://1.com/1.jpg`)                   | A `from_url` source that fails synchronously, at `POST /from_url/` itself, with a 400 — instead of only failing once the job is polled.                                                                                                                                                                       |
-| `EMULATOR_PORT` (`3000`) | The port `upload-client`'s suite serves the emulator on (`createEmulatorServer({ port: EMULATOR_PORT })`); its `127.0.0.1` origin is a reachable `from_url` host. Exported from `.`. |
-| `REACHABLE_HOSTS`                                                  | The only hosts a `from_url` upload can actually "fetch" from; anything else resolves to a poll-time `Host does not exist` failure. Includes `127.0.0.1:EMULATOR_PORT`.                                                                                                             |
-| `isPrivateSourceUrl()`                                             | Flags a `from_url` source as a private/local address (`192.168.*` or any `localhost` host; `127.0.0.1:EMULATOR_PORT` is in `REACHABLE_HOSTS`), which `POST /from_url/` rejects.                                                                                                                          |
-| `STUB_GROUP_MEMBER` (`392e3aa3-…`)                                 | The one uuid `POST /group/` accepts without it being uploaded, as a 0-byte stand-in, for `upload-client`'s hardcoded group fixtures. Any other member the session doesn't hold is "Some files not found.".                                                                                                    |
-| `GROUP_FILES_NOT_FOUND_KEY` (`demopublickey`)                      | Scoped to `POST /group/` alone: under this key even `STUB_GROUP_MEMBER` counts as missing. Real uploads still group. Everywhere else, this is just an ordinary allowed public key.                                                                                                                            |
-| `SIGNED_UPLOADS_PUBLIC_KEY` (`pub_test__signed_uploads`)           | A project with Signed Uploads on: any protected request under it without a Bearer token gets `400 SignatureRequiredError`. Exported from `.`.                                                                                                                                                                 |
-| `SIGNED_UPLOADS_SECRET_KEY` (`mock_secret_key`)                    | The secret Bearer tokens are verified against (HS256 keyed with `sha256(secret)`, as `generateAuthToken` mints them). Exported from `.`, so a test can mint tokens the emulator accepts.                                                                                                                      |
-| `THROTTLE_ONCE_FIELD` (`metadata[mock_throttle]`)                  | The first protected request carrying a given value is answered `429 RequestThrottledError` with `retry-after: 1`; later ones with the same value pass. Spent per session. In a JSON body (the derivative endpoints) it's `metadata.mock_throttle`.                                                            |
-| `DERIVATIVE_DISABLED_PUBLIC_KEY` (`pub_test__derivative_disabled`) | A project without AI generation: both derivative POSTs answer `403 derivative_disabled`. Exported from `.`.                                                                                                                                                                                                   |
-| `DERIVATIVE_INSTANT_PUBLIC_KEY` (`pub_test__derivative_instant`)   | A project whose derivative jobs answer their first status poll with the terminal frame (a ready `success`, or a scenario prompt's error) instead of walking `processing` → `uploading` → `success` not ready. For a browser suite whose client polls on a fixed interval it can't shorten. Exported from `.`. |
-| `CONTENT_MODERATED_PROMPT` (`mock_content_moderated`)              | A derivative job with this prompt reports `processing` once, then an `error` frame with `error_source: 'ai_gateway'`, `error_code: 'content_moderated'`. Exported from `.`.                                                                                                                                   |
-| `PROVIDER_UNAVAILABLE_PROMPT` (`mock_provider_unavailable`)        | The same, with `error_code: 'provider_unavailable'`. Exported from `.`.                                                                                                                                                                                                                                       |
+```ts
+import { resetSession } from '@uploadcare/api-emulator'
+
+const session = resetSession()
+
+// Answer the next /info/ request with a 503.
+session.on('GET /info/', () => new Response(null, { status: 503 }), {
+  times: 1
+})
+
+// Let the real route run, then change its answer.
+session.on('POST /base/', async ({ next }) => {
+  const response = await next()
+  // ... inspect or replace it
+  return response
+})
+
+session.files // the SessionView stays readable from the handle
+```
+
+- `on(match, handler, { times? })`. `match` is `'METHOD /path/'`, in the
+  routes' own path syntax (`/multipart/upload/:uuid/original/` captures
+  `params.uuid`, a trailing `*` captures `params.rest`, the trailing slash
+  is optional), or `{ method?, path?, host? }`, any of them on its own.
+  `host` is the URL's host, port included.
+- The handler gets `{ request, params, session, next }`. `request` is a copy,
+  so reading its body leaves the real one alone. It answers a `Response`, or
+  `undefined` to fall through as if it hadn't matched.
+- `next()` runs the rest of the chain and answers its `Response`, with its
+  state changes applied (a file it uploaded is in `session.files`). Every
+  call runs the rest again; a handler that called it and then falls through
+  gets that answer instead of a second run. It is `undefined` only when
+  nothing down the chain handles the request.
+- The most recently registered scenario runs first, so `next()` from one
+  reaches the scenarios registered before it, then the emulator's own route.
+- `times: N` removes the scenario after it has answered `N` requests. A
+  fall-through doesn't count, and two concurrent requests can't both take
+  its last use.
+- `on()` and `use()` answer the session, for chaining.
+
+### Presets
+
+`session.use(name, args)` applies a named, parameterised bundle of
+scenarios and session settings. The names are the closed `PresetName`
+union; args are plain JSON (`PresetArgs` types each one).
+
+| Preset                | Args                                       | What it does                                                                                                                                                                                                                  |
+| --------------------- | ------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `throttle`            | `{ match, times = 1, retryAfter = 1 }`     | The next `times` requests `match` covers answer `429 RequestThrottledError` with `retry-after: retryAfter`, before any credential is checked.                                                                                 |
+| `signedUploads`       | `{ publicKey? }`                           | Signed Uploads on: a protected request with no Bearer token gets `400 SignatureRequiredError`, after the public-key check. Mint tokens with `mintAuthToken()`.                                                                |
+| `unknownProgress`     | `{ publicKey? }`                           | `/from_url/` jobs report `total: 'unknown'` while in progress, as for a source that sends no `Content-Length`.                                                                                                               |
+| `hostNotFound`        | `{ sourceUrl? }`                           | `POST /from_url/` refuses the source at once with `Host does not exist.`, instead of the poll-time failure an unreachable host gets. Every source without `sourceUrl`.                                                        |
+| `storedFile`          | `{ uuid, publicKey? }`                     | The stock image, stored under `uuid`, as if uploaded before the test.                                                                                                                                                         |
+| `derivativesDisabled` | none                                       | Both derivative POSTs answer `403 derivative_disabled`.                                                                                                                                                                       |
+| `derivativesInstant`  | none                                       | A derivative status poll answers the job's terminal frame, for a client that polls on an interval it can't shorten. It wraps the scenarios registered before it: after `derivativeFailure`, the error comes on the first poll. |
+| `derivativeFailure`   | `{ code }`                                 | Every derivative job started after it reports `processing` once, then an `error` frame (`error_source: 'ai_gateway'`) with `code`: `content_moderated` or `provider_unavailable`. No file is stored.                        |
+
+A `publicKey` scopes a preset to one project, for a suite whose test files
+share one session (upload-client's, over `./listen`), and adds that project
+to the session's known keys; without one, the preset covers every project.
+A file `storedFile` puts in a project isn't found by another project's
+`/info/` or `/group/`.
+
+`mintAuthToken({ lifetime?, tokenId?, scope?, operations? })` mints a Bearer
+token the emulator accepts (a minute long by default), with WebCrypto, so it
+works in a page too. It doesn't validate its options, so a test can mint a
+token the API refuses. `SIGNED_UPLOADS_SECRET_KEY` is the secret it signs
+with, for a suite that mints with `generateAuthToken` itself.
+
+### From another process
+
+`./listen`'s server takes scenarios over HTTP at `/__emulator/scenarios`,
+for the session its `x-uploadcare-emulator-session` header names (the
+`'default'` one without it). `remoteSession` wraps it:
+
+```ts
+import { remoteSession } from '@uploadcare/api-emulator/listen'
+
+const session = remoteSession(origin, 'my-test-file')
+
+await session.use('throttle', { match: 'POST /base/' })
+await session.on(
+  'GET /info/',
+  { status: 503, body: { detail: 'down' }, delay: 100 },
+  { times: 1 }
+)
+await session.clear()
+```
+
+- `POST { preset, args }` is `session.use(preset, args)`, same names, same
+  args.
+- `POST { match, status, body, headers, delay, times }` declares a response:
+  `status` is 200 by default, a string `body` is sent as text and anything
+  else as JSON, `delay` waits that many milliseconds first. Functions can't
+  cross processes; that is the only reason this form exists.
+- `DELETE` drops the session's scenarios and preset settings. Files and jobs
+  stay until the session is reset.
+
+A request it can't use is answered `400` with the reason, and the helper
+rejects with it.
+
+### What stays the real API
+
+These aren't scenarios, and no preset turns them off: a private `from_url`
+source (`192.168.*`, `localhost`) is refused; only `REACHABLE_HOSTS`
+(`src/apis/upload/sources.ts`: the CDN, `images.unsplash.com`, and
+`127.0.0.1:EMULATOR_PORT`, the origin upload-client's suite serves the
+emulator on) can be "fetched" from, and any other host fails at poll time;
+the demo-project files are in every fresh session; an unknown public key is
+`pub_key is invalid.` (the known ones are `demopublickey` and
+`secret_public_key`, plus any project a preset names); every validation
+error, and Bearer-token verification below.
 
 ### Bearer tokens
 
