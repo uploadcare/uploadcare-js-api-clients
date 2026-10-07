@@ -1,12 +1,5 @@
 import { beforeEach, expect, it } from 'vitest'
-import {
-  CONTENT_MODERATED_PROMPT,
-  DERIVATIVE_DISABLED_PUBLIC_KEY,
-  DERIVATIVE_INSTANT_PUBLIC_KEY,
-  PROVIDER_UNAVAILABLE_PROMPT,
-  mintAuthToken,
-  resetSession
-} from '../src/index.js'
+import { mintAuthToken, resetSession } from '../src/index.js'
 import { STOCK_IMAGE } from '../src/state/stock-image.js'
 import { call, token, upload } from './emulator.js'
 import { jsonError } from './spec.js'
@@ -234,13 +227,12 @@ it('keeps jobs per session', async () => {
   expect(await jsonError(other)).toMatchObject({ error_code: 'job_not_found' })
 })
 
-it.each([
-  [CONTENT_MODERATED_PROMPT, 'content_moderated'],
-  [PROVIDER_UNAVAILABLE_PROMPT, 'provider_unavailable']
-])(
-  'fails the job at poll time for the %s scenario prompt',
-  async (prompt, code) => {
-    const jobId = await jobIdOf(await generate({ prompt }))
+it.each(['content_moderated', 'provider_unavailable'] as const)(
+  'fails the job at poll time with the %s derivativeFailure preset',
+  async (code) => {
+    const session = resetSession().use('derivativeFailure', { code })
+    const files = session.files.size
+    const jobId = await jobIdOf(await generate())
     const frames = await pollToEnd(jobId)
     expect(frames).toEqual([
       { type: 'job', status: 'processing' },
@@ -252,23 +244,37 @@ it.each([
         error: expect.any(String)
       }
     ])
-    // Terminal: the next poll says the same.
+    // Terminal: the next poll says the same, and no file was ever stored.
     expect(await (await status(jobId)).json()).toEqual(frames[1])
+    expect(session.files.size).toBe(files)
   }
 )
 
 it('fails an edit job the same way', async () => {
-  const jobId = await jobIdOf(await edit({ prompt: CONTENT_MODERATED_PROMPT }))
+  resetSession().use('derivativeFailure', { code: 'content_moderated' })
+  const jobId = await jobIdOf(await edit())
   expect((await pollToEnd(jobId)).at(-1)).toMatchObject({
     status: 'error',
     error_code: 'content_moderated'
   })
 })
 
-it('finishes a job on its first poll for the instant-derivatives project', async () => {
-  const jobId = await jobIdOf(
-    await generate({ pub_key: DERIVATIVE_INSTANT_PUBLIC_KEY })
-  )
+it('leaves a job_id it never handed out to the route', async () => {
+  resetSession().use('derivativeFailure', { code: 'content_moderated' })
+  expect(await jsonError(await status('nope'))).toMatchObject({
+    error_code: 'job_not_found'
+  })
+})
+
+it('refuses a derivativeFailure code it does not know', () => {
+  expect(() =>
+    resetSession().use('derivativeFailure', { code: 'nope' as never })
+  ).toThrow(TypeError)
+})
+
+it('finishes a job on its first poll with the derivativesInstant preset', async () => {
+  resetSession().use('derivativesInstant')
+  const jobId = await jobIdOf(await generate())
   const frames = await pollToEnd(jobId)
   expect(frames).toHaveLength(1)
   expect(frames[0]).toMatchObject({
@@ -278,13 +284,11 @@ it('finishes a job on its first poll for the instant-derivatives project', async
   })
 })
 
-it('still fails a scenario prompt on the instant-derivatives project, on its first poll', async () => {
-  const jobId = await jobIdOf(
-    await edit({
-      pub_key: DERIVATIVE_INSTANT_PUBLIC_KEY,
-      prompt: CONTENT_MODERATED_PROMPT
-    })
-  )
+it('fails on the first poll when derivativesInstant is registered after derivativeFailure', async () => {
+  resetSession()
+    .use('derivativeFailure', { code: 'content_moderated' })
+    .use('derivativesInstant')
+  const jobId = await jobIdOf(await edit())
   expect(await pollToEnd(jobId)).toEqual([
     expect.objectContaining({
       status: 'error',
@@ -293,11 +297,24 @@ it('still fails a scenario prompt on the instant-derivatives project, on its fir
   ])
 })
 
-it('refuses both job kinds for a project with derivatives disabled', async () => {
+it('reports processing first when derivativeFailure is registered after derivativesInstant', async () => {
+  resetSession()
+    .use('derivativesInstant')
+    .use('derivativeFailure', { code: 'content_moderated' })
+  const jobId = await jobIdOf(await generate())
+  expect((await pollToEnd(jobId)).map((frame) => frame.status)).toEqual([
+    'processing',
+    'error'
+  ])
+})
+
+it('refuses both job kinds with the derivativesDisabled preset', async () => {
+  resetSession().use('derivativesDisabled')
   for (const send of [generate, edit])
-    expect(
-      await jsonError(await send({ pub_key: DERIVATIVE_DISABLED_PUBLIC_KEY }))
-    ).toMatchObject({ status_code: 403, error_code: 'derivative_disabled' })
+    expect(await jsonError(await send())).toMatchObject({
+      status_code: 403,
+      error_code: 'derivative_disabled'
+    })
 })
 
 it('checks the public key in the JSON body before anything else', async () => {
@@ -379,9 +396,4 @@ it('scopes a Bearer token by the derivative path', async () => {
     { authorization }
   )
   await jobIdOf(allowed)
-})
-
-it('treats a prompt that names an Object.prototype key as an ordinary prompt', async () => {
-  const jobId = await jobIdOf(await generate({ prompt: 'constructor' }))
-  expect((await pollToEnd(jobId)).at(-1)).toMatchObject({ status: 'success' })
 })

@@ -6,13 +6,7 @@ import { runScenarios } from './core/scenarios.js'
 import { handleOf } from './session.js'
 import * as store from './state/store.js'
 
-export {
-  CONTENT_MODERATED_PROMPT,
-  DERIVATIVE_DISABLED_PUBLIC_KEY,
-  DERIVATIVE_INSTANT_PUBLIC_KEY,
-  EMULATOR_PORT,
-  PROVIDER_UNAVAILABLE_PROMPT
-} from './apis/upload/scenarios.js'
+export { EMULATOR_PORT } from './apis/upload/scenarios.js'
 export {
   mintAuthToken,
   SIGNED_UPLOADS_SECRET_KEY,
@@ -23,7 +17,12 @@ export { DEMO_FILES, SESSION_HEADER } from './state/store.js'
 export type { StoredFile, StoredImage, TelemetryEvent } from './state/store.js'
 export { resetSession, sessionOf } from './session.js'
 export type { EmulatorSession, SessionView } from './session.js'
-export type { PresetArgs, PresetArgsOf, PresetName } from './presets.js'
+export type {
+  DerivativeFailureCode,
+  PresetArgs,
+  PresetArgsOf,
+  PresetName
+} from './presets.js'
 export type {
   ScenarioContext,
   ScenarioHandler,
