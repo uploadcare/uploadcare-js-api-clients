@@ -1,11 +1,8 @@
-// Each import registers its routes as a side effect. Order is only a tiebreak:
-// a route that answers `undefined` (the CDN for a non-uuid path) passes the
-// request on to the next match.
-import './apis/upload/index.js'
-import './apis/cdn/index.js'
-import './apis/telemetry/index.js'
+import { cdnRoutes } from './apis/cdn/index.js'
+import { telemetryRoutes } from './apis/telemetry/index.js'
+import { uploadRoutes } from './apis/upload/index.js'
+import { createRouter } from './core/router.js'
 
-export { handle } from './core/router.js'
 export {
   CONTENT_MODERATED_PROMPT,
   DERIVATIVE_DISABLED_PUBLIC_KEY,
@@ -29,6 +26,13 @@ export type SessionView = {
   readonly files: ReadonlyMap<string, StoredFile>
   readonly telemetry: readonly TelemetryEvent[]
 }
+
+// The CDN's `/:uuid/*` matches nearly any path, so it goes last.
+export const handle = createRouter([
+  ...uploadRoutes,
+  ...telemetryRoutes,
+  ...cdnRoutes
+])
 
 export const resetSession: (id?: string) => SessionView = store.resetSession
 export const sessionOf: (request: Request) => SessionView = store.sessionOf

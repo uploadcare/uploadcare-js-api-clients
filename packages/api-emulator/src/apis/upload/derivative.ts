@@ -12,7 +12,7 @@
  */
 import { isRecord } from '../../core/body.js'
 import { apiError } from '../../core/responses.js'
-import { route } from '../../core/router.js'
+import { route, type Route } from '../../core/router.js'
 import {
   type DerivativeJob,
   type Session,
@@ -114,39 +114,6 @@ const startJob =
  */
 const POST_GATE = { protected: { source: 'both' } } as const
 
-route(
-  'POST',
-  '/derivative/image/generate/',
-  startJob('generate', () => undefined),
-  POST_GATE
-)
-
-route(
-  'POST',
-  '/derivative/image/edit/',
-  startJob('edit', (request, body) => {
-    if (typeof body.source !== 'string' || !body.source)
-      return refuse(request, 400, 'invalid_request', '`source` is required.')
-    const source = sessionOf(request).files.get(body.source)
-    if (!source)
-      return refuse(
-        request,
-        404,
-        'source_not_found',
-        'Source file is not found.'
-      )
-    if (!source.image)
-      return refuse(
-        request,
-        400,
-        'source_not_image',
-        'Source file is not an image.'
-      )
-    return undefined
-  }),
-  POST_GATE
-)
-
 /**
  * One frame per poll: `processing`, then `uploading`, then `success` with
  * `is_ready: false` (the file is stored, but — as the real API reports while it
@@ -178,23 +145,56 @@ const frame = (session: Session, job: DerivativeJob) => {
   }
 }
 
-route(
-  'GET',
-  '/derivative/status/',
-  ({ request }) => {
-    const session = sessionOf(request)
-    const jobId = new URL(request.url).searchParams.get('job_id')
-    if (!jobId)
-      return refuse(request, 400, 'job_id_required', 'job_id is required.')
-    const job = session.derivativeJobs.get(jobId)
-    if (!job)
-      return refuse(
-        request,
-        404,
-        'job_not_found',
-        'Derivative job is not found.'
-      )
-    return Response.json(frame(session, job))
-  },
-  { protected: true }
-)
+export const derivativeRoutes: Route[] = [
+  route(
+    'POST',
+    '/derivative/image/generate/',
+    startJob('generate', () => undefined),
+    POST_GATE
+  ),
+  route(
+    'POST',
+    '/derivative/image/edit/',
+    startJob('edit', (request, body) => {
+      if (typeof body.source !== 'string' || !body.source)
+        return refuse(request, 400, 'invalid_request', '`source` is required.')
+      const source = sessionOf(request).files.get(body.source)
+      if (!source)
+        return refuse(
+          request,
+          404,
+          'source_not_found',
+          'Source file is not found.'
+        )
+      if (!source.image)
+        return refuse(
+          request,
+          400,
+          'source_not_image',
+          'Source file is not an image.'
+        )
+      return undefined
+    }),
+    POST_GATE
+  ),
+  route(
+    'GET',
+    '/derivative/status/',
+    ({ request }) => {
+      const session = sessionOf(request)
+      const jobId = new URL(request.url).searchParams.get('job_id')
+      if (!jobId)
+        return refuse(request, 400, 'job_id_required', 'job_id is required.')
+      const job = session.derivativeJobs.get(jobId)
+      if (!job)
+        return refuse(
+          request,
+          404,
+          'job_not_found',
+          'Derivative job is not found.'
+        )
+      return Response.json(frame(session, job))
+    },
+    { protected: true }
+  )
+]

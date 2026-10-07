@@ -5,7 +5,6 @@ import {
   type ServerResponse
 } from 'node:http'
 import { Server as TlsServer } from 'node:https'
-// Registers the routes as a side effect; `router.js` alone knows nothing about them.
 import { handle } from './index.js'
 import { DROP_CONNECTION_MARKER } from './core/responses.js'
 

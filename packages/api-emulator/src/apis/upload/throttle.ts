@@ -1,5 +1,5 @@
 import { apiError } from '../../core/responses.js'
-import { route } from '../../core/router.js'
+import { route, type Route } from '../../core/router.js'
 import { sessionOf } from '../../state/store.js'
 
 /**
@@ -11,18 +11,20 @@ import { sessionOf } from '../../state/store.js'
  * sessions concurrently against one fake (see store.ts), and a shared counter
  * would make one file's call flip another file's outcome.
  */
-route(
-  'POST',
-  '/throttle/',
-  ({ request }) => {
-    const session = sessionOf(request)
-    session.throttled += 1
-    if (session.throttled < 2)
-      // schema: requestThrottledError
-      return apiError(request, 429, 'Request was throttled.')
+export const throttleRoutes: Route[] = [
+  route(
+    'POST',
+    '/throttle/',
+    ({ request }) => {
+      const session = sessionOf(request)
+      session.throttled += 1
+      if (session.throttled < 2)
+        // schema: requestThrottledError
+        return apiError(request, 429, 'Request was throttled.')
 
-    session.throttled = 0
-    return new Response(null, { status: 200 })
-  },
-  { protected: true }
-)
+      session.throttled = 0
+      return new Response(null, { status: 200 })
+    },
+    { protected: true }
+  )
+]

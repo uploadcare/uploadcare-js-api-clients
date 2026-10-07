@@ -1,9 +1,17 @@
-// Registers this API's routes as a side effect; `router.js` alone knows
-// nothing about them.
-import './base.js'
-import './derivative.js'
-import './from-url.js'
-import './group.js'
-import './info.js'
-import './multipart.js'
-import './throttle.js'
+import { baseRoutes } from './base.js'
+import { derivativeRoutes } from './derivative.js'
+import { fromUrlRoutes } from './from-url.js'
+import { groupRoutes } from './group.js'
+import { infoRoutes } from './info.js'
+import { multipartRoutes } from './multipart.js'
+import { throttleRoutes } from './throttle.js'
+
+export const uploadRoutes = [
+  ...baseRoutes,
+  ...derivativeRoutes,
+  ...fromUrlRoutes,
+  ...groupRoutes,
+  ...infoRoutes,
+  ...multipartRoutes,
+  ...throttleRoutes
+]

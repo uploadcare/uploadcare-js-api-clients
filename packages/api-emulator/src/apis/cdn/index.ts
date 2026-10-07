@@ -1,5 +1,5 @@
 import { apiError } from '../../core/responses.js'
-import { route } from '../../core/router.js'
+import { route, type Route } from '../../core/router.js'
 import { type Session, type StoredFile, sessionOf } from '../../state/store.js'
 
 /**
@@ -58,26 +58,28 @@ const jsonInfo = (file: StoredFile) =>
     datetime_original: null
   }
 
-route('GET', '/:uuid/*', ({ request, params }) => {
-  if (!CDN_ID.test(params.uuid ?? '')) return undefined
+export const cdnRoutes: Route[] = [
+  route('GET', '/:uuid/*', ({ request, params }) => {
+    if (!CDN_ID.test(params.uuid ?? '')) return undefined
 
-  const { pathname } = new URL(request.url)
-  const file = resolve(sessionOf(request), params.uuid ?? '', pathname)
-  if (!file) return apiError(request, 404, 'File not found')
+    const { pathname } = new URL(request.url)
+    const file = resolve(sessionOf(request), params.uuid ?? '', pathname)
+    if (!file) return apiError(request, 404, 'File not found')
 
-  if (pathname.includes('/-/json/')) {
-    const info = jsonInfo(file)
-    return info ? Response.json(info) : apiError(request, 400, 'Not an image')
-  }
-
-  // `mimeType` is whatever the uploader claimed, `text/html` included; the
-  // sandbox keeps such a file from running script on the emulator's origin.
-  // `<img>` and `fetch` consumers are unaffected.
-  return new Response(file.bytes, {
-    headers: {
-      'content-type': file.mimeType,
-      'content-security-policy': 'sandbox',
-      'x-content-type-options': 'nosniff'
+    if (pathname.includes('/-/json/')) {
+      const info = jsonInfo(file)
+      return info ? Response.json(info) : apiError(request, 400, 'Not an image')
     }
+
+    // `mimeType` is whatever the uploader claimed, `text/html` included; the
+    // sandbox keeps such a file from running script on the emulator's origin.
+    // `<img>` and `fetch` consumers are unaffected.
+    return new Response(file.bytes, {
+      headers: {
+        'content-type': file.mimeType,
+        'content-security-policy': 'sandbox',
+        'x-content-type-options': 'nosniff'
+      }
+    })
   })
-})
+]

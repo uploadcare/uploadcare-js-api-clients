@@ -1,6 +1,6 @@
 import { storedBy } from '../../core/body.js'
 import { apiError } from '../../core/responses.js'
-import { route } from '../../core/router.js'
+import { route, type Route } from '../../core/router.js'
 import { imageSize } from '../../state/image-size.js'
 import { sessionOf, store } from '../../state/store.js'
 
@@ -14,28 +14,30 @@ import { sessionOf, store } from '../../state/store.js'
  * uploads with an invalid key and expects the failure here, at `/base/`, before
  * a group is ever created.
  */
-route(
-  'POST',
-  '/base/',
-  async ({ request }) => {
-    const form = await request.formData()
-    const part = form.get('file')
-    if (!(part instanceof File)) {
-      // schema: filesRequiredError
-      return apiError(request, 400, 'Request does not contain files.')
-    }
+export const baseRoutes: Route[] = [
+  route(
+    'POST',
+    '/base/',
+    async ({ request }) => {
+      const form = await request.formData()
+      const part = form.get('file')
+      if (!(part instanceof File)) {
+        // schema: filesRequiredError
+        return apiError(request, 400, 'Request does not contain files.')
+      }
 
-    const bytes = new Uint8Array(await part.arrayBuffer())
-    const stored = store(sessionOf(request), {
-      name: part.name,
-      size: bytes.byteLength,
-      mimeType: part.type || 'application/octet-stream',
-      bytes,
-      image: imageSize(bytes),
-      isStored: storedBy(form.get('UPLOADCARE_STORE'))
-    })
+      const bytes = new Uint8Array(await part.arrayBuffer())
+      const stored = store(sessionOf(request), {
+        name: part.name,
+        size: bytes.byteLength,
+        mimeType: part.type || 'application/octet-stream',
+        bytes,
+        image: imageSize(bytes),
+        isStored: storedBy(form.get('UPLOADCARE_STORE'))
+      })
 
-    return Response.json({ file: stored.uuid })
-  },
-  { protected: { paramName: 'UPLOADCARE_PUB_KEY', source: 'body' } }
-)
+      return Response.json({ file: stored.uuid })
+    },
+    { protected: { paramName: 'UPLOADCARE_PUB_KEY', source: 'body' } }
+  )
+]
