@@ -16,6 +16,12 @@ import type { StoredFile, TelemetryEvent } from './state/store.js'
 export type SessionView = {
   readonly files: ReadonlyMap<string, StoredFile>
   readonly telemetry: readonly TelemetryEvent[]
+  /**
+   * A clone of every request the session received, in arrival order, bodies
+   * unread: the ones a scenario answered and the ones nothing answered too.
+   * Kept until `resetSession()`, bodies and all, so reset between tests.
+   */
+  readonly requests: readonly Request[]
 }
 
 /** A session, and the per-test scenarios that steer it. */
@@ -45,6 +51,9 @@ export const handleOf = (session: store.Session): EmulatorSession => {
     },
     get telemetry() {
       return session.telemetry
+    },
+    get requests() {
+      return session.requests
     },
     on(match, handler, options) {
       session.scenarios.push(scenario(match, handler, options))

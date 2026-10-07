@@ -174,3 +174,18 @@ it('answers 502 for a path no route handles, naming it only in the log', async (
   )
   logged.mockRestore()
 })
+
+it('logs what it received to the session’s requests', async () => {
+  const { resetSession, SESSION_HEADER } = await import('../src/index.js')
+  const session = resetSession('listen-requests')
+  await fetch(`${server.origin}/base/`, {
+    method: 'POST',
+    headers: { [SESSION_HEADER]: 'listen-requests' },
+    body: fileUploadBody()
+  })
+
+  expect(session.requests.map((request) => request.method)).toEqual(['POST'])
+  expect(
+    ((await session.requests[0].formData()).get('file') as File).name
+  ).toBe('a.bin')
+})

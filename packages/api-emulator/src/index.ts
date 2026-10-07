@@ -34,10 +34,12 @@ const routes = createRouter([...uploadRoutes, ...telemetryRoutes, ...cdnRoutes])
 
 /**
  * The emulator's answer to `request`: its session's scenarios first, then the
- * routes. `undefined` for a request nothing handles.
+ * routes. `undefined` for a request nothing handles. Logged to its session's
+ * `requests` either way.
  */
 export const handle = (request: Request): Promise<Response | undefined> => {
   const session = store.sessionOf(request)
+  session.requests.push(request.clone())
   return runScenarios(session.scenarios, handleOf(session), request, routes)
 }
 

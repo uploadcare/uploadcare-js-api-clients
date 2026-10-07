@@ -144,3 +144,17 @@ it('keeps the session readable from that handle', async () => {
   const { uuid } = await upload(await pngOf(1, 1))
   expect(session.files.get(uuid)?.image).toMatchObject({ width: 1, height: 1 })
 })
+
+it('logs fetch and XHR requests to the handle reset() returns', async () => {
+  const session = await emulator.reset()
+  await fetch('https://tlm.uploadcare.com/api/v1/events', {
+    method: 'POST',
+    body: '{}'
+  })
+  await sendXhr('POST', 'https://tlm.uploadcare.com/api/v1/events', '{}')
+
+  expect(session.requests.map((request) => request.method)).toEqual([
+    'POST',
+    'POST'
+  ])
+})

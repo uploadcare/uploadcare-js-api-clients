@@ -124,6 +124,8 @@ export type Session = {
   issued: number
   /** Every `POST /api/v1/events` body received, in arrival order. */
   telemetry: TelemetryEvent[]
+  /** A clone of every request `handle()` received, in arrival order. */
+  requests: Request[]
   /** Operations spent per bearer token, for `limits.operations` — see auth.ts. */
   tokenOperations: Map<string, number>
   /** `session.on()`'s, in registration order — see core/scenarios.ts. */
@@ -154,6 +156,7 @@ export const resetSession = (id = 'default') => {
     derivativeJobs: new Map(),
     issued: 0,
     telemetry: [],
+    requests: [],
     tokenOperations: new Map(),
     scenarios: [],
     publicKeys: new Set(),

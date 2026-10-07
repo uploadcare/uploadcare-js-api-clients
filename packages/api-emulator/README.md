@@ -197,6 +197,27 @@ session holds only the demo project's files (see [Demo-project files](#demo-proj
   separate pages are isolated even when they send the same header value.
   `test/session.test.ts` pins the server-mode behaviour.
 
+### What a session received
+
+A session's handle reads back what it holds: `files`, `telemetry` (every
+telemetry event body), and `requests`, a clone of every request the session
+received, in arrival order. A request is logged before any scenario sees it, so
+the log holds the ones a scenario answered and the ones nothing answered too,
+whichever way in they came (`handle()`, `createFetch()`, `./listen`,
+`./browser`). Bodies are unread, so a test can `await request.json()` on one.
+
+```ts
+const session = resetSession()
+await uploadSomething()
+const [request] = session.requests
+expect(request.method).toBe('POST')
+expect((await request.formData()).get('UPLOADCARE_PUB_KEY')).toBe('demopublickey')
+```
+
+The log is per session and kept, bodies and all, until `resetSession()` (or
+`./browser`'s `reset()`) clears it: reset between tests, or a long suite on one
+session holds every upload's bytes twice.
+
 ## What's implemented today
 
 The Upload API's `POST /base/` (single-file upload), `GET /info/` (file
@@ -291,6 +312,7 @@ session.on('POST /base/', async ({ next }) => {
 })
 
 session.files // the SessionView stays readable from the handle
+session.requests // every request the session received
 ```
 
 - `on(match, handler, { times? })`. `match` is `'METHOD /path/'`, in the
