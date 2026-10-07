@@ -40,8 +40,12 @@ export const handleOf = (session: store.Session): EmulatorSession => {
   const existing = handles.get(session)
   if (existing) return existing
   const handle: EmulatorSession = {
-    files: session.files,
-    telemetry: session.telemetry,
+    get files() {
+      return session.files
+    },
+    get telemetry() {
+      return session.telemetry
+    },
     on(match, handler, options) {
       session.scenarios.push(scenario(match, handler, options))
       return handle

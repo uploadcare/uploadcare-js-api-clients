@@ -141,10 +141,11 @@ const sessions = new Map<string, Session>()
 
 /**
  * Empties a session, or starts one: a freshly reset session holds no files
- * beyond the demo project's own (`DEMO_FILES`, above).
+ * beyond the demo project's own (`DEMO_FILES`, above). A session is emptied in
+ * place, so a handle taken before the reset keeps steering it.
  */
 export const resetSession = (id = 'default') => {
-  const session: Session = {
+  const fresh: Session = {
     files: new Map(),
     groups: new Map(),
     fromUrlJobs: new Map(),
@@ -158,10 +159,11 @@ export const resetSession = (id = 'default') => {
     publicKeys: new Set(),
     signedUploads: new Set()
   }
-  for (const uuid of DEMO_FILES)
-    storeStockImage(session, 'demo.jpg', true, uuid)
-  sessions.set(id, session)
-  return session
+  for (const uuid of DEMO_FILES) storeStockImage(fresh, 'demo.jpg', true, uuid)
+  const existing = sessions.get(id)
+  if (existing) return Object.assign(existing, fresh)
+  sessions.set(id, fresh)
+  return fresh
 }
 
 /**
