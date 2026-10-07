@@ -366,9 +366,8 @@ rejects with it.
 
 These aren't scenarios, and no preset turns them off: a private `from_url`
 source (`192.168.*`, `localhost`) is refused; only `REACHABLE_HOSTS`
-(`src/apis/upload/sources.ts`: the CDN, `images.unsplash.com`, and
-`127.0.0.1:EMULATOR_PORT`, the origin upload-client's suite serves the
-emulator on) can be "fetched" from, and any other host fails at poll time;
+(`src/apis/upload/sources.ts`: the CDN and `images.unsplash.com`) can be
+"fetched" from, and any other host fails at poll time;
 the demo-project files are in every fresh session; an unknown public key is
 `pub_key is invalid.` (the known ones are `demopublickey` and
 `secret_public_key`, plus any project a preset names); every validation
