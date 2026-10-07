@@ -1,12 +1,13 @@
 import { apiError } from '../../core/responses.js'
 import { route, type Route } from '../../core/router.js'
+import { protect } from './auth.js'
 import { fileInfo, sessionOf } from '../../state/store.js'
 
 export const infoRoutes: Route[] = [
   route(
     'GET',
     '/info/',
-    ({ request }) => {
+    protect(({ request }) => {
       const params = new URL(request.url).searchParams
       const id = params.get('file_id')
       if (!id)
@@ -17,7 +18,6 @@ export const infoRoutes: Route[] = [
       return file
         ? Response.json(fileInfo(file))
         : apiError(request, 404, 'File is not found.')
-    },
-    { protected: true }
+    })
   )
 ]

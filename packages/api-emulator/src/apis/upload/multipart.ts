@@ -1,6 +1,7 @@
 import { storedBy } from '../../core/body.js'
 import { apiError, dropConnection } from '../../core/responses.js'
 import { route, type Route } from '../../core/router.js'
+import { protect } from './auth.js'
 import { imageSize } from '../../state/image-size.js'
 import { fileInfo, nextUuid, sessionOf } from '../../state/store.js'
 
@@ -59,7 +60,7 @@ export const multipartRoutes: Route[] = [
   route(
     'POST',
     '/multipart/start/',
-    async ({ request }) => {
+    protect(async ({ request }) => {
       const session = sessionOf(request)
       const form = await request.formData().catch(() => new FormData())
 
@@ -112,13 +113,12 @@ export const multipartRoutes: Route[] = [
       )
 
       return Response.json({ uuid, parts })
-    },
-    { protected: { paramName: 'UPLOADCARE_PUB_KEY', source: 'body' } }
+    }, 'UPLOADCARE_PUB_KEY')
   ),
   route(
     'POST',
     '/multipart/complete/',
-    async ({ request }) => {
+    protect(async ({ request }) => {
       const session = sessionOf(request)
       const form = await request.formData().catch(() => new FormData())
 
@@ -174,7 +174,6 @@ export const multipartRoutes: Route[] = [
       session.files.set(uuid, stored)
 
       return Response.json(fileInfo(stored))
-    },
-    { protected: { paramName: 'UPLOADCARE_PUB_KEY', source: 'body' } }
+    }, 'UPLOADCARE_PUB_KEY')
   )
 ]

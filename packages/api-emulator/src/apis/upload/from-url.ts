@@ -1,6 +1,7 @@
 import { storedBy } from '../../core/body.js'
 import { apiError } from '../../core/responses.js'
 import { route, type Route } from '../../core/router.js'
+import { protect } from './auth.js'
 import { STOCK_IMAGE } from '../../state/stock-image.js'
 import {
   fileInfo,
@@ -36,7 +37,7 @@ export const fromUrlRoutes: Route[] = [
   route(
     'POST',
     '/from_url/',
-    ({ request }) => {
+    protect(({ request, publicKey }) => {
       const session = sessionOf(request)
       const params = new URL(request.url).searchParams
       const sourceUrl = params.get('source_url')
@@ -93,13 +94,12 @@ export const fromUrlRoutes: Route[] = [
       session.fromUrlJobs.set(token, {
         uuid,
         polls: 0,
-        computable: params.get('pub_key') !== UNKNOWN_PROGRESS_KEY,
+        computable: publicKey !== UNKNOWN_PROGRESS_KEY,
         total: STOCK_IMAGE.byteLength,
         done: 0
       })
       return Response.json({ type: 'token', token })
-    },
-    { protected: true }
+    })
   ),
   route('GET', '/from_url/status/', ({ request }) => {
     const session = sessionOf(request)

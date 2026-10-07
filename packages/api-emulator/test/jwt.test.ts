@@ -10,7 +10,7 @@ import { assertMatchesSpec, jsonError } from './spec.js'
 
 /**
  * Bearer-token auth, the signed-uploads key and throttle-once — the gate
- * `auth.ts`'s `authorize` puts in front of every protected route.
+ * `auth.ts`'s `protect` puts in front of every protected route.
  *
  * Token rejections are asserted directly rather than through
  * `assertMatchesSpec`: the vendored 2024-02-12 spec documents no 401 and none

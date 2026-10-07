@@ -1,5 +1,6 @@
 import { apiError } from '../../core/responses.js'
 import { route, type Route } from '../../core/router.js'
+import { protect } from './auth.js'
 import {
   fileInfo,
   nextUuid,
@@ -55,9 +56,6 @@ const stubFile = (uuid: string): StoredFile => ({
   isStored: false
 })
 
-const asString = (value: FormDataEntryValue | null) =>
-  typeof value === 'string' ? value : null
-
 /**
  * A `files[N]` entry is a string on every real client — but `FormData` lets one
  * be a `File` too. That must still 400 the whole request as an invalid member
@@ -95,15 +93,10 @@ export const groupRoutes: Route[] = [
   route(
     'POST',
     '/group/',
-    async ({ request }) => {
+    protect(async ({ request, publicKey }) => {
       const session = sessionOf(request)
       const form = await request.formData().catch(() => new FormData())
       const query = new URL(request.url).searchParams
-
-      // Only for the STUB_GROUP_MEMBER scenario check below — the
-      // public-key gate itself is the router's (`{ protected: { source: 'both'
-      // } }`).
-      const publicKey = asString(form.get('pub_key')) ?? query.get('pub_key')
 
       const tokens = [...form.entries(), ...query.entries()]
         .filter(([key]) => MEMBER_KEY.test(key))
@@ -134,13 +127,12 @@ export const groupRoutes: Route[] = [
       const id = `${nextUuid(session)}~${members.length}`
       session.groups.set(id, members)
       return Response.json(groupEnvelope(session, id, members))
-    },
-    { protected: { source: 'both' } }
+    })
   ),
   route(
     'GET',
     '/group/info/',
-    ({ request }) => {
+    protect(({ request }) => {
       const session = sessionOf(request)
       const params = new URL(request.url).searchParams
       const id = params.get('group_id')
@@ -154,7 +146,6 @@ export const groupRoutes: Route[] = [
         return apiError(request, 404, 'group_id is invalid.')
 
       return Response.json(groupEnvelope(session, id, members))
-    },
-    { protected: true }
+    })
   )
 ]

@@ -1,5 +1,6 @@
 import { apiError } from '../../core/responses.js'
 import { route, type Route } from '../../core/router.js'
+import { protect } from './auth.js'
 import { sessionOf } from '../../state/store.js'
 
 /**
@@ -15,7 +16,7 @@ export const throttleRoutes: Route[] = [
   route(
     'POST',
     '/throttle/',
-    ({ request }) => {
+    protect(({ request }) => {
       const session = sessionOf(request)
       session.throttled += 1
       if (session.throttled < 2)
@@ -24,7 +25,6 @@ export const throttleRoutes: Route[] = [
 
       session.throttled = 0
       return new Response(null, { status: 200 })
-    },
-    { protected: true }
+    })
   )
 ]

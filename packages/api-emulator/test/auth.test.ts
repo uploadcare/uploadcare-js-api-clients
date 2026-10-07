@@ -2,12 +2,12 @@ import { beforeEach, expect, it } from 'vitest'
 import { handle, resetSession } from '../src/index.js'
 
 /**
- * Covers the router's `protected` flag on the routes whose own test file
- * doesn't already exercise the unauthenticated case (`base.test.ts`,
- * `group.test.ts` and `multipart.test.ts` each cover their own route already —
- * see those files). `/info/`, `/from_url/`, `/group/info/` and
- * `/multipart/complete/` are covered here instead of duplicating a test per
- * file. Bearer tokens, signed uploads and throttle-once are `jwt.test.ts`'s.
+ * Covers `protect` (auth.ts) on the routes whose own test file doesn't already
+ * exercise the unauthenticated case (`base.test.ts`, `group.test.ts` and
+ * `multipart.test.ts` each cover their own route already — see those files).
+ * `/info/`, `/from_url/`, `/group/info/` and `/multipart/complete/` are covered
+ * here instead of duplicating a test per file. Bearer tokens, signed uploads
+ * and throttle-once are `jwt.test.ts`'s.
  */
 
 beforeEach(() => resetSession())

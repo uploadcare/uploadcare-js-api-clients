@@ -1,24 +1,19 @@
 import { storedBy } from '../../core/body.js'
 import { apiError } from '../../core/responses.js'
 import { route, type Route } from '../../core/router.js'
+import { protect } from './auth.js'
 import { imageSize } from '../../state/image-size.js'
 import { sessionOf, store } from '../../state/store.js'
 
 /**
  * Direct upload. The file part is kept whole, because the CDN has to serve it
  * back.
- *
- * The public-key gate is the router's (`{ protected: { paramName:
- * 'UPLOADCARE_PUB_KEY', source: 'body' } }`) — `uploadFileGroup/
- * groupFromObject.test.ts` ("should be rejected with error code if failed")
- * uploads with an invalid key and expects the failure here, at `/base/`, before
- * a group is ever created.
  */
 export const baseRoutes: Route[] = [
   route(
     'POST',
     '/base/',
-    async ({ request }) => {
+    protect(async ({ request }) => {
       const form = await request.formData()
       const part = form.get('file')
       if (!(part instanceof File)) {
@@ -37,7 +32,6 @@ export const baseRoutes: Route[] = [
       })
 
       return Response.json({ file: stored.uuid })
-    },
-    { protected: { paramName: 'UPLOADCARE_PUB_KEY', source: 'body' } }
+    }, 'UPLOADCARE_PUB_KEY')
   )
 ]

@@ -280,7 +280,7 @@ with a comment there naming the consumer. Summarised:
 ### Bearer tokens
 
 A protected request with an `Authorization` header is checked by its token
-instead of its public key (`authorize` in `src/apis/upload/auth.ts`), with the
+instead of its public key (`protect` in `src/apis/upload/auth.ts`), with the
 Upload API's rules: a non-`Bearer` header is a 401; `signature`/`expire`
 alongside a token is a 403; the token must be a JWT signed with
 `SIGNED_UPLOADS_SECRET_KEY` and carry a numeric `exp` (30s clock leeway),
