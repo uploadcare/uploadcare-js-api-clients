@@ -5,8 +5,14 @@
 export const storedBy = (value: FormDataEntryValue | null) =>
   value !== '0' && value !== 'false'
 
-export const isRecord = (value: unknown): value is Record<string, unknown> =>
+const isRecord = (value: unknown): value is Record<string, unknown> =>
   value !== null && typeof value === 'object' && !Array.isArray(value)
+
+/** A JSON object body, or `undefined` for anything else. */
+export const jsonRecord = async (request: Request) => {
+  const body: unknown = await request.json().catch(() => undefined)
+  return isRecord(body) ? body : undefined
+}
 
 /**
  * A request body's string fields, read from a _clone_ — the handler still needs
@@ -24,8 +30,8 @@ export const bodyFields = async (
   const fields = new Map<string, string>()
   const clone = request.clone()
   if (request.headers.get('content-type')?.includes('application/json')) {
-    const body: unknown = await clone.json().catch(() => undefined)
-    if (!isRecord(body)) return fields
+    const body = await jsonRecord(clone)
+    if (!body) return fields
     for (const [name, value] of Object.entries(body)) {
       if (typeof value === 'string') fields.set(name, value)
       else if (isRecord(value))

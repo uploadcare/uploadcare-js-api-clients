@@ -1,4 +1,4 @@
-import { isRecord } from '../../core/body.js'
+import { jsonRecord } from '../../core/body.js'
 import { route, type Route } from '../../core/router.js'
 import { sessionOf } from '../../state/store.js'
 
@@ -24,8 +24,8 @@ import { sessionOf } from '../../state/store.js'
 export const telemetryRoutes: Route[] = [
   route('POST', '/api/v1/events', async ({ request }) => {
     const session = sessionOf(request)
-    const body = await request.json().catch(() => undefined)
-    if (isRecord(body)) session.telemetry.push(body)
+    const body = await jsonRecord(request)
+    if (body) session.telemetry.push(body)
     return Response.json({})
   })
 ]

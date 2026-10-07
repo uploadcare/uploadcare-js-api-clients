@@ -10,7 +10,7 @@
  * the snake_case `error_code` the client turns into an `AiProviderError`
  * (without one, it would read the envelope as a job with no `job_id`).
  */
-import { isRecord } from '../../core/body.js'
+import { jsonRecord } from '../../core/body.js'
 import { apiError } from '../../core/responses.js'
 import { route, type Route } from '../../core/router.js'
 import { protect } from './auth.js'
@@ -42,11 +42,6 @@ const isRatio = (value: unknown) =>
   value.length === 2 &&
   value.every((side) => Number.isInteger(side) && side > 0)
 
-const readBody = async (request: Request): Promise<Body | undefined> => {
-  const body: unknown = await request.json().catch(() => undefined)
-  return isRecord(body) ? body : undefined
-}
-
 /**
  * What generate and edit share: the body, the project check, the fields both
  * require, and the job they start. `validate` is the kind-specific rest, a
@@ -57,7 +52,7 @@ const startJob = (
   validate: (request: Request, body: Body) => Response | undefined
 ) =>
   protect(async ({ request, publicKey }) => {
-    const body = await readBody(request)
+    const body = await jsonRecord(request)
     if (!body)
       return refuse(request, 400, 'invalid_request', 'Request body is invalid.')
 
