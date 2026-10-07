@@ -2,7 +2,6 @@ import { storedBy } from '../../core/body.js'
 import { apiError } from '../../core/responses.js'
 import { route, type Route } from '../../core/router.js'
 import { protect } from './auth.js'
-import { imageSize } from '../../state/image-size.js'
 import { sessionOf, store } from '../../state/store.js'
 
 /**
@@ -24,10 +23,8 @@ export const baseRoutes: Route[] = [
       const bytes = new Uint8Array(await part.arrayBuffer())
       const stored = store(sessionOf(request), {
         name: part.name,
-        size: bytes.byteLength,
         mimeType: part.type || 'application/octet-stream',
         bytes,
-        image: imageSize(bytes),
         isStored: storedBy(form.get('UPLOADCARE_STORE'))
       })
 
