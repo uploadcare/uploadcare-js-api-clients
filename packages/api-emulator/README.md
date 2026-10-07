@@ -82,6 +82,21 @@ await page.route(/^https?:\/\//, async (route) => {
 (The `Buffer` above is the caller's Node/Playwright code, not the emulator's
 — the browser-safe guard only scans `src/`.)
 
+For code that takes an injectable `fetch`, `createFetch()` wraps `handle` in
+`fetch`'s own signature: no server, no worker, no interceptor.
+
+```ts
+import { createFetch } from '@uploadcare/api-emulator'
+
+const client = createApiClient({ fetch: createFetch({ session: 'my-suite' }) })
+```
+
+It behaves like `fetch` where a client can tell: it rejects with the signal's
+reason when the signal is already aborted, and with a `TypeError` naming the
+method and URL when no route answers it or a scenario drops the connection
+(`Response.error()`). `session` is sent as `SESSION_HEADER` on every request;
+without it, requests go to the `'default'` session.
+
 ### 3. In the browser, with MSW
 
 `@uploadcare/api-emulator/browser` answers a page's Uploadcare traffic for a
