@@ -92,9 +92,9 @@ const client = createApiClient({ fetch: createFetch({ session: 'my-suite' }) })
 ```
 
 It behaves like `fetch` where a client can tell: it rejects with the signal's
-reason when the signal is already aborted, and with a `TypeError` naming the
-method and URL when no route answers it or a scenario drops the connection
-(`Response.error()`). `session` is sent as `SESSION_HEADER` on every request;
+reason when the signal is aborted, before or during the request, and with a
+`TypeError` naming the method and URL when no route answers it or a scenario
+drops the connection (`Response.error()`). `session` is sent as `SESSION_HEADER` on every request;
 without it, requests go to the `'default'` session.
 
 ### 3. In the browser, with MSW

@@ -60,6 +60,19 @@ it('rejects with the reason of an already-aborted signal, like fetch', async () 
   expect(session.telemetry).toEqual([])
 })
 
+it('rejects with the reason of a signal aborted mid-request, like fetch', async () => {
+  const session = resetSession('create-fetch-hang')
+  session.on('GET /info/', () => new Promise<never>(() => {}))
+  const controller = new AbortController()
+  const reason = new Error('gone')
+  const pending = createFetch({ session: 'create-fetch-hang' })(
+    `${INFO_URL}x`,
+    { signal: controller.signal }
+  )
+  controller.abort(reason)
+  await expect(pending).rejects.toBe(reason)
+})
+
 it('rejects with a TypeError naming the request when no route answers', async () => {
   await expect(
     createFetch()('https://upload.uploadcare.com/nope/', { method: 'PUT' })

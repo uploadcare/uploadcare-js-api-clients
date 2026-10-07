@@ -54,8 +54,9 @@ export type CreateFetchOptions = {
 /**
  * A `fetch` the emulator answers, in-process, for code that takes an injectable
  * one. Like `fetch`, it rejects with the signal's reason when the signal is
- * already aborted, and with a `TypeError` on a network error: a request no
- * route answers, or a dropped connection (`Response.error()`).
+ * aborted, before or during the request, and with a `TypeError` on a network
+ * error: a request no route answers, or a dropped connection
+ * (`Response.error()`).
  */
 export const createFetch =
   ({ session }: CreateFetchOptions = {}) =>
@@ -64,7 +65,15 @@ export const createFetch =
     request.signal.throwIfAborted()
     if (session !== undefined)
       request.headers.set(store.SESSION_HEADER, session)
-    const response = await handle(request)
+    const { signal } = request
+    let onAbort: () => void
+    const aborted = new Promise<never>((_, reject) => {
+      onAbort = () => reject(signal.reason)
+      signal.addEventListener('abort', onAbort, { once: true })
+    })
+    const response = await Promise.race([handle(request), aborted]).finally(
+      () => signal.removeEventListener('abort', onAbort)
+    )
     if (!response)
       throw new TypeError(
         `@uploadcare/api-emulator does not implement ${request.method} ${request.url}`
