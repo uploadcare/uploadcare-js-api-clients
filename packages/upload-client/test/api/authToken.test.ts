@@ -16,7 +16,7 @@ import { UploadError } from '../../src/tools/UploadError'
 import {
   SIGNED_UPLOADS_PUBLIC_KEY,
   SIGNED_UPLOADS_SECRET_KEY
-} from '../../../api-emulator/src/apis/upload/scenarios'
+} from '@uploadcare/api-emulator'
 import * as factory from '../_fixtureFactory'
 import { getSettingsForTesting } from '../_helpers'
 
