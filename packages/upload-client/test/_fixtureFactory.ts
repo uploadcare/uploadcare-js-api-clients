@@ -1,13 +1,7 @@
 import './_envs'
 
-import {
-  dataURItoBlob,
-  dataURItoBuffer,
-  getSettingsForTesting
-} from './_helpers'
+import { dataURItoBlob, dataURItoBuffer } from './_helpers'
 import { isNode } from '@uploadcare/api-client-utils'
-
-const settings = getSettingsForTesting({})
 
 /* eslint-disable max-len */
 const images: { [key: string]: string } = {
@@ -43,17 +37,12 @@ const uuids: { [key: string]: { publicKey: string; uuid: string } } = {
     uuid: ''
   },
   multipart: {
-    // TEMPORARY: the emulator no longer knows this key (it never behaved
-    // differently there); production still has the project.
+    // In production, a project that doesn't store uploads.
     publicKey:
       process.env.TEST_ENV === 'production'
         ? 'pub_test__no_storing'
         : 'secret_public_key',
     uuid: ''
-  },
-  unknownProgress: {
-    publicKey: 'pub_test__unknown_progress',
-    uuid: '49b4c5a1-31b3-4349-ba07-d97a2d883c37'
   }
 }
 
@@ -133,7 +122,9 @@ export function publicKey(id: string): string {
 
 export function imageUrl(id: string): string {
   const images: Record<string, string> = {
-    valid: `${settings.baseCDN}/49b4c5a1-31b3-4349-ba07-d97a2d883c37/20200721174713.png`,
+    // The CDN is a host the emulator can "fetch" from too.
+    valid:
+      'https://ucarecdn.com/49b4c5a1-31b3-4349-ba07-d97a2d883c37/20200721174713.png',
     doesNotExist: 'https://1.com/1.jpg',
     privateIP: 'http://192.168.1.10/1.jpg'
   }

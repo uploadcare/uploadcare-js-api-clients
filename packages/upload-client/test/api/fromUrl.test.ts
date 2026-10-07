@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import fromUrl, { TypeEnum } from '../../src/api/fromUrl'
+import { resetSession } from '@uploadcare/api-emulator'
 import * as factory from '../_fixtureFactory'
 import { getSettingsForTesting } from '../_helpers'
 import { UploadError } from '../../src/tools/UploadError'
@@ -32,6 +33,7 @@ describe('API - from url', () => {
 
   it('should be rejected with image that does not exists', async () => {
     const sourceUrl = factory.imageUrl('doesNotExist')
+    resetSession().use('hostNotFound', { sourceUrl })
 
     await expect(fromUrl(sourceUrl, settings)).rejects.toThrowError(
       'Host does not exist.'

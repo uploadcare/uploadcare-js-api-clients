@@ -2,7 +2,7 @@ import { expect } from 'vitest'
 import type { Mock } from 'vitest'
 import dataUriToBuffer from 'data-uri-to-buffer'
 import dataUriToBlob from 'dataurl-to-blob'
-import { EMULATOR_PORT } from '@uploadcare/api-emulator'
+import { emulatorOrigin } from './_emulator'
 import defaultSettings from '../src/defaultSettings'
 import { DefaultSettings } from '../src/types'
 import { ProgressCallback, ComputableProgressInfo } from '../src/api/types'
@@ -24,8 +24,8 @@ export const getSettingsForTesting = <T>(options: T): T & DefaultSettings => {
   const allEnvironments = {
     development: {
       ...defaultSettings,
-      baseCDN: `http://127.0.0.1:${EMULATOR_PORT}`,
-      baseURL: `http://127.0.0.1:${EMULATOR_PORT}`,
+      baseCDN: emulatorOrigin,
+      baseURL: emulatorOrigin,
       multipartMinFileSize: 10 * 1024 * 1024,
       ...options
     },
