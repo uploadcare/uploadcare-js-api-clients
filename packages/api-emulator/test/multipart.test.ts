@@ -1,14 +1,8 @@
 import { afterAll, beforeAll, beforeEach, expect, it } from 'vitest'
-import { handle, resetSession } from '../src/index.js'
+import { resetSession } from '../src/index.js'
 import { createEmulatorServer } from '../src/listen.js'
+import { call, JPEG_1X1 } from './emulator.js'
 import { assertMatchesSpec } from './spec.js'
-
-// Long enough to decode as a real 1×1 JPEG (see base.test.ts / group.test.ts)
-// — needed so `image_info` comes back non-null, since the spec's `imageInfo`
-// schema isn't nullable.
-const JPEG = new Uint8Array([
-  0xff, 0xd8, 0xff, 0xc0, 0x00, 0x11, 0x08, 0x00, 0x01, 0x00, 0x01, 0xff, 0xd9
-])
 
 const BIG = 11 * 1024 * 1024
 
@@ -19,24 +13,20 @@ const startForm = (fields: Record<string, string>) => {
   return form
 }
 
-const start = async (fields: Record<string, string>) =>
-  (await handle(
-    new Request('https://upload.uploadcare.com/multipart/start/', {
-      method: 'POST',
-      body: startForm(fields)
-    })
-  ))!
+const start = (fields: Record<string, string>) =>
+  call('https://upload.uploadcare.com/multipart/start/', {
+    method: 'POST',
+    body: startForm(fields)
+  })
 
-const complete = async (uuid: string) => {
+const complete = (uuid: string) => {
   const body = new FormData()
   body.set('UPLOADCARE_PUB_KEY', 'demopublickey')
   body.set('uuid', uuid)
-  return (await handle(
-    new Request('https://upload.uploadcare.com/multipart/complete/', {
-      method: 'POST',
-      body
-    })
-  ))!
+  return call('https://upload.uploadcare.com/multipart/complete/', {
+    method: 'POST',
+    body
+  })
 }
 
 beforeEach(() => resetSession())
@@ -78,13 +68,14 @@ it('refuses an upload with no UPLOADCARE_PUB_KEY', async () => {
   form.set('filename', 'a.jpg')
   form.set('size', String(BIG))
   form.set('content_type', 'image/jpeg')
-  const response = await handle(
-    new Request('https://upload.uploadcare.com/multipart/start/', {
+  const response = await call(
+    'https://upload.uploadcare.com/multipart/start/',
+    {
       method: 'POST',
       body: form
-    })
+    }
   )
-  expect(response!.status).toBe(403)
+  expect(response.status).toBe(403)
 })
 
 it('hands out one part url per 5MB chunk, on its own origin', async () => {
@@ -123,14 +114,15 @@ it('describes the finished file once the upload is completed', async () => {
 
   // Distinct bytes per part, PUT out of order: every part's bytes must land
   // in the completed file by partNumber, not by arrival.
-  const chunks = [JPEG, new Uint8Array([2, 2, 2]), new Uint8Array([3])]
+  const chunks = [JPEG_1X1, new Uint8Array([2, 2, 2]), new Uint8Array([3])]
   for (const index of [2, 0, 1]) {
-    const response = await handle(
-      new Request(parts[index], { method: 'PUT', body: chunks[index] })
-    )
-    expect(response!.status).toBe(200)
+    const response = await call(parts[index], {
+      method: 'PUT',
+      body: chunks[index]
+    })
+    expect(response.status).toBe(200)
   }
-  const assembled = new Uint8Array([...JPEG, 2, 2, 2, 3])
+  const assembled = new Uint8Array([...JPEG_1X1, 2, 2, 2, 3])
 
   const completed = await complete(uuid)
   const body = await completed.clone().json()
@@ -148,18 +140,16 @@ it('describes the finished file once the upload is completed', async () => {
   })
 
   // Stored like any other file: /info/ can answer about it afterwards.
-  const info = await handle(
-    new Request(
-      `https://upload.uploadcare.com/info/?pub_key=demopublickey&file_id=${uuid}`
-    )
+  const info = await call(
+    `https://upload.uploadcare.com/info/?pub_key=demopublickey&file_id=${uuid}`
   )
-  expect(info!.status).toBe(200)
-  expect(await info!.json()).toMatchObject({
+  expect(info.status).toBe(200)
+  expect(await info.json()).toMatchObject({
     uuid,
     original_filename: 'big.jpg'
   })
-  const delivered = await handle(new Request(`https://ucarecdn.com/${uuid}/`))
-  expect(new Uint8Array(await delivered!.arrayBuffer())).toEqual(assembled)
+  const delivered = await call(`https://ucarecdn.com/${uuid}/`)
+  expect(new Uint8Array(await delivered.arrayBuffer())).toEqual(assembled)
 })
 
 it('refuses to complete a uuid no /multipart/start/ ever issued', async () => {
@@ -177,14 +167,12 @@ it('fails a part PUT that leaks an Authorization header as a network error', asy
   ).json()) as { parts: string[]; uuid: string }
   expect(uuid).toBeTruthy()
 
-  const response = await handle(
-    new Request(parts[0], {
-      method: 'PUT',
-      headers: { authorization: 'Bearer leaked' },
-      body: new Uint8Array([1])
-    })
-  )
-  expect(response!.type).toBe('error')
+  const response = await call(parts[0], {
+    method: 'PUT',
+    headers: { authorization: 'Bearer leaked' },
+    body: new Uint8Array([1])
+  })
+  expect(response.type).toBe('error')
 })
 
 let server: Awaited<ReturnType<typeof createEmulatorServer>>
@@ -223,13 +211,11 @@ it('refuses to complete an upload missing a part, ignoring a stray partNumber', 
   ).json()) as { parts: string[]; uuid: string }
   expect(parts).toHaveLength(3)
 
-  const stray = await handle(
-    new Request(
-      `https://upload.uploadcare.com/multipart/upload/${uuid}/original?partNumber=10`,
-      { method: 'PUT', body: new Uint8Array([1]) }
-    )
+  const stray = await call(
+    `https://upload.uploadcare.com/multipart/upload/${uuid}/original?partNumber=10`,
+    { method: 'PUT', body: new Uint8Array([1]) }
   )
-  expect(stray!.status).toBe(200)
+  expect(stray.status).toBe(200)
 
   // The out-of-range write lands nowhere, so none of the three parts arrived.
   const completed = await complete(uuid)

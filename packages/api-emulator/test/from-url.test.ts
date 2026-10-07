@@ -1,23 +1,19 @@
 import { beforeEach, expect, it } from 'vitest'
-import { handle, resetSession } from '../src/index.js'
+import { EMULATOR_PORT, resetSession } from '../src/index.js'
+import { call } from './emulator.js'
 import { assertMatchesSpec, jsonError } from './spec.js'
 
 // `jsonerrors=1`, exactly as `upload-client` always sends it — without it
 // `apiError` answers `text/plain`.
-const post = async (query: string) =>
-  (await handle(
-    new Request(
-      `https://upload.uploadcare.com/from_url/?${query}&jsonerrors=1`,
-      {
-        method: 'POST'
-      }
-    )
-  ))!
+const post = (query: string) =>
+  call(`https://upload.uploadcare.com/from_url/?${query}&jsonerrors=1`, {
+    method: 'POST'
+  })
 
 const poll = async (token: string) => {
-  const response = (await handle(
-    new Request(`https://upload.uploadcare.com/from_url/status/?token=${token}`)
-  ))!
+  const response = await call(
+    `https://upload.uploadcare.com/from_url/status/?token=${token}`
+  )
   const body = (await response.clone().json()) as Record<string, unknown>
   await assertMatchesSpec({
     method: 'get',
@@ -78,9 +74,9 @@ it('refuses a private address', async () => {
   })
 })
 
-it("fetches a source_url on the CLI's own origin (127.0.0.1:3000)", async () => {
+it("fetches a source_url on upload-client's emulator origin", async () => {
   const response = await post(
-    `pub_key=demopublickey&source_url=${encodeURIComponent('http://127.0.0.1:3000/49b4c5a1-31b3-4349-ba07-d97a2d883c37/x.png')}`
+    `pub_key=demopublickey&source_url=${encodeURIComponent(`http://127.0.0.1:${EMULATOR_PORT}/49b4c5a1-31b3-4349-ba07-d97a2d883c37/x.png`)}`
   )
   expect(response.status).toBe(200)
   const { token } = (await response.json()) as { token: string }
@@ -140,9 +136,9 @@ it('reports unknown totals for the unknown-progress key', async () => {
   // so it can't express the `'unknown'` string this pins — upload-client's
   // test's exact expectation for this key.
   // Same shape of gap as base.test.ts's non-image `image_info: null` case.
-  const response = (await handle(
-    new Request(`https://upload.uploadcare.com/from_url/status/?token=${token}`)
-  ))!
+  const response = await call(
+    `https://upload.uploadcare.com/from_url/status/?token=${token}`
+  )
   expect(await response.json()).toMatchObject({ total: 'unknown' })
 })
 
@@ -188,13 +184,13 @@ it('serves a from_url upload as bytes an image decoder can actually read', async
     image_info: { width: 136, height: 150, format: 'JPEG' }
   })
 
-  const delivered = (await handle(
-    new Request(`https://ucarecdn.com/${(last as { uuid: string }).uuid}/`)
-  ))!
+  const delivered = await call(
+    `https://ucarecdn.com/${(last as { uuid: string }).uuid}/`
+  )
   expect(await delivered.arrayBuffer()).toEqual(
-    await (await handle(
-      new Request('https://ucarecdn.com/49b4c5a1-31b3-4349-ba07-d97a2d883c37/')
-    ))!.arrayBuffer()
+    await (
+      await call('https://ucarecdn.com/49b4c5a1-31b3-4349-ba07-d97a2d883c37/')
+    ).arrayBuffer()
   )
 })
 

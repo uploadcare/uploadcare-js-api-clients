@@ -1,11 +1,11 @@
 import { createHash, createHmac } from 'node:crypto'
 import { beforeEach, expect, it } from 'vitest'
 import {
-  handle,
   resetSession,
   SIGNED_UPLOADS_PUBLIC_KEY,
   SIGNED_UPLOADS_SECRET_KEY
 } from '../src/index.js'
+import { call } from './emulator.js'
 import { assertMatchesSpec, jsonError } from './spec.js'
 
 /**
@@ -54,34 +54,32 @@ const base = (
   for (const [name, value] of Object.entries(options.fields ?? {}))
     body.set(name, value)
   body.set('file', new File([new Uint8Array([1])], 'a.bin'))
-  return handle(
-    new Request(
-      `https://upload.uploadcare.com/base/?jsonerrors=1${options.query ?? ''}`,
-      {
-        method: 'POST',
-        body,
-        headers: options.authorization
-          ? { authorization: options.authorization }
-          : {}
-      }
-    )
+  return call(
+    `https://upload.uploadcare.com/base/?jsonerrors=1${options.query ?? ''}`,
+    {
+      method: 'POST',
+      body,
+      headers: options.authorization
+        ? { authorization: options.authorization }
+        : {}
+    }
   )
 }
 
 const bearer = (value: string) => base({ authorization: `Bearer ${value}` })
 
-const expectUploaded = async (response: Response | undefined) => {
-  const body = (await response!.clone().json()) as { file?: string }
+const expectUploaded = async (response: Response) => {
+  const body = (await response.clone().json()) as { file?: string }
   expect(body.file).toEqual(expect.any(String))
 }
 
 const expectRejected = async (
-  response: Response | undefined,
+  response: Response,
   status: number,
   code: string,
   content?: string | RegExp
 ) => {
-  const error = await jsonError(response!)
+  const error = await jsonError(response)
   expect(error.status_code).toBe(status)
   expect(error.error_code).toBe(code)
   if (content) expect(error.content).toMatch(content)
@@ -204,19 +202,17 @@ it('refuses an Authorization header that is not Bearer', async () => {
 })
 
 it('ignores Authorization on /from_url/status/', async () => {
-  const response = await handle(
-    new Request(
-      'https://upload.uploadcare.com/from_url/status/?jsonerrors=1&token=nope',
-      { headers: { authorization: 'Bearer rubbish' } }
-    )
+  const response = await call(
+    'https://upload.uploadcare.com/from_url/status/?jsonerrors=1&token=nope',
+    { headers: { authorization: 'Bearer rubbish' } }
   )
-  const body = (await response!.clone().json()) as { status?: string }
+  const body = (await response.clone().json()) as { status?: string }
   expect(body.status).toBe('unknown')
 })
 
 it('requires a signature for the signed-uploads key without a token', async () => {
   const response = await base({ publicKey: SIGNED_UPLOADS_PUBLIC_KEY })
-  const error = await jsonError(response!)
+  const error = await jsonError(response)
   expect(error).toMatchObject({
     status_code: 400,
     error_code: 'SignatureRequiredError'
@@ -225,8 +221,8 @@ it('requires a signature for the signed-uploads key without a token', async () =
     method: 'post',
     path: '/base/',
     status: 400,
-    response: response!,
-    body: await response!.clone().json()
+    response: response,
+    body: await response.clone().json()
   })
 })
 
@@ -238,8 +234,8 @@ it('throttles the first request with a throttle key, once per session', async ()
     })
 
   const first = await throttled()
-  expect(first!.headers.get('retry-after')).toBe('1')
-  const error = await jsonError(first!)
+  expect(first.headers.get('retry-after')).toBe('1')
+  const error = await jsonError(first)
   expect(error).toMatchObject({
     status_code: 429,
     error_code: 'RequestThrottledError'
@@ -248,14 +244,14 @@ it('throttles the first request with a throttle key, once per session', async ()
     method: 'post',
     path: '/base/',
     status: 429,
-    response: first!,
-    body: await first!.clone().json()
+    response: first,
+    body: await first.clone().json()
   })
 
   await expectUploaded(await throttled())
 
   resetSession()
-  expect((await jsonError((await throttled())!)).status_code).toBe(429)
+  expect((await jsonError(await throttled())).status_code).toBe(429)
 })
 
 it('forgets spent operations on resetSession', async () => {

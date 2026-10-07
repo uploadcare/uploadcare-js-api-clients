@@ -1,5 +1,6 @@
 import { beforeEach, expect, it } from 'vitest'
-import { handle, resetSession } from '../src/index.js'
+import { resetSession } from '../src/index.js'
+import { call } from './emulator.js'
 
 /**
  * Covers `protect` (auth.ts) on the routes whose own test file doesn't already
@@ -13,79 +14,76 @@ import { handle, resetSession } from '../src/index.js'
 beforeEach(() => resetSession())
 
 it('refuses /info/ with no pub_key', async () => {
-  const response = await handle(
-    new Request('https://upload.uploadcare.com/info/?file_id=nope')
+  const response = await call(
+    'https://upload.uploadcare.com/info/?file_id=nope'
   )
-  expect(response!.status).toBe(403)
+  expect(response.status).toBe(403)
 })
 
 it('refuses /from_url/ with no pub_key', async () => {
-  const response = await handle(
-    new Request(
-      'https://upload.uploadcare.com/from_url/?source_url=https://ucarecdn.com/x.jpg',
-      {
-        method: 'POST'
-      }
-    )
+  const response = await call(
+    'https://upload.uploadcare.com/from_url/?source_url=https://ucarecdn.com/x.jpg',
+    {
+      method: 'POST'
+    }
   )
-  expect(response!.status).toBe(403)
+  expect(response.status).toBe(403)
 })
 
 it('does not require a pub_key on /from_url/status/', async () => {
-  const response = await handle(
-    new Request('https://upload.uploadcare.com/from_url/status/?token=nope')
+  const response = await call(
+    'https://upload.uploadcare.com/from_url/status/?token=nope'
   )
   // Answers 'unknown' rather than 403: the route isn't protected.
-  expect(response!.status).toBe(200)
+  expect(response.status).toBe(200)
 })
 
 it('refuses /group/info/ with no pub_key', async () => {
-  const response = await handle(
-    new Request('https://upload.uploadcare.com/group/info/?group_id=nope')
+  const response = await call(
+    'https://upload.uploadcare.com/group/info/?group_id=nope'
   )
-  expect(response!.status).toBe(403)
+  expect(response.status).toBe(403)
 })
 
 it('refuses /multipart/complete/ with no UPLOADCARE_PUB_KEY', async () => {
   const body = new FormData()
   body.set('uuid', 'nope')
-  const response = await handle(
-    new Request('https://upload.uploadcare.com/multipart/complete/', {
+  const response = await call(
+    'https://upload.uploadcare.com/multipart/complete/',
+    {
       method: 'POST',
       body
-    })
+    }
   )
-  expect(response!.status).toBe(403)
+  expect(response.status).toBe(403)
 })
 
 it('does not require a pub_key on a part PUT', async () => {
-  const response = await handle(
-    new Request(
-      'https://upload.uploadcare.com/multipart/upload/some-uuid/original?partNumber=1&uploadId=x',
-      { method: 'PUT', body: new Uint8Array([1, 2, 3]) }
-    )
+  const response = await call(
+    'https://upload.uploadcare.com/multipart/upload/some-uuid/original?partNumber=1&uploadId=x',
+    { method: 'PUT', body: new Uint8Array([1, 2, 3]) }
   )
   // The upload session doesn't exist, but the route still ran unauthenticated
   // — no 403.
-  expect(response!.status).toBe(200)
+  expect(response.status).toBe(200)
 })
 
 it('/throttle/ answers 429 then 200, per session', async () => {
   const url = 'https://upload.uploadcare.com/throttle/?pub_key=demopublickey'
-  const first = await handle(new Request(url, { method: 'POST' }))
-  expect(first!.status).toBe(429)
-  expect(await first!.clone().text()).toBe('Request was throttled.')
+  const first = await call(url, { method: 'POST' })
+  expect(first.status).toBe(429)
+  expect(await first.clone().text()).toBe('Request was throttled.')
 
-  const second = await handle(new Request(url, { method: 'POST' }))
-  expect(second!.status).toBe(200)
+  const second = await call(url, { method: 'POST' })
+  expect(second.status).toBe(200)
 
-  const third = await handle(new Request(url, { method: 'POST' }))
-  expect(third!.status).toBe(429)
+  const third = await call(url, { method: 'POST' })
+  expect(third.status).toBe(429)
 })
 
 it('refuses /throttle/ with no pub_key', async () => {
-  const response = await handle(
-    new Request('https://upload.uploadcare.com/throttle/', { method: 'POST' })
-  )
-  expect(response!.status).toBe(403)
+  const response = await call('https://upload.uploadcare.com/throttle/', {
+    method: 'POST'
+  })
+  expect(response.status).toBe(403)
 })

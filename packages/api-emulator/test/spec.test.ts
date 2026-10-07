@@ -1,29 +1,20 @@
 import { beforeEach, expect, it } from 'vitest'
-import { handle, resetSession } from '../src/index.js'
+import { resetSession } from '../src/index.js'
+import { call, uploadFile } from './emulator.js'
 import { assertMatchesSpec, jsonError, UNSPECIFIED_OPERATIONS } from './spec.js'
 import uploadApiSpec from './specs/upload-api.json'
 
-const JPEG = new Uint8Array([
-  0xff, 0xd8, 0xff, 0xc0, 0x00, 0x11, 0x08, 0x00, 0x01, 0x00, 0x01, 0xff, 0xd9
-])
-
 const upload = async () => {
-  const body = new FormData()
-  body.set('UPLOADCARE_PUB_KEY', 'demopublickey')
-  body.set('UPLOADCARE_STORE', 'auto')
-  body.set('file', new File([JPEG], 'a.jpg', { type: 'image/jpeg' }))
-  const response = await handle(
-    new Request('https://upload.uploadcare.com/base/?jsonerrors=1', {
-      method: 'POST',
-      body
-    })
-  )
-  const parsed = (await response!.clone().json()) as { file: string }
+  const response = await uploadFile({
+    fields: { UPLOADCARE_STORE: 'auto' },
+    query: '?jsonerrors=1'
+  })
+  const parsed = (await response.clone().json()) as { file: string }
   await assertMatchesSpec({
     method: 'post',
     path: '/base/',
     status: 200,
-    response: response!,
+    response,
     body: parsed
   })
   return parsed.file
@@ -37,47 +28,41 @@ it('answers /base/ with a body the spec accepts', async () => {
 
 it('answers /info/ with every field the spec requires', async () => {
   const uuid = await upload()
-  const response = await handle(
-    new Request(
-      `https://upload.uploadcare.com/info/?jsonerrors=1&pub_key=demopublickey&file_id=${uuid}`
-    )
+  const response = await call(
+    `https://upload.uploadcare.com/info/?jsonerrors=1&pub_key=demopublickey&file_id=${uuid}`
   )
   await assertMatchesSpec({
     method: 'get',
     path: '/info/',
     status: 200,
-    response: response!,
-    body: await response!.clone().json()
+    response: response,
+    body: await response.clone().json()
   })
 })
 
 it('uses a status code the spec documents when the file is unknown', async () => {
-  const response = await handle(
-    new Request(
-      'https://upload.uploadcare.com/info/?jsonerrors=1&pub_key=demopublickey&file_id=nope'
-    )
+  const response = await call(
+    'https://upload.uploadcare.com/info/?jsonerrors=1&pub_key=demopublickey&file_id=nope'
   )
   // The HTTP status is 200 under `jsonerrors=1`; the status the spec
   // documents is the one inside the envelope.
   await assertMatchesSpec({
     method: 'get',
     path: '/info/',
-    status: (await jsonError(response!)).status_code,
-    response: response!,
-    body: await response!.clone().json()
+    status: (await jsonError(response)).status_code,
+    response: response,
+    body: await response.clone().json()
   })
 })
 
 it('answers an unknown file with the spec-declared sentence, jsonerrors=1', async () => {
-  const response = await handle(
-    new Request(
-      'https://upload.uploadcare.com/info/?jsonerrors=1&pub_key=demopublickey&file_id=nope'
-    )
+  const response = await call(
+    'https://upload.uploadcare.com/info/?jsonerrors=1&pub_key=demopublickey&file_id=nope'
   )
-  const body = (await response!.clone().json()) as {
+  const body = (await response.clone().json()) as {
     error: { content: string }
   }
-  expect(await jsonError(response!)).toMatchObject({
+  expect(await jsonError(response)).toMatchObject({
     status_code: 404,
     content: 'File is not found.'
   })
@@ -85,26 +70,24 @@ it('answers an unknown file with the spec-declared sentence, jsonerrors=1', asyn
     method: 'get',
     path: '/info/',
     status: 404,
-    response: response!,
+    response: response,
     body
   })
 })
 
 it('answers an unknown file with the bare spec sentence, no jsonerrors', async () => {
-  const response = await handle(
-    new Request(
-      'https://upload.uploadcare.com/info/?pub_key=demopublickey&file_id=nope'
-    )
+  const response = await call(
+    'https://upload.uploadcare.com/info/?pub_key=demopublickey&file_id=nope'
   )
-  const body = await response!.clone().text()
-  expect(response!.status).toBe(404)
-  expect(response!.headers.get('content-type')).toMatch(/^text\/plain/)
+  const body = await response.clone().text()
+  expect(response.status).toBe(404)
+  expect(response.headers.get('content-type')).toMatch(/^text\/plain/)
   expect(body).toBe('File is not found.')
   await assertMatchesSpec({
     method: 'get',
     path: '/info/',
     status: 404,
-    response: response!,
+    response: response,
     body
   })
 })
@@ -112,16 +95,17 @@ it('answers an unknown file with the bare spec sentence, no jsonerrors', async (
 it('rejects a /base/ upload with no file, jsonerrors=1', async () => {
   const form = new FormData()
   form.set('UPLOADCARE_PUB_KEY', 'demopublickey')
-  const response = await handle(
-    new Request('https://upload.uploadcare.com/base/?jsonerrors=1', {
+  const response = await call(
+    'https://upload.uploadcare.com/base/?jsonerrors=1',
+    {
       method: 'POST',
       body: form
-    })
+    }
   )
-  const body = (await response!.clone().json()) as {
+  const body = (await response.clone().json()) as {
     error: { content: string }
   }
-  expect(await jsonError(response!)).toMatchObject({
+  expect(await jsonError(response)).toMatchObject({
     status_code: 400,
     content: 'Request does not contain files.'
   })
@@ -129,19 +113,17 @@ it('rejects a /base/ upload with no file, jsonerrors=1', async () => {
     method: 'post',
     path: '/base/',
     status: 400,
-    response: response!,
+    response: response,
     body
   })
 })
 
 it('rejects an /info/ 200 body missing a required field', async () => {
   const uuid = await upload()
-  const response = await handle(
-    new Request(
-      `https://upload.uploadcare.com/info/?jsonerrors=1&pub_key=demopublickey&file_id=${uuid}`
-    )
+  const response = await call(
+    `https://upload.uploadcare.com/info/?jsonerrors=1&pub_key=demopublickey&file_id=${uuid}`
   )
-  const body = (await response!.clone().json()) as Record<string, unknown>
+  const body = (await response.clone().json()) as Record<string, unknown>
   delete body.is_image // one of the spec's 15 required fields
 
   await expect(
@@ -149,7 +131,7 @@ it('rejects an /info/ 200 body missing a required field', async () => {
       method: 'get',
       path: '/info/',
       status: 200,
-      response: response!,
+      response: response,
       body
     })
   ).rejects.toThrow()
@@ -157,12 +139,10 @@ it('rejects an /info/ 200 body missing a required field', async () => {
 
 it('rejects an /info/ 200 body with a required field of the wrong type', async () => {
   const uuid = await upload()
-  const response = await handle(
-    new Request(
-      `https://upload.uploadcare.com/info/?jsonerrors=1&pub_key=demopublickey&file_id=${uuid}`
-    )
+  const response = await call(
+    `https://upload.uploadcare.com/info/?jsonerrors=1&pub_key=demopublickey&file_id=${uuid}`
   )
-  const body = (await response!.clone().json()) as Record<string, unknown>
+  const body = (await response.clone().json()) as Record<string, unknown>
   body.is_image = 'yes' // spec says boolean
 
   await expect(
@@ -170,7 +150,7 @@ it('rejects an /info/ 200 body with a required field of the wrong type', async (
       method: 'get',
       path: '/info/',
       status: 200,
-      response: response!,
+      response: response,
       body
     })
   ).rejects.toThrow()
@@ -178,12 +158,10 @@ it('rejects an /info/ 200 body with a required field of the wrong type', async (
 
 it('names the operation, the status, and the failing field when a body fails validation', async () => {
   const uuid = await upload()
-  const response = await handle(
-    new Request(
-      `https://upload.uploadcare.com/info/?jsonerrors=1&pub_key=demopublickey&file_id=${uuid}`
-    )
+  const response = await call(
+    `https://upload.uploadcare.com/info/?jsonerrors=1&pub_key=demopublickey&file_id=${uuid}`
   )
-  const body = (await response!.clone().json()) as Record<string, unknown>
+  const body = (await response.clone().json()) as Record<string, unknown>
   delete body.is_image
 
   let thrown: unknown
@@ -192,7 +170,7 @@ it('names the operation, the status, and the failing field when a body fails val
       method: 'get',
       path: '/info/',
       status: 200,
-      response: response!,
+      response: response,
       body
     })
   } catch (error) {
@@ -210,47 +188,41 @@ it('names the operation, the status, and the failing field when a body fails val
 it('rejects a /base/ upload with no file, no jsonerrors', async () => {
   const form = new FormData()
   form.set('UPLOADCARE_PUB_KEY', 'demopublickey')
-  const response = await handle(
-    new Request('https://upload.uploadcare.com/base/', {
-      method: 'POST',
-      body: form
-    })
-  )
-  const body = await response!.clone().text()
-  expect(response!.status).toBe(400)
-  expect(response!.headers.get('content-type')).toMatch(/^text\/plain/)
+  const response = await call('https://upload.uploadcare.com/base/', {
+    method: 'POST',
+    body: form
+  })
+  const body = await response.clone().text()
+  expect(response.status).toBe(400)
+  expect(response.headers.get('content-type')).toMatch(/^text\/plain/)
   expect(body).toBe('Request does not contain files.')
   await assertMatchesSpec({
     method: 'post',
     path: '/base/',
     status: 400,
-    response: response!,
+    response: response,
     body
   })
 })
 
 it('answers the JSON envelope for Accept: application/json, without jsonerrors', async () => {
-  const response = await handle(
-    new Request(
-      'https://upload.uploadcare.com/info/?pub_key=demopublickey&file_id=nope',
-      { headers: { Accept: 'application/json' } }
-    )
+  const response = await call(
+    'https://upload.uploadcare.com/info/?pub_key=demopublickey&file_id=nope',
+    { headers: { Accept: 'application/json' } }
   )
-  expect(await jsonError(response!)).toMatchObject({
+  expect(await jsonError(response)).toMatchObject({
     status_code: 404,
     content: 'File is not found.'
   })
 })
 
 it('lets an explicit jsonerrors=0 win over Accept: application/json', async () => {
-  const response = await handle(
-    new Request(
-      'https://upload.uploadcare.com/info/?jsonerrors=0&pub_key=demopublickey&file_id=nope',
-      { headers: { Accept: 'application/json' } }
-    )
+  const response = await call(
+    'https://upload.uploadcare.com/info/?jsonerrors=0&pub_key=demopublickey&file_id=nope',
+    { headers: { Accept: 'application/json' } }
   )
-  expect(response!.status).toBe(404)
-  expect(await response!.text()).toBe('File is not found.')
+  expect(response.status).toBe(404)
+  expect(await response.text()).toBe('File is not found.')
 })
 
 it.each([...UNSPECIFIED_OPERATIONS])(

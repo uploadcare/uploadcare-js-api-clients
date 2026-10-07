@@ -4,13 +4,13 @@ import {
   CONTENT_MODERATED_PROMPT,
   DERIVATIVE_DISABLED_PUBLIC_KEY,
   DERIVATIVE_INSTANT_PUBLIC_KEY,
-  handle,
   PROVIDER_UNAVAILABLE_PROMPT,
   resetSession,
   SIGNED_UPLOADS_PUBLIC_KEY,
   SIGNED_UPLOADS_SECRET_KEY
 } from '../src/index.js'
 import { STOCK_IMAGE } from '../src/state/stock-image.js'
+import { call, upload } from './emulator.js'
 import { jsonError } from './spec.js'
 
 /**
@@ -32,17 +32,15 @@ const post = (
   body: unknown,
   headers: Record<string, string> = {}
 ) =>
-  handle(
-    new Request(`${UPLOAD}${path}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Accept: 'application/json',
-        ...headers
-      },
-      body: typeof body === 'string' ? body : JSON.stringify(body)
-    })
-  ) as Promise<Response>
+  call(`${UPLOAD}${path}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+      ...headers
+    },
+    body: typeof body === 'string' ? body : JSON.stringify(body)
+  })
 
 const generate = (body: Record<string, unknown> = {}) =>
   post('/derivative/image/generate/', {
@@ -66,9 +64,7 @@ const status = (jobId: string | undefined, pubKey = 'demopublickey') => {
   const url = new URL(`${UPLOAD}/derivative/status/`)
   url.searchParams.set('pub_key', pubKey)
   if (jobId !== undefined) url.searchParams.set('job_id', jobId)
-  return handle(
-    new Request(url, { headers: { Accept: 'application/json' } })
-  ) as Promise<Response>
+  return call(url, { headers: { Accept: 'application/json' } })
 }
 
 const jobIdOf = async (response: Response) => {
@@ -125,17 +121,17 @@ it('starts a generate job and polls it through every non-terminal state to a sto
   // The not-yet-ready frame already names the same file.
   expect(frames[2]?.uuid).toBe(done.uuid)
 
-  const info = await handle(
-    new Request(`${UPLOAD}/info/?pub_key=demopublickey&file_id=${done.uuid}`)
+  const info = await call(
+    `${UPLOAD}/info/?pub_key=demopublickey&file_id=${done.uuid}`
   )
-  expect(await info!.json()).toMatchObject({
+  expect(await info.json()).toMatchObject({
     uuid: done.uuid,
     original_filename: 'generated.png'
   })
 
-  const cdn = await handle(new Request(`https://ucarecdn.com/${done.uuid}/`))
-  expect(cdn!.status).toBe(200)
-  expect(new Uint8Array(await cdn!.arrayBuffer())).toEqual(STOCK_IMAGE)
+  const cdn = await call(`https://ucarecdn.com/${done.uuid}/`)
+  expect(cdn.status).toBe(200)
+  expect(new Uint8Array(await cdn.arrayBuffer())).toEqual(STOCK_IMAGE)
 })
 
 it('keeps answering success once the job is done', async () => {
@@ -172,13 +168,11 @@ it('refuses an edit whose source does not exist', async () => {
 })
 
 it('refuses an edit whose source is not an image', async () => {
-  const form = new FormData()
-  form.set('UPLOADCARE_PUB_KEY', 'demopublickey')
-  form.set('file', new File(['hello'], 'note.txt', { type: 'text/plain' }))
-  const uploaded = await handle(
-    new Request(`${UPLOAD}/base/`, { method: 'POST', body: form })
-  )
-  const { file } = (await uploaded!.json()) as { file: string }
+  const file = await upload({
+    bytes: new TextEncoder().encode('hello'),
+    name: 'note.txt',
+    type: 'text/plain'
+  })
 
   expect(await jsonError(await edit({ source: file }))).toMatchObject({
     status_code: 400,
@@ -234,18 +228,12 @@ it('does not know a job it never started', async () => {
 
 it('keeps jobs per session', async () => {
   const jobId = await jobIdOf(await generate())
-  const other = await handle(
-    new Request(
-      `${UPLOAD}/derivative/status/?pub_key=demopublickey&job_id=${jobId}`,
-      {
-        headers: {
-          Accept: 'application/json',
-          'x-uploadcare-emulator-session': 'someone-else'
-        }
-      }
-    )
+  const other = await call(
+    `${UPLOAD}/derivative/status/?pub_key=demopublickey&job_id=${jobId}`,
+    { headers: { Accept: 'application/json' } },
+    { session: 'someone-else' }
   )
-  expect(await jsonError(other!)).toMatchObject({ error_code: 'job_not_found' })
+  expect(await jsonError(other)).toMatchObject({ error_code: 'job_not_found' })
 })
 
 it.each([
@@ -372,13 +360,11 @@ it('runs a signed-uploads project end to end on a Bearer token', async () => {
     { authorization }
   )
   const jobId = await jobIdOf(started)
-  const polled = await handle(
-    new Request(
-      `${UPLOAD}/derivative/status/?pub_key=${SIGNED_UPLOADS_PUBLIC_KEY}&job_id=${jobId}`,
-      { headers: { Accept: 'application/json', authorization } }
-    )
+  const polled = await call(
+    `${UPLOAD}/derivative/status/?pub_key=${SIGNED_UPLOADS_PUBLIC_KEY}&job_id=${jobId}`,
+    { headers: { Accept: 'application/json', authorization } }
   )
-  expect(await polled!.json()).toEqual({ type: 'job', status: 'processing' })
+  expect(await polled.json()).toEqual({ type: 'job', status: 'processing' })
 })
 
 it('scopes a Bearer token by the derivative path', async () => {
