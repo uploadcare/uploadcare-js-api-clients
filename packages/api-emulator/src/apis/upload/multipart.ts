@@ -29,8 +29,7 @@ export const multipartRoutes: Route[] = [
     'PUT',
     '/multipart/upload/:uuid/original',
     async ({ request, params }) => {
-      // The check this route exists for: see `DROP_CONNECTION_MARKER` in
-      // core/responses.ts for why a marker response, not an error status.
+      // The check this route exists for: see `dropConnection`.
       if (request.headers.has('authorization')) return dropConnection()
 
       const upload = sessionOf(request).multipart.get(params.uuid ?? '')
