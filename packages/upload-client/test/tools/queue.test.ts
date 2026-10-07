@@ -1,10 +1,14 @@
-import { expect, describe, it } from 'vitest'
+import { afterEach, expect, describe, it, vi } from 'vitest'
 import { delay } from '@uploadcare/api-client-utils'
 import { Queue } from '../../src/tools/Queue'
 const DELAY = 100
 const TIME_TOLERANCE = DELAY / 2
 
 describe('Queue', () => {
+  afterEach(() => {
+    vi.useRealTimers()
+  })
+
   describe('#add', () => {
     it('should return promise resolved with the same value', async () => {
       expect.assertions(1)
@@ -51,6 +55,7 @@ describe('Queue', () => {
 
   it('should run tasks concurrently', async () => {
     expect.assertions(12)
+    vi.useFakeTimers()
     const queue = new Queue(4)
     const times: number[] = []
     const startTime = Date.now()
@@ -59,6 +64,7 @@ describe('Queue', () => {
         delay(DELAY).then(() => times.push(Date.now() - startTime))
       )
     })
+    await vi.runAllTimersAsync()
     await Promise.all(promises)
 
     expect(Math.abs(times[0] - DELAY * 1)).toBeLessThan(TIME_TOLERANCE)
@@ -120,6 +126,7 @@ describe('Queue', () => {
   describe('set concurrency', () => {
     it('should be able to change concurrency', async () => {
       expect.assertions(9)
+      vi.useFakeTimers()
       const queue = new Queue(1)
       const times: number[] = []
       const startTime = Date.now()
@@ -128,12 +135,14 @@ describe('Queue', () => {
           delay(DELAY).then(() => times.push(Date.now() - startTime))
         )
       })
-      await delay(0)
+      await vi.advanceTimersByTimeAsync(0)
       expect(queue.running).toBe(1)
+      await vi.advanceTimersByTimeAsync(DELAY)
       await promises[0]
       queue.concurrency = 2
       expect(queue.concurrency).toBe(2)
       expect(queue.running).toBe(2)
+      await vi.runAllTimersAsync()
       await Promise.all(promises)
 
       expect(Math.abs(times[0] - DELAY * 1)).toBeLessThan(TIME_TOLERANCE)
