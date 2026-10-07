@@ -22,11 +22,6 @@ import {
   sessionOf,
   storeStockImage
 } from '../../state/store.js'
-import {
-  DERIVATIVE_DISABLED_PUBLIC_KEY,
-  DERIVATIVE_FAILURES,
-  DERIVATIVE_INSTANT_PUBLIC_KEY
-} from './scenarios.js'
 
 type Body = Record<string, unknown>
 
@@ -43,40 +38,21 @@ const isRatio = (value: unknown) =>
   value.every((side) => Number.isInteger(side) && side > 0)
 
 /**
- * What generate and edit share: the body, the project check, the fields both
- * require, and the job they start. `validate` is the kind-specific rest, a
- * refusal or nothing.
+ * What generate and edit share: the body, the fields both require, and the job
+ * they start. `validate` is the kind-specific rest, a refusal or nothing.
  */
 const startJob = (
-  kind: 'generate' | 'edit',
   validate: (request: Request, body: Body) => Response | undefined
 ) =>
-  protect(async ({ request, publicKey }) => {
+  protect(async ({ request }) => {
     const body = await jsonRecord(request)
     if (!body)
       return refuse(request, 400, 'invalid_request', 'Request body is invalid.')
-
-    // The gate has already accepted the key; this one is a project without
-    // derivatives, refused before any validation.
-    if (publicKey === DERIVATIVE_DISABLED_PUBLIC_KEY)
-      return refuse(
-        request,
-        403,
-        'derivative_disabled',
-        'Derivatives are not enabled for this project.'
-      )
 
     if (typeof body.prompt !== 'string' || !body.prompt)
       return refuse(request, 400, 'invalid_request', '`prompt` is required.')
     if (typeof body.filename !== 'string')
       return refuse(request, 400, 'invalid_request', '`filename` is required.')
-    if (kind === 'generate' && body.aspect_ratio === undefined)
-      return refuse(
-        request,
-        400,
-        'invalid_request',
-        '`aspect_ratio` is required.'
-      )
     if (body.aspect_ratio !== undefined && !isRatio(body.aspect_ratio))
       return refuse(
         request,
@@ -93,9 +69,7 @@ const startJob = (
     session.derivativeJobs.set(jobId, {
       polls: 0,
       name: body.filename,
-      isStored: body.store !== false,
-      instant: publicKey === DERIVATIVE_INSTANT_PUBLIC_KEY,
-      failure: DERIVATIVE_FAILURES.get(body.prompt)
+      isStored: body.store !== false
     })
     return Response.json({ type: 'job', job_id: jobId })
   })
@@ -104,43 +78,32 @@ const startJob = (
  * One frame per poll: `processing`, then `uploading`, then `success` with
  * `is_ready: false` (the file is stored, but — as the real API reports while it
  * is still being ingested — not CDN-ready yet), then `success` with `is_ready:
- * true` for good. A scenario job (`DERIVATIVE_FAILURES`) reports `processing`
- * once and then its error frame for good. The client keeps polling on every
- * frame but an error or a ready success, so this walks it through each. An
- * `instant` job skips straight to its terminal frame.
+ * true` for good. The client keeps polling on every frame but an error or a
+ * ready success, so this walks it through each. The `derivativesInstant` and
+ * `derivativeFailure` presets change the walk.
  */
 const frame = (session: Session, job: DerivativeJob) => {
   job.polls += 1
-  if (job.polls === 1 && !job.instant)
-    return { type: 'job', status: 'processing' }
-  if (job.failure)
-    return {
-      type: 'job',
-      status: 'error',
-      error_source: 'ai_gateway',
-      error_code: job.failure.code,
-      error: job.failure.message
-    }
-  if (job.polls === 2 && !job.instant)
-    return { type: 'job', status: 'uploading' }
+  if (job.polls === 1) return { type: 'job', status: 'processing' }
+  if (job.polls === 2) return { type: 'job', status: 'uploading' }
   job.file ??= storeStockImage(session, job.name, job.isStored)
-  return {
-    status: 'success',
-    ...fileInfo(job.file),
-    is_ready: job.instant || job.polls > 3
-  }
+  return { status: 'success', ...fileInfo(job.file), is_ready: job.polls > 3 }
 }
 
 export const derivativeRoutes: Route[] = [
   route(
     'POST',
     '/derivative/image/generate/',
-    startJob('generate', () => undefined)
+    startJob((request, body) =>
+      body.aspect_ratio === undefined
+        ? refuse(request, 400, 'invalid_request', '`aspect_ratio` is required.')
+        : undefined
+    )
   ),
   route(
     'POST',
     '/derivative/image/edit/',
-    startJob('edit', (request, body) => {
+    startJob((request, body) => {
       if (typeof body.source !== 'string' || !body.source)
         return refuse(request, 400, 'invalid_request', '`source` is required.')
       const source = sessionOf(request).files.get(body.source)

@@ -6,7 +6,7 @@
  */
 import { bodyFields, isRecord } from './core/body.js'
 import { apiError } from './core/responses.js'
-import type { ScenarioMatch } from './core/scenarios.js'
+import type { ScenarioHandler, ScenarioMatch } from './core/scenarios.js'
 import type { EmulatorSession } from './session.js'
 import { STOCK_IMAGE } from './state/stock-image.js'
 import { type Session, store } from './state/store.js'
@@ -44,7 +44,32 @@ export type PresetArgs = {
    * `/group/` then can't find it.
    */
   storedFile: { uuid: string; publicKey?: string }
+  /**
+   * `POST /derivative/image/generate/` and `.../edit/` answer `403
+   * derivative_disabled`.
+   */
+  derivativesDisabled: undefined
+  /**
+   * A derivative job's first status poll answers its terminal frame: polls the
+   * rest of the chain until it stops reporting progress. Wraps the scenarios
+   * registered before it, so after `derivativeFailure` it answers the error at
+   * once.
+   */
+  derivativesInstant: undefined
+  /**
+   * Every derivative job started after it fails at poll time with `code`, the
+   * AI-gateway failure: `processing` once, then the `error` frame for good. No
+   * file is stored.
+   */
+  derivativeFailure: { code: DerivativeFailureCode }
 }
+
+const DERIVATIVE_FAILURES = {
+  content_moderated: 'The request was rejected by content moderation.',
+  provider_unavailable: 'The image generation provider is unavailable.'
+}
+
+export type DerivativeFailureCode = keyof typeof DERIVATIVE_FAILURES
 
 export type PresetName = keyof PresetArgs
 
@@ -182,6 +207,82 @@ const storedFile = (session: Session, args: Args) => {
   )
 }
 
+const GENERATE = 'POST /derivative/image/generate/'
+const EDIT = 'POST /derivative/image/edit/'
+const STATUS = 'GET /derivative/status/'
+
+const refuseDerivatives: ScenarioHandler = ({ request }) =>
+  apiError(
+    request,
+    403,
+    'Derivatives are not enabled for this project.',
+    'derivative_disabled'
+  )
+
+const derivativesDisabled = (handle: EmulatorSession) => {
+  handle.on(GENERATE, refuseDerivatives).on(EDIT, refuseDerivatives)
+}
+
+const isPending = (frame: unknown) =>
+  isRecord(frame) &&
+  (frame.status === 'processing' ||
+    frame.status === 'uploading' ||
+    (frame.status === 'success' && frame.is_ready === false))
+
+const derivativesInstant = (handle: EmulatorSession) => {
+  handle.on(STATUS, async ({ next }) => {
+    let response = await next()
+    // ponytail: bounded at 8, twice the real walk, in case a scenario down the
+    // chain never stops reporting progress.
+    for (let poll = 1; poll < 8; poll += 1) {
+      if (!isPending(await response?.clone().json())) break
+      response = await next()
+    }
+    return response
+  })
+}
+
+const isFailureCode = (code: unknown): code is DerivativeFailureCode =>
+  typeof code === 'string' && Object.hasOwn(DERIVATIVE_FAILURES, code)
+
+const derivativeFailure = (handle: EmulatorSession, args: Args) => {
+  const { code } = args
+  if (!isFailureCode(code))
+    throw invalid(
+      'derivativeFailure',
+      `code is one of ${Object.keys(DERIVATIVE_FAILURES).join(', ')}`
+    )
+  /** Polls answered per job this preset failed. */
+  const polls = new Map<string, number>()
+  const start: ScenarioHandler = async ({ next }) => {
+    const response = await next()
+    const body: unknown = await response?.clone().json()
+    if (isRecord(body) && typeof body.job_id === 'string')
+      polls.set(body.job_id, 0)
+    return response
+  }
+  handle
+    .on(GENERATE, start)
+    .on(EDIT, start)
+    .on(STATUS, ({ request }) => {
+      const jobId = queryOf(request, 'job_id') ?? ''
+      const answered = polls.get(jobId)
+      if (answered === undefined) return undefined
+      polls.set(jobId, answered + 1)
+      return Response.json(
+        answered === 0
+          ? { type: 'job', status: 'processing' }
+          : {
+              type: 'job',
+              status: 'error',
+              error_source: 'ai_gateway',
+              error_code: code,
+              error: DERIVATIVE_FAILURES[code]
+            }
+      )
+    })
+}
+
 export const applyPreset = (
   session: Session,
   handle: EmulatorSession,
@@ -199,6 +300,12 @@ export const applyPreset = (
       return hostNotFound(handle, argsOf(name, args))
     case 'storedFile':
       return storedFile(session, argsOf(name, args))
+    case 'derivativesDisabled':
+      return derivativesDisabled(handle)
+    case 'derivativesInstant':
+      return derivativesInstant(handle)
+    case 'derivativeFailure':
+      return derivativeFailure(handle, argsOf(name, args))
     default: {
       // A new preset fails to compile here until it is handled; a name from
       // the control endpoint that isn't one fails at runtime.

@@ -61,18 +61,13 @@ export type MultipartUpload = {
 
 /**
  * A derivative (AI generate/edit) job in flight, keyed by the `job_id` the POST
- * handed out. `polls` drives the status sequence (see `derivative.ts`);
- * `failure` is the scenario error the job ends in instead of a file (see
- * `scenarios.ts`); `file` is the stored result, set by the first poll that
- * reports `success`.
+ * handed out. `polls` drives the status sequence (see `derivative.ts`); `file`
+ * is the stored result, set by the first poll that reports `success`.
  */
 export type DerivativeJob = {
   polls: number
   name: string
   isStored: boolean
-  /** Terminal on the first poll — see `DERIVATIVE_INSTANT_PUBLIC_KEY`. */
-  instant: boolean
-  failure?: { code: string; message: string }
   file?: StoredFile
 }
 
