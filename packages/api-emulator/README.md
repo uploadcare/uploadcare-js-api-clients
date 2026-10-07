@@ -11,13 +11,16 @@ including inside a browser page — that's what lets it back an in-browser MSW
 worker. `@uploadcare/api-emulator/listen` is Node-only: it speaks raw HTTP
 sockets (`node:http`/`node:https`, `Buffer`) to give a suite a real origin to
 point a `baseURL` at. `@uploadcare/api-emulator/browser` is page-only, and the
-one export that needs MSW (see [3. In the browser](#3-in-the-browser-with-msw)).
+one export that needs MSW (see [3. In the browser](#3-in-the-browser-with-msw));
+`@uploadcare/api-emulator/node` is its Node counterpart, on
+`@mswjs/interceptors` alone (see [4. In Node](#4-in-node)).
 The split exists so the core can be bundled into a page without dragging Node
 built-ins with it, and used from Node without installing MSW;
 `test/dist.test.ts` asserts the built `.` and `./browser` bundles don't regress
-that, and that only `./browser` reaches MSW.
+that, that only `./browser` reaches MSW, and that only `./browser` and `./node`
+reach `@mswjs/interceptors`.
 
-Three ways to run it, in increasing order of how "real" the transport needs
+Four ways to run it, in increasing order of how "real" the transport needs
 to be:
 
 ### 1. As a server
@@ -158,7 +161,7 @@ Per-chunk upload progress needs `@mswjs/interceptors` 0.45.7 or a later 0.45.x
 depends on `^0.41`, a copy that fires a single upload `progress` event. Depend
 on `@mswjs/interceptors` directly so your install resolves the 0.45 one.
 
-For a different transport policy, or MSW in Node, skip `./browser` and
+For a different transport policy, skip `./browser` (or `./node`) and
 delegate to `handle` yourself — `undefined` from it is exactly what makes
 `passthrough()` the right fallback:
 
@@ -171,6 +174,34 @@ const server = setupServer(
   http.all('*', async ({ request }) => (await handle(request)) ?? passthrough())
 )
 ```
+
+### 4. In Node
+
+`@uploadcare/api-emulator/node` is `./browser` for a Node process: the same
+`setupEmulator({ cdnHosts, unhandled })`, `reset()` and `stop()`, and the same
+host rules above, except that Node has no "own origin": every non-Uploadcare
+request, `localhost` included, follows `unhandled`. It needs
+`@mswjs/interceptors` (not `msw`).
+
+```ts
+import { setupEmulator } from '@uploadcare/api-emulator/node'
+
+const emulator = setupEmulator()
+
+beforeEach(() => emulator.reset())
+afterAll(() => emulator.stop()) // restores the real fetch and node:http(s)
+```
+
+It answers the global `fetch` and `node:http`/`node:https`, which is how
+`@uploadcare/upload-client` sends in Node, so `uploadFile()` works unchanged.
+The `node:http(s)` hook patches the module objects: a client calling
+`http.request` is answered, one holding a named `import { request }` taken
+before `reset()` is not. There's no macrotask hold. One emulator per process.
+
+Pick `createFetch()` when the code under test takes a `fetch` you can pass in:
+nothing global changes, and each instance can target its own session. Pick
+`./node` when it reaches for the global `fetch` or `node:http(s)` itself, or
+you're testing a client end to end without touching its options.
 
 ## Sessions
 

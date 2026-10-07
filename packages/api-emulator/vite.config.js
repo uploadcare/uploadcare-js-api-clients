@@ -18,20 +18,22 @@ export default defineConfig({
       entry: {
         index: resolve(__dirname, 'src/index.ts'),
         listen: resolve(__dirname, 'src/listen.ts'),
-        browser: resolve(__dirname, 'src/browser.ts')
+        browser: resolve(__dirname, 'src/browser.ts'),
+        node: resolve(__dirname, 'src/node.ts')
       },
       formats: ['es'],
       fileName: '[name]'
     },
     rollupOptions: {
       // Keep these runtime imports rather than trying to bundle them; only
-      // `listen.js` ever pulls them in, which is what keeps the "." entry
-      // browser-safe.
+      // `listen.js` and `node.js` ever pull them in, which is what keeps the
+      // "." entry browser-safe.
       external: [
         'node:http',
         'node:https',
-        // Optional peers of `./browser` only, resolved from the consumer's own
-        // install: bundling them would ship a second MSW next to theirs.
+        // Optional peers of `./browser` (and, for the interceptors, `./node`),
+        // resolved from the consumer's own install: bundling them would ship a
+        // second MSW next to theirs.
         /^msw(?:\/|$)/,
         /^@mswjs\/interceptors(?:\/|$)/
       ]

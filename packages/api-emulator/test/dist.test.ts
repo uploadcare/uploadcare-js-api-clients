@@ -30,11 +30,16 @@ const FORBIDDEN = [
 ]
 
 /**
- * MSW is an optional peer of `./browser` alone: a `.` or `./listen` consumer
- * never installs it, so any other entry reaching it is a bundle that won't
- * resolve.
+ * MSW is an optional peer of `./browser` alone, and `@mswjs/interceptors` of
+ * `./browser` and `./node`: a `.` or `./listen` consumer never installs either,
+ * and a `./node` one never installs `msw`, so any other entry reaching them is
+ * a bundle that won't resolve.
  */
-const MSW_IMPORT = /\bfrom\s*['"](?:msw|@mswjs\/)/
+const MSW_IMPORT = /\bfrom\s*['"]msw(?:\/[^'"]*)?['"]/
+const INTERCEPTORS_IMPORT = /\bfrom\s*['"]@mswjs\//
+/** `./node`'s interceptors: `browser` is `null` in their package exports. */
+const NODE_INTERCEPTORS_IMPORT =
+  /\bfrom\s*['"]@mswjs\/interceptors\/(?:ClientRequest|fetch)['"]/
 
 /**
  * Walk the built `dist/` import graph from an entry, the way a consumer's
@@ -70,11 +75,34 @@ it.each(['index.js', 'browser.js'])(
 )
 
 it.each(['index.js', 'listen.js'])(
-  'keeps the built %s bundle free of msw',
+  'keeps the built %s bundle free of msw and its interceptors',
   (entry) => {
-    expect(offendersFrom(entry, [MSW_IMPORT])).toEqual([])
+    expect(offendersFrom(entry, [MSW_IMPORT, INTERCEPTORS_IMPORT])).toEqual([])
   }
 )
+
+it('keeps the built node.js bundle free of msw itself', () => {
+  expect(offendersFrom('node.js', [MSW_IMPORT])).toEqual([])
+})
+
+it('keeps the built browser.js bundle free of the Node-only interceptors', () => {
+  expect(offendersFrom('browser.js', [NODE_INTERCEPTORS_IMPORT])).toEqual([])
+})
+
+it('answers fetch from the built ./node bundle', async () => {
+  const { setupEmulator } = await import(path.join(distRoot, 'node.js'))
+  const emulator = setupEmulator()
+  await emulator.reset()
+  try {
+    const response = await fetch('https://tlm.uploadcare.com/api/v1/events', {
+      method: 'POST',
+      body: '{}'
+    })
+    expect(response.status).toBe(200)
+  } finally {
+    await emulator.stop()
+  }
+})
 
 /**
  * A tree-shaking setting can drop every route from `dist/index.js` while it
