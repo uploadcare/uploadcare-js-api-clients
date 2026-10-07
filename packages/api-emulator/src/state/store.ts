@@ -9,6 +9,7 @@
  * to ask about.
  */
 
+import type { Scenario } from '../core/scenarios.js'
 import { imageSize } from './image-size.js'
 import { STOCK_IMAGE } from './stock-image.js'
 
@@ -129,6 +130,8 @@ export type Session = {
   throttledOnce: Set<string>
   /** Operations spent per bearer token, for `limits.operations` — see auth.ts. */
   tokenOperations: Map<string, number>
+  /** `session.on()`'s, in registration order — see core/scenarios.ts. */
+  scenarios: Scenario[]
 }
 
 /** Names the session on every redirected request; set by the caller. */
@@ -152,7 +155,8 @@ export const resetSession = (id = 'default') => {
     throttled: 0,
     telemetry: [],
     throttledOnce: new Set(),
-    tokenOperations: new Map()
+    tokenOperations: new Map(),
+    scenarios: []
   }
   for (const uuid of DEMO_FILES)
     storeStockImage(session, 'demo.jpg', true, uuid)

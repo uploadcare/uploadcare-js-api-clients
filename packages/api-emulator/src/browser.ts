@@ -2,7 +2,7 @@ import { XMLHttpRequestInterceptor } from '@mswjs/interceptors/XMLHttpRequest'
 import { http, passthrough } from 'msw'
 import { setupWorker } from 'msw/browser'
 import { handle, resetSession } from './index.js'
-import type { SessionView } from './index.js'
+import type { EmulatorSession } from './index.js'
 
 /**
  * The hosts the emulator answers for: the Upload API, the CDN (`ucarecdn.com`
@@ -41,9 +41,10 @@ export type EmulatorOptions = {
 export type BrowserEmulator = {
   /**
    * Starts answering the page's requests (once; later calls reuse it) and
-   * resets the default session. Call it before every test.
+   * resets the default session, scenarios included. Call it before every test;
+   * register the test's scenarios on the session it answers.
    */
-  reset(): Promise<SessionView>
+  reset(): Promise<EmulatorSession>
   /** Stops answering; a later `reset()` starts again. */
   stop(): Promise<void>
 }

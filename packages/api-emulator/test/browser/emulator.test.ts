@@ -123,3 +123,24 @@ it('starts each test from a fresh session', async () => {
 
   expect((await fetch(`https://ucarecdn.com/${uuid}/`)).status).toBe(404)
 })
+
+it('answers with the scenarios registered on the handle reset() returns, over XHR and fetch', async () => {
+  const session = await emulator.reset()
+  session.on('GET /info/', () => new Response('scenario'), { times: 2 })
+  const info =
+    'https://upload.uploadcare.com/info/?pub_key=demopublickey&file_id=x'
+
+  expect(await (await fetch(info)).text()).toBe('scenario')
+  expect((await sendXhr('GET', info)).body).toBe('scenario')
+  expect((await fetch(info)).status).toBe(404)
+
+  session.on('GET /info/', () => new Response('scenario'))
+  await emulator.reset()
+  expect(await (await fetch(info)).text()).not.toBe('scenario')
+})
+
+it('keeps the session readable from that handle', async () => {
+  const session = await emulator.reset()
+  const { uuid } = await upload(await pngOf(1, 1))
+  expect(session.files.get(uuid)?.image).toMatchObject({ width: 1, height: 1 })
+})
