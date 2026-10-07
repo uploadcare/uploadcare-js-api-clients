@@ -92,7 +92,6 @@ export const multipartRoutes: Route[] = [
       session.multipart.set(uuid, {
         uuid,
         name: filename,
-        size,
         mimeType: contentType,
         isStored: storedBy(fields.get('UPLOADCARE_STORE') ?? null),
         parts: Array.from({ length: partCount }, () => undefined)
@@ -138,12 +137,6 @@ export const multipartRoutes: Route[] = [
           'File size mismatch. Not all parts uploaded?'
         )
 
-      // The completed file's `size` is the bytes actually received, not the
-      // `upload.size` `/multipart/start/` was told to expect. That's deliberate:
-      // a test that PUTs short parts (as this package's own does) should see the
-      // file it really assembled, and `/info/` and the CDN then agree with it.
-      // It does mean `upload.size` is written and never read — it stays only
-      // because `/multipart/start/` needs it to work out the part count.
       const bytes = new Uint8Array(await new Blob(received).arrayBuffer())
 
       // Under the uuid /multipart/start/ handed out, so /info/ and the CDN

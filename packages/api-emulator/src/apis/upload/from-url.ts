@@ -2,7 +2,6 @@ import { storedBy } from '../../core/body.js'
 import { apiError } from '../../core/responses.js'
 import { route, type Route } from '../../core/router.js'
 import { protect } from './auth.js'
-import { STOCK_IMAGE } from '../../state/stock-image.js'
 import {
   fileInfo,
   nextUuid,
@@ -86,16 +85,14 @@ export const fromUrlRoutes: Route[] = [
       const uuid =
         host && REACHABLE_HOSTS.includes(host)
           ? storeStockImage(session, name, storedBy(params.get('store'))).uuid
-          : ''
+          : undefined
 
       if (saveForDuplicates && uuid) session.fromUrlSources.set(sourceUrl, uuid)
 
       const token = nextUuid(session)
       session.fromUrlJobs.set(token, {
         uuid,
-        polls: 0,
         computable: publicKey !== UNKNOWN_PROGRESS_KEY,
-        total: STOCK_IMAGE.byteLength,
         done: 0
       })
       return Response.json({ type: 'token', token })
@@ -115,21 +112,20 @@ export const fromUrlRoutes: Route[] = [
       // it.
       return Response.json({ status: 'unknown' })
 
-    job.polls += 1
-    const file = session.files.get(job.uuid)
+    const file = job.uuid && session.files.get(job.uuid)
     if (!file)
       // The host wasn't in REACHABLE_HOSTS: the job got a token at POST time
       // (see scenarios.ts on why that's deliberate), but there is no file
       // behind it to ever finish fetching.
       return Response.json({ status: 'error', error: 'Host does not exist' })
 
-    if (job.done >= job.total)
+    if (job.done >= file.size)
       return Response.json({ status: 'success', ...fileInfo(file) })
 
     const response = job.computable
-      ? { status: 'progress', total: job.total, done: job.done }
+      ? { status: 'progress', total: file.size, done: job.done }
       : { status: 'progress', total: 'unknown', done: job.done }
-    job.done = Math.min(job.done + Math.ceil(job.total / 3), job.total)
+    job.done = Math.min(job.done + Math.ceil(file.size / 3), file.size)
     return Response.json(response)
   })
 ]
