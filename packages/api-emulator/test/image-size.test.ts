@@ -1,6 +1,7 @@
 import { expect, it } from 'vitest'
-import { handle, resetSession } from '../src/index.js'
+import { resetSession } from '../src/index.js'
 import { imageSize } from '../src/state/image-size.js'
+import { call, upload } from './emulator.js'
 
 // Signature, then an IHDR chunk (length, type) whose first fields are a 3×5
 // width and height, plus one padding byte.
@@ -24,20 +25,11 @@ it('reads GIF dimensions little-endian', () => {
 
 it('reports what the bytes are, not the declared type', async () => {
   resetSession()
-  const body = new FormData()
-  body.set('UPLOADCARE_PUB_KEY', 'demopublickey')
-  body.set('file', new File([PNG_3X5], 'square.jpg', { type: 'image/jpeg' }))
-  const uploaded = await handle(
-    new Request('https://upload.uploadcare.com/base/', { method: 'POST', body })
+  const file = await upload({ bytes: PNG_3X5, name: 'square.jpg' })
+  const info = await call(
+    `https://upload.uploadcare.com/info/?pub_key=demopublickey&file_id=${file}`
   )
-  const { file } = (await uploaded!.json()) as { file: string }
-
-  const info = await handle(
-    new Request(
-      `https://upload.uploadcare.com/info/?pub_key=demopublickey&file_id=${file}`
-    )
-  )
-  expect(await info!.json()).toMatchObject({
+  expect(await info.json()).toMatchObject({
     image_info: { format: 'PNG', width: 3, height: 5 }
   })
 })

@@ -1,19 +1,14 @@
 import { expect, it } from 'vitest'
-import { handle, resetSession, SESSION_HEADER } from '../src/index.js'
+import { resetSession } from '../src/index.js'
+import { call } from './emulator.js'
 
 const EVENTS_URL = 'https://tlm.uploadcare.com/api/v1/events'
 
 const post = (body: unknown, session = 'telemetry') =>
-  handle(
-    new Request(EVENTS_URL, {
-      method: 'POST',
-      headers: { [SESSION_HEADER]: session },
-      body: JSON.stringify(body)
-    })
-  )
+  call(EVENTS_URL, { method: 'POST', body: JSON.stringify(body) }, { session })
 
 it('answers {} at 200, like the stub it replaces', async () => {
-  const response = (await post({ event_type: 'lifecycle' }))!
+  const response = await post({ event_type: 'lifecycle' })
   expect(response.status).toBe(200)
   expect(await response.json()).toEqual({})
 })
@@ -39,9 +34,9 @@ it('keeps two sessions from seeing each other', async () => {
 })
 
 it('does not reject an unexpected shape', async () => {
-  const response = (await post('not-an-object'))!
+  const response = await post('not-an-object')
   expect(response.status).toBe(200)
-  const response2 = (await post([1, 2, 3]))!
+  const response2 = await post([1, 2, 3])
   expect(response2.status).toBe(200)
 })
 
