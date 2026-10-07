@@ -24,6 +24,12 @@ export type StoredFile = {
   bytes: Uint8Array
   image?: StoredImage
   isStored: boolean
+  /**
+   * The project it belongs to, set by the `storedFile` preset: another
+   * project's `/info/` and `/group/` can't find it. Every project's when
+   * absent.
+   */
+  publicKey?: string
 }
 
 /**
@@ -193,6 +199,23 @@ export const store = (
   }
   session.files.set(uuid, stored)
   return stored
+}
+
+/**
+ * `uuid`'s file as `publicKey`'s project sees it; `null` (a Bearer token stood
+ * in for the key) sees every file.
+ */
+export const fileOf = (
+  session: Session,
+  uuid: string,
+  publicKey: string | null
+) => {
+  const file = session.files.get(uuid)
+  return file?.publicKey === undefined ||
+    publicKey === null ||
+    file.publicKey === publicKey
+    ? file
+    : undefined
 }
 
 /**

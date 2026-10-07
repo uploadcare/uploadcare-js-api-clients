@@ -3,13 +3,13 @@ import { route, type Route } from '../../core/router.js'
 import { protect } from './auth.js'
 import {
   fileInfo,
+  fileOf,
   nextUuid,
   sessionOf,
   type GroupMember,
   type Session,
   type StoredFile
 } from '../../state/store.js'
-import { GROUP_FILES_NOT_FOUND_KEY, STUB_GROUP_MEMBER } from './scenarios.js'
 
 /**
  * `upload-client` sends a member per repeated `files[]` (`buildFormData`'s
@@ -43,10 +43,7 @@ const parseMember = (raw: string): GroupMember | undefined => {
   return { uuid, effects: tail.startsWith('-/') ? tail.slice(2) : '' }
 }
 
-/**
- * What a member that isn't a stored file reports as: `STUB_GROUP_MEMBER`, or a
- * `<uuid>~N` group reference.
- */
+/** What a `<uuid>~N` group reference member reports as. */
 const stubFile = (uuid: string): StoredFile => ({
   uuid,
   name: uuid,
@@ -114,14 +111,12 @@ export const groupRoutes: Route[] = [
           return apiError(request, 400, `This is not valid file url: ${raw}.`)
         members.push(parsed)
       }
-      const stubAllowed = publicKey !== GROUP_FILES_NOT_FOUND_KEY
       const isKnown = ({ uuid }: GroupMember) =>
-        session.files.has(uuid) ||
-        session.groups.has(uuid) ||
-        (stubAllowed && uuid === STUB_GROUP_MEMBER)
+        fileOf(session, uuid, publicKey) !== undefined ||
+        session.groups.has(uuid)
 
       if (!members.every(isKnown))
-        // schema: groupFilesNotFoundError — see scenarios.ts.
+        // schema: groupFilesNotFoundError
         return apiError(request, 400, 'Some files not found.')
 
       const id = `${nextUuid(session)}~${members.length}`

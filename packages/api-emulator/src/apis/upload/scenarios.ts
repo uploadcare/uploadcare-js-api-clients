@@ -61,26 +61,6 @@ export const REACHABLE_HOSTS = [
 ]
 
 /**
- * The one uuid `POST /group/` accepts without it being in the session:
- * `upload-client`'s `factory.groupOfFiles('valid')` groups it without ever
- * uploading it first (`group.test.ts`' "should create group of files",
- * `uploadFileGroup/groupFromUploaded.test.ts`). It stands in as a 0-byte file.
- * Every other unknown member is "Some files not found.", as the real API
- * answers.
- */
-export const STUB_GROUP_MEMBER = '392e3aa3-5ed6-4ad6-a67e-b3a7c1d5b9e9'
-
-/**
- * `upload-client`'s `group.test.ts` ("should fail with [HTTP 400] Some files
- * not found.") groups `STUB_GROUP_MEMBER` under this public key and expects
- * `groupFilesNotFoundError` — so under this key, and only on `POST /group/`,
- * even the stub counts as missing. A real upload grouped under it still
- * succeeds (file-uploader's e2e suite does exactly that; it's a widely used
- * real demo public key). Everywhere else it's an ordinary allowed key.
- */
-export const GROUP_FILES_NOT_FOUND_KEY = 'demopublickey'
-
-/**
  * Ai-image-editor's `errorCodes.ts` (`derivative_disabled`): a project without
  * AI generation. `POST /derivative/image/generate/` and `.../edit/` under this
  * otherwise ordinary allowed key (see `auth.ts`) answer `derivative_disabled`
