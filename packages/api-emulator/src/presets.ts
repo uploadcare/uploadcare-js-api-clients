@@ -73,6 +73,21 @@ export type DerivativeFailureCode = keyof typeof DERIVATIVE_FAILURES
 
 export type PresetName = keyof PresetArgs
 
+/** Every name, for the control endpoint; a missing one fails to compile. */
+const PRESET_NAMES: Record<PresetName, true> = {
+  throttle: true,
+  signedUploads: true,
+  unknownProgress: true,
+  hostNotFound: true,
+  storedFile: true,
+  derivativesDisabled: true,
+  derivativesInstant: true,
+  derivativeFailure: true
+}
+
+export const isPresetName = (name: unknown): name is PresetName =>
+  typeof name === 'string' && Object.hasOwn(PRESET_NAMES, name)
+
 /** `use(name)` alone for a preset whose args are all optional. */
 export type PresetArgsOf<N extends PresetName> = undefined extends PresetArgs[N]
   ? [args?: PresetArgs[N]]

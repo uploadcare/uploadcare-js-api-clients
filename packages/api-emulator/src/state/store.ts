@@ -164,6 +164,16 @@ export const resetSession = (id = 'default') => {
 }
 
 /**
+ * Drops a session's scenarios and the settings presets made, keeping its files
+ * and jobs (a file `storedFile` stored included).
+ */
+export const clearScenarios = (session: Session) => {
+  session.scenarios.length = 0
+  session.publicKeys.clear()
+  session.signedUploads = new Set()
+}
+
+/**
  * The session a request belongs to. An unknown one is started rather than
  * refused: it has simply uploaded nothing.
  */
