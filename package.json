@@ -69,10 +69,5 @@
     "tsx": "^4.20.3",
     "typedoc": "^0.28.5",
     "typescript": "^5.3.3"
-  },
-  "dependencies": {
-    "@koa/cors": "5.0.0",
-    "koa": "2.16.3",
-    "start-server-and-test": "2.1.3"
   }
 }
