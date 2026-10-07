@@ -1,5 +1,5 @@
 import { beforeEach, expect, it } from 'vitest'
-import { EMULATOR_PORT, resetSession } from '../src/index.js'
+import { resetSession } from '../src/index.js'
 import { call } from './emulator.js'
 import { assertMatchesSpec, jsonError } from './spec.js'
 
@@ -64,15 +64,6 @@ it('refuses a private address', async () => {
     status_code: 400,
     content: 'Only public IPs are allowed.'
   })
-})
-
-it("fetches a source_url on upload-client's emulator origin", async () => {
-  const response = await post(
-    `pub_key=demopublickey&source_url=${encodeURIComponent(`http://127.0.0.1:${EMULATOR_PORT}/49b4c5a1-31b3-4349-ba07-d97a2d883c37/x.png`)}`
-  )
-  expect(response.status).toBe(200)
-  const { token } = (await response.json()) as { token: string }
-  expect(await poll(token)).not.toMatchObject({ status: 'error' })
 })
 
 it('reports progress before it succeeds, and names the file from the url', async () => {

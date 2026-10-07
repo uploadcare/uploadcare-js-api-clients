@@ -1,22 +1,9 @@
 /**
  * Where a `/from_url/` source can be fetched from: the emulator fetches
- * nothing, so it models which hosts resolve, which addresses the real API
- * refuses, and the origin upload-client's suite serves it on. Per-test
- * deviations from this are presets (see `presets.ts`), not values here.
+ * nothing, so it models which hosts resolve and which addresses the real API
+ * refuses. Per-test deviations from this are presets (see `presets.ts`), not
+ * values here.
  */
-
-/**
- * The port `upload-client`'s suite runs the emulator on, on the `127.0.0.1`
- * that `listen.ts` binds. Its dev settings point `baseCDN`/`baseURL` at this
- * origin, and its "valid" `from_url` fixture (`_fixtureFactory.ts`'s
- * `imageUrl('valid')`) is a URL on it, so that host has to be reachable (see
- * `REACHABLE_HOSTS`). It is `127.0.0.1` rather than `localhost` because
- * `localhost` can resolve to `::1` first, where another dev server on the same
- * port would answer instead of the IPv4-only emulator.
- */
-export const EMULATOR_PORT = 3000
-
-const EMULATOR_OWN_HOST = `127.0.0.1:${EMULATOR_PORT}`
 
 /**
  * `URL.parse(url)?.host`, spelled with `canParse` because the repo's root
@@ -41,14 +28,11 @@ export const isPrivateSourceUrl = (sourceUrl: string): boolean => {
  * implies — so the emulator has no other way to learn that a host doesn't
  * resolve the way the real service would; it has to be told.
  *
- * `EMULATOR_OWN_HOST` covers `upload-client`'s own dev-settings host; the rest
- * are the hosts file-uploader's e2e suite uploads from. Its from-url validation
- * tests point at a host that is deliberately _not_ in this list to get the
- * poll-time `Host does not exist` failure (see `from-url.ts`), rather than the
- * fast, synchronous one the `hostNotFound` preset answers.
+ * The CDN is upload-client's "valid" source (`_fixtureFactory.ts`'s
+ * `imageUrl('valid')`); the rest are the hosts file-uploader's e2e suite
+ * uploads from. Its from-url validation tests point at a host that is
+ * deliberately _not_ in this list to get the poll-time `Host does not exist`
+ * failure (see `from-url.ts`), rather than the fast, synchronous one the
+ * `hostNotFound` preset answers.
  */
-export const REACHABLE_HOSTS = [
-  EMULATOR_OWN_HOST,
-  'images.unsplash.com',
-  'ucarecdn.com'
-]
+export const REACHABLE_HOSTS = ['images.unsplash.com', 'ucarecdn.com']

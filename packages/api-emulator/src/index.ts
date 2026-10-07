@@ -6,7 +6,6 @@ import { runScenarios } from './core/scenarios.js'
 import { handleOf } from './session.js'
 import * as store from './state/store.js'
 
-export { EMULATOR_PORT } from './apis/upload/sources.js'
 export {
   mintAuthToken,
   SIGNED_UPLOADS_SECRET_KEY,
