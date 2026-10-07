@@ -17,6 +17,13 @@ export type NodeEmulator = Emulator
  *   so a client must call `http.request` (or `get`), not a named import bound
  *   before `reset()`.
  *
+ * A DOM test environment (happy-dom, jsdom) swaps the global `fetch` for its
+ * own, which goes out over `node:http(s)` and enforces CORS like a browser: it
+ * preflights a cross-origin request and checks the answer's
+ * `access-control-allow-origin`. So, like `./listen`, this answers `OPTIONS`
+ * itself (`handle()` has no `OPTIONS` route) and lets every origin read the
+ * emulator's answers.
+ *
  * One per process: both patch globals.
  */
 export const setupEmulator = (options: EmulatorOptions = {}): NodeEmulator => {
@@ -33,10 +40,34 @@ export const setupEmulator = (options: EmulatorOptions = {}): NodeEmulator => {
         if (decision.kind === 'passthrough') return
         if (decision.kind === 'refuse')
           return controller.errorWith(decision.error)
+        if (request.method === 'OPTIONS') {
+          return controller.respondWith(
+            new Response(null, {
+              status: 204,
+              headers: {
+                'access-control-allow-origin': '*',
+                'access-control-allow-methods':
+                  'GET, POST, PUT, DELETE, HEAD, OPTIONS',
+                'access-control-allow-headers':
+                  request.headers.get('access-control-request-headers') ?? '*',
+                'access-control-max-age': '86400'
+              }
+            })
+          )
+        }
         const response = await answer(request)
         if (!response)
           return controller.errorWith(new TypeError('Failed to fetch'))
-        controller.respondWith(response)
+        const headers = new Headers(response.headers)
+        headers.set('access-control-allow-origin', '*')
+        headers.set('access-control-expose-headers', '*')
+        controller.respondWith(
+          new Response(response.body, {
+            status: response.status,
+            statusText: response.statusText,
+            headers
+          })
+        )
       })
       interceptor.apply()
     }
