@@ -28,12 +28,10 @@ export type StoredFile = {
 
 /**
  * A `/from_url/` job in flight: `uuid` is absent for a host it can't fetch
- * from, `computable` is false for `UNKNOWN_PROGRESS_KEY`, `done` counts bytes
- * so far.
+ * from, `done` counts bytes so far.
  */
 export type FromUrlJob = {
   uuid?: string
-  computable: boolean
   done: number
 }
 

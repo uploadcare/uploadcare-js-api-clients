@@ -45,7 +45,8 @@ it('refuses a request with no source_url', async () => {
   await assertMatchesSpec(response, { method: 'post', path: '/from_url/' })
 })
 
-it('refuses a host that does not exist', async () => {
+it('refuses a host that does not exist, with the hostNotFound preset', async () => {
+  resetSession().use('hostNotFound')
   const response = await post(
     'pub_key=demopublickey&source_url=https%3A%2F%2F1.com%2F1.jpg'
   )
@@ -112,14 +113,15 @@ it('reads store=false the way /base/ does', async () => {
   expect(last).toMatchObject({ status: 'success', is_stored: false })
 })
 
-it('reports unknown totals for the unknown-progress key', async () => {
+it('reports unknown totals with the unknownProgress preset', async () => {
+  resetSession().use('unknownProgress')
   const { token } = (await post(
-    `pub_key=pub_test__unknown_progress&source_url=${encodeURIComponent(SOURCE)}`
+    `pub_key=demopublickey&source_url=${encodeURIComponent(SOURCE)}`
   ).then((r) => r.json())) as { token: string }
   // Deliberately not run through assertMatchesSpec/poll: the spec's
   // `fileUploadInfoProgressStatus` schema types `total` as `number | null`,
   // so it can't express the `'unknown'` string this pins — upload-client's
-  // test's exact expectation for this key.
+  // test's exact expectation.
   // Same shape of gap as base.test.ts's non-image `image_info: null` case.
   const response = await call(
     `https://upload.uploadcare.com/from_url/status/?token=${token}`

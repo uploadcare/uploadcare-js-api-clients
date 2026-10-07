@@ -8,13 +8,7 @@ import {
   sessionOf,
   storeStockImage
 } from '../../state/store.js'
-import {
-  hostOf,
-  isPrivateSourceUrl,
-  REACHABLE_HOSTS,
-  UNKNOWN_PROGRESS_KEY,
-  UNREACHABLE_SOURCE_URL
-} from './scenarios.js'
+import { hostOf, isPrivateSourceUrl, REACHABLE_HOSTS } from './scenarios.js'
 
 /**
  * The name the real API takes from a download URL: the `dl` parameter when
@@ -36,7 +30,7 @@ export const fromUrlRoutes: Route[] = [
   route(
     'POST',
     '/from_url/',
-    protect(({ request, publicKey }) => {
+    protect(({ request }) => {
       const session = sessionOf(request)
       const params = new URL(request.url).searchParams
       const sourceUrl = params.get('source_url')
@@ -51,11 +45,6 @@ export const fromUrlRoutes: Route[] = [
           'Failed to parse URL.',
           'URLParsingFailedError'
         )
-
-      if (sourceUrl === UNREACHABLE_SOURCE_URL)
-        // schema: hostnameNotFoundError — the one host that fails synchronously;
-        // see scenarios.ts.
-        return apiError(request, 400, 'Host does not exist.')
 
       if (isPrivateSourceUrl(sourceUrl))
         // schema: urlHostPrivateIPForbiddenError
@@ -90,11 +79,7 @@ export const fromUrlRoutes: Route[] = [
       if (saveForDuplicates && uuid) session.fromUrlSources.set(sourceUrl, uuid)
 
       const token = nextUuid(session)
-      session.fromUrlJobs.set(token, {
-        uuid,
-        computable: publicKey !== UNKNOWN_PROGRESS_KEY,
-        done: 0
-      })
+      session.fromUrlJobs.set(token, { uuid, done: 0 })
       return Response.json({ type: 'token', token })
     })
   ),
@@ -122,9 +107,7 @@ export const fromUrlRoutes: Route[] = [
     if (job.done >= file.size)
       return Response.json({ status: 'success', ...fileInfo(file) })
 
-    const response = job.computable
-      ? { status: 'progress', total: file.size, done: job.done }
-      : { status: 'progress', total: 'unknown', done: job.done }
+    const response = { status: 'progress', total: file.size, done: job.done }
     job.done = Math.min(job.done + Math.ceil(file.size / 3), file.size)
     return Response.json(response)
   })

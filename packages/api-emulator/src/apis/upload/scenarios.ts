@@ -5,29 +5,12 @@
  */
 
 /**
- * `upload-client`'s `uploadFromUrl.test.ts` ("should be able to handle
- * non-computable unknown progress") uses this public key to get a poll sequence
- * whose `total` is `'unknown'` instead of a byte count.
- */
-export const UNKNOWN_PROGRESS_KEY = 'pub_test__unknown_progress'
-
-/**
  * `upload-client`'s multipart fixtures (`_fixtureFactory.ts`'s `multipart`
  * entry) use this public key. Not read by `/from_url/` itself — kept here so
  * `auth.ts`'s allow-list and the multipart routes share one spelling instead of
  * two.
  */
 export const NO_STORING_KEY = 'pub_test__no_storing'
-
-/**
- * `upload-client`'s `fromUrl.test.ts` ("should be rejected with image that does
- * not exists") and `_fixtureFactory.ts`'s `imageUrl('doesNotExist')`. This one
- * host fails fast, at `POST /from_url/` itself, with a 400 — unlike an ordinary
- * unreachable host (see `REACHABLE_HOSTS` below), which only fails once the job
- * is polled. The real API doesn't special-case this URL; `upload-client`'s test
- * asserts on the synchronous rejection, so the emulator does.
- */
-export const UNREACHABLE_SOURCE_URL = 'https://1.com/1.jpg'
 
 /**
  * The port `upload-client`'s suite runs the emulator on, on the `127.0.0.1`
@@ -69,7 +52,7 @@ export const isPrivateSourceUrl = (sourceUrl: string): boolean => {
  * are the hosts file-uploader's e2e suite uploads from. Its from-url validation
  * tests point at a host that is deliberately _not_ in this list to get the
  * poll-time `Host does not exist` failure (see `from-url.ts`), rather than the
- * fast, synchronous one `UNREACHABLE_SOURCE_URL` triggers above.
+ * fast, synchronous one the `hostNotFound` preset answers.
  */
 export const REACHABLE_HOSTS = [
   EMULATOR_OWN_HOST,
