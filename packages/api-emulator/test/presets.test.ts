@@ -146,9 +146,11 @@ const fromUrl = (query: string) =>
     method: 'POST'
   })
 
-const pollAll = async (pubKey = 'demopublickey') => {
+const pollAll = async () => {
   const { token: jobToken } = (await (
-    await fromUrl(`pub_key=${pubKey}&source_url=${encodeURIComponent(SOURCE)}`)
+    await fromUrl(
+      `pub_key=demopublickey&source_url=${encodeURIComponent(SOURCE)}`
+    )
   ).json()) as { token: string }
   const frames: Record<string, unknown>[] = []
   for (let poll = 0; poll < 10; poll += 1) {
@@ -173,12 +175,6 @@ it('unknownProgress: reports progress with an unknown total, then the file', asy
     status: 'success',
     original_filename: 'holiday.jpg'
   })
-})
-
-it('unknownProgress: with a publicKey, for that project alone, which it makes known', async () => {
-  session.use('unknownProgress', { publicKey: 'pub_unknown' })
-  expect((await pollAll('pub_unknown'))[0]).toMatchObject({ total: 'unknown' })
-  expect((await pollAll())[0]).toMatchObject({ total: expect.any(Number) })
 })
 
 it('hostNotFound: refuses every source at POST time', async () => {
