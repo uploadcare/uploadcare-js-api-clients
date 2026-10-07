@@ -8,7 +8,7 @@ import {
   sessionOf,
   storeStockImage
 } from '../../state/store.js'
-import { hostOf, isPrivateSourceUrl, REACHABLE_HOSTS } from './scenarios.js'
+import { hostOf, isPrivateSourceUrl, REACHABLE_HOSTS } from './sources.js'
 
 /**
  * The name the real API takes from a download URL: the `dl` parameter when
@@ -100,7 +100,7 @@ export const fromUrlRoutes: Route[] = [
     const file = job.uuid && session.files.get(job.uuid)
     if (!file)
       // The host wasn't in REACHABLE_HOSTS: the job got a token at POST time
-      // (see scenarios.ts on why that's deliberate), but there is no file
+      // (see sources.ts on why that's deliberate), but there is no file
       // behind it to ever finish fetching.
       return Response.json({ status: 'error', error: 'Host does not exist' })
 

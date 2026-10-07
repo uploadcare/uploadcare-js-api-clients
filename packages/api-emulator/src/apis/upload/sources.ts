@@ -1,7 +1,8 @@
 /**
- * Every magic value a test steers the emulator with — public keys, source urls,
- * prompts, and the secret test tokens are signed with — named here so a route
- * file never carries a bare string a test elsewhere is quietly relying on.
+ * Where a `/from_url/` source can be fetched from: the emulator fetches
+ * nothing, so it models which hosts resolve, which addresses the real API
+ * refuses, and the origin upload-client's suite serves it on. Per-test
+ * deviations from this are presets (see `presets.ts`), not values here.
  */
 
 /**
