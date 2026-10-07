@@ -198,6 +198,11 @@ The `node:http(s)` hook patches the module objects: a client calling
 `http.request` is answered, one holding a named `import { request }` taken
 before `reset()` is not. There's no macrotask hold. One emulator per process.
 
+A DOM test environment's own `fetch` (happy-dom) or `XMLHttpRequest` (jsdom)
+goes out over `node:http(s)` too, and enforces CORS like a browser: the
+emulator answers its preflights and sends `access-control-allow-origin: *`, so
+no same-origin setting is needed.
+
 Pick `createFetch()` when the code under test takes a `fetch` you can pass in:
 nothing global changes, and each instance can target its own session. Pick
 `./node` when it reaches for the global `fetch` or `node:http(s)` itself, or

@@ -70,6 +70,18 @@ it('fails an Uploadcare path it has no route for, naming it', async () => {
   warn.mockRestore()
 })
 
+// A DOM test environment's fetch (happy-dom) or XHR (jsdom) goes out over
+// node:http(s) and enforces CORS: it preflights, then checks the answer.
+it('answers a CORS preflight and lets any origin read its answers', async () => {
+  const info =
+    'https://upload.uploadcare.com/info/?pub_key=demopublickey&file_id=x'
+
+  expect(await sendNode('OPTIONS', info)).toMatchObject({ status: 204 })
+  expect((await fetch(info)).headers.get('access-control-allow-origin')).toBe(
+    '*'
+  )
+})
+
 it('refuses a foreign origin by default, naming it, localhost included', async () => {
   const error = vi.spyOn(console, 'error').mockImplementation(() => {})
   const url = `${local.origin}/`
