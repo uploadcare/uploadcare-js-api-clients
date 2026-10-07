@@ -1,5 +1,5 @@
 import { isRecord } from '../../core/body.js'
-import { route } from '../../core/router.js'
+import { route, type Route } from '../../core/router.js'
 import { sessionOf } from '../../state/store.js'
 
 /**
@@ -21,9 +21,11 @@ import { sessionOf } from '../../state/store.js'
  * fire-and-forget from the client's side, so a strict emulator would fail tests
  * over a shape mismatch the real endpoint would have silently accepted.
  */
-route('POST', '/api/v1/events', async ({ request }) => {
-  const session = sessionOf(request)
-  const body = await request.json().catch(() => undefined)
-  if (isRecord(body)) session.telemetry.push(body)
-  return Response.json({})
-})
+export const telemetryRoutes: Route[] = [
+  route('POST', '/api/v1/events', async ({ request }) => {
+    const session = sessionOf(request)
+    const body = await request.json().catch(() => undefined)
+    if (isRecord(body)) session.telemetry.push(body)
+    return Response.json({})
+  })
+]

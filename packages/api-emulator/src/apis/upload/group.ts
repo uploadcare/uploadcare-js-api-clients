@@ -1,5 +1,5 @@
 import { apiError } from '../../core/responses.js'
-import { route } from '../../core/router.js'
+import { route, type Route } from '../../core/router.js'
 import {
   fileInfo,
   nextUuid,
@@ -91,69 +91,70 @@ const groupEnvelope = (
   }))
 })
 
-route(
-  'POST',
-  '/group/',
-  async ({ request }) => {
-    const session = sessionOf(request)
-    const form = await request.formData().catch(() => new FormData())
-    const query = new URL(request.url).searchParams
+export const groupRoutes: Route[] = [
+  route(
+    'POST',
+    '/group/',
+    async ({ request }) => {
+      const session = sessionOf(request)
+      const form = await request.formData().catch(() => new FormData())
+      const query = new URL(request.url).searchParams
 
-    // Only for the STUB_GROUP_MEMBER scenario check below — the
-    // public-key gate itself is the router's (`{ protected: { source: 'both'
-    // } }`).
-    const publicKey = asString(form.get('pub_key')) ?? query.get('pub_key')
+      // Only for the STUB_GROUP_MEMBER scenario check below — the
+      // public-key gate itself is the router's (`{ protected: { source: 'both'
+      // } }`).
+      const publicKey = asString(form.get('pub_key')) ?? query.get('pub_key')
 
-    const tokens = [...form.entries(), ...query.entries()]
-      .filter(([key]) => MEMBER_KEY.test(key))
-      .map(([, value]) => memberToken(value))
+      const tokens = [...form.entries(), ...query.entries()]
+        .filter(([key]) => MEMBER_KEY.test(key))
+        .map(([, value]) => memberToken(value))
 
-    if (tokens.length === 0)
-      // schema: groupFileURLParsingFailedError
-      return apiError(request, 400, 'No files[N] parameters found.')
+      if (tokens.length === 0)
+        // schema: groupFileURLParsingFailedError
+        return apiError(request, 400, 'No files[N] parameters found.')
 
-    const members: GroupMember[] = []
-    for (const raw of tokens) {
-      const parsed = parseMember(raw)
-      if (!parsed)
-        // schema: groupFilesInvalidError
-        return apiError(request, 400, `This is not valid file url: ${raw}.`)
-      members.push(parsed)
-    }
-    const stubAllowed = publicKey !== GROUP_FILES_NOT_FOUND_KEY
-    const isKnown = ({ uuid }: GroupMember) =>
-      session.files.has(uuid) ||
-      session.groups.has(uuid) ||
-      (stubAllowed && uuid === STUB_GROUP_MEMBER)
+      const members: GroupMember[] = []
+      for (const raw of tokens) {
+        const parsed = parseMember(raw)
+        if (!parsed)
+          // schema: groupFilesInvalidError
+          return apiError(request, 400, `This is not valid file url: ${raw}.`)
+        members.push(parsed)
+      }
+      const stubAllowed = publicKey !== GROUP_FILES_NOT_FOUND_KEY
+      const isKnown = ({ uuid }: GroupMember) =>
+        session.files.has(uuid) ||
+        session.groups.has(uuid) ||
+        (stubAllowed && uuid === STUB_GROUP_MEMBER)
 
-    if (!members.every(isKnown))
-      // schema: groupFilesNotFoundError — see scenarios.ts.
-      return apiError(request, 400, 'Some files not found.')
+      if (!members.every(isKnown))
+        // schema: groupFilesNotFoundError — see scenarios.ts.
+        return apiError(request, 400, 'Some files not found.')
 
-    const id = `${nextUuid(session)}~${members.length}`
-    session.groups.set(id, members)
-    return Response.json(groupEnvelope(session, id, members))
-  },
-  { protected: { source: 'both' } }
-)
+      const id = `${nextUuid(session)}~${members.length}`
+      session.groups.set(id, members)
+      return Response.json(groupEnvelope(session, id, members))
+    },
+    { protected: { source: 'both' } }
+  ),
+  route(
+    'GET',
+    '/group/info/',
+    ({ request }) => {
+      const session = sessionOf(request)
+      const params = new URL(request.url).searchParams
+      const id = params.get('group_id')
+      if (!id)
+        // schema: groupIdRequiredError
+        return apiError(request, 400, 'group_id is required.')
 
-route(
-  'GET',
-  '/group/info/',
-  ({ request }) => {
-    const session = sessionOf(request)
-    const params = new URL(request.url).searchParams
-    const id = params.get('group_id')
-    if (!id)
-      // schema: groupIdRequiredError
-      return apiError(request, 400, 'group_id is required.')
+      const members = session.groups.get(id)
+      if (!members)
+        // schema: groupNotFoundError
+        return apiError(request, 404, 'group_id is invalid.')
 
-    const members = session.groups.get(id)
-    if (!members)
-      // schema: groupNotFoundError
-      return apiError(request, 404, 'group_id is invalid.')
-
-    return Response.json(groupEnvelope(session, id, members))
-  },
-  { protected: true }
-)
+      return Response.json(groupEnvelope(session, id, members))
+    },
+    { protected: true }
+  )
+]

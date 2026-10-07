@@ -107,13 +107,10 @@ it.runIf(existsSync(distRoot))('keeps the built "." bundle free of msw', () => {
 })
 
 /**
- * The regression this repo actually shipped (PR #586): `sideEffects: false`
- * plus Rollup's `treeshake: 'smallest'` preset (which sets `moduleSideEffects:
- * false`) tree-shook away the side-effect-only imports in `index.ts` that
- * register every route. `dist/index.js` built clean, exported `handle`,
- * typechecked — and answered nothing. A source-level test can't catch this:
- * `src/index.ts` still has the imports, tree-shaking is a build step. This has
- * to import the actual built artifact and prove it answers.
+ * The regression this repo actually shipped (PR #586): a tree-shaking setting
+ * dropped every route from `dist/index.js`, which built clean, exported
+ * `handle`, typechecked — and answered nothing. A source-level test can't catch
+ * that; only importing the built artifact can.
  */
 it.runIf(existsSync(distRoot))(
   'answers real requests from the built "." bundle, across all three APIs',

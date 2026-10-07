@@ -22,14 +22,12 @@ export type ProtectedConfig = {
   source?: 'query' | 'body' | 'both'
 }
 
-type Route = {
+export type Route = {
   method: string
   segments: string[]
   handler: RouteHandler
   protected?: ProtectedConfig
 }
-
-const routes: Route[] = []
 
 /**
  * `/multipart/upload/:uuid/original/` — `:name` captures one segment, a
@@ -44,14 +42,12 @@ export const route = (
   path: string,
   handler: RouteHandler,
   options?: { protected?: ProtectedConfig | true }
-) => {
-  routes.push({
-    method,
-    segments: path.split('/').filter(Boolean),
-    handler,
-    protected: options?.protected === true ? {} : options?.protected
-  })
-}
+): Route => ({
+  method,
+  segments: path.split('/').filter(Boolean),
+  handler,
+  protected: options?.protected === true ? {} : options?.protected
+})
 
 const matchRoute = (candidate: Route, method: string, pathname: string) => {
   if (candidate.method !== method) return undefined
@@ -82,31 +78,34 @@ const extractPublicKey = async (
   return (await bodyPublicKey(request, paramName)) ?? fromQuery()
 }
 
-/** The Upload API answers with or without the trailing slash, and so must this. */
-export const handle = async (
-  request: Request
-): Promise<Response | undefined> => {
-  const { pathname } = new URL(request.url)
-  for (const candidate of routes) {
-    const params = matchRoute(candidate, request.method, pathname)
-    if (params) {
-      if (candidate.protected) {
-        const paramName = candidate.protected.paramName ?? 'pub_key'
-        const publicKey = await extractPublicKey(request, candidate.protected)
-        const gateError = await authorize(
-          request,
-          publicKey,
-          paramName,
-          pathname.endsWith('/') ? pathname : `${pathname}/`,
-          sessionOf(request)
-        )
-        if (gateError) return gateError
+/**
+ * The first answer from `routes`, tried in order. The Upload API answers with
+ * or without the trailing slash, and so must this.
+ */
+export const createRouter =
+  (routes: readonly Route[]) =>
+  async (request: Request): Promise<Response | undefined> => {
+    const { pathname } = new URL(request.url)
+    for (const candidate of routes) {
+      const params = matchRoute(candidate, request.method, pathname)
+      if (params) {
+        if (candidate.protected) {
+          const paramName = candidate.protected.paramName ?? 'pub_key'
+          const publicKey = await extractPublicKey(request, candidate.protected)
+          const gateError = await authorize(
+            request,
+            publicKey,
+            paramName,
+            pathname.endsWith('/') ? pathname : `${pathname}/`,
+            sessionOf(request)
+          )
+          if (gateError) return gateError
+        }
+        // `undefined` is "not mine after all" — keep looking, so a broad
+        // pattern (the CDN's `/:uuid/*`) can't shadow a later, narrower route.
+        const answer = await candidate.handler({ request, params })
+        if (answer) return answer
       }
-      // `undefined` is "not mine after all" — keep looking, so a broad
-      // pattern (the CDN's `/:uuid/*`) can't shadow a later, narrower route.
-      const answer = await candidate.handler({ request, params })
-      if (answer) return answer
     }
+    return undefined
   }
-  return undefined
-}
