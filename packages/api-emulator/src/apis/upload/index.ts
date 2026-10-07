@@ -4,7 +4,6 @@ import { fromUrlRoutes } from './from-url.js'
 import { groupRoutes } from './group.js'
 import { infoRoutes } from './info.js'
 import { multipartRoutes } from './multipart.js'
-import { throttleRoutes } from './throttle.js'
 
 export const uploadRoutes = [
   ...baseRoutes,
@@ -12,6 +11,5 @@ export const uploadRoutes = [
   ...fromUrlRoutes,
   ...groupRoutes,
   ...infoRoutes,
-  ...multipartRoutes,
-  ...throttleRoutes
+  ...multipartRoutes
 ]

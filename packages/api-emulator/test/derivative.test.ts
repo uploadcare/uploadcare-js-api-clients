@@ -317,13 +317,13 @@ it('checks the public key in the JSON body before anything else', async () => {
   })
 })
 
-it('throttles once on metadata.mock_throttle, read from the JSON body', async () => {
-  const send = () => generate({ metadata: { mock_throttle: 'derivative-1' } })
-  expect(await jsonError(await send())).toMatchObject({
+it('answers the throttle preset in the JSON envelope the client reads', async () => {
+  resetSession().use('throttle', { match: 'POST /derivative/image/generate/' })
+  expect(await jsonError(await generate())).toMatchObject({
     status_code: 429,
     error_code: 'RequestThrottledError'
   })
-  await jobIdOf(await send())
+  await jobIdOf(await generate())
 })
 
 it('runs a signed-uploads project end to end on a Bearer token', async () => {

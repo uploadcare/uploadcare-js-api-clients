@@ -24,7 +24,7 @@ export const apiError = (
   status: number,
   content: string,
   errorCode?: string,
-  /** Extra response headers — throttle-once's `retry-after`, say. */
+  /** Extra response headers — the throttle preset's `retry-after`, say. */
   headers?: Record<string, string>
 ): Response => {
   const jsonerrors = new URL(request.url).searchParams.get('jsonerrors')

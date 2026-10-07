@@ -115,15 +115,6 @@ export const SIGNED_UPLOADS_PUBLIC_KEY = 'pub_test__signed_uploads'
 export const SIGNED_UPLOADS_SECRET_KEY = 'mock_secret_key'
 
 /**
- * `upload-client`'s `test/api/authToken.test.ts` ("should refresh an expired
- * token that surfaces after a throttle retry") sends `metadata: {
- * mock_throttle: '<key>' }` to have the first request carrying a given key
- * answered 429 with `retry-after: 1`; every later one with the same key passes.
- * The key is spent per session — tests use a unique one per run.
- */
-export const THROTTLE_ONCE_FIELD = 'metadata[mock_throttle]'
-
-/**
  * Ai-image-editor's `errorCodes.ts` (`derivative_disabled`): a project without
  * AI generation. `POST /derivative/image/generate/` and `.../edit/` under this
  * otherwise ordinary allowed key (see `auth.ts`) answer `derivative_disabled`
