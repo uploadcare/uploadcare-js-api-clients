@@ -1,4 +1,4 @@
-import { storedBy } from '../../core/body.js'
+import { bodyFields, storedBy } from '../../core/body.js'
 import { apiError, dropConnection } from '../../core/responses.js'
 import { route, type Route } from '../../core/router.js'
 import { protect } from './auth.js'
@@ -18,9 +18,6 @@ const MULTIPART_CHUNK_SIZE = 5 * 1024 * 1024
  * ponytail: 100 GiB (20480 parts); raise it if a test ever needs bigger.
  */
 const MULTIPART_MAX_SIZE = 100 * 1024 ** 3
-
-const asString = (value: FormDataEntryValue | null) =>
-  typeof value === 'string' ? value : null
 
 export const multipartRoutes: Route[] = [
   /**
@@ -61,14 +58,14 @@ export const multipartRoutes: Route[] = [
     '/multipart/start/',
     protect(async ({ request }) => {
       const session = sessionOf(request)
-      const form = await request.formData().catch(() => new FormData())
+      const fields = await bodyFields(request)
 
-      const filename = asString(form.get('filename'))
+      const filename = fields.get('filename')
       if (!filename)
         // schema: requestParamRequiredError
         return apiError(request, 400, 'filename is required.')
 
-      const sizeRaw = asString(form.get('size'))
+      const sizeRaw = fields.get('size')
       const size = sizeRaw ? Number(sizeRaw) : NaN
       if (!Number.isSafeInteger(size))
         // schema: multipartSizeInvalidError
@@ -86,7 +83,7 @@ export const multipartRoutes: Route[] = [
         // schema: multipartFileSizeLimitExceededError
         return apiError(request, 400, 'File size exceeds project limit.')
 
-      const contentType = asString(form.get('content_type'))
+      const contentType = fields.get('content_type')
       if (!contentType)
         // schema: requestParamRequiredError
         return apiError(request, 400, 'content_type is required.')
@@ -98,7 +95,7 @@ export const multipartRoutes: Route[] = [
         name: filename,
         size,
         mimeType: contentType,
-        isStored: storedBy(form.get('UPLOADCARE_STORE')),
+        isStored: storedBy(fields.get('UPLOADCARE_STORE') ?? null),
         parts: Array.from({ length: partCount }, () => undefined)
       })
 
@@ -119,9 +116,9 @@ export const multipartRoutes: Route[] = [
     '/multipart/complete/',
     protect(async ({ request }) => {
       const session = sessionOf(request)
-      const form = await request.formData().catch(() => new FormData())
+      const fields = await bodyFields(request)
 
-      const uuid = asString(form.get('uuid'))
+      const uuid = fields.get('uuid')
       if (!uuid)
         // schema: multipartFileIdRequiredError
         return apiError(request, 400, 'uuid is required.')
@@ -148,14 +145,7 @@ export const multipartRoutes: Route[] = [
       // file it really assembled, and `/info/` and the CDN then agree with it.
       // It does mean `upload.size` is written and never read — it stays only
       // because `/multipart/start/` needs it to work out the part count.
-      const bytes = new Uint8Array(
-        received.reduce((total, part) => total + part.byteLength, 0)
-      )
-      let offset = 0
-      for (const part of received) {
-        bytes.set(part, offset)
-        offset += part.byteLength
-      }
+      const bytes = new Uint8Array(await new Blob(received).arrayBuffer())
 
       // Under the uuid /multipart/start/ handed out, so /info/ and the CDN
       // answer for it.
