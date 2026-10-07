@@ -88,12 +88,9 @@ it('hands out one part url per 5MB chunk, on its own origin', async () => {
     parts: string[]
     uuid: string
   }
-  await assertMatchesSpec({
+  await assertMatchesSpec(response, {
     method: 'post',
-    path: '/multipart/start/',
-    status: 200,
-    response,
-    body
+    path: '/multipart/start/'
   })
 
   expect(body.parts).toHaveLength(3)
@@ -131,12 +128,9 @@ it('describes the finished file once the upload is completed', async () => {
     original_filename: 'big.jpg',
     size: assembled.byteLength
   })
-  await assertMatchesSpec({
+  await assertMatchesSpec(completed, {
     method: 'post',
-    path: '/multipart/complete/',
-    status: 200,
-    response: completed,
-    body
+    path: '/multipart/complete/'
   })
 
   // Stored like any other file: /info/ can answer about it afterwards.

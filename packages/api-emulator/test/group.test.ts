@@ -22,13 +22,7 @@ it('builds a group out of files it holds', async () => {
     datetime_created: string
     datetime_stored: string | null
   }
-  await assertMatchesSpec({
-    method: 'post',
-    path: '/group/',
-    status: 200,
-    response,
-    body: group
-  })
+  await assertMatchesSpec(response, { method: 'post', path: '/group/' })
 
   expect(group.id).toMatch(/~2$/)
   expect(group.files_count).toBe(2)
@@ -53,13 +47,7 @@ it('builds a group out of files it holds', async () => {
     datetime_created: group.datetime_created,
     datetime_stored: null
   })
-  await assertMatchesSpec({
-    method: 'get',
-    path: '/group/info/',
-    status: 200,
-    response: info,
-    body: infoBody
-  })
+  await assertMatchesSpec(info, { method: 'get', path: '/group/info/' })
 })
 
 it('refuses a group containing a file nobody uploaded', async () => {

@@ -15,12 +15,9 @@ const poll = async (token: string) => {
     `https://upload.uploadcare.com/from_url/status/?token=${token}`
   )
   const body = (await response.clone().json()) as Record<string, unknown>
-  await assertMatchesSpec({
+  await assertMatchesSpec(response, {
     method: 'get',
-    path: '/from_url/status/',
-    status: response.status,
-    response,
-    body
+    path: '/from_url/status/'
   })
   return body
 }
@@ -45,13 +42,7 @@ it('refuses a request with no source_url', async () => {
   expect(parsed).toMatchObject({
     error: { content: 'source_url is required.' }
   })
-  await assertMatchesSpec({
-    method: 'post',
-    path: '/from_url/',
-    status: 400,
-    response,
-    body: parsed
-  })
+  await assertMatchesSpec(response, { method: 'post', path: '/from_url/' })
 })
 
 it('refuses a host that does not exist', async () => {
@@ -88,13 +79,7 @@ it('reports progress before it succeeds, and names the file from the url', async
     `pub_key=demopublickey&source_url=${encodeURIComponent(SOURCE)}`
   )
   const parsed = (await post200.clone().json()) as { token: string }
-  await assertMatchesSpec({
-    method: 'post',
-    path: '/from_url/',
-    status: 200,
-    response: post200,
-    body: parsed
-  })
+  await assertMatchesSpec(post200, { method: 'post', path: '/from_url/' })
   const { token } = parsed
 
   expect(await poll(token)).toMatchObject({ status: 'progress' })
@@ -151,13 +136,7 @@ it('shortcuts to the file info only once the source has been seen before', async
 
   const response = await post(query)
   const parsed = (await response.clone().json()) as Record<string, unknown>
-  await assertMatchesSpec({
-    method: 'post',
-    path: '/from_url/',
-    status: 200,
-    response,
-    body: parsed
-  })
+  await assertMatchesSpec(response, { method: 'post', path: '/from_url/' })
   expect(parsed).toMatchObject({
     type: 'file_info',
     original_filename: 'holiday.jpg'

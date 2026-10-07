@@ -16,13 +16,7 @@ const upload = async (name = 'pixel.jpg', bytes = PIXEL) => {
     fields: { UPLOADCARE_STORE: 'auto' }
   })
   const parsed = (await response.clone().json()) as { file: string }
-  await assertMatchesSpec({
-    method: 'post',
-    path: '/base/',
-    status: 200,
-    response,
-    body: parsed
-  })
+  await assertMatchesSpec(response, { method: 'post', path: '/base/' })
   return parsed
 }
 
@@ -40,13 +34,7 @@ it('describes the file that was actually uploaded', async () => {
     `https://upload.uploadcare.com/info/?pub_key=demopublickey&file_id=${file}`
   )
   const parsed = await response.clone().json()
-  await assertMatchesSpec({
-    method: 'get',
-    path: '/info/',
-    status: 200,
-    response,
-    body: parsed
-  })
+  await assertMatchesSpec(response, { method: 'get', path: '/info/' })
   expect(parsed).toMatchObject({
     uuid: file,
     original_filename: 'holiday.jpg',
@@ -85,13 +73,7 @@ const noPubKey = (query = '') => {
 it('refuses an upload with no UPLOADCARE_PUB_KEY', async () => {
   const response = await noPubKey()
   expect(response.status).toBe(403)
-  await assertMatchesSpec({
-    method: 'post',
-    path: '/base/',
-    status: 403,
-    response,
-    body: await response.clone().text()
-  })
+  await assertMatchesSpec(response, { method: 'post', path: '/base/' })
 })
 
 it('names UPLOADCARE_PUB_KEY, not pub_key, in that error', async () => {
@@ -106,13 +88,7 @@ it('400s for /info/ without a file_id', async () => {
     'https://upload.uploadcare.com/info/?pub_key=demopublickey'
   )
   expect(response.status).toBe(400)
-  await assertMatchesSpec({
-    method: 'get',
-    path: '/info/',
-    status: response.status,
-    response,
-    body: await response.clone().text()
-  })
+  await assertMatchesSpec(response, { method: 'get', path: '/info/' })
   expect(await response.clone().text()).toContain('file_id is required.')
 })
 
@@ -121,11 +97,5 @@ it('404s for a file nobody uploaded', async () => {
     'https://upload.uploadcare.com/info/?pub_key=demopublickey&file_id=nope'
   )
   expect(response.status).toBe(404)
-  await assertMatchesSpec({
-    method: 'get',
-    path: '/info/',
-    status: response.status,
-    response,
-    body: await response.clone().text()
-  })
+  await assertMatchesSpec(response, { method: 'get', path: '/info/' })
 })
