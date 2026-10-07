@@ -1,4 +1,3 @@
-import { createHash, createHmac } from 'node:crypto'
 import { beforeEach, expect, it } from 'vitest'
 import {
   CONTENT_MODERATED_PROMPT,
@@ -6,11 +5,10 @@ import {
   DERIVATIVE_INSTANT_PUBLIC_KEY,
   PROVIDER_UNAVAILABLE_PROMPT,
   resetSession,
-  SIGNED_UPLOADS_PUBLIC_KEY,
-  SIGNED_UPLOADS_SECRET_KEY
+  SIGNED_UPLOADS_PUBLIC_KEY
 } from '../src/index.js'
 import { STOCK_IMAGE } from '../src/state/stock-image.js'
-import { call, upload } from './emulator.js'
+import { call, token, upload } from './emulator.js'
 import { jsonError } from './spec.js'
 
 /**
@@ -328,23 +326,8 @@ it('throttles once on metadata.mock_throttle, read from the JSON body', async ()
   await jobIdOf(await send())
 })
 
-const now = () => Math.floor(Date.now() / 1000)
-const encode = (value: object) =>
-  Buffer.from(JSON.stringify(value)).toString('base64url')
-const sign = (claims: object) => {
-  const header = encode({ alg: 'HS256', typ: 'JWT' })
-  const payload = encode({ exp: now() + 600, ...claims })
-  const key = createHash('sha256')
-    .update(SIGNED_UPLOADS_SECRET_KEY, 'utf8')
-    .digest()
-  const signature = createHmac('sha256', key)
-    .update(`${header}.${payload}`)
-    .digest('base64url')
-  return `${header}.${payload}.${signature}`
-}
-
 it('runs a signed-uploads project end to end on a Bearer token', async () => {
-  const authorization = `Bearer ${sign({})}`
+  const authorization = `Bearer ${token()}`
   expect(
     await jsonError(await generate({ pub_key: SIGNED_UPLOADS_PUBLIC_KEY }))
   ).toMatchObject({ error_code: 'SignatureRequiredError' })
@@ -368,7 +351,7 @@ it('runs a signed-uploads project end to end on a Bearer token', async () => {
 })
 
 it('scopes a Bearer token by the derivative path', async () => {
-  const authorization = `Bearer ${sign({
+  const authorization = `Bearer ${token({
     uc: { restrictions: { scope: ['/derivative/image/edit/'] } }
   })}`
   const response = await post(
