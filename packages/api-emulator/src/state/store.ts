@@ -208,7 +208,7 @@ export const store = (session: Session, file: Omit<StoredFile, 'uuid'>) => {
  */
 const sanitize = (name: string) => name.replace(/[^\w.-]/g, '')
 
-const imageInfo = (file: StoredFile) =>
+export const imageInfo = (file: StoredFile) =>
   file.image && {
     dpi: [72, 72],
     width: file.image.width,
