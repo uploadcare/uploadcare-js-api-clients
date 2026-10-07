@@ -47,7 +47,7 @@ const secretKey = isProduction
 
 /** Skipped rather than failed where the production keys are not configured. */
 const describeContract = publicKey && secretKey ? describe : describe.skip
-const describeMockOnly = isProduction ? describe.skip : describe
+const describeEmulatorOnly = isProduction ? describe.skip : describe
 
 /** Trap for errors: resolves to the thrown error, or null on success. */
 const caught = (promise: Promise<unknown>): Promise<UploadError | null> =>
@@ -451,7 +451,7 @@ describeContract('authToken', () => {
  * carrying a valid token. Succeeding there is what proves the header is read
  * before the key, and no real project will play along.
  */
-describeMockOnly('authToken (mock server only)', () => {
+describeEmulatorOnly('authToken (emulator only)', () => {
   it('should refresh an expired token that surfaces after a throttle retry', async () => {
     // The sequence that made the refresh unreachable: the retrier's `attempt`
     // counter is shared, so keying the refresh off it meant a token which

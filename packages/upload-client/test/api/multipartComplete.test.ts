@@ -86,13 +86,8 @@ describe('API - multipartComplete', () => {
 
     const upload = multipartComplete('', settings)
 
-    // Not `toThrowError(new UploadError('uuid is required.'))`: vitest 3's
-    // `toThrowError`, given an Error instance, compares the whole object, and
-    // a real `UploadError` always carries `request`/`response`/`headers`
-    // populated from the actual round trip, which that literal never would.
-    // Message-only comparison (as jest's equivalent matcher did) is what this
-    // test means to check — see the "should be able to cancel uploading" fix
-    // above for the same class of bug.
+    // A real `UploadError` carries the round trip's request/response/headers,
+    // so check its class and message rather than comparing a literal instance.
     await expect(upload).rejects.toThrow(UploadError)
     await expect(upload).rejects.toThrow('uuid is required.')
   })
