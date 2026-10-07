@@ -43,7 +43,12 @@ const uuids: { [key: string]: { publicKey: string; uuid: string } } = {
     uuid: ''
   },
   multipart: {
-    publicKey: 'pub_test__no_storing',
+    // TEMPORARY: the emulator no longer knows this key (it never behaved
+    // differently there); production still has the project.
+    publicKey:
+      process.env.TEST_ENV === 'production'
+        ? 'pub_test__no_storing'
+        : 'secret_public_key',
     uuid: ''
   },
   unknownProgress: {

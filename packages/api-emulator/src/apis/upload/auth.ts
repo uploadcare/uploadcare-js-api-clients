@@ -2,7 +2,6 @@ import { bodyFields } from '../../core/body.js'
 import { apiError } from '../../core/responses.js'
 import type { RouteContext, RouteHandler } from '../../core/router.js'
 import { type Session, sessionOf } from '../../state/store.js'
-import { NO_STORING_KEY } from './scenarios.js'
 
 /**
  * The secret Bearer tokens are verified against: HS256 keyed with
@@ -20,8 +19,7 @@ export const SIGNED_UPLOADS_SECRET_KEY = 'mock_secret_key'
 const ALLOWED_PUBLIC_KEYS = [
   'demopublickey',
   // Public test fixture, not a real credential.
-  'secret_public_key',
-  NO_STORING_KEY
+  'secret_public_key'
 ]
 
 /**

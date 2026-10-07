@@ -5,14 +5,6 @@
  */
 
 /**
- * `upload-client`'s multipart fixtures (`_fixtureFactory.ts`'s `multipart`
- * entry) use this public key. Not read by `/from_url/` itself — kept here so
- * `auth.ts`'s allow-list and the multipart routes share one spelling instead of
- * two.
- */
-export const NO_STORING_KEY = 'pub_test__no_storing'
-
-/**
  * The port `upload-client`'s suite runs the emulator on, on the `127.0.0.1`
  * that `listen.ts` binds. Its dev settings point `baseCDN`/`baseURL` at this
  * origin, and its "valid" `from_url` fixture (`_fixtureFactory.ts`'s
