@@ -31,15 +31,17 @@ export const NO_STORING_KEY = 'pub_test__no_storing'
 export const UNREACHABLE_SOURCE_URL = 'https://1.com/1.jpg'
 
 /**
- * The emulator's own default origin: `cli.ts`'s default `PORT` on the
- * `127.0.0.1` that `listen.ts` binds. `upload-client`'s dev settings point
- * `baseCDN`/`baseURL` at exactly this host, and its "valid" `from_url` fixture
- * (`_fixtureFactory.ts`'s `imageUrl('valid')`) is a URL on it — so it has to be
- * reachable. It is `127.0.0.1` rather than `localhost` because `localhost` can
- * resolve to `::1` first, where another dev server on port 3000 would answer
- * instead of the IPv4-only emulator.
+ * The port `upload-client`'s suite runs the emulator on, on the `127.0.0.1`
+ * that `listen.ts` binds. Its dev settings point `baseCDN`/`baseURL` at this
+ * origin, and its "valid" `from_url` fixture (`_fixtureFactory.ts`'s
+ * `imageUrl('valid')`) is a URL on it, so that host has to be reachable (see
+ * `REACHABLE_HOSTS`). It is `127.0.0.1` rather than `localhost` because
+ * `localhost` can resolve to `::1` first, where another dev server on the same
+ * port would answer instead of the IPv4-only emulator.
  */
-const EMULATOR_OWN_HOST = '127.0.0.1:3000'
+export const EMULATOR_PORT = 3000
+
+const EMULATOR_OWN_HOST = `127.0.0.1:${EMULATOR_PORT}`
 
 /**
  * `URL.parse(url)?.host`, spelled with `canParse` because the repo's root
@@ -64,12 +66,11 @@ export const isPrivateSourceUrl = (sourceUrl: string): boolean => {
  * implies — so the emulator has no other way to learn that a host doesn't
  * resolve the way the real service would; it has to be told.
  *
- * `127.0.0.1:3000` covers `upload-client`'s own dev-settings host (see
- * `EMULATOR_OWN_HOST`). The rest mirror the browser fake's list
- * (`tests/utils/fake-uploadcare/upload-api.ts` in the file-uploader repo): that
- * suite's from-url validation tests point at a host that is deliberately _not_
- * in this list to get the poll-time `Host does not exist` failure (see
- * `from-url.ts`), rather than the fast, synchronous one
+ * `EMULATOR_OWN_HOST` covers `upload-client`'s own dev-settings host. The rest
+ * mirror the browser fake's list (`tests/utils/fake-uploadcare/upload-api.ts`
+ * in the file-uploader repo): that suite's from-url validation tests point at a
+ * host that is deliberately _not_ in this list to get the poll-time `Host does
+ * not exist` failure (see `from-url.ts`), rather than the fast, synchronous one
  * `UNREACHABLE_SOURCE_URL` triggers above.
  */
 export const REACHABLE_HOSTS = [

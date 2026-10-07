@@ -33,7 +33,7 @@ jobs:
             upload-client:
               - 'packages/upload-client/**'
               - 'packages/api-client-utils/**'
-              # The whole suite runs against the emulator (`mock:start`), so an
+              # The whole suite runs against the emulator (`test/_emulator.ts`), so an
               # emulator-only change has to re-run it.
               - 'packages/api-emulator/**'
             api-emulator:
