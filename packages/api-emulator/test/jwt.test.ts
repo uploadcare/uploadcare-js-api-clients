@@ -1,11 +1,10 @@
-import { createHash, createHmac } from 'node:crypto'
 import { beforeEach, expect, it } from 'vitest'
 import {
   resetSession,
   SIGNED_UPLOADS_PUBLIC_KEY,
   SIGNED_UPLOADS_SECRET_KEY
 } from '../src/index.js'
-import { call } from './emulator.js'
+import { call, now, sign, token } from './emulator.js'
 import { assertMatchesSpec, jsonError } from './spec.js'
 
 /**
@@ -18,28 +17,6 @@ import { assertMatchesSpec, jsonError } from './spec.js'
  */
 
 beforeEach(() => resetSession())
-
-const now = () => Math.floor(Date.now() / 1000)
-
-const encode = (value: object) =>
-  Buffer.from(JSON.stringify(value)).toString('base64url')
-
-/** HS256 keyed with `sha256(secret)`, the way `generateAuthToken` signs. */
-const sign = (
-  claims: object,
-  secret = SIGNED_UPLOADS_SECRET_KEY,
-  protectedHeader: object = { alg: 'HS256', typ: 'JWT' }
-) => {
-  const header = encode(protectedHeader)
-  const payload = encode(claims)
-  const key = createHash('sha256').update(secret, 'utf8').digest()
-  const signature = createHmac('sha256', key)
-    .update(`${header}.${payload}`)
-    .digest('base64url')
-  return `${header}.${payload}.${signature}`
-}
-
-const token = (claims: object = {}) => sign({ exp: now() + 600, ...claims })
 
 const base = (
   options: {

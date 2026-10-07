@@ -1,4 +1,9 @@
-import { handle, SESSION_HEADER } from '../src/index.js'
+import { createHash, createHmac } from 'node:crypto'
+import {
+  handle,
+  SESSION_HEADER,
+  SIGNED_UPLOADS_SECRET_KEY
+} from '../src/index.js'
 
 /**
  * The shortest bytes `imageSize` decodes as a real 1×1 JPEG: SOI, then an SOF0
@@ -77,3 +82,32 @@ export const createGroup = (
     { session }
   )
 }
+
+export const now = () => Math.floor(Date.now() / 1000)
+
+const encode = (value: object) =>
+  Buffer.from(JSON.stringify(value)).toString('base64url')
+
+/**
+ * HS256 keyed with `sha256(secret)`, the way `generateAuthToken` signs. Written
+ * out rather than imported from `@uploadcare/signed-uploads`, so the verifier
+ * isn't tested against the code it checks, and so a test can sign claims
+ * `generateAuthToken` refuses to mint.
+ */
+export const sign = (
+  claims: object,
+  secret = SIGNED_UPLOADS_SECRET_KEY,
+  protectedHeader: object = { alg: 'HS256', typ: 'JWT' }
+) => {
+  const header = encode(protectedHeader)
+  const payload = encode(claims)
+  const key = createHash('sha256').update(secret, 'utf8').digest()
+  const signature = createHmac('sha256', key)
+    .update(`${header}.${payload}`)
+    .digest('base64url')
+  return `${header}.${payload}.${signature}`
+}
+
+/** A token the emulator accepts: `claims` plus an `exp` ten minutes out. */
+export const token = (claims: object = {}) =>
+  sign({ exp: now() + 600, ...claims })
