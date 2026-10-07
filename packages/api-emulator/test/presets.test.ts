@@ -30,8 +30,7 @@ it('refuses a preset it does not have', () => {
   )
 })
 
-it('refuses args of the wrong shape', () => {
-  expect(() => session.use('throttle', {} as never)).toThrow(TypeError)
+it('refuses a throttle `times` that is not a positive integer', () => {
   expect(() =>
     session.use('throttle', { match: 'POST /base/', times: 0 })
   ).toThrow(TypeError)
@@ -138,12 +137,6 @@ it('signedUploads: with a publicKey, turns it on for that project alone, which i
     (await jsonError(await uploadJson({ pubKey: 'pub_signed' }))).error_code
   ).toBe('SignatureRequiredError')
   expect(await uploadJson().then((r) => r.json())).toHaveProperty('file')
-})
-
-it('signedUploads: refuses a publicKey that is not a string', () => {
-  expect(() => session.use('signedUploads', { publicKey: 1 as never })).toThrow(
-    TypeError
-  )
 })
 
 const SOURCE = 'https://images.unsplash.com/photo-1?dl=holiday.jpg'

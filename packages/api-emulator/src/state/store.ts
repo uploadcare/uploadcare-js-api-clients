@@ -2,11 +2,12 @@
  * What the fake Uploadcare keeps: the files uploaded to it, the groups built
  * from them, and the `from_url` and derivative jobs still being polled.
  *
- * All of it is per session, and a session is one test file's page. The suite
- * runs its files in parallel against one fake, so a single shared store would
- * mean one file's upload being answered with another's — and clearing it
- * between tests would drop a file that a test still running elsewhere was about
- * to ask about.
+ * All of it is per session, named by a request's `SESSION_HEADER` (the
+ * `'default'` session without one). A suite that runs its files in parallel
+ * against one shared emulator, a single `./listen` server say, sets a header
+ * per file: with one store, one file's upload could be answered with another's,
+ * and a reset between tests would drop a file that a test still running
+ * elsewhere was about to ask about.
  */
 
 import type { Scenario } from '../core/scenarios.js'
@@ -161,16 +162,6 @@ export const resetSession = (id = 'default') => {
     storeStockImage(session, 'demo.jpg', true, uuid)
   sessions.set(id, session)
   return session
-}
-
-/**
- * Drops a session's scenarios and the settings presets made, keeping its files
- * and jobs (a file `storedFile` stored included).
- */
-export const clearScenarios = (session: Session) => {
-  session.scenarios.length = 0
-  session.publicKeys.clear()
-  session.signedUploads = new Set()
 }
 
 /**

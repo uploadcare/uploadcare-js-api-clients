@@ -49,18 +49,6 @@ const parseMatch = (match: string): Exclude<ScenarioMatch, string> => {
   return { method, path }
 }
 
-/** The object form arrives as JSON from `./listen`'s control endpoint too. */
-const checkMatch = (match: Exclude<ScenarioMatch, string>) => {
-  if (typeof match !== 'object' || match === null)
-    throw new TypeError(`A scenario match is a string or an object`)
-  for (const value of [match.method, match.path, match.host])
-    if (value !== undefined && typeof value !== 'string')
-      throw new TypeError(
-        `A scenario match's method, path and host are strings`
-      )
-  return match
-}
-
 export const scenario = (
   match: ScenarioMatch,
   handler: ScenarioHandler,
@@ -69,7 +57,7 @@ export const scenario = (
   if (times !== undefined && !(Number.isInteger(times) && times > 0))
     throw new TypeError(`times is a positive integer, got ${times}`)
   const { method, path, host } =
-    typeof match === 'string' ? parseMatch(match) : checkMatch(match)
+    typeof match === 'string' ? parseMatch(match) : match
   const segments = path === undefined ? undefined : segmentsOf(path)
   const matches = (request: Request) => {
     const url = new URL(request.url)

@@ -36,9 +36,6 @@ const { origin, close } = await createEmulatorServer({ port: 0, delayMs: 30 })
 await close()
 ```
 
-A test in another process steers the server's sessions through its control
-endpoint; see [From another process](#from-another-process).
-
 When the server is started lazily from somewhere with no teardown hook, call
 `unref()` on the returned handle instead, so it doesn't keep the process
 alive. A route that throws answers that one request `500` rather than taking
@@ -305,7 +302,7 @@ session.files // the SessionView stays readable from the handle
 
 `session.use(name, args)` applies a named, parameterised bundle of
 scenarios and session settings. The names are the closed `PresetName`
-union; args are plain JSON (`PresetArgs` types each one).
+union; `PresetArgs` types each one's args.
 
 | Preset                | Args                                       | What it does                                                                                                                                                                                                                  |
 | --------------------- | ------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -329,38 +326,6 @@ token the emulator accepts (a minute long by default), with WebCrypto, so it
 works in a page too. It doesn't validate its options, so a test can mint a
 token the API refuses. `SIGNED_UPLOADS_SECRET_KEY` is the secret it signs
 with, for a suite that mints with `generateAuthToken` itself.
-
-### From another process
-
-`./listen`'s server takes scenarios over HTTP at `/__emulator/scenarios`,
-for the session its `x-uploadcare-emulator-session` header names (the
-`'default'` one without it). `remoteSession` wraps it:
-
-```ts
-import { remoteSession } from '@uploadcare/api-emulator/listen'
-
-const session = remoteSession(origin, 'my-test-file')
-
-await session.use('throttle', { match: 'POST /base/' })
-await session.on(
-  'GET /info/',
-  { status: 503, body: { detail: 'down' }, delay: 100 },
-  { times: 1 }
-)
-await session.clear()
-```
-
-- `POST { preset, args }` is `session.use(preset, args)`, same names, same
-  args.
-- `POST { match, status, body, headers, delay, times }` declares a response:
-  `status` is 200 by default, a string `body` is sent as text and anything
-  else as JSON, `delay` waits that many milliseconds first. Functions can't
-  cross processes; that is the only reason this form exists.
-- `DELETE` drops the session's scenarios and preset settings. Files and jobs
-  stay until the session is reset.
-
-A request it can't use is answered `400` with the reason, and the helper
-rejects with it.
 
 ### What stays the real API
 

@@ -5,10 +5,7 @@ import {
   type ServerResponse
 } from 'node:http'
 import { Server as TlsServer } from 'node:https'
-import { CONTROL_PATH, control } from './control.js'
-import type { ScenarioMatch, ScenarioOptions } from './core/scenarios.js'
-import { handle, SESSION_HEADER } from './index.js'
-import type { PresetArgsOf, PresetName } from './presets.js'
+import { handle } from './index.js'
 
 export type EmulatorServerOptions = {
   /** 0, the default, takes whatever port is free. */
@@ -145,7 +142,7 @@ export const createEmulatorServer = async (
       headers: headersOf(request),
       body
     })
-    const answer = (await control(webRequest)) ?? (await handle(webRequest))
+    const answer = await handle(webRequest)
     if (request.aborted) return
 
     // `Response.error()` — see `dropConnection` (core/responses.ts).
@@ -207,49 +204,5 @@ export const createEmulatorServer = async (
     unref: () => {
       server.unref()
     }
-  }
-}
-
-/** What the control endpoint answers a `remoteSession().on()` match with. */
-export type DeclaredResponse = {
-  /** 200 by default. */
-  status?: number
-  /** A string is sent as is; anything else as JSON. Empty when absent. */
-  body?: unknown
-  headers?: Record<string, string>
-  /** Milliseconds to wait before answering. */
-  delay?: number
-}
-
-/**
- * A session of the emulator serving `origin`, steered from another process
- * through its control endpoint: `use()` takes the same preset names and args as
- * `session.use()`, and `on()` a declared response instead of a handler. `id` is
- * the session's `SESSION_HEADER`; the `'default'` session without it. Every
- * call rejects with the endpoint's message when it refuses.
- */
-export const remoteSession = (origin: string, id?: string) => {
-  const send = async (method: 'POST' | 'DELETE', body?: object) => {
-    const response = await fetch(new URL(CONTROL_PATH, origin), {
-      method,
-      headers: {
-        'content-type': 'application/json',
-        ...(id === undefined ? {} : { [SESSION_HEADER]: id })
-      },
-      body: body && JSON.stringify(body)
-    })
-    if (!response.ok)
-      throw new Error(`@uploadcare/api-emulator: ${await response.text()}`)
-  }
-  return {
-    use: <N extends PresetName>(name: N, ...args: PresetArgsOf<N>) =>
-      send('POST', { preset: name, args: args[0] }),
-    on: (
-      match: ScenarioMatch,
-      response: DeclaredResponse = {},
-      options: ScenarioOptions = {}
-    ) => send('POST', { match, ...response, ...options }),
-    /** Drops the session's scenarios and preset settings. */
-    clear: () => send('DELETE')
   }
 }

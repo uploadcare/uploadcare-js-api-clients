@@ -1,17 +1,8 @@
 import { once } from 'node:events'
 import { connect } from 'node:net'
-import {
-  afterAll,
-  afterEach,
-  beforeAll,
-  describe,
-  expect,
-  it,
-  vi
-} from 'vitest'
-import { SESSION_HEADER } from '../src/index.js'
+import { afterAll, beforeAll, expect, it, vi } from 'vitest'
 import type * as Emulator from '../src/index.js'
-import { createEmulatorServer, remoteSession } from '../src/listen.js'
+import { createEmulatorServer } from '../src/listen.js'
 
 // A route that throws, so the listener's own error path can be reached; no
 // real route is supposed to, which is exactly why it needs a net.
@@ -182,111 +173,4 @@ it('answers 502 for a path no route handles, naming it only in the log', async (
     '/no-such-route/'
   )
   logged.mockRestore()
-})
-
-describe('the control endpoint', () => {
-  const info = (session?: string) =>
-    fetch(`${server.origin}/info/?pub_key=demopublickey&file_id=nope`, {
-      headers: session === undefined ? {} : { [SESSION_HEADER]: session }
-    })
-
-  afterEach(() => remoteSession(server.origin).clear())
-
-  it('applies a preset by name and args, as session.use() does', async () => {
-    await remoteSession(server.origin).use('throttle', {
-      match: 'POST /base/'
-    })
-    const throttled = await fetch(`${server.origin}/base/?jsonerrors=1`, {
-      method: 'POST',
-      body: fileUploadBody()
-    })
-    expect(throttled.headers.get('retry-after')).toBe('1')
-    expect(await throttled.json()).toMatchObject({
-      error: { status_code: 429 }
-    })
-    const response = await fetch(`${server.origin}/base/`, {
-      method: 'POST',
-      body: fileUploadBody()
-    })
-    expect(await response.json()).toHaveProperty('file')
-  })
-
-  it('answers a declared response: status, JSON body and headers, `times` times', async () => {
-    await remoteSession(server.origin).on(
-      'GET /info/',
-      { status: 503, body: { down: true }, headers: { 'x-why': 'test' } },
-      { times: 1 }
-    )
-    const declared = await info()
-    expect(declared.status).toBe(503)
-    expect(declared.headers.get('x-why')).toBe('test')
-    expect(await declared.json()).toEqual({ down: true })
-    expect((await info()).status).toBe(404)
-  })
-
-  it('sends a string body as text, after `delay` milliseconds', async () => {
-    await remoteSession(server.origin).on('GET /info/', {
-      body: 'plain',
-      delay: 150
-    })
-    const started = Date.now()
-    const response = await info()
-    expect(await response.text()).toBe('plain')
-    expect(Date.now() - started).toBeGreaterThanOrEqual(150)
-  })
-
-  it('is scoped by the session header, and clear() empties that session alone', async () => {
-    await remoteSession(server.origin, 'remote-a').on('GET /info/', {
-      status: 418
-    })
-    await remoteSession(server.origin).on('GET /info/', { status: 410 })
-    expect((await info('remote-a')).status).toBe(418)
-    expect((await info()).status).toBe(410)
-
-    await remoteSession(server.origin, 'remote-a').clear()
-    expect((await info('remote-a')).status).toBe(404)
-    expect((await info()).status).toBe(410)
-  })
-
-  it('clears preset settings too', async () => {
-    await remoteSession(server.origin).use('signedUploads')
-    await remoteSession(server.origin).clear()
-    const response = await fetch(`${server.origin}/base/`, {
-      method: 'POST',
-      body: fileUploadBody()
-    })
-    expect(await response.json()).toHaveProperty('file')
-  })
-
-  it.each([
-    [{ preset: 'nope' }, /No such preset/],
-    [{ preset: 'throttle', args: { match: 'POST /base/', times: 0 } }, /times/],
-    [{ match: 'nope' }, /METHOD \/path/],
-    [{ match: 'GET /info/', status: 99 }, /status/],
-    [{ match: 'GET /info/', headers: { a: 1 } }, /headers/],
-    [{ match: 'GET /info/', delay: -1 }, /delay/],
-    [{ match: 'GET /info/', status: 204, body: 'x' }, /204/]
-  ])('refuses %j with a 400 naming the problem', async (body, message) => {
-    const response = await fetch(`${server.origin}/__emulator/scenarios`, {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify(body)
-    })
-    expect(response.status).toBe(400)
-    expect(await response.text()).toMatch(message)
-  })
-
-  it('refuses a body that is not a JSON object', async () => {
-    const response = await fetch(`${server.origin}/__emulator/scenarios`, {
-      method: 'POST',
-      body: 'nope'
-    })
-    expect(response.status).toBe(400)
-  })
-
-  it("rejects the helper call with the endpoint's message", async () => {
-    await expect(
-      remoteSession(server.origin).use('nope' as never, undefined as never)
-    ).rejects.toThrow(/No such preset/)
-  })
 })
