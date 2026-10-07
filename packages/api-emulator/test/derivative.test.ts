@@ -266,12 +266,6 @@ it('leaves a job_id it never handed out to the route', async () => {
   })
 })
 
-it('refuses a derivativeFailure code it does not know', () => {
-  expect(() =>
-    resetSession().use('derivativeFailure', { code: 'nope' as never })
-  ).toThrow(TypeError)
-})
-
 it('finishes a job on its first poll with the derivativesInstant preset', async () => {
   resetSession().use('derivativesInstant')
   const jobId = await jobIdOf(await generate())

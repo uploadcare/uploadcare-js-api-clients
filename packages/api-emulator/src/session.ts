@@ -47,7 +47,7 @@ export const handleOf = (session: store.Session): EmulatorSession => {
       return handle
     },
     use(name, ...args) {
-      applyPreset(session, handle, name, args[0])
+      applyPreset(session, handle, name, ...args)
       return handle
     }
   }
