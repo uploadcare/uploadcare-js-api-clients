@@ -128,6 +128,10 @@ export type Session = {
   tokenOperations: Map<string, number>
   /** `session.on()`'s, in registration order — see core/scenarios.ts. */
   scenarios: Scenario[]
+  /** Projects a preset named, on top of the demo account's — see auth.ts. */
+  publicKeys: Set<string>
+  /** The `signedUploads` preset: for these projects, or `true` for all. */
+  signedUploads: true | Set<string>
 }
 
 /** Names the session on every redirected request; set by the caller. */
@@ -150,7 +154,9 @@ export const resetSession = (id = 'default') => {
     issued: 0,
     telemetry: [],
     tokenOperations: new Map(),
-    scenarios: []
+    scenarios: [],
+    publicKeys: new Set(),
+    signedUploads: new Set()
   }
   for (const uuid of DEMO_FILES)
     storeStockImage(session, 'demo.jpg', true, uuid)

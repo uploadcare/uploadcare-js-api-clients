@@ -98,23 +98,6 @@ export const STUB_GROUP_MEMBER = '392e3aa3-5ed6-4ad6-a67e-b3a7c1d5b9e9'
 export const GROUP_FILES_NOT_FOUND_KEY = 'demopublickey'
 
 /**
- * `upload-client`'s `test/api/authToken.test.ts` uses this public key as the
- * stand-in for a project with Signed Uploads switched on: a request under it
- * that carries no Bearer token is refused with `SignatureRequiredError`,
- * whatever the endpoint.
- */
-export const SIGNED_UPLOADS_PUBLIC_KEY = 'pub_test__signed_uploads'
-
-/**
- * The secret `auth.ts` verifies Bearer tokens (HS256 JWTs, keyed with
- * `sha256(secret)`, as `@uploadcare/signed-uploads`' `generateAuthToken` mints
- * them) against. `upload-client`'s `test/api/authToken.test.ts` mints real
- * tokens with it, so one suite runs against both the emulator and production.
- */
-// Public test fixture, documented in the README — not a real credential.
-export const SIGNED_UPLOADS_SECRET_KEY = 'mock_secret_key'
-
-/**
  * Ai-image-editor's `errorCodes.ts` (`derivative_disabled`): a project without
  * AI generation. `POST /derivative/image/generate/` and `.../edit/` under this
  * otherwise ordinary allowed key (see `auth.ts`) answer `derivative_disabled`

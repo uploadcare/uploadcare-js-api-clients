@@ -1,15 +1,16 @@
 import { beforeEach, expect, it } from 'vitest'
 import {
+  DEMO_FILES,
+  mintAuthToken,
   resetSession,
-  SIGNED_UPLOADS_PUBLIC_KEY,
   SIGNED_UPLOADS_SECRET_KEY
 } from '../src/index.js'
 import { call, now, sign, token } from './emulator.js'
-import { assertMatchesSpec, jsonError } from './spec.js'
+import { jsonError } from './spec.js'
 
 /**
- * Bearer-token auth and the signed-uploads key — the gate `auth.ts`'s `protect`
- * puts in front of every protected route.
+ * Bearer-token auth — the gate `auth.ts`'s `protect` puts in front of every
+ * protected route.
  *
  * Token rejections are asserted directly rather than through
  * `assertMatchesSpec`: the vendored 2024-02-12 spec documents no 401 and none
@@ -187,19 +188,60 @@ it('ignores Authorization on /from_url/status/', async () => {
   expect(body.status).toBe('unknown')
 })
 
-it('requires a signature for the signed-uploads key without a token', async () => {
-  const response = await base({ publicKey: SIGNED_UPLOADS_PUBLIC_KEY })
-  const error = await jsonError(response)
-  expect(error).toMatchObject({
-    status_code: 400,
-    error_code: 'SignatureRequiredError'
-  })
-  await assertMatchesSpec(response, { method: 'post', path: '/base/' })
-})
-
 it('forgets spent operations on resetSession', async () => {
   const limited = token({ uc: { restrictions: { limits: { operations: 1 } } } })
   await expectUploaded(await bearer(limited))
   resetSession()
   await expectUploaded(await bearer(limited))
+})
+
+const claimsOf = (jwt: string) =>
+  JSON.parse(atob(jwt.split('.')[1].replace(/-/g, '+').replace(/_/g, '/'))) as {
+    iat: number
+    exp: number
+    jti?: string
+    uc?: unknown
+  }
+
+it('mints tokens it accepts, a minute long by default', async () => {
+  const minted = await mintAuthToken()
+  await expectUploaded(await bearer(minted))
+  const { iat, exp, jti, uc } = claimsOf(minted)
+  expect(exp - iat).toBe(60)
+  expect(Math.abs(iat - now())).toBeLessThanOrEqual(1)
+  expect(jti).toBeUndefined()
+  expect(uc).toBeUndefined()
+})
+
+it('mints with a lifetime, a token id, a scope and an operation limit', async () => {
+  const minted = await mintAuthToken({
+    lifetime: 600_000,
+    tokenId: 'abc',
+    scope: ['/multipart/*'],
+    operations: 1
+  })
+  expect(claimsOf(minted)).toMatchObject({
+    jti: 'abc',
+    uc: { restrictions: { scope: ['/multipart/*'], limits: { operations: 1 } } }
+  })
+  const { iat, exp } = claimsOf(minted)
+  expect(exp - iat).toBe(600)
+  await expectRejected(await bearer(minted), 403, 'ScopeForbiddenError')
+})
+
+it('verifies against the exported secret', async () => {
+  await expectUploaded(
+    await bearer(sign({ exp: now() + 600 }, SIGNED_UPLOADS_SECRET_KEY))
+  )
+})
+
+it('exports the demo-project files every fresh session holds', async () => {
+  for (const uuid of DEMO_FILES)
+    expect(
+      (
+        await call(
+          `https://upload.uploadcare.com/info/?pub_key=demopublickey&file_id=${uuid}`
+        )
+      ).status
+    ).toBe(200)
 })

@@ -13,10 +13,8 @@ import {
 } from '@uploadcare/signed-uploads/client'
 import { AuthError } from '../../src/tools/AuthError'
 import { UploadError } from '../../src/tools/UploadError'
-import {
-  SIGNED_UPLOADS_PUBLIC_KEY,
-  SIGNED_UPLOADS_SECRET_KEY
-} from '@uploadcare/api-emulator'
+import { SIGNED_UPLOADS_SECRET_KEY } from '@uploadcare/api-emulator'
+import { SIGNED_UPLOADS_PUBLIC_KEY } from '../_emulatorLegacy'
 import * as factory from '../_fixtureFactory'
 import { getSettingsForTesting } from '../_helpers'
 
