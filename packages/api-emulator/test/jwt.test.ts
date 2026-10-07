@@ -194,13 +194,7 @@ it('requires a signature for the signed-uploads key without a token', async () =
     status_code: 400,
     error_code: 'SignatureRequiredError'
   })
-  await assertMatchesSpec({
-    method: 'post',
-    path: '/base/',
-    status: 400,
-    response: response,
-    body: await response.clone().json()
-  })
+  await assertMatchesSpec(response, { method: 'post', path: '/base/' })
 })
 
 it('throttles the first request with a throttle key, once per session', async () => {
@@ -217,13 +211,7 @@ it('throttles the first request with a throttle key, once per session', async ()
     status_code: 429,
     error_code: 'RequestThrottledError'
   })
-  await assertMatchesSpec({
-    method: 'post',
-    path: '/base/',
-    status: 429,
-    response: first,
-    body: await first.clone().json()
-  })
+  await assertMatchesSpec(first, { method: 'post', path: '/base/' })
 
   await expectUploaded(await throttled())
 

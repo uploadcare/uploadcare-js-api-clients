@@ -10,13 +10,7 @@ const upload = async () => {
     query: '?jsonerrors=1'
   })
   const parsed = (await response.clone().json()) as { file: string }
-  await assertMatchesSpec({
-    method: 'post',
-    path: '/base/',
-    status: 200,
-    response,
-    body: parsed
-  })
+  await assertMatchesSpec(response, { method: 'post', path: '/base/' })
   return parsed.file
 }
 
@@ -31,48 +25,27 @@ it('answers /info/ with every field the spec requires', async () => {
   const response = await call(
     `https://upload.uploadcare.com/info/?jsonerrors=1&pub_key=demopublickey&file_id=${uuid}`
   )
-  await assertMatchesSpec({
-    method: 'get',
-    path: '/info/',
-    status: 200,
-    response: response,
-    body: await response.clone().json()
-  })
+  await assertMatchesSpec(response, { method: 'get', path: '/info/' })
 })
 
 it('uses a status code the spec documents when the file is unknown', async () => {
   const response = await call(
     'https://upload.uploadcare.com/info/?jsonerrors=1&pub_key=demopublickey&file_id=nope'
   )
-  // The HTTP status is 200 under `jsonerrors=1`; the status the spec
-  // documents is the one inside the envelope.
-  await assertMatchesSpec({
-    method: 'get',
-    path: '/info/',
-    status: (await jsonError(response)).status_code,
-    response: response,
-    body: await response.clone().json()
-  })
+  // The HTTP status is 200 under `jsonerrors=1`; assertMatchesSpec validates
+  // the status inside the envelope, which the spec documents.
+  await assertMatchesSpec(response, { method: 'get', path: '/info/' })
 })
 
 it('answers an unknown file with the spec-declared sentence, jsonerrors=1', async () => {
   const response = await call(
     'https://upload.uploadcare.com/info/?jsonerrors=1&pub_key=demopublickey&file_id=nope'
   )
-  const body = (await response.clone().json()) as {
-    error: { content: string }
-  }
   expect(await jsonError(response)).toMatchObject({
     status_code: 404,
     content: 'File is not found.'
   })
-  await assertMatchesSpec({
-    method: 'get',
-    path: '/info/',
-    status: 404,
-    response: response,
-    body
-  })
+  await assertMatchesSpec(response, { method: 'get', path: '/info/' })
 })
 
 it('answers an unknown file with the bare spec sentence, no jsonerrors', async () => {
@@ -83,13 +56,7 @@ it('answers an unknown file with the bare spec sentence, no jsonerrors', async (
   expect(response.status).toBe(404)
   expect(response.headers.get('content-type')).toMatch(/^text\/plain/)
   expect(body).toBe('File is not found.')
-  await assertMatchesSpec({
-    method: 'get',
-    path: '/info/',
-    status: 404,
-    response: response,
-    body
-  })
+  await assertMatchesSpec(response, { method: 'get', path: '/info/' })
 })
 
 it('rejects a /base/ upload with no file, jsonerrors=1', async () => {
@@ -102,20 +69,11 @@ it('rejects a /base/ upload with no file, jsonerrors=1', async () => {
       body: form
     }
   )
-  const body = (await response.clone().json()) as {
-    error: { content: string }
-  }
   expect(await jsonError(response)).toMatchObject({
     status_code: 400,
     content: 'Request does not contain files.'
   })
-  await assertMatchesSpec({
-    method: 'post',
-    path: '/base/',
-    status: 400,
-    response: response,
-    body
-  })
+  await assertMatchesSpec(response, { method: 'post', path: '/base/' })
 })
 
 it('rejects an /info/ 200 body missing a required field', async () => {
@@ -127,13 +85,7 @@ it('rejects an /info/ 200 body missing a required field', async () => {
   delete body.is_image // one of the spec's 15 required fields
 
   await expect(
-    assertMatchesSpec({
-      method: 'get',
-      path: '/info/',
-      status: 200,
-      response: response,
-      body
-    })
+    assertMatchesSpec(response, { method: 'get', path: '/info/' }, body)
   ).rejects.toThrow()
 })
 
@@ -146,13 +98,7 @@ it('rejects an /info/ 200 body with a required field of the wrong type', async (
   body.is_image = 'yes' // spec says boolean
 
   await expect(
-    assertMatchesSpec({
-      method: 'get',
-      path: '/info/',
-      status: 200,
-      response: response,
-      body
-    })
+    assertMatchesSpec(response, { method: 'get', path: '/info/' }, body)
   ).rejects.toThrow()
 })
 
@@ -166,13 +112,7 @@ it('names the operation, the status, and the failing field when a body fails val
 
   let thrown: unknown
   try {
-    await assertMatchesSpec({
-      method: 'get',
-      path: '/info/',
-      status: 200,
-      response: response,
-      body
-    })
+    await assertMatchesSpec(response, { method: 'get', path: '/info/' }, body)
   } catch (error) {
     thrown = error
   }
@@ -196,13 +136,7 @@ it('rejects a /base/ upload with no file, no jsonerrors', async () => {
   expect(response.status).toBe(400)
   expect(response.headers.get('content-type')).toMatch(/^text\/plain/)
   expect(body).toBe('Request does not contain files.')
-  await assertMatchesSpec({
-    method: 'post',
-    path: '/base/',
-    status: 400,
-    response: response,
-    body
-  })
+  await assertMatchesSpec(response, { method: 'post', path: '/base/' })
 })
 
 it('answers the JSON envelope for Accept: application/json, without jsonerrors', async () => {
@@ -236,12 +170,9 @@ it.each([...UNSPECIFIED_OPERATIONS])(
 
 it('refuses to validate an unspecified operation, naming why', async () => {
   await expect(
-    assertMatchesSpec({
+    assertMatchesSpec(Response.json({}), {
       method: 'get',
-      path: '/derivative/status/',
-      status: 200,
-      response: Response.json({}),
-      body: {}
+      path: '/derivative/status/'
     })
   ).rejects.toThrow(/UNSPECIFIED_OPERATIONS/)
 })

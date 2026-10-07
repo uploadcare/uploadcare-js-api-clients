@@ -39,10 +39,6 @@ delete (
     ?.properties as { default_effects?: { format?: string } } | undefined
 )?.default_effects?.format
 
-/** The specs `assertMatchesSpec` can select by name — `upload-api` today. */
-const specs = { 'upload-api': uploadApiSpec } as const
-export type SpecName = keyof typeof specs
-
 type JsonObject = Record<string, unknown>
 
 const isObject = (value: unknown): value is JsonObject =>
@@ -111,9 +107,8 @@ const toJsonSchema = (node: unknown): unknown => {
 
 const ajv = new Ajv({ strict: false, allErrors: true })
 addFormats(ajv)
-for (const [name, document] of Object.entries(specs)) {
-  ajv.addSchema(toJsonSchema(document) as JsonObject, name)
-}
+const SPEC = 'upload-api'
+ajv.addSchema(toJsonSchema(uploadApiSpec) as JsonObject, SPEC)
 
 /** Reads `doc[a][b][c]…`, returning `undefined` for any missing step. */
 const get = (doc: unknown, segments: readonly string[]): unknown =>
@@ -189,7 +184,7 @@ const collectDefaults = (doc: unknown, schema: unknown): string[] => {
 
 class SpecMismatchError extends Error {}
 
-const fail = (message: string): never => {
+function fail(message: string): never {
   throw new SpecMismatchError(message)
 }
 
@@ -266,11 +261,11 @@ const assertNotVacuous = (key: string, validate: ValidateFunction) => {
     )
 }
 
-const validatorAt = (name: SpecName, pointer: string): ValidateFunction => {
-  const key = `${name}${pointer}`
+const validatorAt = (pointer: string): ValidateFunction => {
+  const key = `${SPEC}${pointer}`
   const cached = validators.get(key)
   if (cached) return cached
-  const validate = ajv.compile({ $ref: `${name}#${pointer}` })
+  const validate = ajv.compile({ $ref: `${SPEC}#${pointer}` })
   assertNotVacuous(key, validate)
   validators.set(key, validate)
   return validate
@@ -280,14 +275,13 @@ const describe = (method: string, path: string, status: number) =>
   `${method.toUpperCase()} ${path} → ${status}`
 
 const validateAgainst = (
-  name: SpecName,
   pointer: string,
   body: unknown,
   method: string,
   path: string,
   status: number
 ) => {
-  const validate = validatorAt(name, pointer)
+  const validate = validatorAt(pointer)
   if (validate(body)) return
   const detail = (validate.errors ?? [])
     .map(
@@ -299,36 +293,48 @@ const validateAgainst = (
   )
 }
 
-export const assertMatchesSpec = async (args: {
-  method: string
-  path: string
-  status: number
-  response: Response
-  body: unknown
-  /** Which spec to validate against — `test/specs/<spec>.json`. */
-  spec?: SpecName
-}): Promise<void> => {
-  const method = args.method.toLowerCase()
-  const { path, status, response, body } = args
-  const name = args.spec ?? 'upload-api'
-  const specDocument = specs[name]
+const contentTypeOf = (response: Response) =>
+  response.headers.get('content-type')?.split(';')[0]?.trim()
 
-  if (UNSPECIFIED_OPERATIONS.has(`${method.toUpperCase()} ${path}`)) {
+/**
+ * Validates `response` against the spec's `method path` operation. The status
+ * it validates is the `jsonerrors` envelope's `error.status_code` when the body
+ * is one (the HTTP status is then 200), and `response.status` otherwise.
+ * `bodyOverride` replaces the response's own body, for the tests that check a
+ * doctored body is rejected.
+ */
+export const assertMatchesSpec = async (
+  response: Response,
+  operation: { method: string; path: string },
+  bodyOverride?: unknown
+): Promise<void> => {
+  const method = operation.method.toLowerCase()
+  const { path } = operation
+  const isJson = contentTypeOf(response) === 'application/json'
+  const body =
+    bodyOverride ??
+    (await (isJson ? response.clone().json() : response.clone().text()))
+  const envelope =
+    isJson && isObject(body) && isObject(body.error) ? body.error : undefined
+  const status =
+    typeof envelope?.status_code === 'number'
+      ? envelope.status_code
+      : response.status
+
+  if (UNSPECIFIED_OPERATIONS.has(`${method.toUpperCase()} ${path}`))
     fail(
       `${method.toUpperCase()} ${path} is in UNSPECIFIED_OPERATIONS: the spec ` +
         `doesn't describe it, so assert the body directly instead`
     )
-    return
-  }
 
-  const operation = get(specDocument, ['paths', path, method])
-  if (!isObject(operation)) {
+  const specOperation = get(uploadApiSpec, ['paths', path, method])
+  if (!isObject(specOperation))
     fail(`the spec has no ${method.toUpperCase()} ${path} operation`)
-    return
-  }
 
   const statusKey = String(status)
-  const responses = isObject(operation.responses) ? operation.responses : {}
+  const responses = isObject(specOperation.responses)
+    ? specOperation.responses
+    : {}
   if (!(statusKey in responses)) {
     const documented = Object.keys(responses)
     fail(
@@ -340,68 +346,55 @@ export const assertMatchesSpec = async (args: {
   const responseBase = ['paths', path, method, 'responses', statusKey]
 
   if (status >= 200 && status < 300) {
-    const { value: schema, pointer } = descend(specDocument, responseBase, [
+    const { value: schema, pointer } = descend(uploadApiSpec, responseBase, [
       'content',
       'application/json',
       'schema'
     ])
-    if (schema === undefined) {
-      // Not a silent pass: an operation the document declares but gives no
-      // JSON schema for (`PUT /<presigned-url-x>`'s `2XX`, which has no
-      // `content` at all) validates nothing, so saying so is the only honest
-      // outcome. Add the case to the document, or assert the body directly.
+    // Not a silent pass: an operation the document declares but gives no
+    // JSON schema for (`PUT /<presigned-url-x>`'s `2XX`, which has no
+    // `content` at all) validates nothing, so saying so is the only honest
+    // outcome. Add the case to the document, or assert the body directly.
+    if (schema === undefined)
       fail(
         `${describe(method, path, status)}: the spec declares this response but no ` +
           `application/json schema for it, so there is nothing to validate against`
       )
-      return
-    }
-    validateAgainst(name, toJsonPointer(pointer), body, method, path, status)
+    validateAgainst(toJsonPointer(pointer), body, method, path, status)
     return
   }
 
   const { value: plainSchema, pointer: plainPointer } = descend(
-    specDocument,
+    uploadApiSpec,
     responseBase,
     ['content', 'text/plain', 'schema']
   )
-  if (plainSchema === undefined) {
-    // Same reasoning as the 2xx branch above.
+  // Same reasoning as the 2xx branch above.
+  if (plainSchema === undefined)
     fail(
       `${describe(method, path, status)}: the spec declares this response but no ` +
         `text/plain schema for it, so there is nothing to validate against`
     )
-    return
-  }
 
-  const contentType = response.headers
-    .get('content-type')
-    ?.split(';')[0]
-    ?.trim()
-
-  if (contentType === 'application/json') {
+  if (isJson) {
     // `jsonerrors=1`: the spec doesn't model this envelope, only the sentence
     // it carries — checked against the same `default`s the plain-text path
     // would be validated against.
-    const content =
-      isObject(body) && isObject(body.error) ? body.error.content : undefined
-    if (typeof content !== 'string') {
+    const content = envelope?.content
+    if (typeof content !== 'string')
       fail(
         `${describe(method, path, status)}: jsonerrors envelope has no string error.content`
       )
-      return
-    }
-    const allowed = collectDefaults(specDocument, plainSchema)
-    if (allowed.length > 0 && !allowed.includes(content)) {
+    const allowed = collectDefaults(uploadApiSpec, plainSchema)
+    if (allowed.length > 0 && !allowed.includes(content))
       fail(
         `${describe(method, path, status)}: error.content ${JSON.stringify(content)} is not one of ` +
           `the sentences the spec declares (${allowed.map((sentence) => JSON.stringify(sentence)).join(', ')})`
       )
-    }
     return
   }
 
-  validateAgainst(name, toJsonPointer(plainPointer), body, method, path, status)
+  validateAgainst(toJsonPointer(plainPointer), body, method, path, status)
 }
 
 /**
