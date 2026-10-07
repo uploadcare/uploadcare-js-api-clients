@@ -6,19 +6,28 @@ import {
   DERIVATIVE_DISABLED_PUBLIC_KEY,
   DERIVATIVE_INSTANT_PUBLIC_KEY,
   NO_STORING_KEY,
-  SIGNED_UPLOADS_PUBLIC_KEY,
-  SIGNED_UPLOADS_SECRET_KEY,
   UNKNOWN_PROGRESS_KEY
 } from './scenarios.js'
 
-/** The public keys the demo project recognises. */
+/**
+ * The secret Bearer tokens are verified against: HS256 keyed with
+ * `sha256(secret)`, as `@uploadcare/signed-uploads`' `generateAuthToken` mints
+ * them. Exported from `.`, for a test that mints its own tokens;
+ * `mintAuthToken` mints with it too.
+ */
+// Public test fixture, documented in the README — not a real credential.
+export const SIGNED_UPLOADS_SECRET_KEY = 'mock_secret_key'
+
+/**
+ * The public keys of the demo account's projects. A preset that names a key
+ * (`signedUploads`' `publicKey`, say) adds that project to its session.
+ */
 const ALLOWED_PUBLIC_KEYS = [
   'demopublickey',
   // Public test fixture, not a real credential.
   'secret_public_key',
   NO_STORING_KEY,
   UNKNOWN_PROGRESS_KEY,
-  SIGNED_UPLOADS_PUBLIC_KEY,
   DERIVATIVE_DISABLED_PUBLIC_KEY,
   DERIVATIVE_INSTANT_PUBLIC_KEY
 ]
@@ -29,6 +38,7 @@ const ALLOWED_PUBLIC_KEYS = [
  */
 const requirePublicKey = (
   request: Request,
+  session: Session,
   publicKey: string | null,
   paramName: string
 ) => {
@@ -40,7 +50,10 @@ const requirePublicKey = (
       `${paramName} is required.`,
       'ProjectPublicKeyInvalidError'
     )
-  if (!ALLOWED_PUBLIC_KEYS.includes(publicKey))
+  if (
+    !ALLOWED_PUBLIC_KEYS.includes(publicKey) &&
+    !session.publicKeys.has(publicKey)
+  )
     // schema: publicKeyInvalidError / uploadcarePublicKeyInvalidError
     return apiError(
       request,
@@ -75,6 +88,69 @@ const base64urlBytes = (segment: string) => {
 
 const decodeSegment = (segment: string): unknown =>
   JSON.parse(new TextDecoder().decode(base64urlBytes(segment)))
+
+const base64url = (bytes: Uint8Array) =>
+  btoa(String.fromCharCode(...bytes))
+    .replace(/\+/g, '-')
+    .replace(/\//g, '_')
+    .replace(/=+$/, '')
+
+const signingKey = async (usage: 'sign' | 'verify') => {
+  const { subtle } = globalThis.crypto
+  return subtle.importKey(
+    'raw',
+    await subtle.digest('SHA-256', utf8(SIGNED_UPLOADS_SECRET_KEY)),
+    { name: 'HMAC', hash: 'SHA-256' },
+    false,
+    [usage]
+  )
+}
+
+export type MintAuthTokenOptions = {
+  /** Milliseconds; a minute by default. */
+  lifetime?: number
+  /** The `jti` claim. */
+  tokenId?: string
+  /** `uc.restrictions.scope`: paths, exactly or as a `/*` prefix. */
+  scope?: string[]
+  /** `uc.restrictions.limits.operations`. */
+  operations?: number
+}
+
+/**
+ * A Bearer token the emulator accepts, signed with `SIGNED_UPLOADS_SECRET_KEY`
+ * the way `generateAuthToken` signs, but with WebCrypto, so it mints in a page
+ * too. Doesn't validate its options the way `generateAuthToken` does: a test
+ * may want a token the API refuses.
+ */
+export const mintAuthToken = async ({
+  lifetime = 60_000,
+  tokenId,
+  scope,
+  operations
+}: MintAuthTokenOptions = {}) => {
+  const iat = Math.floor(Date.now() / 1000)
+  const claims: Record<string, unknown> = {
+    exp: iat + Math.floor(lifetime / 1000),
+    iat
+  }
+  if (tokenId !== undefined) claims.jti = tokenId
+  const restrictions: Record<string, unknown> = {}
+  if (scope !== undefined) restrictions.scope = scope
+  if (operations !== undefined) restrictions.limits = { operations }
+  if (Object.keys(restrictions).length > 0) claims.uc = { restrictions }
+
+  const header = { alg: 'HS256', typ: 'JWT' }
+  const signed = [header, claims]
+    .map((part) => base64url(utf8(JSON.stringify(part))))
+    .join('.')
+  const signature = await globalThis.crypto.subtle.sign(
+    'HMAC',
+    await signingKey('sign'),
+    utf8(signed)
+  )
+  return `${signed}.${base64url(new Uint8Array(signature))}`
+}
 
 type Claims = {
   exp?: unknown
@@ -118,16 +194,16 @@ const verifyAuthToken = async (
 
   if (protectedHeader.alg !== 'HS256') return invalid('`alg` must be HS256')
 
-  const { subtle } = globalThis.crypto
-  const key = await subtle.importKey(
-    'raw',
-    await subtle.digest('SHA-256', utf8(SIGNED_UPLOADS_SECRET_KEY)),
-    { name: 'HMAC', hash: 'SHA-256' },
-    false,
-    ['verify']
-  )
   const signed = utf8(`${header}.${payload}`)
-  if (!(await subtle.verify('HMAC', key, signatureBytes, signed)))
+  const key = await signingKey('verify')
+  if (
+    !(await globalThis.crypto.subtle.verify(
+      'HMAC',
+      key,
+      signatureBytes,
+      signed
+    ))
+  )
     return invalid('signature does not match')
 
   if (typeof claims.exp !== 'number') return invalid('`exp` is required')
@@ -173,8 +249,9 @@ const verifyAuthToken = async (
  *    how a test proves the header reached the server). Sending `signature` or
  *    `expire` alongside it is refused: the client drops them when it sends a
  *    token, so either one arriving means something leaked.
- * 2. `SIGNED_UPLOADS_PUBLIC_KEY` with no token: `SignatureRequiredError`.
- * 3. The ordinary public-key check.
+ * 2. The public-key check.
+ * 3. No token for a project with Signed Uploads on (the `signedUploads` preset):
+ *    `SignatureRequiredError`.
  *
  * Unprotected routes (`/from_url/status/`, the part `PUT`, CDN, telemetry)
  * never get here, so they ignore `Authorization` the way the Upload API does.
@@ -211,16 +288,20 @@ const authorize = async (
     return rejection && apiError(request, ...rejection)
   }
 
+  const session = sessionOf(request)
   const publicKey = field(paramName)
-  if (publicKey === SIGNED_UPLOADS_PUBLIC_KEY)
+  const refusal = requirePublicKey(request, session, publicKey, paramName)
+  if (refusal) return refusal
+
+  const { signedUploads } = session
+  if (signedUploads === true || signedUploads.has(publicKey ?? ''))
     return apiError(
       request,
       400,
       '`signature` is required.',
       'SignatureRequiredError'
     )
-
-  return requirePublicKey(request, publicKey, paramName)
+  return undefined
 }
 
 /**

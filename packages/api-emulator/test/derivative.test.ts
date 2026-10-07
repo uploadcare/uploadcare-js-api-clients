@@ -4,8 +4,8 @@ import {
   DERIVATIVE_DISABLED_PUBLIC_KEY,
   DERIVATIVE_INSTANT_PUBLIC_KEY,
   PROVIDER_UNAVAILABLE_PROMPT,
-  resetSession,
-  SIGNED_UPLOADS_PUBLIC_KEY
+  mintAuthToken,
+  resetSession
 } from '../src/index.js'
 import { STOCK_IMAGE } from '../src/state/stock-image.js'
 import { call, token, upload } from './emulator.js'
@@ -327,15 +327,16 @@ it('answers the throttle preset in the JSON envelope the client reads', async ()
 })
 
 it('runs a signed-uploads project end to end on a Bearer token', async () => {
-  const authorization = `Bearer ${token()}`
-  expect(
-    await jsonError(await generate({ pub_key: SIGNED_UPLOADS_PUBLIC_KEY }))
-  ).toMatchObject({ error_code: 'SignatureRequiredError' })
+  resetSession().use('signedUploads')
+  const authorization = `Bearer ${await mintAuthToken()}`
+  expect(await jsonError(await generate())).toMatchObject({
+    error_code: 'SignatureRequiredError'
+  })
 
   const started = await post(
     '/derivative/image/generate/',
     {
-      pub_key: SIGNED_UPLOADS_PUBLIC_KEY,
+      pub_key: 'demopublickey',
       prompt: 'a hat',
       aspect_ratio: [1, 1],
       filename: 'generated.png'
@@ -344,7 +345,7 @@ it('runs a signed-uploads project end to end on a Bearer token', async () => {
   )
   const jobId = await jobIdOf(started)
   const polled = await call(
-    `${UPLOAD}/derivative/status/?pub_key=${SIGNED_UPLOADS_PUBLIC_KEY}&job_id=${jobId}`,
+    `${UPLOAD}/derivative/status/?pub_key=demopublickey&job_id=${jobId}`,
     { headers: { Accept: 'application/json', authorization } }
   )
   expect(await polled.json()).toEqual({ type: 'job', status: 'processing' })

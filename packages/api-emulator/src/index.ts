@@ -11,12 +11,15 @@ export {
   DERIVATIVE_DISABLED_PUBLIC_KEY,
   DERIVATIVE_INSTANT_PUBLIC_KEY,
   EMULATOR_PORT,
-  PROVIDER_UNAVAILABLE_PROMPT,
-  SIGNED_UPLOADS_PUBLIC_KEY,
-  SIGNED_UPLOADS_SECRET_KEY
+  PROVIDER_UNAVAILABLE_PROMPT
 } from './apis/upload/scenarios.js'
+export {
+  mintAuthToken,
+  SIGNED_UPLOADS_SECRET_KEY,
+  type MintAuthTokenOptions
+} from './apis/upload/auth.js'
 
-export { SESSION_HEADER } from './state/store.js'
+export { DEMO_FILES, SESSION_HEADER } from './state/store.js'
 export type { StoredFile, StoredImage, TelemetryEvent } from './state/store.js'
 export { resetSession, sessionOf } from './session.js'
 export type { EmulatorSession, SessionView } from './session.js'

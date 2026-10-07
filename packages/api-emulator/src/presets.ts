@@ -17,6 +17,13 @@ export type PresetArgs = {
    * any credential is checked.
    */
   throttle: { match: ScenarioMatch; times?: number; retryAfter?: number }
+  /**
+   * Signed Uploads on: a protected request with no Bearer token is refused
+   * `SignatureRequiredError` (after the public-key check). For every project in
+   * the session, or for `publicKey`'s alone, which it adds to the session's
+   * projects. Mint tokens with `mintAuthToken`.
+   */
+  signedUploads: { publicKey?: string } | undefined
 }
 
 export type PresetName = keyof PresetArgs
@@ -46,6 +53,12 @@ const count = (preset: string, args: Args, key: string) => {
   throw invalid(preset, `${key} is a positive integer`)
 }
 
+const string = (preset: string, args: Args, key: string) => {
+  const value = args[key]
+  if (value === undefined || typeof value === 'string') return value
+  throw invalid(preset, `${key} is a string`)
+}
+
 /** Checked in full by `session.on()`. */
 const match = (preset: string, args: Args): ScenarioMatch => {
   const value = args.match
@@ -72,8 +85,18 @@ const throttle = (handle: EmulatorSession, args: Args) => {
   )
 }
 
+const signedUploads = (session: Session, args: Args) => {
+  const publicKey = string('signedUploads', args, 'publicKey')
+  if (publicKey === undefined) {
+    session.signedUploads = true
+    return
+  }
+  session.publicKeys.add(publicKey)
+  if (session.signedUploads !== true) session.signedUploads.add(publicKey)
+}
+
 export const applyPreset = (
-  _session: Session,
+  session: Session,
   handle: EmulatorSession,
   name: PresetName,
   args: unknown
@@ -81,6 +104,8 @@ export const applyPreset = (
   switch (name) {
     case 'throttle':
       return throttle(handle, argsOf(name, args))
+    case 'signedUploads':
+      return signedUploads(session, argsOf(name, args))
     default: {
       // A new preset fails to compile here until it is handled; a name from
       // the control endpoint that isn't one fails at runtime.
