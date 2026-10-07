@@ -4,7 +4,7 @@ import {
   resetSession,
   type EmulatorSession
 } from '../src/index.js'
-import { call, token, uploadFile } from './emulator.js'
+import { call, createGroup, token, uploadFile } from './emulator.js'
 import { assertMatchesSpec, jsonError } from './spec.js'
 
 /**
@@ -222,4 +222,48 @@ it('hostNotFound: leaves a request without a source_url to the route', async () 
   expect(await jsonError(await fromUrl('pub_key=demopublickey'))).toMatchObject(
     { content: 'source_url is required.' }
   )
+})
+
+const STORED = '392e3aa3-5ed6-4ad6-a67e-b3a7c1d5b9e9'
+const infoOf = (uuid: string, pubKey = 'demopublickey') =>
+  call(
+    `https://upload.uploadcare.com/info/?jsonerrors=1&pub_key=${pubKey}&file_id=${uuid}`
+  )
+
+it('storedFile: puts a file in the project without an upload', async () => {
+  expect((await jsonError(await createGroup([STORED]))).content).toBe(
+    'Some files not found.'
+  )
+
+  session.use('storedFile', { uuid: STORED })
+  expect(await (await infoOf(STORED)).json()).toMatchObject({
+    uuid: STORED,
+    is_image: true,
+    is_stored: true
+  })
+  const group = (await (await createGroup([STORED])).json()) as {
+    files: { uuid: string }[]
+  }
+  expect(group.files[0]?.uuid).toBe(STORED)
+  expect((await call(`https://ucarecdn.com/${STORED}/`)).status).toBe(200)
+})
+
+it("storedFile: with a publicKey, in that project alone, so another project's /group/ and /info/ can't find it", async () => {
+  session.use('storedFile', { uuid: STORED, publicKey: 'pub_owner' })
+  expect((await createGroup([STORED], { pubKey: 'pub_owner' })).status).toBe(
+    200
+  )
+  expect(await jsonError(await createGroup([STORED]))).toMatchObject({
+    status_code: 400,
+    content: 'Some files not found.'
+  })
+  expect(await jsonError(await infoOf(STORED))).toMatchObject({
+    status_code: 404
+  })
+  expect((await infoOf(STORED, 'pub_owner')).status).toBe(200)
+})
+
+it('storedFile: refuses a uuid that is not one', () => {
+  expect(() => session.use('storedFile', { uuid: 'nope' })).toThrow(TypeError)
+  expect(() => session.use('storedFile', {} as never)).toThrow(TypeError)
 })

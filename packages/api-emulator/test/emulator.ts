@@ -64,11 +64,7 @@ export const uploadFile = ({
 export const upload = async (options?: Parameters<typeof uploadFile>[0]) =>
   ((await (await uploadFile(options)).json()) as { file: string }).file
 
-/**
- * `POST /group/` with `jsonerrors=1`. `demopublickey` is also
- * `GROUP_FILES_NOT_FOUND_KEY`, so grouping `STUB_GROUP_MEMBER` takes another
- * key.
- */
+/** `POST /group/` with `jsonerrors=1`. */
 export const createGroup = (
   members: string[],
   { pubKey = 'demopublickey', session }: { pubKey?: string } & Session = {}

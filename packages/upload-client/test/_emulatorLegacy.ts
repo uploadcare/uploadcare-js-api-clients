@@ -15,6 +15,12 @@ export const legacyScenarios = () => {
     .use('signedUploads', { publicKey: SIGNED_UPLOADS_PUBLIC_KEY })
     .use('unknownProgress', { publicKey: 'pub_test__unknown_progress' })
     .use('hostNotFound', { sourceUrl: 'https://1.com/1.jpg' })
+    // In the project `factory.publicKey('image')` names, so the "Some files
+    // not found." case under `demopublickey` still can't find it.
+    .use('storedFile', {
+      uuid: '392e3aa3-5ed6-4ad6-a67e-b3a7c1d5b9e9',
+      publicKey: 'secret_public_key'
+    })
     .on('POST /base/', async ({ request }) => {
       const key = (await request.formData()).get('metadata[mock_throttle]')
       if (typeof key !== 'string' || spentThrottleKeys.has(key))

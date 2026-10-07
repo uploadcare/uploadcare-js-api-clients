@@ -1,5 +1,4 @@
 import { beforeEach, expect, it } from 'vitest'
-import { STUB_GROUP_MEMBER } from '../src/apis/upload/scenarios.js'
 import { resetSession } from '../src/index.js'
 import { call, createGroup, upload } from './emulator.js'
 import { assertMatchesSpec, jsonError } from './spec.js'
@@ -90,32 +89,7 @@ it('refuses a well-formed member nobody uploaded', async () => {
   })
 })
 
-it('stands in for STUB_GROUP_MEMBER, which upload-client groups unuploaded', async () => {
-  const response = await createGroup([STUB_GROUP_MEMBER], {
-    pubKey: 'secret_public_key'
-  })
-  expect(response.status).toBe(200)
-  const group = (await response.json()) as {
-    files: Array<{ uuid: string }>
-  }
-  expect(group.files[0].uuid).toBe(STUB_GROUP_MEMBER)
-})
-
-it('fails for the "files not found" key when the member was never uploaded', async () => {
-  // Unlike the STUB_GROUP_MEMBER test above, under an ordinary key:
-  // `demopublickey` must surface even the stub as "not found"
-  // (`upload-client`'s own `group.test.ts` depends on this).
-  const response = await createGroup([STUB_GROUP_MEMBER])
-  expect(await jsonError(response)).toMatchObject({
-    status_code: 400,
-    content: 'Some files not found.'
-  })
-})
-
-it('groups a real upload under the "files not found" key by bare uuid, unlike the stub case above', async () => {
-  // `demopublickey` is the public key file-uploader's e2e suite uses for real
-  // uploads, so the member existence check must key off whether the file is
-  // in the session, not off the public key alone.
+it('groups a real upload by bare uuid', async () => {
   const uuid = await upload()
   const response = await createGroup([uuid])
   expect(response.status).toBe(200)
@@ -126,7 +100,7 @@ it('groups a real upload under the "files not found" key by bare uuid, unlike th
   expect(group.files[0].original_filename).toBe('a.jpg')
 })
 
-it('groups a real upload under the "files not found" key by CDN url', async () => {
+it('groups a real upload by CDN url', async () => {
   const uuid = await upload({ name: 'b.jpg' })
   const response = await createGroup([`https://ucarecdn.com/${uuid}/`])
   expect(response.status).toBe(200)

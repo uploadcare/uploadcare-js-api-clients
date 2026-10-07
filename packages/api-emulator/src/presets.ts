@@ -8,7 +8,8 @@ import { bodyFields, isRecord } from './core/body.js'
 import { apiError } from './core/responses.js'
 import type { ScenarioMatch } from './core/scenarios.js'
 import type { EmulatorSession } from './session.js'
-import type { Session } from './state/store.js'
+import { STOCK_IMAGE } from './state/stock-image.js'
+import { type Session, store } from './state/store.js'
 
 export type PresetArgs = {
   /**
@@ -36,6 +37,13 @@ export type PresetArgs = {
    * unreachable host gets.
    */
   hostNotFound: { sourceUrl?: string } | undefined
+  /**
+   * A file already in the project, as if uploaded before the test: the stock
+   * image under `uuid`, stored. In every project, or in `publicKey`'s alone,
+   * which it adds to the session's projects; another project's `/info/` and
+   * `/group/` then can't find it.
+   */
+  storedFile: { uuid: string; publicKey?: string }
 }
 
 export type PresetName = keyof PresetArgs
@@ -153,6 +161,27 @@ const hostNotFound = (handle: EmulatorSession, args: Args) => {
   })
 }
 
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+
+const storedFile = (session: Session, args: Args) => {
+  const uuid = string('storedFile', args, 'uuid')
+  if (uuid === undefined || !UUID.test(uuid))
+    throw invalid('storedFile', 'uuid is a file uuid')
+  const publicKey = string('storedFile', args, 'publicKey')
+  if (publicKey !== undefined) session.publicKeys.add(publicKey)
+  store(
+    session,
+    {
+      name: 'demo.jpg',
+      mimeType: 'image/jpeg',
+      bytes: STOCK_IMAGE,
+      isStored: true,
+      publicKey
+    },
+    uuid
+  )
+}
+
 export const applyPreset = (
   session: Session,
   handle: EmulatorSession,
@@ -168,6 +197,8 @@ export const applyPreset = (
       return unknownProgress(session, handle, argsOf(name, args))
     case 'hostNotFound':
       return hostNotFound(handle, argsOf(name, args))
+    case 'storedFile':
+      return storedFile(session, argsOf(name, args))
     default: {
       // A new preset fails to compile here until it is handled; a name from
       // the control endpoint that isn't one fails at runtime.
