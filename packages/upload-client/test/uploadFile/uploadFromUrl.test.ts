@@ -1,4 +1,5 @@
 import { vi, expect, describe, it } from 'vitest'
+import { resetSession } from '@uploadcare/api-emulator'
 import * as factory from '../_fixtureFactory'
 import {
   getSettingsForTesting,
@@ -137,10 +138,11 @@ describe('uploadFromUrl', () => {
 
   process.env.TEST_ENV !== 'production' &&
     it('should be able to handle non-computable unknown progress', async () => {
+      resetSession().use('unknownProgress')
       const onProgress = vi.fn()
       const sourceUrl = factory.imageUrl('valid')
       const settings = getSettingsForTesting({
-        publicKey: factory.publicKey('unknownProgress'),
+        publicKey: factory.publicKey('image'),
         onProgress
       })
 

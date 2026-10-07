@@ -1,4 +1,5 @@
-import { vi, expect, describe, it } from 'vitest'
+import { beforeEach, vi, expect, describe, it } from 'vitest'
+import { resetSession } from '@uploadcare/api-emulator'
 import * as factory from '../_fixtureFactory'
 import { getSettingsForTesting, assertComputableProgress } from '../_helpers'
 import { uploadFileGroup } from '../../src/uploadFileGroup'
@@ -8,6 +9,14 @@ describe('groupFrom Uploaded[]', () => {
   const files = factory.groupOfFiles('valid')
   const settings = getSettingsForTesting({
     publicKey: factory.publicKey('image')
+  })
+
+  // Already in the project in production; `demopublickey`'s can't see it.
+  beforeEach(() => {
+    resetSession().use('storedFile', {
+      uuid: files[0],
+      publicKey: settings.publicKey
+    })
   })
 
   it('should resolves when file is ready on CDN', async () => {

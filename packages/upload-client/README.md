@@ -649,13 +649,9 @@ uploadFile(blob, {
 
 ## Testing
 
-```
-npm run test
-```
-
 By default, tests run against the local API emulator
-([`@uploadcare/api-emulator`](../api-emulator)), which the test run starts
-itself:
+([`@uploadcare/api-emulator`](../api-emulator)), which each test file starts
+on a free port (`test/_emulator.ts`):
 
 ```bash
 npm run test

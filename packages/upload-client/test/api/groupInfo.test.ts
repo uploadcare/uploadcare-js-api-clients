@@ -1,4 +1,5 @@
-import { describe, it, expect } from 'vitest'
+import { beforeEach, describe, it, expect } from 'vitest'
+import { resetSession } from '@uploadcare/api-emulator'
 import * as factory from '../_fixtureFactory'
 import { getSettingsForTesting } from '../_helpers'
 import group from '../../src/api/group'
@@ -9,6 +10,14 @@ describe('API - group info', () => {
   const files = factory.groupOfFiles('valid')
   const settings = getSettingsForTesting({
     publicKey: factory.publicKey('image')
+  })
+
+  // Already in the project in production; `demopublickey`'s can't see it.
+  beforeEach(() => {
+    resetSession().use('storedFile', {
+      uuid: files[0],
+      publicKey: settings.publicKey
+    })
   })
 
   it('should return info about uploaded group of files', async () => {

@@ -1,6 +1,6 @@
 import { createHash, createHmac } from 'node:crypto'
 import { generateAuthToken } from '@uploadcare/signed-uploads'
-import { vi, expect, describe, it } from 'vitest'
+import { beforeEach, vi, expect, describe, it } from 'vitest'
 import base from '../../src/api/base'
 import fromUrl from '../../src/api/fromUrl'
 import group from '../../src/api/group'
@@ -13,8 +13,11 @@ import {
 } from '@uploadcare/signed-uploads/client'
 import { AuthError } from '../../src/tools/AuthError'
 import { UploadError } from '../../src/tools/UploadError'
-import { SIGNED_UPLOADS_SECRET_KEY } from '@uploadcare/api-emulator'
-import { SIGNED_UPLOADS_PUBLIC_KEY } from '../_emulatorLegacy'
+import {
+  resetSession,
+  SIGNED_UPLOADS_SECRET_KEY,
+  type EmulatorSession
+} from '@uploadcare/api-emulator'
 import * as factory from '../_fixtureFactory'
 import { getSettingsForTesting } from '../_helpers'
 
@@ -30,15 +33,15 @@ vi.setConfig({ testTimeout: 60000 })
  * checked against the API, and a mock that recognizes well-known fake tokens
  * cannot catch that.
  *
- * Both need a project that enforces signed uploads — `pub_test__signed_uploads`
- * on the mock, `UPLOAD_CLIENT_SECURE_UPLOADS_*` in production, where the keys
- * are a dedicated project because enabling the feature rejects every unsigned
- * request to it.
+ * Both need a project that enforces signed uploads — one the `signedUploads`
+ * preset names on the emulator, `UPLOAD_CLIENT_SECURE_UPLOADS_*` in production,
+ * where the keys are a dedicated project because enabling the feature rejects
+ * every unsigned request to it.
  */
 const isProduction = process.env.TEST_ENV === 'production'
 const publicKey = isProduction
   ? process.env.UPLOAD_CLIENT_SECURE_UPLOADS_PUBLIC_KEY
-  : SIGNED_UPLOADS_PUBLIC_KEY
+  : 'signed_uploads_public_key'
 const secretKey = isProduction
   ? process.env.UPLOAD_CLIENT_SECURE_UPLOADS_SECRET_KEY
   : SIGNED_UPLOADS_SECRET_KEY
@@ -89,6 +92,11 @@ const mintExpiredToken = (): string => {
   const issuedAt = Math.floor(Date.now() / 1000) - 3600
   return signTokenWithClaims({ iat: issuedAt, exp: issuedAt + 60 })
 }
+
+let session: EmulatorSession
+beforeEach(() => {
+  session = resetSession().use('signedUploads', { publicKey })
+})
 
 describeContract('authToken', () => {
   const fileToUpload = factory.image('blackSquare')
@@ -463,14 +471,12 @@ describeEmulatorOnly('authToken (emulator only)', () => {
       return calls === 2 ? mintExpiredToken() : mintToken()
     })
 
+    session.use('throttle', { match: 'POST /base/' })
+
     const startedAt = Date.now()
     const { file } = await base(factory.image('blackSquare').data, {
-      ...getSettingsForTesting({ publicKey: SIGNED_UPLOADS_PUBLIC_KEY }),
+      ...getSettingsForTesting({ publicKey: publicKey as string }),
       authToken: resolver,
-      // Unique per run: the mock spends a throttle key once per process, and
-      // a fixed one would quietly stop throttling on the second run against the
-      // same server.
-      metadata: { mock_throttle: `auth-token-retry-${Date.now()}` },
       retryThrottledRequestMaxTimes: 1
     })
 
