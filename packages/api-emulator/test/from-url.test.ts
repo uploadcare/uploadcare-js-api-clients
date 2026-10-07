@@ -48,7 +48,7 @@ it('refuses a request with no source_url', async () => {
 it('refuses a host that does not exist, with the hostNotFound preset', async () => {
   resetSession().use('hostNotFound')
   const response = await post(
-    'pub_key=demopublickey&source_url=https%3A%2F%2F1.com%2F1.jpg'
+    'pub_key=demopublickey&source_url=https%3A%2F%2Fgone.example%2F1.jpg'
   )
   expect(await jsonError(response)).toMatchObject({
     status_code: 400,

@@ -200,11 +200,11 @@ it('hostNotFound: refuses every source at POST time', async () => {
 })
 
 it('hostNotFound: with a sourceUrl, refuses that one alone', async () => {
-  session.use('hostNotFound', { sourceUrl: 'https://1.com/1.jpg' })
+  session.use('hostNotFound', { sourceUrl: 'https://gone.example/1.jpg' })
   expect(
     await jsonError(
       await fromUrl(
-        `pub_key=demopublickey&source_url=${encodeURIComponent('https://1.com/1.jpg')}`
+        `pub_key=demopublickey&source_url=${encodeURIComponent('https://gone.example/1.jpg')}`
       )
     )
   ).toMatchObject({ content: 'Host does not exist.' })
@@ -224,7 +224,7 @@ it('hostNotFound: leaves a request without a source_url to the route', async () 
   )
 })
 
-const STORED = '392e3aa3-5ed6-4ad6-a67e-b3a7c1d5b9e9'
+const STORED = 'aaaaaaaa-0000-4000-8000-000000000001'
 const infoOf = (uuid: string, pubKey = 'demopublickey') =>
   call(
     `https://upload.uploadcare.com/info/?jsonerrors=1&pub_key=${pubKey}&file_id=${uuid}`
