@@ -56,7 +56,9 @@ describe('API - group info', () => {
   it('should be rejected with error code if failed', async () => {
     const publicKey = factory.publicKey('invalid')
 
-    await expect(groupInfo('id', { publicKey })).rejects.toMatchObject({
+    await expect(
+      groupInfo('id', getSettingsForTesting({ publicKey }))
+    ).rejects.toMatchObject({
       message: 'pub_key is invalid.',
       code: 'ProjectPublicKeyInvalidError'
     })

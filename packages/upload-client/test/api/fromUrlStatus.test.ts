@@ -48,7 +48,9 @@ describe('API - from url status', () => {
     // /from_url/status/ takes no pub_key, so an invalid one can't be refused.
     const publicKey = factory.publicKey('invalid')
 
-    await expect(fromUrlStatus('token', { publicKey })).resolves.toEqual({
+    await expect(
+      fromUrlStatus('token', getSettingsForTesting({ publicKey }))
+    ).resolves.toEqual({
       status: Status.Unknown
     })
   })

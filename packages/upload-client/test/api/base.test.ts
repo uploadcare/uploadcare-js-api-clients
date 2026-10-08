@@ -1,7 +1,7 @@
 import { vi, expect, describe, it } from 'vitest'
 import base from '../../src/api/base'
 import * as factory from '../_fixtureFactory'
-import { assertComputableProgress } from '../_helpers'
+import { assertComputableProgress, getSettingsForTesting } from '../_helpers'
 describe('API - base', () => {
   const fileToUpload = factory.image('blackSquare')
 
@@ -43,7 +43,9 @@ describe('API - base', () => {
   it('should be rejected with error code if failed', async () => {
     const publicKey = factory.publicKey('invalid')
 
-    await expect(base(fileToUpload.data, { publicKey })).rejects.toMatchObject({
+    await expect(
+      base(fileToUpload.data, getSettingsForTesting({ publicKey }))
+    ).rejects.toMatchObject({
       message: 'UPLOADCARE_PUB_KEY is invalid.',
       code: 'ProjectPublicKeyInvalidError'
     })
