@@ -48,10 +48,12 @@ it('matches by method, path or host alone with the object form', async () => {
   expect((await call(INFO)).status).toBe(404)
 })
 
-it('refuses a match string that is not "METHOD /path"', () => {
-  for (const match of ['/info/', 'GET', 'GET info', 'GET /a/ /b/'])
+it.each(['/info/', 'GET', 'GET info', 'GET /a/ /b/'])(
+  'refuses the match string %j, which is not "METHOD /path"',
+  (match) => {
     expect(() => session.on(match, () => undefined)).toThrow(TypeError)
-})
+  }
+)
 
 it('falls through when the handler answers undefined', async () => {
   session.on('GET /info/', () => undefined)
@@ -158,12 +160,14 @@ it('gives `times: 1` to one of two concurrent requests', async () => {
   expect(statuses).toEqual([200, 404])
 })
 
-it('refuses a `times` that is not a positive integer', () => {
-  for (const times of [0, -1, 1.5, Number.NaN])
+it.each([0, -1, 1.5, Number.NaN])(
+  'refuses times: %s, which is not a positive integer',
+  (times) => {
     expect(() => session.on('GET /info/', () => undefined, { times })).toThrow(
       TypeError
     )
-})
+  }
+)
 
 it('passes the session handle to the handler', async () => {
   session.on('GET /info/', ({ session: seen }) =>

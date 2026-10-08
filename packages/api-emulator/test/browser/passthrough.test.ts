@@ -29,24 +29,22 @@ it('still fails an unrouted Uploadcare path rather than reaching the real API', 
   warn.mockRestore()
 })
 
-it('still refuses an Uploadcare host it does not emulate, naming it', async () => {
-  const error = vi.spyOn(console, 'error').mockImplementation(() => {})
-  const urls = [
-    'https://social.uploadcare.com/',
-    'https://api.uploadcare.com/files/',
-    'https://sub.ucarecdn.com/'
-  ]
+it.each([
+  'https://social.uploadcare.com/',
+  'https://api.uploadcare.com/files/',
+  'https://sub.ucarecdn.com/'
+])(
+  'still refuses %s, an Uploadcare host it does not emulate, naming it',
+  async (url) => {
+    const error = vi.spyOn(console, 'error').mockImplementation(() => {})
 
-  for (const url of urls) {
     await expect(fetch(url)).rejects.toThrow(TypeError)
     expect((await sendXhr('GET', url)).error).toBe(true)
-  }
 
-  expect(error.mock.calls.map(([message]) => message)).toEqual(
-    urls.flatMap((url) => [
+    expect(error.mock.calls.map(([message]) => message)).toEqual([
       expect.stringContaining(url),
       expect.stringContaining(url)
     ])
-  )
-  error.mockRestore()
-})
+    error.mockRestore()
+  }
+)
