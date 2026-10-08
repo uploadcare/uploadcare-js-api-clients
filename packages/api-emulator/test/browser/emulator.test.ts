@@ -24,7 +24,7 @@ const upload = async (file: Blob) => {
 }
 
 // The macrotask is the contract file-uploader's progress events depend on (see
-// the hold in `src/browser.ts`). Chromium's body reads already span tasks, so
+// the hold in `src/msw.ts`). Chromium's body reads already span tasks, so
 // this passes without the hold too; file-uploader's
 // `upload-progress.e2e.test.tsx` is what caught its absence.
 it('answers an XHR upload with per-chunk upload progress, a macrotask after send()', async () => {
