@@ -1,5 +1,6 @@
 import { afterAll, beforeEach, expect, it, vi } from 'vitest'
 import { setupEmulator } from '../../src/browser.js'
+import { DEMO_IMAGE_UUID } from '../../src/index.js'
 import {
   foreignOrigin,
   loadImage,
@@ -25,8 +26,8 @@ const upload = async (file: Blob) => {
 
 // The macrotask is the contract file-uploader's progress events depend on (see
 // the hold in `src/msw.ts`). Chromium's body reads already span tasks, so
-// this passes without the hold too; file-uploader's
-// `upload-progress.e2e.test.tsx` is what caught its absence.
+// this passes without the hold too; the body-less XHR below is what guards
+// the hold itself.
 it('answers an XHR upload with per-chunk upload progress, a macrotask after send()', async () => {
   const result = await upload(new Blob([new Uint8Array(5 * 1024 * 1024)]))
 
@@ -35,6 +36,25 @@ it('answers an XHR upload with per-chunk upload progress, a macrotask after send
   ).toBeGreaterThan(1)
   expect(result.uploadEvents.at(-1)).toBe('loadend')
   expect(result.macrotaskBeforeUpload).toBe(true)
+})
+
+// An XHR with a body spans a task anyway (the interceptor reads the body to
+// emit upload progress), so only a body-less one shows the hold itself.
+const seededInfo = `https://upload.uploadcare.com/info/?pub_key=demopublickey&file_id=${DEMO_IMAGE_UUID}`
+
+it('holds a body-less XHR a macrotask before it loads', async () => {
+  const result = await sendXhr('GET', seededInfo)
+  expect(result.status).toBe(200)
+  expect(result.macrotaskBeforeLoad).toBe(true)
+})
+
+it('answers in the same task under a scenario registered with hold: false', async () => {
+  const session = await emulator.reset()
+  session.on('GET /info/', ({ next }) => next(), { hold: false })
+
+  const result = await sendXhr('GET', seededInfo)
+  expect(result.status).toBe(200)
+  expect(result.macrotaskBeforeLoad).toBe(false)
 })
 
 it('serves the uploaded bytes to an <img> from every CDN host', async () => {

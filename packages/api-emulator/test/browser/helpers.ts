@@ -9,6 +9,8 @@ export type XhrResult = {
    * upload event.
    */
   macrotaskBeforeUpload: boolean | undefined
+  /** Whether that `setTimeout(0)` ran before `load` (or `error`). */
+  macrotaskBeforeLoad: boolean
 }
 
 export const sendXhr = (
@@ -34,7 +36,8 @@ export const sendXhr = (
         error,
         body: error ? '' : xhr.responseText,
         uploadEvents,
-        macrotaskBeforeUpload
+        macrotaskBeforeUpload,
+        macrotaskBeforeLoad: macrotask
       })
     xhr.addEventListener('load', done(false))
     xhr.addEventListener('error', done(true))
