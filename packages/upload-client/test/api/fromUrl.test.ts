@@ -67,7 +67,9 @@ describe('API - from url', () => {
   it('should be rejected with error code if failed', async () => {
     const publicKey = factory.publicKey('invalid')
 
-    await expect(fromUrl(sourceUrl, { publicKey })).rejects.toMatchObject({
+    await expect(
+      fromUrl(sourceUrl, getSettingsForTesting({ publicKey }))
+    ).rejects.toMatchObject({
       message: 'pub_key is invalid.',
       code: 'ProjectPublicKeyInvalidError'
     })
