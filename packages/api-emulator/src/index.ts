@@ -8,6 +8,7 @@ import * as store from './state/store.js'
 
 export {
   mintAuthToken,
+  SIGNED_UPLOADS_PUBLIC_KEY,
   SIGNED_UPLOADS_SECRET_KEY,
   type MintAuthTokenOptions
 } from './apis/upload/auth.js'

@@ -2,6 +2,7 @@ import { beforeEach, expect, it } from 'vitest'
 import {
   mintAuthToken,
   resetSession,
+  SIGNED_UPLOADS_PUBLIC_KEY,
   type EmulatorSession
 } from '../src/index.js'
 import { call, createGroup, token, uploadFile } from './emulator.js'
@@ -137,6 +138,16 @@ it('signedUploads: with a publicKey, turns it on for that project alone, which i
     (await jsonError(await uploadJson({ pubKey: 'pub_signed' }))).error_code
   ).toBe('SignatureRequiredError')
   expect(await uploadJson().then((r) => r.json())).toHaveProperty('file')
+})
+
+it('signedUploads: SIGNED_UPLOADS_PUBLIC_KEY names a project to turn it on for', async () => {
+  // Consumers pair it with their own runs' key, so the value is pinned.
+  expect(SIGNED_UPLOADS_PUBLIC_KEY).toBe('signed_uploads_public_key')
+  session.use('signedUploads', { publicKey: SIGNED_UPLOADS_PUBLIC_KEY })
+  expect(
+    (await jsonError(await uploadJson({ pubKey: SIGNED_UPLOADS_PUBLIC_KEY })))
+      .error_code
+  ).toBe('SignatureRequiredError')
 })
 
 const SOURCE = 'https://images.unsplash.com/photo-1?dl=holiday.jpg'
