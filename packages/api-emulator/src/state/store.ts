@@ -63,12 +63,15 @@ export type MultipartUpload = {
 /**
  * A derivative (AI generate/edit) job in flight, keyed by the `job_id` the POST
  * handed out. `polls` drives the status sequence (see `derivative.ts`); `file`
- * is the stored result, set by the first poll that reports `success`.
+ * is the stored result, set by the first poll that reports `success`, from
+ * `mimeType` and `bytes`.
  */
 export type DerivativeJob = {
   polls: number
   name: string
   isStored: boolean
+  mimeType: string
+  bytes: Uint8Array
   file?: StoredFile
 }
 

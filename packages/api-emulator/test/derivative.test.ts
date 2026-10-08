@@ -4,7 +4,7 @@ import {
   mintAuthToken,
   resetSession
 } from '../src/index.js'
-import { STOCK_IMAGE } from '../src/state/stock-image.js'
+import { imageSize } from '../src/state/image-size.js'
 import { call, token, upload } from './emulator.js'
 import { jsonError } from './spec.js'
 
@@ -108,8 +108,6 @@ it('starts a generate job and polls it through every non-terminal state to a sto
     original_filename: 'generated.png',
     is_image: true,
     is_stored: true,
-    mime_type: 'image/jpeg',
-    size: STOCK_IMAGE.byteLength,
     image_info: { width: expect.any(Number), height: expect.any(Number) }
   })
   // The not-yet-ready frame already names the same file.
@@ -125,7 +123,75 @@ it('starts a generate job and polls it through every non-terminal state to a sto
 
   const cdn = await call(`https://ucarecdn.com/${done.uuid}/`)
   expect(cdn.status).toBe(200)
-  expect(new Uint8Array(await cdn.arrayBuffer())).toEqual(STOCK_IMAGE)
+  expect((await cdn.arrayBuffer()).byteLength).toBe(done.size)
+})
+
+type ImageInfo = { width: number; height: number; format: string }
+
+/** The finished job's file: what its frame, `-/json/` and its bytes say. */
+const resultOf = async (jobId: string) => {
+  const done = (await pollToEnd(jobId)).at(-1) as Frame & {
+    image_info: ImageInfo
+    mime_type: string
+  }
+  const json = (await (
+    await call(`https://ucarecdn.com/${done.uuid}/-/json/`)
+  ).json()) as ImageInfo
+  const bytes = new Uint8Array(
+    await (await call(`https://ucarecdn.com/${done.uuid}/`)).arrayBuffer()
+  )
+  return { done, json, decoded: imageSize(bytes) }
+}
+
+it.each([[[1, 1]], [[3, 2]], [[16, 9]], [[9, 16]], [[1920, 1080]]])(
+  'generates an image of aspect_ratio %j, as its frame, -/json/ and bytes all report',
+  async ([w, h]) => {
+    const { done, json, decoded } = await resultOf(
+      await jobIdOf(await generate({ aspect_ratio: [w, h] }))
+    )
+    const { width, height } = done.image_info
+    expect(width * h).toBe(height * w)
+    expect(json).toMatchObject({ width, height })
+    expect(decoded).toEqual({ width, height, format: done.image_info.format })
+    expect(done.mime_type).toBe(`image/${decoded!.format.toLowerCase()}`)
+  }
+)
+
+it('fits a ratio too fine to draw exactly within 2048 px on its long side', async () => {
+  const { done, decoded } = await resultOf(
+    await jobIdOf(await generate({ aspect_ratio: [100_000, 99_999] }))
+  )
+  expect(done.image_info).toMatchObject({ width: 2048, height: 2048 })
+  expect(decoded).toMatchObject({ width: 2048, height: 2048 })
+})
+
+it('reshapes an edit to its aspect_ratio', async () => {
+  const { done, decoded } = await resultOf(
+    await jobIdOf(await edit({ aspect_ratio: [16, 9] }))
+  )
+  expect(done.image_info.width * 9).toBe(done.image_info.height * 16)
+  expect(decoded).toMatchObject({
+    width: done.image_info.width,
+    height: done.image_info.height
+  })
+})
+
+it('keeps the source dimensions for an edit without aspect_ratio', async () => {
+  const { done } = await resultOf(await jobIdOf(await edit()))
+  // The seeded stock image.
+  expect(done.image_info).toMatchObject({ width: 136, height: 150 })
+
+  const tall = await resultOf(
+    await jobIdOf(await generate({ aspect_ratio: [1, 3] }))
+  )
+  const kept = await resultOf(
+    await jobIdOf(await edit({ source: tall.done.uuid }))
+  )
+  expect(kept.done.image_info).toMatchObject({
+    width: tall.done.image_info.width,
+    height: tall.done.image_info.height
+  })
+  expect(kept.done.uuid).not.toBe(tall.done.uuid)
 })
 
 it('keeps answering success once the job is done', async () => {
