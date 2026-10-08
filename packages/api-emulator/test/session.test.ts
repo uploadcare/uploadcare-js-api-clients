@@ -1,5 +1,12 @@
 import { expect, it } from 'vitest'
-import { resetSession } from '../src/index.js'
+import {
+  ADAPTIVE_IMAGE_UUID,
+  BUNDLE_IMAGE_UUID,
+  DEMO_FILES,
+  DEMO_IMAGE_UUID,
+  EDITOR_IMAGE_UUID,
+  resetSession
+} from '../src/index.js'
 import { call, createGroup, upload } from './emulator.js'
 
 /**
@@ -71,4 +78,25 @@ it('keeps two sessions from seeing each other', async () => {
   ).toMatchObject({
     status: 'progress'
   })
+})
+
+it('starts every session with the named demo files, which are all of DEMO_FILES', async () => {
+  resetSession('fresh')
+  // The uuids are the real demo project's: consumers hardcode them, so a
+  // changed value is a breaking change, not a refactor.
+  const named = {
+    DEMO_IMAGE_UUID: '49b4c5a1-31b3-4349-ba07-d97a2d883c37',
+    ADAPTIVE_IMAGE_UUID: '7124ae98-344c-42b2-ae2a-bd9aa79d76d8',
+    EDITOR_IMAGE_UUID: 'f4dc9ebc-ed6d-4b4d-83d1-863bf1e4bb7f',
+    BUNDLE_IMAGE_UUID: '90e06e59-8055-4435-9291-c005a98cf098'
+  }
+  expect({
+    DEMO_IMAGE_UUID,
+    ADAPTIVE_IMAGE_UUID,
+    EDITOR_IMAGE_UUID,
+    BUNDLE_IMAGE_UUID
+  }).toEqual(named)
+  expect(DEMO_FILES).toEqual(Object.values(named))
+  for (const uuid of DEMO_FILES)
+    expect(await statusOf(infoUrl(uuid), 'fresh')).toBe(200)
 })

@@ -74,26 +74,39 @@ export type DerivativeJob = {
 
 /**
  * Files the tests address by uuid without uploading them first — they exist in
- * the demo project, so a fresh session starts with them already stored.
- *
- * - `49b4c5a1-31b3-4349-ba07-d97a2d883c37` — `upload-client`'s
- *   `test/_fixtureFactory.ts` (`uuid('image')`/`uuid('token')`), polled by
- *   `uploadFromUploaded.test.ts`, `api/info.test.ts` and `uploadFile.test.ts`.
- *   The real API has this file; nothing in the suite uploads it first.
- * - `7124ae98-344c-42b2-ae2a-bd9aa79d76d8` — the browser suite's
- *   `adaptive-image.e2e.test.tsx` (`<uc-img>`).
- * - `f4dc9ebc-ed6d-4b4d-83d1-863bf1e4bb7f` — the browser suite's
- *   `cloud-image-editor.e2e.test.tsx` / `editor-filters.e2e.test.tsx` /
- *   `telemetry/editor-and-sources.e2e.test.tsx` (`<uc-cloud-image-editor>`).
- * - `90e06e59-8055-4435-9291-c005a98cf098` — the browser suite's
- *   `solutions/bundles.e2e.test.tsx` (both `<uc-cloud-image-editor>` and
- *   `<uc-img>`).
+ * the demo project, so a fresh session starts with them already stored. Each is
+ * the stock image (`STOCK_IMAGE`: a 136×150 JPEG, stored, named `demo.jpg`);
+ * the uuids differ only because each consumer hardcoded the one its real-API
+ * run used. Import the name rather than repeating the uuid.
  */
-export const DEMO_FILES = [
-  '49b4c5a1-31b3-4349-ba07-d97a2d883c37',
-  '7124ae98-344c-42b2-ae2a-bd9aa79d76d8',
-  'f4dc9ebc-ed6d-4b4d-83d1-863bf1e4bb7f',
-  '90e06e59-8055-4435-9291-c005a98cf098'
+
+/**
+ * `upload-client`'s `test/_fixtureFactory.ts`
+ * (`uuid('image')`/`uuid('token')`), polled by `uploadFromUploaded.test.ts`,
+ * `api/info.test.ts` and `uploadFile.test.ts`. The real API has this file;
+ * nothing in the suite uploads it first.
+ */
+export const DEMO_IMAGE_UUID = '49b4c5a1-31b3-4349-ba07-d97a2d883c37'
+/** The browser suite's `adaptive-image.e2e.test.tsx` (`<uc-img>`). */
+export const ADAPTIVE_IMAGE_UUID = '7124ae98-344c-42b2-ae2a-bd9aa79d76d8'
+/**
+ * The browser suite's `cloud-image-editor.e2e.test.tsx` /
+ * `editor-filters.e2e.test.tsx` / `telemetry/editor-and-sources.e2e.test.tsx`
+ * (`<uc-cloud-image-editor>`).
+ */
+export const EDITOR_IMAGE_UUID = 'f4dc9ebc-ed6d-4b4d-83d1-863bf1e4bb7f'
+/**
+ * The browser suite's `solutions/bundles.e2e.test.tsx` (both
+ * `<uc-cloud-image-editor>` and `<uc-img>`).
+ */
+export const BUNDLE_IMAGE_UUID = '90e06e59-8055-4435-9291-c005a98cf098'
+
+/** Every seeded demo file, the named uuids above. */
+export const DEMO_FILES: readonly string[] = [
+  DEMO_IMAGE_UUID,
+  ADAPTIVE_IMAGE_UUID,
+  EDITOR_IMAGE_UUID,
+  BUNDLE_IMAGE_UUID
 ]
 
 /**
