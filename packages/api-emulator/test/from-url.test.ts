@@ -22,6 +22,16 @@ const poll = async (token: string) => {
   return body
 }
 
+// The emulator finishes a job in four polls (see `from-url.ts`), so a job
+// still in progress after ten has hung; the caller's toMatchObject then fails
+// on its `status: 'progress'` frame instead of the test timing out.
+const pollToEnd = async (token: string) => {
+  let last = await poll(token)
+  for (let polls = 1; last.status === 'progress' && polls < 10; polls += 1)
+    last = await poll(token)
+  return last
+}
+
 const SOURCE = 'https://images.unsplash.com/photo-1?dl=holiday.jpg'
 
 beforeEach(() => resetSession())
@@ -75,8 +85,7 @@ it('reports progress before it succeeds, and names the file from the url', async
   const { token } = parsed
 
   expect(await poll(token)).toMatchObject({ status: 'progress' })
-  let last = await poll(token)
-  while (last.status === 'progress') last = await poll(token)
+  const last = await pollToEnd(token)
 
   expect(last).toMatchObject({
     status: 'success',
@@ -89,8 +98,7 @@ it('names the file from the last path segment when there is no dl param', async 
     `pub_key=demopublickey&source_url=${encodeURIComponent('https://images.unsplash.com/photo-2.jpg')}`
   ).then((r) => r.json())) as { token: string }
 
-  let last = await poll(token)
-  while (last.status === 'progress') last = await poll(token)
+  const last = await pollToEnd(token)
   expect(last).toMatchObject({ original_filename: 'photo-2.jpg' })
 })
 
@@ -99,8 +107,7 @@ it('reads store=false the way /base/ does', async () => {
     `pub_key=demopublickey&store=false&source_url=${encodeURIComponent(SOURCE)}`
   ).then((r) => r.json())) as { token: string }
 
-  let last = await poll(token)
-  while (last.status === 'progress') last = await poll(token)
+  const last = await pollToEnd(token)
   expect(last).toMatchObject({ status: 'success', is_stored: false })
 })
 
@@ -147,8 +154,7 @@ it('serves a from_url upload as bytes an image decoder can actually read', async
     `pub_key=demopublickey&source_url=${encodeURIComponent(SOURCE)}`
   ).then((r) => r.json())) as { token: string }
 
-  let last = await poll(token)
-  while (last.status === 'progress') last = await poll(token)
+  const last = await pollToEnd(token)
   // Read off the real bytes, not hardcoded — a 13-byte hand-written JPEG
   // header would have reported 1×1 here and still failed to decode in a page.
   expect(last).toMatchObject({
@@ -184,7 +190,6 @@ it('respects a filename override', async () => {
     `pub_key=demopublickey&source_url=${encodeURIComponent(SOURCE)}&filename=renamed.jpg`
   ).then((r) => r.json())) as { token: string }
 
-  let last = await poll(token)
-  while (last.status === 'progress') last = await poll(token)
+  const last = await pollToEnd(token)
   expect(last).toMatchObject({ original_filename: 'renamed.jpg' })
 })

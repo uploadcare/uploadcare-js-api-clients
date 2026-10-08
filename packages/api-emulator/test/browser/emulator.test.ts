@@ -89,19 +89,22 @@ it.each([
       })
     })
     const { job_id: jobId } = (await started.json()) as { job_id: string }
-    let frame: {
+    const pollStatus = async (): Promise<{
       is_ready?: boolean
       uuid: string
       image_info: { width: number; height: number }
-    }
-    do {
-      frame = await (
+    }> =>
+      (
         await fetch(
           `${api}/derivative/status/?pub_key=demopublickey&job_id=${jobId}`,
           { headers: { Accept: 'application/json' } }
         )
       ).json()
-    } while (!frame.is_ready)
+    // The job is ready on the fourth poll (see `derivative.ts`); ten is a hang.
+    let frame = await pollStatus()
+    for (let polls = 1; !frame.is_ready && polls < 10; polls += 1)
+      frame = await pollStatus()
+    expect(frame).toMatchObject({ is_ready: true })
 
     // Each test's session restarts the uuid sequence: the query keeps the
     // browser from answering with the last test's cached image.
