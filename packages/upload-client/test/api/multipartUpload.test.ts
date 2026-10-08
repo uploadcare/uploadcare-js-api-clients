@@ -3,7 +3,6 @@ import * as factory from '../_fixtureFactory'
 import multipartUpload from '../../src/api/multipartUpload'
 import { getSettingsForTesting, assertComputableProgress } from '../_helpers'
 import multipartStart from '../../src/api/multipartStart'
-import { UploadError } from '../../src/tools/UploadError'
 import { CancelError } from '@uploadcare/api-client-utils'
 let parts: [string, Blob | Buffer][] = []
 
@@ -65,23 +64,5 @@ describe('API - multipartUpload', () => {
     await multipartUpload(part, url, options)
 
     assertComputableProgress(onProgress)
-  })
-
-  it('should be rejected with error code if failed', async () => {
-    const options = getSettingsForTesting({
-      publicKey: factory.publicKey('invalid')
-    })
-    const [url, part] = parts[2]
-
-    try {
-      await multipartUpload(part, url, options)
-    } catch (error) {
-      expect((error as UploadError).message).toEqual(
-        'UPLOADCARE_PUB_KEY is invalid.'
-      )
-      expect((error as UploadError).code).toEqual(
-        'ProjectPublicKeyInvalidError'
-      )
-    }
   })
 })

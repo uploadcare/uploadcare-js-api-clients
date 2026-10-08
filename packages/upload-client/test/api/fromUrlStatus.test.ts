@@ -2,7 +2,6 @@ import { describe, it, expect } from 'vitest'
 import fromUrlStatus, { Status } from '../../src/api/fromUrlStatus'
 import * as factory from '../_fixtureFactory'
 import { getSettingsForTesting } from '../_helpers'
-import { UploadError } from '../../src/tools/UploadError'
 
 describe('API - from url status', () => {
   const token = factory.token('valid')
@@ -45,18 +44,12 @@ describe('API - from url status', () => {
     )
   })
 
-  it('should be rejected with error code if failed', async () => {
+  it('answers unknown for a token it never issued, whatever the public key', async () => {
+    // /from_url/status/ takes no pub_key, so an invalid one can't be refused.
     const publicKey = factory.publicKey('invalid')
 
-    try {
-      await fromUrlStatus('token', { publicKey })
-    } catch (error) {
-      expect((error as UploadError).message).toEqual(
-        'UPLOADCARE_PUB_KEY is invalid.'
-      )
-      expect((error as UploadError).code).toEqual(
-        'ProjectPublicKeyInvalidError'
-      )
-    }
+    await expect(fromUrlStatus('token', { publicKey })).resolves.toEqual({
+      status: Status.Unknown
+    })
   })
 })

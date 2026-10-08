@@ -1,7 +1,6 @@
 import { vi, expect, describe, it } from 'vitest'
 import * as factory from '../_fixtureFactory'
 import { getSettingsForTesting, assertComputableProgress } from '../_helpers'
-import { UploadError } from '../../src/tools/UploadError'
 import { CancelError } from '@uploadcare/api-client-utils'
 import { uploadFromUploaded } from '../../src/uploadFile/uploadFromUploaded'
 import info from '../../src/api/info'
@@ -64,13 +63,9 @@ describe('uploadFromUploaded', () => {
       publicKey: factory.publicKey('invalid')
     })
 
-    try {
-      await uploadFromUploaded(uuid, settings)
-    } catch (error) {
-      expect((error as UploadError).message).toEqual('pub_key is invalid.')
-      expect((error as UploadError).code).toEqual(
-        'ProjectPublicKeyInvalidError'
-      )
-    }
+    await expect(uploadFromUploaded(uuid, settings)).rejects.toMatchObject({
+      message: 'pub_key is invalid.',
+      code: 'ProjectPublicKeyInvalidError'
+    })
   })
 })

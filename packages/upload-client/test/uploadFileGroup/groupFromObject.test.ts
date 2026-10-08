@@ -2,7 +2,6 @@ import { vi, expect, describe, it } from 'vitest'
 import * as factory from '../_fixtureFactory'
 import { uploadFileGroup } from '../../src/uploadFileGroup'
 import { getSettingsForTesting, assertComputableProgress } from '../_helpers'
-import { UploadError } from '../../src/tools/UploadError'
 import { CancelError } from '@uploadcare/api-client-utils'
 describe('groupFrom Object[]', () => {
   const fileToUpload = factory.image('blackSquare').data
@@ -59,15 +58,9 @@ describe('groupFrom Object[]', () => {
       publicKey: factory.publicKey('invalid')
     })
 
-    try {
-      await uploadFileGroup(files, settings)
-    } catch (error) {
-      expect((error as UploadError).message).toEqual(
-        'UPLOADCARE_PUB_KEY is invalid.'
-      )
-      expect((error as UploadError).code).toEqual(
-        'ProjectPublicKeyInvalidError'
-      )
-    }
+    await expect(uploadFileGroup(files, settings)).rejects.toMatchObject({
+      message: 'UPLOADCARE_PUB_KEY is invalid.',
+      code: 'ProjectPublicKeyInvalidError'
+    })
   })
 })

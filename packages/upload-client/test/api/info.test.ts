@@ -3,7 +3,6 @@ import base from '../../src/api/base'
 import info from '../../src/api/info'
 import * as factory from '../_fixtureFactory'
 import { getSettingsForTesting } from '../_helpers'
-import { UploadError } from '../../src/tools/UploadError'
 
 describe('API - info', () => {
   it('should return file info', async () => {
@@ -47,13 +46,9 @@ describe('API - info', () => {
   it('should be rejected with error code if failed', async () => {
     const publicKey = factory.publicKey('invalid')
 
-    try {
-      await info('uuid', { publicKey })
-    } catch (error) {
-      expect((error as UploadError).message).toEqual('pub_key is invalid.')
-      expect((error as UploadError).code).toEqual(
-        'ProjectPublicKeyInvalidError'
-      )
-    }
+    await expect(info('uuid', { publicKey })).rejects.toMatchObject({
+      message: 'pub_key is invalid.',
+      code: 'ProjectPublicKeyInvalidError'
+    })
   })
 })
