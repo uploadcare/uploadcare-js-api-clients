@@ -6,7 +6,6 @@ import {
   assertComputableProgress,
   assertUnknownProgress
 } from '../_helpers'
-import { UploadError } from '../../src/tools/UploadError'
 import { CancelError } from '@uploadcare/api-client-utils'
 import http from 'node:http'
 import https, { RequestOptions } from 'node:https'
@@ -157,13 +156,9 @@ describe('uploadFromUrl', () => {
       publicKey: factory.publicKey('invalid')
     })
 
-    try {
-      await uploadFromUrl(sourceUrl, settings)
-    } catch (error) {
-      expect((error as UploadError).message).toEqual('pub_key is invalid.')
-      expect((error as UploadError).code).toEqual(
-        'ProjectPublicKeyInvalidError'
-      )
-    }
+    await expect(uploadFromUrl(sourceUrl, settings)).rejects.toMatchObject({
+      message: 'pub_key is invalid.',
+      code: 'ProjectPublicKeyInvalidError'
+    })
   })
 })

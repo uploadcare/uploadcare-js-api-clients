@@ -60,15 +60,9 @@ describe('API - multipartStart', () => {
       contentType: 'application/octet-stream'
     })
 
-    try {
-      await multipartStart(size, settings)
-    } catch (error) {
-      expect((error as UploadError).message).toEqual(
-        'UPLOADCARE_PUB_KEY is invalid.'
-      )
-      expect((error as UploadError).code).toEqual(
-        'ProjectPublicKeyInvalidError'
-      )
-    }
+    await expect(multipartStart(size, settings)).rejects.toMatchObject({
+      message: 'UPLOADCARE_PUB_KEY is invalid.',
+      code: 'ProjectPublicKeyInvalidError'
+    })
   })
 })

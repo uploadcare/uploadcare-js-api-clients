@@ -7,7 +7,6 @@ import {
   assertUnknownProgress
 } from '../_helpers'
 import { uploadFileGroup } from '../../src/uploadFileGroup'
-import { UploadError } from '../../src/tools/UploadError'
 import { CancelError } from '@uploadcare/api-client-utils'
 describe('groupFrom Url[]', () => {
   const sourceUrl = factory.imageUrl('valid')
@@ -82,13 +81,9 @@ describe('groupFrom Url[]', () => {
       publicKey: factory.publicKey('invalid')
     })
 
-    try {
-      await uploadFileGroup(files, settings)
-    } catch (error) {
-      expect((error as UploadError).message).toEqual('pub_key is invalid.')
-      expect((error as UploadError).code).toEqual(
-        'ProjectPublicKeyInvalidError'
-      )
-    }
+    await expect(uploadFileGroup(files, settings)).rejects.toMatchObject({
+      message: 'pub_key is invalid.',
+      code: 'ProjectPublicKeyInvalidError'
+    })
   })
 })

@@ -1,7 +1,6 @@
 import { vi, expect, describe, it } from 'vitest'
 import * as factory from '../_fixtureFactory'
 import { getSettingsForTesting, assertComputableProgress } from '../_helpers'
-import { UploadError } from '../../src/tools/UploadError'
 import { uploadDirect } from '../../src/uploadFile/uploadDirect'
 import info from '../../src/api/info'
 // TODO: add tests for metadata
@@ -98,15 +97,9 @@ describe('uploadDirect', () => {
       publicKey: factory.publicKey('invalid')
     })
 
-    try {
-      await uploadDirect(fileToUpload, settings)
-    } catch (error) {
-      expect((error as UploadError).message).toEqual(
-        'UPLOADCARE_PUB_KEY is invalid.'
-      )
-      expect((error as UploadError).code).toEqual(
-        'ProjectPublicKeyInvalidError'
-      )
-    }
+    await expect(uploadDirect(fileToUpload, settings)).rejects.toMatchObject({
+      message: 'UPLOADCARE_PUB_KEY is invalid.',
+      code: 'ProjectPublicKeyInvalidError'
+    })
   })
 })

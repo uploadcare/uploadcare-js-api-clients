@@ -95,15 +95,9 @@ describe('API - multipartComplete', () => {
   it('should be rejected with error code if failed', async () => {
     const publicKey = factory.publicKey('invalid')
 
-    try {
-      await multipartComplete('', { publicKey })
-    } catch (error) {
-      expect((error as UploadError).message).toEqual(
-        'UPLOADCARE_PUB_KEY is invalid.'
-      )
-      expect((error as UploadError).code).toEqual(
-        'ProjectPublicKeyInvalidError'
-      )
-    }
+    await expect(multipartComplete('', { publicKey })).rejects.toMatchObject({
+      message: 'UPLOADCARE_PUB_KEY is invalid.',
+      code: 'ProjectPublicKeyInvalidError'
+    })
   })
 })

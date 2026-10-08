@@ -1,7 +1,6 @@
 import { vi, expect, describe, it } from 'vitest'
 import * as factory from '../_fixtureFactory'
 import { getSettingsForTesting, assertComputableProgress } from '../_helpers'
-import { UploadError } from '../../src/tools/UploadError'
 import { CancelError } from '@uploadcare/api-client-utils'
 import { uploadMultipart } from '../../src/uploadFile/uploadMultipart'
 import info from '../../src/api/info'
@@ -88,15 +87,11 @@ describe('uploadMultipart', () => {
       publicKey: factory.publicKey('invalid')
     })
 
-    try {
-      await uploadMultipart(fileToUpload, settings)
-    } catch (error) {
-      expect((error as UploadError).message).toEqual(
-        'UPLOADCARE_PUB_KEY is invalid.'
-      )
-      expect((error as UploadError).code).toEqual(
-        'ProjectPublicKeyInvalidError'
-      )
-    }
+    await expect(uploadMultipart(fileToUpload, settings)).rejects.toMatchObject(
+      {
+        message: 'UPLOADCARE_PUB_KEY is invalid.',
+        code: 'ProjectPublicKeyInvalidError'
+      }
+    )
   })
 })

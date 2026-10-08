@@ -3,7 +3,6 @@ import fromUrl, { TypeEnum } from '../../src/api/fromUrl'
 import { resetSession } from '@uploadcare/api-emulator'
 import * as factory from '../_fixtureFactory'
 import { getSettingsForTesting } from '../_helpers'
-import { UploadError } from '../../src/tools/UploadError'
 
 describe('API - from url', () => {
   const sourceUrl = factory.imageUrl('valid')
@@ -68,13 +67,9 @@ describe('API - from url', () => {
   it('should be rejected with error code if failed', async () => {
     const publicKey = factory.publicKey('invalid')
 
-    try {
-      await fromUrl(sourceUrl, { publicKey })
-    } catch (error) {
-      expect((error as UploadError).message).toEqual('pub_key is invalid.')
-      expect((error as UploadError).code).toEqual(
-        'ProjectPublicKeyInvalidError'
-      )
-    }
+    await expect(fromUrl(sourceUrl, { publicKey })).rejects.toMatchObject({
+      message: 'pub_key is invalid.',
+      code: 'ProjectPublicKeyInvalidError'
+    })
   })
 })

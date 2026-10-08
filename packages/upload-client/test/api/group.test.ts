@@ -3,7 +3,6 @@ import { resetSession } from '@uploadcare/api-emulator'
 import * as factory from '../_fixtureFactory'
 import { getSettingsForTesting } from '../_helpers'
 import group from '../../src/api/group'
-import { UploadError } from '../../src/tools/UploadError'
 import { GroupFileInfo } from '../../src'
 
 describe('API - group', () => {
@@ -76,13 +75,9 @@ describe('API - group', () => {
   it('should be rejected with error code if failed', async () => {
     const publicKey = factory.publicKey('invalid')
 
-    try {
-      await group([], { publicKey })
-    } catch (error) {
-      expect((error as UploadError).message).toEqual('pub_key is invalid.')
-      expect((error as UploadError).code).toEqual(
-        'ProjectPublicKeyInvalidError'
-      )
-    }
+    await expect(group([], { publicKey })).rejects.toMatchObject({
+      message: 'pub_key is invalid.',
+      code: 'ProjectPublicKeyInvalidError'
+    })
   })
 })
