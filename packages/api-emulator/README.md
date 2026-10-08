@@ -199,6 +199,7 @@ export default defineConfig({ plugins: [msw({})] })
 
 ```ts
 // src/main.ts
+/// <reference types="msw/vite/client" />
 if (import.meta.env.DEV) {
   const { network } = await import('virtual:msw')
   const { emulatorHandlers } = await import('@uploadcare/api-emulator/msw')
