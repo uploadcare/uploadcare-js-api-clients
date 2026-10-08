@@ -12,7 +12,14 @@ export {
   type MintAuthTokenOptions
 } from './apis/upload/auth.js'
 
-export { DEMO_FILES, SESSION_HEADER } from './state/store.js'
+export {
+  ADAPTIVE_IMAGE_UUID,
+  BUNDLE_IMAGE_UUID,
+  DEMO_FILES,
+  DEMO_IMAGE_UUID,
+  EDITOR_IMAGE_UUID,
+  SESSION_HEADER
+} from './state/store.js'
 export type { StoredFile, StoredImage, TelemetryEvent } from './state/store.js'
 export { resetSession, sessionOf } from './session.js'
 export type { EmulatorSession, SessionView } from './session.js'

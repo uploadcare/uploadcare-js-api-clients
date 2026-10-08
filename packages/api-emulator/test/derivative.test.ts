@@ -1,5 +1,9 @@
 import { beforeEach, expect, it } from 'vitest'
-import { mintAuthToken, resetSession } from '../src/index.js'
+import {
+  DEMO_IMAGE_UUID as SEEDED,
+  mintAuthToken,
+  resetSession
+} from '../src/index.js'
 import { STOCK_IMAGE } from '../src/state/stock-image.js'
 import { call, token, upload } from './emulator.js'
 import { jsonError } from './spec.js'
@@ -13,7 +17,6 @@ import { jsonError } from './spec.js'
  * snake_case `error_code`.
  */
 
-const SEEDED = '49b4c5a1-31b3-4349-ba07-d97a2d883c37'
 const UPLOAD = 'https://upload.uploadcare.com'
 
 beforeEach(() => resetSession())

@@ -1,5 +1,5 @@
 import { beforeEach, expect, it } from 'vitest'
-import { resetSession } from '../src/index.js'
+import { DEMO_IMAGE_UUID, resetSession } from '../src/index.js'
 import { call } from './emulator.js'
 import { assertMatchesSpec, jsonError } from './spec.js'
 
@@ -160,9 +160,7 @@ it('serves a from_url upload as bytes an image decoder can actually read', async
     `https://ucarecdn.com/${(last as { uuid: string }).uuid}/`
   )
   expect(await delivered.arrayBuffer()).toEqual(
-    await (
-      await call('https://ucarecdn.com/49b4c5a1-31b3-4349-ba07-d97a2d883c37/')
-    ).arrayBuffer()
+    await (await call(`https://ucarecdn.com/${DEMO_IMAGE_UUID}/`)).arrayBuffer()
   )
 })
 
