@@ -55,12 +55,12 @@ const expectRejected = async (
   response: Response,
   status: number,
   code: string,
-  content?: string | RegExp
+  content: string | RegExp
 ) => {
   const error = await jsonError(response)
   expect(error.status_code).toBe(status)
   expect(error.error_code).toBe(code)
-  if (content) expect(error.content).toMatch(content)
+  expect(error.content).toMatch(content)
 }
 
 it('accepts a valid token on /base/, even with an invalid public key', async () => {
@@ -131,7 +131,8 @@ it('refuses an endpoint outside the scope', async () => {
   await expectRejected(
     await bearer(token({ uc: { restrictions: { scope: ['/multipart/*'] } } })),
     403,
-    'ScopeForbiddenError'
+    'ScopeForbiddenError',
+    '`uc.restrictions.scope` does not allow this endpoint.'
   )
 })
 
@@ -147,7 +148,8 @@ it('spends `limits.operations`, then refuses', async () => {
   await expectRejected(
     await bearer(limited),
     403,
-    'OperationsLimitExceededError'
+    'OperationsLimitExceededError',
+    'The operation limit of the token is exhausted.'
   )
 })
 
@@ -226,7 +228,12 @@ it('mints with a lifetime, a token id, a scope and an operation limit', async ()
   })
   const { iat, exp } = claimsOf(minted)
   expect(exp - iat).toBe(600)
-  await expectRejected(await bearer(minted), 403, 'ScopeForbiddenError')
+  await expectRejected(
+    await bearer(minted),
+    403,
+    'ScopeForbiddenError',
+    '`uc.restrictions.scope` does not allow this endpoint.'
+  )
 })
 
 it('verifies against the exported secret', async () => {
