@@ -110,19 +110,9 @@ it('names the operation, the status, and the failing field when a body fails val
   const body = (await response.clone().json()) as Record<string, unknown>
   delete body.is_image
 
-  let thrown: unknown
-  try {
-    await assertMatchesSpec(response, { method: 'get', path: '/info/' }, body)
-  } catch (error) {
-    thrown = error
-  }
-
-  expect(thrown).toBeInstanceOf(Error)
-  const message = (thrown as Error).message
-  expect(message).toContain('GET')
-  expect(message).toContain('/info/')
-  expect(message).toContain('200')
-  expect(message).toContain('is_image')
+  await expect(
+    assertMatchesSpec(response, { method: 'get', path: '/info/' }, body)
+  ).rejects.toThrow(/GET[\s\S]*\/info\/[\s\S]*200[\s\S]*is_image/)
 })
 
 it('rejects a /base/ upload with no file, no jsonerrors', async () => {
