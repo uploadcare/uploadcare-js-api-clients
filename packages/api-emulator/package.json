@@ -70,7 +70,7 @@
   "homepage": "https://github.com/uploadcare/uploadcare-js-api-clients#readme",
   "peerDependencies": {
     "@mswjs/interceptors": "^0.45.7",
-    "msw": "^2.15.0"
+    "msw": "^3.0.2"
   },
   "peerDependenciesMeta": {
     "@mswjs/interceptors": {
@@ -85,7 +85,7 @@
     "@vitest/browser-playwright": "^4.1.11",
     "ajv": "^8.17.1",
     "ajv-formats": "^3.0.1",
-    "msw": "^2.15.0",
+    "msw": "^3.0.2",
     "oxfmt": "^0.53.0",
     "oxlint": "^1.68.0",
     "oxlint-tsgolint": "^0.23.0",
