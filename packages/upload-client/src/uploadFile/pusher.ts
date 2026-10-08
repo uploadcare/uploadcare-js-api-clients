@@ -78,9 +78,14 @@ class Pusher {
     if (!this.isConnected && !this.ws) {
       const pusherUrl = `wss://ws.pusherapp.com/app/${this.key}?protocol=5&client=js&version=1.12.2`
 
-      this.ws = new WebSocket(pusherUrl)
+      const ws = new WebSocket(pusherUrl)
+      this.ws = ws
 
-      this.ws.addEventListener('error', (error) => {
+      // A socket `disconnect()` closed can still deliver frames; only the
+      // current one may drive state, or its `connection_established` would
+      // flush the queue into a newer socket that is still CONNECTING.
+      ws.addEventListener('error', (error) => {
+        if (this.ws !== ws) return
         this.emmitter.emit('error', new Error(error.message))
       })
 
@@ -90,7 +95,8 @@ class Pusher {
         this.queue = []
       })
 
-      this.ws.addEventListener('message', (e) => {
+      ws.addEventListener('message', (e) => {
+        if (this.ws !== ws) return
         const data = JSON.parse(e.data.toString())
 
         switch (data.event) {
