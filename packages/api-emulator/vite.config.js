@@ -20,7 +20,8 @@ export default defineConfig({
         index: resolve(__dirname, 'src/index.ts'),
         listen: resolve(__dirname, 'src/listen.ts'),
         browser: resolve(__dirname, 'src/browser.ts'),
-        node: resolve(__dirname, 'src/node.ts')
+        node: resolve(__dirname, 'src/node.ts'),
+        msw: resolve(__dirname, 'src/msw.ts')
       },
       formats: ['es'],
       fileName: '[name]'
@@ -32,7 +33,8 @@ export default defineConfig({
       external: [
         'node:http',
         'node:https',
-        // Optional peers of `./browser` (and, for the interceptors, `./node`),
+        // Optional peers of `./browser` and `./msw` (and, for the
+        // interceptors, `./node`),
         // resolved from the consumer's own install: bundling them would ship a
         // second MSW next to theirs.
         /^msw(?:\/|$)/,
