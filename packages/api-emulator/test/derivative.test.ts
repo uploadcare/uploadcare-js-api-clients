@@ -194,6 +194,87 @@ it('keeps the source dimensions for an edit without aspect_ratio', async () => {
   expect(kept.done.uuid).not.toBe(tall.done.uuid)
 })
 
+/**
+ * A `GET /derivative/status/` success frame production sent, verbatim, as
+ * ai-image-editor recorded it (`uploadcareApiClient.schemas.dev.test.ts`, "a
+ * real derivative status success frame"). The only frame of these routes
+ * checked against the real API.
+ */
+const PRODUCTION_SUCCESS_FRAME = {
+  size: 1620930,
+  total: 1620930,
+  done: 1620930,
+  uuid: '2e0c4294-32e0-4999-aed1-e78221224339',
+  file_id: '2e0c4294-32e0-4999-aed1-e78221224339',
+  original_filename: 'generated.png',
+  is_image: true,
+  is_stored: false,
+  image_info: {
+    dpi: null,
+    width: 1248,
+    format: 'PNG',
+    height: 832,
+    sequence: false,
+    color_mode: 'RGB',
+    orientation: null,
+    geo_location: null,
+    datetime_original: null
+  },
+  video_info: null,
+  content_info: {
+    mime: { mime: 'image/png', type: 'image', subtype: 'png' },
+    image: {
+      dpi: null,
+      width: 1248,
+      format: 'PNG',
+      height: 832,
+      sequence: false,
+      color_mode: 'RGB',
+      orientation: null,
+      geo_location: null,
+      datetime_original: null
+    }
+  },
+  is_ready: true,
+  filename: 'generated.png',
+  mime_type: 'image/png',
+  metadata: {},
+  status: 'success'
+}
+
+/** Every key, with its value's JSON type in place of the value. */
+const shapeOf = (value: unknown): unknown => {
+  if (value === null) return 'null'
+  if (Array.isArray(value)) return 'array'
+  if (typeof value !== 'object') return typeof value
+  return Object.fromEntries(
+    Object.entries(value).map(([key, inner]) => [key, shapeOf(inner)])
+  )
+}
+
+it('answers a success frame shaped like the one production sent', async () => {
+  const done = (
+    await pollToEnd(
+      await jobIdOf(await generate({ aspect_ratio: [3, 2], store: false }))
+    )
+  ).at(-1)
+  const expected = shapeOf(PRODUCTION_SUCCESS_FRAME) as {
+    image_info: { dpi: unknown }
+    content_info: { image: { dpi: unknown } }
+  }
+  // The one known difference (see derivative.ts): production sent `dpi: null`.
+  expected.image_info.dpi = 'array'
+  expected.content_info.image.dpi = 'array'
+  expect(shapeOf(done)).toEqual(expected)
+  expect(done).toMatchObject({
+    status: 'success',
+    is_ready: true,
+    is_stored: false,
+    mime_type: 'image/png',
+    image_info: { format: 'PNG' }
+  })
+})
+
 it('keeps answering success once the job is done', async () => {
   const jobId = await jobIdOf(await generate())
   const [last] = (await pollToEnd(jobId)).slice(-1)
