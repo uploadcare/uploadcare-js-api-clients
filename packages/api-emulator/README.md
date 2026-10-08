@@ -133,6 +133,10 @@ chunk, and MSW's default browser sources (the Service Worker) answer `fetch`
 and resource loads like `<img>`, which nothing in the page can reach. One
 emulator per page.
 
+`./browser` builds that network with `msw/experimental`, which carries no
+semver promise; it is tested against `msw` 3.0.x. `./msw` uses only MSW's
+stable `http`/`passthrough` API and works with any `msw` 3.
+
 Where a request goes depends on its host, since `handle` routes by path alone:
 
 - Uploadcare's hosts (`upload.uploadcare.com`, `ucarecdn.com`, `ucarecd.net`

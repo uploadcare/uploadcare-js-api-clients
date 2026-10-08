@@ -1,5 +1,6 @@
 import { XMLHttpRequestInterceptor } from '@mswjs/interceptors/XMLHttpRequest'
 import { createDefaultNetworkOptions } from 'msw/browser'
+// msw's experimental network API: no semver promise, tested against msw 3.0.x.
 import { InterceptorSource, defineNetwork } from 'msw/experimental'
 import { resetSession } from './index.js'
 import { emulatorHandlers } from './msw.js'
