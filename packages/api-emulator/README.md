@@ -10,15 +10,17 @@ need real request/response round-trips without hitting the network.
 including inside a browser page — that's what lets it back an in-browser MSW
 worker. `@uploadcare/api-emulator/listen` is Node-only: it speaks raw HTTP
 sockets (`node:http`/`node:https`, `Buffer`) to give a suite a real origin to
-point a `baseURL` at. `@uploadcare/api-emulator/browser` is page-only, and the
-one export that needs MSW (see [3. In the browser](#3-in-the-browser-with-msw));
+point a `baseURL` at. `@uploadcare/api-emulator/browser` is page-only, and,
+with `@uploadcare/api-emulator/msw` (the bare MSW handlers, for a dev server),
+one of the two exports that need MSW (see
+[3. In the browser](#3-in-the-browser-with-msw));
 `@uploadcare/api-emulator/node` is its Node counterpart, on
 `@mswjs/interceptors` alone (see [4. In Node](#4-in-node)).
 The split exists so the core can be bundled into a page without dragging Node
 built-ins with it, and used from Node without installing MSW;
-`test/dist.test.ts` asserts the built `.` and `./browser` bundles don't regress
-that, that only `./browser` reaches MSW, and that only `./browser` and `./node`
-reach `@mswjs/interceptors`.
+`test/dist.test.ts` asserts the built `.`, `./browser` and `./msw` bundles
+don't regress that, that only `./browser` and `./msw` reach MSW, and that only
+`./browser` and `./node` reach `@mswjs/interceptors`.
 
 Four ways to run it, in increasing order of how "real" the transport needs
 to be:
@@ -103,7 +105,7 @@ without it, requests go to the `'default'` session.
 ### 3. In the browser, with MSW
 
 `@uploadcare/api-emulator/browser` answers a page's Uploadcare traffic for a
-browser-mode test suite (Vitest browser mode, for one). `msw` and
+browser-mode test suite (Vitest browser mode, for one). `msw` 3 and
 `@mswjs/interceptors` are optional peer dependencies: install them next to it.
 
 ```ts
@@ -124,10 +126,12 @@ it('retries a throttled upload', async () => {
 `reset()` answers the session's handle; see
 [Per-test scenarios](#per-test-scenarios).
 
-Two ways in, one state: an `XMLHttpRequestInterceptor` answers XHR (every
-upload) in the page, so `xhr.upload` fires a `progress` event per body chunk,
-and an MSW Service Worker answers `fetch` and resource loads like `<img>`,
-which nothing in the page can reach. One emulator per page.
+One MSW network, one handler (the one [`./msw`](#in-a-vite-dev-server)
+exports), two ways in: an `XMLHttpRequestInterceptor` source answers XHR
+(every upload) in the page, so `xhr.upload` fires a `progress` event per body
+chunk, and MSW's default browser sources (the Service Worker) answer `fetch`
+and resource loads like `<img>`, which nothing in the page can reach. One
+emulator per page.
 
 Where a request goes depends on its host, since `handle` routes by path alone:
 
@@ -149,17 +153,60 @@ An emulated XHR is held back by one macrotask (`setTimeout(0)`) before it is
 answered. Answered in the page, the whole request would otherwise be able to
 complete within microtasks of `send()`, before a store that flushes on
 `setTimeout(0)` (file-uploader's) has run, and its upload-start/progress
-events would never fire. A real network can't answer that fast. `fetch` has
-no upload events and gets no hold.
+events would never fire. A real network can't answer that fast. `fetch` gets
+the same hold; it has no upload events to miss, so it just answers a task
+later.
 
-The worker script is `/mockServiceWorker.js`. `@vitest/browser` serves it from
-`msw` itself, so a Vitest browser suite needs nothing else; anywhere else,
-copy it into the public directory with `npx msw init <publicDir>`.
+The worker script is `/mockServiceWorker.js`, or wherever `workerUrl` says
+(`setupEmulator({ workerUrl: '/app/mockServiceWorker.js' })`, for an app under
+a non-root `base`). Serve it with `msw/vite`'s plugin, as this package's own
+browser suite does:
+
+```ts
+// vitest.config.ts, the browser project
+import { msw } from 'msw/vite'
+
+export default defineConfig({
+  plugins: [msw({ mode: 'worker-only' })]
+  // ...
+})
+```
+
+or copy it into the public directory with `npx msw init <publicDir>`. If it
+can't be registered, `reset()` rejects and nothing is left patched.
 
 Per-chunk upload progress needs `@mswjs/interceptors` 0.45.7 or a later 0.45.x
-(the peer range is `^0.45.7`), which is why it's a peer of its own: `msw` 2.15
-depends on `^0.41`, a copy that fires a single upload `progress` event. Depend
-on `@mswjs/interceptors` directly so your install resolves the 0.45 one.
+(the peer range is `^0.45.7`); `msw` 3 depends on `^0.45.6`, so depend on
+`@mswjs/interceptors` directly to make sure your install resolves 0.45.7+.
+
+#### In a Vite dev server
+
+`@uploadcare/api-emulator/msw` exports the handler `./browser` runs on, for an
+app that sets up its own MSW network: `emulatorHandlers({ cdnHosts, unhandled })`
+returns MSW request handlers with the same host rules as above, answering the
+default session. With `msw/vite`'s plugin in its default `auto` mode:
+
+```ts
+// vite.config.ts
+import { msw } from 'msw/vite'
+
+export default defineConfig({ plugins: [msw({})] })
+```
+
+```ts
+// src/main.ts
+if (import.meta.env.DEV) {
+  const { network } = await import('virtual:msw')
+  const { emulatorHandlers } = await import('@uploadcare/api-emulator/msw')
+  network.configure({ handlers: emulatorHandlers() })
+  await network.enable()
+}
+```
+
+`auto` mode's network has MSW's default sources only (the Service Worker, or
+in-page `fetch`/XHR interceptors where there is none), so uploads there go
+through the worker and `xhr.upload` reports no per-chunk progress. Tests that
+assert on upload progress should use `./browser`.
 
 For a different transport policy, skip `./browser` (or `./node`) and
 delegate to `handle` yourself — `undefined` from it is exactly what makes
