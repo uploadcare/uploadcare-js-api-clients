@@ -9,6 +9,19 @@
  * `jsonerrors=1`; `apiError` honours the header, and every refusal here carries
  * the snake_case `error_code` the client turns into an `AiProviderError`
  * (without one, it would read the envelope as a job with no `job_id`).
+ *
+ * Provenance. Each rule below is tagged `[production]` or `[inferred]`:
+ *
+ * - `[production]`: checked against a frame the real API sent. The only one is
+ *   the `success` status frame, recorded verbatim in ai-image-editor's
+ *   `uploadcareApiClient.schemas.dev.test.ts` ("a real derivative status
+ *   success frame"): the `/info/` payload plus `status: 'success'` and
+ *   `is_ready`, no `type`, the result a PNG (`generated.png`, 1248×832). Known
+ *   gap: that frame has `dpi: null`; `fileInfo` reports `[72, 72]`.
+ * - `[inferred]`: taken from what the client sends, reads or names in
+ *   `shared/lib/errorCodes.ts`, never seen from the real API. A test that
+ *   passes against one of these proves the client and the emulator agree, not
+ *   that either matches production.
  */
 import { jsonRecord } from '../../core/body.js'
 import { apiError } from '../../core/responses.js'
@@ -34,6 +47,8 @@ const refuse = (
   content: string
 ) => apiError(request, status, content, errorCode)
 
+// [inferred] `aspect_ratio` is two positive integers (the client's Zod tuple
+// of numbers); `invalid_aspect_ratio` is a code the client names.
 const isRatio = (value: unknown): value is [number, number] =>
   Array.isArray(value) &&
   value.length === 2 &&
@@ -45,6 +60,10 @@ const gcd = (a: number, b: number): number => (b ? gcd(b, a % b) : a)
 const MAX_SIDE = 2048
 
 /**
+ * [inferred] The result follows `aspect_ratio`. Production's one recorded
+ * result (1248×832) fits a requested ratio, but the request it answered was not
+ * recorded. The sizes here are the emulator's own.
+ *
  * The size a result in `[w, h]` is drawn at: the ratio in lowest terms, scaled
  * up to about 256 px on the long side, so it is exact. A ratio whose lowest
  * terms exceed `MAX_SIDE` is scaled down to fit, to the nearest pixel.
@@ -78,6 +97,12 @@ const resultOf = (body: Body, source?: StoredFile) => {
 /**
  * What generate and edit share: the body, the fields both require, and the job
  * they start. `validate` is the kind-specific rest, a refusal or nothing.
+ *
+ * [inferred] All three routes are gated like every other protected route:
+ * public key, Bearer token, the `signedUploads` and `throttle` presets. The
+ * client's `errorCodes.ts` says `derivative/*` "does not check the token
+ * today", so production may accept what this refuses. [inferred] `store: false`
+ * leaves the result unstored.
  */
 const startJob = (
   validate: (request: Request, body: Body) => Response | undefined
@@ -87,6 +112,8 @@ const startJob = (
     if (!body)
       return refuse(request, 400, 'invalid_request', 'Request body is invalid.')
 
+    // [inferred] The `invalid_request` refusals: required `prompt` and
+    // `filename`, a JSON body.
     if (typeof body.prompt !== 'string' || !body.prompt)
       return refuse(request, 400, 'invalid_request', '`prompt` is required.')
     if (typeof body.filename !== 'string')
@@ -118,6 +145,10 @@ const startJob = (
   })
 
 /**
+ * [inferred] The walk: the client names `processing` and `uploading` and waits
+ * for `is_ready`; the order and the poll counts are the emulator's.
+ * [production] The `success` frame's shape (see the header).
+ *
  * One frame per poll: `processing`, then `uploading`, then `success` with
  * `is_ready: false` (the file is stored, but — as the real API reports while it
  * is still being ingested — not CDN-ready yet), then `success` with `is_ready:
@@ -142,6 +173,8 @@ export const derivativeRoutes: Route[] = [
   route(
     'POST',
     '/derivative/image/generate/',
+    // [inferred] Generate requires `aspect_ratio`: the client's Zod schema
+    // makes it required for generate, optional for edit.
     startJob((request, body) =>
       body.aspect_ratio === undefined
         ? refuse(request, 400, 'invalid_request', '`aspect_ratio` is required.')
@@ -152,6 +185,8 @@ export const derivativeRoutes: Route[] = [
     'POST',
     '/derivative/image/edit/',
     startJob((request, body) => {
+      // [inferred] `source` is required, and must be a stored image
+      // (`source_not_found`, `source_not_image`: codes the client names).
       if (typeof body.source !== 'string' || !body.source)
         return refuse(request, 400, 'invalid_request', '`source` is required.')
       const source = sessionOf(request).files.get(body.source)
@@ -178,6 +213,7 @@ export const derivativeRoutes: Route[] = [
     protect(({ request }) => {
       const session = sessionOf(request)
       const jobId = new URL(request.url).searchParams.get('job_id')
+      // [inferred] `job_id_required`, `job_not_found`: codes the client names.
       if (!jobId)
         return refuse(request, 400, 'job_id_required', 'job_id is required.')
       const job = session.derivativeJobs.get(jobId)

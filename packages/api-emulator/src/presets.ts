@@ -223,6 +223,8 @@ const derivativeFailure = (
       const answered = polls.get(jobId)
       if (answered === undefined) return undefined
       polls.set(jobId, answered + 1)
+      // [inferred] The error frame's fields are the ones the client reads;
+      // no production error frame has been recorded.
       return Response.json(
         answered === 0
           ? { type: 'job', status: 'processing' }

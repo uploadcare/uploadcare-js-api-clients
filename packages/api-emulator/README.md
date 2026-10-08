@@ -329,7 +329,19 @@ So do the AI derivative endpoints, `POST /derivative/image/generate/`,
 not the OpenAPI spec**: the published document doesn't describe them, so they
 are modelled on ai-image-editor's `UploadcareApiClient` (and its dev-only Zod
 schemas) and listed in `UNSPECIFIED_OPERATIONS` (`test/spec.ts`);
-`test/derivative.test.ts` asserts their shapes directly. In short:
+`test/derivative.test.ts` asserts their shapes directly.
+
+Only one of their rules has been checked against production: the `success`
+status frame's shape, against a frame the real API sent (recorded verbatim in
+ai-image-editor's `uploadcareApiClient.schemas.dev.test.ts`). Its one known
+difference: production sent `dpi: null`, the emulator reports `[72, 72]`.
+Every other rule below is inferred from the client: the routes, the request
+fields and which are required, the status walk, every `error_code`, and the
+auth gate (which the client's own `errorCodes.ts` says production doesn't
+apply to `derivative/*`). A test that passes against those proves the client
+and the emulator agree, not that either matches production.
+`src/apis/upload/derivative.ts` tags each rule `[production]` or
+`[inferred]`. In short:
 
 - Both POSTs take a JSON body with `pub_key` (the query string works too),
   `prompt`, `filename`, `aspect_ratio` (`[w, h]`, positive integers; required
