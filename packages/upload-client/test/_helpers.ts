@@ -41,6 +41,19 @@ export const getSettingsForTesting = <T>(options: T): T & DefaultSettings => {
   return allEnvironments[selectedEnvironment]
 }
 
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
+
+/** An uploaded file has a uuid and a `cdnUrl` on the CDN the test set. */
+export function assertUploadedFile(
+  file: { uuid: string; cdnUrl: string },
+  { baseCDN }: { baseCDN: string }
+): void {
+  expect(file).toMatchObject({
+    uuid: expect.stringMatching(UUID),
+    cdnUrl: `${baseCDN}/${file.uuid}/`
+  })
+}
+
 export function assertComputableProgress(
   onProgress: Mock<ProgressCallback<ComputableProgressInfo>>
 ): void {
