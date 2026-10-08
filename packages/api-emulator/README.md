@@ -341,8 +341,13 @@ schemas) and listed in `UNSPECIFIED_OPERATIONS` (`test/spec.ts`);
 - Polling `GET /derivative/status/?pub_key=…&job_id=…` walks the job through
   `processing`, `uploading`, `success` with `is_ready: false`, then `success`
   with `is_ready: true` for good. The success frame is the `/info/` payload
-  plus `status`: the result is a real stored file (the stock image under the
-  requested `filename`), so `/info/` and the CDN serve it.
+  plus `status`: the result is a real stored file under the requested
+  `filename`, so `/info/` and the CDN serve it. Its dimensions follow
+  `aspect_ratio`: it is a blank PNG drawn at the ratio in lowest terms (scaled
+  up to about 256 px on the long side; a ratio whose lowest terms pass 2048 is
+  fitted to 2048, to the nearest pixel). An edit without `aspect_ratio` keeps
+  the source's bytes, and so its dimensions. `image_info`, `-/json/` and an
+  `<img>` all report the same size.
 - Refusals are the JSON error envelope with a snake_case `error_code`:
   `invalid_request`, `invalid_aspect_ratio`, `source_not_found`,
   `source_not_image`, `derivative_disabled`, `job_id_required`,

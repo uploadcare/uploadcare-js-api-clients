@@ -70,6 +70,54 @@ it('serves the uploaded bytes to an <img> from every CDN host', async () => {
   }
 })
 
+it.each([
+  [[3, 2]],
+  // Past 65535 bytes of pixels: more than one deflate block.
+  [[100_000, 99_999]]
+])(
+  'draws a derivative of aspect_ratio %j that an <img> decodes at its reported size',
+  async (ratio) => {
+    const api = 'https://upload.uploadcare.com'
+    const started = await fetch(`${api}/derivative/image/generate/`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json'
+      },
+      body: JSON.stringify({
+        pub_key: 'demopublickey',
+        prompt: 'a hat',
+        aspect_ratio: ratio,
+        filename: 'generated.png'
+      })
+    })
+    const { job_id: jobId } = (await started.json()) as { job_id: string }
+    let frame: {
+      is_ready?: boolean
+      uuid: string
+      image_info: { width: number; height: number }
+    }
+    do {
+      frame = await (
+        await fetch(
+          `${api}/derivative/status/?pub_key=demopublickey&job_id=${jobId}`,
+          { headers: { Accept: 'application/json' } }
+        )
+      ).json()
+    } while (!frame.is_ready)
+
+    // Each test's session restarts the uuid sequence: the query keeps the
+    // browser from answering with the last test's cached image.
+    const img = await loadImage(
+      `https://ucarecdn.com/${frame.uuid}/?ratio=${ratio.join(':')}`
+    )
+    expect([img.naturalWidth, img.naturalHeight]).toEqual([
+      frame.image_info.width,
+      frame.image_info.height
+    ])
+  }
+)
+
 it('answers fetch on the emulated hosts too', async () => {
   const response = await fetch('https://tlm.uploadcare.com/api/v1/events', {
     method: 'POST',

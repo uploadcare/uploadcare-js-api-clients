@@ -14,13 +14,15 @@ import { jsonRecord } from '../../core/body.js'
 import { apiError } from '../../core/responses.js'
 import { route, type Route } from '../../core/router.js'
 import { protect } from './auth.js'
+import { blankPng } from '../../state/blank-png.js'
 import {
   type DerivativeJob,
   type Session,
+  type StoredFile,
   fileInfo,
   nextUuid,
   sessionOf,
-  storeStockImage
+  store
 } from '../../state/store.js'
 
 type Body = Record<string, unknown>
@@ -32,10 +34,46 @@ const refuse = (
   content: string
 ) => apiError(request, status, content, errorCode)
 
-const isRatio = (value: unknown) =>
+const isRatio = (value: unknown): value is [number, number] =>
   Array.isArray(value) &&
   value.length === 2 &&
   value.every((side) => Number.isInteger(side) && side > 0)
+
+const gcd = (a: number, b: number): number => (b ? gcd(b, a % b) : a)
+
+/** The longest side the emulator draws a derivative at. */
+const MAX_SIDE = 2048
+
+/**
+ * The size a result in `[w, h]` is drawn at: the ratio in lowest terms, scaled
+ * up to about 256 px on the long side, so it is exact. A ratio whose lowest
+ * terms exceed `MAX_SIDE` is scaled down to fit, to the nearest pixel.
+ */
+const sizeFor = ([w, h]: [number, number]) => {
+  const divisor = gcd(w, h)
+  const [width, height] = [w / divisor, h / divisor]
+  const long = Math.max(width, height)
+  const scale =
+    long > MAX_SIDE ? MAX_SIDE / long : Math.max(1, Math.floor(256 / long))
+  return {
+    width: Math.max(1, Math.round(width * scale)),
+    height: Math.max(1, Math.round(height * scale))
+  }
+}
+
+/**
+ * What a job stores when it succeeds. No model draws anything: a blank PNG at
+ * `aspect_ratio`, or with none (an edit on "Auto") the source's own bytes, so
+ * the result keeps its dimensions. Either way `/info/`, `-/json/` and an
+ * `<img>` all see the same size.
+ */
+const resultOf = (body: Body, source?: StoredFile) => {
+  if (isRatio(body.aspect_ratio)) {
+    const { width, height } = sizeFor(body.aspect_ratio)
+    return { mimeType: 'image/png', bytes: blankPng(width, height) }
+  }
+  return { mimeType: source!.mimeType, bytes: source!.bytes }
+}
 
 /**
  * What generate and edit share: the body, the fields both require, and the job
@@ -65,11 +103,16 @@ const startJob = (
     if (refusal) return refusal
 
     const session = sessionOf(request)
+    const source =
+      typeof body.source === 'string'
+        ? session.files.get(body.source)
+        : undefined
     const jobId = nextUuid(session)
     session.derivativeJobs.set(jobId, {
       polls: 0,
       name: body.filename,
-      isStored: body.store !== false
+      isStored: body.store !== false,
+      ...resultOf(body, source)
     })
     return Response.json({ type: 'job', job_id: jobId })
   })
@@ -86,7 +129,12 @@ const frame = (session: Session, job: DerivativeJob) => {
   job.polls += 1
   if (job.polls === 1) return { type: 'job', status: 'processing' }
   if (job.polls === 2) return { type: 'job', status: 'uploading' }
-  job.file ??= storeStockImage(session, job.name, job.isStored)
+  job.file ??= store(session, {
+    name: job.name,
+    mimeType: job.mimeType,
+    bytes: job.bytes,
+    isStored: job.isStored
+  })
   return { status: 'success', ...fileInfo(job.file), is_ready: job.polls > 3 }
 }
 
