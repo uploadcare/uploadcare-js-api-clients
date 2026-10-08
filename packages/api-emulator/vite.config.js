@@ -2,6 +2,7 @@ import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { defineConfig } from 'vite'
 import { playwright } from '@vitest/browser-playwright'
+import { msw } from 'msw/vite'
 import dts from 'vite-plugin-dts'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
@@ -53,8 +54,11 @@ export default defineConfig({
         // `./browser` is tested where it runs: a Service Worker and real
         // `xhr.upload` events don't exist in Node.
         extends: true,
-        // Discovered late otherwise, which reloads the page mid-run. (msw
-        // itself is left to @vitest/browser, which handles it on its own.)
+        // Serves `/mockServiceWorker.js` from the installed msw, as an app
+        // would, instead of leaning on @vitest/browser's own mapping (which
+        // resolves msw from its own install, not this package's).
+        plugins: [msw({ mode: 'worker-only' })],
+        // Discovered late otherwise, which reloads the page mid-run.
         optimizeDeps: { include: ['@mswjs/interceptors/XMLHttpRequest'] },
         test: {
           name: 'browser',
