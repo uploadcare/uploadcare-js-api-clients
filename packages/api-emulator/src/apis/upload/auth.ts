@@ -13,6 +13,15 @@ import { type Session, sessionOf } from '../../state/store.js'
 export const SIGNED_UPLOADS_SECRET_KEY = 'mock_secret_key'
 
 /**
+ * A public key for a project with Signed Uploads on: pass it to the
+ * `signedUploads` preset (`use('signedUploads', { publicKey })`) and mint its
+ * tokens with `SIGNED_UPLOADS_SECRET_KEY`. Any key works there; this one saves
+ * each suite inventing its own.
+ */
+// Public test fixture, documented in the README — not a real credential.
+export const SIGNED_UPLOADS_PUBLIC_KEY = 'signed_uploads_public_key'
+
+/**
  * The public keys of the demo account's projects. A preset that names a key
  * (`signedUploads`' `publicKey`, say) adds that project to its session.
  */

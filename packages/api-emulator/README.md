@@ -464,7 +464,18 @@ found by another project's `/info/` or `/group/`.
 token the emulator accepts (a minute long by default), with WebCrypto, so it
 works in a page too. It doesn't validate its options, so a test can mint a
 token the API refuses. `SIGNED_UPLOADS_SECRET_KEY` is the secret it signs
-with, for a suite that mints with `generateAuthToken` itself.
+with, for a suite that mints with `generateAuthToken` itself, and
+`SIGNED_UPLOADS_PUBLIC_KEY` a ready-made project key to pair it with:
+
+```ts
+import {
+  SIGNED_UPLOADS_PUBLIC_KEY,
+  SIGNED_UPLOADS_SECRET_KEY
+} from '@uploadcare/api-emulator'
+
+session.use('signedUploads', { publicKey: SIGNED_UPLOADS_PUBLIC_KEY })
+const token = generateAuthToken(SIGNED_UPLOADS_SECRET_KEY, { lifetime })
+```
 
 ### What stays the real API
 
