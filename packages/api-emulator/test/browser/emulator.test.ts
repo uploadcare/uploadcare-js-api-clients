@@ -57,18 +57,15 @@ it('answers in the same task under a scenario registered with hold: false', asyn
   expect(result.macrotaskBeforeLoad).toBe(false)
 })
 
-it('serves the uploaded bytes to an <img> from every CDN host', async () => {
-  const { uuid } = await upload(await pngOf(3, 2))
+it.each(['ucarecdn.com', 'abcdef1234.ucarecd.net', 'cdn.example.com'])(
+  'serves the uploaded bytes to an <img> from the CDN host %s',
+  async (host) => {
+    const { uuid } = await upload(await pngOf(3, 2))
 
-  for (const host of [
-    'ucarecdn.com',
-    'abcdef1234.ucarecd.net',
-    'cdn.example.com'
-  ]) {
     const img = await loadImage(`https://${host}/${uuid}/`)
-    expect([host, img.naturalWidth, img.naturalHeight]).toEqual([host, 3, 2])
+    expect([img.naturalWidth, img.naturalHeight]).toEqual([3, 2])
   }
-})
+)
 
 it.each([
   [[3, 2]],
