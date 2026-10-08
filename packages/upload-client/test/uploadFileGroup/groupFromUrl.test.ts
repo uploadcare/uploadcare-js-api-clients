@@ -58,8 +58,9 @@ describe('groupFrom Url[]', () => {
     assertComputableProgress(onProgress)
   })
 
-  process.env.TEST_ENV !== 'production' &&
-    it('should be able to handle non-computable unknown progress', async () => {
+  it.skipIf(process.env.TEST_ENV === 'production')(
+    'should be able to handle non-computable unknown progress',
+    async () => {
       resetSession().use('unknownProgress')
       const onProgress = vi.fn()
       const settings = getSettingsForTesting({
@@ -74,7 +75,8 @@ describe('groupFrom Url[]', () => {
       await upload
 
       assertUnknownProgress(onProgress)
-    })
+    }
+  )
 
   it('should be rejected with error code if failed', async () => {
     const settings = getSettingsForTesting({

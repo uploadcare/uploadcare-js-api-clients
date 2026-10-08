@@ -135,8 +135,9 @@ describe('uploadFromUrl', () => {
     assertComputableProgress(onProgress)
   })
 
-  process.env.TEST_ENV !== 'production' &&
-    it('should be able to handle non-computable unknown progress', async () => {
+  it.skipIf(process.env.TEST_ENV === 'production')(
+    'should be able to handle non-computable unknown progress',
+    async () => {
       resetSession().use('unknownProgress')
       const onProgress = vi.fn()
       const sourceUrl = factory.imageUrl('valid')
@@ -148,7 +149,8 @@ describe('uploadFromUrl', () => {
       await uploadFromUrl(sourceUrl, settings)
 
       assertUnknownProgress(onProgress)
-    })
+    }
+  )
 
   it('should be rejected with error code if failed', async () => {
     const sourceUrl = factory.imageUrl('valid')
