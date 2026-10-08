@@ -5,7 +5,7 @@ import type { EmulatorSession } from './session.js'
  * The hosts the emulator answers for: the Upload API, the CDN (`ucarecdn.com`
  * and the per-project `<prefix>.ucarecd.net`) and the telemetry sink — see
  * `apis/`. `handle` routes by path alone, so the host check lives here, shared
- * by `./browser` and `./node`.
+ * by `./browser`, `./msw` and `./node`.
  */
 const UPLOADCARE_HOSTS = [
   'upload.uploadcare.com',

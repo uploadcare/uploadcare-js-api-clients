@@ -30,10 +30,10 @@ const FORBIDDEN = [
 ]
 
 /**
- * MSW is an optional peer of `./browser` alone, and `@mswjs/interceptors` of
- * `./browser` and `./node`: a `.` or `./listen` consumer never installs either,
- * and a `./node` one never installs `msw`, so any other entry reaching them is
- * a bundle that won't resolve.
+ * MSW is an optional peer of `./browser` and `./msw` alone, and
+ * `@mswjs/interceptors` of `./browser` and `./node`: a `.` or `./listen`
+ * consumer never installs either, and a `./node` one never installs `msw`, so
+ * any other entry reaching them is a bundle that won't resolve.
  */
 const MSW_IMPORT = /\bfrom\s*['"]msw(?:\/[^'"]*)?['"]/
 const INTERCEPTORS_IMPORT = /\bfrom\s*['"]@mswjs\//
@@ -67,7 +67,7 @@ const offendersFrom = (entry: string, patterns: RegExp[]) =>
       .map((pattern) => `${path.relative(distRoot, file)} matches ${pattern}`)
   )
 
-it.each(['index.js', 'browser.js'])(
+it.each(['index.js', 'browser.js', 'msw.js'])(
   'keeps the built %s bundle free of node built-ins',
   (entry) => {
     expect(offendersFrom(entry, FORBIDDEN)).toEqual([])
@@ -85,8 +85,15 @@ it('keeps the built node.js bundle free of msw itself', () => {
   expect(offendersFrom('node.js', [MSW_IMPORT])).toEqual([])
 })
 
-it('keeps the built browser.js bundle free of the Node-only interceptors', () => {
-  expect(offendersFrom('browser.js', [NODE_INTERCEPTORS_IMPORT])).toEqual([])
+it.each(['browser.js', 'msw.js'])(
+  'keeps the built %s bundle free of the Node-only interceptors',
+  (entry) => {
+    expect(offendersFrom(entry, [NODE_INTERCEPTORS_IMPORT])).toEqual([])
+  }
+)
+
+it('keeps the built msw.js bundle free of @mswjs/interceptors', () => {
+  expect(offendersFrom('msw.js', [INTERCEPTORS_IMPORT])).toEqual([])
 })
 
 it('answers fetch from the built ./node bundle', async () => {
