@@ -161,6 +161,14 @@ events would never fire. A real network can't answer that fast. `fetch` gets
 the same hold; it has no upload events to miss, so it just answers a task
 later.
 
+A test that wants the race the hold hides registers a scenario with
+`hold: false`; its answers skip the hold (`session.on({}, ({ next }) => next(),
+{ hold: false })` for the whole session). That makes a body-less request
+(`GET /info/`, a status poll) complete in the task that sent it. A request
+with a body still spans at least one task in Chromium whatever the emulator
+does: `@mswjs/interceptors` reads the body to emit upload progress, and a body
+read is a task. `./node` has no hold to skip.
+
 The worker script is `/mockServiceWorker.js`, or wherever `workerUrl` says
 (`setupEmulator({ workerUrl: '/app/mockServiceWorker.js' })`, for an app under
 a non-root `base`). Serve it with `msw/vite`'s plugin, as this package's own
@@ -418,7 +426,7 @@ session.files // the SessionView stays readable from the handle
 session.requests // every request the session received
 ```
 
-- `on(match, handler, { times? })`. `match` is `'METHOD /path/'`, in the
+- `on(match, handler, { times?, hold? })`. `match` is `'METHOD /path/'`, in the
   routes' own path syntax (`/multipart/upload/:uuid/original/` captures
   `params.uuid`, a trailing `*` captures `params.rest`, the trailing slash
   is optional), or `{ method?, path?, host? }`, any of them on its own.
@@ -436,6 +444,9 @@ session.requests // every request the session received
 - `times: N` removes the scenario after it has answered `N` requests. A
   fall-through doesn't count, and two concurrent requests can't both take
   its last use.
+- `hold: false` lets `./browser` and `./msw` answer what this scenario
+  answers without their one-macrotask hold (see
+  [In the browser, with MSW](#3-in-the-browser-with-msw)).
 - `on()` and `use()` answer the session, for chaining.
 
 ### Presets

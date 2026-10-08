@@ -31,6 +31,15 @@ export type ScenarioHandler = (
 export type ScenarioOptions = {
   /** Answers this many requests, then is gone. Every request by default. */
   times?: number
+  /**
+   * `false` answers in the same task: `./browser` and `./msw` skip their
+   * one-macrotask hold for the answers this scenario gives, so a test can
+   * reproduce a race against a store that flushes on `setTimeout(0)`. `{
+   * method, path, host }` all left out covers the whole session.
+   *
+   * @default true
+   */
+  hold?: boolean
 }
 
 export type Scenario = {
@@ -42,7 +51,13 @@ export type Scenario = {
   handler: ScenarioHandler
   /** Uses left, claimed when a request matches; unlimited when absent. */
   remaining?: number
+  hold: boolean
 }
+
+const unheld = new WeakSet<Response>()
+
+/** Whether a scenario with `hold: false` gave this answer. */
+export const answersInSameTask = (response: Response) => unheld.has(response)
 
 const parseMatch = (match: string): Exclude<ScenarioMatch, string> => {
   const [method, path, extra] = match.trim().split(/\s+/)
@@ -56,7 +71,7 @@ const parseMatch = (match: string): Exclude<ScenarioMatch, string> => {
 export const scenario = (
   match: ScenarioMatch,
   handler: ScenarioHandler,
-  { times }: ScenarioOptions = {}
+  { times, hold = true }: ScenarioOptions = {}
 ): Scenario => {
   if (times !== undefined && !(Number.isInteger(times) && times > 0))
     throw new TypeError(`times is a positive integer, got ${times}`)
@@ -70,7 +85,7 @@ export const scenario = (
     if (host !== undefined && host !== url.host) return undefined
     return segments ? matchPath(segments, url.pathname) : {}
   }
-  return { paramsFor, handler, remaining: times }
+  return { paramsFor, handler, remaining: times, hold }
 }
 
 /**
@@ -103,6 +118,7 @@ export const runScenarios = (
         next
       })
       if (answer) {
+        if (!current.hold) unheld.add(answer)
         const position = scenarios.indexOf(current)
         if (current.remaining === 0 && position !== -1)
           scenarios.splice(position, 1)

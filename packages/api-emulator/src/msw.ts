@@ -1,5 +1,6 @@
 import { http, passthrough } from 'msw'
 import type { RequestHandler } from 'msw'
+import { answersInSameTask } from './core/scenarios.js'
 import { answer, createPolicy } from './policy.js'
 import type { EmulatorOptions } from './policy.js'
 
@@ -36,8 +37,9 @@ export const emulatorHandlers = (
       // XHR would otherwise finish within microtasks of `send()`, before a
       // store that flushes on `setTimeout(0)` (file-uploader's
       // `TypedCollection`) has run, and its upload-start/progress events would
-      // never be observed. A real network can't answer that fast.
-      await nextTask()
+      // never be observed. A real network can't answer that fast. A scenario
+      // registered with `hold: false` opts out, to reproduce that race.
+      if (!answersInSameTask(response)) await nextTask()
       return response
     })
   ]
