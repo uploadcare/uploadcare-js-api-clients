@@ -139,6 +139,12 @@ it('answers 500 when a route throws, instead of crashing the process', async () 
     expect.any(Error)
   )
   logged.mockRestore()
+})
+
+it('keeps serving after a route throws', async () => {
+  const logged = vi.spyOn(console, 'error').mockImplementation(() => {})
+  await fetch(`${server.origin}/throws/`)
+  logged.mockRestore()
 
   const next = await fetch(
     `${server.origin}/info/?pub_key=demopublickey&file_id=nope`
