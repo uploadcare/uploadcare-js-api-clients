@@ -1,4 +1,4 @@
-import { vi, expect, describe, it } from 'vitest'
+import { vi, expect, describe, it, beforeEach, afterEach } from 'vitest'
 import { NetworkError } from '@uploadcare/api-client-utils'
 import { retryIfFailed } from '../../src/tools/retryIfFailed'
 import { UploadError } from '../../src/tools/UploadError'
@@ -184,16 +184,27 @@ const networkError = new NetworkError(
 )
 
 describe('retryIfFailed', () => {
+  beforeEach(() => {
+    vi.useFakeTimers()
+  })
+
+  afterEach(() => {
+    vi.useRealTimers()
+  })
+
   describe('Throttle errors', () => {
     it('retries a throttled call after retry-after and resolves', async () => {
       const { spy, task } = createRunner({ attempts: 1, error: throttledError })
+      const p = retryIfFailed<number>(task, {
+        retryThrottledRequestMaxTimes: 10,
+        retryNetworkErrorMaxTimes: 0
+      })
 
-      await expect(
-        retryIfFailed<number>(task, {
-          retryThrottledRequestMaxTimes: 10,
-          retryNetworkErrorMaxTimes: 0
-        })
-      ).resolves.toBe(0)
+      // retry-after: 1
+      await vi.advanceTimersByTimeAsync(999)
+      expect(spy).toHaveBeenCalledTimes(1)
+      await vi.advanceTimersByTimeAsync(1)
+      await expect(p).resolves.toBe(0)
       expect(spy).toHaveBeenCalledTimes(2)
     })
 
@@ -228,13 +239,16 @@ describe('retryIfFailed', () => {
         attempts: 3,
         resolve: 100
       })
+      const p = retryIfFailed<number>(task, {
+        retryThrottledRequestMaxTimes: 10,
+        retryNetworkErrorMaxTimes: 0
+      })
 
-      await expect(
-        retryIfFailed<number>(task, {
-          retryThrottledRequestMaxTimes: 10,
-          retryNetworkErrorMaxTimes: 0
-        })
-      ).resolves.toBe(100)
+      // Every throttle waits the same retry-after: 1, unlike network backoff.
+      await vi.advanceTimersByTimeAsync(2999)
+      expect(spy).toHaveBeenCalledTimes(3)
+      await vi.advanceTimersByTimeAsync(1)
+      await expect(p).resolves.toBe(100)
       expect(spy).toHaveBeenCalledTimes(4)
     })
 
@@ -254,13 +268,15 @@ describe('retryIfFailed', () => {
   describe('Network errors', () => {
     it('retries a call that hit a network error and resolves', async () => {
       const { spy, task } = createRunner({ attempts: 1, error: networkError })
+      const p = retryIfFailed<number>(task, {
+        retryNetworkErrorMaxTimes: 10,
+        retryThrottledRequestMaxTimes: 0
+      })
 
-      await expect(
-        retryIfFailed<number>(task, {
-          retryNetworkErrorMaxTimes: 10,
-          retryThrottledRequestMaxTimes: 0
-        })
-      ).resolves.toBe(0)
+      await vi.advanceTimersByTimeAsync(999)
+      expect(spy).toHaveBeenCalledTimes(1)
+      await vi.advanceTimersByTimeAsync(1)
+      await expect(p).resolves.toBe(0)
       expect(spy).toHaveBeenCalledTimes(2)
     })
 
@@ -295,13 +311,16 @@ describe('retryIfFailed', () => {
         attempts: 3,
         resolve: 100
       })
+      const p = retryIfFailed<number>(task, {
+        retryNetworkErrorMaxTimes: 10,
+        retryThrottledRequestMaxTimes: 0
+      })
 
-      await expect(
-        retryIfFailed<number>(task, {
-          retryNetworkErrorMaxTimes: 10,
-          retryThrottledRequestMaxTimes: 0
-        })
-      ).resolves.toBe(100)
+      // 1+2+3=6
+      await vi.advanceTimersByTimeAsync(5999)
+      expect(spy).toHaveBeenCalledTimes(3)
+      await vi.advanceTimersByTimeAsync(1)
+      await expect(p).resolves.toBe(100)
       expect(spy).toHaveBeenCalledTimes(4)
     })
 
@@ -318,23 +337,18 @@ describe('retryIfFailed', () => {
     })
 
     it('should increase timeout by 1 second on each attempt', async () => {
-      vi.useFakeTimers()
-      try {
-        const { spy, task } = createRunner({ error: networkError, attempts: 4 })
-        const p = retryIfFailed<number>(task, {
-          retryNetworkErrorMaxTimes: 10,
-          retryThrottledRequestMaxTimes: 0
-        })
+      const { spy, task } = createRunner({ error: networkError, attempts: 4 })
+      const p = retryIfFailed<number>(task, {
+        retryNetworkErrorMaxTimes: 10,
+        retryThrottledRequestMaxTimes: 0
+      })
 
-        // 1+2+3+4=10
-        await vi.advanceTimersByTimeAsync(9999)
-        expect(spy).toHaveBeenCalledTimes(4)
-        await vi.advanceTimersByTimeAsync(1)
-        await expect(p).resolves.toBe(0)
-        expect(spy).toHaveBeenCalledTimes(5)
-      } finally {
-        vi.useRealTimers()
-      }
+      // 1+2+3+4=10
+      await vi.advanceTimersByTimeAsync(9999)
+      expect(spy).toHaveBeenCalledTimes(4)
+      await vi.advanceTimersByTimeAsync(1)
+      await expect(p).resolves.toBe(0)
+      expect(spy).toHaveBeenCalledTimes(5)
     })
   })
 })
