@@ -159,7 +159,9 @@ it('fails a part PUT that leaks an Authorization header as a network error', asy
       content_type: 'image/jpeg'
     })
   ).json()) as { parts: string[]; uuid: string }
-  expect(uuid).toBeTruthy()
+  expect(uuid).toMatch(
+    /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[0-9a-f]{4}-[0-9a-f]{12}$/
+  )
 
   const response = await call(parts[0], {
     method: 'PUT',
