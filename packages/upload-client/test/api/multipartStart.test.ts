@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import multipartStart from '../../src/api/multipartStart'
 import * as factory from '../_fixtureFactory'
-import { getSettingsForTesting } from '../_helpers'
+import { getSettingsForTesting, UUID } from '../_helpers'
 import { UploadError } from '../../src/tools/UploadError'
 import { CancelError } from '@uploadcare/api-client-utils'
 
@@ -15,8 +15,9 @@ describe('API - multipartStart', () => {
     })
     const { uuid, parts } = await multipartStart(size, settings)
 
-    expect(uuid).toBeTruthy()
-    expect(parts).toBeTruthy()
+    expect(uuid).toMatch(UUID)
+    // 12 MiB in the Upload API's 5 MiB parts.
+    expect(parts).toHaveLength(3)
   })
 
   it('should be able to cancel uploading', async () => {

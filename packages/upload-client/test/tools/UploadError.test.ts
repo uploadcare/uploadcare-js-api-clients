@@ -6,7 +6,7 @@ describe('UploadError', () => {
   it('should work', () => {
     const error = new UploadError('test error')
 
-    expect(error instanceof UploadError).toBeTruthy()
+    expect(error).toBeInstanceOf(UploadError)
   })
 
   it('should have message', () => {

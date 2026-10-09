@@ -23,9 +23,8 @@ describe('API - group info', () => {
     const { id } = await group(files, settings)
     const data = await groupInfo(id, settings)
 
-    expect(data).toBeTruthy()
-    expect(data.id).toBeTruthy()
-    expect(data.files).toBeTruthy()
+    expect(data.id).toBe(id)
+    expect(data.files).toHaveLength(2)
   })
   it('should fail with [HTTP 404] group_id is invalid.', async () => {
     const groupId = factory.groupId('invalid')

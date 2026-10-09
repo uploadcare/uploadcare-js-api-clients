@@ -48,7 +48,7 @@ describe('API - multipartComplete', () => {
 
     const { uuid } = await multipartComplete(completedUuid, settings)
 
-    expect(uuid).toBeTruthy()
+    expect(uuid).toBe(completedUuid)
   })
 
   it('should be able to cancel uploading', async () => {

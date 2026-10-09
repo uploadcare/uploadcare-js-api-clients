@@ -1,6 +1,10 @@
 import { vi, expect, describe, it } from 'vitest'
 import * as factory from '../_fixtureFactory'
-import { getSettingsForTesting, assertComputableProgress } from '../_helpers'
+import {
+  getSettingsForTesting,
+  assertComputableProgress,
+  assertUploadedFile
+} from '../_helpers'
 import { CancelError } from '@uploadcare/api-client-utils'
 import { uploadFromUploaded } from '../../src/uploadFile/uploadFromUploaded'
 import info from '../../src/api/info'
@@ -13,7 +17,8 @@ describe('uploadFromUploaded', () => {
   it('should resolves when file is ready on CDN', async () => {
     const file = await uploadFromUploaded(uuid, settings)
 
-    expect(file.cdnUrl).toBeTruthy()
+    expect(file.uuid).toBe(uuid)
+    assertUploadedFile(file, settings)
   })
 
   it('should wait until file is ready', async () => {

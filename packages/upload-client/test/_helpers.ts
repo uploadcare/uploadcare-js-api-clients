@@ -41,7 +41,8 @@ export const getSettingsForTesting = <T>(options: T): T & DefaultSettings => {
   return allEnvironments[selectedEnvironment]
 }
 
-const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
+export const UUID =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
 
 /** An uploaded file has a uuid and a `cdnUrl` on the CDN the test set. */
 export function assertUploadedFile(
@@ -51,6 +52,22 @@ export function assertUploadedFile(
   expect(file).toMatchObject({
     uuid: expect.stringMatching(UUID),
     cdnUrl: `${baseCDN}/${file.uuid}/`
+  })
+}
+
+/** A group id: `<uuid>~<number of files>`. */
+export const groupIdPattern = (filesCount: number): RegExp =>
+  new RegExp(`^${UUID.source.slice(1, -1)}~${filesCount}$`)
+
+/** A created group has a group id and a `cdnUrl` on the CDN the test set. */
+export function assertUploadedGroup(
+  group: { uuid: string; cdnUrl: string },
+  { baseCDN }: { baseCDN: string },
+  filesCount: number
+): void {
+  expect(group).toMatchObject({
+    uuid: expect.stringMatching(groupIdPattern(filesCount)),
+    cdnUrl: `${baseCDN}/${group.uuid}/`
   })
 }
 

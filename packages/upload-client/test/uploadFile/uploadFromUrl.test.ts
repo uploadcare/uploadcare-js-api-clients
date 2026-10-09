@@ -4,7 +4,8 @@ import * as factory from '../_fixtureFactory'
 import {
   getSettingsForTesting,
   assertComputableProgress,
-  assertUnknownProgress
+  assertUnknownProgress,
+  assertUploadedFile
 } from '../_helpers'
 import { CancelError } from '@uploadcare/api-client-utils'
 import http from 'node:http'
@@ -23,8 +24,7 @@ describe('uploadFromUrl', () => {
 
     const file = await uploadFromUrl(sourceUrl, settings)
 
-    expect(file.cdnUrl).toBeTruthy()
-    expect(file.uuid).toBeTruthy()
+    assertUploadedFile(file, settings)
   })
 
   it('should wait until file is ready', async () => {
@@ -48,7 +48,7 @@ describe('uploadFromUrl', () => {
 
     const file = await uploadFromUrl(sourceUrl, settings)
 
-    expect(file.isStored).toBeFalsy()
+    expect(file.isStored).toBe(false)
   })
 
   it('should accept checkForUrlDuplicates setting', async () => {

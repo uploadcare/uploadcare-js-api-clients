@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest'
 import fromUrl, { TypeEnum } from '../../src/api/fromUrl'
 import { resetSession } from '@uploadcare/api-emulator'
 import * as factory from '../_fixtureFactory'
-import { getSettingsForTesting } from '../_helpers'
+import { getSettingsForTesting, UUID } from '../_helpers'
 
 describe('API - from url', () => {
   const sourceUrl = factory.imageUrl('valid')
@@ -13,11 +13,10 @@ describe('API - from url', () => {
   it('should return token for file', async () => {
     const data = await fromUrl(sourceUrl, settings)
 
-    expect(data.type).toEqual(TypeEnum.Token)
-
-    if (data.type === TypeEnum.Token) {
-      expect(data.token).toBeTruthy()
-    }
+    expect(data).toEqual({
+      type: TypeEnum.Token,
+      token: expect.stringMatching(UUID)
+    })
   })
 
   it('should be rejected with bad options', async () => {

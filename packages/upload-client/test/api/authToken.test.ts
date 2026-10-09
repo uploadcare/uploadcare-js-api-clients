@@ -19,7 +19,12 @@ import {
   type EmulatorSession
 } from '@uploadcare/api-emulator'
 import * as factory from '../_fixtureFactory'
-import { getSettingsForTesting } from '../_helpers'
+import {
+  assertUploadedFile,
+  getSettingsForTesting,
+  groupIdPattern,
+  UUID
+} from '../_helpers'
 
 vi.setConfig({ testTimeout: 60000 })
 
@@ -403,7 +408,7 @@ describeContract('authToken', () => {
       authToken: mintToken()
     })
 
-    expect(groupInfo.id).toBeTruthy()
+    expect(groupInfo.id).toMatch(groupIdPattern(1))
   })
 
   it('should authenticate the info requests a poller makes', async () => {
@@ -415,7 +420,7 @@ describeContract('authToken', () => {
       authToken: mintToken()
     })
 
-    expect(file.uuid).toBeTruthy()
+    expect(file.uuid).toMatch(UUID)
   })
 
   it('should authenticate multipart start and complete, and leave the parts bare', async () => {
@@ -427,7 +432,7 @@ describeContract('authToken', () => {
       authToken: mintToken()
     })
 
-    expect(file.cdnUrl).toBeTruthy()
+    assertUploadedFile(file, settings)
   })
 
   it('should drop legacy signature params when authToken is set', async () => {

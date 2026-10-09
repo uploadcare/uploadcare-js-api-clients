@@ -1,6 +1,10 @@
 import { vi, expect, describe, it } from 'vitest'
 import * as factory from '../_fixtureFactory'
-import { getSettingsForTesting, assertComputableProgress } from '../_helpers'
+import {
+  getSettingsForTesting,
+  assertComputableProgress,
+  assertUploadedFile
+} from '../_helpers'
 import { CancelError } from '@uploadcare/api-client-utils'
 import { uploadMultipart } from '../../src/uploadFile/uploadMultipart'
 import info from '../../src/api/info'
@@ -16,7 +20,7 @@ describe('uploadMultipart', () => {
   it('should resolves when file is ready on CDN', async () => {
     const file = await uploadMultipart(fileToUpload, settings)
 
-    expect(file.cdnUrl).toBeTruthy()
+    assertUploadedFile(file, settings)
   })
 
   it('should wait until file is ready', async () => {
@@ -32,7 +36,7 @@ describe('uploadMultipart', () => {
       multipartChunkSize: 10 * 1024 * 1024
     })
 
-    expect(file.cdnUrl).toBeTruthy()
+    assertUploadedFile(file, settings)
   })
 
   it('should accept store setting', async () => {
@@ -42,7 +46,7 @@ describe('uploadMultipart', () => {
     })
     const file = await uploadMultipart(fileToUpload, settings)
 
-    expect(file.isStored).toBeFalsy()
+    expect(file.isStored).toBe(false)
   })
 
   it('should be able to cancel uploading', async () => {
