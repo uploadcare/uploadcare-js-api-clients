@@ -1,4 +1,5 @@
 import { vi, expect, describe, it } from 'vitest'
+import { DEMO_IMAGE_UUID } from '@uploadcare/api-emulator'
 import * as factory from '../_fixtureFactory'
 import {
   getSettingsForTesting,
@@ -9,7 +10,8 @@ import { CancelError } from '@uploadcare/api-client-utils'
 import { uploadFromUploaded } from '../../src/uploadFile/uploadFromUploaded'
 import info from '../../src/api/info'
 describe('uploadFromUploaded', () => {
-  const uuid = factory.uuid('image')
+  // A file the production project holds, and every emulator session seeds.
+  const uuid = DEMO_IMAGE_UUID
   const settings = getSettingsForTesting({
     publicKey: factory.publicKey('image')
   })

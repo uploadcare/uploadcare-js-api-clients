@@ -84,10 +84,9 @@ export type DerivativeJob = {
  */
 
 /**
- * `upload-client`'s `test/_fixtureFactory.ts`
- * (`uuid('image')`/`uuid('token')`), polled by `uploadFromUploaded.test.ts`,
- * `api/info.test.ts` and `uploadFile.test.ts`. The real API has this file;
- * nothing in the suite uploads it first.
+ * Imported by name in `upload-client`'s `uploadFromUploaded.test.ts`,
+ * `api/info.test.ts`, `uploadFile.test.ts` and `test/_fixtureFactory.ts`. The
+ * real API has this file; nothing in the suite uploads it first.
  */
 export const DEMO_IMAGE_UUID = '49b4c5a1-31b3-4349-ba07-d97a2d883c37'
 /** The browser suite's `adaptive-image.e2e.test.tsx` (`<uc-img>`). */

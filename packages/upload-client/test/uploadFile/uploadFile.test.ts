@@ -1,5 +1,5 @@
 import { expect, vi, describe, it } from 'vitest'
-import { resetSession } from '@uploadcare/api-emulator'
+import { DEMO_IMAGE_UUID, resetSession } from '@uploadcare/api-emulator'
 import { uploadFile } from '../../src/uploadFile/uploadFile'
 import * as factory from '../_fixtureFactory'
 import { assertUploadedFile, getSettingsForTesting } from '../_helpers'
@@ -52,7 +52,8 @@ describe('uploadFile', () => {
 
   it('should upload uuids using `uploadFromUploaded`', async () => {
     refuseRoutes('POST /base/', 'POST /multipart/start/', 'POST /from_url/')
-    const uuid = factory.uuid('image')
+    // A file the production project holds, and every emulator session seeds.
+    const uuid = DEMO_IMAGE_UUID
     const settings = getSettingsForTesting({
       publicKey: factory.publicKey('image')
     })
