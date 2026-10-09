@@ -24,7 +24,6 @@ it("lets a foreign origin through under unhandled: 'passthrough'", async () => {
   })
 
   expect(error).not.toHaveBeenCalled()
-  error.mockRestore()
 })
 
 it('still fails an unrouted Uploadcare path rather than reaching the real API', async () => {
@@ -35,7 +34,6 @@ it('still fails an unrouted Uploadcare path rather than reaching the real API', 
   )
 
   expect(warn).toHaveBeenCalledOnce()
-  warn.mockRestore()
 })
 
 it('still refuses an Uploadcare host it does not emulate, naming it', async () => {
@@ -56,5 +54,4 @@ it('still refuses an Uploadcare host it does not emulate, naming it', async () =
       expect.stringContaining(url)
     ])
   )
-  error.mockRestore()
 })

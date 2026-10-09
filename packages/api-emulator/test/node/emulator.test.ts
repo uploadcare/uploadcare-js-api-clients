@@ -67,7 +67,6 @@ it('fails an Uploadcare path it has no route for, naming it', async () => {
     expect.stringContaining('GET https://upload.uploadcare.com/nope/'),
     expect.stringContaining('POST https://ucarecdn.com/not-a-uuid/')
   ])
-  warn.mockRestore()
 })
 
 // A DOM test environment's fetch (happy-dom) or XHR (jsdom) goes out over
@@ -93,7 +92,6 @@ it('refuses a foreign origin by default, naming it, localhost included', async (
     expect.stringContaining(url),
     expect.stringContaining(url)
   ])
-  error.mockRestore()
 })
 
 it('fails a dropped connection as a network error', async () => {
