@@ -617,9 +617,6 @@ file, because the emulator answers differently:
 - Every real error carries an `error_code` (`FilesRequiredError`,
   `GroupIdRequiredError`, …). The emulator sends one only on the public-key,
   token, throttle, signed-upload and `from_url` URL-parsing errors.
-- `POST /multipart/complete/` for a uuid no `/multipart/start/` handed out:
-  the real API answers 404 `File is not found.`, the emulator 400
-  `uuid is invalid.`
 - `POST /from_url/` with a `source_url` that has no scheme (`nope`): the real
   API answers `No URL scheme supplied.`, the emulator `Failed to parse URL.`
 - `POST /multipart/start/` below the minimum size: the real API's sentence says

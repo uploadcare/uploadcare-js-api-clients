@@ -148,7 +148,7 @@ it('describes the finished file once the upload is completed', async () => {
 
 it('refuses to complete a uuid no /multipart/start/ ever issued', async () => {
   const response = await complete('00000000-0000-4000-8000-000000000000')
-  expect(response.status).toBe(400)
+  expect(response.status).toBe(404)
 })
 
 it('fails a part PUT that leaks an Authorization header as a network error', async () => {
