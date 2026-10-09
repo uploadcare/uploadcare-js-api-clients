@@ -7,7 +7,10 @@ describe('API - base', () => {
 
   it('should be able to upload data', async () => {
     const publicKey = factory.publicKey('demo')
-    const { file } = await base(fileToUpload.data, { publicKey })
+    const { file } = await base(
+      fileToUpload.data,
+      getSettingsForTesting({ publicKey })
+    )
 
     expect(typeof file).toBe('string')
   })
@@ -16,10 +19,10 @@ describe('API - base', () => {
     const timeout = vi.fn()
     const publicKey = factory.publicKey('demo')
     const controller = new AbortController()
-    const directUpload = base(fileToUpload.data, {
-      publicKey,
-      signal: controller.signal
-    })
+    const directUpload = base(
+      fileToUpload.data,
+      getSettingsForTesting({ publicKey, signal: controller.signal })
+    )
 
     controller.abort()
 
@@ -35,7 +38,10 @@ describe('API - base', () => {
     const publicKey = factory.publicKey('demo')
     const onProgress = vi.fn()
 
-    await base(fileToUpload.data, { publicKey, onProgress })
+    await base(
+      fileToUpload.data,
+      getSettingsForTesting({ publicKey, onProgress })
+    )
 
     assertComputableProgress(onProgress)
   })
