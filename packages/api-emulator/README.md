@@ -398,7 +398,7 @@ test can say which file it means instead of repeating a uuid:
 
 | Export                | uuid                                   | Hardcoded by                                                    |
 | --------------------- | -------------------------------------- | --------------------------------------------------------------- |
-| `DEMO_IMAGE_UUID`     | `49b4c5a1-31b3-4349-ba07-d97a2d883c37` | `upload-client`'s fixtures (`uuid('image')`, `uuid('token')`)   |
+| `DEMO_IMAGE_UUID`     | `49b4c5a1-31b3-4349-ba07-d97a2d883c37` | `upload-client`'s tests, by this name                           |
 | `ADAPTIVE_IMAGE_UUID` | `7124ae98-344c-42b2-ae2a-bd9aa79d76d8` | file-uploader's `<uc-img>` e2e                                  |
 | `EDITOR_IMAGE_UUID`   | `f4dc9ebc-ed6d-4b4d-83d1-863bf1e4bb7f` | file-uploader's `<uc-cloud-image-editor>` e2e                   |
 | `BUNDLE_IMAGE_UUID`   | `90e06e59-8055-4435-9291-c005a98cf098` | file-uploader's `solutions/bundles.e2e.test.tsx`                |

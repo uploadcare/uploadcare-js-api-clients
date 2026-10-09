@@ -1,4 +1,5 @@
 import { describe, it, expect } from 'vitest'
+import { DEMO_IMAGE_UUID } from '@uploadcare/api-emulator'
 import base from '../../src/api/base'
 import info from '../../src/api/info'
 import * as factory from '../_fixtureFactory'
@@ -18,7 +19,7 @@ describe('API - info', () => {
   })
 
   it('should be rejected with bad options', async () => {
-    const uuid = factory.uuid('image')
+    const uuid = DEMO_IMAGE_UUID
     const settings = getSettingsForTesting({
       publicKey: factory.publicKey('empty')
     })
@@ -28,7 +29,7 @@ describe('API - info', () => {
   })
 
   it('should be able to cancel uploading', async () => {
-    const uuid = factory.uuid('image')
+    const uuid = DEMO_IMAGE_UUID
     const controller = new AbortController()
 
     const settings = getSettingsForTesting({
