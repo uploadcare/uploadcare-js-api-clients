@@ -32,6 +32,13 @@ export const multipartRoutes: Route[] = [
       // The check this route exists for: see `dropConnection`.
       if (request.headers.has('authorization')) return dropConnection()
 
+      // A simplification: a part for an unknown upload, or a `partNumber`
+      // outside the range, is answered 200 and its bytes dropped. Real S3
+      // refuses a PUT whose presigned URL doesn't match an open upload
+      // (`NoSuchUpload`, or 403 on a bad signature), and the emulator doesn't
+      // sign its part URLs at all. A client that skips a part still finds out:
+      // `/multipart/complete/` answers "File size mismatch" (or "uuid is
+      // invalid" for an upload that was never started).
       const upload = sessionOf(request).multipart.get(params.uuid ?? '')
       const partNumber = Number(
         new URL(request.url).searchParams.get('partNumber')
