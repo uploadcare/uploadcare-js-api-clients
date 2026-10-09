@@ -58,7 +58,7 @@ it('does not let the CDN route swallow an Upload API GET', async () => {
   // answers `undefined` and `handle()` moves on to the next route. A 502 in a
   // consumer is what regressing it looks like.
   const response = await call(
-    'https://upload.uploadcare.com/info/?pub_key=demopublickey&file_id=nope'
+    'https://upload.uploadcare.com/info/?pub_key=demopublickey&file_id=00000000-0000-4000-8000-000000000000'
   )
   expect(response.status).toBe(404)
 })

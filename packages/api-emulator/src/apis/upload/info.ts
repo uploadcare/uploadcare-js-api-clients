@@ -1,7 +1,7 @@
 import { apiError } from '../../core/responses.js'
 import { route, type Route } from '../../core/router.js'
 import { protect } from './auth.js'
-import { fileInfo, fileOf, sessionOf } from '../../state/store.js'
+import { fileInfo, fileOf, sessionOf, UUID } from '../../state/store.js'
 
 export const infoRoutes: Route[] = [
   route(
@@ -13,6 +13,9 @@ export const infoRoutes: Route[] = [
       if (!id)
         // schema: fileIdRequiredError
         return apiError(request, 400, 'file_id is required.')
+      if (!UUID.test(id))
+        // schema: fileIdInvalidError
+        return apiError(request, 400, 'file_id is invalid.')
       const file = fileOf(sessionOf(request), id, publicKey)
       // schema: fileNotFoundError
       return file

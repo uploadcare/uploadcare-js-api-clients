@@ -83,6 +83,10 @@ export type DerivativeJob = {
  * run used. Import the name rather than repeating the uuid.
  */
 
+/** A bare file uuid, the shape the Upload API accepts as a `file_id`. */
+export const UUID =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+
 /**
  * Imported by name in `upload-client`'s `uploadFromUploaded.test.ts`,
  * `api/info.test.ts`, `uploadFile.test.ts` and `test/_fixtureFactory.ts`. The

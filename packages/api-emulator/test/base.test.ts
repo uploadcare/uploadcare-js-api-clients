@@ -91,7 +91,7 @@ it('400s for /info/ without a file_id', async () => {
 
 it('404s for a file nobody uploaded', async () => {
   const response = await call(
-    'https://upload.uploadcare.com/info/?pub_key=demopublickey&file_id=nope'
+    'https://upload.uploadcare.com/info/?pub_key=demopublickey&file_id=00000000-0000-4000-8000-000000000000'
   )
   expect(response.status).toBe(404)
   await assertMatchesSpec(response, { method: 'get', path: '/info/' })

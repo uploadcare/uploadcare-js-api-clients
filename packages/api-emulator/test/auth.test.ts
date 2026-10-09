@@ -15,7 +15,7 @@ beforeEach(() => resetSession())
 
 it('refuses /info/ with no pub_key', async () => {
   const response = await call(
-    'https://upload.uploadcare.com/info/?file_id=nope'
+    'https://upload.uploadcare.com/info/?file_id=00000000-0000-4000-8000-000000000000'
   )
   expect(response.status).toBe(403)
 })
