@@ -1,13 +1,8 @@
 import './_envs'
 
-import {
-  dataURItoBlob,
-  dataURItoBuffer,
-  getSettingsForTesting
-} from './_helpers'
+import { dataURItoBlob, dataURItoBuffer } from './_helpers'
 import { isNode } from '@uploadcare/api-client-utils'
-
-const settings = getSettingsForTesting({})
+import { DEMO_IMAGE_UUID } from '@uploadcare/api-emulator'
 
 /* eslint-disable max-len */
 const images: { [key: string]: string } = {
@@ -21,35 +16,16 @@ const pubkey = (): string =>
     ? process.env.UPLOAD_CLIENT_DEFAULT_PUBLIC_KEY
     : 'secret_public_key') || ''
 
-const uuids: { [key: string]: { publicKey: string; uuid: string } } = {
-  image: {
-    publicKey: pubkey(),
-    uuid: '49b4c5a1-31b3-4349-ba07-d97a2d883c37'
-  },
-  token: {
-    publicKey: pubkey(),
-    uuid: '49b4c5a1-31b3-4349-ba07-d97a2d883c37'
-  },
-  demo: {
-    publicKey: 'demopublickey',
-    uuid: ''
-  },
-  invalid: {
-    publicKey: 'invalidpublickey',
-    uuid: ''
-  },
-  empty: {
-    publicKey: '',
-    uuid: ''
-  },
-  multipart: {
-    publicKey: 'pub_test__no_storing',
-    uuid: ''
-  },
-  unknownProgress: {
-    publicKey: 'pub_test__unknown_progress',
-    uuid: '49b4c5a1-31b3-4349-ba07-d97a2d883c37'
-  }
+const publicKeys: Record<string, string> = {
+  image: pubkey(),
+  demo: 'demopublickey',
+  invalid: 'invalidpublickey',
+  empty: '',
+  // In production, a project that doesn't store uploads.
+  multipart:
+    process.env.TEST_ENV === 'production'
+      ? 'pub_test__no_storing'
+      : 'secret_public_key'
 }
 
 export type FixtureFile = {
@@ -114,21 +90,14 @@ export function file(mbSize: number): FixtureFile {
   return fileBlob(byteLength)
 }
 
-export function uuid(id: string): string {
-  const { uuid } = uuids[id]
-
-  return uuid
-}
-
 export function publicKey(id: string): string {
-  const { publicKey } = uuids[id]
-
-  return publicKey
+  return publicKeys[id]
 }
 
 export function imageUrl(id: string): string {
-  const images = {
-    valid: `${settings.baseCDN}/49b4c5a1-31b3-4349-ba07-d97a2d883c37/20200721174713.png`,
+  const images: Record<string, string> = {
+    // The CDN is a host the emulator can "fetch" from too.
+    valid: `https://ucarecdn.com/${DEMO_IMAGE_UUID}/20200721174713.png`,
     doesNotExist: 'https://1.com/1.jpg',
     privateIP: 'http://192.168.1.10/1.jpg'
   }
@@ -137,7 +106,7 @@ export function imageUrl(id: string): string {
 }
 
 export function token(id: string): string {
-  const tokens = {
+  const tokens: Record<string, string> = {
     valid: '49b4c5a1-31b3-4349-ba07-d97a2d883c37',
     empty: ''
   }
@@ -146,7 +115,7 @@ export function token(id: string): string {
 }
 
 export function groupId(id: string): string {
-  const groupIds = {
+  const groupIds: Record<string, string> = {
     valid: '0b14f2f6-6d30-482b-a6d6-da2d434779d3~2',
     invalid: '123ebb27-1fd6-46c6-a859-b9893'
   }
@@ -155,10 +124,12 @@ export function groupId(id: string): string {
 }
 
 export function groupOfFiles(id: string): Array<string> {
-  const groupOfFiles = {
+  const groupOfFiles: Record<string, string[]> = {
+    // The first is in the production project only (the tests seed it with
+    // the emulator's `storedFile` preset); the second is `DEMO_IMAGE_UUID`.
     valid: [
       '392e3aa3-5ed6-4ad6-a67e-b3a7c1d5b9e9',
-      '49b4c5a1-31b3-4349-ba07-d97a2d883c37/-/resize/x800/'
+      `${DEMO_IMAGE_UUID}/-/resize/x800/`
     ],
     invalid: [
       '2e6b7f23-9143-4b71-94e7-338bb',

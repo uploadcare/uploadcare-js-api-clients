@@ -1,3 +1,4 @@
+import { describe, it, expect } from 'vitest'
 import { getStoreValue } from '../../src/tools/getStoreValue'
 
 describe('getStoreValue', () => {

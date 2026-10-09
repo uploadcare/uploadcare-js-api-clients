@@ -1,69 +1,65 @@
-import { expect, jest } from '@jest/globals'
+import { expect, vi, describe, it } from 'vitest'
+import { DEMO_IMAGE_UUID, resetSession } from '@uploadcare/api-emulator'
 import { uploadFile } from '../../src/uploadFile/uploadFile'
 import * as factory from '../_fixtureFactory'
-import { getSettingsForTesting } from '../_helpers'
+import { assertUploadedFile, getSettingsForTesting } from '../_helpers'
 
-jest.setTimeout(60000)
+vi.setConfig({ testTimeout: 60000 })
 
 /**
- * Those spying tests are commented because jest isn't able to mock statically
- * imported ESM modules So we just ensure that `uploadFile` is working at all
- * Without checking for actual upload method used
+ * Answers 500 on the other strategies' endpoints, so a test passes only through
+ * the strategy it names. A no-op against the real API.
  */
-describe('uploadFile', () => {
-  // afterEach(() => {
-  //   jest.clearAllMocks()
-  // })
+const refuseRoutes = (...routes: string[]) => {
+  const session = resetSession()
+  for (const route of routes)
+    session.on(route, () => new Response('', { status: 500 }))
+}
 
+describe('uploadFile', () => {
   it('should upload small files using `uploadDirect`', async () => {
+    refuseRoutes('POST /multipart/start/', 'POST /from_url/')
     const fileToUpload = factory.image('blackSquare').data
     const settings = getSettingsForTesting({
       publicKey: factory.publicKey('image')
     })
 
-    // const spy = jest.spyOn(uploadDirect, 'default')
     const file = await uploadFile(fileToUpload, settings)
-
-    // expect(spy).toHaveBeenCalled()
-    expect(file.cdnUrl).toBeTruthy()
+    assertUploadedFile(file, settings)
   })
 
   it('should upload big files using `uploadMultipart`', async () => {
+    refuseRoutes('POST /base/', 'POST /from_url/')
     const fileToUpload = factory.file(12).data
     const settings = getSettingsForTesting({
       publicKey: factory.publicKey('multipart')
     })
 
-    // const spy = jest.spyOn(uploadMultipart, 'default')
     const file = await uploadFile(fileToUpload, settings)
-
-    // expect(spy).toHaveBeenCalled()
-    expect(file.cdnUrl).toBeTruthy()
+    assertUploadedFile(file, settings)
   })
 
   it('should upload urls using `uploadFromUrl`', async () => {
+    refuseRoutes('POST /base/', 'POST /multipart/start/')
     const sourceUrl = factory.imageUrl('valid')
     const settings = getSettingsForTesting({
       publicKey: factory.publicKey('image')
     })
 
-    // const spy = jest.spyOn(uploadFromUrl, 'default')
     const file = await uploadFile(sourceUrl, settings)
-
-    // expect(spy).toHaveBeenCalled()
-    expect(file.cdnUrl).toBeTruthy()
+    assertUploadedFile(file, settings)
   })
 
-  it('should uuids using `uploadFromUploaded`', async () => {
-    const uuid = factory.uuid('image')
+  it('should upload uuids using `uploadFromUploaded`', async () => {
+    refuseRoutes('POST /base/', 'POST /multipart/start/', 'POST /from_url/')
+    // A file the production project holds, and every emulator session seeds.
+    const uuid = DEMO_IMAGE_UUID
     const settings = getSettingsForTesting({
       publicKey: factory.publicKey('image')
     })
 
-    // const spy = jest.spyOn(uploadFromUploaded, 'default')
     const file = await uploadFile(uuid, settings)
-
-    // expect(spy).toHaveBeenCalled()
-    expect(file.cdnUrl).toBeTruthy()
+    expect(file.uuid).toBe(uuid)
+    assertUploadedFile(file, settings)
   })
 })

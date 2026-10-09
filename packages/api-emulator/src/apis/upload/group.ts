@@ -1,0 +1,171 @@
+import { apiError } from '../../core/responses.js'
+import { route, type Route } from '../../core/router.js'
+import { protect } from './auth.js'
+import {
+  fileInfo,
+  fileOf,
+  nextUuid,
+  sessionOf,
+  type GroupMember,
+  type Session,
+  type StoredFile
+} from '../../state/store.js'
+
+/**
+ * `upload-client` sends a member per repeated `files[]` (`buildFormData`'s
+ * array handling); file-uploader's fake sends one per indexed `files[0]`,
+ * `files[1]`, … — in the query string as often as the body. `\d*` (rather than
+ * `\d+`) matches both spellings with one pattern.
+ */
+const MEMBER_KEY = /^files\[\d*]$/
+
+/**
+ * A bare file uuid, or a group reference (`<uuid>~N`, matching the group-id
+ * shape `nextUuid`/`groupEnvelope` mint below) — either can stand as a
+ * `files[]` member.
+ */
+const MEMBER_UUID =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}(~[1-9][0-9]*)?$/i
+
+/**
+ * A `files[]` member may be a full CDN url (`https://ucarecdn.com/<uuid>/…`) —
+ * the file-uploader builds groups from `cdnUrl` values, not bare uuids. Strip
+ * the scheme and host so what's left parses exactly like the bare/`-/`-effects
+ * forms below, whether or not the url carries a trailing slash.
+ */
+const CDN_URL_PREFIX = /^https?:\/\/[^/]+\//i
+
+const parseMember = (raw: string): GroupMember | undefined => {
+  const path = raw.replace(CDN_URL_PREFIX, '')
+  const [uuid = '', ...rest] = path.split('/')
+  if (!MEMBER_UUID.test(uuid)) return undefined
+  const tail = rest.join('/')
+  return { uuid, effects: tail.startsWith('-/') ? tail.slice(2) : '' }
+}
+
+/** What a `<uuid>~N` group reference member reports as. */
+const stubFile = (uuid: string): StoredFile => ({
+  uuid,
+  name: uuid,
+  size: 0,
+  mimeType: 'application/octet-stream',
+  bytes: new Uint8Array(),
+  isStored: false
+})
+
+/**
+ * A `files[N]` entry is a string on every real client — but `FormData` lets one
+ * be a `File` too. That must still 400 the whole request as an invalid member
+ * (matching what a malformed string already does below), not vanish from it:
+ * silently dropping it would hand back a group smaller than the one asked for,
+ * which looks fine and is wrong. `String(value)` would trip `no-base-to-string`
+ * for no benefit — the literal below is exactly the `[object File]` `String()`
+ * would have produced anyway.
+ */
+const memberToken = (value: FormDataEntryValue) =>
+  typeof value === 'string' ? value : '[object File]'
+
+/**
+ * `/group/` and `/group/info/` answer with the same shape, built fresh each
+ * time.
+ */
+const groupEnvelope = (
+  session: Session,
+  id: string,
+  members: GroupMember[]
+) => ({
+  id,
+  datetime_created: new Date(0).toISOString(),
+  datetime_stored: null,
+  files_count: members.length,
+  cdn_url: `https://ucarecdn.com/${id}/`,
+  url: `https://api.uploadcare.com/groups/${id}/`,
+  files: members.map(({ uuid, effects }) => ({
+    ...fileInfo(session.files.get(uuid) ?? stubFile(uuid)),
+    default_effects: effects
+  }))
+})
+
+export const groupRoutes: Route[] = [
+  route(
+    'POST',
+    '/group/',
+    protect(async ({ request, publicKey }) => {
+      const session = sessionOf(request)
+      const form = await request.formData().catch(() => new FormData())
+      const query = new URL(request.url).searchParams
+
+      const tokens = [...form.entries(), ...query.entries()]
+        .filter(([key]) => MEMBER_KEY.test(key))
+        .map(([, value]) => memberToken(value))
+
+      if (tokens.length === 0)
+        // schema: groupFileURLParsingFailedError
+        return apiError(
+          request,
+          400,
+          'No files[N] parameters found.',
+          'GroupFilesInvalidError'
+        )
+
+      const members: GroupMember[] = []
+      for (const raw of tokens) {
+        const parsed = parseMember(raw)
+        if (!parsed)
+          // schema: groupFilesInvalidError
+          return apiError(
+            request,
+            400,
+            `This is not valid file url: ${raw}.`,
+            'GroupFileURLParsingFailedError'
+          )
+        members.push(parsed)
+      }
+      const isKnown = ({ uuid }: GroupMember) =>
+        fileOf(session, uuid, publicKey) !== undefined ||
+        session.groups.has(uuid)
+
+      if (!members.every(isKnown))
+        // schema: groupFilesNotFoundError
+        return apiError(
+          request,
+          400,
+          'Some files not found.',
+          'GroupFilesNotFoundError'
+        )
+
+      const id = `${nextUuid(session)}~${members.length}`
+      session.groups.set(id, members)
+      return Response.json(groupEnvelope(session, id, members))
+    })
+  ),
+  route(
+    'GET',
+    '/group/info/',
+    protect(({ request }) => {
+      const session = sessionOf(request)
+      const params = new URL(request.url).searchParams
+      const id = params.get('group_id')
+      if (!id)
+        // schema: groupIdRequiredError
+        return apiError(
+          request,
+          400,
+          'group_id is required.',
+          'GroupIdRequiredError'
+        )
+
+      const members = session.groups.get(id)
+      if (!members)
+        // schema: groupNotFoundError
+        return apiError(
+          request,
+          404,
+          'group_id is invalid.',
+          'GroupNotFoundError'
+        )
+
+      return Response.json(groupEnvelope(session, id, members))
+    })
+  )
+]

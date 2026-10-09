@@ -653,35 +653,18 @@ uploadFile(blob, {
 
 ## Testing
 
-```
+By default, tests run against the local API emulator
+([`@uploadcare/api-emulator`](../api-emulator)), which each test file starts
+on a free port (`test/_emulator.ts`):
+
+```bash
 npm run test
 ```
 
-By default, tests runs with mock server, but you can run tests with
-production environment.
-
-Run test on production servers:
+Run tests against the production servers instead:
 
 ```bash
 npm run test:production
-```
-
-Run test with mock server (mock server starts automaticaly):
-
-```bash
-npm run test
-```
-
-Run mock server:
-
-```
-npm run mock:start
-```
-
-And then you can run test:
-
-```
-npm run test:jest
 ```
 
 ## Security issues

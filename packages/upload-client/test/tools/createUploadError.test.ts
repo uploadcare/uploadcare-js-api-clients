@@ -1,4 +1,4 @@
-import { expect } from '@jest/globals'
+import { expect, describe, it } from 'vitest'
 import { AuthError } from '../../src/tools/AuthError'
 import { createUploadError } from '../../src/tools/createUploadError'
 import { UploadError } from '../../src/tools/UploadError'

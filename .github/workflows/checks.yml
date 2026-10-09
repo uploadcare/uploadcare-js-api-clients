@@ -33,6 +33,11 @@ jobs:
             upload-client:
               - 'packages/upload-client/**'
               - 'packages/api-client-utils/**'
+              # The whole suite runs against the emulator (`test/_emulator.ts`), so an
+              # emulator-only change has to re-run it.
+              - 'packages/api-emulator/**'
+            api-emulator:
+              - 'packages/api-emulator/**'
             api-client-utils:
               - 'packages/api-client-utils/**'
             signed-uploads:
@@ -53,6 +58,47 @@ jobs:
         working-directory: ./
         run: npm run lint
 
+      - name: Lint `api-emulator`
+        if: steps.changes.outputs.api-emulator == 'true'
+        run: npm run lint -w packages/api-emulator
+
+      - name: Check `api-emulator` formatting
+        if: steps.changes.outputs.api-emulator == 'true'
+        run: npm run format:check -w packages/api-emulator
+
+      # api-emulator's `./browser` tests and upload-client's `chromium` project
+      # run in a real Chromium (Vitest browser mode). The upload-client filter
+      # covers api-emulator's paths too. System packages aren't covered by the
+      # browser cache, so they install every time; only the browser binaries
+      # are cache-gated.
+      - name: Install Chromium system deps
+        if: steps.changes.outputs.upload-client == 'true'
+        timeout-minutes: 10
+        env:
+          # `install-deps` shells out to apt-get; keep it from stalling on an
+          # interactive prompt (e.g. Ubuntu's needrestart).
+          DEBIAN_FRONTEND: noninteractive
+          NEEDRESTART_MODE: a
+        run: npx playwright install-deps chromium
+        working-directory: ./packages/api-emulator
+
+      - uses: actions/cache@v4
+        if: steps.changes.outputs.upload-client == 'true'
+        id: playwright-cache
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('package-lock.json') }}
+
+      - name: Install Chromium
+        if: steps.changes.outputs.upload-client == 'true' && steps.playwright-cache.outputs.cache-hit != 'true'
+        timeout-minutes: 10
+        run: npx playwright install chromium
+        working-directory: ./packages/api-emulator
+
+      - name: Run `api-emulator` tests
+        if: steps.changes.outputs.api-emulator == 'true'
+        run: npm run test -w packages/api-emulator
+
       - name: Run `upload-client` mock tests
         if: steps.changes.outputs.upload-client == 'true'
         run: npm run test -w packages/upload-client
@@ -69,6 +115,9 @@ jobs:
         if: steps.changes.outputs.rest-client == 'true'
         run: npm run test:production -w packages/rest-client
 
+      # Real-API drift is reported on a pull request, not blocking it: the
+      # emulator-backed run above is the gate. On master it still blocks.
       - name: Run `upload-client` integration tests
         if: steps.changes.outputs.upload-client == 'true'
+        continue-on-error: ${{ github.event_name == 'pull_request' }}
         run: npm run test:production -w packages/upload-client

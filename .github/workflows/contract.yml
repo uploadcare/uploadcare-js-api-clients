@@ -1,0 +1,33 @@
+name: contract
+
+# Runs the real-API checks on demand: by hand, or by labelling a pull request
+# `contract`. Not on a schedule.
+on:
+  workflow_dispatch:
+  pull_request:
+    types: [labeled]
+
+jobs:
+  contract:
+    if: github.event_name == 'workflow_dispatch' || github.event.label.name == 'contract'
+    runs-on: ubuntu-latest
+    env:
+      # A missing secret fails the run (see api-emulator's test/contract.test.ts
+      # and the root env.js); neither falls back to the emulator.
+      CONTRACT_PUBLIC_KEY: ${{ secrets.UPLOAD_CLIENT_DEFAULT_PUBLIC_KEY }}
+      UPLOAD_CLIENT_DEFAULT_PUBLIC_KEY: ${{ secrets.UPLOAD_CLIENT_DEFAULT_PUBLIC_KEY }}
+      REST_CLIENT_DEFAULT_PUBLIC_KEY: ${{ secrets.REST_CLIENT_DEFAULT_PUBLIC_KEY }}
+      REST_CLIENT_DEFAULT_SECRET_KEY: ${{ secrets.REST_CLIENT_DEFAULT_SECRET_KEY }}
+      UPLOAD_CLIENT_SECURE_UPLOADS_PUBLIC_KEY: ${{ secrets.UPLOAD_CLIENT_SECURE_UPLOADS_PUBLIC_KEY }}
+      UPLOAD_CLIENT_SECURE_UPLOADS_SECRET_KEY: ${{ secrets.UPLOAD_CLIENT_SECURE_UPLOADS_SECRET_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - run: npm i
+      - run: npm run build
+      - run: npm run test:contract -w packages/api-emulator
+      # Blocking here, unlike on a plain pull request (see checks.yml).
+      - if: ${{ !cancelled() }}
+        run: npm run test:production -w packages/upload-client

@@ -1,3 +1,4 @@
+import { describe, it, expect } from 'vitest'
 import { replaceUrlBase } from '../../src/tools/replaceUrlBase'
 
 describe('replaceUrlBase', () => {

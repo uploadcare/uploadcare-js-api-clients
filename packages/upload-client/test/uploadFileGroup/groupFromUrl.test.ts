@@ -1,13 +1,14 @@
+import { vi, expect, describe, it } from 'vitest'
+import { resetSession } from '@uploadcare/api-emulator'
 import * as factory from '../_fixtureFactory'
 import {
   getSettingsForTesting,
   assertComputableProgress,
-  assertUnknownProgress
+  assertUnknownProgress,
+  assertUploadedGroup
 } from '../_helpers'
 import { uploadFileGroup } from '../../src/uploadFileGroup'
-import { UploadError } from '../../src/tools/UploadError'
-import { jest, expect } from '@jest/globals'
-
+import { CancelError } from '@uploadcare/api-client-utils'
 describe('groupFrom Url[]', () => {
   const sourceUrl = factory.imageUrl('valid')
   const files = [sourceUrl, sourceUrl]
@@ -16,9 +17,9 @@ describe('groupFrom Url[]', () => {
   })
 
   it('should resolves when file is ready on CDN', async () => {
-    const { cdnUrl } = await uploadFileGroup(files, settings)
+    const group = await uploadFileGroup(files, settings)
 
-    expect(cdnUrl).toBeTruthy()
+    assertUploadedGroup(group, settings, 2)
   })
 
   it('should accept store setting', async () => {
@@ -29,7 +30,8 @@ describe('groupFrom Url[]', () => {
     const upload = uploadFileGroup(files, settings)
     const group = await upload
 
-    expect(group.isStored).toBeFalsy()
+    expect(group.isStored).toBe(false)
+    expect(group.files.map((file) => file.isStored)).toEqual([false, false])
   })
 
   it('should be able to cancel uploading', async () => {
@@ -42,12 +44,12 @@ describe('groupFrom Url[]', () => {
     ctrl.abort()
 
     await expect(upload).rejects.toThrowError(
-      new UploadError('Request canceled')
+      new CancelError('Request canceled')
     )
   })
 
   it('should be able to handle progress', async () => {
-    const onProgress = jest.fn()
+    const onProgress = vi.fn()
     const upload = uploadFileGroup(files, {
       ...settings,
       onProgress
@@ -58,11 +60,13 @@ describe('groupFrom Url[]', () => {
     assertComputableProgress(onProgress)
   })
 
-  process.env.TEST_ENV !== 'production' &&
-    it('should be able to handle non-computable unknown progress', async () => {
-      const onProgress = jest.fn()
+  it.skipIf(process.env.TEST_ENV === 'production')(
+    'should be able to handle non-computable unknown progress',
+    async () => {
+      resetSession().use('unknownProgress')
+      const onProgress = vi.fn()
       const settings = getSettingsForTesting({
-        publicKey: factory.publicKey('unknownProgress'),
+        publicKey: factory.publicKey('image'),
         onProgress
       })
       const upload = uploadFileGroup(
@@ -73,20 +77,17 @@ describe('groupFrom Url[]', () => {
       await upload
 
       assertUnknownProgress(onProgress)
-    })
+    }
+  )
 
   it('should be rejected with error code if failed', async () => {
     const settings = getSettingsForTesting({
       publicKey: factory.publicKey('invalid')
     })
 
-    try {
-      await uploadFileGroup(files, settings)
-    } catch (error) {
-      expect((error as UploadError).message).toEqual('pub_key is invalid.')
-      expect((error as UploadError).code).toEqual(
-        'ProjectPublicKeyInvalidError'
-      )
-    }
+    await expect(uploadFileGroup(files, settings)).rejects.toMatchObject({
+      message: 'pub_key is invalid.',
+      code: 'ProjectPublicKeyInvalidError'
+    })
   })
 })

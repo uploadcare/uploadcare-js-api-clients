@@ -1,4 +1,4 @@
-import { expect } from '@jest/globals'
+import { expect, describe, it } from 'vitest'
 import {
   AUTH_ERROR_CODES,
   AuthError,

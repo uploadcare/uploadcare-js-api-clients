@@ -1,27 +1,28 @@
+import { vi, expect, describe, it } from 'vitest'
 import base from '../../src/api/base'
 import * as factory from '../_fixtureFactory'
-import { UploadError } from '../../src/tools/UploadError'
-import { assertComputableProgress } from '../_helpers'
-import { jest, expect } from '@jest/globals'
-
+import { assertComputableProgress, getSettingsForTesting } from '../_helpers'
 describe('API - base', () => {
   const fileToUpload = factory.image('blackSquare')
 
   it('should be able to upload data', async () => {
     const publicKey = factory.publicKey('demo')
-    const { file } = await base(fileToUpload.data, { publicKey })
+    const { file } = await base(
+      fileToUpload.data,
+      getSettingsForTesting({ publicKey })
+    )
 
     expect(typeof file).toBe('string')
   })
 
   it('should be able to cancel uploading', async () => {
-    const timeout = jest.fn()
+    const timeout = vi.fn()
     const publicKey = factory.publicKey('demo')
     const controller = new AbortController()
-    const directUpload = base(fileToUpload.data, {
-      publicKey,
-      signal: controller.signal
-    })
+    const directUpload = base(
+      fileToUpload.data,
+      getSettingsForTesting({ publicKey, signal: controller.signal })
+    )
 
     controller.abort()
 
@@ -35,9 +36,12 @@ describe('API - base', () => {
 
   it('should be able to handle progress', async () => {
     const publicKey = factory.publicKey('demo')
-    const onProgress = jest.fn()
+    const onProgress = vi.fn()
 
-    await base(fileToUpload.data, { publicKey, onProgress })
+    await base(
+      fileToUpload.data,
+      getSettingsForTesting({ publicKey, onProgress })
+    )
 
     assertComputableProgress(onProgress)
   })
@@ -45,15 +49,11 @@ describe('API - base', () => {
   it('should be rejected with error code if failed', async () => {
     const publicKey = factory.publicKey('invalid')
 
-    try {
-      await base(fileToUpload.data, { publicKey })
-    } catch (error) {
-      expect((error as UploadError).message).toEqual(
-        'UPLOADCARE_PUB_KEY is invalid.'
-      )
-      expect((error as UploadError).code).toEqual(
-        'ProjectPublicKeyInvalidError'
-      )
-    }
+    await expect(
+      base(fileToUpload.data, getSettingsForTesting({ publicKey }))
+    ).rejects.toMatchObject({
+      message: 'UPLOADCARE_PUB_KEY is invalid.',
+      code: 'ProjectPublicKeyInvalidError'
+    })
   })
 })

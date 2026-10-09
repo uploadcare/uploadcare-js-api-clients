@@ -1,6 +1,6 @@
+import { expect, describe, it } from 'vitest'
 // eslint-disable-next-line import/no-unresolved -- subpath export, resolved by bundler/TS
 import { getPrefixedCdnBaseSync } from '@uploadcare/cname-prefix/sync'
-import { expect } from '@jest/globals'
 import { toUploadcareGroup } from '../../src/tools/toUploadcareGroup'
 import { defaultSettings } from '../../src/defaultSettings'
 import { GroupFileInfo, GroupInfo } from '../../src/api/types'

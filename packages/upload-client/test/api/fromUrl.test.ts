@@ -1,7 +1,8 @@
+import { describe, it, expect } from 'vitest'
 import fromUrl, { TypeEnum } from '../../src/api/fromUrl'
+import { resetSession } from '@uploadcare/api-emulator'
 import * as factory from '../_fixtureFactory'
-import { getSettingsForTesting } from '../_helpers'
-import { UploadError } from '../../src/tools/UploadError'
+import { getSettingsForTesting, UUID } from '../_helpers'
 
 describe('API - from url', () => {
   const sourceUrl = factory.imageUrl('valid')
@@ -12,11 +13,10 @@ describe('API - from url', () => {
   it('should return token for file', async () => {
     const data = await fromUrl(sourceUrl, settings)
 
-    expect(data.type).toEqual(TypeEnum.Token)
-
-    if (data.type === TypeEnum.Token) {
-      expect(data.token).toBeTruthy()
-    }
+    expect(data).toEqual({
+      type: TypeEnum.Token,
+      token: expect.stringMatching(UUID)
+    })
   })
 
   it('should be rejected with bad options', async () => {
@@ -31,6 +31,7 @@ describe('API - from url', () => {
 
   it('should be rejected with image that does not exists', async () => {
     const sourceUrl = factory.imageUrl('doesNotExist')
+    resetSession().use('hostNotFound', { sourceUrl })
 
     await expect(fromUrl(sourceUrl, settings)).rejects.toThrowError(
       'Host does not exist.'
@@ -65,13 +66,11 @@ describe('API - from url', () => {
   it('should be rejected with error code if failed', async () => {
     const publicKey = factory.publicKey('invalid')
 
-    try {
-      await fromUrl(sourceUrl, { publicKey })
-    } catch (error) {
-      expect((error as UploadError).message).toEqual('pub_key is invalid.')
-      expect((error as UploadError).code).toEqual(
-        'ProjectPublicKeyInvalidError'
-      )
-    }
+    await expect(
+      fromUrl(sourceUrl, getSettingsForTesting({ publicKey }))
+    ).rejects.toMatchObject({
+      message: 'pub_key is invalid.',
+      code: 'ProjectPublicKeyInvalidError'
+    })
   })
 })

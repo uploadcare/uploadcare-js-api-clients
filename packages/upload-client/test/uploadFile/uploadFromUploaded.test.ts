@@ -1,12 +1,17 @@
+import { vi, expect, describe, it } from 'vitest'
+import { DEMO_IMAGE_UUID } from '@uploadcare/api-emulator'
 import * as factory from '../_fixtureFactory'
-import { getSettingsForTesting, assertComputableProgress } from '../_helpers'
-import { UploadError } from '../../src/tools/UploadError'
+import {
+  getSettingsForTesting,
+  assertComputableProgress,
+  assertUploadedFile
+} from '../_helpers'
+import { CancelError } from '@uploadcare/api-client-utils'
 import { uploadFromUploaded } from '../../src/uploadFile/uploadFromUploaded'
 import info from '../../src/api/info'
-import { jest, expect } from '@jest/globals'
-
 describe('uploadFromUploaded', () => {
-  const uuid = factory.uuid('image')
+  // A file the production project holds, and every emulator session seeds.
+  const uuid = DEMO_IMAGE_UUID
   const settings = getSettingsForTesting({
     publicKey: factory.publicKey('image')
   })
@@ -14,7 +19,8 @@ describe('uploadFromUploaded', () => {
   it('should resolves when file is ready on CDN', async () => {
     const file = await uploadFromUploaded(uuid, settings)
 
-    expect(file.cdnUrl).toBeTruthy()
+    expect(file.uuid).toBe(uuid)
+    assertUploadedFile(file, settings)
   })
 
   it('should wait until file is ready', async () => {
@@ -33,7 +39,7 @@ describe('uploadFromUploaded', () => {
 
     ctrl.abort()
 
-    await expect(upload).rejects.toThrowError(new UploadError('Poll cancelled'))
+    await expect(upload).rejects.toThrowError(new CancelError('Poll cancelled'))
   })
 
   it('should accept new file name setting', async () => {
@@ -48,7 +54,7 @@ describe('uploadFromUploaded', () => {
   })
 
   it('should be able to handle progress', async () => {
-    const onProgress = jest.fn()
+    const onProgress = vi.fn()
     const settings = getSettingsForTesting({
       publicKey: factory.publicKey('image'),
       onProgress
@@ -64,13 +70,9 @@ describe('uploadFromUploaded', () => {
       publicKey: factory.publicKey('invalid')
     })
 
-    try {
-      await uploadFromUploaded(uuid, settings)
-    } catch (error) {
-      expect((error as UploadError).message).toEqual('pub_key is invalid.')
-      expect((error as UploadError).code).toEqual(
-        'ProjectPublicKeyInvalidError'
-      )
-    }
+    await expect(uploadFromUploaded(uuid, settings)).rejects.toMatchObject({
+      message: 'pub_key is invalid.',
+      code: 'ProjectPublicKeyInvalidError'
+    })
   })
 })

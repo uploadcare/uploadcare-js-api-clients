@@ -1,4 +1,4 @@
-import { expect } from '@jest/globals'
+import { expect, describe, it } from 'vitest'
 import { AuthTokenResolverError } from '@uploadcare/signed-uploads/client'
 import {
   isAuthTokenResolver,
@@ -116,7 +116,7 @@ describe('resolveAuthToken', () => {
   })
 
   it.each([undefined, '', null])(
-    'should reject a resolver that returns %p rather than send no header',
+    'should reject a resolver that returns %o rather than send no header',
     async (value) => {
       const error = await resolveAuthToken(
         () => value as unknown as string

@@ -1,17 +1,16 @@
+import { vi, expect, describe, it } from 'vitest'
+import { resetSession } from '@uploadcare/api-emulator'
 import * as factory from '../_fixtureFactory'
 import {
   getSettingsForTesting,
   assertComputableProgress,
-  assertUnknownProgress
+  assertUnknownProgress,
+  assertUploadedFile
 } from '../_helpers'
-import { UploadError } from '../../src/tools/UploadError'
-import http from 'http'
-import https, { RequestOptions } from 'https'
+import { CancelError } from '@uploadcare/api-client-utils'
 import { uploadFromUrl } from '../../src/uploadFile/uploadFromUrl'
 import info from '../../src/api/info'
-import { jest, expect } from '@jest/globals'
-
-jest.setTimeout(60000)
+vi.setConfig({ testTimeout: 60000 })
 
 // TODO: add tests for metadata
 describe('uploadFromUrl', () => {
@@ -23,8 +22,7 @@ describe('uploadFromUrl', () => {
 
     const file = await uploadFromUrl(sourceUrl, settings)
 
-    expect(file.cdnUrl).toBeTruthy()
-    expect(file.uuid).toBeTruthy()
+    assertUploadedFile(file, settings)
   })
 
   it('should wait until file is ready', async () => {
@@ -48,49 +46,21 @@ describe('uploadFromUrl', () => {
 
     const file = await uploadFromUrl(sourceUrl, settings)
 
-    expect(file.isStored).toBeFalsy()
+    expect(file.isStored).toBe(false)
   })
 
-  it('should accept checkForUrlDuplicates setting', async () => {
+  it('should return the saved file for a URL uploaded before with checkForUrlDuplicates and saveUrlForRecurrentUploads', async () => {
     const sourceUrl = factory.imageUrl('valid')
     const settings = getSettingsForTesting({
       publicKey: factory.publicKey('image'),
-      checkForUrlDuplicates: true
-    })
-
-    const protocol = settings.baseURL.includes('https') ? 'https' : 'http'
-    const isHttpsProtocol = protocol === 'https'
-    const spy = jest.spyOn(isHttpsProtocol ? https : http, 'request')
-    await uploadFromUrl(sourceUrl, settings)
-
-    const uploadRequest = spy.mock.calls.find(
-      (call) => (call[0] as RequestOptions).protocol === protocol + ':'
-    )?.[0]
-    expect(uploadRequest?.['query']).toEqual(
-      expect.stringContaining('check_URL_duplicates=1')
-    )
-    spy.mockRestore()
-  })
-
-  it('should accept saveUrlForRecurrentUploads setting', async () => {
-    const sourceUrl = factory.imageUrl('valid')
-    const settings = getSettingsForTesting({
-      publicKey: factory.publicKey('image'),
+      checkForUrlDuplicates: true,
       saveUrlForRecurrentUploads: true
     })
 
-    const protocol = settings.baseURL.includes('https') ? 'https' : 'http'
-    const isHttpsProtocol = protocol === 'https'
-    const spy = jest.spyOn(isHttpsProtocol ? https : http, 'request')
-    await uploadFromUrl(sourceUrl, settings)
+    const first = await uploadFromUrl(sourceUrl, settings)
+    const second = await uploadFromUrl(sourceUrl, settings)
 
-    const uploadRequest = spy.mock.calls.find(
-      (call) => (call[0] as RequestOptions).protocol === protocol + ':'
-    )?.[0]
-    expect(uploadRequest?.['query']).toEqual(
-      expect.stringContaining('save_URL_duplicates=1')
-    )
-    spy.mockRestore()
+    expect(second.uuid).toBe(first.uuid)
   })
 
   it('should be able to cancel uploading', async () => {
@@ -106,7 +76,7 @@ describe('uploadFromUrl', () => {
     })
 
     await expect(uploadFromUrl(sourceUrl, settings)).rejects.toThrowError(
-      new UploadError('Request canceled')
+      new CancelError('Request canceled')
     )
   })
 
@@ -123,7 +93,7 @@ describe('uploadFromUrl', () => {
   })
 
   it('should be able to handle computable progress', async () => {
-    const onProgress = jest.fn()
+    const onProgress = vi.fn()
     const sourceUrl = factory.imageUrl('valid')
     const settings = getSettingsForTesting({
       publicKey: factory.publicKey('image'),
@@ -135,19 +105,22 @@ describe('uploadFromUrl', () => {
     assertComputableProgress(onProgress)
   })
 
-  process.env.TEST_ENV !== 'production' &&
-    it('should be able to handle non-computable unknown progress', async () => {
-      const onProgress = jest.fn()
+  it.skipIf(process.env.TEST_ENV === 'production')(
+    'should be able to handle non-computable unknown progress',
+    async () => {
+      resetSession().use('unknownProgress')
+      const onProgress = vi.fn()
       const sourceUrl = factory.imageUrl('valid')
       const settings = getSettingsForTesting({
-        publicKey: factory.publicKey('unknownProgress'),
+        publicKey: factory.publicKey('image'),
         onProgress
       })
 
       await uploadFromUrl(sourceUrl, settings)
 
       assertUnknownProgress(onProgress)
-    })
+    }
+  )
 
   it('should be rejected with error code if failed', async () => {
     const sourceUrl = factory.imageUrl('valid')
@@ -155,13 +128,9 @@ describe('uploadFromUrl', () => {
       publicKey: factory.publicKey('invalid')
     })
 
-    try {
-      await uploadFromUrl(sourceUrl, settings)
-    } catch (error) {
-      expect((error as UploadError).message).toEqual('pub_key is invalid.')
-      expect((error as UploadError).code).toEqual(
-        'ProjectPublicKeyInvalidError'
-      )
-    }
+    await expect(uploadFromUrl(sourceUrl, settings)).rejects.toMatchObject({
+      message: 'pub_key is invalid.',
+      code: 'ProjectPublicKeyInvalidError'
+    })
   })
 })

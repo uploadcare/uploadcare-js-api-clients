@@ -1,0 +1,194 @@
+import { beforeEach, expect, it } from 'vitest'
+import { DEMO_IMAGE_UUID, resetSession } from '../src/index.js'
+import { call, UNKNOWN_TOTAL } from './emulator.js'
+import { assertMatchesSpec, jsonError } from './spec.js'
+
+// `jsonerrors=1`, exactly as `upload-client` always sends it — without it
+// `apiError` answers `text/plain`.
+const post = (query: string) =>
+  call(`https://upload.uploadcare.com/from_url/?${query}&jsonerrors=1`, {
+    method: 'POST'
+  })
+
+const poll = async (token: string) => {
+  const response = await call(
+    `https://upload.uploadcare.com/from_url/status/?token=${token}`
+  )
+  const body = (await response.clone().json()) as Record<string, unknown>
+  await assertMatchesSpec(response, {
+    method: 'get',
+    path: '/from_url/status/'
+  })
+  return body
+}
+
+// The emulator finishes a job in four polls (see `from-url.ts`), so a job
+// still in progress after ten has hung; the caller's toMatchObject then fails
+// on its `status: 'progress'` frame instead of the test timing out.
+const pollToEnd = async (token: string) => {
+  let last = await poll(token)
+  for (let polls = 1; last.status === 'progress' && polls < 10; polls += 1)
+    last = await poll(token)
+  return last
+}
+
+const SOURCE = 'https://images.unsplash.com/photo-1?dl=holiday.jpg'
+
+beforeEach(() => resetSession())
+
+it('refuses a source_url that does not parse', async () => {
+  const response = await post(
+    `pub_key=demopublickey&source_url=${encodeURIComponent('http://[::1')}`
+  )
+  expect(await jsonError(response)).toMatchObject({
+    status_code: 400,
+    content: 'Failed to parse URL.',
+    error_code: 'URLParsingFailedError'
+  })
+})
+
+it('refuses a request with no source_url', async () => {
+  const response = await post('pub_key=demopublickey')
+  expect((await jsonError(response)).status_code).toBe(400)
+  const parsed = await response.clone().json()
+  expect(parsed).toMatchObject({
+    error: { content: 'source_url is required.' }
+  })
+  await assertMatchesSpec(response, { method: 'post', path: '/from_url/' })
+})
+
+it('refuses a host that does not exist, with the hostNotFound preset', async () => {
+  resetSession().use('hostNotFound')
+  const response = await post(
+    'pub_key=demopublickey&source_url=https%3A%2F%2Fgone.example%2F1.jpg'
+  )
+  expect(await jsonError(response)).toMatchObject({
+    status_code: 400,
+    content: 'Host does not exist.'
+  })
+})
+
+it('refuses a private address', async () => {
+  const response = await post(
+    'pub_key=demopublickey&source_url=http%3A%2F%2F192.168.0.1%2Fa.jpg'
+  )
+  expect(await jsonError(response)).toMatchObject({
+    status_code: 400,
+    content: 'Only public IPs are allowed.'
+  })
+})
+
+it('reports progress before it succeeds, and names the file from the url', async () => {
+  const post200 = await post(
+    `pub_key=demopublickey&source_url=${encodeURIComponent(SOURCE)}`
+  )
+  const parsed = (await post200.clone().json()) as { token: string }
+  await assertMatchesSpec(post200, { method: 'post', path: '/from_url/' })
+  const { token } = parsed
+
+  expect(await poll(token)).toMatchObject({ status: 'progress' })
+  const last = await pollToEnd(token)
+
+  expect(last).toMatchObject({
+    status: 'success',
+    original_filename: 'holiday.jpg'
+  })
+})
+
+it('names the file from the last path segment when there is no dl param', async () => {
+  const { token } = (await post(
+    `pub_key=demopublickey&source_url=${encodeURIComponent('https://images.unsplash.com/photo-2.jpg')}`
+  ).then((r) => r.json())) as { token: string }
+
+  const last = await pollToEnd(token)
+  expect(last).toMatchObject({ original_filename: 'photo-2.jpg' })
+})
+
+it('reads store=false the way /base/ does', async () => {
+  const { token } = (await post(
+    `pub_key=demopublickey&store=false&source_url=${encodeURIComponent(SOURCE)}`
+  ).then((r) => r.json())) as { token: string }
+
+  const last = await pollToEnd(token)
+  expect(last).toMatchObject({ status: 'success', is_stored: false })
+})
+
+it('reports unknown totals with the unknownProgress preset', async () => {
+  resetSession().use('unknownProgress')
+  const { token } = (await post(
+    `pub_key=demopublickey&source_url=${encodeURIComponent(SOURCE)}`
+  ).then((r) => r.json())) as { token: string }
+  const response = await call(
+    `https://upload.uploadcare.com/from_url/status/?token=${token}`,
+    undefined,
+    { offSpec: UNKNOWN_TOTAL }
+  )
+  expect(await response.json()).toMatchObject({ total: 'unknown' })
+})
+
+it('shortcuts to the file info only once the source has been seen before', async () => {
+  const query = `pub_key=demopublickey&source_url=${encodeURIComponent(SOURCE)}&check_URL_duplicates=1&save_URL_duplicates=1`
+
+  // First time: no duplicate to find, so the ordinary token/poll path.
+  const first = await post(query)
+  expect(await first.clone().json()).toMatchObject({ type: 'token' })
+
+  const response = await post(query)
+  const parsed = (await response.clone().json()) as Record<string, unknown>
+  await assertMatchesSpec(response, { method: 'post', path: '/from_url/' })
+  expect(parsed).toMatchObject({
+    type: 'file_info',
+    original_filename: 'holiday.jpg'
+  })
+})
+
+it('does not dedupe a source that was never saved for duplicates', async () => {
+  const query = `pub_key=demopublickey&source_url=${encodeURIComponent(SOURCE)}&check_URL_duplicates=1`
+  expect(await (await post(query)).json()).toMatchObject({ type: 'token' })
+  expect(await (await post(query)).json()).toMatchObject({ type: 'token' })
+})
+
+it('serves a from_url upload as bytes an image decoder can actually read', async () => {
+  const { token } = (await post(
+    `pub_key=demopublickey&source_url=${encodeURIComponent(SOURCE)}`
+  ).then((r) => r.json())) as { token: string }
+
+  const last = await pollToEnd(token)
+  // Read off the real bytes, not hardcoded — a 13-byte hand-written JPEG
+  // header would have reported 1×1 here and still failed to decode in a page.
+  expect(last).toMatchObject({
+    is_image: true,
+    image_info: { width: 136, height: 150, format: 'JPEG' }
+  })
+
+  const delivered = await call(
+    `https://ucarecdn.com/${(last as { uuid: string }).uuid}/`
+  )
+  expect(await delivered.arrayBuffer()).toEqual(
+    await (await call(`https://ucarecdn.com/${DEMO_IMAGE_UUID}/`)).arrayBuffer()
+  )
+})
+
+it('fails at poll time for a host outside REACHABLE_HOSTS, rather than at POST time', async () => {
+  const { token } = (await post(
+    `pub_key=demopublickey&source_url=${encodeURIComponent('https://fake-domain-that-will-404.com/a.jpg')}`
+  ).then((r) => r.json())) as { token: string }
+
+  expect(await poll(token)).toEqual({
+    status: 'error',
+    error: 'Host does not exist'
+  })
+})
+
+it('reports unknown for a token nobody issued', async () => {
+  expect(await poll('nope')).toEqual({ status: 'unknown' })
+})
+
+it('respects a filename override', async () => {
+  const { token } = (await post(
+    `pub_key=demopublickey&source_url=${encodeURIComponent(SOURCE)}&filename=renamed.jpg`
+  ).then((r) => r.json())) as { token: string }
+
+  const last = await pollToEnd(token)
+  expect(last).toMatchObject({ original_filename: 'renamed.jpg' })
+})

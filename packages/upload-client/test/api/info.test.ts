@@ -1,21 +1,25 @@
+import { describe, it, expect } from 'vitest'
+import { DEMO_IMAGE_UUID } from '@uploadcare/api-emulator'
+import base from '../../src/api/base'
 import info from '../../src/api/info'
 import * as factory from '../_fixtureFactory'
 import { getSettingsForTesting } from '../_helpers'
-import { UploadError } from '../../src/tools/UploadError'
 
 describe('API - info', () => {
   it('should return file info', async () => {
+    // `/info/` answers about a file that exists, so upload one first.
     const settings = getSettingsForTesting({
       publicKey: factory.publicKey('image')
     })
-    const uuid = factory.uuid('image')
+    const fileToUpload = factory.image('blackSquare')
+    const { file: uuid } = await base(fileToUpload.data, settings)
     const data = await info(uuid, settings)
 
-    expect(data.uuid).toBeTruthy()
+    expect(data.uuid).toEqual(uuid)
   })
 
   it('should be rejected with bad options', async () => {
-    const uuid = factory.uuid('image')
+    const uuid = DEMO_IMAGE_UUID
     const settings = getSettingsForTesting({
       publicKey: factory.publicKey('empty')
     })
@@ -25,7 +29,7 @@ describe('API - info', () => {
   })
 
   it('should be able to cancel uploading', async () => {
-    const uuid = factory.uuid('image')
+    const uuid = DEMO_IMAGE_UUID
     const controller = new AbortController()
 
     const settings = getSettingsForTesting({
@@ -43,13 +47,11 @@ describe('API - info', () => {
   it('should be rejected with error code if failed', async () => {
     const publicKey = factory.publicKey('invalid')
 
-    try {
-      await info('uuid', { publicKey })
-    } catch (error) {
-      expect((error as UploadError).message).toEqual('pub_key is invalid.')
-      expect((error as UploadError).code).toEqual(
-        'ProjectPublicKeyInvalidError'
-      )
-    }
+    await expect(
+      info('uuid', getSettingsForTesting({ publicKey }))
+    ).rejects.toMatchObject({
+      message: 'pub_key is invalid.',
+      code: 'ProjectPublicKeyInvalidError'
+    })
   })
 })

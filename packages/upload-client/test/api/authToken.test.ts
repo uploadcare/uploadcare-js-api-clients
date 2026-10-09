@@ -1,6 +1,6 @@
 import { createHash, createHmac } from 'node:crypto'
 import { generateAuthToken } from '@uploadcare/signed-uploads'
-import { expect, jest } from '@jest/globals'
+import { beforeEach, vi, expect, describe, it } from 'vitest'
 import base from '../../src/api/base'
 import fromUrl from '../../src/api/fromUrl'
 import group from '../../src/api/group'
@@ -14,13 +14,19 @@ import {
 import { AuthError } from '../../src/tools/AuthError'
 import { UploadError } from '../../src/tools/UploadError'
 import {
-  SIGNED_UPLOADS_PUBLIC_KEY,
-  SIGNED_UPLOADS_SECRET_KEY
-} from '../../mock-server/config'
+  resetSession,
+  SIGNED_UPLOADS_SECRET_KEY,
+  type EmulatorSession
+} from '@uploadcare/api-emulator'
 import * as factory from '../_fixtureFactory'
-import { getSettingsForTesting } from '../_helpers'
+import {
+  assertUploadedFile,
+  getSettingsForTesting,
+  groupIdPattern,
+  UUID
+} from '../_helpers'
 
-jest.setTimeout(60000)
+vi.setConfig({ testTimeout: 60000 })
 
 /**
  * One suite for both servers.
@@ -32,22 +38,22 @@ jest.setTimeout(60000)
  * checked against the API, and a mock that recognizes well-known fake tokens
  * cannot catch that.
  *
- * Both need a project that enforces signed uploads — `pub_test__signed_uploads`
- * on the mock, `UPLOAD_CLIENT_SECURE_UPLOADS_*` in production, where the keys
- * are a dedicated project because enabling the feature rejects every unsigned
- * request to it.
+ * Both need a project that enforces signed uploads — one the `signedUploads`
+ * preset names on the emulator, `UPLOAD_CLIENT_SECURE_UPLOADS_*` in production,
+ * where the keys are a dedicated project because enabling the feature rejects
+ * every unsigned request to it.
  */
 const isProduction = process.env.TEST_ENV === 'production'
 const publicKey = isProduction
   ? process.env.UPLOAD_CLIENT_SECURE_UPLOADS_PUBLIC_KEY
-  : SIGNED_UPLOADS_PUBLIC_KEY
+  : 'signed_uploads_public_key'
 const secretKey = isProduction
   ? process.env.UPLOAD_CLIENT_SECURE_UPLOADS_SECRET_KEY
   : SIGNED_UPLOADS_SECRET_KEY
 
 /** Skipped rather than failed where the production keys are not configured. */
 const describeContract = publicKey && secretKey ? describe : describe.skip
-const describeMockOnly = isProduction ? describe.skip : describe
+const describeEmulatorOnly = isProduction ? describe.skip : describe
 
 /** Trap for errors: resolves to the thrown error, or null on success. */
 const caught = (promise: Promise<unknown>): Promise<UploadError | null> =>
@@ -92,6 +98,11 @@ const mintExpiredToken = (): string => {
   return signTokenWithClaims({ iat: issuedAt, exp: issuedAt + 60 })
 }
 
+let session: EmulatorSession
+beforeEach(() => {
+  session = resetSession().use('signedUploads', { publicKey })
+})
+
 describeContract('authToken', () => {
   const fileToUpload = factory.image('blackSquare')
   // `store: false` so production uploads expire on their own rather than
@@ -122,7 +133,7 @@ describeContract('authToken', () => {
   it('should authenticate every request of an upload from a resolver', async () => {
     // `uploadFile` uploads and then polls `/info/`, so a resolver called once
     // would mean a request went out unauthenticated.
-    const resolver = jest.fn(() => mintToken())
+    const resolver = vi.fn(() => mintToken())
     const fileInfo = await uploadFile(fileToUpload.data, {
       ...settings,
       authToken: resolver
@@ -166,7 +177,7 @@ describeContract('authToken', () => {
 
   it('should re-resolve the token and retry once when it has expired', async () => {
     let calls = 0
-    const resolver = jest.fn(() =>
+    const resolver = vi.fn(() =>
       ++calls === 1 ? mintExpiredToken() : mintToken()
     )
     const { file } = await base(fileToUpload.data, {
@@ -179,7 +190,7 @@ describeContract('authToken', () => {
   })
 
   it('should give up when the token is still expired after a refresh', async () => {
-    const resolver = jest.fn(() => mintExpiredToken())
+    const resolver = vi.fn(() => mintExpiredToken())
     const error = await caught(
       base(fileToUpload.data, { ...settings, authToken: resolver })
     )
@@ -213,7 +224,7 @@ describeContract('authToken', () => {
   })
 
   it('should reject an endpoint the token scope does not cover', async () => {
-    const resolver = jest.fn(() =>
+    const resolver = vi.fn(() =>
       mintToken({ lifetime: 60_000, scope: ['/multipart/*'] })
     )
     const error = await caught(
@@ -253,7 +264,7 @@ describeContract('authToken', () => {
       operations: 1,
       tokenId: 'spent-no-recovery'
     })
-    const resolver = jest.fn(() => spent)
+    const resolver = vi.fn(() => spent)
 
     await base(fileToUpload.data, { ...settings, authToken: resolver })
     const error = await caught(
@@ -268,7 +279,7 @@ describeContract('authToken', () => {
     // One operation per token, so the second upload starts out refused. The
     // provider lets the client drop the spent token and ask for another.
     let minted = 0
-    const fetchToken = jest.fn(() =>
+    const fetchToken = vi.fn(() =>
       mintToken({
         lifetime: 60_000,
         operations: 1,
@@ -295,7 +306,7 @@ describeContract('authToken', () => {
   })
 
   it('should keep the cached token when the failure is not about the token', async () => {
-    const fetchToken = jest.fn(() =>
+    const fetchToken = vi.fn(() =>
       mintToken({ lifetime: 60_000, tokenId: 'kept-across-uploads' })
     )
     const tokens = new AuthTokenCache({ fetchToken })
@@ -328,7 +339,7 @@ describeContract('authToken', () => {
     // The failure every integrator meets first: their own token endpoint is
     // down. Nothing was sent, so there is no server code and nothing to retry.
     const cause = new Error('token endpoint is down')
-    const resolver = jest.fn(() => {
+    const resolver = vi.fn(() => {
       throw cause
     })
 
@@ -397,7 +408,7 @@ describeContract('authToken', () => {
       authToken: mintToken()
     })
 
-    expect(groupInfo.id).toBeTruthy()
+    expect(groupInfo.id).toMatch(groupIdPattern(1))
   })
 
   it('should authenticate the info requests a poller makes', async () => {
@@ -409,7 +420,7 @@ describeContract('authToken', () => {
       authToken: mintToken()
     })
 
-    expect(file.uuid).toBeTruthy()
+    expect(file.uuid).toMatch(UUID)
   })
 
   it('should authenticate multipart start and complete, and leave the parts bare', async () => {
@@ -421,28 +432,24 @@ describeContract('authToken', () => {
       authToken: mintToken()
     })
 
-    expect(file.cdnUrl).toBeTruthy()
+    assertUploadedFile(file, settings)
   })
 
   it('should drop legacy signature params when authToken is set', async () => {
-    const warnSpy = jest
+    const warnSpy = vi
       .spyOn(console, 'warn')
       .mockImplementation(() => undefined)
-    try {
-      // A request carrying both is checked the old way, and these values are
-      // nonsense, so success proves `signature`/`expire` were never sent.
-      const { file } = await base(fileToUpload.data, {
-        ...settings,
-        authToken: mintToken(),
-        secureSignature: 'signature',
-        secureExpire: '1234567890'
-      })
+    // A request carrying both is checked the old way, and these values are
+    // nonsense, so success proves `signature`/`expire` were never sent.
+    const { file } = await base(fileToUpload.data, {
+      ...settings,
+      authToken: mintToken(),
+      secureSignature: 'signature',
+      secureExpire: '1234567890'
+    })
 
-      expect(typeof file).toBe('string')
-      expect(warnSpy).toHaveBeenCalledTimes(1)
-    } finally {
-      warnSpy.mockRestore()
-    }
+    expect(typeof file).toBe('string')
+    expect(warnSpy).toHaveBeenCalledTimes(1)
   })
 })
 
@@ -451,7 +458,7 @@ describeContract('authToken', () => {
  * carrying a valid token. Succeeding there is what proves the header is read
  * before the key, and no real project will play along.
  */
-describeMockOnly('authToken (mock server only)', () => {
+describeEmulatorOnly('authToken (emulator only)', () => {
   it('should refresh an expired token that surfaces after a throttle retry', async () => {
     // The sequence that made the refresh unreachable: the retrier's `attempt`
     // counter is shared, so keying the refresh off it meant a token which
@@ -459,28 +466,25 @@ describeMockOnly('authToken (mock server only)', () => {
     // what puts another attempt in front of the expiry, and it cannot be
     // provoked on demand against the Upload API.
     let calls = 0
-    const resolver = jest.fn(() => {
+    const resolver = vi.fn(() => {
       calls += 1
       // Valid for the throttled attempt, expired for the one after it.
       return calls === 2 ? mintExpiredToken() : mintToken()
     })
 
-    const startedAt = Date.now()
+    // retry-after: 0, so the retry is immediate; the wait itself is pinned
+    // in retryIfFailed.test.ts.
+    session.use('throttle', { match: 'POST /base/', retryAfter: 0 })
+
     const { file } = await base(factory.image('blackSquare').data, {
-      ...getSettingsForTesting({ publicKey: SIGNED_UPLOADS_PUBLIC_KEY }),
+      ...getSettingsForTesting({ publicKey: publicKey as string }),
       authToken: resolver,
-      // Unique per run: the mock spends a throttle key once per process, and
-      // a fixed one would quietly stop throttling on the second run against the
-      // same server.
-      metadata: { mock_throttle: `auth-token-retry-${Date.now()}` },
       retryThrottledRequestMaxTimes: 1
     })
 
     expect(typeof file).toBe('string')
     // Throttled, expired, then accepted.
     expect(resolver).toHaveBeenCalledTimes(3)
-    // `retry-after: 1`, so an immediate retry would land well under a second.
-    expect(Date.now() - startedAt).toBeGreaterThanOrEqual(1000)
   })
 
   it('should check the header before the public key', async () => {

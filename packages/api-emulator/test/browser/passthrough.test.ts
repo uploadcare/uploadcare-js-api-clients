@@ -1,0 +1,47 @@
+import { afterAll, beforeEach, expect, it, vi } from 'vitest'
+import { setupEmulator } from '../../src/browser.js'
+import { foreignOrigin, sendXhr } from './helpers.js'
+
+const emulator = setupEmulator({ unhandled: 'passthrough' })
+
+beforeEach(() => emulator.reset())
+afterAll(() => emulator.stop())
+
+it("lets a foreign origin through under unhandled: 'passthrough'", async () => {
+  const error = vi.spyOn(console, 'error')
+  const url = `${foreignOrigin()}/package.json`
+
+  expect((await fetch(url)).status).toBe(200)
+  expect((await sendXhr('GET', url)).status).toBe(200)
+
+  expect(error).not.toHaveBeenCalled()
+})
+
+it('still fails an unrouted Uploadcare path rather than reaching the real API', async () => {
+  const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+
+  await expect(fetch('https://upload.uploadcare.com/nope/')).rejects.toThrow(
+    TypeError
+  )
+
+  expect(warn).toHaveBeenCalledOnce()
+})
+
+it.each([
+  'https://social.uploadcare.com/',
+  'https://api.uploadcare.com/files/',
+  'https://sub.ucarecdn.com/'
+])(
+  'still refuses %s, an Uploadcare host it does not emulate, naming it',
+  async (url) => {
+    const error = vi.spyOn(console, 'error').mockImplementation(() => {})
+
+    await expect(fetch(url)).rejects.toThrow(TypeError)
+    expect((await sendXhr('GET', url)).error).toBe(true)
+
+    expect(error.mock.calls.map(([message]) => message)).toEqual([
+      expect.stringContaining(url),
+      expect.stringContaining(url)
+    ])
+  }
+)

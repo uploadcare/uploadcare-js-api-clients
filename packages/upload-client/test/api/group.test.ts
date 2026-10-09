@@ -1,7 +1,8 @@
+import { beforeEach, describe, it, expect } from 'vitest'
+import { resetSession } from '@uploadcare/api-emulator'
 import * as factory from '../_fixtureFactory'
-import { getSettingsForTesting } from '../_helpers'
+import { getSettingsForTesting, groupIdPattern } from '../_helpers'
 import group from '../../src/api/group'
-import { UploadError } from '../../src/tools/UploadError'
 import { GroupFileInfo } from '../../src'
 
 describe('API - group', () => {
@@ -10,12 +11,19 @@ describe('API - group', () => {
     publicKey: factory.publicKey('image')
   })
 
+  // Already in the project in production; `demopublickey`'s can't see it.
+  beforeEach(() => {
+    resetSession().use('storedFile', {
+      uuid: files[0],
+      publicKey: settings.publicKey
+    })
+  })
+
   it('should create group of files', async () => {
     const data = await group(files, settings)
     const groupFiles = data.files.filter(Boolean) as GroupFileInfo[]
-    expect(data).toBeTruthy()
-    expect(data.id).toBeTruthy()
-    expect(data.files).toBeTruthy()
+    expect(data.id).toMatch(groupIdPattern(2))
+    expect(data.files).toHaveLength(2)
     expect(groupFiles[0].uuid).toBe(files[0])
     expect(groupFiles[0].defaultEffects).toBe('')
     expect(groupFiles[1].uuid).toBe(files[1].split('/')[0])
@@ -66,13 +74,11 @@ describe('API - group', () => {
   it('should be rejected with error code if failed', async () => {
     const publicKey = factory.publicKey('invalid')
 
-    try {
-      await group([], { publicKey })
-    } catch (error) {
-      expect((error as UploadError).message).toEqual('pub_key is invalid.')
-      expect((error as UploadError).code).toEqual(
-        'ProjectPublicKeyInvalidError'
-      )
-    }
+    await expect(
+      group([], getSettingsForTesting({ publicKey }))
+    ).rejects.toMatchObject({
+      message: 'pub_key is invalid.',
+      code: 'ProjectPublicKeyInvalidError'
+    })
   })
 })

@@ -1,10 +1,12 @@
+import { vi, expect, describe, it } from 'vitest'
 import * as factory from '../_fixtureFactory'
-import { getSettingsForTesting, assertComputableProgress } from '../_helpers'
-import { UploadError } from '../../src/tools/UploadError'
+import {
+  getSettingsForTesting,
+  assertComputableProgress,
+  assertUploadedFile
+} from '../_helpers'
 import { uploadDirect } from '../../src/uploadFile/uploadDirect'
 import info from '../../src/api/info'
-import { jest, expect } from '@jest/globals'
-
 // TODO: add tests for metadata
 describe('uploadDirect', () => {
   it('should resolves when file is ready on CDN', async () => {
@@ -15,7 +17,7 @@ describe('uploadDirect', () => {
 
     const file = await uploadDirect(fileToUpload, settings)
 
-    expect(file.cdnUrl).toBeTruthy()
+    assertUploadedFile(file, settings)
   })
 
   it('should wait until file is ready', async () => {
@@ -38,7 +40,7 @@ describe('uploadDirect', () => {
     })
     const file = await uploadDirect(fileToUpload, settings)
 
-    expect(file.isStored).toBeFalsy()
+    expect(file.isStored).toBe(false)
   })
 
   it('should be able to cancel uploading', async () => {
@@ -81,7 +83,7 @@ describe('uploadDirect', () => {
   })
 
   it('should be able to handle progress', async () => {
-    const onProgress = jest.fn()
+    const onProgress = vi.fn()
     const fileToUpload = factory.image('blackSquare').data
     const settings = getSettingsForTesting({
       publicKey: factory.publicKey('image'),
@@ -99,15 +101,9 @@ describe('uploadDirect', () => {
       publicKey: factory.publicKey('invalid')
     })
 
-    try {
-      await uploadDirect(fileToUpload, settings)
-    } catch (error) {
-      expect((error as UploadError).message).toEqual(
-        'UPLOADCARE_PUB_KEY is invalid.'
-      )
-      expect((error as UploadError).code).toEqual(
-        'ProjectPublicKeyInvalidError'
-      )
-    }
+    await expect(uploadDirect(fileToUpload, settings)).rejects.toMatchObject({
+      message: 'UPLOADCARE_PUB_KEY is invalid.',
+      code: 'ProjectPublicKeyInvalidError'
+    })
   })
 })
