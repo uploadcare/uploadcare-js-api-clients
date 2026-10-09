@@ -54,6 +54,7 @@
     "build": "tsc && vite build",
     "pretest": "vite build",
     "test": "vitest --run",
+    "test:coverage": "vitest --run --coverage",
     "test:contract": "CONTRACT_BASE_URL=https://upload.uploadcare.com vitest --run --project node test/contract.test.ts",
     "tsc": "tsc --noEmit",
     "lint": "oxlint src test scripts",
@@ -88,6 +89,7 @@
   "devDependencies": {
     "@mswjs/interceptors": "^0.45.7",
     "@vitest/browser-playwright": "^4.1.11",
+    "@vitest/coverage-v8": "^4.1.11",
     "ajv": "^8.17.1",
     "ajv-formats": "^3.0.1",
     "fast-check": "^4.10.2",
