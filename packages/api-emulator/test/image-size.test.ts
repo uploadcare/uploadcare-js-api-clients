@@ -1,3 +1,12 @@
+import {
+  array,
+  assert,
+  constantFrom,
+  oneof,
+  property,
+  tuple,
+  uint8Array
+} from 'fast-check'
 import { expect, it } from 'vitest'
 import { resetSession } from '../src/index.js'
 import { imageSize } from '../src/state/image-size.js'
@@ -21,6 +30,39 @@ it('reads PNG dimensions out of IHDR', () => {
 
 it('reads GIF dimensions little-endian', () => {
   expect(imageSize(GIF)).toEqual({ width: 258, height: 772, format: 'GIF' })
+})
+
+// Each format's signature, then random chunks, with runs of zeros and a
+// start-of-frame marker mixed in: uniform random bytes almost never put a zero
+// dimension or a JPEG frame where a decoder reads.
+const SIGNATURES = [
+  [0x89, 0x50, 0x4e, 0x47],
+  [0x47, 0x49, 0x46],
+  [0xff, 0xd8]
+]
+const chunk = oneof(
+  uint8Array({ maxLength: 8 }),
+  constantFrom(new Uint8Array(4), new Uint8Array([0xff, 0xc0]))
+)
+const bytes = tuple(
+  constantFrom([], ...SIGNATURES),
+  array(chunk, { maxLength: 12 })
+).map(
+  ([signature, chunks]) =>
+    new Uint8Array([...signature, ...chunks.flatMap((c) => [...c])])
+)
+const isDimension = (n: number) => Number.isInteger(n) && n > 0
+
+it('reads any bytes, truncated or garbage, as positive dimensions or a non-image', () => {
+  assert(
+    property(bytes, (input) => {
+      const image = imageSize(input)
+      return (
+        image === undefined ||
+        (isDimension(image.width) && isDimension(image.height))
+      )
+    })
+  )
 })
 
 it('reports what the bytes are, not the declared type', async () => {
