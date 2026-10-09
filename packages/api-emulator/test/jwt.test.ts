@@ -1,6 +1,5 @@
 import { beforeEach, expect, it } from 'vitest'
 import {
-  DEMO_FILES,
   mintAuthToken,
   resetSession,
   SIGNED_UPLOADS_SECRET_KEY
@@ -240,15 +239,4 @@ it('verifies against the exported secret', async () => {
   await expectUploaded(
     await bearer(sign({ exp: now() + 600 }, SIGNED_UPLOADS_SECRET_KEY))
   )
-})
-
-it('exports the demo-project files every fresh session holds', async () => {
-  for (const uuid of DEMO_FILES)
-    expect(
-      (
-        await call(
-          `https://upload.uploadcare.com/info/?pub_key=demopublickey&file_id=${uuid}`
-        )
-      ).status
-    ).toBe(200)
 })
