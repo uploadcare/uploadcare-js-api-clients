@@ -37,7 +37,9 @@ const SOURCE = 'https://images.unsplash.com/photo-1?dl=holiday.jpg'
 beforeEach(() => resetSession())
 
 it('refuses a source_url that does not parse', async () => {
-  const response = await post('pub_key=demopublickey&source_url=notaurl')
+  const response = await post(
+    `pub_key=demopublickey&source_url=${encodeURIComponent('http://[::1')}`
+  )
   expect(await jsonError(response)).toMatchObject({
     status_code: 400,
     content: 'Failed to parse URL.',

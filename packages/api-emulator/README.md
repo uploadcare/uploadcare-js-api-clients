@@ -617,7 +617,5 @@ file, because the emulator answers differently:
 - Every real error carries an `error_code` (`FilesRequiredError`,
   `GroupIdRequiredError`, …). The emulator sends one only on the public-key,
   token, throttle, signed-upload and `from_url` URL-parsing errors.
-- `POST /from_url/` with a `source_url` that has no scheme (`nope`): the real
-  API answers `No URL scheme supplied.`, the emulator `Failed to parse URL.`
 - `POST /multipart/start/` below the minimum size: the real API's sentence says
   `10000000 bytes`, the spec's (and the emulator's) `10485760 bytes`.

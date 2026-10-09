@@ -142,6 +142,42 @@ it.each<{
     content: 'source_url is required.'
   },
   {
+    name: 'POST /from_url/ for a source_url without a scheme',
+    path: () =>
+      `/from_url/?pub_key=${pubKey}&source_url=${encodeURIComponent('nope')}`,
+    init: () => ({ method: 'POST' }),
+    status: 400,
+    content: 'No URL scheme supplied.',
+    errorCode: 'URLSchemeRequiredError'
+  },
+  {
+    name: 'POST /from_url/ for a source_url without a host',
+    path: () =>
+      `/from_url/?pub_key=${pubKey}&source_url=${encodeURIComponent('http://')}`,
+    init: () => ({ method: 'POST' }),
+    status: 400,
+    content: 'No URL host supplied.',
+    errorCode: 'URLHostRequiredError'
+  },
+  {
+    name: 'POST /from_url/ for a source_url with a scheme other than http(s)',
+    path: () =>
+      `/from_url/?pub_key=${pubKey}&source_url=${encodeURIComponent('ftp://example.com/a.jpg')}`,
+    init: () => ({ method: 'POST' }),
+    status: 400,
+    content: 'Invalid URL scheme.',
+    errorCode: 'URLSchemeInvalidError'
+  },
+  {
+    name: 'POST /from_url/ for a source_url that does not parse',
+    path: () =>
+      `/from_url/?pub_key=${pubKey}&source_url=${encodeURIComponent('http://[::1')}`,
+    init: () => ({ method: 'POST' }),
+    status: 400,
+    content: 'Failed to parse URL.',
+    errorCode: 'URLParsingFailedError'
+  },
+  {
     name: 'POST /from_url/ for a private IP',
     path: () =>
       `/from_url/?pub_key=${pubKey}&source_url=${encodeURIComponent('http://192.168.1.10/1.jpg')}`,

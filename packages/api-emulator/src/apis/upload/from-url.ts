@@ -23,6 +23,12 @@ const nameFromUrl = (sourceUrl: string) => {
   )
 }
 
+/** `nope` has none; `ftp://…` has one the real API refuses. */
+const URL_SCHEME = /^([a-z][a-z0-9+.-]*):/i
+
+/** `http://`, `https://?x`: a scheme and nothing where the host goes. */
+const EMPTY_HOST = /^https?:\/\/(?:[/?#]|$)/i
+
 const truthy = (value: FormDataEntryValue | string | null) =>
   value === '1' || value === 'true'
 
@@ -38,13 +44,38 @@ export const fromUrlRoutes: Route[] = [
         // schema: sourceURLRequiredError
         return apiError(request, 400, 'source_url is required.')
 
-      if (!URL.canParse(sourceUrl))
+      const scheme = URL_SCHEME.exec(sourceUrl)?.[1]?.toLowerCase()
+      if (!scheme)
+        // schema: urlSchemeRequiredError
         return apiError(
           request,
           400,
-          'Failed to parse URL.',
-          'URLParsingFailedError'
+          'No URL scheme supplied.',
+          'URLSchemeRequiredError'
         )
+      if (scheme !== 'http' && scheme !== 'https')
+        // schema: urlSchemeInvalidError
+        return apiError(
+          request,
+          400,
+          'Invalid URL scheme.',
+          'URLSchemeInvalidError'
+        )
+      if (!URL.canParse(sourceUrl))
+        return EMPTY_HOST.test(sourceUrl)
+          ? // schema: urlHostRequiredError
+            apiError(
+              request,
+              400,
+              'No URL host supplied.',
+              'URLHostRequiredError'
+            )
+          : apiError(
+              request,
+              400,
+              'Failed to parse URL.',
+              'URLParsingFailedError'
+            )
 
       if (isPrivateSourceUrl(sourceUrl))
         // schema: urlHostPrivateIPForbiddenError
