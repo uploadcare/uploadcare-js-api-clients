@@ -113,6 +113,9 @@ jobs:
         if: steps.changes.outputs.rest-client == 'true'
         run: npm run test:production -w packages/rest-client
 
+      # Real-API drift is reported on a pull request, not blocking it: the
+      # emulator-backed run above is the gate. On master it still blocks.
       - name: Run `upload-client` integration tests
         if: steps.changes.outputs.upload-client == 'true'
+        continue-on-error: ${{ github.event_name == 'pull_request' }}
         run: npm run test:production -w packages/upload-client
