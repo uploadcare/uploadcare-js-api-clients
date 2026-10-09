@@ -5,7 +5,11 @@ import https from 'node:https'
 import { Readable, Transform, TransformCallback } from 'node:stream'
 import { parse } from 'node:url'
 
-import { CancelError, onCancel } from '@uploadcare/api-client-utils'
+import {
+  CancelError,
+  NetworkError,
+  onCancel
+} from '@uploadcare/api-client-utils'
 import { ProgressCallback } from '../api/types'
 import { SupportedFileInput } from '../types'
 import { RequestOptions, RequestResponse } from './types'
@@ -128,8 +132,19 @@ const request = (params: RequestOptions): Promise<RequestResponse> => {
             )
           })
 
-          req.on('error', (err) => {
+          req.on('error', (err: NodeJS.ErrnoException) => {
             if (aborted) return
+
+            // A keep-alive socket the server closed while it sat in the
+            // agent's pool fails the next request sent down it with
+            // ECONNRESET. Node leaves the retry to the caller (see
+            // `request.reusedSocket` in its docs); as a NetworkError it goes
+            // through `retryNetworkErrorMaxTimes` on a fresh connection, like
+            // the browser's XHR error. It has no ProgressEvent to carry.
+            if (req.reusedSocket && err.code === 'ECONNRESET') {
+              reject(new NetworkError(undefined as unknown as ProgressEvent))
+              return
+            }
 
             reject(err)
           })
