@@ -39,7 +39,7 @@ it('refuses a file small enough for a direct upload', async () => {
   })
   expect(response.status).toBe(400)
   expect(await response.clone().text()).toBe(
-    'File size can not be less than 10485760 bytes. Please use direct upload instead of multipart.'
+    'File size can not be less than 10000000 bytes. Please use direct upload instead of multipart.'
   )
 })
 

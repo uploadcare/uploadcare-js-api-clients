@@ -608,11 +608,3 @@ anywhere else. A base URL without a key fails the run rather than skipping it.
 Every request in the file is refused before anything is stored, so a run
 leaves nothing behind in the project. In CI it's the `contract` workflow, run
 by hand or by adding the `contract` label to a pull request.
-
-### Divergences from the real API
-
-Found by probing the real API on 2026-10-09 and not covered by the contract
-file, because the emulator answers differently:
-
-- `POST /multipart/start/` below the minimum size: the real API's sentence says
-  `10000000 bytes`, the spec's (and the emulator's) `10485760 bytes`.

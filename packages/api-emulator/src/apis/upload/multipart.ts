@@ -93,12 +93,13 @@ export const multipartRoutes: Route[] = [
           'MultipartSizeInvalidError'
         )
 
-      if (size < 10485760)
+      // The real API's own sentence names 10000000 bytes (10 MB, not MiB).
+      if (size < 10000000)
         // schema: multipartFileSizeTooSmallError
         return apiError(
           request,
           400,
-          'File size can not be less than 10485760 bytes. Please use direct upload instead of multipart.',
+          'File size can not be less than 10000000 bytes. Please use direct upload instead of multipart.',
           'MultipartFileSizeTooSmallError'
         )
 

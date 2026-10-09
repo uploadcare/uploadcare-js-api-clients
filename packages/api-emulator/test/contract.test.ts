@@ -10,8 +10,8 @@ import { createFetch, resetSession } from '../src/index.js'
  * run leaves nothing behind in the project.
  *
  * Each case compares the envelope's `status_code`, `content` and `error_code`.
- * Cases known to differ are listed in README.md ("Divergences from the real
- * API").
+ * A case that fails against the real API is a bug in the emulator: fix the
+ * emulator, not the case.
  */
 
 const baseUrl = process.env.CONTRACT_BASE_URL
@@ -213,6 +213,21 @@ it.each<{
     status: 400,
     content: 'filename is required.',
     errorCode: 'RequestParamRequiredError'
+  },
+  {
+    name: 'POST /multipart/start/ below the minimum size',
+    path: () => '/multipart/start/',
+    init: () =>
+      form({
+        UPLOADCARE_PUB_KEY: pubKey,
+        filename: 'a.bin',
+        size: '100',
+        content_type: 'application/octet-stream'
+      }),
+    status: 400,
+    content:
+      'File size can not be less than 10000000 bytes. Please use direct upload instead of multipart.',
+    errorCode: 'MultipartFileSizeTooSmallError'
   },
   {
     name: 'POST /multipart/start/ with a size that is not an integer',
