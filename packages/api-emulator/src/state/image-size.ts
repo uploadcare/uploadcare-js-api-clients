@@ -11,8 +11,15 @@ import type { StoredImage } from './store.js'
  * Only the formats the suite actually uploads. Anything else reads as a
  * non-image, so a test that starts uploading, say, a WebP will see `is_image:
  * false` and should send us back here.
+ *
+ * A zero width or height is a corrupt header, so a non-image too.
  */
 export const imageSize = (bytes: Uint8Array): StoredImage | undefined => {
+  const image = decode(bytes)
+  return image && image.width > 0 && image.height > 0 ? image : undefined
+}
+
+const decode = (bytes: Uint8Array): StoredImage | undefined => {
   const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength)
   const at = (offset: number) => view.getUint8(offset)
 
