@@ -185,7 +185,7 @@ const networkError = new NetworkError(
 
 describe('retryIfFailed', () => {
   describe('Throttle errors', () => {
-    it('should work', async () => {
+    it('retries a throttled call after retry-after and resolves', async () => {
       const { spy, task } = createRunner({ attempts: 1, error: throttledError })
 
       await expect(
@@ -222,7 +222,7 @@ describe('retryIfFailed', () => {
       expect(spy).toHaveBeenCalledTimes(1)
     })
 
-    it('should resolve if task resolve', async () => {
+    it('retries a call throttled three times and resolves with its value', async () => {
       const { spy, task } = createRunner({
         error: throttledError,
         attempts: 3,
@@ -238,7 +238,7 @@ describe('retryIfFailed', () => {
       expect(spy).toHaveBeenCalledTimes(4)
     })
 
-    it('should resolve without errors if task resolve', async () => {
+    it('runs a call that succeeds at once only once', async () => {
       const { spy, task } = createRunner({ error: throttledError, attempts: 0 })
 
       await expect(
@@ -252,7 +252,7 @@ describe('retryIfFailed', () => {
   })
 
   describe('Network errors', () => {
-    it('should work', async () => {
+    it('retries a call that hit a network error and resolves', async () => {
       const { spy, task } = createRunner({ attempts: 1, error: networkError })
 
       await expect(
@@ -289,7 +289,7 @@ describe('retryIfFailed', () => {
       expect(spy).toHaveBeenCalledTimes(1)
     })
 
-    it('should resolve if task resolve', async () => {
+    it('retries a call that hit three network errors and resolves with its value', async () => {
       const { spy, task } = createRunner({
         error: networkError,
         attempts: 3,
@@ -305,7 +305,7 @@ describe('retryIfFailed', () => {
       expect(spy).toHaveBeenCalledTimes(4)
     })
 
-    it('should resolve without errors if task resolve', async () => {
+    it('runs a call that succeeds at once only once', async () => {
       const { spy, task } = createRunner({ error: networkError, attempts: 0 })
 
       await expect(
