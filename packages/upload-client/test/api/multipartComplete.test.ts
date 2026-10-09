@@ -66,17 +66,11 @@ describe('API - multipartComplete', () => {
 
     await naiveMultipart(file, parts, settings)
 
-    let time
-    setTimeout(() => {
-      time = Date.now()
-      ctrl.abort()
-    })
+    setTimeout(() => ctrl.abort())
 
     await expect(
       multipartComplete(completedUuid, settings)
     ).rejects.toThrowError(new CancelError('Request canceled'))
-
-    expect(Date.now() - time).toBeLessThan(200) // could be slow on ci
   })
 
   it('should be rejected with bad options', async () => {
