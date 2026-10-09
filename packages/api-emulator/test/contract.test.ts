@@ -43,20 +43,24 @@ it.each<{
   init?: () => RequestInit
   status: number
   content: string
+  /** Compared only where the emulator sends one (see README.md). */
+  errorCode?: string
 }>([
   {
     name: 'POST /base/ without a public key',
     path: () => '/base/',
     init: () => form({}, true),
     status: 403,
-    content: 'UPLOADCARE_PUB_KEY is required.'
+    content: 'UPLOADCARE_PUB_KEY is required.',
+    errorCode: 'ProjectPublicKeyRequiredError'
   },
   {
     name: 'POST /base/ with an unknown public key',
     path: () => '/base/',
     init: () => form({ UPLOADCARE_PUB_KEY: 'invalidpublickey' }, true),
     status: 403,
-    content: 'UPLOADCARE_PUB_KEY is invalid.'
+    content: 'UPLOADCARE_PUB_KEY is invalid.',
+    errorCode: 'ProjectPublicKeyInvalidError'
   },
   {
     name: 'POST /base/ without a file',
@@ -69,13 +73,15 @@ it.each<{
     name: 'GET /info/ without a public key',
     path: () => `/info/?file_id=${UNKNOWN_UUID}`,
     status: 403,
-    content: 'pub_key is required.'
+    content: 'pub_key is required.',
+    errorCode: 'ProjectPublicKeyRequiredError'
   },
   {
     name: 'GET /info/ with an unknown public key',
     path: () => `/info/?pub_key=invalidpublickey&file_id=${UNKNOWN_UUID}`,
     status: 403,
-    content: 'pub_key is invalid.'
+    content: 'pub_key is invalid.',
+    errorCode: 'ProjectPublicKeyInvalidError'
   },
   {
     name: 'GET /info/ without a file_id',
@@ -175,12 +181,16 @@ it.each<{
     status: 400,
     content: 'uuid is required.'
   }
-])('$name', async ({ path, init, status, content }) => {
+])('$name', async ({ path, init, status, content, errorCode }) => {
   const url = new URL(path(), origin)
   url.searchParams.set('jsonerrors', '1')
   const response = await send(url, init?.())
   const body = (await response.json()) as { error?: unknown }
-  expect(body.error).toMatchObject({ status_code: status, content })
+  expect(body.error).toMatchObject({
+    status_code: status,
+    content,
+    ...(errorCode && { error_code: errorCode })
+  })
 })
 
 it('answers unknown for a from_url token nobody issued', async () => {
