@@ -3,11 +3,15 @@ import { vi, expect, describe, it } from 'vitest'
 import { CancelError } from '@uploadcare/api-client-utils'
 import request from '../../src/request/request.browser'
 import getUrl from '../../src/tools/getUrl'
+import { getSettingsForTesting } from '../_helpers'
+
+const { baseURL } = getSettingsForTesting({})
+
 describe('request', () => {
   it('should post', async () => {
     const response = await request({
       method: 'POST',
-      url: getUrl('https://upload.uploadcare.com', '/base/', {
+      url: getUrl(baseURL, '/base/', {
         jsonerrors: 1
       }),
       data: new Blob(Array(1000).fill(1))
@@ -15,9 +19,7 @@ describe('request', () => {
 
     expect(response.request.method).toBe('POST')
     expect(response.status).toBe(200)
-    expect(response.request.url).toBe(
-      'https://upload.uploadcare.com/base/?jsonerrors=1'
-    )
+    expect(response.request.url).toBe(`${baseURL}/base/?jsonerrors=1`)
     expect(JSON.parse(response.data).error.content).toBe(
       'UPLOADCARE_PUB_KEY is required.'
     )
@@ -25,14 +27,12 @@ describe('request', () => {
 
   it('should get', async () => {
     const response = await request({
-      url: getUrl('https://upload.uploadcare.com', '/from_url/status/', {
+      url: getUrl(baseURL, '/from_url/status/', {
         token: 'test'
       })
     })
 
-    expect(response.request.url).toBe(
-      'https://upload.uploadcare.com/from_url/status/?token=test'
-    )
+    expect(response.request.url).toBe(`${baseURL}/from_url/status/?token=test`)
     expect(response.request.method).toBe('GET')
     expect(JSON.parse(response.data).status).toBe('unknown')
   })
@@ -46,7 +46,7 @@ describe('request', () => {
 
     await expect(
       request({
-        url: getUrl('https://upload.uploadcare.com', '/from_url/status/', {
+        url: getUrl(baseURL, '/from_url/status/', {
           token: 'test'
         }),
         signal: cntr.signal
@@ -58,7 +58,7 @@ describe('request', () => {
     const onProgress = vi.fn()
     const response = await request({
       method: 'POST',
-      url: getUrl('https://upload.uploadcare.com', '/base/', {
+      url: getUrl(baseURL, '/base/', {
         jsonerrors: 1
       }),
       data: new Blob(Array(1000).fill(1)),
