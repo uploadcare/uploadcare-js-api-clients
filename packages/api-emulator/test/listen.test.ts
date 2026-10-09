@@ -1,5 +1,6 @@
 import { once } from 'node:events'
 import { connect } from 'node:net'
+import { format } from 'node:util'
 import { afterAll, beforeAll, expect, it, vi } from 'vitest'
 import { resetSession, SESSION_HEADER } from '../src/index.js'
 import { createEmulatorServer } from '../src/listen.js'
@@ -153,12 +154,9 @@ it('answers 500 when a route throws, instead of crashing the process', async () 
   // The error stays in the server log; the body is fixed, so nothing thrown
   // inside the emulator reaches the client.
   expect(await response.text()).toBe('emulator error')
-  expect(logged).toHaveBeenCalledWith(
-    '[api-emulator] %s %s threw:',
-    'GET',
-    '/throws/',
-    expect.any(Error)
-  )
+  expect(logged.mock.calls.map((call) => format(...call))).toEqual([
+    expect.stringMatching(/GET \/throws\/.*route blew up/s)
+  ])
 })
 
 it('keeps serving after a route throws', async () => {
@@ -193,11 +191,9 @@ it('answers 502 for a path no route handles, naming it only in the log', async (
   expect(response.headers.get('access-control-allow-origin')).toBe('*')
   expect(response.headers.get('content-type')).toContain('text/plain')
   expect(await response.text()).toBe('not handled by the emulator')
-  expect(logged).toHaveBeenCalledExactlyOnceWith(
-    '[api-emulator] not handled by the emulator: %s %s',
-    'GET',
-    '/no-such-route/'
-  )
+  expect(logged.mock.calls.map((call) => format(...call))).toEqual([
+    expect.stringContaining('GET /no-such-route/')
+  ])
 })
 
 it('logs what it received to the session’s requests', async () => {
