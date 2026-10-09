@@ -192,7 +192,7 @@ it('starts each test from a fresh session', async () => {
   expect((await fetch(`https://ucarecdn.com/${uuid}/`)).status).toBe(404)
 })
 
-it('answers with the scenarios registered on the handle reset() returns, over XHR and fetch', async () => {
+it('answers with the scenarios registered on the handle reset() returns, `times` times, over XHR and fetch', async () => {
   const session = await emulator.reset()
   session.on('GET /info/', () => new Response('scenario'), { times: 2 })
   const info =
@@ -201,10 +201,16 @@ it('answers with the scenarios registered on the handle reset() returns, over XH
   expect(await (await fetch(info)).text()).toBe('scenario')
   expect((await sendXhr('GET', info)).body).toBe('scenario')
   expect((await fetch(info)).status).toBe(404)
+})
 
+it('drops the scenarios on reset()', async () => {
+  const session = await emulator.reset()
   session.on('GET /info/', () => new Response('scenario'))
   await emulator.reset()
-  expect(await (await fetch(info)).text()).not.toBe('scenario')
+
+  const info =
+    'https://upload.uploadcare.com/info/?pub_key=demopublickey&file_id=x'
+  expect((await fetch(info)).status).toBe(404)
 })
 
 it('keeps the session readable from that handle', async () => {
