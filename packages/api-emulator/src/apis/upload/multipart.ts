@@ -75,30 +75,51 @@ export const multipartRoutes: Route[] = [
       const filename = fields.get('filename')
       if (!filename)
         // schema: requestParamRequiredError
-        return apiError(request, 400, 'filename is required.')
+        return apiError(
+          request,
+          400,
+          'filename is required.',
+          'RequestParamRequiredError'
+        )
 
       const sizeRaw = fields.get('size')
       const size = sizeRaw ? Number(sizeRaw) : NaN
       if (!Number.isSafeInteger(size))
         // schema: multipartSizeInvalidError
-        return apiError(request, 400, 'size should be integer.')
+        return apiError(
+          request,
+          400,
+          'size should be integer.',
+          'MultipartSizeInvalidError'
+        )
 
       if (size < 10485760)
         // schema: multipartFileSizeTooSmallError
         return apiError(
           request,
           400,
-          'File size can not be less than 10485760 bytes. Please use direct upload instead of multipart.'
+          'File size can not be less than 10485760 bytes. Please use direct upload instead of multipart.',
+          'MultipartFileSizeTooSmallError'
         )
 
       if (size > MULTIPART_MAX_SIZE)
         // schema: multipartFileSizeLimitExceededError
-        return apiError(request, 400, 'File size exceeds project limit.')
+        return apiError(
+          request,
+          400,
+          'File size exceeds project limit.',
+          'MultipartFileSizeLimitExceededError'
+        )
 
       const contentType = fields.get('content_type')
       if (!contentType)
         // schema: requestParamRequiredError
-        return apiError(request, 400, 'content_type is required.')
+        return apiError(
+          request,
+          400,
+          'content_type is required.',
+          'RequestParamRequiredError'
+        )
 
       const uuid = nextUuid(session)
       const partCount = Math.ceil(size / MULTIPART_CHUNK_SIZE)
@@ -132,16 +153,26 @@ export const multipartRoutes: Route[] = [
       const uuid = fields.get('uuid')
       if (!uuid)
         // schema: multipartFileIdRequiredError
-        return apiError(request, 400, 'uuid is required.')
+        return apiError(
+          request,
+          400,
+          'uuid is required.',
+          'MultipartFileIdRequiredError'
+        )
 
       if (!UUID.test(uuid))
         // schema: uuidInvalidError
-        return apiError(request, 400, 'uuid is invalid.')
+        return apiError(request, 400, 'uuid is invalid.', 'UUIDInvalidError')
 
       const upload = session.multipart.get(uuid)
       if (!upload)
         // schema: multipartFileNotFoundError — no /multipart/start/ by this uuid.
-        return apiError(request, 404, 'File is not found.')
+        return apiError(
+          request,
+          404,
+          'File is not found.',
+          'MultipartFileNotFoundError'
+        )
 
       const received = upload.parts.filter(
         (part): part is Uint8Array => part !== undefined
@@ -151,7 +182,8 @@ export const multipartRoutes: Route[] = [
         return apiError(
           request,
           400,
-          'File size mismatch. Not all parts uploaded?'
+          'File size mismatch. Not all parts uploaded?',
+          'MultipartUploadSizeTooSmallError'
         )
 
       const bytes = new Uint8Array(await new Blob(received).arrayBuffer())

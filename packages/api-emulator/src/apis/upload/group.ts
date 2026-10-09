@@ -101,14 +101,24 @@ export const groupRoutes: Route[] = [
 
       if (tokens.length === 0)
         // schema: groupFileURLParsingFailedError
-        return apiError(request, 400, 'No files[N] parameters found.')
+        return apiError(
+          request,
+          400,
+          'No files[N] parameters found.',
+          'GroupFilesInvalidError'
+        )
 
       const members: GroupMember[] = []
       for (const raw of tokens) {
         const parsed = parseMember(raw)
         if (!parsed)
           // schema: groupFilesInvalidError
-          return apiError(request, 400, `This is not valid file url: ${raw}.`)
+          return apiError(
+            request,
+            400,
+            `This is not valid file url: ${raw}.`,
+            'GroupFileURLParsingFailedError'
+          )
         members.push(parsed)
       }
       const isKnown = ({ uuid }: GroupMember) =>
@@ -117,7 +127,12 @@ export const groupRoutes: Route[] = [
 
       if (!members.every(isKnown))
         // schema: groupFilesNotFoundError
-        return apiError(request, 400, 'Some files not found.')
+        return apiError(
+          request,
+          400,
+          'Some files not found.',
+          'GroupFilesNotFoundError'
+        )
 
       const id = `${nextUuid(session)}~${members.length}`
       session.groups.set(id, members)
@@ -133,12 +148,22 @@ export const groupRoutes: Route[] = [
       const id = params.get('group_id')
       if (!id)
         // schema: groupIdRequiredError
-        return apiError(request, 400, 'group_id is required.')
+        return apiError(
+          request,
+          400,
+          'group_id is required.',
+          'GroupIdRequiredError'
+        )
 
       const members = session.groups.get(id)
       if (!members)
         // schema: groupNotFoundError
-        return apiError(request, 404, 'group_id is invalid.')
+        return apiError(
+          request,
+          404,
+          'group_id is invalid.',
+          'GroupNotFoundError'
+        )
 
       return Response.json(groupEnvelope(session, id, members))
     })

@@ -42,7 +42,12 @@ export const fromUrlRoutes: Route[] = [
       const sourceUrl = params.get('source_url')
       if (!sourceUrl)
         // schema: sourceURLRequiredError
-        return apiError(request, 400, 'source_url is required.')
+        return apiError(
+          request,
+          400,
+          'source_url is required.',
+          'SourceURLRequiredError'
+        )
 
       const scheme = URL_SCHEME.exec(sourceUrl)?.[1]?.toLowerCase()
       if (!scheme)
@@ -79,7 +84,12 @@ export const fromUrlRoutes: Route[] = [
 
       if (isPrivateSourceUrl(sourceUrl))
         // schema: urlHostPrivateIPForbiddenError
-        return apiError(request, 400, 'Only public IPs are allowed.')
+        return apiError(
+          request,
+          400,
+          'Only public IPs are allowed.',
+          'URLHostPrivateIPForbiddenError'
+        )
 
       // The client's `fileName` option overrides the name the URL would
       // otherwise imply.
@@ -119,7 +129,7 @@ export const fromUrlRoutes: Route[] = [
     const token = new URL(request.url).searchParams.get('token')
     if (!token)
       // schema: tokenRequiredError
-      return apiError(request, 400, 'token is required.')
+      return apiError(request, 400, 'token is required.', 'TokenRequiredError')
 
     const job = session.fromUrlJobs.get(token)
     if (!job)

@@ -17,7 +17,12 @@ export const baseRoutes: Route[] = [
       const part = form.get('file')
       if (!(part instanceof File)) {
         // schema: filesRequiredError
-        return apiError(request, 400, 'Request does not contain files.')
+        return apiError(
+          request,
+          400,
+          'Request does not contain files.',
+          'FilesRequiredError'
+        )
       }
 
       const bytes = new Uint8Array(await part.arrayBuffer())

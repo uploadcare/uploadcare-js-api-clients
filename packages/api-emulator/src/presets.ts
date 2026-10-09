@@ -141,7 +141,12 @@ const hostNotFound = (
     if (!source || (sourceUrl !== undefined && source !== sourceUrl))
       return undefined
     // schema: hostnameNotFoundError
-    return apiError(request, 400, 'Host does not exist.')
+    return apiError(
+      request,
+      400,
+      'Host does not exist.',
+      'HostnameNotFoundError'
+    )
   })
 }
 

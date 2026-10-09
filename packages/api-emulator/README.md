@@ -614,8 +614,5 @@ by hand or by adding the `contract` label to a pull request.
 Found by probing the real API on 2026-10-09 and not covered by the contract
 file, because the emulator answers differently:
 
-- Every real error carries an `error_code` (`FilesRequiredError`,
-  `GroupIdRequiredError`, …). The emulator sends one only on the public-key,
-  token, throttle, signed-upload and `from_url` URL-parsing errors.
 - `POST /multipart/start/` below the minimum size: the real API's sentence says
   `10000000 bytes`, the spec's (and the emulator's) `10485760 bytes`.
