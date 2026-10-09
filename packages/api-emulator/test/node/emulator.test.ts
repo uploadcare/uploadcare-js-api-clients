@@ -73,7 +73,7 @@ it('fails an Uploadcare path it has no route for, naming it', async () => {
 // node:http(s) and enforces CORS: it preflights, then checks the answer.
 it('answers a CORS preflight and lets any origin read its answers', async () => {
   const info =
-    'https://upload.uploadcare.com/info/?pub_key=demopublickey&file_id=x'
+    'https://upload.uploadcare.com/info/?pub_key=demopublickey&file_id=00000000-0000-4000-8000-000000000000'
 
   expect(await sendNode('OPTIONS', info)).toMatchObject({ status: 204 })
   expect((await fetch(info)).headers.get('access-control-allow-origin')).toBe(
@@ -98,7 +98,7 @@ it('fails a dropped connection as a network error', async () => {
   const session = await emulator.reset()
   session.on('GET /info/', () => Response.error())
   const info =
-    'https://upload.uploadcare.com/info/?pub_key=demopublickey&file_id=x'
+    'https://upload.uploadcare.com/info/?pub_key=demopublickey&file_id=00000000-0000-4000-8000-000000000000'
 
   await expect(fetch(info)).rejects.toThrow(TypeError)
   expect(await sendNode('GET', info)).toHaveProperty('error')
@@ -117,7 +117,7 @@ it('answers with the scenarios registered on the handle reset() returns, and log
   const session = await emulator.reset()
   session.on('GET /info/', () => new Response('scenario'), { times: 2 })
   const info =
-    'https://upload.uploadcare.com/info/?pub_key=demopublickey&file_id=x'
+    'https://upload.uploadcare.com/info/?pub_key=demopublickey&file_id=00000000-0000-4000-8000-000000000000'
 
   expect(await (await fetch(info)).text()).toBe('scenario')
   expect(await sendNode('GET', info)).toMatchObject({ body: 'scenario' })

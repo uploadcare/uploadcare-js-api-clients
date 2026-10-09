@@ -194,7 +194,7 @@ it('answers with the scenarios registered on the handle reset() returns, `times`
   const session = await emulator.reset()
   session.on('GET /info/', () => new Response('scenario'), { times: 2 })
   const info =
-    'https://upload.uploadcare.com/info/?pub_key=demopublickey&file_id=x'
+    'https://upload.uploadcare.com/info/?pub_key=demopublickey&file_id=00000000-0000-4000-8000-000000000000'
 
   expect(await (await fetch(info)).text()).toBe('scenario')
   expect((await sendXhr('GET', info)).body).toBe('scenario')
@@ -207,7 +207,7 @@ it('drops the scenarios on reset()', async () => {
   await emulator.reset()
 
   const info =
-    'https://upload.uploadcare.com/info/?pub_key=demopublickey&file_id=x'
+    'https://upload.uploadcare.com/info/?pub_key=demopublickey&file_id=00000000-0000-4000-8000-000000000000'
   expect((await fetch(info)).status).toBe(404)
 })
 
