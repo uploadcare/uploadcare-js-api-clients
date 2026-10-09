@@ -1,4 +1,4 @@
-import { beforeEach, expect, it } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import {
   mintAuthToken,
   resetSession,
@@ -113,8 +113,31 @@ it('rejects an expired token', async () => {
   )
 })
 
-it('accepts a token expired within the 30s clock leeway', async () => {
-  await expectUploaded(await bearer(token({ exp: now() - 10 })))
+describe('on a frozen clock', () => {
+  beforeEach(() => {
+    vi.useFakeTimers({ toFake: ['Date'] })
+    vi.setSystemTime(new Date('2026-01-01T00:00:00Z'))
+  })
+  afterEach(() => {
+    vi.useRealTimers()
+  })
+
+  it('accepts a token expired 29s ago, inside the 30s clock leeway', async () => {
+    await expectUploaded(await bearer(token({ exp: now() - 29 })))
+  })
+
+  it('rejects a token expired 31s ago, past the 30s clock leeway', async () => {
+    await expectRejected(
+      await bearer(token({ exp: now() - 31 })),
+      401,
+      'AccessTokenExpiredError',
+      'Expired token.'
+    )
+  })
+
+  it('mints tokens issued now', async () => {
+    expect(claimsOf(await mintAuthToken()).iat).toBe(now())
+  })
 })
 
 it('rejects a malformed scope item', async () => {
@@ -209,7 +232,6 @@ it('mints tokens it accepts, a minute long by default', async () => {
   await expectUploaded(await bearer(minted))
   const { iat, exp, jti, uc } = claimsOf(minted)
   expect(exp - iat).toBe(60)
-  expect(Math.abs(iat - now())).toBeLessThanOrEqual(1)
   expect(jti).toBeUndefined()
   expect(uc).toBeUndefined()
 })
