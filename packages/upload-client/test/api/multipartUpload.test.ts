@@ -1,4 +1,4 @@
-import { vi, expect, describe, it, beforeAll } from 'vitest'
+import { vi, expect, describe, it, beforeEach } from 'vitest'
 import * as factory from '../_fixtureFactory'
 import multipartUpload from '../../src/api/multipartUpload'
 import { getSettingsForTesting, assertComputableProgress } from '../_helpers'
@@ -8,7 +8,8 @@ let parts: [string, Blob | Buffer][] = []
 
 vi.setConfig({ testTimeout: 60000 })
 
-beforeAll(async () => {
+// Per test: the emulator's session (and so the upload) is reset before each.
+beforeEach(async () => {
   const file = factory.file(11)
   const settings = getSettingsForTesting({
     publicKey: factory.publicKey('multipart'),
