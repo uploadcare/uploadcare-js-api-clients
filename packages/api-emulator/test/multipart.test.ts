@@ -63,6 +63,12 @@ it('refuses a size too big to cut into parts', async () => {
   expect(await response.text()).toBe('File size exceeds project limit.')
 })
 
+it('refuses an upload with no content_type', async () => {
+  const response = await start({ filename: 'a.jpg', size: String(BIG) })
+  expect(response.status).toBe(400)
+  expect(await response.text()).toBe('content_type is required.')
+})
+
 it('refuses an upload with no UPLOADCARE_PUB_KEY', async () => {
   const form = new FormData()
   form.set('filename', 'a.jpg')
