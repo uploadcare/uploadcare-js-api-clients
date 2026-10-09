@@ -476,9 +476,10 @@ describeEmulatorOnly('authToken (emulator only)', () => {
       return calls === 2 ? mintExpiredToken() : mintToken()
     })
 
-    session.use('throttle', { match: 'POST /base/' })
+    // retry-after: 0, so the retry is immediate; the wait itself is pinned
+    // in retryIfFailed.test.ts.
+    session.use('throttle', { match: 'POST /base/', retryAfter: 0 })
 
-    const startedAt = Date.now()
     const { file } = await base(factory.image('blackSquare').data, {
       ...getSettingsForTesting({ publicKey: publicKey as string }),
       authToken: resolver,
@@ -488,8 +489,6 @@ describeEmulatorOnly('authToken (emulator only)', () => {
     expect(typeof file).toBe('string')
     // Throttled, expired, then accepted.
     expect(resolver).toHaveBeenCalledTimes(3)
-    // `retry-after: 1`, so an immediate retry would land well under a second.
-    expect(Date.now() - startedAt).toBeGreaterThanOrEqual(1000)
   })
 
   it('should check the header before the public key', async () => {
