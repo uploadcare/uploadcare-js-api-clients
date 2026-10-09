@@ -9,9 +9,8 @@ import { createFetch, resetSession } from '../src/index.js'
  * from the real API. Every request is refused before anything is stored, so a
  * run leaves nothing behind in the project.
  *
- * Only `status_code` and `content` are compared. The real API also sends an
- * `error_code` on every error, which the emulator mostly doesn't; that, and the
- * cases known to differ, are listed in README.md ("Divergences from the real
+ * Each case compares the envelope's `status_code`, `content` and `error_code`.
+ * Cases known to differ are listed in README.md ("Divergences from the real
  * API").
  */
 
@@ -43,8 +42,7 @@ it.each<{
   init?: () => RequestInit
   status: number
   content: string
-  /** Compared only where the emulator sends one (see README.md). */
-  errorCode?: string
+  errorCode: string
 }>([
   {
     name: 'POST /base/ without a public key',
@@ -67,7 +65,8 @@ it.each<{
     path: () => '/base/',
     init: () => form({ UPLOADCARE_PUB_KEY: pubKey }),
     status: 400,
-    content: 'Request does not contain files.'
+    content: 'Request does not contain files.',
+    errorCode: 'FilesRequiredError'
   },
   {
     name: 'GET /info/ without a public key',
@@ -87,59 +86,68 @@ it.each<{
     name: 'GET /info/ without a file_id',
     path: () => `/info/?pub_key=${pubKey}`,
     status: 400,
-    content: 'file_id is required.'
+    content: 'file_id is required.',
+    errorCode: 'FileIdRequiredError'
   },
   {
     name: 'GET /info/ with a file_id that is not a uuid',
     path: () => `/info/?pub_key=${pubKey}&file_id=nope`,
     status: 400,
-    content: 'file_id is invalid.'
+    content: 'file_id is invalid.',
+    errorCode: 'FileIdInvalidError'
   },
   {
     name: 'GET /info/ for a uuid nobody uploaded',
     path: () => `/info/?pub_key=${pubKey}&file_id=${UNKNOWN_UUID}`,
     status: 404,
-    content: 'File is not found.'
+    content: 'File is not found.',
+    errorCode: 'FileNotFoundError'
   },
   {
     name: 'POST /group/ without members',
     path: () => '/group/',
     init: () => form({ pub_key: pubKey }),
     status: 400,
-    content: 'No files[N] parameters found.'
+    content: 'No files[N] parameters found.',
+    errorCode: 'GroupFilesInvalidError'
   },
   {
     name: 'POST /group/ with a member that is not a file url',
     path: () => '/group/',
     init: () => form({ pub_key: pubKey, 'files[0]': 'nope' }),
     status: 400,
-    content: 'This is not valid file url: nope.'
+    content: 'This is not valid file url: nope.',
+    errorCode: 'GroupFileURLParsingFailedError'
   },
   {
     name: 'POST /group/ with a member nobody uploaded',
     path: () => '/group/',
     init: () => form({ pub_key: pubKey, 'files[0]': UNKNOWN_UUID }),
     status: 400,
-    content: 'Some files not found.'
+    content: 'Some files not found.',
+    errorCode: 'GroupFilesNotFoundError'
   },
   {
     name: 'GET /group/info/ without a group_id',
     path: () => `/group/info/?pub_key=${pubKey}`,
     status: 400,
-    content: 'group_id is required.'
+    content: 'group_id is required.',
+    errorCode: 'GroupIdRequiredError'
   },
   {
     name: 'GET /group/info/ for a group nobody created',
     path: () => `/group/info/?pub_key=${pubKey}&group_id=${UNKNOWN_UUID}~1`,
     status: 404,
-    content: 'group_id is invalid.'
+    content: 'group_id is invalid.',
+    errorCode: 'GroupNotFoundError'
   },
   {
     name: 'POST /from_url/ without a source_url',
     path: () => `/from_url/?pub_key=${pubKey}`,
     init: () => ({ method: 'POST' }),
     status: 400,
-    content: 'source_url is required.'
+    content: 'source_url is required.',
+    errorCode: 'SourceURLRequiredError'
   },
   {
     name: 'POST /from_url/ for a source_url without a scheme',
@@ -183,13 +191,15 @@ it.each<{
       `/from_url/?pub_key=${pubKey}&source_url=${encodeURIComponent('http://192.168.1.10/1.jpg')}`,
     init: () => ({ method: 'POST' }),
     status: 400,
-    content: 'Only public IPs are allowed.'
+    content: 'Only public IPs are allowed.',
+    errorCode: 'URLHostPrivateIPForbiddenError'
   },
   {
     name: 'GET /from_url/status/ without a token',
     path: () => '/from_url/status/',
     status: 400,
-    content: 'token is required.'
+    content: 'token is required.',
+    errorCode: 'TokenRequiredError'
   },
   {
     name: 'POST /multipart/start/ without a filename',
@@ -201,7 +211,8 @@ it.each<{
         content_type: 'application/octet-stream'
       }),
     status: 400,
-    content: 'filename is required.'
+    content: 'filename is required.',
+    errorCode: 'RequestParamRequiredError'
   },
   {
     name: 'POST /multipart/start/ with a size that is not an integer',
@@ -214,28 +225,32 @@ it.each<{
         content_type: 'application/octet-stream'
       }),
     status: 400,
-    content: 'size should be integer.'
+    content: 'size should be integer.',
+    errorCode: 'MultipartSizeInvalidError'
   },
   {
     name: 'POST /multipart/complete/ without a uuid',
     path: () => '/multipart/complete/',
     init: () => form({ UPLOADCARE_PUB_KEY: pubKey }),
     status: 400,
-    content: 'uuid is required.'
+    content: 'uuid is required.',
+    errorCode: 'MultipartFileIdRequiredError'
   },
   {
     name: 'POST /multipart/complete/ with a uuid that is not a uuid',
     path: () => '/multipart/complete/',
     init: () => form({ UPLOADCARE_PUB_KEY: pubKey, uuid: 'nope' }),
     status: 400,
-    content: 'uuid is invalid.'
+    content: 'uuid is invalid.',
+    errorCode: 'UUIDInvalidError'
   },
   {
     name: 'POST /multipart/complete/ for an upload nobody started',
     path: () => '/multipart/complete/',
     init: () => form({ UPLOADCARE_PUB_KEY: pubKey, uuid: UNKNOWN_UUID }),
     status: 404,
-    content: 'File is not found.'
+    content: 'File is not found.',
+    errorCode: 'MultipartFileNotFoundError'
   }
 ])('$name', async ({ path, init, status, content, errorCode }) => {
   const url = new URL(path(), origin)
@@ -245,7 +260,7 @@ it.each<{
   expect(body.error).toMatchObject({
     status_code: status,
     content,
-    ...(errorCode && { error_code: errorCode })
+    error_code: errorCode
   })
 })
 

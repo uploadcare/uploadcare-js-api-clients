@@ -12,15 +12,25 @@ export const infoRoutes: Route[] = [
       const id = params.get('file_id')
       if (!id)
         // schema: fileIdRequiredError
-        return apiError(request, 400, 'file_id is required.')
+        return apiError(
+          request,
+          400,
+          'file_id is required.',
+          'FileIdRequiredError'
+        )
       if (!UUID.test(id))
         // schema: fileIdInvalidError
-        return apiError(request, 400, 'file_id is invalid.')
+        return apiError(
+          request,
+          400,
+          'file_id is invalid.',
+          'FileIdInvalidError'
+        )
       const file = fileOf(sessionOf(request), id, publicKey)
       // schema: fileNotFoundError
       return file
         ? Response.json(fileInfo(file))
-        : apiError(request, 404, 'File is not found.')
+        : apiError(request, 404, 'File is not found.', 'FileNotFoundError')
     })
   )
 ]
