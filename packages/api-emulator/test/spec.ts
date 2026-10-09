@@ -182,6 +182,20 @@ const collectDefaults = (doc: unknown, schema: unknown): string[] => {
   return [...anyOf, ...oneOf].flatMap((branch) => collectDefaults(doc, branch))
 }
 
+/**
+ * Whether `content` is `sentence` with its placeholders filled in. The spec
+ * writes the variable part of a sentence as `%s` (`This is not valid file url:
+ * %s.`) or `<PUB-KEY>`; anything outside a placeholder must be verbatim.
+ */
+const fillsIn = (sentence: string, content: string) =>
+  new RegExp(
+    `^${sentence
+      .split(/%s|<PUB-KEY>/)
+      .map((part) => part.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
+      .join('.+')}$`,
+    's'
+  ).test(content)
+
 class SpecMismatchError extends Error {}
 
 function fail(message: string): never {
@@ -386,7 +400,10 @@ export const assertMatchesSpec = async (
         `${describe(method, path, status)}: jsonerrors envelope has no string error.content`
       )
     const allowed = collectDefaults(uploadApiSpec, plainSchema)
-    if (allowed.length > 0 && !allowed.includes(content))
+    if (
+      allowed.length > 0 &&
+      !allowed.some((sentence) => fillsIn(sentence, content))
+    )
       fail(
         `${describe(method, path, status)}: error.content ${JSON.stringify(content)} is not one of ` +
           `the sentences the spec declares (${allowed.map((sentence) => JSON.stringify(sentence)).join(', ')})`

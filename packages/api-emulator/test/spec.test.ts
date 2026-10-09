@@ -166,3 +166,22 @@ it('refuses to validate an unspecified operation, naming why', async () => {
     })
   ).rejects.toThrow(/UNSPECIFIED_OPERATIONS/)
 })
+
+/** A `jsonerrors=1` envelope for `POST /group/`, carrying `content`. */
+const groupError = (content: string) =>
+  assertMatchesSpec(Response.json({ error: { status_code: 400, content } }), {
+    method: 'post',
+    path: '/group/'
+  })
+
+it('accepts any value where a spec sentence has a %s placeholder', async () => {
+  await expect(
+    groupError('This is not valid file url: nope.')
+  ).resolves.toBeUndefined()
+})
+
+it('still rejects a sentence that differs outside its placeholder', async () => {
+  await expect(
+    groupError('This is not a valid file url: nope.')
+  ).rejects.toThrow(/is not one of the sentences the spec declares/)
+})
