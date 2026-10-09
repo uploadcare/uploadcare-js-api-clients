@@ -90,6 +90,12 @@ it.each<{
     content: 'file_id is required.'
   },
   {
+    name: 'GET /info/ with a file_id that is not a uuid',
+    path: () => `/info/?pub_key=${pubKey}&file_id=nope`,
+    status: 400,
+    content: 'file_id is invalid.'
+  },
+  {
     name: 'GET /info/ for a uuid nobody uploaded',
     path: () => `/info/?pub_key=${pubKey}&file_id=${UNKNOWN_UUID}`,
     status: 404,

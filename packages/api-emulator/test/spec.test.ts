@@ -30,7 +30,7 @@ it('answers /info/ with every field the spec requires', async () => {
 
 it('uses a status code the spec documents when the file is unknown', async () => {
   const response = await call(
-    'https://upload.uploadcare.com/info/?jsonerrors=1&pub_key=demopublickey&file_id=nope'
+    'https://upload.uploadcare.com/info/?jsonerrors=1&pub_key=demopublickey&file_id=00000000-0000-4000-8000-000000000000'
   )
   // The HTTP status is 200 under `jsonerrors=1`; assertMatchesSpec validates
   // the status inside the envelope, which the spec documents.
@@ -39,7 +39,7 @@ it('uses a status code the spec documents when the file is unknown', async () =>
 
 it('answers an unknown file with the spec-declared sentence, jsonerrors=1', async () => {
   const response = await call(
-    'https://upload.uploadcare.com/info/?jsonerrors=1&pub_key=demopublickey&file_id=nope'
+    'https://upload.uploadcare.com/info/?jsonerrors=1&pub_key=demopublickey&file_id=00000000-0000-4000-8000-000000000000'
   )
   expect(await jsonError(response)).toMatchObject({
     status_code: 404,
@@ -50,7 +50,7 @@ it('answers an unknown file with the spec-declared sentence, jsonerrors=1', asyn
 
 it('answers an unknown file with the bare spec sentence, no jsonerrors', async () => {
   const response = await call(
-    'https://upload.uploadcare.com/info/?pub_key=demopublickey&file_id=nope'
+    'https://upload.uploadcare.com/info/?pub_key=demopublickey&file_id=00000000-0000-4000-8000-000000000000'
   )
   const body = await response.clone().text()
   expect(response.status).toBe(404)
@@ -131,7 +131,7 @@ it('rejects a /base/ upload with no file, no jsonerrors', async () => {
 
 it('answers the JSON envelope for Accept: application/json, without jsonerrors', async () => {
   const response = await call(
-    'https://upload.uploadcare.com/info/?pub_key=demopublickey&file_id=nope',
+    'https://upload.uploadcare.com/info/?pub_key=demopublickey&file_id=00000000-0000-4000-8000-000000000000',
     { headers: { Accept: 'application/json' } }
   )
   expect(await jsonError(response)).toMatchObject({
@@ -142,7 +142,7 @@ it('answers the JSON envelope for Accept: application/json, without jsonerrors',
 
 it('lets an explicit jsonerrors=0 win over Accept: application/json', async () => {
   const response = await call(
-    'https://upload.uploadcare.com/info/?jsonerrors=0&pub_key=demopublickey&file_id=nope',
+    'https://upload.uploadcare.com/info/?jsonerrors=0&pub_key=demopublickey&file_id=00000000-0000-4000-8000-000000000000',
     { headers: { Accept: 'application/json' } }
   )
   expect(response.status).toBe(404)

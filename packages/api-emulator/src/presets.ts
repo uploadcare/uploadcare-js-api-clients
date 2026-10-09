@@ -8,7 +8,7 @@ import { apiError } from './core/responses.js'
 import type { ScenarioHandler, ScenarioMatch } from './core/scenarios.js'
 import type { EmulatorSession } from './session.js'
 import { STOCK_IMAGE } from './state/stock-image.js'
-import { type Session, store } from './state/store.js'
+import { type Session, store, UUID } from './state/store.js'
 
 export type PresetArgs = {
   /**
@@ -144,8 +144,6 @@ const hostNotFound = (
     return apiError(request, 400, 'Host does not exist.')
   })
 }
-
-const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 
 const storedFile = (
   session: Session,

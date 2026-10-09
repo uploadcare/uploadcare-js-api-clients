@@ -15,7 +15,7 @@ const call = (...[input, init, options]: Parameters<typeof emulatorCall>) =>
   })
 
 const INFO =
-  'https://upload.uploadcare.com/info/?pub_key=demopublickey&file_id=nope'
+  'https://upload.uploadcare.com/info/?pub_key=demopublickey&file_id=00000000-0000-4000-8000-000000000000'
 
 let session: ReturnType<typeof resetSession>
 beforeEach(() => {

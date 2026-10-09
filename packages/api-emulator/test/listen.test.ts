@@ -41,14 +41,14 @@ it('answers over HTTP on the port it picked', async () => {
 
 it('tolerates a missing trailing slash, as the Upload API does', async () => {
   const response = await fetch(
-    `${server.origin}/info?pub_key=demopublickey&file_id=nope`
+    `${server.origin}/info?pub_key=demopublickey&file_id=00000000-0000-4000-8000-000000000000`
   )
   expect(response.status).toBe(404)
 })
 
 it('allows any origin, because every consumer is cross-origin', async () => {
   const response = await fetch(
-    `${server.origin}/info/?pub_key=demopublickey&file_id=nope`
+    `${server.origin}/info/?pub_key=demopublickey&file_id=00000000-0000-4000-8000-000000000000`
   )
   expect(response.headers.get('access-control-allow-origin')).toBe('*')
   expect(response.headers.get('access-control-expose-headers')).toBe('*')
@@ -78,7 +78,7 @@ it('answers correctly with the response delay turned off', async () => {
   const fast = await createEmulatorServer({ delayMs: 0 })
   try {
     const response = await fetch(
-      `${fast.origin}/info/?pub_key=demopublickey&file_id=nope`
+      `${fast.origin}/info/?pub_key=demopublickey&file_id=00000000-0000-4000-8000-000000000000`
     )
     expect(response.status).toBe(404)
   } finally {
@@ -141,7 +141,9 @@ it('survives a client hanging up while its body is read and still answers the ne
   // after the aborted one is answered after its own zero delay, so by then the
   // aborted one is past its delay and waiting on the body.
   await survivesHangUp(0, (origin) =>
-    fetch(`${origin}/info/?pub_key=demopublickey&file_id=nope`)
+    fetch(
+      `${origin}/info/?pub_key=demopublickey&file_id=00000000-0000-4000-8000-000000000000`
+    )
   )
 })
 
@@ -165,7 +167,7 @@ it('keeps serving after a route throws', async () => {
   await fetch(`${server.origin}/throws/`)
 
   const next = await fetch(
-    `${server.origin}/info/?pub_key=demopublickey&file_id=nope`
+    `${server.origin}/info/?pub_key=demopublickey&file_id=00000000-0000-4000-8000-000000000000`
   )
   expect(next.status).toBe(404)
 })
@@ -176,7 +178,7 @@ it('can stop holding the process open, for a caller with no teardown hook', asyn
     detached.unref()
     // Still serves while something else keeps the process alive.
     const response = await fetch(
-      `${detached.origin}/info/?pub_key=demopublickey&file_id=nope`
+      `${detached.origin}/info/?pub_key=demopublickey&file_id=00000000-0000-4000-8000-000000000000`
     )
     expect(response.status).toBe(404)
   } finally {
