@@ -556,6 +556,12 @@ presigned S3 URL that expires after 7 days — so neither runs as part of
 records the `info.version`, a SHA-256 of the downloaded bytes, the date, and
 the URL with its `X-Amz-*` signature parameters stripped.
 
+The package's own tests check every Upload API response against it: `call()`
+in `test/emulator.ts` runs `assertMatchesSpec` for each operation the spec
+describes, and a call that can't be checked passes an `offSpec` reason instead
+(a scenario's own body, a token error the spec doesn't document, or one of the
+gaps below).
+
 Three things the spec doesn't model, which the validator accommodates rather
 than "fixing" the emulator to match literally:
 
@@ -577,8 +583,9 @@ than "fixing" the emulator to match literally:
 - `fileUploadInfo.image_info` isn't marked `nullable` in the spec, unlike its
   `video_info`/`content_info` siblings — but a non-image upload genuinely has
   no image info, and the emulator answers `null` for one, matching the real
-  API. The `test/base.test.ts` test named `reports image_info: null for a
-non-image upload` asserts that behaviour directly, deliberately without
-  `assertMatchesSpec`, since the spec can't express it; the `/info/`
-  round-trip test that goes through `assertMatchesSpec` uploads something
-  `imageSize()` recognizes as an image instead.
+  API. Tests that read one pass `offSpec: NON_IMAGE_INFO` and assert the
+  `null` directly (`reports image_info: null for a non-image upload` in
+  `test/base.test.ts`); the `/info/` round trips that are checked upload
+  something `imageSize()` recognizes as an image instead. The
+  `unknownProgress` preset's `total: 'unknown'` is the same kind of gap
+  (`offSpec: UNKNOWN_TOTAL`).

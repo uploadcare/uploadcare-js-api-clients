@@ -39,7 +39,8 @@ const base = (
       headers: options.authorization
         ? { authorization: options.authorization }
         : {}
-    }
+    },
+    { offSpec: 'the spec documents no 401 and no token error (see above)' }
   )
 }
 

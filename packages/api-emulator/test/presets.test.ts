@@ -5,7 +5,13 @@ import {
   SIGNED_UPLOADS_PUBLIC_KEY,
   type EmulatorSession
 } from '../src/index.js'
-import { call, createGroup, token, uploadFile } from './emulator.js'
+import {
+  call,
+  createGroup,
+  token,
+  UNKNOWN_TOTAL,
+  uploadFile
+} from './emulator.js'
 import { assertMatchesSpec, jsonError } from './spec.js'
 
 /**
@@ -167,7 +173,9 @@ const pollAll = async () => {
   for (let poll = 0; poll < 10; poll += 1) {
     const frame = (await (
       await call(
-        `https://upload.uploadcare.com/from_url/status/?token=${jobToken}`
+        `https://upload.uploadcare.com/from_url/status/?token=${jobToken}`,
+        undefined,
+        { offSpec: UNKNOWN_TOTAL }
       )
     ).json()) as Record<string, unknown>
     frames.push(frame)
