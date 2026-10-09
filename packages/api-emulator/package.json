@@ -54,6 +54,7 @@
     "build": "tsc && vite build",
     "pretest": "vite build",
     "test": "vitest --run",
+    "test:contract": "CONTRACT_BASE_URL=https://upload.uploadcare.com vitest --run --project node test/contract.test.ts",
     "tsc": "tsc --noEmit",
     "lint": "oxlint src test scripts",
     "lint:fix": "oxlint src test scripts --fix",

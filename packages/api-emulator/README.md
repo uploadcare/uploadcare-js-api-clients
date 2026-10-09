@@ -589,3 +589,43 @@ than "fixing" the emulator to match literally:
   something `imageSize()` recognizes as an image instead. The
   `unknownProgress` preset's `total: 'unknown'` is the same kind of gap
   (`offSpec: UNKNOWN_TOTAL`).
+
+## Checked against the real API
+
+`test/contract.test.ts` holds the error paths the emulator shares with the real
+Upload API: the status and sentence for a missing or unknown public key, a
+missing parameter, a file or group nobody created, and so on. `npm test` runs
+it against the emulator. The same assertions run against the real API on
+demand:
+
+```bash
+CONTRACT_PUBLIC_KEY=<a project's public key> npm run test:contract
+```
+
+`test:contract` sets `CONTRACT_BASE_URL` to `https://upload.uploadcare.com`.
+Run vitest on the file with `CONTRACT_BASE_URL` set yourself to point it
+anywhere else. A base URL without a key fails the run rather than skipping it.
+Every request in the file is refused before anything is stored, so a run
+leaves nothing behind in the project. In CI it's the `contract` workflow, run
+by hand or by adding the `contract` label to a pull request.
+
+### Divergences from the real API
+
+Found by probing the real API on 2026-10-09 and not covered by the contract
+file, because the emulator answers differently:
+
+- Every real error carries an `error_code` (`FilesRequiredError`,
+  `GroupIdRequiredError`, …). The emulator sends one only on the public-key,
+  token, throttle, signed-upload and `from_url` URL-parsing errors.
+- `pub_key is required.` / `UPLOADCARE_PUB_KEY is required.` carry
+  `ProjectPublicKeyInvalidError`; the real API says
+  `ProjectPublicKeyRequiredError`.
+- `GET /info/` with a `file_id` that isn't a uuid: the real API answers 400
+  `file_id is invalid.`, the emulator 404 `File is not found.`
+- `POST /multipart/complete/` for a uuid no `/multipart/start/` handed out:
+  the real API answers 404 `File is not found.`, the emulator 400
+  `uuid is invalid.`
+- `POST /from_url/` with a `source_url` that has no scheme (`nope`): the real
+  API answers `No URL scheme supplied.`, the emulator `Failed to parse URL.`
+- `POST /multipart/start/` below the minimum size: the real API's sentence says
+  `10000000 bytes`, the spec's (and the emulator's) `10485760 bytes`.
