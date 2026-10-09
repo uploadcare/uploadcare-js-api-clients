@@ -191,6 +191,11 @@ Per-chunk upload progress needs `@mswjs/interceptors` 0.45.7 or a later 0.45.x
 (the peer range is `^0.45.7`); `msw` 3 depends on `^0.45.6`, so depend on
 `@mswjs/interceptors` directly to make sure your install resolves 0.45.7+.
 
+The interceptor has an XHR's whole body before it reports upload progress, so
+an upload aborted mid-progress still reaches the emulator and lands in
+`session.files`; the real API never sees the rest of the body. Assert on the
+client's `CancelError`, not on the session.
+
 #### In a Vite dev server
 
 `@uploadcare/api-emulator/msw` exports the handler `./browser` runs on, for an
