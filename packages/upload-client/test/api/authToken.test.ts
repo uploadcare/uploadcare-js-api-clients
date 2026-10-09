@@ -439,21 +439,17 @@ describeContract('authToken', () => {
     const warnSpy = vi
       .spyOn(console, 'warn')
       .mockImplementation(() => undefined)
-    try {
-      // A request carrying both is checked the old way, and these values are
-      // nonsense, so success proves `signature`/`expire` were never sent.
-      const { file } = await base(fileToUpload.data, {
-        ...settings,
-        authToken: mintToken(),
-        secureSignature: 'signature',
-        secureExpire: '1234567890'
-      })
+    // A request carrying both is checked the old way, and these values are
+    // nonsense, so success proves `signature`/`expire` were never sent.
+    const { file } = await base(fileToUpload.data, {
+      ...settings,
+      authToken: mintToken(),
+      secureSignature: 'signature',
+      secureExpire: '1234567890'
+    })
 
-      expect(typeof file).toBe('string')
-      expect(warnSpy).toHaveBeenCalledTimes(1)
-    } finally {
-      warnSpy.mockRestore()
-    }
+    expect(typeof file).toBe('string')
+    expect(warnSpy).toHaveBeenCalledTimes(1)
   })
 })
 

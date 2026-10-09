@@ -132,7 +132,6 @@ const survivesHangUp = async (
     // An aborted request is ordinary, not a route error to report.
     expect(logged).not.toHaveBeenCalled()
   } finally {
-    logged.mockRestore()
     await target.close()
   }
 }
@@ -165,13 +164,11 @@ it('answers 500 when a route throws, instead of crashing the process', async () 
     '/throws/',
     expect.any(Error)
   )
-  logged.mockRestore()
 })
 
 it('keeps serving after a route throws', async () => {
-  const logged = vi.spyOn(console, 'error').mockImplementation(() => {})
+  vi.spyOn(console, 'error').mockImplementation(() => {})
   await fetch(`${server.origin}/throws/`)
-  logged.mockRestore()
 
   const next = await fetch(
     `${server.origin}/info/?pub_key=demopublickey&file_id=nope`
@@ -205,7 +202,6 @@ it('answers 502 for a path no route handles, naming it only in the log', async (
     'GET',
     '/no-such-route/'
   )
-  logged.mockRestore()
 })
 
 it('logs what it received to the session’s requests', async () => {

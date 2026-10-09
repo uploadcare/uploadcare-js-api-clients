@@ -43,6 +43,9 @@ export default defineConfig({
     }
   },
   test: {
+    // Puts back every `vi.spyOn` (console included) before each test, so a
+    // failed assertion can't leave a spy silencing the rest of the file.
+    restoreMocks: true,
     projects: [
       {
         extends: true,

@@ -69,7 +69,6 @@ describe('uploadFromUrl', () => {
     expect(uploadRequest?.['query']).toEqual(
       expect.stringContaining('check_URL_duplicates=1')
     )
-    spy.mockRestore()
   })
 
   it('should accept saveUrlForRecurrentUploads setting', async () => {
@@ -90,7 +89,6 @@ describe('uploadFromUrl', () => {
     expect(uploadRequest?.['query']).toEqual(
       expect.stringContaining('save_URL_duplicates=1')
     )
-    spy.mockRestore()
   })
 
   it('should be able to cancel uploading', async () => {

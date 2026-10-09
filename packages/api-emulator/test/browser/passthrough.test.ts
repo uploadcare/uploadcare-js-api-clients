@@ -15,7 +15,6 @@ it("lets a foreign origin through under unhandled: 'passthrough'", async () => {
   expect((await sendXhr('GET', url)).status).toBe(200)
 
   expect(error).not.toHaveBeenCalled()
-  error.mockRestore()
 })
 
 it('still fails an unrouted Uploadcare path rather than reaching the real API', async () => {
@@ -26,7 +25,6 @@ it('still fails an unrouted Uploadcare path rather than reaching the real API', 
   )
 
   expect(warn).toHaveBeenCalledOnce()
-  warn.mockRestore()
 })
 
 it.each([
@@ -45,6 +43,5 @@ it.each([
       expect.stringContaining(url),
       expect.stringContaining(url)
     ])
-    error.mockRestore()
   }
 )

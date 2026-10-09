@@ -1,4 +1,4 @@
-import { vi, expect, describe, it, beforeEach, afterEach } from 'vitest'
+import { vi, expect, describe, it, beforeEach } from 'vitest'
 import { getSecureParams } from '../../src/tools/getSecureParams'
 
 describe('getSecureParams', () => {
@@ -6,10 +6,6 @@ describe('getSecureParams', () => {
 
   beforeEach(() => {
     warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => undefined)
-  })
-
-  afterEach(() => {
-    warnSpy.mockRestore()
   })
 
   it('should pass the signature params through without authToken', () => {

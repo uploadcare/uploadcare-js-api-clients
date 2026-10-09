@@ -37,5 +37,4 @@ it('refuses a foreign origin by default, naming it', async () => {
   expect(error).toHaveBeenCalledWith(
     expect.stringContaining('https://example.com/')
   )
-  error.mockRestore()
 })
