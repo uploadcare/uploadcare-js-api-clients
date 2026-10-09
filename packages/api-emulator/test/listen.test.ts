@@ -1,21 +1,15 @@
 import { once } from 'node:events'
 import { connect } from 'node:net'
 import { afterAll, beforeAll, expect, it, vi } from 'vitest'
-import type * as Emulator from '../src/index.js'
+import { resetSession, SESSION_HEADER } from '../src/index.js'
 import { createEmulatorServer } from '../src/listen.js'
 
-// A route that throws, so the listener's own error path can be reached; no
-// real route is supposed to, which is exactly why it needs a net.
-vi.mock('../src/index.js', async (importOriginal) => {
-  const actual = await importOriginal<typeof Emulator>()
-  return {
-    ...actual,
-    handle: (request: Request) =>
-      new URL(request.url).pathname === '/throws/'
-        ? Promise.reject(new Error('route blew up'))
-        : actual.handle(request)
-  }
-})
+// No real route throws, which is exactly why the listener needs a net; a
+// scenario that throws is how a test reaches it.
+const throwOnRoute = () =>
+  resetSession().on('GET /throws/', () => {
+    throw new Error('route blew up')
+  })
 
 let server: Awaited<ReturnType<typeof createEmulatorServer>>
 
@@ -151,6 +145,7 @@ it('survives a client hanging up while its body is read and still answers the ne
 })
 
 it('answers 500 when a route throws, instead of crashing the process', async () => {
+  throwOnRoute()
   const logged = vi.spyOn(console, 'error').mockImplementation(() => {})
   const response = await fetch(`${server.origin}/throws/`)
   expect(response.status).toBe(500)
@@ -167,6 +162,7 @@ it('answers 500 when a route throws, instead of crashing the process', async () 
 })
 
 it('keeps serving after a route throws', async () => {
+  throwOnRoute()
   vi.spyOn(console, 'error').mockImplementation(() => {})
   await fetch(`${server.origin}/throws/`)
 
@@ -205,7 +201,6 @@ it('answers 502 for a path no route handles, naming it only in the log', async (
 })
 
 it('logs what it received to the session’s requests', async () => {
-  const { resetSession, SESSION_HEADER } = await import('../src/index.js')
   const session = resetSession('listen-requests')
   await fetch(`${server.origin}/base/`, {
     method: 'POST',
