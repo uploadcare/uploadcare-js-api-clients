@@ -93,36 +93,63 @@ it('answers correctly with the response delay turned off', async () => {
 
 // A raw socket, because `fetch` + `abort()` tears the request down before a
 // single byte reaches the server. This one sends the headers and part of the
-// body, then hangs up — during the listener's 30ms delay, or after it, while
-// `bodyOf` is reading.
-const abortMidBody = async (hangUpAfterMs: number) => {
-  const { port } = new URL(server.origin)
+// body, then hangs up. `expect: 100-continue` is the signal that the listener
+// has the request: Node answers it as it hands the request over.
+const abortMidBody = async (
+  origin: string,
+  beforeHangUp?: (origin: string) => Promise<unknown>
+) => {
+  const { port } = new URL(origin)
   const socket = connect(Number(port), '127.0.0.1')
   await once(socket, 'connect')
   socket.write(
-    'POST /base/ HTTP/1.1\r\nhost: 127.0.0.1\r\ncontent-type: text/plain\r\ncontent-length: 1000\r\n\r\npartial'
+    'POST /base/ HTTP/1.1\r\nhost: 127.0.0.1\r\ncontent-type: text/plain\r\ncontent-length: 1000\r\nexpect: 100-continue\r\n\r\n'
   )
-  await new Promise((resolve) => setTimeout(resolve, hangUpAfterMs))
+  const [chunk] = await once(socket, 'data')
+  expect(String(chunk)).toMatch(/^HTTP\/1\.1 100 Continue/)
+  socket.write('partial')
+  await beforeHangUp?.(origin)
   socket.destroy()
+  await once(socket, 'close')
 }
 
-it.each([10, 60])(
-  'survives a client hanging up mid-body after %sms and still answers the next one',
-  async (hangUpAfterMs) => {
-    const logged = vi.spyOn(console, 'error').mockImplementation(() => {})
-    await abortMidBody(hangUpAfterMs)
-    await new Promise((resolve) => setTimeout(resolve, 50))
+const survivesHangUp = async (
+  delayMs: number,
+  beforeHangUp?: (origin: string) => Promise<unknown>
+) => {
+  const logged = vi.spyOn(console, 'error').mockImplementation(() => {})
+  const target = await createEmulatorServer({ delayMs })
+  try {
+    await abortMidBody(target.origin, beforeHangUp)
 
-    const response = await fetch(`${server.origin}/base/`, {
+    // Answered after its own delay, so after the aborted request's delay ran
+    // out and it went on to read the body it will never get.
+    const response = await fetch(`${target.origin}/base/`, {
       method: 'POST',
       body: fileUploadBody()
     })
     expect(await response.json()).toHaveProperty('file')
     // An aborted request is ordinary, not a route error to report.
     expect(logged).not.toHaveBeenCalled()
+  } finally {
     logged.mockRestore()
+    await target.close()
   }
-)
+}
+
+it('survives a client hanging up during the response delay and still answers the next one', async () => {
+  // A delay far longer than the hang-up takes, so the hang-up lands inside it.
+  await survivesHangUp(200)
+})
+
+it('survives a client hanging up while its body is read and still answers the next one', async () => {
+  // No delay: the listener goes straight to reading the body. A request sent
+  // after the aborted one is answered after its own zero delay, so by then the
+  // aborted one is past its delay and waiting on the body.
+  await survivesHangUp(0, (origin) =>
+    fetch(`${origin}/info/?pub_key=demopublickey&file_id=nope`)
+  )
+})
 
 it('answers 500 when a route throws, instead of crashing the process', async () => {
   const logged = vi.spyOn(console, 'error').mockImplementation(() => {})
