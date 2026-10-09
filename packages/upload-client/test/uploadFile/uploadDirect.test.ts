@@ -1,6 +1,10 @@
 import { vi, expect, describe, it } from 'vitest'
 import * as factory from '../_fixtureFactory'
-import { getSettingsForTesting, assertComputableProgress } from '../_helpers'
+import {
+  getSettingsForTesting,
+  assertComputableProgress,
+  assertUploadedFile
+} from '../_helpers'
 import { uploadDirect } from '../../src/uploadFile/uploadDirect'
 import info from '../../src/api/info'
 // TODO: add tests for metadata
@@ -13,7 +17,7 @@ describe('uploadDirect', () => {
 
     const file = await uploadDirect(fileToUpload, settings)
 
-    expect(file.cdnUrl).toBeTruthy()
+    assertUploadedFile(file, settings)
   })
 
   it('should wait until file is ready', async () => {
@@ -36,7 +40,7 @@ describe('uploadDirect', () => {
     })
     const file = await uploadDirect(fileToUpload, settings)
 
-    expect(file.isStored).toBeFalsy()
+    expect(file.isStored).toBe(false)
   })
 
   it('should be able to cancel uploading', async () => {

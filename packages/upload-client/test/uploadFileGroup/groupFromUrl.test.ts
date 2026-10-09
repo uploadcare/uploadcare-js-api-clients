@@ -4,7 +4,8 @@ import * as factory from '../_fixtureFactory'
 import {
   getSettingsForTesting,
   assertComputableProgress,
-  assertUnknownProgress
+  assertUnknownProgress,
+  assertUploadedGroup
 } from '../_helpers'
 import { uploadFileGroup } from '../../src/uploadFileGroup'
 import { CancelError } from '@uploadcare/api-client-utils'
@@ -16,9 +17,9 @@ describe('groupFrom Url[]', () => {
   })
 
   it('should resolves when file is ready on CDN', async () => {
-    const { cdnUrl } = await uploadFileGroup(files, settings)
+    const group = await uploadFileGroup(files, settings)
 
-    expect(cdnUrl).toBeTruthy()
+    assertUploadedGroup(group, settings, 2)
   })
 
   it('should accept store setting', async () => {
@@ -29,7 +30,8 @@ describe('groupFrom Url[]', () => {
     const upload = uploadFileGroup(files, settings)
     const group = await upload
 
-    expect(group.isStored).toBeFalsy()
+    expect(group.isStored).toBe(false)
+    expect(group.files.map((file) => file.isStored)).toEqual([false, false])
   })
 
   it('should be able to cancel uploading', async () => {

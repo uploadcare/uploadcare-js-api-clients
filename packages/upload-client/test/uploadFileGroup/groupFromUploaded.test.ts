@@ -1,7 +1,11 @@
 import { beforeEach, vi, expect, describe, it } from 'vitest'
 import { resetSession } from '@uploadcare/api-emulator'
 import * as factory from '../_fixtureFactory'
-import { getSettingsForTesting, assertComputableProgress } from '../_helpers'
+import {
+  getSettingsForTesting,
+  assertComputableProgress,
+  assertUploadedGroup
+} from '../_helpers'
 import { uploadFileGroup } from '../../src/uploadFileGroup'
 import { CancelError } from '@uploadcare/api-client-utils'
 describe('groupFrom Uploaded[]', () => {
@@ -21,9 +25,7 @@ describe('groupFrom Uploaded[]', () => {
   it('should resolves when file is ready on CDN', async () => {
     const data = await uploadFileGroup(files, settings)
 
-    expect(data).toBeTruthy()
-    expect(data.uuid).toBeTruthy()
-    expect(data.files).toBeTruthy()
+    assertUploadedGroup(data, settings, 2)
     expect(data.files[0].uuid).toBe(files[0])
     expect(data.files[0].defaultEffects).toBe('')
     expect(data.files[1].uuid).toBe(files[1].split('/')[0])
@@ -38,7 +40,7 @@ describe('groupFrom Uploaded[]', () => {
     const upload = uploadFileGroup(files, settings)
     const group = await upload
 
-    expect(group.isStored).toBeFalsy()
+    expect(group.isStored).toBe(false)
   })
 
   it('should be able to cancel uploading', async () => {

@@ -32,7 +32,9 @@ describe('API - multipartUpload', () => {
   it('should be able to upload multipart file', async () => {
     const [url, part] = parts[0]
 
-    await expect(multipartUpload(part, url, settings)).resolves.toBeTruthy()
+    await expect(multipartUpload(part, url, settings)).resolves.toEqual({
+      code: 200
+    })
   })
 
   it('should be able to cancel uploading', async () => {

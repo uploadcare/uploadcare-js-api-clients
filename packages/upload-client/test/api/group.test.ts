@@ -1,7 +1,7 @@
 import { beforeEach, describe, it, expect } from 'vitest'
 import { resetSession } from '@uploadcare/api-emulator'
 import * as factory from '../_fixtureFactory'
-import { getSettingsForTesting } from '../_helpers'
+import { getSettingsForTesting, groupIdPattern } from '../_helpers'
 import group from '../../src/api/group'
 import { GroupFileInfo } from '../../src'
 
@@ -22,9 +22,8 @@ describe('API - group', () => {
   it('should create group of files', async () => {
     const data = await group(files, settings)
     const groupFiles = data.files.filter(Boolean) as GroupFileInfo[]
-    expect(data).toBeTruthy()
-    expect(data.id).toBeTruthy()
-    expect(data.files).toBeTruthy()
+    expect(data.id).toMatch(groupIdPattern(2))
+    expect(data.files).toHaveLength(2)
     expect(groupFiles[0].uuid).toBe(files[0])
     expect(groupFiles[0].defaultEffects).toBe('')
     expect(groupFiles[1].uuid).toBe(files[1].split('/')[0])
