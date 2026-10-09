@@ -10,6 +10,7 @@
   },
   "rules": {
     "typescript/consistent-type-imports": "error",
+    "typescript/no-floating-promises": "error",
     "import/no-cycle": "error",
     "import/no-unassigned-import": [
       "error",
