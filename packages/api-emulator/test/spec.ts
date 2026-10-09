@@ -185,12 +185,13 @@ const collectDefaults = (doc: unknown, schema: unknown): string[] => {
 /**
  * Whether `content` is `sentence` with its placeholders filled in. The spec
  * writes the variable part of a sentence as `%s` (`This is not valid file url:
- * %s.`) or `<PUB-KEY>`; anything outside a placeholder must be verbatim.
+ * %s.`) or a `<NAME>` (`<PUB-KEY>`, `<SIZE>`); anything outside a placeholder
+ * must be verbatim.
  */
 const fillsIn = (sentence: string, content: string) =>
   new RegExp(
     `^${sentence
-      .split(/%s|<PUB-KEY>/)
+      .split(/%s|<[A-Z-]+>/)
       .map((part) => part.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
       .join('.+')}$`,
     's'

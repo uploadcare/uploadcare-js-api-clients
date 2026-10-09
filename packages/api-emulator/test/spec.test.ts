@@ -185,3 +185,18 @@ it('still rejects a sentence that differs outside its placeholder', async () => 
     groupError('This is not a valid file url: nope.')
   ).rejects.toThrow(/is not one of the sentences the spec declares/)
 })
+
+it('accepts any value where a spec sentence has a <NAME> placeholder', async () => {
+  await expect(
+    assertMatchesSpec(
+      Response.json({
+        error: {
+          status_code: 400,
+          content:
+            'File size can not be less than 10000000 bytes. Please use direct upload instead of multipart.'
+        }
+      }),
+      { method: 'post', path: '/multipart/start/' }
+    )
+  ).resolves.toBeUndefined()
+})
