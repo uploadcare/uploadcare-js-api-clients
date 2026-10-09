@@ -2,7 +2,13 @@ import { bodyFields, storedBy } from '../../core/body.js'
 import { apiError, dropConnection } from '../../core/responses.js'
 import { route, type Route } from '../../core/router.js'
 import { protect } from './auth.js'
-import { fileInfo, nextUuid, sessionOf, store } from '../../state/store.js'
+import {
+  fileInfo,
+  nextUuid,
+  sessionOf,
+  store,
+  UUID
+} from '../../state/store.js'
 
 /**
  * The part size `/multipart/start/` hands out, matching the real Upload API
@@ -37,8 +43,8 @@ export const multipartRoutes: Route[] = [
       // refuses a PUT whose presigned URL doesn't match an open upload
       // (`NoSuchUpload`, or 403 on a bad signature), and the emulator doesn't
       // sign its part URLs at all. A client that skips a part still finds out:
-      // `/multipart/complete/` answers "File size mismatch" (or "uuid is
-      // invalid" for an upload that was never started).
+      // `/multipart/complete/` answers "File size mismatch" (or "File is not
+      // found." for an upload that was never started).
       const upload = sessionOf(request).multipart.get(params.uuid ?? '')
       const partNumber = Number(
         new URL(request.url).searchParams.get('partNumber')
@@ -128,10 +134,14 @@ export const multipartRoutes: Route[] = [
         // schema: multipartFileIdRequiredError
         return apiError(request, 400, 'uuid is required.')
 
+      if (!UUID.test(uuid))
+        // schema: uuidInvalidError
+        return apiError(request, 400, 'uuid is invalid.')
+
       const upload = session.multipart.get(uuid)
       if (!upload)
-        // schema: uuidInvalidError — no /multipart/start/ session by this uuid.
-        return apiError(request, 400, 'uuid is invalid.')
+        // schema: multipartFileNotFoundError — no /multipart/start/ by this uuid.
+        return apiError(request, 404, 'File is not found.')
 
       const received = upload.parts.filter(
         (part): part is Uint8Array => part !== undefined

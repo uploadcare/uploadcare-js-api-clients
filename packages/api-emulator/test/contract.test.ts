@@ -186,6 +186,20 @@ it.each<{
     init: () => form({ UPLOADCARE_PUB_KEY: pubKey }),
     status: 400,
     content: 'uuid is required.'
+  },
+  {
+    name: 'POST /multipart/complete/ with a uuid that is not a uuid',
+    path: () => '/multipart/complete/',
+    init: () => form({ UPLOADCARE_PUB_KEY: pubKey, uuid: 'nope' }),
+    status: 400,
+    content: 'uuid is invalid.'
+  },
+  {
+    name: 'POST /multipart/complete/ for an upload nobody started',
+    path: () => '/multipart/complete/',
+    init: () => form({ UPLOADCARE_PUB_KEY: pubKey, uuid: UNKNOWN_UUID }),
+    status: 404,
+    content: 'File is not found.'
   }
 ])('$name', async ({ path, init, status, content, errorCode }) => {
   const url = new URL(path(), origin)
