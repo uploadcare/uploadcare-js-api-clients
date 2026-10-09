@@ -136,7 +136,12 @@ it('accepts a <uuid>~N group reference as a member', async () => {
   const uuid = await upload()
   const first = await createGroup([uuid])
   const firstGroup = (await first.json()) as { id: string }
-  const response = await createGroup([firstGroup.id])
+  const response = await createGroup([firstGroup.id], {
+    // The member reports as `stubFile` (group.ts): its uuid is the group id,
+    // not a uuid, and it has no image_info. The real API's answer for a
+    // group-of-groups isn't known, so the emulator doesn't pretend to model it.
+    offSpec: 'a group reference member reports as a stub file'
+  })
   expect(response.status).toBe(200)
 })
 

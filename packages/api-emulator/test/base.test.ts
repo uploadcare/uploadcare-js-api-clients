@@ -1,6 +1,6 @@
 import { beforeEach, expect, it } from 'vitest'
 import { resetSession } from '../src/index.js'
-import { call, JPEG_1X1, uploadFile } from './emulator.js'
+import { call, NON_IMAGE_INFO, JPEG_1X1, uploadFile } from './emulator.js'
 import { assertMatchesSpec } from './spec.js'
 
 // A JPEG signature with no frame header, so `imageSize` can't read a size out
@@ -46,17 +46,14 @@ it('describes the file that was actually uploaded', async () => {
 it('reports image_info: null for a non-image upload', async () => {
   const { file } = await upload('note.txt')
   const response = await call(
-    `https://upload.uploadcare.com/info/?pub_key=demopublickey&file_id=${file}`
+    `https://upload.uploadcare.com/info/?pub_key=demopublickey&file_id=${file}`,
+    undefined,
+    { offSpec: NON_IMAGE_INFO }
   )
   const parsed = (await response.clone().json()) as {
     is_image: boolean
     image_info: unknown
   }
-  // Deliberately not run through assertMatchesSpec: components.schemas.fileUploadInfo
-  // requires `image_info` and doesn't mark it nullable (unlike its video_info/
-  // content_info siblings — see README.md), so the spec can't express this response,
-  // even though it's exactly what the real API returns for a non-image. This test
-  // asserts the emulator's behaviour directly instead.
   expect(parsed.is_image).toBe(false)
   expect(parsed.image_info).toBeNull()
 })

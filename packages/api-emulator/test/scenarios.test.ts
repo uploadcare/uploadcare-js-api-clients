@@ -1,11 +1,18 @@
 import { beforeEach, expect, it } from 'vitest'
 import { resetSession, sessionOf } from '../src/index.js'
-import { call, upload } from './emulator.js'
+import { call as emulatorCall, upload } from './emulator.js'
 
 /**
  * `session.on()`: the per-test scenario chain in front of the emulator's own
  * routes. Presets (`session.use()`) have their own file, presets.test.ts.
  */
+
+/** `call`, unchecked against the spec: each test answers with its own scenario. */
+const call = (...[input, init, options]: Parameters<typeof emulatorCall>) =>
+  emulatorCall(input, init, {
+    offSpec: "a scenario answers in the route's place",
+    ...options
+  })
 
 const INFO =
   'https://upload.uploadcare.com/info/?pub_key=demopublickey&file_id=nope'

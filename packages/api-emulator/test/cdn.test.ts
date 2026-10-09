@@ -1,9 +1,15 @@
 import { beforeEach, expect, it } from 'vitest'
 import { resetSession } from '../src/index.js'
-import { call, createGroup, JPEG_1X1, upload } from './emulator.js'
+import {
+  call,
+  createGroup,
+  JPEG_1X1,
+  NON_IMAGE_INFO,
+  upload
+} from './emulator.js'
 
-const groupOf = async (members: string[]) =>
-  ((await (await createGroup(members)).json()) as { id: string }).id
+const groupOf = async (members: string[], options?: { offSpec?: string }) =>
+  ((await (await createGroup(members, options)).json()) as { id: string }).id
 
 const cdnBytes = async (path: string) =>
   new Uint8Array(
@@ -69,7 +75,9 @@ it('picks a group member by nth/, defaulting to the first', async () => {
     bytes: new Uint8Array([2]),
     type: 'text/plain'
   })
-  const group = await groupOf([first, `${second}/-/resize/x800/`])
+  const group = await groupOf([first, `${second}/-/resize/x800/`], {
+    offSpec: NON_IMAGE_INFO
+  })
 
   expect(await cdnBytes(`${group}/-/preview/`)).toEqual(new Uint8Array([1]))
   expect(await cdnBytes(`${group}/nth/1/-/preview/`)).toEqual(

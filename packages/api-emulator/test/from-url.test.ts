@@ -1,6 +1,6 @@
 import { beforeEach, expect, it } from 'vitest'
 import { DEMO_IMAGE_UUID, resetSession } from '../src/index.js'
-import { call } from './emulator.js'
+import { call, UNKNOWN_TOTAL } from './emulator.js'
 import { assertMatchesSpec, jsonError } from './spec.js'
 
 // `jsonerrors=1`, exactly as `upload-client` always sends it — without it
@@ -116,13 +116,10 @@ it('reports unknown totals with the unknownProgress preset', async () => {
   const { token } = (await post(
     `pub_key=demopublickey&source_url=${encodeURIComponent(SOURCE)}`
   ).then((r) => r.json())) as { token: string }
-  // Deliberately not run through assertMatchesSpec/poll: the spec's
-  // `fileUploadInfoProgressStatus` schema types `total` as `number | null`,
-  // so it can't express the `'unknown'` string this pins — upload-client's
-  // test's exact expectation.
-  // Same shape of gap as base.test.ts's non-image `image_info: null` case.
   const response = await call(
-    `https://upload.uploadcare.com/from_url/status/?token=${token}`
+    `https://upload.uploadcare.com/from_url/status/?token=${token}`,
+    undefined,
+    { offSpec: UNKNOWN_TOTAL }
   )
   expect(await response.json()).toMatchObject({ total: 'unknown' })
 })
