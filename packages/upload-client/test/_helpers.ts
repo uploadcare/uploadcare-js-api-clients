@@ -71,52 +71,40 @@ export function assertUploadedGroup(
   })
 }
 
+const computable = { isComputable: true, value: expect.any(Number) }
+
+/** Progress values never go backwards. */
+const expectNonDecreasing = (values: number[]): void => {
+  expect(values).toEqual([...values].sort((a, b) => a - b))
+}
+
 export function assertComputableProgress(
   onProgress: Mock<ProgressCallback<ComputableProgressInfo>>
 ): void {
-  expect(onProgress).toHaveBeenCalled()
   expect(onProgress).toHaveBeenLastCalledWith({ isComputable: true, value: 1 })
 
-  let lastProgressValue = -1
-  onProgress.mock.calls.forEach(([progress]) => {
-    const { isComputable, value } = progress
-    expect(isComputable === true).toBeTruthy()
-    expect(typeof value === 'number').toBeTruthy()
-    expect(value).toBeGreaterThanOrEqual(lastProgressValue)
-    lastProgressValue = value
-  })
+  const progress = onProgress.mock.calls.map(([info]) => info)
+  expect(progress).toEqual(progress.map(() => computable))
+  expectNonDecreasing(progress.map(({ value }) => value))
 }
 
+/**
+ * Computable progress, then unknown progress once the server stops reporting
+ * sizes, then a final computable value when the upload finishes.
+ */
 export function assertUnknownProgress(
   onProgress: Mock<ProgressCallback>
 ): void {
-  expect(onProgress).toHaveBeenCalled()
-  expect(onProgress).toHaveBeenCalledWith({ isComputable: false })
+  const progress = onProgress.mock.calls.map(([info]) => info)
+  const firstUnknown = progress.findIndex((info) => !info.isComputable)
+  expect(firstUnknown, 'no unknown progress was reported').toBeGreaterThan(-1)
 
-  const calls = onProgress.mock.calls
-  let isStillComputable = true
-  let lastProgressValue: number | undefined = -1
-  calls.forEach(([progress], idx) => {
-    const isLastCall = idx === calls.length - 1
-    const { isComputable } = progress
-    const value = progress.isComputable ? progress.value : undefined
-    if (isLastCall) {
-      expect(isComputable === true).toBeTruthy()
-      expect(typeof value === 'number').toBeTruthy()
-      return
-    }
-
-    if (!isComputable) {
-      isStillComputable = false
-    }
-
-    if (isStillComputable) {
-      expect(isComputable === true).toBeTruthy()
-      expect(typeof value === 'number').toBeTruthy()
-      expect(value).toBeGreaterThanOrEqual(lastProgressValue as number)
-      lastProgressValue = value
-    } else {
-      expect(isComputable === false).toBeTruthy()
-    }
-  })
+  const known = progress.slice(0, firstUnknown)
+  const unknown = progress.slice(firstUnknown, -1)
+  expect(known).toEqual(known.map(() => computable))
+  expectNonDecreasing(
+    known.map((info) => (info as ComputableProgressInfo).value)
+  )
+  expect(unknown).toEqual(unknown.map(() => ({ isComputable: false })))
+  expect(progress.at(-1)).toEqual(computable)
 }
