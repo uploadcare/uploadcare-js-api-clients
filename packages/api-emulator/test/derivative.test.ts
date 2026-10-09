@@ -258,14 +258,7 @@ it('answers a success frame shaped like the one production sent', async () => {
       await jobIdOf(await generate({ aspect_ratio: [3, 2], store: false }))
     )
   ).at(-1)
-  const expected = shapeOf(PRODUCTION_SUCCESS_FRAME) as {
-    image_info: { dpi: unknown }
-    content_info: { image: { dpi: unknown } }
-  }
-  // The one known difference (see derivative.ts): production sent `dpi: null`.
-  expected.image_info.dpi = 'array'
-  expected.content_info.image.dpi = 'array'
-  expect(shapeOf(done)).toEqual(expected)
+  expect(shapeOf(done)).toEqual(shapeOf(PRODUCTION_SUCCESS_FRAME))
   expect(done).toMatchObject({
     status: 'success',
     is_ready: true,

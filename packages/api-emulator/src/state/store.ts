@@ -244,9 +244,15 @@ export const fileOf = (
  */
 const sanitize = (name: string) => name.replace(/[^\w.-]/g, '')
 
+/**
+ * The real API reads `dpi` from the file, and production sent `null` for the
+ * one PNG recorded (a derivative result). ponytail: no PNG `pHYs` chunk is
+ * parsed, so every PNG reports `null` and every other image `[72, 72]`; read
+ * the chunk if a test ever uploads a PNG that carries one.
+ */
 export const imageInfo = (file: StoredFile) =>
   file.image && {
-    dpi: [72, 72],
+    dpi: file.image.format === 'PNG' ? null : [72, 72],
     width: file.image.width,
     format: file.image.format,
     height: file.image.height,

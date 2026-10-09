@@ -16,8 +16,8 @@
  *   the `success` status frame, recorded verbatim in ai-image-editor's
  *   `uploadcareApiClient.schemas.dev.test.ts` ("a real derivative status
  *   success frame"): the `/info/` payload plus `status: 'success'` and
- *   `is_ready`, no `type`, the result a PNG (`generated.png`, 1248×832). Known
- *   gap: that frame has `dpi: null`; `fileInfo` reports `[72, 72]`.
+ *   `is_ready`, no `type`, the result a PNG (`generated.png`, 1248×832) with
+ *   `dpi: null`.
  * - `[inferred]`: taken from what the client sends, reads or names in
  *   `shared/lib/errorCodes.ts`, never seen from the real API. A test that
  *   passes against one of these proves the client and the emulator agree, not
