@@ -208,6 +208,33 @@ describe('retryIfFailed', () => {
       expect(spy).toHaveBeenCalledTimes(2)
     })
 
+    it.each([
+      ['without a retry-after', {}],
+      ['with a retry-after that is not a number', { 'retry-after': 'soon' }]
+    ])(
+      'retries a throttled call %s after the 15 s default',
+      async (_, headers) => {
+        const error = new UploadError(
+          'test error',
+          'RequestThrottledError',
+          undefined,
+          undefined,
+          headers
+        )
+        const { spy, task } = createRunner({ attempts: 1, error })
+        const p = retryIfFailed<number>(task, {
+          retryThrottledRequestMaxTimes: 1,
+          retryNetworkErrorMaxTimes: 0
+        })
+
+        await vi.advanceTimersByTimeAsync(14999)
+        expect(spy).toHaveBeenCalledTimes(1)
+        await vi.advanceTimersByTimeAsync(1)
+        await expect(p).resolves.toBe(0)
+        expect(spy).toHaveBeenCalledTimes(2)
+      }
+    )
+
     it('should be rejected with error if not throttled', async () => {
       const error = new Error()
       const { spy, task } = createRunner({ error })
