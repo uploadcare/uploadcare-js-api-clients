@@ -8,8 +8,6 @@ import {
   assertUploadedFile
 } from '../_helpers'
 import { CancelError } from '@uploadcare/api-client-utils'
-import http from 'node:http'
-import https, { RequestOptions } from 'node:https'
 import { uploadFromUrl } from '../../src/uploadFile/uploadFromUrl'
 import info from '../../src/api/info'
 vi.setConfig({ testTimeout: 60000 })
@@ -51,44 +49,18 @@ describe('uploadFromUrl', () => {
     expect(file.isStored).toBe(false)
   })
 
-  it('should accept checkForUrlDuplicates setting', async () => {
+  it('should return the saved file for a URL uploaded before with checkForUrlDuplicates and saveUrlForRecurrentUploads', async () => {
     const sourceUrl = factory.imageUrl('valid')
     const settings = getSettingsForTesting({
       publicKey: factory.publicKey('image'),
-      checkForUrlDuplicates: true
-    })
-
-    const protocol = settings.baseURL.includes('https') ? 'https' : 'http'
-    const isHttpsProtocol = protocol === 'https'
-    const spy = vi.spyOn(isHttpsProtocol ? https : http, 'request')
-    await uploadFromUrl(sourceUrl, settings)
-
-    const uploadRequest = spy.mock.calls.find(
-      (call) => (call[0] as RequestOptions).protocol === protocol + ':'
-    )?.[0]
-    expect(uploadRequest?.['query']).toEqual(
-      expect.stringContaining('check_URL_duplicates=1')
-    )
-  })
-
-  it('should accept saveUrlForRecurrentUploads setting', async () => {
-    const sourceUrl = factory.imageUrl('valid')
-    const settings = getSettingsForTesting({
-      publicKey: factory.publicKey('image'),
+      checkForUrlDuplicates: true,
       saveUrlForRecurrentUploads: true
     })
 
-    const protocol = settings.baseURL.includes('https') ? 'https' : 'http'
-    const isHttpsProtocol = protocol === 'https'
-    const spy = vi.spyOn(isHttpsProtocol ? https : http, 'request')
-    await uploadFromUrl(sourceUrl, settings)
+    const first = await uploadFromUrl(sourceUrl, settings)
+    const second = await uploadFromUrl(sourceUrl, settings)
 
-    const uploadRequest = spy.mock.calls.find(
-      (call) => (call[0] as RequestOptions).protocol === protocol + ':'
-    )?.[0]
-    expect(uploadRequest?.['query']).toEqual(
-      expect.stringContaining('save_URL_duplicates=1')
-    )
+    expect(second.uuid).toBe(first.uuid)
   })
 
   it('should be able to cancel uploading', async () => {
