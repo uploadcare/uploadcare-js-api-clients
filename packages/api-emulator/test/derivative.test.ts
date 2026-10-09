@@ -470,7 +470,7 @@ it('checks the public key in the JSON body before anything else', async () => {
     content: 'pub_key is invalid.'
   })
   expect(await jsonError(await edit({ pub_key: undefined }))).toMatchObject({
-    error_code: 'ProjectPublicKeyInvalidError',
+    error_code: 'ProjectPublicKeyRequiredError',
     content: 'pub_key is required.'
   })
   expect(await jsonError(await status('nope', 'nope'))).toMatchObject({

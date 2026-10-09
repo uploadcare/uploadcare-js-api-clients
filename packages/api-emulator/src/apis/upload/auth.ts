@@ -47,7 +47,7 @@ const requirePublicKey = (
       request,
       403,
       `${paramName} is required.`,
-      'ProjectPublicKeyInvalidError'
+      'ProjectPublicKeyRequiredError'
     )
   if (
     !ALLOWED_PUBLIC_KEYS.includes(publicKey) &&
