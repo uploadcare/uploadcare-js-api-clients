@@ -1,5 +1,7 @@
 dist
 node_modules
 docs
+# Uses oxlint (see packages/api-emulator/.oxlintrc.json)
+packages/api-emulator
 # Uses oxlint (see packages/signed-uploads/.oxlintrc.json)
 packages/signed-uploads

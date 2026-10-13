@@ -9,7 +9,11 @@ const VARS = [
   'REST_CLIENT_DEFAULT_SECRET_KEY'
 ]
 
-const __dirname = url.fileURLToPath(new URL('.', import.meta.url))
+// Use node:url's own URL, not the ambient global one: vitest's jsdom
+// environment (used by some upload-client tests) replaces `globalThis.URL`
+// with jsdom's implementation, which does not round-trip a `file:` URL the
+// way `url.fileURLToPath` expects.
+const __dirname = url.fileURLToPath(new url.URL('.', import.meta.url))
 
 const getUndefinedVars = () =>
   VARS.filter((variable) => process.env[variable] == null)

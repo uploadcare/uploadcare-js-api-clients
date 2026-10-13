@@ -1,9 +1,12 @@
+import { vi, expect, describe, it } from 'vitest'
 import * as factory from '../_fixtureFactory'
 import { uploadFileGroup } from '../../src/uploadFileGroup'
-import { getSettingsForTesting, assertComputableProgress } from '../_helpers'
-import { UploadError } from '../../src/tools/UploadError'
-import { jest, expect } from '@jest/globals'
-
+import {
+  getSettingsForTesting,
+  assertComputableProgress,
+  assertUploadedGroup
+} from '../_helpers'
+import { CancelError } from '@uploadcare/api-client-utils'
 describe('groupFrom Object[]', () => {
   const fileToUpload = factory.image('blackSquare').data
   const files = [fileToUpload, fileToUpload]
@@ -12,9 +15,9 @@ describe('groupFrom Object[]', () => {
   })
 
   it('should resolves when file is ready on CDN', async () => {
-    const { cdnUrl } = await uploadFileGroup(files, settings)
+    const group = await uploadFileGroup(files, settings)
 
-    expect(cdnUrl).toBeTruthy()
+    assertUploadedGroup(group, settings, 2)
   })
 
   it('should accept store setting', async () => {
@@ -25,7 +28,8 @@ describe('groupFrom Object[]', () => {
     const upload = uploadFileGroup(files, settings)
     const group = await upload
 
-    expect(group.isStored).toBeFalsy()
+    expect(group.isStored).toBe(false)
+    expect(group.files.map((file) => file.isStored)).toEqual([false, false])
   })
 
   it('should be able to cancel uploading', async () => {
@@ -38,12 +42,12 @@ describe('groupFrom Object[]', () => {
     ctrl.abort()
 
     await expect(upload).rejects.toThrowError(
-      new UploadError('Request canceled')
+      new CancelError('Request canceled')
     )
   })
 
   it('should be able to handle progress', async () => {
-    const onProgress = jest.fn()
+    const onProgress = vi.fn()
     const upload = uploadFileGroup(files, {
       ...settings,
       onProgress
@@ -59,15 +63,9 @@ describe('groupFrom Object[]', () => {
       publicKey: factory.publicKey('invalid')
     })
 
-    try {
-      await uploadFileGroup(files, settings)
-    } catch (error) {
-      expect((error as UploadError).message).toEqual(
-        'UPLOADCARE_PUB_KEY is invalid.'
-      )
-      expect((error as UploadError).code).toEqual(
-        'ProjectPublicKeyInvalidError'
-      )
-    }
+    await expect(uploadFileGroup(files, settings)).rejects.toMatchObject({
+      message: 'UPLOADCARE_PUB_KEY is invalid.',
+      code: 'ProjectPublicKeyInvalidError'
+    })
   })
 })

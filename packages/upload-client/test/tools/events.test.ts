@@ -1,7 +1,6 @@
+import { vi, expect, describe, it } from 'vitest'
 /* eslint-disable @typescript-eslint/unbound-method */
 import { Events } from '../../src/uploadFile/events'
-import { jest, expect } from '@jest/globals'
-
 describe('Events', () => {
   it('should create instance', () => {
     const emitter = new Events()
@@ -18,7 +17,7 @@ describe('Events', () => {
       test2: undefined
     }
 
-    const spy = jest.fn()
+    const spy = vi.fn()
     const emitter = new Events<EventsMap>()
 
     emitter.on('test1', spy)
@@ -40,7 +39,7 @@ describe('Events', () => {
       test: string
     }
 
-    const spy = jest.fn()
+    const spy = vi.fn()
     const emitter = new Events<EventsMap>()
 
     emitter.on('test', spy)
@@ -62,8 +61,8 @@ describe('Events', () => {
       test: string
     }
 
-    const firstSpy = jest.fn()
-    const secondSpy = jest.fn()
+    const firstSpy = vi.fn()
+    const secondSpy = vi.fn()
     const emitter = new Events<EventsMap>()
 
     emitter.on('test', firstSpy)

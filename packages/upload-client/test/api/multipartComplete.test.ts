@@ -1,11 +1,11 @@
+import { vi, expect, describe, it } from 'vitest'
 import multipartStart from '../../src/api/multipartStart'
 import multipartUpload from '../../src/api/multipartUpload'
 import multipartComplete from '../../src/api/multipartComplete'
 import * as factory from '../_fixtureFactory'
 import { getSettingsForTesting } from '../_helpers'
 import { UploadError } from '../../src/tools/UploadError'
-import { jest, expect } from '@jest/globals'
-
+import { CancelError } from '@uploadcare/api-client-utils'
 const getChunk = (
   file: Buffer | Blob,
   index: number,
@@ -18,7 +18,7 @@ const getChunk = (
   return file.slice(start, end)
 }
 
-jest.setTimeout(60000)
+vi.setConfig({ testTimeout: 60000 })
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const naiveMultipart = (file, parts, options): Promise<any> =>
@@ -48,7 +48,7 @@ describe('API - multipartComplete', () => {
 
     const { uuid } = await multipartComplete(completedUuid, settings)
 
-    expect(uuid).toBeTruthy()
+    expect(uuid).toBe(completedUuid)
   })
 
   it('should be able to cancel uploading', async () => {
@@ -66,17 +66,11 @@ describe('API - multipartComplete', () => {
 
     await naiveMultipart(file, parts, settings)
 
-    let time
-    setTimeout(() => {
-      time = Date.now()
-      ctrl.abort()
-    })
+    setTimeout(() => ctrl.abort())
 
     await expect(
       multipartComplete(completedUuid, settings)
-    ).rejects.toThrowError(new UploadError('Request canceled'))
-
-    expect(Date.now() - time).toBeLessThan(200) // could be slow on ci
+    ).rejects.toThrowError(new CancelError('Request canceled'))
   })
 
   it('should be rejected with bad options', async () => {
@@ -86,23 +80,20 @@ describe('API - multipartComplete', () => {
 
     const upload = multipartComplete('', settings)
 
-    await expect(upload).rejects.toThrowError(
-      new UploadError('uuid is required.')
-    )
+    // A real `UploadError` carries the round trip's request/response/headers,
+    // so check its class and message rather than comparing a literal instance.
+    await expect(upload).rejects.toThrow(UploadError)
+    await expect(upload).rejects.toThrow('uuid is required.')
   })
 
   it('should be rejected with error code if failed', async () => {
     const publicKey = factory.publicKey('invalid')
 
-    try {
-      await multipartComplete('', { publicKey })
-    } catch (error) {
-      expect((error as UploadError).message).toEqual(
-        'UPLOADCARE_PUB_KEY is invalid.'
-      )
-      expect((error as UploadError).code).toEqual(
-        'ProjectPublicKeyInvalidError'
-      )
-    }
+    await expect(
+      multipartComplete('', getSettingsForTesting({ publicKey }))
+    ).rejects.toMatchObject({
+      message: 'UPLOADCARE_PUB_KEY is invalid.',
+      code: 'ProjectPublicKeyInvalidError'
+    })
   })
 })

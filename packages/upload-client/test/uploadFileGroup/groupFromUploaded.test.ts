@@ -1,21 +1,31 @@
+import { beforeEach, vi, expect, describe, it } from 'vitest'
+import { resetSession } from '@uploadcare/api-emulator'
 import * as factory from '../_fixtureFactory'
-import { getSettingsForTesting, assertComputableProgress } from '../_helpers'
+import {
+  getSettingsForTesting,
+  assertComputableProgress,
+  assertUploadedGroup
+} from '../_helpers'
 import { uploadFileGroup } from '../../src/uploadFileGroup'
-import { UploadError } from '../../src/tools/UploadError'
-import { jest, expect } from '@jest/globals'
-
+import { CancelError } from '@uploadcare/api-client-utils'
 describe('groupFrom Uploaded[]', () => {
   const files = factory.groupOfFiles('valid')
   const settings = getSettingsForTesting({
     publicKey: factory.publicKey('image')
   })
 
+  // Already in the project in production; `demopublickey`'s can't see it.
+  beforeEach(() => {
+    resetSession().use('storedFile', {
+      uuid: files[0],
+      publicKey: settings.publicKey
+    })
+  })
+
   it('should resolves when file is ready on CDN', async () => {
     const data = await uploadFileGroup(files, settings)
 
-    expect(data).toBeTruthy()
-    expect(data.uuid).toBeTruthy()
-    expect(data.files).toBeTruthy()
+    assertUploadedGroup(data, settings, 2)
     expect(data.files[0].uuid).toBe(files[0])
     expect(data.files[0].defaultEffects).toBe('')
     expect(data.files[1].uuid).toBe(files[1].split('/')[0])
@@ -30,7 +40,7 @@ describe('groupFrom Uploaded[]', () => {
     const upload = uploadFileGroup(files, settings)
     const group = await upload
 
-    expect(group.isStored).toBeFalsy()
+    expect(group.isStored).toBe(false)
   })
 
   it('should be able to cancel uploading', async () => {
@@ -43,12 +53,12 @@ describe('groupFrom Uploaded[]', () => {
     ctrl.abort()
 
     await expect(upload).rejects.toThrowError(
-      new UploadError('Request canceled')
+      new CancelError('Request canceled')
     )
   })
 
   it('should be able to handle progress', async () => {
-    const onProgress = jest.fn()
+    const onProgress = vi.fn()
     const upload = uploadFileGroup(files, {
       ...settings,
       onProgress
@@ -64,13 +74,9 @@ describe('groupFrom Uploaded[]', () => {
       publicKey: factory.publicKey('invalid')
     })
 
-    try {
-      await uploadFileGroup(files, settings)
-    } catch (error) {
-      expect((error as UploadError).message).toEqual('pub_key is invalid.')
-      expect((error as UploadError).code).toEqual(
-        'ProjectPublicKeyInvalidError'
-      )
-    }
+    await expect(uploadFileGroup(files, settings)).rejects.toMatchObject({
+      message: 'pub_key is invalid.',
+      code: 'ProjectPublicKeyInvalidError'
+    })
   })
 })

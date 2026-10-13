@@ -1,0 +1,40 @@
+name: contract
+
+# Checks the emulator against the real Upload API on every pull request that
+# changes it or the code whose tests run on it: upload-client and the packages
+# it bundles. Release PRs bump all of them, so they run it too. Also by hand
+# from the Actions tab, for any branch. Not on a schedule.
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'packages/api-emulator/**'
+      - 'packages/upload-client/**'
+      - 'packages/api-client-utils/**'
+      - 'packages/signed-uploads/**'
+      - '.github/workflows/contract.yml'
+
+jobs:
+  contract:
+    runs-on: ubuntu-latest
+    env:
+      # A missing secret fails the run (see api-emulator's test/contract.test.ts
+      # and the root env.js); neither falls back to the emulator.
+      CONTRACT_PUBLIC_KEY: ${{ secrets.UPLOAD_CLIENT_DEFAULT_PUBLIC_KEY }}
+      UPLOAD_CLIENT_DEFAULT_PUBLIC_KEY: ${{ secrets.UPLOAD_CLIENT_DEFAULT_PUBLIC_KEY }}
+      REST_CLIENT_DEFAULT_PUBLIC_KEY: ${{ secrets.REST_CLIENT_DEFAULT_PUBLIC_KEY }}
+      REST_CLIENT_DEFAULT_SECRET_KEY: ${{ secrets.REST_CLIENT_DEFAULT_SECRET_KEY }}
+      UPLOAD_CLIENT_SECURE_UPLOADS_PUBLIC_KEY: ${{ secrets.UPLOAD_CLIENT_SECURE_UPLOADS_PUBLIC_KEY }}
+      UPLOAD_CLIENT_SECURE_UPLOADS_SECRET_KEY: ${{ secrets.UPLOAD_CLIENT_SECURE_UPLOADS_SECRET_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - run: npm i
+      - run: npm run build
+      - run: npm run test:contract -w packages/api-emulator
+      # The full upload-client real-API suite only on a manual run: on pull
+      # requests it runs for releases only (see checks.yml).
+      - if: ${{ !cancelled() && github.event_name == 'workflow_dispatch' }}
+        run: npm run test:production -w packages/upload-client

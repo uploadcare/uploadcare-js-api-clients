@@ -1,14 +1,15 @@
-/** @jest-environment jsdom */
-import { expect, jest } from '@jest/globals'
+/** @vitest-environment jsdom */
+import { expect, vi, describe, it, beforeEach } from 'vitest'
+import type { Mock } from 'vitest'
 import { getFileSize } from '../../src/tools/getFileSize'
 
-global.fetch = jest.fn(() =>
+global.fetch = vi.fn(() =>
   Promise.resolve({
     blob: () => new Blob(['111'])
   })
 ) as unknown as typeof fetch
 
-beforeEach(() => (fetch as jest.Mock).mockClear())
+beforeEach(() => (fetch as Mock).mockClear())
 
 describe('getFileSize', () => {
   it('should return size of File', async () => {
