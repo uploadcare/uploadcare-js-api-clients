@@ -52,6 +52,7 @@
     "prepack": "cp ../../LICENSE ./LICENSE",
     "clean": "rimraf dist",
     "test": "vitest run",
+    "typecheck": "tsc -p tsconfig.test.json",
     "test:coverage": "vitest run --coverage",
     "test:production": "TEST_ENV=production vitest run --project node",
     "prebuild": "npm run clean",

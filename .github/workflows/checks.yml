@@ -57,6 +57,11 @@ jobs:
       - name: Run lint
         working-directory: ./
         run: npm run lint
+      # Vitest strips types without checking them, so this is what turns a
+      # typo'd fixture name into a failure.
+      - name: Typecheck `upload-client` tests
+        working-directory: ./
+        run: npm run typecheck -w packages/upload-client
 
       - name: Lint `api-emulator`
         if: steps.changes.outputs.api-emulator == 'true'

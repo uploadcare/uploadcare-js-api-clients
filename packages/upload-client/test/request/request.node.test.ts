@@ -26,7 +26,6 @@ const resettingServer = async (answered: number) => {
 const servers: net.Server[] = []
 afterEach(async () => {
   for (const server of servers.splice(0)) {
-    server.closeAllConnections?.()
     await new Promise((resolve) => server.close(resolve))
   }
 })
