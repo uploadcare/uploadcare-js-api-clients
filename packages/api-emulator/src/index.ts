@@ -7,6 +7,10 @@ import './apis/cdn/index.js'
 import './apis/telemetry/index.js'
 
 export { handle } from './core/router.js'
+export {
+  SIGNED_UPLOADS_PUBLIC_KEY,
+  SIGNED_UPLOADS_SECRET_KEY
+} from './apis/upload/scenarios.js'
 export { resetSession, sessionOf, SESSION_HEADER } from './state/store.js'
 export type {
   Session,

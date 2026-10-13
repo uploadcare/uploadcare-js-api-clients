@@ -114,6 +114,10 @@ export type Session = {
   throttled: number
   /** Every `POST /api/v1/events` body received, in arrival order. */
   telemetry: TelemetryEvent[]
+  /** `THROTTLE_ONCE_FIELD` values already throttled — see auth.ts. */
+  throttledOnce: Set<string>
+  /** Operations spent per bearer token, for `limits.operations` — see auth.ts. */
+  tokenOperations: Map<string, number>
 }
 
 /** Names the session on every redirected request; set by the caller. */
@@ -134,7 +138,9 @@ export const resetSession = (id = 'default') => {
     multipart: new Map(),
     issued: 0,
     throttled: 0,
-    telemetry: []
+    telemetry: [],
+    throttledOnce: new Set(),
+    tokenOperations: new Map()
   }
   for (const uuid of DEMO_FILES) {
     session.files.set(uuid, {

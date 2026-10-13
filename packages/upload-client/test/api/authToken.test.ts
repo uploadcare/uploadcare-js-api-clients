@@ -1,6 +1,6 @@
 import { createHash, createHmac } from 'node:crypto'
 import { generateAuthToken } from '@uploadcare/signed-uploads'
-import { expect, jest } from '@jest/globals'
+import { vi, expect, describe, it } from 'vitest'
 import base from '../../src/api/base'
 import fromUrl from '../../src/api/fromUrl'
 import group from '../../src/api/group'
@@ -16,11 +16,11 @@ import { UploadError } from '../../src/tools/UploadError'
 import {
   SIGNED_UPLOADS_PUBLIC_KEY,
   SIGNED_UPLOADS_SECRET_KEY
-} from '../../mock-server/config'
+} from '../../../api-emulator/src/apis/upload/scenarios'
 import * as factory from '../_fixtureFactory'
 import { getSettingsForTesting } from '../_helpers'
 
-jest.setTimeout(60000)
+vi.setConfig({ testTimeout: 60000 })
 
 /**
  * One suite for both servers.
@@ -122,7 +122,7 @@ describeContract('authToken', () => {
   it('should authenticate every request of an upload from a resolver', async () => {
     // `uploadFile` uploads and then polls `/info/`, so a resolver called once
     // would mean a request went out unauthenticated.
-    const resolver = jest.fn(() => mintToken())
+    const resolver = vi.fn(() => mintToken())
     const fileInfo = await uploadFile(fileToUpload.data, {
       ...settings,
       authToken: resolver
@@ -166,7 +166,7 @@ describeContract('authToken', () => {
 
   it('should re-resolve the token and retry once when it has expired', async () => {
     let calls = 0
-    const resolver = jest.fn(() =>
+    const resolver = vi.fn(() =>
       ++calls === 1 ? mintExpiredToken() : mintToken()
     )
     const { file } = await base(fileToUpload.data, {
@@ -179,7 +179,7 @@ describeContract('authToken', () => {
   })
 
   it('should give up when the token is still expired after a refresh', async () => {
-    const resolver = jest.fn(() => mintExpiredToken())
+    const resolver = vi.fn(() => mintExpiredToken())
     const error = await caught(
       base(fileToUpload.data, { ...settings, authToken: resolver })
     )
@@ -213,7 +213,7 @@ describeContract('authToken', () => {
   })
 
   it('should reject an endpoint the token scope does not cover', async () => {
-    const resolver = jest.fn(() =>
+    const resolver = vi.fn(() =>
       mintToken({ lifetime: 60_000, scope: ['/multipart/*'] })
     )
     const error = await caught(
@@ -253,7 +253,7 @@ describeContract('authToken', () => {
       operations: 1,
       tokenId: 'spent-no-recovery'
     })
-    const resolver = jest.fn(() => spent)
+    const resolver = vi.fn(() => spent)
 
     await base(fileToUpload.data, { ...settings, authToken: resolver })
     const error = await caught(
@@ -268,7 +268,7 @@ describeContract('authToken', () => {
     // One operation per token, so the second upload starts out refused. The
     // provider lets the client drop the spent token and ask for another.
     let minted = 0
-    const fetchToken = jest.fn(() =>
+    const fetchToken = vi.fn(() =>
       mintToken({
         lifetime: 60_000,
         operations: 1,
@@ -295,7 +295,7 @@ describeContract('authToken', () => {
   })
 
   it('should keep the cached token when the failure is not about the token', async () => {
-    const fetchToken = jest.fn(() =>
+    const fetchToken = vi.fn(() =>
       mintToken({ lifetime: 60_000, tokenId: 'kept-across-uploads' })
     )
     const tokens = new AuthTokenCache({ fetchToken })
@@ -328,7 +328,7 @@ describeContract('authToken', () => {
     // The failure every integrator meets first: their own token endpoint is
     // down. Nothing was sent, so there is no server code and nothing to retry.
     const cause = new Error('token endpoint is down')
-    const resolver = jest.fn(() => {
+    const resolver = vi.fn(() => {
       throw cause
     })
 
@@ -425,7 +425,7 @@ describeContract('authToken', () => {
   })
 
   it('should drop legacy signature params when authToken is set', async () => {
-    const warnSpy = jest
+    const warnSpy = vi
       .spyOn(console, 'warn')
       .mockImplementation(() => undefined)
     try {
@@ -459,7 +459,7 @@ describeMockOnly('authToken (mock server only)', () => {
     // what puts another attempt in front of the expiry, and it cannot be
     // provoked on demand against the Upload API.
     let calls = 0
-    const resolver = jest.fn(() => {
+    const resolver = vi.fn(() => {
       calls += 1
       // Valid for the throttled attempt, expired for the one after it.
       return calls === 2 ? mintExpiredToken() : mintToken()

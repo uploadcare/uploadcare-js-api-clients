@@ -4,6 +4,7 @@ import { imageSize } from '../../state/image-size.js'
 import { STOCK_IMAGE } from '../../state/stock-image.js'
 import { fileInfo, nextUuid, sessionOf, store } from '../../state/store.js'
 import {
+  hostOf,
   isPrivateSourceUrl,
   REACHABLE_HOSTS,
   UNKNOWN_PROGRESS_KEY,
@@ -89,7 +90,7 @@ route(
       if (file) return Response.json({ type: 'file_info', ...fileInfo(file) })
     }
 
-    const host = URL.parse(sourceUrl)?.host
+    const host = hostOf(sourceUrl)
     const uuid =
       host && REACHABLE_HOSTS.includes(host)
         ? storeStockImage(session, name, params.get('store') !== '0').uuid

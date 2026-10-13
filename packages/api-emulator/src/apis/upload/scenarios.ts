@@ -41,13 +41,20 @@ export const UNREACHABLE_SOURCE_URL = 'https://1.com/1.jpg'
 const EMULATOR_OWN_HOST = 'localhost:3000'
 
 /**
+ * `URL.parse(url)?.host`, spelled with `canParse` because the repo's root
+ * TypeScript (5.3) predates `URL.parse`'s typings.
+ */
+export const hostOf = (url: string) =>
+  URL.canParse(url) ? new URL(url).host : undefined
+
+/**
  * `upload-client`'s `fromUrl.test.ts` ("should be rejected with image from
  * private IP") and `_fixtureFactory.ts`'s `imageUrl('privateIP')`
  * (`http://192.168.1.10/1.jpg`), plus any `localhost` host other than the
  * emulator's own (see `EMULATOR_OWN_HOST`).
  */
 export const isPrivateSourceUrl = (sourceUrl: string): boolean => {
-  const host = URL.parse(sourceUrl)?.host ?? ''
+  const host = hostOf(sourceUrl) ?? ''
   if (host === EMULATOR_OWN_HOST) return false
   return host.includes('192.168.') || host.includes('localhost')
 }
@@ -112,3 +119,29 @@ export const MULTIPART_CHUNK_SIZE = 5 * 1024 * 1024
  * as-is; see the README's caveats.
  */
 export const DROP_CONNECTION_MARKER = 'x-emulator-drop-connection'
+
+/**
+ * `upload-client`'s `test/api/authToken.test.ts` uses this public key as the
+ * stand-in for a project with Signed Uploads switched on: a request under it
+ * that carries no Bearer token is refused with `SignatureRequiredError`,
+ * whatever the endpoint. Mirrors the old mock server's `config.ts`.
+ */
+export const SIGNED_UPLOADS_PUBLIC_KEY = 'pub_test__signed_uploads'
+
+/**
+ * The secret `auth.ts` verifies Bearer tokens (HS256 JWTs, keyed with
+ * `sha256(secret)`, as `@uploadcare/signed-uploads`' `generateAuthToken` mints
+ * them) against. `upload-client`'s `test/api/authToken.test.ts` mints real
+ * tokens with it, so one suite runs against both the emulator and production.
+ */
+export const SIGNED_UPLOADS_SECRET_KEY = 'mock_secret_key'
+
+/**
+ * `upload-client`'s `test/api/authToken.test.ts` ("should refresh an expired
+ * token that surfaces after a throttle retry") sends `metadata: {
+ * mock_throttle: '<key>' }` to have the first request carrying a given key
+ * answered 429 with `retry-after: 1`; every later one with the same key passes.
+ * The key is spent per session — tests use a unique one per run. Mirrors the
+ * old mock server's `middleware/throttleOnce.ts`.
+ */
+export const THROTTLE_ONCE_FIELD = 'metadata[mock_throttle]'

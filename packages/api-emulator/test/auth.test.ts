@@ -7,10 +7,7 @@ import { handle, resetSession } from '../src/index.js'
  * `group.test.ts` and `multipart.test.ts` each cover their own route already —
  * see those files). `/info/`, `/from_url/`, `/group/info/` and
  * `/multipart/complete/` are covered here instead of duplicating a test per
- * file.
- *
- * There is no JWT/bearer-token auth on this branch — see the task brief's own
- * correction. This is public-key auth only.
+ * file. Bearer tokens, signed uploads and throttle-once are `jwt.test.ts`'s.
  */
 
 beforeEach(() => resetSession())

@@ -1,11 +1,11 @@
-import { expect, jest } from '@jest/globals'
+import { vi, expect, describe, it, beforeEach, afterEach } from 'vitest'
 import { getSecureParams } from '../../src/tools/getSecureParams'
 
 describe('getSecureParams', () => {
-  let warnSpy: ReturnType<typeof jest.spyOn>
+  let warnSpy: ReturnType<typeof vi.spyOn>
 
   beforeEach(() => {
-    warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => undefined)
+    warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => undefined)
   })
 
   afterEach(() => {

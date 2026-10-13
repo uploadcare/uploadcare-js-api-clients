@@ -21,20 +21,25 @@ export const apiError = (
   request: Request,
   status: number,
   content: string,
-  errorCode?: string
+  errorCode?: string,
+  /** Extra response headers — throttle-once's `retry-after`, say. */
+  headers?: Record<string, string>
 ): Response => {
   const jsonerrors = new URL(request.url).searchParams.get('jsonerrors')
   if (!jsonerrors || jsonerrors === '0') {
     return new Response(content, {
       status,
-      headers: { 'content-type': 'text/plain' }
+      headers: { 'content-type': 'text/plain', ...headers }
     })
   }
-  return Response.json({
-    error: {
-      status_code: status,
-      content,
-      ...(errorCode ? { error_code: errorCode } : {})
-    }
-  })
+  return Response.json(
+    {
+      error: {
+        status_code: status,
+        content,
+        ...(errorCode ? { error_code: errorCode } : {})
+      }
+    },
+    { headers }
+  )
 }

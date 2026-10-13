@@ -186,6 +186,24 @@ with a comment there naming the consumer. Summarised:
 | `GROUP_FILES_NOT_FOUND_KEY` (`demopublickey`) | Scoped to `POST /group/` alone: makes group creation fail with "Some files not found." regardless of whether the members exist. Everywhere else, this is just an ordinary allowed public key. |
 | `MULTIPART_CHUNK_SIZE` (5 MB) | The part size `/multipart/start/` hands out, matching the real Upload API rather than the client's own chunk-size setting. |
 | `DROP_CONNECTION_MARKER` | The header a part `PUT` carrying a leaked `Authorization` header gets answered with; only `listen.ts` (server mode) acts on it by destroying the connection — see the caveat above. |
+| `SIGNED_UPLOADS_PUBLIC_KEY` (`pub_test__signed_uploads`) | A project with Signed Uploads on: any protected request under it without a Bearer token gets `400 SignatureRequiredError`. Exported from `.`. |
+| `SIGNED_UPLOADS_SECRET_KEY` (`mock_secret_key`) | The secret Bearer tokens are verified against (HS256 keyed with `sha256(secret)`, as `generateAuthToken` mints them). Exported from `.`, so a test can mint tokens the emulator accepts. |
+| `THROTTLE_ONCE_FIELD` (`metadata[mock_throttle]`) | The first protected request carrying a given value is answered `429 RequestThrottledError` with `retry-after: 1`; later ones with the same value pass. Spent per session. |
+
+### Bearer tokens
+
+A protected request with an `Authorization` header is checked by its token
+instead of its public key (`authorize` in `src/apis/upload/auth.ts`), with the
+Upload API's rules: a non-`Bearer` header is a 401; `signature`/`expire`
+alongside a token is a 403; the token must be a JWT signed with
+`SIGNED_UPLOADS_SECRET_KEY` and carry a numeric `exp` (30s clock leeway),
+otherwise 401 `AccessTokenInvalidError`/`AccessTokenExpiredError`;
+`uc.restrictions.scope` items must start with `/` (401) and match the request
+path, exactly or as a `/*` prefix (403 `ScopeForbiddenError`);
+`uc.restrictions.limits.operations` is counted per token, per session (403
+`OperationsLimitExceededError`). Unprotected routes (`/from_url/status/`, the
+part `PUT`, CDN, telemetry) ignore the header. Verification uses WebCrypto,
+which is why the package needs Node 20+.
 
 ## The spec is the authority
 
