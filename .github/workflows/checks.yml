@@ -116,13 +116,18 @@ jobs:
         if: steps.changes.outputs.api-client-utils == 'true'
         run: npm run test -w packages/api-client-utils
 
+      # Real-API tests run on release PRs (Ship.js opens them from
+      # `releases/v*`), whatever changed, and block the release. Everywhere
+      # else the emulator-backed runs above are the gate; `contract.yml` runs
+      # them on demand. rest-client is the exception: it has no emulator-backed
+      # tests, so a PR that touches it runs its real-API suite too.
       - name: Run `rest-client` integration tests
-        if: steps.changes.outputs.rest-client == 'true'
+        if: >-
+          startsWith(github.head_ref, 'releases/v') ||
+          (github.event_name == 'pull_request' &&
+          steps.changes.outputs.rest-client == 'true')
         run: npm run test:production -w packages/rest-client
 
-      # Real-API drift is reported on a pull request, not blocking it: the
-      # emulator-backed run above is the gate. On master it still blocks.
       - name: Run `upload-client` integration tests
-        if: steps.changes.outputs.upload-client == 'true'
-        continue-on-error: ${{ github.event_name == 'pull_request' }}
+        if: startsWith(github.head_ref, 'releases/v')
         run: npm run test:production -w packages/upload-client
