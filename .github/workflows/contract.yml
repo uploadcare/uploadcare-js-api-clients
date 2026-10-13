@@ -1,15 +1,21 @@
 name: contract
 
-# Runs the real-API checks on demand: by hand, or by labelling a pull request
-# `contract`. Not on a schedule.
+# Checks the emulator against the real Upload API on every pull request that
+# changes it or the code whose tests run on it: upload-client and the packages
+# it bundles. Release PRs bump all of them, so they run it too. Also by hand
+# from the Actions tab, for any branch. Not on a schedule.
 on:
   workflow_dispatch:
   pull_request:
-    types: [labeled]
+    paths:
+      - 'packages/api-emulator/**'
+      - 'packages/upload-client/**'
+      - 'packages/api-client-utils/**'
+      - 'packages/signed-uploads/**'
+      - '.github/workflows/contract.yml'
 
 jobs:
   contract:
-    if: github.event_name == 'workflow_dispatch' || github.event.label.name == 'contract'
     runs-on: ubuntu-latest
     env:
       # A missing secret fails the run (see api-emulator's test/contract.test.ts
@@ -28,6 +34,7 @@ jobs:
       - run: npm i
       - run: npm run build
       - run: npm run test:contract -w packages/api-emulator
-      # Blocking here, unlike on a plain pull request (see checks.yml).
-      - if: ${{ !cancelled() }}
+      # The full upload-client real-API suite only on a manual run: on pull
+      # requests it runs for releases only (see checks.yml).
+      - if: ${{ !cancelled() && github.event_name == 'workflow_dispatch' }}
         run: npm run test:production -w packages/upload-client

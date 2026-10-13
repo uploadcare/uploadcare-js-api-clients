@@ -611,5 +611,6 @@ CONTRACT_PUBLIC_KEY=<a project's public key> npm run test:contract
 Run vitest on the file with `CONTRACT_BASE_URL` set yourself to point it
 anywhere else. A base URL without a key fails the run rather than skipping it.
 Every request in the file is refused before anything is stored, so a run
-leaves nothing behind in the project. In CI it's the `contract` workflow, run
-by hand or by adding the `contract` label to a pull request.
+leaves nothing behind in the project. In CI it's the `contract` workflow: it
+runs on every pull request that changes the emulator, upload-client,
+api-client-utils or signed-uploads, and by hand from the Actions tab.
