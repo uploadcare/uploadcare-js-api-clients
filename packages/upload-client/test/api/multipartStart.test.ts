@@ -1,7 +1,9 @@
+import { describe, it, expect } from 'vitest'
 import multipartStart from '../../src/api/multipartStart'
 import * as factory from '../_fixtureFactory'
-import { getSettingsForTesting } from '../_helpers'
+import { getSettingsForTesting, UUID } from '../_helpers'
 import { UploadError } from '../../src/tools/UploadError'
+import { CancelError } from '@uploadcare/api-client-utils'
 
 describe('API - multipartStart', () => {
   const size = factory.file(12).size
@@ -13,8 +15,9 @@ describe('API - multipartStart', () => {
     })
     const { uuid, parts } = await multipartStart(size, settings)
 
-    expect(uuid).toBeTruthy()
-    expect(parts).toBeTruthy()
+    expect(uuid).toMatch(UUID)
+    // 12 MiB in the Upload API's 5 MiB parts.
+    expect(parts).toHaveLength(3)
   })
 
   it('should be able to cancel uploading', async () => {
@@ -31,7 +34,7 @@ describe('API - multipartStart', () => {
     })
 
     await expect(upload).rejects.toThrowError(
-      new UploadError('Request canceled')
+      new CancelError('Request canceled')
     )
   })
 
@@ -58,15 +61,9 @@ describe('API - multipartStart', () => {
       contentType: 'application/octet-stream'
     })
 
-    try {
-      await multipartStart(size, settings)
-    } catch (error) {
-      expect((error as UploadError).message).toEqual(
-        'UPLOADCARE_PUB_KEY is invalid.'
-      )
-      expect((error as UploadError).code).toEqual(
-        'ProjectPublicKeyInvalidError'
-      )
-    }
+    await expect(multipartStart(size, settings)).rejects.toMatchObject({
+      message: 'UPLOADCARE_PUB_KEY is invalid.',
+      code: 'ProjectPublicKeyInvalidError'
+    })
   })
 })

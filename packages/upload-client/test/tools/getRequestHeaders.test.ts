@@ -1,4 +1,4 @@
-import { expect, jest } from '@jest/globals'
+import { vi, expect, describe, it } from 'vitest'
 import { getRequestHeaders } from '../../src/tools/getRequestHeaders'
 
 describe('getRequestHeaders', () => {
@@ -17,7 +17,7 @@ describe('getRequestHeaders', () => {
   })
 
   it('should call a sync resolver', async () => {
-    const resolver = jest.fn(() => 'jwt-token')
+    const resolver = vi.fn(() => 'jwt-token')
     const headers = await getRequestHeaders({ authToken: resolver })
 
     expect(headers).toEqual({ Authorization: 'Bearer jwt-token' })
@@ -25,7 +25,7 @@ describe('getRequestHeaders', () => {
   })
 
   it.each([undefined, null, ''])(
-    'should send no Authorization header when authToken is %p',
+    'should send no Authorization header when authToken is %o',
     async (value) => {
       const headers = await getRequestHeaders({
         authToken: value as unknown as string

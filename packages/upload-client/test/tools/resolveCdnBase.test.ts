@@ -1,6 +1,6 @@
+import { expect, describe, it } from 'vitest'
 // eslint-disable-next-line import/no-unresolved -- subpath export, resolved by bundler/TS
 import { getPrefixedCdnBaseSync } from '@uploadcare/cname-prefix/sync'
-import { expect } from '@jest/globals'
 import { resolveCdnBase } from '../../src/tools/resolveCdnBase'
 import { defaultSettings } from '../../src/defaultSettings'
 

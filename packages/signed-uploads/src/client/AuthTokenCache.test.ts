@@ -225,6 +225,8 @@ describe('AuthTokenCache', () => {
       const token = tokenExpiringIn(3600)
       const fetchToken = vi
         .fn<() => string>()
+        // The function breaks its own type contract on purpose here.
+        // oxlint-disable-next-line typescript/no-unsafe-type-assertion
         .mockImplementationOnce(() => value as unknown as string)
         .mockImplementation(() => token)
       const cache = new AuthTokenCache({ fetchToken })
@@ -242,8 +244,8 @@ describe('AuthTokenCache', () => {
     // Both calls land in the same turn, before either fetch runs. The second
     // caller joins the first one's request, so the token must come from the
     // function that was set when that request started.
-    const first = vi.fn(async () => tokenExpiringIn(3600))
-    const second = vi.fn(async () => tokenExpiringIn(3600))
+    const first = vi.fn(() => Promise.resolve(tokenExpiringIn(3600)))
+    const second = vi.fn(() => Promise.resolve(tokenExpiringIn(3600)))
     const cache = new AuthTokenCache({ fetchToken: first })
 
     const started = cache.getToken()
