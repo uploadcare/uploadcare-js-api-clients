@@ -1,3 +1,12 @@
+# [6.24.0](https://github.com/uploadcare/uploadcare-js-api-clients/compare/v6.23.0...v6.24.0) (2026-10-20)
+
+
+### Features
+
+* **api-emulator:** a stateful stand-in for the Upload API ([#586](https://github.com/uploadcare/uploadcare-js-api-clients/issues/586)) ([a89ceaa](https://github.com/uploadcare/uploadcare-js-api-clients/commit/a89ceaa4a9be2ed559d6eaf34e26486498529f38)), closes [#97](https://github.com/uploadcare/uploadcare-js-api-clients/issues/97) [#1081](https://github.com/uploadcare/uploadcare-js-api-clients/issues/1081) [#97](https://github.com/uploadcare/uploadcare-js-api-clients/issues/97) [#1081](https://github.com/uploadcare/uploadcare-js-api-clients/issues/1081) [#1081](https://github.com/uploadcare/uploadcare-js-api-clients/issues/1081) [#97](https://github.com/uploadcare/uploadcare-js-api-clients/issues/97) [#97](https://github.com/uploadcare/uploadcare-js-api-clients/issues/97) [#97](https://github.com/uploadcare/uploadcare-js-api-clients/issues/97) [#97](https://github.com/uploadcare/uploadcare-js-api-clients/issues/97)
+
+
+
 # [6.23.0](https://github.com/uploadcare/uploadcare-js-api-clients/compare/v6.22.0...v6.23.0) (2026-10-05)
 
 
