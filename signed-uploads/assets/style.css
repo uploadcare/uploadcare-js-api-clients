@@ -538,6 +538,14 @@
         scroll-margin-block: calc(var(--dim-header-height) + 0.5rem);
     }
 
+    math[display="block"] {
+        position: relative;
+        padding: 10px;
+        border: 1px solid var(--color-accent);
+        border-radius: 0.8em;
+        margin-bottom: 8px;
+    }
+
     code,
     pre {
         font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
@@ -1054,7 +1062,7 @@
 
         cursor: pointer;
     }
-    .tsd-accordion-summary a {
+    .tsd-accordion-summary > a {
         width: calc(100% - 1.5rem);
     }
     .tsd-accordion-summary > * {
@@ -1602,9 +1610,9 @@
         .container-main {
             grid-template-columns:
                 minmax(0, 1fr) minmax(0, 2.5fr) minmax(
-                0,
-                20rem
-            );
+                    0,
+                    20rem
+                );
             grid-template-areas: "sidebar content toc";
         }
 
