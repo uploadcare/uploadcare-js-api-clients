@@ -1,8 +1,8 @@
-import type { SafeParseReturnType, ZodSchema, ZodTypeDef } from 'zod'
+import type { ZodSafeParseResult, ZodType } from 'zod'
 
 export const safeParseAsync = async <TOutput, TInput>(
-  schema: ZodSchema<TOutput, ZodTypeDef, TInput>,
+  schema: ZodType<TOutput, TInput>,
   data: unknown
-): Promise<SafeParseReturnType<TInput, TOutput>> => {
+): Promise<ZodSafeParseResult<TOutput>> => {
   return await schema.safeParseAsync(data)
 }
