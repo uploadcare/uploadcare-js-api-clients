@@ -165,7 +165,7 @@ const srcset = widths
   .map((w) => {
     const url = serializeCdnUrl({
       ...parsed,
-      operations: [...parsed.operations, preview(w, w)]
+      operations: [...parsed.operations, resize({ width: w })]
     })
     return `${url} ${w}w`
   })

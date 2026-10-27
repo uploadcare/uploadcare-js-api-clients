@@ -74,7 +74,10 @@ The cost is that a `srcset` needs one signed URL per width, and every one of the
 // client
 const parsed = parseCdnUrl(signedFromApi)
 const srcset = WIDTHS.map((w) => {
-  const href = serializeCdnUrl({ ...parsed, operations: [preview(w, w)] })
+  const href = serializeCdnUrl({
+    ...parsed,
+    operations: [resize({ width: w })]
+  })
   return `${href} ${w}w`
 }).join(', ')
 ```

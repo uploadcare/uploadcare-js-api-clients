@@ -10,7 +10,7 @@ Each variant is built from a uuid, so these need [your CDN base](/guide/cdn-base
 
 ```ts [Atomic]
 import { serializeCdnUrl } from '@uploadcare/cdn-url'
-import { preview } from '@uploadcare/cdn-url/ops'
+import { resize } from '@uploadcare/cdn-url/ops'
 
 const WIDTHS = [320, 640, 960, 1280, 1920]
 
@@ -18,7 +18,7 @@ function variant(uuid: string, width: number): string {
   return serializeCdnUrl({
     cdnBase: 'https://1s4oyld5dc.ucarecd.net',
     uuid,
-    operations: [preview(width, width)]
+    operations: [resize({ width })]
   })
 }
 
@@ -27,7 +27,7 @@ const srcset = WIDTHS.map((w) => `${variant(uuid, w)} ${w}w`).join(', ')
 
 ```ts [Builder]
 import { CdnUrl } from '@uploadcare/cdn-url/builder'
-import { preview } from '@uploadcare/cdn-url/ops'
+import { resize } from '@uploadcare/cdn-url/ops'
 
 const WIDTHS = [320, 640, 960, 1280, 1920]
 
@@ -35,7 +35,7 @@ function variant(uuid: string, width: number): string {
   return new CdnUrl({
     cdnBase: 'https://1s4oyld5dc.ucarecd.net',
     uuid,
-    operations: [preview(width, width)]
+    operations: [resize({ width })]
   }).href
 }
 
@@ -50,7 +50,7 @@ const myCdn = cdn.base(prefixedCdnBase('demopublickey'))
 const WIDTHS = [320, 640, 960, 1280, 1920]
 
 function variant(uuid: string, width: number): string {
-  return myCdn.file(uuid).preview(width, width).href
+  return myCdn.file(uuid).resize({ width }).href
 }
 
 const srcset = WIDTHS.map((w) => `${variant(uuid, w)} ${w}w`).join(', ')
@@ -66,7 +66,7 @@ function variant(uuid: string, width: number): string {
   return tinyBuild({
     cdnBase,
     uuid,
-    modifiers: modifiers(`preview/${width}x${width}`)
+    modifiers: modifiers(`resize/${width}x`)
   })
 }
 
@@ -77,7 +77,7 @@ const srcset = WIDTHS.map((w) => `${variant(uuid, w)} ${w}w`).join(', ')
 
 A `srcset` is the case the [string level](/guide/string-level-api) was built for: one known file, one operation per variant, no validation needed, and the whole helper costs a few hundred bytes. The widths interpolate into a template literal in argument position, which is where `modifiers` still type-checks the operation name.
 
-The `preview` alone is enough. Once a chain contains a processing operation,
+The `resize` alone is enough. Once a chain contains a processing operation,
 the CDN defaults to `format/auto` (AVIF/WebP negotiation) and applies adaptive
 quality automatically. See [Best practices](/best-practices) for when explicit
 `format`/`quality`/`progressive` overrides still earn their place.
@@ -91,7 +91,7 @@ quality automatically. See [Best practices](/best-practices) for when explicit
 />
 ```
 
-`preview(w, w)` downscales proportionally to fit. It never crops and never upscales, so one operation covers both landscape and portrait sources.
+`resize({ width: w })` sets the width alone and keeps the aspect ratio, so every variant is exactly as wide as its `w` descriptor says, landscape or portrait. `preview(w, w)` would cap the height as well, and a portrait source would come out narrower than its descriptor. Resize also enlarges a source narrower than `w`; put `stretch('off')` before it to keep the original instead, at the cost of that variant being narrower than its descriptor.
 
 ## Pixel-density variants
 

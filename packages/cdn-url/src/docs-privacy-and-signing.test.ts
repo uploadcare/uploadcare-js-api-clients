@@ -7,7 +7,7 @@
 import { describe, expect, it } from 'vitest'
 
 import { detectDomainKind, parseCdnUrl, serializeCdnUrl } from './index'
-import { blurRegion, preview, stripMeta } from './ops/index'
+import { blurRegion, preview, resize, stripMeta } from './ops/index'
 
 import { CDN_BASE as cdnBase, myCdn, UUID as uuid } from './docs-fixtures'
 
@@ -96,14 +96,14 @@ describe('signed-urls', () => {
       .map((w) => {
         const href = serializeCdnUrl({
           ...parsed,
-          operations: [preview(w, w)]
+          operations: [resize({ width: w })]
         })
         return `${href} ${w}w`
       })
       .join(', ')
     expect(srcset).toBe(
-      `${cdnBase}/${uuid}/-/preview/320x320/${token} 320w, ` +
-        `${cdnBase}/${uuid}/-/preview/640x640/${token} 640w`
+      `${cdnBase}/${uuid}/-/resize/320x/${token} 320w, ` +
+        `${cdnBase}/${uuid}/-/resize/640x/${token} 640w`
     )
   })
 })

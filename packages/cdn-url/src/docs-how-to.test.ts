@@ -33,7 +33,8 @@ const fluentAvatar = (u: string, s: number) =>
     .scaleCrop(s, s, { type: 'smart_faces_objects' })
     .borderRadius('50p').href
 
-const fluentVariant = (u: string, w: number) => myCdn.file(u).preview(w, w).href
+const fluentVariant = (u: string, w: number) =>
+  myCdn.file(u).resize({ width: w }).href
 
 const tinyAvatar = (u: string, s: number) =>
   tinyBuild({
@@ -49,7 +50,7 @@ const tinyVariant = (u: string, w: number) =>
   tinyBuild({
     cdnBase: CDN_BASE,
     uuid: u,
-    modifiers: modifiers(`preview/${w}x${w}`)
+    modifiers: modifiers(`resize/${w}x`)
   })
 
 describe('avatars: the four tabs agree', () => {
@@ -84,9 +85,17 @@ describe('avatars: the four tabs agree', () => {
 describe('responsive images: the four tabs agree', () => {
   const WIDTHS = [320, 640, 960, 1280, 1920]
   const atomic = (u: string, w: number) =>
-    serializeCdnUrl({ cdnBase: CDN_BASE, uuid: u, operations: [preview(w, w)] })
+    serializeCdnUrl({
+      cdnBase: CDN_BASE,
+      uuid: u,
+      operations: [resize({ width: w })]
+    })
   const builder = (u: string, w: number) =>
-    new CdnUrl({ cdnBase: CDN_BASE, uuid: u, operations: [preview(w, w)] }).href
+    new CdnUrl({
+      cdnBase: CDN_BASE,
+      uuid: u,
+      operations: [resize({ width: w })]
+    }).href
 
   it('all four produce the same srcset', () => {
     const build = (v: (u: string, w: number) => string) =>
@@ -94,7 +103,7 @@ describe('responsive images: the four tabs agree', () => {
     expect(build(atomic)).toBe(build(builder))
     expect(build(atomic)).toBe(build(fluentVariant))
     expect(build(atomic)).toBe(build(tinyVariant))
-    expect(atomic(uuid, 320)).toBe(`${CDN_BASE}/${uuid}/-/preview/320x320/`)
+    expect(atomic(uuid, 320)).toBe(`${CDN_BASE}/${uuid}/-/resize/320x/`)
   })
 })
 
