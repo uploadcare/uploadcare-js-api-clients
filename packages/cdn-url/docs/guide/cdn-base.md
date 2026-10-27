@@ -8,11 +8,11 @@ https://1s4oyld5dc.ucarecd.net/c2499162-…-47e858/-/preview/800x600/
            cdnBase
 ```
 
-| Kind                                       | Host                   | Use it when                                            |
-| ------------------------------------------ | ---------------------- | ------------------------------------------------------ |
+| Kind                                  | Host                   | Use it when                                            |
+| ------------------------------------- | ---------------------- | ------------------------------------------------------ |
 | [prefixed](#the-cdn-base-the-default) | `<prefix>.ucarecd.net` | almost always — it is your project's own subdomain     |
-| [legacy](#the-legacy-base)                 | `ucarecdn.com`         | older accounts still delivering from the shared domain |
-| [custom](#a-custom-cname)                  | `cdn.example.com`      | you pointed your own domain at Uploadcare              |
+| [legacy](#the-legacy-base)            | `ucarecdn.com`         | older accounts still delivering from the shared domain |
+| [custom](#a-custom-cname)             | `cdn.example.com`      | you pointed your own domain at Uploadcare              |
 
 Not sure which one your project uses? Two ways to find out without guessing: read the delivery settings in [app.uploadcare.com](https://app.uploadcare.com/), or look at a URL the project already produced — an upload's `cdnUrl`, or any stored URL — and hand it to `detectDomainKind`, [below](#things-that-bite). Inheriting a codebase that serves from `ucarecdn.com` tells you the project is on the legacy domain; a new project will not be.
 
@@ -150,7 +150,10 @@ Both variants exist, they return the same string, and the only difference is
 where the SHA-256 comes from.
 
 ```ts
-import { prefixedCdnBase, prefixedCdnBaseAsync } from '@uploadcare/cdn-url/cdn-base'
+import {
+  prefixedCdnBase,
+  prefixedCdnBaseAsync
+} from '@uploadcare/cdn-url/cdn-base'
 
 prefixedCdnBase('demopublickey') // → https://1s4oyld5dc.ucarecd.net
 await prefixedCdnBaseAsync('demopublickey') // → the same string
@@ -189,9 +192,9 @@ a quarter of the cost in a browser.
 result bytes as four 64-bit words into a `bigint`, writes it in base 36 and takes
 the leading 10 digits. WebCrypto is available in browsers, Web Workers and
 Service Workers on secure origins (HTTPS or `localhost`); on a plain `http://`
-origin `crypto.subtle` is undefined and the call fails. Under Node it rejects on
-purpose, pointing you at the sync variant, because the async one exists precisely
-to avoid bundling a hash — a problem Node does not have.
+origin `crypto.subtle` is undefined and the call fails. Under Node it hashes with
+`node:crypto`'s WebCrypto and returns the same string as the sync variant, so
+isomorphic code can await it on the server too.
 
 `prefixedCdnBase` needs a digest **before** it returns, and `crypto.subtle`
 cannot provide one: it hands back a `Promise`, and no synchronous code can wait
