@@ -6,10 +6,12 @@ import {
   Uuid
 } from '../api/types'
 import { CustomUserAgent, poll } from '@uploadcare/api-client-utils'
+import { AuthToken } from '../types'
 
 export type IsReadyPoolOptions = {
   publicKey: string
   baseURL?: string
+  authToken?: AuthToken
   source?: string
   integration?: string
   userAgent?: CustomUserAgent
@@ -24,6 +26,7 @@ function isReadyPoll(
   {
     publicKey,
     baseURL,
+    authToken,
     source,
     integration,
     userAgent,
@@ -38,6 +41,7 @@ function isReadyPoll(
       info(uuid, {
         publicKey,
         baseURL,
+        authToken,
         signal,
         source,
         integration,

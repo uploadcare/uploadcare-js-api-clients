@@ -27,9 +27,18 @@
       },
       "settings": {
         "import/internal-regex": "^@uploadcare/",
-        "import/extensions": [".ts", ".js"],
+        "import/extensions": [
+          ".ts",
+          ".js"
+        ],
         "import/parsers": {
-          "@typescript-eslint/parser": [".ts", ".js"]
+          "@typescript-eslint/parser": [
+            ".ts",
+            ".js"
+          ]
+        },
+        "import/resolver": {
+          "typescript": true
         }
       }
     },
@@ -53,9 +62,18 @@
       },
       "settings": {
         "import/internal-regex": "^@uploadcare/",
-        "import/extensions": [".ts", ".js"],
+        "import/extensions": [
+          ".ts",
+          ".js"
+        ],
         "import/parsers": {
-          "@typescript-eslint/parser": [".ts", ".js"]
+          "@typescript-eslint/parser": [
+            ".ts",
+            ".js"
+          ]
+        },
+        "import/resolver": {
+          "typescript": true
         }
       }
     },

@@ -1,4 +1,0 @@
-{
-  "extends": "../../tsconfig.dts.json",
-  "include": ["src"],
-}

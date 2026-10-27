@@ -1,6 +1,7 @@
 import fromUrlStatus, { Status } from '../api/fromUrlStatus'
 import fromUrl, { TypeEnum, FromUrlOptions } from '../api/fromUrl'
 import { UploadError } from '../tools/UploadError'
+import { createUploadError } from '../tools/createUploadError'
 import { race } from '../tools/race'
 import { isReadyPoll } from '../tools/isReadyPoll'
 import defaultSettings from '../defaultSettings'
@@ -15,11 +16,13 @@ import {
 import { UploadcareFile } from '../tools/UploadcareFile'
 import { toUploadcareFile } from '../tools/toUploadcareFile'
 import { FileInfo, ProgressCallback } from '../api/types'
+import { AuthToken } from '../types'
 
 function pollStrategy({
   token,
   publicKey,
   baseURL,
+  authToken,
   integration,
   userAgent,
   retryThrottledRequestMaxTimes,
@@ -30,6 +33,7 @@ function pollStrategy({
   token: string
   publicKey: string
   baseURL?: string
+  authToken?: AuthToken
   integration?: string
   userAgent?: CustomUserAgent
   retryThrottledRequestMaxTimes?: number
@@ -42,6 +46,7 @@ function pollStrategy({
       fromUrlStatus(token, {
         publicKey,
         baseURL,
+        authToken,
         integration,
         userAgent,
         retryThrottledRequestMaxTimes,
@@ -50,7 +55,7 @@ function pollStrategy({
       }).then((response) => {
         switch (response.status) {
           case Status.Error: {
-            return new UploadError(response.error, response.errorCode)
+            return createUploadError(response.error, response.errorCode)
           }
           case Status.Waiting: {
             return false
@@ -148,7 +153,7 @@ const pushStrategy = ({
 
         case Status.Error: {
           destroy()
-          reject(new UploadError(result.msg, result.error_code))
+          reject(createUploadError(result.msg, result.error_code))
         }
       }
     })
@@ -166,6 +171,7 @@ export const uploadFromUrl = (
     saveUrlForRecurrentUploads,
     secureSignature,
     secureExpire,
+    authToken,
     store,
     signal,
     onProgress,
@@ -188,6 +194,7 @@ export const uploadFromUrl = (
         saveUrlForRecurrentUploads,
         secureSignature,
         secureExpire,
+        authToken,
         store,
         signal,
         source,
@@ -214,6 +221,7 @@ export const uploadFromUrl = (
                 token: urlResponse.token,
                 publicKey,
                 baseURL,
+                authToken,
                 integration,
                 userAgent,
                 retryThrottledRequestMaxTimes,
@@ -244,6 +252,7 @@ export const uploadFromUrl = (
       return isReadyPoll(result.uuid, {
         publicKey,
         baseURL,
+        authToken,
         integration,
         userAgent,
         retryThrottledRequestMaxTimes,

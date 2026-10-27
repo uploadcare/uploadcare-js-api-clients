@@ -15,7 +15,7 @@ import { getFileSize } from '../tools/getFileSize'
 import { isFileData } from '../tools/isFileData'
 import { isMultipart } from '../tools/isMultipart'
 import { UploadcareFile } from '../tools/UploadcareFile'
-import { SupportedFileInput } from '../types'
+import { AuthToken, SupportedFileInput } from '../types'
 import { isUrl, isUuid } from './types'
 import { uploadMultipart } from './uploadMultipart'
 
@@ -26,6 +26,7 @@ export type FileFromOptions = {
   baseURL?: string
   secureSignature?: string
   secureExpire?: string
+  authToken?: AuthToken
   store?: StoreValue
 
   signal?: AbortSignal
@@ -65,6 +66,7 @@ export async function uploadFile(
     baseURL = defaultSettings.baseURL,
     secureSignature,
     secureExpire,
+    authToken,
     store,
 
     signal,
@@ -110,6 +112,7 @@ export async function uploadFile(
         baseURL,
         secureSignature,
         secureExpire,
+        authToken,
         store,
 
         signal,
@@ -138,6 +141,7 @@ export async function uploadFile(
       baseURL,
       secureSignature,
       secureExpire,
+      authToken,
       store,
 
       signal,
@@ -169,6 +173,7 @@ export async function uploadFile(
       saveUrlForRecurrentUploads,
       secureSignature,
       secureExpire,
+      authToken,
       store,
 
       signal,
@@ -192,6 +197,7 @@ export async function uploadFile(
 
       fileName,
       baseURL,
+      authToken,
 
       signal,
       onProgress,

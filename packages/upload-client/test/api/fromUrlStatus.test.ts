@@ -1,23 +1,22 @@
+import { describe, it, expect } from 'vitest'
 import fromUrlStatus, { Status } from '../../src/api/fromUrlStatus'
 import * as factory from '../_fixtureFactory'
 import { getSettingsForTesting } from '../_helpers'
-import { UploadError } from '../../src/tools/UploadError'
+import fromUrl from '../../src/api/fromUrl'
 
 describe('API - from url status', () => {
   const token = factory.token('valid')
   const settings = getSettingsForTesting({})
 
-  it('should return info about file uploaded from url', async () => {
-    const data = await fromUrlStatus(token, settings)
+  it('should return the status of a from_url job', async () => {
+    const { token } = (await fromUrl(
+      factory.imageUrl('valid'),
+      getSettingsForTesting({ publicKey: factory.publicKey('image') })
+    )) as { token: string }
 
-    expect(data.status).toBeTruthy()
-
-    if (data.status === Status.Progress || data.status === Status.Success) {
-      expect(data.done).toBeTruthy()
-      expect(data.total).toBeTruthy()
-    } else if (data.status === Status.Error) {
-      expect(data.error).toBeTruthy()
-    }
+    await expect(fromUrlStatus(token, settings)).resolves.toMatchObject({
+      status: expect.stringMatching(/^(waiting|progress|success)$/)
+    })
   })
 
   it('should be rejected with empty token', async () => {
@@ -44,18 +43,14 @@ describe('API - from url status', () => {
     )
   })
 
-  it('should be rejected with error code if failed', async () => {
+  it('answers unknown for a token it never issued, whatever the public key', async () => {
+    // /from_url/status/ takes no pub_key, so an invalid one can't be refused.
     const publicKey = factory.publicKey('invalid')
 
-    try {
-      await fromUrlStatus('token', { publicKey })
-    } catch (error) {
-      expect((error as UploadError).message).toEqual(
-        'UPLOADCARE_PUB_KEY is invalid.'
-      )
-      expect((error as UploadError).code).toEqual(
-        'ProjectPublicKeyInvalidError'
-      )
-    }
+    await expect(
+      fromUrlStatus('token', getSettingsForTesting({ publicKey }))
+    ).resolves.toEqual({
+      status: Status.Unknown
+    })
   })
 })

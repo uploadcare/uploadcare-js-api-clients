@@ -1,9 +1,13 @@
 # Uploadcare Upload Client
 
 <a href="https://uploadcare.com/?utm_source=github&utm_campaign=uploadcare-js-api-clients">
-    <img align="right" width="64" height="64"
-      src="https://ucarecdn.com/edfdf045-34c0-4087-bbdd-e3834921f890/userpiccircletransparent.svg"
-      alt="">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="https://ucarecdn.com/0c643d09-f5cb-47f5-ac55-8e5273819476/uploadcare-logo-mark-inverted.svg">
+      <source media="(prefers-color-scheme: light)" srcset="https://ucarecdn.com/4f546650-8772-4222-baf3-2ad2d5a855b0/uploadcare-logo-mark.svg">
+      <img align="right" width="64" height="64"
+        src="https://ucarecdn.com/4f546650-8772-4222-baf3-2ad2d5a855b0/uploadcare-logo-mark.svg"
+        alt="">
+    </picture>
 </a>
 
 `@uploadcare/upload-client` is a JavaScript and TypeScript SDK for the Uploadcare [Upload API][uc-docs-upload-api]. It handles direct binary uploads, multipart uploads for large files, URL-based and UUID-based uploads, and file group creation. Works in Node.js, browser, and React Native. Supports upload progress tracking, AbortController cancellation, concurrent request queuing, and signed uploads.
@@ -312,6 +316,99 @@ of `API secret key` and `secureExpire`.
 
 Stands for the Unix time to which the signature is valid, e.g., `1454902434`.
 
+#### `authToken: string | (() => string | Promise<string>)`
+
+A JWT issued on your backend, sent with every Upload API request as an
+`Authorization: Bearer <token>` header. This is the successor of the legacy
+`secureSignature`/`secureExpire` scheme: the token carries an endpoint scope,
+an optional operation quota, and a max TTL of 24 hours.
+
+```javascript
+const client = new UploadClient({
+  publicKey: 'YOUR_PUBLIC_KEY',
+  authToken: 'YOUR_JWT'
+})
+```
+
+Instead of a plain token you can pass a resolver function (sync or async). It
+is called before **every** request, which lets long-running uploads (e.g.
+multipart) pick up a fresh token mid-flight.
+
+This client never stores a token between calls, so a resolver that fetches on
+each call would hit your backend once per request. Use `AuthTokenCache` from
+[`@uploadcare/signed-uploads/client`][signed-uploads] — it holds the token,
+replaces it shortly before `exp`, and shares one request between concurrent
+callers. Its `getToken` is bound, so pass it directly:
+
+```javascript
+import { AuthTokenCache } from '@uploadcare/signed-uploads/client'
+
+const tokens = new AuthTokenCache({
+  fetchToken: async () => {
+    const response = await fetch('/uploadcare-token')
+    return (await response.json()).token
+  }
+})
+
+const client = new UploadClient({
+  publicKey: 'YOUR_PUBLIC_KEY',
+  authToken: tokens.getToken
+})
+```
+
+Mint the token on your own server with `generateAuthToken` from
+[`@uploadcare/signed-uploads`][signed-uploads]; it needs your project secret
+key, which must never reach a browser.
+
+When the Upload API reports that the token has expired and `authToken` is a
+resolver, the client calls the resolver again and retries the request once.
+
+Precedence: when both `authToken` and `secureSignature`/`secureExpire` are
+provided, only the `Authorization` header is sent, and the signature
+parameters are dropped (with a one-time console warning).
+
+Multipart uploads authorize the start and complete requests (and the file
+info polling) with the token; the individual part uploads go directly to
+presigned storage URLs and never carry the header.
+
+Auth failures are thrown as `AuthError` (a subclass of `UploadError`) whose
+`code` holds the raw server error code: `AccessTokenExpiredError` (refresh the
+token and retry), `OperationsLimitExceededError` and `ScopeForbiddenError` (final,
+don't retry), or `AccessTokenInvalidError` (final):
+
+```javascript
+import { AuthError } from '@uploadcare/upload-client'
+
+try {
+  await client.uploadFile(fileData)
+} catch (error) {
+  if (error instanceof AuthError && error.code === 'AccessTokenExpiredError') {
+    // refresh the token and retry
+  }
+}
+```
+
+A resolver that throws or returns no token is a different failure: nothing was
+sent, so there is no server code. It surfaces as `AuthTokenResolverError` with
+the original failure on `cause`, and nothing retries it, since only your own
+code can fix it. For unsigned requests, leave `authToken` unset rather than
+returning an empty token:
+
+```javascript
+import { AuthTokenResolverError } from '@uploadcare/upload-client'
+
+try {
+  await client.uploadFile(fileData)
+} catch (error) {
+  if (error instanceof AuthTokenResolverError) {
+    // your token endpoint failed; `error.cause` says how
+  }
+}
+```
+
+The class lives in [`@uploadcare/signed-uploads`][signed-uploads], which also
+throws it from `AuthTokenCache`, and is re-exported here.
+
 #### `userAgent: string | CustomUserAgentFn`
 
 ```typescript
@@ -556,35 +653,18 @@ uploadFile(blob, {
 
 ## Testing
 
-```
+By default, tests run against the local API emulator
+([`@uploadcare/api-emulator`](../api-emulator)), which each test file starts
+on a free port (`test/_emulator.ts`):
+
+```bash
 npm run test
 ```
 
-By default, tests runs with mock server, but you can run tests with
-production environment.
-
-Run test on production servers:
+Run tests against the production servers instead:
 
 ```bash
 npm run test:production
-```
-
-Run test with mock server (mock server starts automaticaly):
-
-```bash
-npm run test
-```
-
-Run mock server:
-
-```
-npm run mock:start
-```
-
-And then you can run test:
-
-```
-npm run test:jest
 ```
 
 ## Security issues
@@ -601,6 +681,7 @@ prior to any public disclosure.
 Issues and PRs are welcome. You can provide your feedback or drop us a support
 request at [hello@uploadcare.com][uc-email-hello].
 
+[signed-uploads]: https://github.com/uploadcare/uploadcare-js-api-clients/tree/main/packages/signed-uploads
 [uc-email-bounty]: mailto:bugbounty@uploadcare.com
 [uc-email-hello]: mailto:hello@uploadcare.com
 [github-releases]: https://github.com/uploadcare/uploadcare-js-api-clients/releases

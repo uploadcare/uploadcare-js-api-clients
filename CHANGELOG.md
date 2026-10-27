@@ -1,3 +1,48 @@
+# [6.24.0](https://github.com/uploadcare/uploadcare-js-api-clients/compare/v6.23.0...v6.24.0) (2026-10-20)
+
+
+### Features
+
+* **api-emulator:** a stateful stand-in for the Upload API ([#586](https://github.com/uploadcare/uploadcare-js-api-clients/issues/586)) ([a89ceaa](https://github.com/uploadcare/uploadcare-js-api-clients/commit/a89ceaa4a9be2ed559d6eaf34e26486498529f38)), closes [#97](https://github.com/uploadcare/uploadcare-js-api-clients/issues/97) [#1081](https://github.com/uploadcare/uploadcare-js-api-clients/issues/1081) [#97](https://github.com/uploadcare/uploadcare-js-api-clients/issues/97) [#1081](https://github.com/uploadcare/uploadcare-js-api-clients/issues/1081) [#1081](https://github.com/uploadcare/uploadcare-js-api-clients/issues/1081) [#97](https://github.com/uploadcare/uploadcare-js-api-clients/issues/97) [#97](https://github.com/uploadcare/uploadcare-js-api-clients/issues/97) [#97](https://github.com/uploadcare/uploadcare-js-api-clients/issues/97) [#97](https://github.com/uploadcare/uploadcare-js-api-clients/issues/97)
+
+
+
+# [6.23.0](https://github.com/uploadcare/uploadcare-js-api-clients/compare/v6.22.0...v6.23.0) (2026-10-05)
+
+
+### Bug Fixes
+
+* **upload-client:** reject a token function that returns no token, instead of sending a request with no `Authorization` header ([#591](https://github.com/uploadcare/uploadcare-js-api-clients/issues/591)) ([e499706](https://github.com/uploadcare/uploadcare-js-api-clients/commit/e4997065131d8a9f93462778e0005bf75c32c169))
+* **signed-uploads:** a token fetch keeps the `fetchToken` it started with, so swapping the function mid-flight no longer serves the new one to the request that began under the old ([#591](https://github.com/uploadcare/uploadcare-js-api-clients/issues/591)) ([e499706](https://github.com/uploadcare/uploadcare-js-api-clients/commit/e4997065131d8a9f93462778e0005bf75c32c169))
+* **signed-uploads:** reject a bare `*` scope the Upload API refuses ([#592](https://github.com/uploadcare/uploadcare-js-api-clients/issues/592)) ([54cd4ea](https://github.com/uploadcare/uploadcare-js-api-clients/commit/54cd4eac0626e0e3540fc1880fa9d6286b3e4415))
+
+
+### Features
+
+* **upload-client:** `authToken` accepts a provider (`{ getToken, invalidate }`) alongside a token and a function, so an `AuthTokenCache` can be passed directly ([#591](https://github.com/uploadcare/uploadcare-js-api-clients/issues/591)) ([e499706](https://github.com/uploadcare/uploadcare-js-api-clients/commit/e4997065131d8a9f93462778e0005bf75c32c169))
+* **upload-client:** retry once with a fresh token when the Upload API refuses one as expired or out of operations. Needs the provider form: a bare function has nothing to invalidate ([#591](https://github.com/uploadcare/uploadcare-js-api-clients/issues/591)) ([e499706](https://github.com/uploadcare/uploadcare-js-api-clients/commit/e4997065131d8a9f93462778e0005bf75c32c169))
+* **rest-client:** add missing WebhookEvent values ([#585](https://github.com/uploadcare/uploadcare-js-api-clients/issues/585)) ([c76ce73](https://github.com/uploadcare/uploadcare-js-api-clients/commit/c76ce73c14a45ca840b5296f86301a3ab0dbfeff))
+
+
+
+# [6.22.0](https://github.com/uploadcare/uploadcare-js-api-clients/compare/v6.21.0...v6.22.0) (2026-09-22)
+
+
+### Features
+
+* JWT auth for the Upload API, minted and cached by @uploadcare/signed-uploads ([#587](https://github.com/uploadcare/uploadcare-js-api-clients/issues/587)) ([5073dba](https://github.com/uploadcare/uploadcare-js-api-clients/commit/5073dbaab4dcb1b4bade529cc32bd814db636469))
+
+
+
+# [6.21.0](https://github.com/uploadcare/uploadcare-js-api-clients/compare/v6.20.0...v6.21.0) (2026-08-18)
+
+
+### Features
+
+* **cname-prefix:** compute the async prefix on Node via node:crypto WebCrypto ([#582](https://github.com/uploadcare/uploadcare-js-api-clients/issues/582)) ([5f60e14](https://github.com/uploadcare/uploadcare-js-api-clients/commit/5f60e14b514ada24148c29065f67786a0b732c39))
+
+
+
 # [6.20.0](https://github.com/uploadcare/uploadcare-js-api-clients/compare/v6.19.0...v6.20.0) (2026-08-18)
 
 

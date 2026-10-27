@@ -95,3 +95,8 @@ export type ServerErrorCode =
   | 'URLSchemeInvalidError' //	400	Invalid URL scheme.
   | 'URLSchemeRequiredError' //	400	No URL scheme supplied.
   | 'URLValidationError' //	400	Failed to validate URL.
+  // JWT (Bearer token) auth errors:
+  | 'AccessTokenExpiredError' //	401	Expired token.
+  | 'OperationsLimitExceededError' //	403	The operation limit of the token is exhausted.
+  | 'ScopeForbiddenError' //	403	`uc.restrictions.scope` does not allow `%s`.
+  | 'AccessTokenInvalidError' //	401	Invalid token. Reason: %s

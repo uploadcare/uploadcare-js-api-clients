@@ -10,7 +10,7 @@ import {
   Tags
 } from '@uploadcare/api-client-utils'
 import { ProgressCallback } from '../api/types'
-import { SupportedFileInput } from '../types'
+import { AuthToken, SupportedFileInput } from '../types'
 
 export type DirectOptions = {
   publicKey: string
@@ -19,6 +19,7 @@ export type DirectOptions = {
   baseURL?: string
   secureSignature?: string
   secureExpire?: string
+  authToken?: AuthToken
   store?: StoreValue
   contentType?: string
 
@@ -47,6 +48,7 @@ export const uploadDirect = (
     baseURL,
     secureSignature,
     secureExpire,
+    authToken,
     store,
     contentType,
 
@@ -73,6 +75,7 @@ export const uploadDirect = (
     baseURL,
     secureSignature,
     secureExpire,
+    authToken,
     store,
     signal,
     onProgress,
@@ -88,6 +91,7 @@ export const uploadDirect = (
       return isReadyPoll(file, {
         publicKey,
         baseURL,
+        authToken,
         source,
         integration,
         userAgent,

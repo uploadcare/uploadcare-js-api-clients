@@ -6,12 +6,14 @@ import { isReadyPoll } from '../tools/isReadyPoll'
 import { Uuid } from '..'
 import { ProgressCallback } from '../api/types'
 import { CustomUserAgent } from '@uploadcare/api-client-utils'
+import { AuthToken } from '../types'
 
 export type FromUploadedOptions = {
   publicKey: string
 
   fileName?: string
   baseURL?: string
+  authToken?: AuthToken
 
   signal?: AbortSignal
   onProgress?: ProgressCallback
@@ -33,6 +35,7 @@ export const uploadFromUploaded = (
     publicKey,
     fileName,
     baseURL,
+    authToken,
     signal,
     onProgress,
     source,
@@ -47,6 +50,7 @@ export const uploadFromUploaded = (
   return isReadyPoll(uuid, {
     publicKey,
     baseURL,
+    authToken,
     signal,
     onProgress,
     source,

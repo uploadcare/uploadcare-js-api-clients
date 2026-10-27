@@ -1,6 +1,6 @@
 {
   "name": "@uploadcare/cdn-url",
-  "version": "6.20.0-alpha.6",
+  "version": "6.24.0",
   "description": "Build and parse Uploadcare CDN URLs: transformations, groups, proxy, video/document conversions. Typed, atomic, tree-shakeable.",
   "type": "module",
   "main": "./dist/prod/index.cjs",
@@ -207,7 +207,7 @@
     "parser"
   ],
   "dependencies": {
-    "@uploadcare/cname-prefix": "^6.20.0"
+    "@uploadcare/cname-prefix": "^6.24.0"
   },
   "devDependencies": {
     "@vitest/browser": "^3.2.4",
