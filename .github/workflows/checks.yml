@@ -48,6 +48,10 @@ jobs:
               - 'packages/cname-prefix/**'
             quality-insights:
               - 'packages/quality-insights/**'
+            cdn-url:
+              - 'packages/cdn-url/**'
+              # The `cdn-base` entry bundles cname-prefix and the smoke test runs it.
+              - 'packages/cname-prefix/**'
       - name: Install dependencies
         working-directory: ./
         run: npm i
@@ -71,13 +75,27 @@ jobs:
         if: steps.changes.outputs.api-emulator == 'true'
         run: npm run format:check -w packages/api-emulator
 
-      # api-emulator's `./browser` tests and upload-client's `chromium` project
-      # run in a real Chromium (Vitest browser mode). The upload-client filter
-      # covers api-emulator's paths too. System packages aren't covered by the
+      # cdn-url uses oxlint/oxfmt, so the root lint above skips it.
+      - name: Lint `cdn-url`
+        if: steps.changes.outputs.cdn-url == 'true'
+        run: npm run lint -w packages/cdn-url
+
+      - name: Check `cdn-url` formatting
+        if: steps.changes.outputs.cdn-url == 'true'
+        run: npm run format:check -w packages/cdn-url
+
+      # Fails on an undocumented export or a broken `{@link}`.
+      - name: Check `cdn-url` API docs
+        if: steps.changes.outputs.cdn-url == 'true'
+        run: npm run docs:api -w packages/cdn-url
+
+      # api-emulator's `./browser` tests, upload-client's `chromium` project and
+      # cdn-url's browser run use a real Chromium (Vitest browser mode). The
+      # upload-client filter covers api-emulator's paths too. System packages aren't covered by the
       # browser cache, so they install every time; only the browser binaries
       # are cache-gated.
       - name: Install Chromium system deps
-        if: steps.changes.outputs.upload-client == 'true'
+        if: steps.changes.outputs.upload-client == 'true' || steps.changes.outputs.cdn-url == 'true'
         timeout-minutes: 10
         env:
           # `install-deps` shells out to apt-get; keep it from stalling on an
@@ -88,14 +106,14 @@ jobs:
         working-directory: ./packages/api-emulator
 
       - uses: actions/cache@v4
-        if: steps.changes.outputs.upload-client == 'true'
+        if: steps.changes.outputs.upload-client == 'true' || steps.changes.outputs.cdn-url == 'true'
         id: playwright-cache
         with:
           path: ~/.cache/ms-playwright
           key: ${{ runner.os }}-playwright-${{ hashFiles('package-lock.json') }}
 
       - name: Install Chromium
-        if: steps.changes.outputs.upload-client == 'true' && steps.playwright-cache.outputs.cache-hit != 'true'
+        if: (steps.changes.outputs.upload-client == 'true' || steps.changes.outputs.cdn-url == 'true') && steps.playwright-cache.outputs.cache-hit != 'true'
         timeout-minutes: 10
         run: npx playwright install chromium
         working-directory: ./packages/api-emulator
@@ -115,6 +133,14 @@ jobs:
       - name: Run `api-client-utils` local tests
         if: steps.changes.outputs.api-client-utils == 'true'
         run: npm run test -w packages/api-client-utils
+
+      - name: Run `cdn-url` tests
+        if: steps.changes.outputs.cdn-url == 'true'
+        run: npm run test -w packages/cdn-url
+
+      - name: Run `cdn-url` tests in Chromium
+        if: steps.changes.outputs.cdn-url == 'true'
+        run: npm run test:browser -w packages/cdn-url
 
       # Real-API tests run on release PRs (Ship.js opens them from
       # `releases/v*`), whatever changed, and block the release. Everywhere
