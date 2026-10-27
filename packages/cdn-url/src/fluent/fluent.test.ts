@@ -556,6 +556,17 @@ describe('fluent operation references', () => {
       expect(file.updateOperations((ops) => ops).href).toBe(file.href)
     })
 
+    it('updateOperations() leaves the original chain alone when the callback edits in place', () => {
+      const original = myCdn.file(UUID).preview(800, 600)
+      const edited = original.updateOperations((ops) => {
+        const [first] = ops
+        if (first) first.params = ['640x480']
+        return ops
+      })
+      expect(edited.href).toContain('/-/preview/640x480/')
+      expect(original.href).toContain('/-/preview/800x600/')
+    })
+
     it('updateOperations() rejects a callback that returns no array', () => {
       expect(() =>
         // @ts-expect-error deliberately wrong callback shape

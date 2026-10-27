@@ -99,7 +99,7 @@ export function replaceEveryMatch(
 }
 
 /**
- * Runs an `updateOperations` callback over a defensive copy.
+ * Runs an `updateOperations` callback over a defensive copy of the operations.
  *
  * A block-bodied callback with no `return` would otherwise produce a chain whose
  * operations are `undefined` — corrupt rather than merely empty — so a
@@ -114,7 +114,11 @@ export function updatedOperations(
   operations: readonly CdnOperation[],
   update: (current: CdnOperation[]) => readonly CdnOperation[]
 ): CdnOperation[] {
-  const next = update([...operations])
+  // Copies the operations too, not just the array: a callback that assigns
+  // `op.params` would otherwise edit the url it came from.
+  const next = update(
+    operations.map((op) => ({ ...op, params: [...op.params] }))
+  )
   if (!Array.isArray(next)) {
     if (__DEV__) {
       throw new TypeError(

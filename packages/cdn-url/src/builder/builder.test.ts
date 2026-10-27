@@ -333,3 +333,18 @@ describe('CdnUrl owns its state', () => {
     )
   })
 })
+
+describe('updateOperations hands over copies', () => {
+  it('leaves the original url alone when the callback edits an operation in place', () => {
+    const original = CdnUrl.parse(
+      'https://ucarecdn.com/c2499162-eb07-4b93-b31e-94a89a47e858/-/resize/300x/'
+    )
+    const edited = original.updateOperations((ops) => {
+      const [first] = ops
+      if (first) first.params = ['640x']
+      return ops
+    })
+    expect(edited.href).toContain('/-/resize/640x/')
+    expect(original.href).toContain('/-/resize/300x/')
+  })
+})
