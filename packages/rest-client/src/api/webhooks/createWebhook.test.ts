@@ -1,4 +1,4 @@
-import { describe, it } from '@jest/globals'
+import { describe, it, expect } from 'vitest'
 import { createWebhook } from './createWebhook'
 
 import { randomTargetUrl, testSettings } from '../../../test/helpers'

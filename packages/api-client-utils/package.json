@@ -17,7 +17,7 @@
   ],
   "scripts": {
     "clean": "rimraf dist",
-    "test": "node --experimental-vm-modules ../../node_modules/jest/bin/jest.js",
+    "test": "vitest --run",
     "prebuild": "npm run clean",
     "build": "npm run build:types && npm run build:compile",
     "build:types": "dts-bundle-generator --project tsconfig.dts.json -o dist/index.d.ts src/index.ts",
@@ -34,6 +34,7 @@
   },
   "homepage": "https://github.com/uploadcare/uploadcare-js-api-clients#readme",
   "devDependencies": {
-    "expect-type": "^1.4.0"
+    "expect-type": "^1.4.0",
+    "vitest": "^4.1.11"
   }
 }

@@ -1,4 +1,4 @@
-import { describe, it, expect } from '@jest/globals'
+import { describe, it, expect } from 'vitest'
 import { replaceTags } from './replaceTags'
 
 import { DEFAULT_UUID, INVALID_UUID } from '../../../test/fixtures'

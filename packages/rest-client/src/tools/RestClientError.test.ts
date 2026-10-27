@@ -1,3 +1,4 @@
+import { describe, it, expect } from 'vitest'
 import { RestClientError } from './RestClientError'
 import { Request, Response } from '../lib/fetch/fetch.node'
 import { UploadcareError } from '@uploadcare/api-client-utils'

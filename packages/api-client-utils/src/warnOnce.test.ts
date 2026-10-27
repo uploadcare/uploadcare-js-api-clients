@@ -1,11 +1,11 @@
-import { jest, expect } from '@jest/globals'
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { warnOnce } from './warnOnce'
 
 describe('warnOnce', () => {
-  let warnSpy: ReturnType<typeof jest.spyOn>
+  let warnSpy: ReturnType<typeof vi.spyOn>
 
   beforeEach(() => {
-    warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => undefined)
+    warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => undefined)
   })
 
   afterEach(() => {
