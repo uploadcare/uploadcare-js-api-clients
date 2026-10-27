@@ -1,7 +1,6 @@
 import { expect } from 'vitest'
 import type { Mock } from 'vitest'
 import dataUriToBuffer from 'data-uri-to-buffer'
-import dataUriToBlob from 'dataurl-to-blob'
 import { emulatorOrigin } from './_emulator'
 import defaultSettings from '../src/defaultSettings'
 import { DefaultSettings } from '../src/types'
@@ -10,7 +9,16 @@ import { ProgressCallback, ComputableProgressInfo } from '../src/api/types'
 export const dataURItoBuffer: (uri: string) => Buffer = dataUriToBuffer as (
   uri: string
 ) => Buffer
-export const dataURItoBlob: (uri: string) => Blob = dataUriToBlob
+export const dataURItoBlob = (uri: string): Blob => {
+  const comma = uri.indexOf(',')
+  const header = uri.slice(0, comma)
+  const data = uri.slice(comma + 1)
+  const type = /^data:([^;,]*)/.exec(header)?.[1] ?? ''
+  const bytes = header.endsWith(';base64')
+    ? Uint8Array.from(atob(data), (char) => char.charCodeAt(0))
+    : new TextEncoder().encode(decodeURIComponent(data))
+  return new Blob([bytes], { type })
+}
 
 export enum Environment {
   Development = 'development',
