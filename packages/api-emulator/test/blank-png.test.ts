@@ -7,7 +7,7 @@ import { imageSize } from '../src/state/image-size.js'
 const idatOf = (png: Uint8Array) => {
   const view = new DataView(png.buffer, png.byteOffset, png.byteLength)
   const parts: Uint8Array[] = []
-  for (let offset = 8; offset < png.length; ) {
+  for (let offset = 8; offset < png.length;) {
     const length = view.getUint32(offset)
     const type = String.fromCharCode(...png.subarray(offset + 4, offset + 8))
     if (type === 'IDAT')
