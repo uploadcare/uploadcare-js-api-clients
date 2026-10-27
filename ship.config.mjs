@@ -13,6 +13,7 @@ export default {
       'packages/quality-insights',
       'packages/cname-prefix',
       'packages/api-emulator',
+      'packages/cdn-url',
     ]
   },
   publishCommand: ({ tag }) => `npm stage publish --tag ${tag}`,

@@ -13,6 +13,9 @@
     "**/vite.config.ts",
     "**/vitest.config.ts",
     "**/vitest.*.config.ts",
-    "**/api-emulator/scripts/**"
+    "**/api-emulator/scripts/**",
+    // The emulator is a dev tool with no page here, and msw's declarations need
+    // a newer TypeScript than the root's, so typing it failed every docs build.
+    "packages/api-emulator/**"
   ],
 }

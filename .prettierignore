@@ -2,3 +2,5 @@ node_modules
 dist
 # Uses oxfmt (see packages/signed-uploads/.oxfmtrc.json)
 packages/signed-uploads
+# Uses oxfmt (see packages/cdn-url/.oxfmtrc.json)
+packages/cdn-url

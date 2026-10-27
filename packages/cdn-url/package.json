@@ -1,0 +1,151 @@
+{
+  "name": "@uploadcare/cdn-url",
+  "version": "6.24.0",
+  "description": "Build and parse Uploadcare CDN URLs: transformations, groups, proxy, video/document conversions. Typed, atomic, tree-shakeable.",
+  "type": "module",
+  "main": "./dist/prod/index.js",
+  "types": "./dist/types/index.d.ts",
+  "unpkg": "./dist/cdn-url.global.js",
+  "jsdelivr": "./dist/cdn-url.global.js",
+  "exports": {
+    ".": {
+      "types": "./dist/types/index.d.ts",
+      "development": "./dist/dev/index.js",
+      "production": "./dist/prod/index.js",
+      "default": "./dist/prod/index.js"
+    },
+    "./ops": {
+      "types": "./dist/types/ops.d.ts",
+      "development": "./dist/dev/ops.js",
+      "production": "./dist/prod/ops.js",
+      "default": "./dist/prod/ops.js"
+    },
+    "./video": {
+      "types": "./dist/types/video.d.ts",
+      "development": "./dist/dev/video.js",
+      "production": "./dist/prod/video.js",
+      "default": "./dist/prod/video.js"
+    },
+    "./document": {
+      "types": "./dist/types/document.d.ts",
+      "development": "./dist/dev/document.js",
+      "production": "./dist/prod/document.js",
+      "default": "./dist/prod/document.js"
+    },
+    "./gif2video": {
+      "types": "./dist/types/gif2video.d.ts",
+      "development": "./dist/dev/gif2video.js",
+      "production": "./dist/prod/gif2video.js",
+      "default": "./dist/prod/gif2video.js"
+    },
+    "./group": {
+      "types": "./dist/types/group.d.ts",
+      "development": "./dist/dev/group.js",
+      "production": "./dist/prod/group.js",
+      "default": "./dist/prod/group.js"
+    },
+    "./proxy": {
+      "types": "./dist/types/proxy.d.ts",
+      "development": "./dist/dev/proxy.js",
+      "production": "./dist/prod/proxy.js",
+      "default": "./dist/prod/proxy.js"
+    },
+    "./builder": {
+      "types": "./dist/types/builder.d.ts",
+      "development": "./dist/dev/builder.js",
+      "production": "./dist/prod/builder.js",
+      "default": "./dist/prod/builder.js"
+    },
+    "./fluent": {
+      "types": "./dist/types/fluent.d.ts",
+      "development": "./dist/dev/fluent.js",
+      "production": "./dist/prod/fluent.js",
+      "default": "./dist/prod/fluent.js"
+    },
+    "./validate": {
+      "types": "./dist/types/validate.d.ts",
+      "development": "./dist/dev/validate.js",
+      "production": "./dist/prod/validate.js",
+      "default": "./dist/prod/validate.js"
+    },
+    "./tiny": {
+      "types": "./dist/types/tiny.d.ts",
+      "development": "./dist/dev/tiny.js",
+      "production": "./dist/prod/tiny.js",
+      "default": "./dist/prod/tiny.js"
+    },
+    "./cdn-base": {
+      "types": "./dist/types/cdn-base.d.ts",
+      "development": "./dist/dev/cdn-base.js",
+      "production": "./dist/prod/cdn-base.js",
+      "default": "./dist/prod/cdn-base.js"
+    }
+  },
+  "sideEffects": false,
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "prepack": "cp ../../LICENSE ./LICENSE",
+    "clean": "rimraf dist",
+    "test": "vitest --run --coverage",
+    "typecheck": "tsc -p tsconfig.test.json",
+    "test:watch": "vitest",
+    "prebuild": "npm run clean",
+    "build": "tsc && vite build && vite build --mode development && vite build --mode iife && node scripts/verify-bundles.mjs && node scripts/smoke-node.mjs",
+    "docs:api": "typedoc --validation.notDocumented --treatValidationWarningsAsErrors",
+    "docs:dev": "npm run docs:api && vitepress dev docs",
+    "docs:build": "npm run docs:api && vitepress build docs",
+    "lint": "oxlint src",
+    "format": "oxfmt .",
+    "format:check": "oxfmt --check .",
+    "test:browser": "vitest --run --config vitest.browser.config.ts",
+    "lint:fix": "oxlint src --fix"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/uploadcare/uploadcare-js-api-clients.git"
+  },
+  "author": "Uploadcare",
+  "license": "MIT",
+  "engines": {
+    "node": ">=20"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "bugs": {
+    "url": "https://github.com/uploadcare/uploadcare-js-api-clients/issues"
+  },
+  "homepage": "https://github.com/uploadcare/uploadcare-js-api-clients#readme",
+  "keywords": [
+    "uploadcare",
+    "cdn",
+    "url",
+    "transformations",
+    "image",
+    "video",
+    "builder",
+    "parser"
+  ],
+  "dependencies": {
+    "@uploadcare/cname-prefix": "^6.24.0"
+  },
+  "devDependencies": {
+    "@vitest/browser": "^3.2.4",
+    "@vitest/coverage-v8": "^3.2.4",
+    "oxfmt": "^0.53.0",
+    "oxlint": "^1.68.0",
+    "oxlint-tsgolint": "^0.23.0",
+    "playwright": "^1.49.0",
+    "terser": "^5.49.0",
+    "typedoc-plugin-markdown": "^4.12.0",
+    "typedoc-vitepress-theme": "^1.1.3",
+    "vite": "^7.0.0",
+    "vite-plugin-dts": "^4.5.4",
+    "vitepress": "^1.6.4",
+    "vitest": "^3.2.4"
+  }
+}

@@ -5,3 +5,5 @@ docs
 packages/api-emulator
 # Uses oxlint (see packages/signed-uploads/.oxlintrc.json)
 packages/signed-uploads
+# Uses oxlint (see packages/cdn-url/.oxlintrc.json)
+packages/cdn-url
