@@ -16,7 +16,7 @@ import type { CdnOperation, CdnUrlInput, ParsedCdnUrl } from '../types'
 
 /** Normalizes a loose {@link CdnUrlInput} into a full {@link ParsedCdnUrl}. */
 function normalizeInput(input: CdnUrlInput | ParsedCdnUrl): ParsedCdnUrl {
-  if ('kind' in input) return input
+  if ('kind' in input) return { ...input }
   const cdnBase = trimTrailingSlashes(input.cdnBase)
 
   if (isProxyInput(input)) {
@@ -259,12 +259,14 @@ export class CdnUrl {
    * ```
    */
   public updateOperations(
-    update: (current: CdnOperation[]) => CdnOperation[]
+    update: (current: CdnOperation[]) => readonly CdnOperation[]
   ): CdnUrl {
     return this.#withOperations(update)
   }
 
-  #withOperations(update: (current: CdnOperation[]) => CdnOperation[]): CdnUrl {
+  #withOperations(
+    update: (current: CdnOperation[]) => readonly CdnOperation[]
+  ): CdnUrl {
     if (!('operations' in this.#parsed)) {
       if (__DEV__) {
         throw new TypeError(`${this.#parsed.kind} urls cannot carry operations`)

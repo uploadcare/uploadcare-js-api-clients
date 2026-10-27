@@ -11,7 +11,7 @@ import type { CdnOperation, ConversionKind } from './types'
 export function conversionPath(
   kind: ConversionKind,
   uuid: string,
-  operations: CdnOperation[]
+  operations: readonly CdnOperation[]
 ): string {
   if (__DEV__ && !UUID_RE.test(uuid)) {
     throw new TypeError(`Invalid uuid: "${uuid}"`)

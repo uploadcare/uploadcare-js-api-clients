@@ -15,7 +15,7 @@ import type { CdnOperation } from '../types'
  */
 export function videoPath(
   uuid: string,
-  operations: CdnOperation[] = []
+  operations: readonly CdnOperation[] = []
 ): string {
   return conversionPath('video', uuid, operations)
 }

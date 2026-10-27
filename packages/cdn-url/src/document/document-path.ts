@@ -16,7 +16,7 @@ import type { CdnOperation } from '../types'
  */
 export function documentPath(
   uuid: string,
-  operations: CdnOperation[] = []
+  operations: readonly CdnOperation[] = []
 ): string {
   return conversionPath('document', uuid, operations)
 }

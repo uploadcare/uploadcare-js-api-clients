@@ -40,7 +40,7 @@ export abstract class ImageChain<S extends ChainState> extends Chain<S> {
     tag: ops.CropTag,
     options?: {
       ratio?: string
-      size?: [SizeValue, SizeValue]
+      size?: readonly [SizeValue, SizeValue]
       align?: Alignment
     }
   ): this {
@@ -198,14 +198,14 @@ export abstract class ImageChain<S extends ChainState> extends Chain<S> {
   /** Appends `rect`; mirrors the creator in `@uploadcare/cdn-url/ops`. */
   public rect(
     color: string,
-    size: [SizeValue, SizeValue],
+    size: readonly [SizeValue, SizeValue],
     position: ops.RelativePoint
   ): this {
     return this._add(ops.rect(color, size, position))
   }
   /** Appends `text`; mirrors the creator in `@uploadcare/cdn-url/ops`. */
   public text(
-    size: [SizeValue, SizeValue],
+    size: readonly [SizeValue, SizeValue],
     position: ops.RelativePoint,
     value: string
   ): this {

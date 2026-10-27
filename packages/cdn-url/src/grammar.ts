@@ -28,6 +28,10 @@ export function trimTrailingSlashes(url: string): string {
 /** A dimension value: pixels as a number, or a percentage as `'50p'` / `'50%'`. */
 export type SizeValue = number | string
 
+/** `Array.isArray` that also narrows a readonly array, which TS's own guard does not. */
+export const isArray = (value: unknown): value is readonly unknown[] =>
+  Array.isArray(value)
+
 const PERCENT_RE = /^\d+(\.\d+)?(p|%)$/
 
 /** Serializes a single size value; `%` is normalized to the `p` shortcut. */

@@ -16,7 +16,7 @@ import type { CdnOperation } from '../types'
 export function proxyUrl(
   endpoint: string,
   sourceUrl: string,
-  operations: CdnOperation[] = []
+  operations: readonly CdnOperation[] = []
 ): string {
   return serializeProxyUrl({ cdnBase: endpoint, sourceUrl, operations })
 }

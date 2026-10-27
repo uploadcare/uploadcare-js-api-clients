@@ -12,7 +12,7 @@ import type { CdnOperation } from '../types'
 
 /** @internal */
 export interface ChainState {
-  operations: CdnOperation[]
+  operations: readonly CdnOperation[]
 }
 
 /**
@@ -43,7 +43,7 @@ export abstract class Chain<S extends ChainState> {
    * ChainState), but TS cannot prove it for an unresolved generic S.
    * @internal
    */
-  protected _withOperations(operations: CdnOperation[]): this {
+  protected _withOperations(operations: readonly CdnOperation[]): this {
     // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- see jsdoc
     const patch = { operations } as Partial<S>
     return this._next(patch)
@@ -87,7 +87,7 @@ export abstract class Chain<S extends ChainState> {
    * ```
    */
   public updateOperations(
-    update: (current: CdnOperation[]) => CdnOperation[]
+    update: (current: CdnOperation[]) => readonly CdnOperation[]
   ): this {
     return this._withOperations(updatedOperations(this._s.operations, update))
   }

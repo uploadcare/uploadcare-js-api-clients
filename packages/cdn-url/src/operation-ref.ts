@@ -112,7 +112,7 @@ export function replaceEveryMatch(
  */
 export function updatedOperations(
   operations: readonly CdnOperation[],
-  update: (current: CdnOperation[]) => CdnOperation[]
+  update: (current: CdnOperation[]) => readonly CdnOperation[]
 ): CdnOperation[] {
   const next = update([...operations])
   if (!Array.isArray(next)) {

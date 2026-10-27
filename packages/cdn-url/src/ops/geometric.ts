@@ -11,6 +11,7 @@ import {
   assertOneOf,
   color,
   dimensions,
+  isArray,
   sizeValue
 } from '../grammar'
 import type { CdnOperation } from '../types'
@@ -162,7 +163,7 @@ export const cropByTag = /* @__PURE__ */ namedOp(
     tag: CropTag,
     options: {
       ratio?: string
-      size?: [SizeValue, SizeValue]
+      size?: readonly [SizeValue, SizeValue]
       align?: Alignment
     } = {}
   ): CdnOperation {
@@ -231,10 +232,10 @@ export const scaleCrop = /* @__PURE__ */ namedOp(
 )
 
 /** One or more (1–4) radius values in pixels or percent. */
-export type Radii = SizeValue | SizeValue[]
+export type Radii = SizeValue | readonly SizeValue[]
 
 function radiiList(value: Radii, label: string): string {
-  const list = Array.isArray(value) ? value : [value]
+  const list = isArray(value) ? value : [value]
   if (__DEV__ && (list.length < 1 || list.length > 4)) {
     throw new RangeError(`${label} accepts 1 to 4 radii`)
   }

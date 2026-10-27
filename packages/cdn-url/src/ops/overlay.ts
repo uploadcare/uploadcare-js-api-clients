@@ -10,16 +10,17 @@ import {
   assertOneOf,
   color,
   dimensions,
+  isArray,
   sizeValue
 } from '../grammar'
 import type { CdnOperation } from '../types'
 import { rawOp } from './raw-op'
 
 /** A point given as an alignment keyword, offsets object or `[x, y]` pair. */
-export type RelativePoint = Alignment | [SizeValue, SizeValue]
+export type RelativePoint = Alignment | readonly [SizeValue, SizeValue]
 
 function relativePoint(value: RelativePoint, label: string): string {
-  if (Array.isArray(value)) {
+  if (isArray(value)) {
     return `${sizeValue(value[0], `${label} x`)},${sizeValue(value[1], `${label} y`)}`
   }
   return alignment(value, label)
@@ -34,7 +35,7 @@ export type OverlaySource = 'self' | (string & {})
 /** Options for {@link overlay}. Params are positional and ordered. */
 export interface OverlayOptions {
   /** Relative size, e.g. `['50p', '50p']` (CDN default 100%). */
-  size?: [SizeValue, SizeValue]
+  size?: readonly [SizeValue, SizeValue]
   /** Position keyword or coordinates (CDN default top-left). */
   position?: RelativePoint
   /** Opacity, e.g. `'40p'`. */
@@ -92,7 +93,7 @@ export const rect = /* @__PURE__ */ namedOp(
   'rect',
   function rect(
     fill: string,
-    size: [SizeValue, SizeValue],
+    size: readonly [SizeValue, SizeValue],
     position: RelativePoint
   ): CdnOperation {
     return rawOp(
@@ -128,7 +129,7 @@ function escapeText(value: string): string {
 export const text = /* @__PURE__ */ namedOp(
   'text',
   function text(
-    size: [SizeValue, SizeValue],
+    size: readonly [SizeValue, SizeValue],
     position: RelativePoint,
     value: string
   ): CdnOperation {

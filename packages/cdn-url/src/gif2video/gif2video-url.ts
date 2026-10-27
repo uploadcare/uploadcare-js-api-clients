@@ -16,7 +16,7 @@ import type { CdnOperation } from '../types'
 export function gif2videoUrl(
   cdnBase: string,
   uuid: string,
-  operations: CdnOperation[] = []
+  operations: readonly CdnOperation[] = []
 ): string {
   return serializeFileUrl({
     cdnBase,

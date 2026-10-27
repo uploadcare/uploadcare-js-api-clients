@@ -9,7 +9,7 @@ export interface CdnOperation {
   /** Operation name, e.g. `preview`, `scale_crop`, `@clib`. */
   name: string
   /** Positional parameters, already serialized to their URL form. */
-  params: string[]
+  params: readonly string[]
 }
 
 /**
@@ -61,7 +61,7 @@ export interface ParsedFileUrl extends CdnUrlShapeBase {
   /** Conversion path prefix, when the url addresses a conversion result. */
   conversion: ConversionKind | null
   /** Transformation directives, in order. */
-  operations: CdnOperation[]
+  operations: readonly CdnOperation[]
   /** Trailing filename, or null when the url ends with a slash. */
   filename: string | null
 }
@@ -109,7 +109,7 @@ export interface ParsedGroupElementUrl extends CdnUrlShapeBase {
   /** Zero-based element index. */
   nth: number
   /** Transformation directives applied to the element, in order. */
-  operations: CdnOperation[]
+  operations: readonly CdnOperation[]
   /** Trailing filename, or null when the url ends with a slash. */
   filename: string | null
 }
@@ -126,7 +126,7 @@ export interface ParsedProxyUrl {
   /** Proxy endpoint cdnBase, e.g. `https://pubkey.ucr.io`. */
   cdnBase: string
   /** Transformation directives applied before fetching the source, in order. */
-  operations: CdnOperation[]
+  operations: readonly CdnOperation[]
   /** The embedded remote source url, verbatim. */
   sourceUrl: string
 }
@@ -152,7 +152,7 @@ export interface FileUrlInput {
   /** Conversion path prefix (`video`, `document`, `gif2video`), if any. */
   conversion?: ConversionKind | null
   /** Transformation directives, in order (default none). */
-  operations?: CdnOperation[]
+  operations?: readonly CdnOperation[]
   /** Trailing filename (default none). */
   filename?: string | null
   /** Query string to append, `'?...'` (default none). */
@@ -175,7 +175,7 @@ export interface GroupUrlInput {
    */
   archive?: ArchiveFormat | null
   /** Transformation directives for the element (group roots cannot carry any). */
-  operations?: CdnOperation[]
+  operations?: readonly CdnOperation[]
   /** Trailing filename for the element (default none). */
   filename?: string | null
   /** Query string to append, `'?...'` (default none). */
@@ -191,7 +191,7 @@ export interface ProxyUrlInput {
   /** Remote source url to embed, verbatim (query string included). */
   sourceUrl: string
   /** Transformation directives applied before the source (default none). */
-  operations?: CdnOperation[]
+  operations?: readonly CdnOperation[]
 }
 
 /**

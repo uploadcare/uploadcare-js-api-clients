@@ -31,7 +31,7 @@ export function nthUrl(
   cdnBase: string,
   group: GroupId,
   index: number,
-  operations: CdnOperation[] = [],
+  operations: readonly CdnOperation[] = [],
   filename?: string
 ): string {
   if (

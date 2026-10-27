@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import { cropByRatio, preview, quality, resize } from '../ops/index'
+import { parseCdnUrl } from '../index'
 import { CdnUrl } from './index'
 
 const UUID = 'c2499162-eb07-4b93-b31e-94a89a47e858'
@@ -317,5 +318,18 @@ describe('CdnUrl on archive urls', () => {
         filename: 'all.zip'
       }).href
     ).toBe(ARCHIVE)
+  })
+})
+
+describe('CdnUrl owns its state', () => {
+  it('is not changed by later edits to the parsed url it was built from', () => {
+    const parsed = parseCdnUrl(
+      'https://ucarecdn.com/c2499162-eb07-4b93-b31e-94a89a47e858/-/resize/300x/'
+    )
+    const url = new CdnUrl(parsed)
+    parsed.cdnBase = 'https://evil.example.com'
+    expect(url.href).toBe(
+      'https://ucarecdn.com/c2499162-eb07-4b93-b31e-94a89a47e858/-/resize/300x/'
+    )
   })
 })
