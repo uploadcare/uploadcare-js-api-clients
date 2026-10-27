@@ -50,10 +50,10 @@ export interface TinyFileUrl {
 }
 
 /**
- * Cuts a single-file CDN url into {@link TinyFileUrl} — the tiny counterpart of
- * `parseFileUrl`. Never throws and never validates: unknown operations and
- * internal `@`-prefixed directives survive verbatim, and a secure-delivery token
- * is kept in `search`.
+ * Cuts a single-file CDN url into {@link TinyFileUrl}, every field filled
+ * (`''` when absent) — the tiny counterpart of `parseFileUrl`. Never throws
+ * and never validates: unknown operations and internal `@`-prefixed directives
+ * survive verbatim, and a secure-delivery token is kept in `search`.
  *
  * **File urls only.** The cuts are lexical, so a group, group element or proxy
  * url produces meaningless fields — though {@link tinyBuild} still reproduces it
@@ -67,7 +67,7 @@ export interface TinyFileUrl {
  * //     modifiers: '-/resize/300x/', filename: 'photo.jpg', search: '', hash: '' }
  * ```
  */
-export function tinyParse(url: string): TinyFileUrl {
+export function tinyParse(url: string): Required<TinyFileUrl> {
   const pathStart = url.indexOf('/', url.indexOf('//') + 2)
   const tail = pathStart === -1 ? '' : url.slice(pathStart + 1)
   // Cut the query and fragment off first: either may contain a `/`.
