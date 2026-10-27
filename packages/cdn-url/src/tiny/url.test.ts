@@ -119,18 +119,18 @@ describe('tinyBuild', () => {
     // pasted raw, one missing its trailing slash, and even a well-formed one.
     // @ts-expect-error stored value, not normalized
     const pastedRaw: TinyFileUrl = { ...parts, modifiers: 'resize/300x' }
-    // @ts-expect-error not slash-terminated
     const noTrailingSlash: TinyFileUrl = {
       ...parts,
+      // @ts-expect-error not slash-terminated
       modifiers: '-/resize/300x'
     }
     // @ts-expect-error well-formed, but still not from a producer
     const handWritten: TinyFileUrl = { ...parts, modifiers: '-/resize/300x/' }
     // @ts-expect-error the empty chain needs a producer too
     const empty: TinyFileUrl = { ...parts, modifiers: '' }
-    // @ts-expect-error template concatenation widens back to string
     const concatenated: TinyFileUrl = {
       ...parts,
+      // @ts-expect-error template concatenation widens back to string
       modifiers: `${parts.modifiers}${modifiers('blur/10')}`
     }
     void [pastedRaw, noTrailingSlash, handWritten, empty, concatenated]

@@ -255,6 +255,7 @@ describe('one owner for "which kind is this input?"', () => {
   })
 
   it('an input with no addressing value at all throws in both', () => {
+    // @ts-expect-error the types already forbid it; this pins the runtime guard
     const empty: CdnUrlInput = { cdnBase: CDN_BASE, uuid: undefined }
     expect(() => serializeCdnUrl(empty)).toThrow(TypeError)
     expect(() => new CdnUrl(empty)).toThrow(TypeError)

@@ -1,0 +1,8 @@
+{
+  // The package tsconfig leaves tests out (the build must not type them), and
+  // Vitest strips types without checking them, so this is what enforces the
+  // `@ts-expect-error` API assertions and the valid usage the tests show.
+  "extends": "./tsconfig.json",
+  "include": ["src/**/*.ts"],
+  "exclude": ["node_modules"]
+}

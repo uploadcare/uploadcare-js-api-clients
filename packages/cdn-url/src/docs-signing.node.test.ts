@@ -11,7 +11,7 @@ import { createHmac } from 'node:crypto'
 
 import { describe, expect, it } from 'vitest'
 
-import { parseCdnUrl, serializeCdnUrl } from './index'
+import { parseCdnUrl, parseFileUrl, serializeCdnUrl } from './index'
 import { preview } from './ops/index'
 
 const uuid = 'c2499162-eb07-4b93-b31e-94a89a47e858'
@@ -39,7 +39,7 @@ describe('signed-urls: the signing snippet', () => {
 
     expect(out).toContain('~hmac=')
     expect(serializeCdnUrl(parseCdnUrl(out))).toBe(out)
-    const parsed = parseCdnUrl(out)
+    const parsed = parseFileUrl(out)
     expect(parsed.search).toContain(`acl=/${uuid}/-/preview/800x600/`)
     // deterministic: same inputs, same token
     expect(signedUrl(href, 'deadbeefcafe', 600)).toBe(out)

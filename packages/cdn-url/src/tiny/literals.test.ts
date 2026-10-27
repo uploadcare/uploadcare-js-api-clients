@@ -80,12 +80,13 @@ const SAMPLES: OperationLiteral[] = [
 
 /** Every operation name the creators actually emit, via their `opName` tag. */
 const CREATOR_NAMES = new Set(
-  Object.values(ops)
-    .filter(
-      (value): value is { opName: string } =>
-        typeof value === 'function' && 'opName' in value
-    )
-    .map((creator) => creator.opName)
+  Object.values(ops).flatMap((value) =>
+    typeof value === 'function' &&
+    'opName' in value &&
+    typeof value.opName === 'string'
+      ? [value.opName]
+      : []
+  )
 )
 
 describe('modifiers', () => {

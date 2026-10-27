@@ -84,6 +84,12 @@ jobs:
         if: steps.changes.outputs.cdn-url == 'true'
         run: npm run format:check -w packages/cdn-url
 
+      # Vitest strips types without checking them; this enforces the tests'
+      # `@ts-expect-error` API assertions and the usage they show.
+      - name: Typecheck `cdn-url` tests
+        if: steps.changes.outputs.cdn-url == 'true'
+        run: npm run typecheck -w packages/cdn-url
+
       # Fails on an undocumented export or a broken `{@link}`.
       - name: Check `cdn-url` API docs
         if: steps.changes.outputs.cdn-url == 'true'

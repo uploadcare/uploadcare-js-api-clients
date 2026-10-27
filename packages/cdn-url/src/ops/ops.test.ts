@@ -245,6 +245,7 @@ describe('effects and enhancements', () => {
       name: 'filter',
       params: ['vevera', '150']
     })
+    // @ts-expect-error not a filter name
     expect(() => filter('nonexistent')).toThrow(RangeError)
     expect(() => filter('iothari', 201)).toThrow(RangeError)
   })

@@ -421,8 +421,8 @@ describe('review regressions', () => {
   })
 
   it('conversion chains stay kind-restricted (type-level)', () => {
-    // @ts-expect-error quality of images does not exist on DocumentChain
-    void myCdn.document(UUID).quality
+    // @ts-expect-error blur is an image operation, not a document one
+    void myCdn.document(UUID).blur
     // @ts-expect-error resize is not a gif2video operation
     void myCdn.gif2video(UUID).resize
   })
@@ -569,20 +569,10 @@ describe('fluent operation references', () => {
 
     it('updateOperations() rejects a callback that returns no array', () => {
       expect(() =>
-        // @ts-expect-error deliberately wrong callback shape
         myCdn
           .file(UUID)
           .preview(800, 600)
-          .updateOperations(() => undefined)
-      ).toThrow(TypeError)
-    })
-
-    it('updateOperations() rejects a callback that returns no array', () => {
-      expect(() =>
-        // @ts-expect-error deliberately wrong callback shape
-        myCdn
-          .file(UUID)
-          .preview(800, 600)
+          // @ts-expect-error deliberately wrong callback shape
           .updateOperations(() => undefined)
       ).toThrow(TypeError)
     })
