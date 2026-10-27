@@ -3,165 +3,80 @@
   "version": "6.24.0",
   "description": "Build and parse Uploadcare CDN URLs: transformations, groups, proxy, video/document conversions. Typed, atomic, tree-shakeable.",
   "type": "module",
-  "main": "./dist/prod/index.cjs",
-  "module": "./dist/prod/index.js",
+  "main": "./dist/prod/index.js",
   "types": "./dist/types/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/types/index.d.ts",
-      "development": {
-        "import": "./dist/dev/index.js",
-        "require": "./dist/dev/index.cjs"
-      },
-      "production": {
-        "import": "./dist/prod/index.js",
-        "require": "./dist/prod/index.cjs"
-      },
-      "import": "./dist/prod/index.js",
-      "require": "./dist/prod/index.cjs"
+      "development": "./dist/dev/index.js",
+      "production": "./dist/prod/index.js",
+      "default": "./dist/prod/index.js"
     },
     "./ops": {
       "types": "./dist/types/ops.d.ts",
-      "development": {
-        "import": "./dist/dev/ops.js",
-        "require": "./dist/dev/ops.cjs"
-      },
-      "production": {
-        "import": "./dist/prod/ops.js",
-        "require": "./dist/prod/ops.cjs"
-      },
-      "import": "./dist/prod/ops.js",
-      "require": "./dist/prod/ops.cjs"
+      "development": "./dist/dev/ops.js",
+      "production": "./dist/prod/ops.js",
+      "default": "./dist/prod/ops.js"
     },
     "./video": {
       "types": "./dist/types/video.d.ts",
-      "development": {
-        "import": "./dist/dev/video.js",
-        "require": "./dist/dev/video.cjs"
-      },
-      "production": {
-        "import": "./dist/prod/video.js",
-        "require": "./dist/prod/video.cjs"
-      },
-      "import": "./dist/prod/video.js",
-      "require": "./dist/prod/video.cjs"
+      "development": "./dist/dev/video.js",
+      "production": "./dist/prod/video.js",
+      "default": "./dist/prod/video.js"
     },
     "./document": {
       "types": "./dist/types/document.d.ts",
-      "development": {
-        "import": "./dist/dev/document.js",
-        "require": "./dist/dev/document.cjs"
-      },
-      "production": {
-        "import": "./dist/prod/document.js",
-        "require": "./dist/prod/document.cjs"
-      },
-      "import": "./dist/prod/document.js",
-      "require": "./dist/prod/document.cjs"
+      "development": "./dist/dev/document.js",
+      "production": "./dist/prod/document.js",
+      "default": "./dist/prod/document.js"
     },
     "./gif2video": {
       "types": "./dist/types/gif2video.d.ts",
-      "development": {
-        "import": "./dist/dev/gif2video.js",
-        "require": "./dist/dev/gif2video.cjs"
-      },
-      "production": {
-        "import": "./dist/prod/gif2video.js",
-        "require": "./dist/prod/gif2video.cjs"
-      },
-      "import": "./dist/prod/gif2video.js",
-      "require": "./dist/prod/gif2video.cjs"
+      "development": "./dist/dev/gif2video.js",
+      "production": "./dist/prod/gif2video.js",
+      "default": "./dist/prod/gif2video.js"
     },
     "./group": {
       "types": "./dist/types/group.d.ts",
-      "development": {
-        "import": "./dist/dev/group.js",
-        "require": "./dist/dev/group.cjs"
-      },
-      "production": {
-        "import": "./dist/prod/group.js",
-        "require": "./dist/prod/group.cjs"
-      },
-      "import": "./dist/prod/group.js",
-      "require": "./dist/prod/group.cjs"
+      "development": "./dist/dev/group.js",
+      "production": "./dist/prod/group.js",
+      "default": "./dist/prod/group.js"
     },
     "./proxy": {
       "types": "./dist/types/proxy.d.ts",
-      "development": {
-        "import": "./dist/dev/proxy.js",
-        "require": "./dist/dev/proxy.cjs"
-      },
-      "production": {
-        "import": "./dist/prod/proxy.js",
-        "require": "./dist/prod/proxy.cjs"
-      },
-      "import": "./dist/prod/proxy.js",
-      "require": "./dist/prod/proxy.cjs"
+      "development": "./dist/dev/proxy.js",
+      "production": "./dist/prod/proxy.js",
+      "default": "./dist/prod/proxy.js"
     },
     "./builder": {
       "types": "./dist/types/builder.d.ts",
-      "development": {
-        "import": "./dist/dev/builder.js",
-        "require": "./dist/dev/builder.cjs"
-      },
-      "production": {
-        "import": "./dist/prod/builder.js",
-        "require": "./dist/prod/builder.cjs"
-      },
-      "import": "./dist/prod/builder.js",
-      "require": "./dist/prod/builder.cjs"
+      "development": "./dist/dev/builder.js",
+      "production": "./dist/prod/builder.js",
+      "default": "./dist/prod/builder.js"
     },
     "./fluent": {
       "types": "./dist/types/fluent.d.ts",
-      "development": {
-        "import": "./dist/dev/fluent.js",
-        "require": "./dist/dev/fluent.cjs"
-      },
-      "production": {
-        "import": "./dist/prod/fluent.js",
-        "require": "./dist/prod/fluent.cjs"
-      },
-      "import": "./dist/prod/fluent.js",
-      "require": "./dist/prod/fluent.cjs"
+      "development": "./dist/dev/fluent.js",
+      "production": "./dist/prod/fluent.js",
+      "default": "./dist/prod/fluent.js"
     },
     "./validate": {
       "types": "./dist/types/validate.d.ts",
-      "development": {
-        "import": "./dist/dev/validate.js",
-        "require": "./dist/dev/validate.cjs"
-      },
-      "production": {
-        "import": "./dist/prod/validate.js",
-        "require": "./dist/prod/validate.cjs"
-      },
-      "import": "./dist/prod/validate.js",
-      "require": "./dist/prod/validate.cjs"
+      "development": "./dist/dev/validate.js",
+      "production": "./dist/prod/validate.js",
+      "default": "./dist/prod/validate.js"
     },
     "./tiny": {
       "types": "./dist/types/tiny.d.ts",
-      "development": {
-        "import": "./dist/dev/tiny.js",
-        "require": "./dist/dev/tiny.cjs"
-      },
-      "production": {
-        "import": "./dist/prod/tiny.js",
-        "require": "./dist/prod/tiny.cjs"
-      },
-      "import": "./dist/prod/tiny.js",
-      "require": "./dist/prod/tiny.cjs"
+      "development": "./dist/dev/tiny.js",
+      "production": "./dist/prod/tiny.js",
+      "default": "./dist/prod/tiny.js"
     },
     "./cdn-base": {
       "types": "./dist/types/cdn-base.d.ts",
-      "development": {
-        "import": "./dist/dev/cdn-base.js",
-        "require": "./dist/dev/cdn-base.cjs"
-      },
-      "production": {
-        "import": "./dist/prod/cdn-base.js",
-        "require": "./dist/prod/cdn-base.cjs"
-      },
-      "import": "./dist/prod/cdn-base.js",
-      "require": "./dist/prod/cdn-base.cjs"
+      "development": "./dist/dev/cdn-base.js",
+      "production": "./dist/prod/cdn-base.js",
+      "default": "./dist/prod/cdn-base.js"
     }
   },
   "sideEffects": false,

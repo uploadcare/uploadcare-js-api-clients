@@ -90,6 +90,7 @@ export default defineConfig(({ mode }) => {
       terserOptions,
       lib: {
         entry: entries,
+        formats: ['es'],
         fileName: '[name]'
       },
       rollupOptions: {

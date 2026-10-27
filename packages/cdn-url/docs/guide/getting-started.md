@@ -32,7 +32,7 @@ No bundler at all? The [IIFE global build](/guide/functional-vs-builder#the-flue
 
 ## Supported environments
 
-The library touches no DOM and no Node-specific APIs, so it runs anywhere modern JavaScript runs. `sideEffects: false`, ESM + CommonJS.
+The library touches no DOM and no Node-specific APIs, so it runs anywhere modern JavaScript runs. `sideEffects: false`, ESM only.
 
 | Environment                                        | Support                                                                                                        |
 | -------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
@@ -43,7 +43,7 @@ The library touches no DOM and no Node-specific APIs, so it runs anywhere modern
 | React Native                                       | ✓ with a spec-compliant `URL` polyfill (Hermes' built-in `URL` is incomplete)                                  |
 | No bundler                                         | ✓ via the [IIFE global build](/guide/functional-vs-builder#the-fluent-mega-object)                             |
 
-The only platform features required are `URL` and `String.prototype.replaceAll` (ES2021), present in every runtime above. Build artifacts are additionally smoke-tested in plain Node (ESM + CJS, every entry point) on every build.
+The only platform features required are `URL` and `String.prototype.replaceAll` (ES2021), present in every runtime above. Build artifacts are additionally smoke-tested in plain Node (every entry point) on every build.
 
 ## Build a URL
 

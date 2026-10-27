@@ -1,17 +1,14 @@
 /**
  * Post-build smoke test: resolves and exercises every entry point in plain
- * Node, through both module systems, against the real dist output. Catches
- * broken exports-map paths, ESM/CJS interop slips and runtime errors that
- * unit tests (which run against source) cannot.
+ * Node against the real dist output. Catches broken exports-map paths and
+ * runtime errors that unit tests (which run against source) cannot.
  */
-import { createRequire } from 'node:module'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 
 const pkgRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const distUrl = (rel) => pathToFileURL(resolve(pkgRoot, 'dist', rel))
 
-const require = createRequire(import.meta.url)
 const UUID = 'c2499162-eb07-4b93-b31e-94a89a47e858'
 
 const checks = []
@@ -37,10 +34,6 @@ for (const entry of entries) {
       const mod = await import(distUrl(`${flavor}/${entry}.js`))
       if (Object.keys(mod).length === 0) throw new Error('no exports')
     })
-    check(`cjs ${flavor}/${entry}`, () => {
-      const mod = require(`../dist/${flavor}/${entry}.cjs`)
-      if (Object.keys(mod).length === 0) throw new Error('no exports')
-    })
   }
 }
 
@@ -53,18 +46,18 @@ check('core roundtrip (prod esm)', async () => {
     throw new Error('roundtrip mismatch')
 })
 
-check('fluent chain (prod cjs)', () => {
-  const { cdn } = require('../dist/prod/fluent.cjs')
+check('fluent chain (prod esm)', async () => {
+  const { cdn } = await import(distUrl('prod/fluent.js'))
   // The host helpers are their own entry now; the iife keeps them on the global.
-  const { prefixedCdnBase } = require('../dist/prod/cdn-base.cjs')
+  const { prefixedCdnBase } = await import(distUrl('prod/cdn-base.js'))
   const myCdn = cdn.base(prefixedCdnBase('demopublickey'))
   const href = myCdn.file(UUID).preview(800, 600).quality('smart').href
   const expected = `https://1s4oyld5dc.ucarecd.net/${UUID}/-/preview/800x600/-/quality/smart/`
   if (href !== expected) throw new Error(`fluent mismatch: ${href}`)
 })
 
-check('structural guards survive minification (prod cjs)', () => {
-  const { cdn } = require('../dist/prod/fluent.cjs')
+check('structural guards survive minification (prod esm)', async () => {
+  const { cdn } = await import(distUrl('prod/fluent.js'))
   // A url cannot address a file without a host: this must throw in the
   // production flavor too, not fall back to some default domain.
   const throws = (fn) => {
@@ -81,8 +74,8 @@ check('structural guards survive minification (prod cjs)', () => {
     throw new Error('prod: unbound cdn.file() did not throw')
 })
 
-check('updateOperations no-ops rather than corrupts (prod cjs)', () => {
-  const { cdn } = require('../dist/prod/fluent.cjs')
+check('updateOperations no-ops rather than corrupts (prod esm)', async () => {
+  const { cdn } = await import(distUrl('prod/fluent.js'))
   const chain = cdn.base('https://x.ucarecd.net').file(UUID).preview(800, 600)
   // Production strips the dev throw; the callback contract must degrade to
   // "chain unchanged", never to `operations: undefined`.
@@ -101,21 +94,17 @@ check('dev bundle still validates (dev esm)', async () => {
   }
 })
 
-check('cdn-base entry (prod esm + cjs, node condition)', async () => {
-  const esm = await import(distUrl('prod/cdn-base.js'))
-  const cjs = require('../dist/prod/cdn-base.cjs')
+check('cdn-base entry (prod esm, node condition)', async () => {
+  const { prefixedCdnBase, prefixedCdnBaseAsync } = await import(
+    distUrl('prod/cdn-base.js')
+  )
   const expected = 'https://1s4oyld5dc.ucarecd.net'
-  for (const [flavor, mod] of [
-    ['esm', esm],
-    ['cjs', cjs]
-  ]) {
-    if (mod.prefixedCdnBase('demopublickey') !== expected)
-      throw new Error(`cdn-base ${flavor} mismatch`)
-    // The dependency's node build computes the async prefix with node:crypto's
-    // WebCrypto, so the async helper agrees with the sync one here.
-    if ((await mod.prefixedCdnBaseAsync('demopublickey')) !== expected)
-      throw new Error(`cdn-base ${flavor} async mismatch`)
-  }
+  if (prefixedCdnBase('demopublickey') !== expected)
+    throw new Error('cdn-base mismatch')
+  // The dependency's node build computes the async prefix with node:crypto's
+  // WebCrypto, so the async helper agrees with the sync one here.
+  if ((await prefixedCdnBaseAsync('demopublickey')) !== expected)
+    throw new Error('cdn-base async mismatch')
 })
 
 check('iife global', async () => {
@@ -146,5 +135,5 @@ if (failed > 0) {
   process.exit(1)
 }
 console.log(
-  `Node smoke passed: ${checks.length} checks (esm+cjs × dev+prod × ${entries.length} entries, iife).`
+  `Node smoke passed: ${checks.length} checks (esm × dev+prod × ${entries.length} entries, iife).`
 )

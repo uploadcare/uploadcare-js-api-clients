@@ -14,7 +14,7 @@ const root = new URL('..', import.meta.url).pathname
 function read(flavor) {
   const dir = join(root, 'dist', flavor)
   return readdirSync(dir)
-    .filter((f) => f.endsWith('.js') || f.endsWith('.cjs'))
+    .filter((f) => f.endsWith('.js'))
     .map((f) => readFileSync(join(dir, f), 'utf8'))
     .join('\n')
 }
@@ -65,13 +65,11 @@ for (const flavor of ['dev', 'prod']) {
   // Per file, not per flavor: the specifier only belongs to the cdn-base
   // entry, and joining every file would let one surviving import vouch for the
   // rest.
-  for (const ext of ['js', 'cjs']) {
-    const entry = join(root, 'dist', flavor, `cdn-base.${ext}`)
-    if (!readFileSync(entry, 'utf8').includes(CNAME_PREFIX_SPECIFIER)) {
-      failures.push(
-        `${flavor}/cdn-base.${ext} does not import ${CNAME_PREFIX_SPECIFIER} — it was inlined, so the consumer cannot resolve its export conditions`
-      )
-    }
+  const entry = join(root, 'dist', flavor, 'cdn-base.js')
+  if (!readFileSync(entry, 'utf8').includes(CNAME_PREFIX_SPECIFIER)) {
+    failures.push(
+      `${flavor}/cdn-base.js does not import ${CNAME_PREFIX_SPECIFIER} — it was inlined, so the consumer cannot resolve its export conditions`
+    )
   }
   const code = flavor === 'dev' ? dev : prod
   if (code.includes(BROWSER_DIGEST_MARKER)) {
