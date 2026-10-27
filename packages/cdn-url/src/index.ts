@@ -1,3 +1,12 @@
+/**
+ * The functional core: parse and serialize CDN URLs, the string-level API, and
+ * the shared types. Imported as `@uploadcare/cdn-url`.
+ *
+ * Named `core` rather than the default `index` so its reference pages do not
+ * collide with the reference landing page (`reference/index.md`).
+ *
+ * @module core
+ */
 export {
   isArchiveUrl,
   isFileUrl,
