@@ -5,6 +5,8 @@
   "type": "module",
   "main": "./dist/prod/index.js",
   "types": "./dist/types/index.d.ts",
+  "unpkg": "./dist/cdn-url.global.js",
+  "jsdelivr": "./dist/cdn-url.global.js",
   "exports": {
     ".": {
       "types": "./dist/types/index.d.ts",

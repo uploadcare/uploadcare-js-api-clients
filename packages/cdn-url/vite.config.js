@@ -80,7 +80,15 @@ export default defineConfig(({ mode }) => {
           dts({
             outDir: resolve(__dirname, 'dist/types'),
             insertTypesEntry: true,
-            exclude: ['vitest.config.ts', '**/*.test.ts']
+            // Only the library ships: no test configs, doc fixtures or the
+            // IIFE wrapper, which has no types entry of its own.
+            exclude: [
+              'vitest.config.ts',
+              'vitest.browser.config.ts',
+              '**/*.test.ts',
+              'src/docs-fixtures.ts',
+              'src/iife.ts'
+            ]
           })
         ],
     build: {
