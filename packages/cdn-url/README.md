@@ -5,6 +5,9 @@ image transformations, file groups, delivery proxy and video/document
 conversion paths. Fully typed, atomic and tree-shakeable — import only what you
 use.
 
+> [!WARNING]
+> **Beta.** The API may still change in a minor release while this notice is here, so pin an exact version (`npm install --save-exact`).
+
 **[Documentation](https://uploadcare.github.io/uploadcare-js-api-clients/cdn-url/)** — guides, how-to articles and the full API reference.
 
 ```sh

@@ -2,6 +2,10 @@
 
 `@uploadcare/cdn-url` builds and parses [Uploadcare CDN](https://uploadcare.com/docs/delivery/cdn/) URLs: image transformations, file groups, delivery proxy and conversion paths. It ships full TypeScript types and one runtime dependency, [`@uploadcare/cname-prefix`](https://www.npmjs.com/package/@uploadcare/cname-prefix), used only if you ask it to derive [your CDN base](/guide/cdn-base) from a public key.
 
+::: warning Beta
+The API may still change in a minor release while this notice is here, so pin an exact version (`npm install --save-exact`).
+:::
+
 ## Install
 
 ::: code-group

@@ -378,13 +378,15 @@ rejections. Operation *names* remain `OperationLiteral`'s business; the brand sa
 
 ## API stability
 
-- **Everything above is pre-release churn, and it stops at the first stable
-  release (6.24.x or later, in lockstep with the repo).** The package has only
-  ever shipped `6.20.0-alpha.x`, which is why this session could rename
+- **Everything above is beta churn, and it stops when the beta notice goes.**
+  The README, the docs landing page and getting-started say the API may change in
+  a minor release while the notice is there; remove all three together, and
+  only then does the rule below apply. The package first shipped as
+  `6.20.0-alpha.x`, which is why this session could rename
   `origin`→`cdnBase`, `configure`→`cdn.base`, `setCdnBase`/`setFilename`→
   `base`/`filename` and `on`/`setEndpoint`→`base`/`proxy` without aliases:
   deprecation shims for an unreleased API are pure debt.
-  **After the first non-alpha release, that stops.** A rename then needs the
+  **Once the beta notice is removed, that stops.** A rename then needs the
   old name kept as a deprecated alias for at least one minor, a `@deprecated`
   JSDoc tag naming the replacement, and a line in the changelog. Assume Hyrum's
   Law applies to anything observable — including the exact text of the errors in
