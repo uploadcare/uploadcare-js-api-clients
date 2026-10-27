@@ -9,7 +9,7 @@ export const LEGACY_CDN_BASE = 'https://ucarecdn.com'
 
 /**
  * The zone a project prefix is prepended to: `<prefix>.ucarecd.net`, which is
- * what {@link prefixedCdnBase} computes. Not a typo for `ucarecdn.com` — it is
+ * what {@link cdn-base!prefixedCdnBase} computes. Not a typo for `ucarecdn.com` — it is
  * the separate zone that serves per-project prefixed hostnames, and it only
  * answers **with** a prefix, never bare.
  *

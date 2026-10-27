@@ -146,7 +146,7 @@ export class CdnUrl {
 
   /**
    * Replaces the first matching operation in place, or appends it. Matching
-   * follows {@link operationMatches}, so counted operations are swapped
+   * follows `operationMatches`, so counted operations are swapped
    * rather than duplicated (`thumbs~5` → `thumbs~3`).
    *
    * Only the first match is touched. For a stackable operation that legitimately

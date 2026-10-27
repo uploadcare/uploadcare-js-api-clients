@@ -12,7 +12,8 @@
     "src/builder/index.ts",
     "src/fluent/index.ts",
     "src/validate/index.ts",
-    "src/tiny/index.ts"
+    "src/tiny/index.ts",
+    "src/cdn-base/index.ts"
   ],
   "out": "docs/reference",
   "docsRoot": "docs",
