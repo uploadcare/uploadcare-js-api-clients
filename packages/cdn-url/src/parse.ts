@@ -136,10 +136,13 @@ export function parseGroupElementUrl(url: string): ParsedGroupElementUrl {
   if (segments[0] !== 'nth') {
     throw new TypeError(`Not a group element URL (no nth segment): "${url}"`)
   }
-  const index = Number(segments[1])
-  if (!Number.isInteger(index)) {
+  const raw = segments[1] ?? ''
+  // Digits only: Number() would read `1e1` as 10 and `0x1` as 1, and serialize
+  // them back as a different url.
+  if (!/^\d+$/.test(raw)) {
     throw new TypeError(`Invalid group element index in "${url}"`)
   }
+  const index = Number(raw)
   segments.splice(0, 2)
   const filename = takeFilename(segments, hasTrailingSlash)
   return {

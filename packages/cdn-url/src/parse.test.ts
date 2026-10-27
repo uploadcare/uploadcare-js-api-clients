@@ -453,6 +453,14 @@ describe('per-kind parsers', () => {
       expect(() => parseGroupElementUrl(GROUP)).toThrow(TypeError)
       expect(() => parseGroupElementUrl(FILE)).toThrow(TypeError)
     })
+
+    it('rejects an index that is not plain decimal digits', () => {
+      for (const index of ['1e1', '0x1', '-1', '1.0', '']) {
+        expect(() =>
+          parseGroupElementUrl(`https://ucarecdn.com/${UUID}~3/nth/${index}/`)
+        ).toThrow(/Invalid group element index/)
+      }
+    })
   })
 
   describe('parseProxyUrl', () => {
