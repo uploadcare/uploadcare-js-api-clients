@@ -70,6 +70,9 @@ const SAMPLES: OperationLiteral[] = [
   'flip',
   'mirror',
   'zoom_objects/50',
+  'trim',
+  'trim/30',
+  'trim/30/10p',
   'json',
   'jsonp/callbackName',
   'main_colors/4'

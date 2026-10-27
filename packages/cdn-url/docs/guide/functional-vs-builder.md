@@ -176,7 +176,7 @@ What each entry costs when you import everything it exports, bundled and minifie
 | `builder`                               | 5.7 kB   | 2.0 kB  |
 | `tiny` (string level)                   | 0.9 kB   | 0.5 kB  |
 | `index` (everything below, re-exported) | 8.1 kB   | 3.3 kB  |
-| `ops` (all 47 creators)                 | 6.1 kB   | 2.2 kB  |
+| `ops` (all 48 creators)                 | 6.1 kB   | 2.2 kB  |
 | `fluent` (the `cdn` mega-object)        | 17.4 kB  | 5.9 kB  |
 
 No total above includes `prefixedCdnBase` — the SHA-256 that derives your project's host lives in its own entry, [`@uploadcare/cdn-url/cdn-base`](/guide/cdn-base), so a bundle carries it only if it imports that entry. Doing so adds 1.9 kB minified (1.2 kB gzipped): `cdn` plus one chain measures 15.0 kB minified, 4.4 kB gzipped on its own, and 17.0 kB (5.7 kB gzipped) once it derives the host. Compute the host at build time or paste it as a literal and you pay nothing for the hashing.

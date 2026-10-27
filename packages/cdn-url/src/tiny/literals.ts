@@ -97,6 +97,9 @@ export type OperationLiteral =
   | 'flip'
   | 'mirror'
   | `zoom_objects/${number}`
+  | 'trim'
+  | `trim/${number}`
+  | `trim/${number}/${number}${'p' | '%'}`
   // information
   | 'json'
   | `jsonp/${string}`

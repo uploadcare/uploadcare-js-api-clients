@@ -25,6 +25,7 @@ export {
   STRETCH_MODES,
   stretch,
   type StretchMode,
+  trim,
   zoomObjects
 } from './geometric'
 export {

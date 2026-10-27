@@ -163,6 +163,12 @@ describe('validateOperations', () => {
     )
   })
 
+  it('knows trim', () => {
+    expect(codes([op('preview'), op('trim', '30')])).not.toContain(
+      'unknown-operation'
+    )
+  })
+
   it('ignores @-prefixed internal operations', () => {
     expect(codes([op('preview'), op('@clib', 'pkg', '1.0.0')])).not.toContain(
       'unknown-operation'

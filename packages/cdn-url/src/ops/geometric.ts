@@ -262,6 +262,44 @@ export const borderRadius = /* @__PURE__ */ namedOp(
   }
 )
 
+const TRIM_PADDING_RE = /^(\d+(?:\.\d+)?)(p|%)$/
+
+/**
+ * Crops away a solid background or fully transparent edges. `tolerance`
+ * (0..99) widens the colors treated as background; `padding` keeps a margin,
+ * as a percentage of the result (`'10p'`, 0–100%). The CDN documents no
+ * default tolerance, so a padding needs one before it.
+ *
+ * @see https://uploadcare.com/docs/transformations/image/resize-crop/#operation-trim
+ * @example
+ * ```ts
+ * trim() // → -/trim/
+ * trim(30, '10p') // → -/trim/30/10p/
+ * ```
+ */
+export const trim = /* @__PURE__ */ namedOp(
+  'trim',
+  function trim(tolerance?: number, padding?: string): CdnOperation {
+    if (tolerance == null) {
+      if (__DEV__ && padding != null) {
+        throw new TypeError('trim padding needs a tolerance before it')
+      }
+      return rawOp('trim')
+    }
+    assertIntInRange(tolerance, 0, 99, 'trim tolerance')
+    if (padding == null) return rawOp('trim', String(tolerance))
+    if (__DEV__) {
+      const match = TRIM_PADDING_RE.exec(padding)
+      if (match === null || Number(match[1]) > 100) {
+        throw new RangeError(
+          `trim padding must be a percentage in 0..100 ('10p'), got "${padding}"`
+        )
+      }
+    }
+    return rawOp('trim', String(tolerance), padding)
+  }
+)
+
 /**
  * Background fill color used by crop-outside-of-image, `stretch/fill` and
  * alpha-channel flattening into JPEG.

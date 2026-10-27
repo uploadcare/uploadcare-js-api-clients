@@ -31,6 +31,10 @@ export abstract class ImageChain<S extends ChainState> extends Chain<S> {
   public crop(width: SizeValue, height: SizeValue, align?: Alignment): this {
     return this._add(ops.crop(width, height, align))
   }
+  /** Appends `trim`; mirrors the creator in `@uploadcare/cdn-url/ops`. */
+  public trim(tolerance?: number, padding?: string): this {
+    return this._add(ops.trim(tolerance, padding))
+  }
   /** Appends `cropByRatio`; mirrors the creator in `@uploadcare/cdn-url/ops`. */
   public cropByRatio(ratio: string, align?: Alignment): this {
     return this._add(ops.cropByRatio(ratio, align))

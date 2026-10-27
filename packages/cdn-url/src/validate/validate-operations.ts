@@ -148,6 +148,7 @@ const KNOWN_IMAGE_OPS = new Set([
   'stretch',
   'crop',
   'scale_crop',
+  'trim',
   'border_radius',
   'setfill',
   'zoom_objects',

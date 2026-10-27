@@ -2,6 +2,9 @@ import { describe, expect, it } from 'vitest'
 
 import {
   autorotate,
+  font,
+  textBox,
+  trim,
   blur,
   blurRegion,
   borderRadius,
@@ -171,6 +174,18 @@ describe('geometric operations', () => {
       params: ['10,20', '5p,0']
     })
     expect(() => borderRadius([1, 2, 3, 4, 5])).toThrow(RangeError)
+  })
+
+  it('trim takes an optional tolerance, then padding', () => {
+    expect(trim()).toEqual({ name: 'trim', params: [] })
+    expect(trim(30)).toEqual({ name: 'trim', params: ['30'] })
+    expect(trim(30, '10p')).toEqual({ name: 'trim', params: ['30', '10p'] })
+    // The CDN documents no default tolerance, so a padding needs one before it.
+    expect(() => trim(undefined, '5%')).toThrow(TypeError)
+    expect(() => trim(100)).toThrow(RangeError)
+    expect(() => trim(-1)).toThrow(RangeError)
+    expect(() => trim(0, '101p')).toThrow(RangeError)
+    expect(() => trim(0, '10px')).toThrow(RangeError)
   })
 
   it('setfill validates hex colors', () => {
