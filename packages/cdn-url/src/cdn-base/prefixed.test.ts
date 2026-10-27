@@ -66,9 +66,10 @@ describe('cdn-base', () => {
   })
 
   describe.runIf(!isBrowser)('on Node', () => {
-    it('rejects the async helper, pointing at the sync one', async () => {
-      await expect(prefixedCdnBaseAsync(PUBLIC_KEY)).rejects.toThrow(
-        /browsers only[\s\S]*getPrefixedCdnBaseSync/
+    it('resolves the async helper through node:crypto and agrees with the sync one', async () => {
+      await expect(prefixedCdnBaseAsync(PUBLIC_KEY)).resolves.toBe(PREFIXED)
+      await expect(prefixedCdnBaseAsync(LONG_KEY)).resolves.toBe(
+        prefixedCdnBase(LONG_KEY)
       )
     })
   })

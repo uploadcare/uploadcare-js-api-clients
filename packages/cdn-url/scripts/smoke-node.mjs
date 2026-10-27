@@ -111,16 +111,10 @@ check('cdn-base entry (prod esm + cjs, node condition)', async () => {
   ]) {
     if (mod.prefixedCdnBase('demopublickey') !== expected)
       throw new Error(`cdn-base ${flavor} mismatch`)
-    // node:crypto is synchronous, so the dependency's node build rejects the
-    // async helper. Reaching that message proves the node condition resolved.
-    await mod
-      .prefixedCdnBaseAsync('demopublickey')
-      .then(() => {
-        throw new Error(`cdn-base ${flavor} resolved the browser helper`)
-      })
-      .catch((error) => {
-        if (!/browsers only/.test(error.message)) throw error
-      })
+    // The dependency's node build computes the async prefix with node:crypto's
+    // WebCrypto, so the async helper agrees with the sync one here.
+    if ((await mod.prefixedCdnBaseAsync('demopublickey')) !== expected)
+      throw new Error(`cdn-base ${flavor} async mismatch`)
   }
 })
 

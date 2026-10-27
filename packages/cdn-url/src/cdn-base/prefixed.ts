@@ -20,9 +20,9 @@ import { trimTrailingSlashes } from '../grammar'
  * ~0.3 kB to a bundle against ~1 kB for {@link prefixedCdnBase}, which has to
  * carry a SHA-256 of its own to be able to return without awaiting.
  *
- * On Node it rejects with a `TypeError` pointing at {@link prefixedCdnBase},
- * which is native there and needs no await. Nothing is broken by importing it in
- * code that runs in both places, as long as only the browser path calls it.
+ * On Node it resolves to the same string, hashing with `node:crypto`'s
+ * WebCrypto, so isomorphic code can await it on the server too. There
+ * {@link prefixedCdnBase} is just as small and needs no await.
  *
  * Being async, it cannot be inlined into a `base(...)` call — resolve it once at
  * startup and keep the string.
