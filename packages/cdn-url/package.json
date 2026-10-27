@@ -192,6 +192,12 @@
   },
   "author": "Uploadcare",
   "license": "MIT",
+  "engines": {
+    "node": ">=16"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
   "bugs": {
     "url": "https://github.com/uploadcare/uploadcare-js-api-clients/issues"
   },
