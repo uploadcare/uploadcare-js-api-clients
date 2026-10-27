@@ -110,8 +110,11 @@ export const format = /* @__PURE__ */ namedOp(
   }
 )
 
-/** `HHH:MM:SS.sss`, `MM:SS.sss` or plain seconds `SSSS.sss`. */
-const TIME_RE = /^(\d{1,3}:)?(\d{1,2}:)?\d{1,4}(\.\d+)?$/
+/**
+ * `HHH:MM:SS.sss` (hours 0–999 and minutes optional, minutes and seconds 0–59)
+ * or plain seconds `SSSS.sss` (0–9999999); the fraction is up to 3 digits.
+ */
+const TIME_RE = /^(?:(?:\d{1,3}:)?[0-5]?\d:[0-5]?\d|\d{1,7})(?:\.\d{1,3})?$/
 
 /**
  * Cuts a fragment starting at `startTime`; `length` accepts a duration in

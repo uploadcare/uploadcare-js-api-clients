@@ -48,6 +48,19 @@ describe('video conversion operations', () => {
     expect(() => cut('not-a-time', '10')).toThrow(RangeError)
   })
 
+  it('cut takes the documented ranges: seconds up to 9999999, minutes and seconds up to 59', () => {
+    expect(cut('0', '10800').params).toEqual(['0', '10800'])
+    expect(cut('9999999.999', 'end').params).toEqual(['9999999.999', 'end'])
+    expect(cut('001:02:40.535', '02:20.0').params).toEqual([
+      '001:02:40.535',
+      '02:20.0'
+    ])
+    expect(() => cut('0:0:99', 'end')).toThrow(RangeError)
+    expect(() => cut('0:60', 'end')).toThrow(RangeError)
+    expect(() => cut('10000000', 'end')).toThrow(RangeError)
+    expect(() => cut('1.5000', 'end')).toThrow(RangeError)
+  })
+
   it('thumbs validates 1..50', () => {
     expect(thumbs(20)).toEqual({ name: 'thumbs~20', params: [] })
     expect(thumbs(1, { fromFirstFrame: true })).toEqual({
