@@ -116,7 +116,7 @@ const framed = [
 
 `text` takes the **box** it draws into (size, then position — same coordinate rules as above), and the string. The box governs wrapping and how `textAlign` positions the copy inside it. `font` sets size and colour (the CDN also accepts weight, style and family); `textAlign` takes horizontal then vertical; `textBox` draws a background behind the text — mode, colour, padding.
 
-Escaping is handled for you — slashes, newlines and tildes are encoded per the CDN's `~s`/`~n`/`~~` rules, so a caption can contain a URL:
+Escaping is handled for you — slashes, newlines and tildes are encoded per the CDN's `~s`/`~n`/`~~` rules and the rest is percent-encoded, so a caption can contain a URL, a `#` or a `?`:
 
 ::: code-group
 
@@ -155,8 +155,6 @@ myCdn
 ```
 
 :::
-
-Note what escaping is _not_: percent-encoding. A space stays a space in the path, which browsers encode on request but an HTTP header or JSON payload will not — encode there yourself.
 
 Prefer the operation creators over [string-level literals](/guide/string-level-api) here. Caption text is the one operation parameter that usually comes from user input, and the creators are what escape it; a hand-written `modifiers('text/80px30p/bottom/…')` puts you in charge of that.
 

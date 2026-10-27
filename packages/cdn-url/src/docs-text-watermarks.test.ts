@@ -6,7 +6,7 @@
 import { describe, expect, it } from 'vitest'
 
 import { CdnUrl } from './builder/index'
-import { serializeCdnUrl } from './index'
+import { parseFileUrl, serializeCdnUrl } from './index'
 import { font, overlay, preview, text, textAlign, textBox } from './ops/index'
 import { operationInputs, validateOperations } from './validate/index'
 
@@ -105,7 +105,7 @@ describe('text-and-watermarks: draw text', () => {
   ]
 
   it('serializes the documented chain, atomic and fluent alike', () => {
-    const expected = `${cdnBase}/${uuid}/-/preview/1200x630/-/font/48/ffffff/-/text_align/center/bottom/-/text_box/fill/00000080/20/-/text/80px30p/bottom/Ship it on Friday/`
+    const expected = `${cdnBase}/${uuid}/-/preview/1200x630/-/font/48/ffffff/-/text_align/center/bottom/-/text_box/fill/00000080/20/-/text/80px30p/bottom/Ship%20it%20on%20Friday/`
     expect(serializeCdnUrl({ cdnBase, uuid, operations: ops })).toBe(expected)
     expect(
       myCdn
@@ -124,12 +124,17 @@ describe('text-and-watermarks: draw text', () => {
     expect(withUrl.params[2]).not.toContain('/')
   })
 
-  it('leaves a space a space — CDN escaping is not percent-encoding', () => {
-    const spaced = text(['80p', '30p'], 'bottom', 'two words')
-    expect(spaced.params[2]).toBe('two words')
-    expect(serializeCdnUrl({ cdnBase, uuid, operations: [spaced] })).toContain(
-      '/two words/'
-    )
+  it('percent-encodes the caption, as the CDN requires', () => {
+    const spaced = text(['80p', '30p'], 'bottom', 'two words 🍷')
+    expect(spaced.params[2]).toBe('two%20words%20%F0%9F%8D%B7')
+  })
+
+  it('keeps a caption with # ? % intact through serialize and parse', () => {
+    const caption = text(['80p', '30p'], 'bottom', 'Sale #1? 50% off')
+    const url = serializeCdnUrl({ cdnBase, uuid, operations: [caption] })
+    expect(new URL(url).hash).toBe('')
+    expect(new URL(url).search).toBe('')
+    expect(parseFileUrl(url).operations).toEqual([caption])
   })
 })
 

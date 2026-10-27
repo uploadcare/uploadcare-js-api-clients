@@ -104,17 +104,20 @@ export const rect = /* @__PURE__ */ namedOp(
   }
 )
 
-/** Escapes the documented `~s` (slash), `~n` (newline), `~~` (tilde) sequences. */
+/**
+ * Applies the documented `~s` (slash), `~n` (newline), `~~` (tilde) sequences,
+ * then percent-encodes the rest, which the CDN requires: a raw `#` or `?` would
+ * otherwise end the path.
+ */
 function escapeText(value: string): string {
-  return value
-    .replaceAll('~', '~~')
-    .replaceAll('/', '~s')
-    .replaceAll('\n', '~n')
+  return encodeURIComponent(
+    value.replaceAll('~', '~~').replaceAll('/', '~s').replaceAll('\n', '~n')
+  )
 }
 
 /**
  * Text overlay (disabled by default; enabled per project). The string is
- * escaped per the documented `~s`/`~n`/`~~` rules.
+ * escaped per the documented `~s`/`~n`/`~~` rules and percent-encoded.
  *
  * @see https://uploadcare.com/docs/transformations/image/overlay/#overlay-text
  * @example
