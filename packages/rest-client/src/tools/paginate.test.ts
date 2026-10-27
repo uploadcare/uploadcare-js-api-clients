@@ -72,7 +72,7 @@ describe('Paginator', () => {
       await paginator.next()
       await paginator.next()
       await paginator.prev()
-      expect(paginator.prev()).resolves.toEqual(null)
+      await expect(paginator.prev()).resolves.toEqual(null)
     })
   })
 
