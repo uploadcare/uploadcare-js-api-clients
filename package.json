@@ -71,6 +71,10 @@
   "overrides": {
     "@types/markdown-it": "13.0.9",
     "@types/linkify-it": "3.0.5",
-    "@types/mdurl": "1.0.5"
+    "@types/mdurl": "1.0.5",
+    "serialize-javascript": "^7.1.4",
+    "vitepress": {
+      "vite": "^7.3.7"
+    }
   }
 }
