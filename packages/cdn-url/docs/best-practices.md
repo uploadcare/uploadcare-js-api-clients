@@ -32,7 +32,7 @@ const processed = [preview(), stripMeta('sensitive')]
 - Use `format(…)` to force a specific output (`preserve` for downloads, `jpeg` to unlock the 5000px ceiling), or when you serve from S3-bypass storage where `auto` doesn't apply.
 - Use `quality(…)` on projects created before August 4, 2025 that don't have adaptive quality enabled, or to override the adaptive choice (see high-DPR below).
 - `progressive(true)` affects only the JPEG fallback path and never forces JPEG. Worth it for large hero images on slow connections, noise elsewhere.
-  :::
+:::
 
 ## High pixel ratios: bigger and lighter
 
