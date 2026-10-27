@@ -7,7 +7,7 @@
  * ```html
  * <script src="https://unpkg.com/@uploadcare/cdn-url/dist/cdn-url.global.js"></script>
  * <script>
- *   UCCdnUrl.base(UCCdnUrl.prefixedCdnBase('YOUR_PUBLIC_KEY'))
+ *   UCCdnUrl.cdn.base(UCCdnUrl.prefixedCdnBase('YOUR_PUBLIC_KEY'))
  *     .file(uuid).preview(800, 600).href
  *   UCCdnUrl.parseCdnUrl(url)
  * </script>

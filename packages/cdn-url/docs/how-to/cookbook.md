@@ -15,7 +15,7 @@ Every recipe is shown in all three API styles. Pick a tab and stay in it. A four
 | **Builder**    | `CdnUrl` + one op creator         | 2069 B  |
 | **Fluent**     | `cdn` + a chain                   | 4509 B  |
 
-Measured on one task — parse a URL, add one operation, serialize. None of them include `prefixedCdnBase`: recipes that build from a uuid need [a CDN base](/guide/cdn-base), and deriving it from a public key adds 2.1 kB gzipped unless you paste the host as a literal.
+Measured on one task — parse a URL, add one operation, serialize. None of them include `prefixedCdnBase`: recipes that build from a uuid need [a CDN base](/guide/cdn-base), and deriving it from a public key adds 1.2 kB gzipped unless you paste the host as a literal.
 
 Atomic is the smallest and the most explicit. Builder wraps one URL in an immutable class. Fluent puts every URL flavor behind one chainable object, and it is the only style that turns an invalid combination into a compile error: `cdn.video(uuid).blur(10)` does not typecheck, because video chains carry no image methods. [API styles & tree-shaking](/guide/functional-vs-builder) compares them properly.
 

@@ -90,8 +90,8 @@ export function parseProxyUrl(url: string): ParsedProxyUrl {
  * @see https://uploadcare.com/docs/file-groups/
  * @example
  * ```ts
- * parseGroupUrl('https://ucarecdn.com/:uuid~3/')
- * // → { kind: 'group', group: { uuid: ':uuid', count: 3 }, ... }
+ * parseGroupUrl(`https://ucarecdn.com/${uuid}~3/`)
+ * // → { kind: 'group', group: { uuid, count: 3 }, ... }
  * ```
  */
 export function parseGroupUrl(url: string): ParsedGroupUrl {
@@ -120,8 +120,8 @@ export function parseGroupUrl(url: string): ParsedGroupUrl {
  * @see https://uploadcare.com/docs/file-groups/#group-cdn
  * @example
  * ```ts
- * parseGroupElementUrl('https://ucarecdn.com/:uuid~3/nth/1/')
- * // → { kind: 'group-element', nth: 1, group: { uuid: ':uuid', count: 3 }, ... }
+ * parseGroupElementUrl(`https://ucarecdn.com/${uuid}~3/nth/1/`)
+ * // → { kind: 'group-element', nth: 1, group: { uuid, count: 3 }, ... }
  * ```
  */
 export function parseGroupElementUrl(url: string): ParsedGroupElementUrl {
@@ -216,8 +216,8 @@ function isArchiveFormat(
  * @see https://uploadcare.com/docs/delivery/cdn/
  * @example
  * ```ts
- * parseFileUrl('https://ucarecdn.com/:uuid/-/resize/300x/photo.jpg').uuid
- * // → ':uuid' — no narrowing needed
+ * parseFileUrl(`https://ucarecdn.com/${uuid}/-/resize/300x/photo.jpg`).uuid
+ * // → uuid — no narrowing needed
  * ```
  */
 export function parseFileUrl(url: string): ParsedFileUrl {
@@ -268,8 +268,8 @@ function matchGroupId(head: string): GroupId | null {
  * @see https://uploadcare.com/docs/cdn-operations/
  * @example
  * ```ts
- * parseCdnUrl('https://ucarecdn.com/:uuid/-/resize/300x/photo.jpg')
- * // → { kind: 'file', uuid: ':uuid', operations: [{ name: 'resize', params: ['300x'] }], filename: 'photo.jpg', ... }
+ * parseCdnUrl(`https://ucarecdn.com/${uuid}/-/resize/300x/photo.jpg`)
+ * // → { kind: 'file', uuid, operations: [{ name: 'resize', params: ['300x'] }], filename: 'photo.jpg', ... }
  * ```
  */
 export function parseCdnUrl(url: string): ParsedCdnUrl {
@@ -378,8 +378,8 @@ function parseOperationSegments(
  * @see https://uploadcare.com/docs/delivery/cdn/
  * @example
  * ```ts
- * isFileUrl('https://ucarecdn.com/:uuid/') // → true
- * isFileUrl('https://ucarecdn.com/:uuid~3/') // → false, that is a group
+ * isFileUrl(`https://ucarecdn.com/${uuid}/`) // → true
+ * isFileUrl(`https://ucarecdn.com/${uuid}~3/`) // → false, that is a group
  * ```
  */
 export function isFileUrl(url: string): boolean {
@@ -397,7 +397,7 @@ export function isFileUrl(url: string): boolean {
  * @see https://uploadcare.com/docs/file-groups/
  * @example
  * ```ts
- * isGroupUrl('https://ucarecdn.com/:uuid~3/') // → true
+ * isGroupUrl(`https://ucarecdn.com/${uuid}~3/`) // → true
  * ```
  */
 export function isGroupUrl(url: string): boolean {
@@ -415,7 +415,7 @@ export function isGroupUrl(url: string): boolean {
  * @see https://uploadcare.com/docs/file-groups/#group-cdn
  * @example
  * ```ts
- * isGroupElementUrl('https://ucarecdn.com/:uuid~3/nth/1/') // → true
+ * isGroupElementUrl(`https://ucarecdn.com/${uuid}~3/nth/1/`) // → true
  * ```
  */
 export function isGroupElementUrl(url: string): boolean {

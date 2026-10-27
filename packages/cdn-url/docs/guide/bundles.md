@@ -28,7 +28,7 @@ Four failure modes exist, and which one you get is a property of the function, n
 | **Dev-only throw, then garbage in / garbage out** — value checks   | every operation creator (`quality('ultra')`, out-of-range sizes, bad enums), `videoPath`/`nthUrl` input checks                                                      | serializes the bad value as given |
 | **Never throws, returns findings**                                 | `validateOperations` and the rest of the `validate` entry                                                                                                           | identical to development          |
 
-Two functions sit outside the table because their behaviour depends on the runtime rather than the bundle: [`prefixedCdnBaseAsync`](/guide/cdn-base#sync-or-async) resolves in browsers and workers and **rejects under Node**, where the synchronous helper is native; `prefixedCdnBase` works everywhere.
+Two functions sit outside the table because their behaviour depends on the runtime rather than the bundle: [`prefixedCdnBaseAsync`](/guide/cdn-base#sync-or-async) needs WebCrypto, so it fails on a plain `http://` origin, where browsers hide `crypto.subtle`; under Node it uses `node:crypto`. `prefixedCdnBase` works everywhere.
 
 The string level ([`tinyParse`/`tinyBuild`](/guide/string-level-api)) throws nowhere, in either flavor, by design — it does no validation at all.
 

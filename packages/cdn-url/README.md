@@ -19,10 +19,10 @@ deno add npm:@uploadcare/cdn-url
 ## Parse and edit existing URLs
 
 ```ts
-import { parseCdnUrl, serializeCdnUrl } from '@uploadcare/cdn-url'
+import { parseFileUrl, serializeCdnUrl } from '@uploadcare/cdn-url'
 import { stripMeta } from '@uploadcare/cdn-url/ops'
 
-const parsed = parseCdnUrl(
+const parsed = parseFileUrl(
   'https://1s4oyld5dc.ucarecd.net/c2499162-eb07-4b93-b31e-94a89a47e858/-/resize/300x/photo.jpg'
 )
 // {
@@ -40,7 +40,8 @@ const url = serializeCdnUrl({
 })
 ```
 
-The parser is **lenient**: unknown directives (including internal `@`-prefixed
+`parseFileUrl` throws for anything but a single file; `parseCdnUrl` reads every
+kind and returns a union to narrow on `kind`. The parser is **lenient**: unknown directives (including internal `@`-prefixed
 ones) are preserved verbatim, so `serializeCdnUrl(parseCdnUrl(url)) === url`.
 
 All domain flavors are supported: legacy `ucarecdn.com`, project-prefixed
@@ -88,7 +89,7 @@ An optional immutable wrapper when chaining reads better than spreading:
 
 ```ts
 import { CdnUrl } from '@uploadcare/cdn-url/builder'
-import { preview, quality } from '@uploadcare/cdn-url/ops'
+import { preview, quality, resize, stripMeta } from '@uploadcare/cdn-url/ops'
 
 CdnUrl.parse('https://1s4oyld5dc.ucarecd.net/c2499162-…/-/resize/300x/')
   .without(resize)
@@ -99,7 +100,7 @@ CdnUrl.parse('https://1s4oyld5dc.ucarecd.net/c2499162-…/-/resize/300x/')
 ## The fluent mega-object
 
 Everything behind one import, chainable end to end — for code that prefers
-convenience over tree-shaking (~14 kB minified):
+convenience over tree-shaking (~17 kB minified):
 
 ```ts
 import { cdn } from '@uploadcare/cdn-url/fluent'
@@ -231,12 +232,12 @@ functional — it is an opt-in API, not a runtime check.
 
 ## Supported environments
 
-No DOM, no Node-specific APIs, one runtime dependency — runs in Node.js **≥ 20**,
+No DOM, one runtime dependency (which picks `node:crypto` under Node) — runs in Node.js **≥ 20**,
 evergreen browsers (Chrome/Edge 87+, Firefox 78+, Safari 14+), Bun, Deno, edge
 runtimes, and React Native (with a spec-compliant `URL` polyfill). The only
 platform features required are `URL` and `String.prototype.replaceAll`. The
-test suite runs in Node and real Chromium; every build is smoke-tested through
-both module systems.
+test suite runs in Node and real Chromium; every build is smoke-tested in plain
+Node. ESM only.
 
 ## Useful links
 

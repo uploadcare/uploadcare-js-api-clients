@@ -8,7 +8,7 @@ import type { GroupId } from '../types'
  * @see https://uploadcare.com/docs/file-groups/
  * @example
  * ```ts
- * parseGroupId(':uuid~11') // → { uuid: ':uuid', count: 11 }
+ * parseGroupId(`${uuid}~11`) // → { uuid, count: 11 }
  * ```
  */
 export function parseGroupId(id: string): GroupId {
@@ -25,7 +25,7 @@ export function parseGroupId(id: string): GroupId {
  * @see https://uploadcare.com/docs/file-groups/
  * @example
  * ```ts
- * formatGroupId({ uuid: ':uuid', count: 3 }) // → ':uuid~3'
+ * formatGroupId({ uuid, count: 3 }) // → `${uuid}~3`
  * ```
  */
 export function formatGroupId(group: GroupId): string {

@@ -83,7 +83,7 @@ export interface Cdn extends UnboundCdn {
  *
  * @example
  * ```ts
- * const chain = parse('https://ucarecdn.com/:uuid/-/crop/640x480/photo.jpg')
+ * const chain = parse(`https://ucarecdn.com/${uuid}/-/crop/640x480/photo.jpg`)
  * if (chain.kind === 'file') chain.preview(400, 400).href
  * ```
  */

@@ -108,8 +108,7 @@ conventions in several ways — do not "fix" these divergences.
   there. It costs nothing: a consumer naming only `tinyParse`/`tinyBuild`/`modifiers`
   bundles 347 B brotli through the root against 348 B through `/tiny`. Do not remove
   either path — and remember the root entry's own "import everything" figure carries
-  them (2.0 kB gzipped rather than 1.7 kB), which is what the table in
-  `functional-vs-builder.md` reports.
+  them, which is what the table in `functional-vs-builder.md` reports.
 - **`src/tiny/` holds the string-level API — `literals.ts` (the chain: `modifiers`,
   `normalizeModifiers`, `joinModifiers`, the `ModifiersChain` brand) and
   `url.ts` (`tinyParse`/`tinyBuild`/`TinyFileUrl`). One folder because they are one
@@ -170,8 +169,8 @@ conventions in several ways — do not "fix" these divergences.
   server one.** The async path uses WebCrypto and adds ~221 B brotli to a browser
   bundle; the sync path must carry a SHA-256 there (~946 B) because no synchronous
   code can wait for a promise, and under Node it resolves to `node:crypto` (~151
-  B). Async rejects under Node by design. Re-measure rather than copying these
-  forward.
+  B). Async works under Node too, through `node:crypto`'s WebCrypto. Re-measure
+  rather than copying these forward.
 - **`prefixedCdnBase(publicKey, cdnBase = PREFIX_CDN_BASE)` is the only prefix
   path, and it is deliberately manual.** It wraps `getPrefixedCdnBaseSync` from
   `@uploadcare/cname-prefix` (the package's first and only runtime dependency),
@@ -379,8 +378,9 @@ rejections. Operation *names* remain `OperationLiteral`'s business; the brand sa
 
 ## API stability
 
-- **Everything above is pre-1.0 churn, and it stops at 6.20.0.** The package has
-  only ever shipped `6.20.0-alpha.x`, which is why this session could rename
+- **Everything above is pre-release churn, and it stops at the first stable
+  release (6.24.x or later, in lockstep with the repo).** The package has only
+  ever shipped `6.20.0-alpha.x`, which is why this session could rename
   `origin`→`cdnBase`, `configure`→`cdn.base`, `setCdnBase`/`setFilename`→
   `base`/`filename` and `on`/`setEndpoint`→`base`/`proxy` without aliases:
   deprecation shims for an unreleased API are pure debt.

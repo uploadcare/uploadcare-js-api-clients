@@ -131,7 +131,7 @@ Also available without a bundler at all, via the IIFE global build:
 ```html
 <script src="https://unpkg.com/@uploadcare/cdn-url/dist/cdn-url.global.js"></script>
 <script>
-  const cdn = UCCdnUrl.base(UCCdnUrl.prefixedCdnBase('YOUR_PUBLIC_KEY'))
+  const myCdn = UCCdnUrl.cdn.base(UCCdnUrl.prefixedCdnBase('YOUR_PUBLIC_KEY'))
   myCdn.file(uuid).preview(800, 600).href
 </script>
 ```

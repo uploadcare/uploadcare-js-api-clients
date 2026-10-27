@@ -35,7 +35,7 @@ To find your own host, print it once — you never need to compute it again:
 
 ```sh
 node --input-type=module -e \
-  "import { prefixedCdnBase } from '@uploadcare/cdn-url'
+  "import { prefixedCdnBase } from '@uploadcare/cdn-url/cdn-base'
    console.log(prefixedCdnBase('YOUR_PUBLIC_KEY'))"
 ```
 
@@ -174,13 +174,13 @@ accept the extra kilobyte.
 Marginal cost over a bundle that already imports `cdn` and one chain, measured
 with esbuild `--minify` on the production build:
 
-| Where    | Helper                 | Added       |
-| -------- | ---------------------- | ----------- |
-| browser  | `prefixedCdnBaseAsync` | **+221 B**  |
-| browser  | `prefixedCdnBase`      | **+946 B**  |
-| Node     | `prefixedCdnBase`      | **+151 B**  |
-| Node     | `prefixedCdnBaseAsync` | unavailable |
-| anywhere | a pasted literal host  | 0 B         |
+| Where    | Helper                 | Added                                |
+| -------- | ---------------------- | ------------------------------------ |
+| browser  | `prefixedCdnBaseAsync` | **+221 B**                           |
+| browser  | `prefixedCdnBase`      | **+946 B**                           |
+| Node     | `prefixedCdnBase`      | **+151 B**                           |
+| Node     | `prefixedCdnBaseAsync` | a little more than `prefixedCdnBase` |
+| anywhere | a pasted literal host  | 0 B                                  |
 
 Brotli, which is what a CDN serves. Neither number is large; the honest summary
 is that a pasted literal beats both, and between the two the async one is roughly

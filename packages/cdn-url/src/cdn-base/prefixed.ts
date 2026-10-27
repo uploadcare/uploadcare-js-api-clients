@@ -34,7 +34,7 @@ import { trimTrailingSlashes } from '../grammar'
  *
  * @example
  * ```ts
- * const cdn = base(await prefixedCdnBaseAsync('demopublickey'))
+ * const myCdn = cdn.base(await prefixedCdnBaseAsync('demopublickey'))
  * myCdn.file(uuid).href
  * // https://1s4oyld5dc.ucarecd.net/:uuid/
  * ```

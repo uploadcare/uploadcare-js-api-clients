@@ -32,11 +32,11 @@ No bundler at all? The [IIFE global build](/guide/functional-vs-builder#the-flue
 
 ## Supported environments
 
-The library touches no DOM and no Node-specific APIs, so it runs anywhere modern JavaScript runs. `sideEffects: false`, ESM only.
+The library touches no DOM, and its one dependency picks `node:crypto` under Node, so it runs anywhere modern JavaScript runs. `sideEffects: false`, ESM only.
 
 | Environment                                        | Support                                                                                                        |
 | -------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
-| Node.js                                            | ≥ 16. Production bundle by default; `node --conditions=development` opts into [dev checks](/guide/bundles)     |
+| Node.js                                            | ≥ 20. Production bundle by default; `node --conditions=development` opts into [dev checks](/guide/bundles)     |
 | Browsers                                           | evergreen: Chrome/Edge 87+, Firefox 78+, Safari 14+. The full test suite runs in real Chromium on every change |
 | Bun, Deno                                          | ✓ via npm compatibility                                                                                        |
 | Edge runtimes (Cloudflare Workers, Vercel Edge, …) | ✓, standard JavaScript only                                                                                    |
@@ -71,19 +71,19 @@ Every operation creator validates its input eagerly during development, so `qual
 Any CDN URL decomposes into a plain object you can edit and serialize back:
 
 ```ts
-import { parseCdnUrl, serializeCdnUrl } from '@uploadcare/cdn-url'
+import { parseFileUrl, serializeCdnUrl } from '@uploadcare/cdn-url'
 import { stripMeta } from '@uploadcare/cdn-url/ops'
 
-const parsed = parseCdnUrl(
-  'https://1s4oyld5dc.ucarecd.net/:uuid/-/resize/300x/photo.jpg'
+const parsed = parseFileUrl(
+  'https://1s4oyld5dc.ucarecd.net/c2499162-eb07-4b93-b31e-94a89a47e858/-/resize/300x/photo.jpg'
 )
-// { kind: 'file', uuid: ':uuid', operations: [{ name: 'resize', params: ['300x'] }], filename: 'photo.jpg', … }
+// { kind: 'file', uuid: 'c2499162-…', operations: [{ name: 'resize', params: ['300x'] }], filename: 'photo.jpg', … }
 
 serializeCdnUrl({
   ...parsed,
   operations: [...parsed.operations, stripMeta('sensitive')]
 })
-// → https://1s4oyld5dc.ucarecd.net/:uuid/-/resize/300x/-/strip_meta/sensitive/photo.jpg
+// → https://1s4oyld5dc.ucarecd.net/c2499162-…/-/resize/300x/-/strip_meta/sensitive/photo.jpg
 ```
 
 Parsing is lenient: operations the library doesn't know (including internal `@`-prefixed ones) pass through untouched, so `serializeCdnUrl(parseCdnUrl(url)) === url` always holds.
@@ -104,6 +104,7 @@ The package is split into atomic entry points, so you import only what you use:
 | `@uploadcare/cdn-url/builder`   | chainable `CdnUrl` facade                                                                                                                 |
 | `@uploadcare/cdn-url/validate`  | cross-operation chain diagnostics, plus the rule sets behind them                                                                         |
 | `@uploadcare/cdn-url/tiny`      | [string-level](/guide/string-level-api) file-URL split/join and typed modifier literals, no runtime checks                                |
+| `@uploadcare/cdn-url/cdn-base`  | [`prefixedCdnBase`](/guide/cdn-base) and its async twin: your project's own CDN host                                                      |
 
 ## Prefer one import for everything?
 
