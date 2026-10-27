@@ -9,6 +9,7 @@ import * as videoOps from '../video/operations'
 import { serializeCdnUrl } from '../serialize'
 import type {
   GroupId,
+  ParsedArchiveUrl,
   ParsedFileUrl,
   ParsedGroupElementUrl,
   ParsedGroupUrl,
@@ -93,6 +94,37 @@ export class GroupChain {
   }
 
   /** The group root URL. */
+  public get href(): string {
+    return serializeCdnUrl(this._s)
+  }
+
+  /** Alias of the terminal getter for string coercion. */
+  public toString(): string {
+    return this.href
+  }
+}
+
+/** @internal */
+
+/** A chainable group archive url — rebase and rename only. */
+export class ArchiveChain {
+  /** Discriminant for chains returned by `cdn.parse`. */
+  public readonly kind = 'archive' as const
+
+  /** @internal */
+  public constructor(private readonly _s: ParsedArchiveUrl) {}
+
+  /** Rebases the chain onto another cdnBase (trailing slash tolerated). */
+  public base(cdnBase: string): ArchiveChain {
+    return new ArchiveChain({ ...this._s, cdnBase })
+  }
+
+  /** Sets (or clears) the archive's filename. */
+  public filename(filename: string | null): ArchiveChain {
+    return new ArchiveChain({ ...this._s, filename })
+  }
+
+  /** The archive URL. */
   public get href(): string {
     return serializeCdnUrl(this._s)
   }

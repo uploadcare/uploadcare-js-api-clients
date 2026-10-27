@@ -1,4 +1,5 @@
 export {
+  ArchiveChain,
   DocumentChain,
   FileChain,
   Gif2VideoChain,

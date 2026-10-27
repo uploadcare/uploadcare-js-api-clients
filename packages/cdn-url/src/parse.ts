@@ -1,8 +1,10 @@
-import { GROUP_ID_RE, UUID_RE } from './grammar'
+import { ARCHIVE_FORMATS, GROUP_ID_RE, UUID_RE } from './grammar'
+import type { ArchiveFormat } from './grammar'
 import type {
   CdnOperation,
   ConversionKind,
   GroupId,
+  ParsedArchiveUrl,
   ParsedCdnUrl,
   ParsedFileUrl,
   ParsedGroupElementUrl,
@@ -158,6 +160,53 @@ export function parseGroupElementUrl(url: string): ParsedGroupElementUrl {
 }
 
 /**
+ * Parses a group archive URL (`/:uuid~N/archive/:format/(:filename)`), the
+ * read-side counterpart of `archiveUrl`.
+ *
+ * @throws TypeError when the URL is not a group archive.
+ * @see https://uploadcare.com/docs/file-groups/#group-archive
+ * @example
+ * ```ts
+ * parseArchiveUrl(`https://ucarecdn.com/${uuid}~3/archive/zip/all.zip`)
+ * // → { kind: 'archive', group: { uuid, count: 3 }, archive: 'zip', filename: 'all.zip', ... }
+ * ```
+ */
+export function parseArchiveUrl(url: string): ParsedArchiveUrl {
+  const { cdnBase, pathname, search, hash, hasTrailingSlash } = splitUrl(url)
+  if (embeddedSourceOf(pathname) !== null) {
+    throw new TypeError(`Not an archive URL (proxy source): "${url}"`)
+  }
+  const segments = segmentize(pathname)
+  const head = segments.shift()
+  const group = head === undefined ? null : matchGroupId(head)
+  if (group === null) {
+    throw new TypeError(`Not an archive URL (no group id): "${url}"`)
+  }
+  if (segments[0] !== 'archive') {
+    throw new TypeError(`Not an archive URL (no archive segment): "${url}"`)
+  }
+  const archive = segments[1]
+  if (!isArchiveFormat(archive)) {
+    throw new TypeError(`Invalid archive format in "${url}"`)
+  }
+  segments.splice(0, 2)
+  const filename = takeFilename(segments, hasTrailingSlash)
+  if (segments.length > 0) {
+    throw new TypeError(`Unexpected path after archive format in "${url}"`)
+  }
+  return { kind: 'archive', cdnBase, search, hash, group, archive, filename }
+}
+
+/** Narrows a path segment to an archive format. */
+function isArchiveFormat(
+  segment: string | undefined
+): segment is ArchiveFormat {
+  return (
+    segment != null && (ARCHIVE_FORMATS as readonly string[]).includes(segment)
+  )
+}
+
+/**
  * Parses a single-file URL, including conversion results. Narrower than
  * {@link parseCdnUrl}: importing this alone keeps the group and proxy parsers
  * out of your bundle, and the result is already narrowed to
@@ -234,9 +283,9 @@ export function parseCdnUrl(url: string): ParsedCdnUrl {
     throw new TypeError(`Not a CDN URL (empty path): "${url}"`)
   }
   if (matchGroupId(head) !== null) {
-    return segments[1] === 'nth'
-      ? parseGroupElementUrl(url)
-      : parseGroupUrl(url)
+    if (segments[1] === 'nth') return parseGroupElementUrl(url)
+    if (segments[1] === 'archive') return parseArchiveUrl(url)
+    return parseGroupUrl(url)
   }
   if (!UUID_RE.test(head)) {
     throw new TypeError(
@@ -372,6 +421,24 @@ export function isGroupUrl(url: string): boolean {
 export function isGroupElementUrl(url: string): boolean {
   try {
     parseGroupElementUrl(url)
+    return true
+  } catch {
+    return false
+  }
+}
+
+/**
+ * Whether a string is a group archive URL, without parsing it or throwing.
+ *
+ * @see https://uploadcare.com/docs/file-groups/#group-archive
+ * @example
+ * ```ts
+ * isArchiveUrl(`https://ucarecdn.com/${uuid}~3/archive/zip/`) // → true
+ * ```
+ */
+export function isArchiveUrl(url: string): boolean {
+  try {
+    parseArchiveUrl(url)
     return true
   } catch {
     return false

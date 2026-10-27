@@ -11,6 +11,7 @@ import {
   joinModifiers,
   modifiers,
   normalizeModifiers,
+  parseArchiveUrl,
   serializeCdnUrl,
   tinyBuild,
   tinyParse
@@ -185,6 +186,21 @@ describe('groups: addressing tabs agree', () => {
     )
     // the page says there is no builder tab because the method does not exist
     expect('archive' in CdnUrl.prototype).toBe(false)
+  })
+
+  it('archives: read back, then renamed', () => {
+    const stored = `${CDN_BASE}/${uuid}~3/archive/tar/photos.tar`
+    expect(parseArchiveUrl(stored)).toMatchObject({
+      kind: 'archive',
+      group,
+      archive: 'tar',
+      filename: 'photos.tar'
+    })
+    const chain = cdn.parse(stored)
+    if (chain.kind !== 'archive') throw new Error('expected an archive chain')
+    expect(chain.filename('all-photos.tar').href).toBe(
+      `${CDN_BASE}/${uuid}~3/archive/tar/all-photos.tar`
+    )
   })
 })
 

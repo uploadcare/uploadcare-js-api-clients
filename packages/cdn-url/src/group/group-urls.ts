@@ -1,7 +1,6 @@
-import { assertOneOf, trimTrailingSlashes } from '../grammar'
+import { ARCHIVE_FORMATS, type ArchiveFormat, assertOneOf } from '../grammar'
 import { serializeGroupUrl } from '../serialize'
 import type { CdnOperation, GroupId } from '../types'
-import { formatGroupId } from './group-id'
 
 /**
  * Group root url `/:uuid~N/` — lists the files. No `-/` operations are
@@ -52,10 +51,7 @@ export function nthUrl(
   })
 }
 
-/** Archive formats accepted by {@link archiveUrl}. */
-export const ARCHIVE_FORMATS = ['zip', 'tar'] as const
-/** One of the {@link ARCHIVE_FORMATS} values. */
-export type ArchiveFormat = (typeof ARCHIVE_FORMATS)[number]
+export { ARCHIVE_FORMATS, type ArchiveFormat } from '../grammar'
 
 /**
  * Group archive url `/:uuid~N/archive/:format/(:filename)`. Archives contain
@@ -75,6 +71,5 @@ export function archiveUrl(
   filename?: string
 ): string {
   assertOneOf(format, ARCHIVE_FORMATS, 'archive format')
-  const base = trimTrailingSlashes(cdnBase)
-  return `${base}/${formatGroupId(group)}/archive/${format}/${filename ?? ''}`
+  return serializeGroupUrl({ cdnBase, group, archive: format, filename })
 }

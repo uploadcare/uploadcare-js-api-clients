@@ -197,6 +197,23 @@ describe('the fluent entry object is frozen', () => {
 })
 
 describe('cdn.parse', () => {
+  it('parses an archive url into a chain that renames and rebases it', () => {
+    const chain = cdn.parse(`${CDN_BASE}/${UUID}~3/archive/zip/all.zip`)
+    if (chain.kind !== 'archive') throw new Error('expected an archive chain')
+    expect(chain.filename('photos.zip').href).toBe(
+      `${CDN_BASE}/${UUID}~3/archive/zip/photos.zip`
+    )
+    expect(chain.base('https://cdn.example.com/').href).toBe(
+      `https://cdn.example.com/${UUID}~3/archive/zip/all.zip`
+    )
+  })
+
+  it('archive() on a group chain gives the same url archiveUrl does', () => {
+    const group = cdn.parse(`${CDN_BASE}/${UUID}~3/`)
+    if (group.kind !== 'group') throw new Error('expected a group chain')
+    expect(group.archive('tar')).toBe(`${CDN_BASE}/${UUID}~3/archive/tar/`)
+  })
+
   it('round-trips every kind, conversion prefixes included', () => {
     // Regression: `wrapParsed` used to copy the parsed url field by field and
     // omitted `conversion`, so a parsed gif2video url serialized back pointing
@@ -208,6 +225,7 @@ describe('cdn.parse', () => {
       `${CDN_BASE}/${UUID}/video/-/size/720x540/`,
       `${CDN_BASE}/${UUID}~3/`,
       `${CDN_BASE}/${UUID}~3/nth/1/-/resize/256x/`,
+      `${CDN_BASE}/${UUID}~3/archive/zip/all.zip`,
       `${CDN_BASE}/${UUID}/-/preview/?token=exp=1~acl=/x/*~hmac=deadbeef`,
       'https://pk.ucr.io/-/preview/https://example.com/a.jpg'
     ]) {

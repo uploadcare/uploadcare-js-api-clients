@@ -21,7 +21,7 @@ One directive is an **operation** (`resize/300x`); the whole serialized run of t
 
 ```ts
 const parsed = parseCdnUrl(url)
-// parsed.kind: 'file' | 'group' | 'group-element' | 'proxy'
+// parsed.kind: 'file' | 'group' | 'group-element' | 'archive' | 'proxy'
 ```
 
 The shape only has the fields its kind allows, and TypeScript narrows on `kind`:
@@ -31,6 +31,7 @@ The shape only has the fields its kind allows, and TypeScript narrows on `kind`:
 | `file`          | `uuid`, `conversion`, `operations`, `filename`, `search`, `hash` |
 | `group`         | `group: { uuid, count }`, no operations, by CDN design           |
 | `group-element` | `group`, `nth`, `operations`, `filename`, `search`, `hash`       |
+| `archive`       | `group`, `archive` (the format), `filename`, no operations       |
 | `proxy`         | `sourceUrl`, `operations`; the source keeps its own query/hash   |
 
 All kinds carry `cdnBase`.

@@ -37,10 +37,10 @@ conventions in several ways — do not "fix" these divergences.
   and `fluent` (`base()` mega-object) entries wrap it; they must never grow logic
   the core doesn't have.
 - **`ParsedCdnUrl` is a discriminated union** (`kind: 'file' | 'group' |
-'group-element' | 'proxy'`). Each member carries only the fields its kind
+'group-element' | 'archive' | 'proxy'`). Each member carries only the fields its kind
   allows (group roots have no `operations`, proxies no `uuid`/`search`).
 - **Per-kind parsers exist alongside `parseCdnUrl`**: `parseFileUrl`,
-  `parseGroupUrl`, `parseGroupElementUrl`, `parseProxyUrl`, plus `isFileUrl`
+  `parseGroupUrl`, `parseGroupElementUrl`, `parseArchiveUrl`, `parseProxyUrl`, plus `isFileUrl`
   and friends. `parseCdnUrl` **delegates** to them, so the dispatch lives in
   one place and cannot drift; a test asserts all five agree on every fixture.
   They exist for bundle size: importing `parseFileUrl` alone is 714 B gzipped
@@ -100,7 +100,7 @@ conventions in several ways — do not "fix" these divergences.
   `with`/`without`/`replace`/`replaceAll` (and the fluent `*Op` variants) are
   sugar over it. It hands the callback a defensive copy. Conversion chains
   (`video`/`document`/`gif2video`) emit a `.path` and `cdn.parse` only re-enters
-  file/group/group-element/proxy urls, so `updateOperations` is their **only**
+  file/group/group-element/archive/proxy urls, so `updateOperations` is their **only**
   edit path — don't remove it thinking the chain methods cover everything.
 - **The string level is reachable from two import paths on purpose.** `/tiny` is a
   registered entry point (the docs use it, since it names the contract) and the same

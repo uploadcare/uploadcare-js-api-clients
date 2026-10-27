@@ -32,6 +32,17 @@ function normalizeInput(input: CdnUrlInput | ParsedCdnUrl): ParsedCdnUrl {
   const hash = input.hash ?? ''
 
   if (isGroupInput(input)) {
+    if (input.archive != null) {
+      return {
+        kind: 'archive',
+        cdnBase,
+        group: input.group,
+        archive: input.archive,
+        filename: input.filename ?? null,
+        search,
+        hash
+      }
+    }
     if (input.nth != null) {
       return {
         kind: 'group-element',
@@ -256,7 +267,7 @@ export class CdnUrl {
   #withOperations(update: (current: CdnOperation[]) => CdnOperation[]): CdnUrl {
     if (!('operations' in this.#parsed)) {
       if (__DEV__) {
-        throw new TypeError('Group root urls cannot carry operations')
+        throw new TypeError(`${this.#parsed.kind} urls cannot carry operations`)
       }
       return this
     }

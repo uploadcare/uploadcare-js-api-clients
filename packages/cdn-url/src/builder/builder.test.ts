@@ -293,3 +293,29 @@ describe('CdnUrl builder', () => {
     })
   })
 })
+
+describe('CdnUrl on archive urls', () => {
+  const ARCHIVE =
+    'https://ucarecdn.com/c2499162-eb07-4b93-b31e-94a89a47e858~3/archive/zip/all.zip'
+
+  it('round-trips, renames and refuses operations', () => {
+    const url = CdnUrl.parse(ARCHIVE)
+    expect(url.href).toBe(ARCHIVE)
+    expect(url.toJSON().kind).toBe('archive')
+    expect(url.filename('photos.zip').href).toBe(
+      ARCHIVE.replace('all.zip', 'photos.zip')
+    )
+    expect(() => url.with(resize({ width: 100 }))).toThrow(TypeError)
+  })
+
+  it('builds one from a group input with an archive format', () => {
+    expect(
+      new CdnUrl({
+        cdnBase: 'https://ucarecdn.com',
+        group: { uuid: 'c2499162-eb07-4b93-b31e-94a89a47e858', count: 3 },
+        archive: 'zip',
+        filename: 'all.zip'
+      }).href
+    ).toBe(ARCHIVE)
+  })
+})

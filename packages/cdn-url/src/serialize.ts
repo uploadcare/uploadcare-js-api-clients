@@ -71,8 +71,9 @@ export function serializeFileUrl(input: FileUrlInput): string {
 }
 
 /**
- * Builds a group root url, or a group element url when `nth` is given — the
- * write-side counterpart of {@link parseGroupUrl} and {@link parseGroupElementUrl}.
+ * Builds a group root url, a group element url when `nth` is given, or the
+ * group's archive url when `archive` is — the write-side counterpart of
+ * {@link parseGroupUrl}, {@link parseGroupElementUrl} and `parseArchiveUrl`.
  *
  * One function rather than two because both come from a single `GroupUrlInput`:
  * a group root is the same url without an element index. Group roots address the
@@ -88,7 +89,9 @@ export function serializeFileUrl(input: FileUrlInput): string {
 export function serializeGroupUrl(input: GroupUrlInput): string {
   const cdnBase = trimTrailingSlashes(input.cdnBase)
   let path = `${cdnBase}/${input.group.uuid}~${input.group.count}/`
-  if (input.nth != null) {
+  if (input.archive != null) {
+    path += `archive/${input.archive}/${input.filename ?? ''}`
+  } else if (input.nth != null) {
     const ops = serializeOperations(input.operations ?? [])
     path += `nth/${input.nth}/${ops}${input.filename ?? ''}`
   }

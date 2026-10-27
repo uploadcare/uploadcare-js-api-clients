@@ -85,7 +85,7 @@ import { prefixedCdnBase } from '@uploadcare/cdn-url/cdn-base'
 const myCdn = cdn.base(prefixedCdnBase('demopublickey'))
 
 myCdn.file(uuid).scaleCrop(96, 96, { type: 'smart' }).borderRadius('50p').href
-cdn.parse(stored).kind // 'file' | 'group' | 'group-element' | 'proxy'; narrow, keep chaining
+cdn.parse(stored).kind // 'file' | 'group' | 'group-element' | 'archive' | 'proxy'; narrow, keep chaining
 myCdn.group(groupId).nth(1).preview(300, 300).href
 cdn.video(uuid).size({ width: 720, height: 540 }).thumbs(5).path
 myCdn.file(uuid).preview().base('https://cdn.example.com').href

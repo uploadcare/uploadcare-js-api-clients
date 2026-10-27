@@ -1,3 +1,5 @@
+import type { ArchiveFormat } from './grammar'
+
 /**
  * A single CDN URL directive: `-/name/param1/param2/`.
  *
@@ -30,7 +32,12 @@ export interface GroupId {
 export type ConversionKind = 'video' | 'document' | 'gif2video'
 
 /** Discriminant of {@link ParsedCdnUrl}. */
-export type CdnUrlKind = 'file' | 'group' | 'group-element' | 'proxy'
+export type CdnUrlKind =
+  | 'file'
+  | 'group'
+  | 'group-element'
+  | 'archive'
+  | 'proxy'
 
 interface CdnUrlShapeBase {
   /** Scheme + host, no trailing slash, e.g. `https://ucarecdn.com`. */
@@ -70,6 +77,23 @@ export interface ParsedGroupUrl extends CdnUrlShapeBase {
   kind: 'group'
   /** Parsed group id. */
   group: GroupId
+}
+
+/**
+ * A group archive URL: `/:uuid~N/archive/:format/(:filename)`. Archives hold the
+ * original files, so it carries no operations.
+ *
+ * @see https://uploadcare.com/docs/file-groups/#group-archive
+ */
+export interface ParsedArchiveUrl extends CdnUrlShapeBase {
+  /** Discriminant: an archive of a whole group. */
+  kind: 'archive'
+  /** Parsed group id. */
+  group: GroupId
+  /** Archive format. */
+  archive: ArchiveFormat
+  /** Trailing filename, or null when the url ends with a slash. */
+  filename: string | null
 }
 
 /**
@@ -116,6 +140,7 @@ export type ParsedCdnUrl =
   | ParsedFileUrl
   | ParsedGroupUrl
   | ParsedGroupElementUrl
+  | ParsedArchiveUrl
   | ParsedProxyUrl
 
 /** Input shape for building a file url with `serializeCdnUrl`. */
@@ -144,6 +169,11 @@ export interface GroupUrlInput {
   group: GroupId
   /** Zero-based element index; omit for the group root url. */
   nth?: number | null
+  /**
+   * Archive format: builds the group's archive url instead, where `nth` and
+   * `operations` do not apply.
+   */
+  archive?: ArchiveFormat | null
   /** Transformation directives for the element (group roots cannot carry any). */
   operations?: CdnOperation[]
   /** Trailing filename for the element (default none). */

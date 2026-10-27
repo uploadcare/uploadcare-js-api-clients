@@ -2,6 +2,7 @@ import { trimTrailingSlashes } from '../grammar'
 import { parseCdnUrl } from '../parse'
 import type { ParsedCdnUrl } from '../types'
 import {
+  ArchiveChain,
   DocumentChain,
   FileChain,
   Gif2VideoChain,
@@ -18,6 +19,7 @@ export type ParsedChain =
   | FileChain
   | GroupChain
   | GroupElementChain
+  | ArchiveChain
   | ProxyChain
 
 /**
@@ -101,6 +103,8 @@ function wrapParsed(parsed: ParsedCdnUrl): ParsedChain {
       return new GroupChain(parsed)
     case 'group-element':
       return new GroupElementChain(parsed)
+    case 'archive':
+      return new ArchiveChain(parsed)
     case 'proxy':
       return new ProxyChain(parsed)
     default: {

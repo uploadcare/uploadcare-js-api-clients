@@ -1,8 +1,10 @@
 export {
+  isArchiveUrl,
   isFileUrl,
   isGroupElementUrl,
   isGroupUrl,
   isProxyUrl,
+  parseArchiveUrl,
   parseCdnUrl,
   parseFileUrl,
   parseGroupElementUrl,
@@ -51,6 +53,7 @@ export type {
   FileUrlInput,
   GroupId,
   GroupUrlInput,
+  ParsedArchiveUrl,
   ParsedCdnUrl,
   ParsedFileUrl,
   ParsedGroupElementUrl,

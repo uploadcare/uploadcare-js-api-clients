@@ -139,3 +139,8 @@ export function assertOneOf<T extends string>(
     )
   }
 }
+
+/** Archive formats a group archive url can name. */
+export const ARCHIVE_FORMATS = ['zip', 'tar'] as const
+/** One of the {@link ARCHIVE_FORMATS} values. */
+export type ArchiveFormat = (typeof ARCHIVE_FORMATS)[number]

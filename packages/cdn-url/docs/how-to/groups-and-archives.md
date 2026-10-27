@@ -112,4 +112,16 @@ myCdn.group(group).archive('tar', 'photos.tar')
 
 There is no builder tab here. `CdnUrl` addresses one URL and has no `archive` method, so archives come from the `group` entry or a fluent group chain.
 
+An archive URL parses back like any other: `parseCdnUrl` returns `kind: 'archive'` with `group`, `archive` (the format) and `filename`, and `cdn.parse` gives a chain you can rebase or rename.
+
+```ts
+import { parseArchiveUrl } from '@uploadcare/cdn-url'
+
+parseArchiveUrl(stored)
+// → { kind: 'archive', group: { uuid, count: 3 }, archive: 'tar', filename: 'photos.tar', … }
+
+cdn.parse(stored).filename('all-photos.tar').href
+// → https://1s4oyld5dc.ucarecd.net/:uuid~3/archive/tar/all-photos.tar
+```
+
 Archive fine print: you get originals only (transformations are discarded), the uncompressed limit is 2 GB, and the request 404s if any file in the group was removed.

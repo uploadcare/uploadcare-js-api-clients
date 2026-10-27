@@ -419,7 +419,7 @@ cdn
 ::: warning Paths, not URLs
 Video and document conversions are **paths** you submit to the REST convert API, not URLs you serve. Atomic and fluent both give you `/<uuid>/video/…`. The builder attaches the CDN base and gives you a full URL, which is the wrong shape for the convert API. Reach for it only when you actually want a URL.
 
-Conversion chains also can't be re-parsed: `parseCdnUrl` and `cdn.parse` only read file, group, group-element and proxy URLs. Build the operations before you serialize.
+Conversion chains also can't be re-parsed: `parseCdnUrl` and `cdn.parse` only read file, group, group-element, archive and proxy URLs. Build the operations before you serialize.
 :::
 
 Match with `operationMatches`, never `op.name === 'size'`. Counted operations fuse the count into the name: `thumbs(5)` is literally called `thumbs~5`, so a string comparison against `'thumbs'` never fires.

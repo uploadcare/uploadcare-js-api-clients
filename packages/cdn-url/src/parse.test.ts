@@ -1,11 +1,13 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  isArchiveUrl,
   isFileUrl,
   isGroupElementUrl,
   isGroupUrl,
   isProxyUrl,
   parseCdnUrl,
+  parseArchiveUrl,
   parseFileUrl,
   parseGroupElementUrl,
   parseGroupUrl,
@@ -374,6 +376,7 @@ describe('per-kind parsers', () => {
   const GROUP = `https://ucarecdn.com/${UUID}~3/`
   const ELEMENT = `https://ucarecdn.com/${UUID}~3/nth/1/-/preview/150x150/`
   const PROXY = 'https://pk.ucr.io/-/preview/https://example.com/a.jpg'
+  const ARCHIVE = `https://ucarecdn.com/${UUID}~3/archive/zip/all.zip`
 
   describe('parseFileUrl', () => {
     it('returns the file shape already narrowed, no kind check needed', () => {
@@ -463,6 +466,39 @@ describe('per-kind parsers', () => {
     })
   })
 
+  describe('parseArchiveUrl', () => {
+    it('returns the archive shape, filename included', () => {
+      expect(parseArchiveUrl(ARCHIVE)).toEqual({
+        kind: 'archive',
+        cdnBase: 'https://ucarecdn.com',
+        group: { uuid: UUID, count: 3 },
+        archive: 'zip',
+        filename: 'all.zip',
+        search: '',
+        hash: ''
+      })
+    })
+
+    it('reads a missing filename as null', () => {
+      const url = `https://ucarecdn.com/${UUID}~3/archive/tar/`
+      expect(parseArchiveUrl(url)).toMatchObject({
+        archive: 'tar',
+        filename: null
+      })
+      expect(serializeCdnUrl(parseArchiveUrl(url))).toBe(url)
+    })
+
+    it('rejects an unknown format, a group root and anything after the filename', () => {
+      for (const url of [
+        `https://ucarecdn.com/${UUID}~3/archive/rar/all.rar`,
+        `https://ucarecdn.com/${UUID}~3/`,
+        `https://ucarecdn.com/${UUID}~3/archive/zip/a/b.zip`
+      ]) {
+        expect(() => parseArchiveUrl(url)).toThrow(TypeError)
+      }
+    })
+  })
+
   describe('parseProxyUrl', () => {
     it('returns the proxy shape with the source url intact', () => {
       expect(parseProxyUrl(PROXY)).toEqual({
@@ -492,10 +528,11 @@ describe('per-kind parsers', () => {
       expect(parseGroupUrl(GROUP)).toEqual(parseCdnUrl(GROUP))
       expect(parseGroupElementUrl(ELEMENT)).toEqual(parseCdnUrl(ELEMENT))
       expect(parseProxyUrl(PROXY)).toEqual(parseCdnUrl(PROXY))
+      expect(parseArchiveUrl(ARCHIVE)).toEqual(parseCdnUrl(ARCHIVE))
     })
 
     it('round-trips through serializeCdnUrl like parseCdnUrl does', () => {
-      for (const url of [FILE, GROUP, ELEMENT, PROXY]) {
+      for (const url of [FILE, GROUP, ELEMENT, PROXY, ARCHIVE]) {
         expect(serializeCdnUrl(parseCdnUrl(url))).toBe(url)
       }
       expect(serializeCdnUrl(parseFileUrl(FILE))).toBe(FILE)
@@ -511,15 +548,23 @@ describe('per-kind parsers', () => {
       expect(isGroupUrl(GROUP)).toBe(true)
       expect(isGroupElementUrl(ELEMENT)).toBe(true)
       expect(isProxyUrl(PROXY)).toBe(true)
+      expect(isArchiveUrl(ARCHIVE)).toBe(true)
     })
 
-    it('are mutually exclusive across the four kinds', () => {
-      const guards = { isFileUrl, isGroupUrl, isGroupElementUrl, isProxyUrl }
+    it('are mutually exclusive across the five kinds', () => {
+      const guards = {
+        isFileUrl,
+        isGroupUrl,
+        isGroupElementUrl,
+        isProxyUrl,
+        isArchiveUrl
+      }
       for (const [url, expected] of [
         [FILE, 'isFileUrl'],
         [GROUP, 'isGroupUrl'],
         [ELEMENT, 'isGroupElementUrl'],
-        [PROXY, 'isProxyUrl']
+        [PROXY, 'isProxyUrl'],
+        [ARCHIVE, 'isArchiveUrl']
       ] as const) {
         for (const [name, guard] of Object.entries(guards)) {
           expect([name, guard(url)]).toEqual([name, name === expected])
@@ -538,6 +583,7 @@ describe('per-kind parsers', () => {
         expect(isGroupUrl(junk)).toBe(false)
         expect(isGroupElementUrl(junk)).toBe(false)
         expect(isProxyUrl(junk)).toBe(false)
+        expect(isArchiveUrl(junk)).toBe(false)
       }
     })
 
