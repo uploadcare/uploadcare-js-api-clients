@@ -73,7 +73,7 @@ class Pusher {
   }
 
   connect(): void {
-    this.disconnectTimeoutId && clearTimeout(this.disconnectTimeoutId)
+    if (this.disconnectTimeoutId) clearTimeout(this.disconnectTimeoutId)
 
     if (!this.isConnected && !this.ws) {
       const pusherUrl = `wss://ws.pusherapp.com/app/${this.key}?protocol=5&client=js&version=1.12.2`

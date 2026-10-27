@@ -144,7 +144,7 @@ export function uploadFileGroup(
         toUploadcareGroup(groupInfo, { publicKey, baseCDN, prefixedBaseCDN })
       )
       .then((group) => {
-        onProgress && onProgress({ isComputable: true, value: 1 })
+        onProgress?.({ isComputable: true, value: 1 })
         return group
       })
   })

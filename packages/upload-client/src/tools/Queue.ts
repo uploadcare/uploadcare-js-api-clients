@@ -62,7 +62,7 @@ export class Queue {
       this._rejectors.set(task, reject as Rejector)
 
       this._pending.push(task)
-      autoRun && this.run()
+      if (autoRun) this.run()
     }) as Promise<T>
   }
 

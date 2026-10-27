@@ -29,9 +29,9 @@ const request = ({
     if (headers) {
       Object.entries(headers).forEach((entry) => {
         const [key, value] = entry
-        typeof value !== 'undefined' &&
-          !Array.isArray(value) &&
+        if (typeof value !== 'undefined' && !Array.isArray(value)) {
           xhr.setRequestHeader(key, value)
+        }
       })
     }
 

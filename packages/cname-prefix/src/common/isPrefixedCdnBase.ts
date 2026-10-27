@@ -6,7 +6,7 @@ export const isPrefixedCdnBase = (cdnBase: string, prefixCdnBase: string) => {
     // `ucarecd.net` and `<prefix>.ucarecd.net` match, but `notucarecd.net`
     // (which merely ends with the same string) does not.
     return host === base || host.endsWith(`.${base}`)
-  } catch (_err) {
+  } catch {
     return false
   }
 }
