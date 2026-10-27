@@ -55,8 +55,7 @@ export default defineConfig({
       },
       fileName: '[name]'
     },
-    rollupOptions: {
-      treeshake: 'smallest',
+    rolldownOptions: {
       // Keep `node:crypto` a runtime import rather than trying to bundle it.
       external: ['node:crypto']
     }

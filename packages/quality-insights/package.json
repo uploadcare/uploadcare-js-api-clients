@@ -54,12 +54,12 @@
   },
   "devDependencies": {
     "@size-limit/file": "^11.2.0",
-    "@vitest/coverage-v8": "^4.1.12",
+    "@vitest/coverage-v8": "^5.0.5",
     "size-limit": "^11.2.0",
-    "typescript": "^5.9.3",
-    "vite": "^7.3.7",
+    "typescript": "^6.0.3",
+    "vite": "^8.3.5",
     "vite-plugin-dts": "^5.1.2",
-    "vitest": "^4.1.12",
+    "vitest": "^5.0.5",
     "zod": "^4.6.7"
   }
 }

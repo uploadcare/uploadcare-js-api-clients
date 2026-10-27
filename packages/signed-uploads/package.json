@@ -106,9 +106,9 @@
     "publint": "^0.3.12",
     "size-limit": "^12.1.0",
     "terser": "^5.51.2",
-    "vite": "^7.3.7",
+    "vite": "^8.3.5",
     "vite-plugin-dts": "^5.1.2",
-    "vitest": "^4.1.12"
+    "vitest": "^5.0.5"
   },
   "size-limit": [
     {

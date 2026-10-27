@@ -17,9 +17,6 @@ export default defineConfig({
       entry: resolve(__dirname, 'src/main.ts'),
       name: 'index',
       fileName: 'index'
-    },
-    rollupOptions: {
-      treeshake: 'smallest'
     }
   },
   resolve: {

@@ -10,6 +10,8 @@
     "moduleResolution": "bundler",
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
+    // TypeScript 6 no longer loads every installed @types package by default.
+    "types": ["node"],
   },
   "exclude": ["node_modules", "**/*.test.ts"],
   "references": [

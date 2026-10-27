@@ -26,7 +26,7 @@ export default defineConfig({
       formats: ['es'],
       fileName: '[name]'
     },
-    rollupOptions: {
+    rolldownOptions: {
       // Keep these runtime imports rather than trying to bundle them; only
       // `listen.js` and `node.js` ever pull them in, which is what keeps the
       // "." entry browser-safe.
@@ -72,6 +72,10 @@ export default defineConfig({
         plugins: [msw({ mode: 'worker-only' })],
         // Discovered late otherwise, which reloads the page mid-run.
         optimizeDeps: { include: ['@mswjs/interceptors/XMLHttpRequest'] },
+        // Serve the page from 127.0.0.1 so `localhost` on the same port is a
+        // real, reachable foreign origin for the `unhandled` policy tests.
+        // Vitest 5 ignores `browser.api.host` for the page itself.
+        server: { host: '127.0.0.1' },
         test: {
           name: 'browser',
           include: ['test/browser/**/*.test.ts'],
@@ -80,11 +84,7 @@ export default defineConfig({
             headless: true,
             provider: playwright(),
             instances: [{ browser: 'chromium' }],
-            screenshotFailures: false,
-            // The page is served from 127.0.0.1, so `localhost` on the same
-            // port is a real, reachable foreign origin for the `unhandled`
-            // policy tests.
-            api: { host: '127.0.0.1' }
+            screenshotFailures: false
           }
         }
       }

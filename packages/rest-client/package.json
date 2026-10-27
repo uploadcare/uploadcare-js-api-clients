@@ -74,7 +74,7 @@
     "@types/blueimp-md5": "^2.18.0",
     "@types/node-fetch": "^2.6.2",
     "@uploadcare/upload-client": "^6.24.0",
-    "vitest": "^4.1.12"
+    "vitest": "^5.0.5"
   },
   "dependencies": {
     "blueimp-md5": "^2.19.0",

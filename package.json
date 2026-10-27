@@ -66,15 +66,12 @@
     "tslib": "^2.4.0",
     "tsx": "^4.20.3",
     "typedoc": "^0.28.19",
-    "typescript": "^5.9.3"
+    "typescript": "^6.0.3"
   },
   "overrides": {
     "@types/markdown-it": "13.0.9",
     "@types/linkify-it": "3.0.5",
     "@types/mdurl": "1.0.5",
-    "serialize-javascript": "^7.1.4",
-    "vitepress": {
-      "vite": "^7.3.7"
-    }
+    "serialize-javascript": "^7.1.4"
   }
 }

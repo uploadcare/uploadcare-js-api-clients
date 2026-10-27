@@ -73,10 +73,10 @@
     "signature"
   ],
   "devDependencies": {
-    "@vitest/browser-playwright": "^4.1.12",
-    "@vitest/coverage-v8": "^4.1.12",
-    "vite": "^7.3.7",
+    "@vitest/browser-playwright": "^5.0.5",
+    "@vitest/coverage-v8": "^5.0.5",
+    "vite": "^8.3.5",
     "vite-plugin-dts": "^5.1.2",
-    "vitest": "^4.1.12"
+    "vitest": "^5.0.5"
   }
 }

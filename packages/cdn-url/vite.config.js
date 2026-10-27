@@ -101,8 +101,10 @@ export default defineConfig(({ mode }) => {
         formats: ['es'],
         fileName: '[name]'
       },
-      rollupOptions: {
-        treeshake: 'smallest',
+      rolldownOptions: {
+        // Rolldown keeps source comments in unminified output; the dev bundle
+        // does not need them, and they would trip verify-bundles' markers.
+        output: { comments: false },
         /**
          * Keep `@uploadcare/cname-prefix` an import rather than inlining it.
          * It ships `node` and browser builds behind export conditions — native
