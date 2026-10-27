@@ -78,7 +78,7 @@ export default defineConfig(({ mode }) => {
       ? []
       : [
           dts({
-            outDir: resolve(__dirname, 'dist/types'),
+            outDirs: resolve(__dirname, 'dist/types'),
             insertTypesEntry: true,
             // Only the library ships: no test configs, doc fixtures or the
             // IIFE wrapper, which has no types entry of its own.
