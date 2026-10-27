@@ -220,15 +220,16 @@ export abstract class ImageChain<S extends ChainState> extends Chain<S> {
     return this._add(ops.textAlign(halign, valign))
   }
   /** Appends `font`; mirrors the creator in `@uploadcare/cdn-url/ops`. */
-  public font(size: number, color?: string): this {
-    return this._add(ops.font(size, color))
+  public font(options: ops.FontOptions): this {
+    return this._add(ops.font(options))
   }
   /** Appends `textBox`; mirrors the creator in `@uploadcare/cdn-url/ops`. */
   public textBox(
     mode: ops.TextBoxMode,
     color?: string,
-    padding?: number
+    padding?: number,
+    borderRadius?: number
   ): this {
-    return this._add(ops.textBox(mode, color, padding))
+    return this._add(ops.textBox(mode, color, padding, borderRadius))
   }
 }

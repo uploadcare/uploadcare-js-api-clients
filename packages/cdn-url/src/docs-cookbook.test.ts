@@ -242,7 +242,7 @@ describe('cookbook: understanding a chain', () => {
 
   it('why text is not styled', () => {
     const styled = [
-      font(24),
+      font({ size: 24 }),
       textAlign('center', 'bottom'),
       text(['80p', '20p'], 'bottom', 'Hi')
     ]

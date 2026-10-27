@@ -70,6 +70,13 @@ export {
 } from './compression'
 export {
   font,
+  FONT_FAMILIES,
+  FONT_STYLES,
+  FONT_WEIGHTS,
+  type FontFamily,
+  type FontOptions,
+  type FontStyle,
+  type FontWeight,
   overlay,
   type OverlayOptions,
   type OverlaySource,

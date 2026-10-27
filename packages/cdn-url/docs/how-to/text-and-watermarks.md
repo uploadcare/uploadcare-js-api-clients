@@ -114,7 +114,7 @@ const framed = [
 
 ## Draw text into the image
 
-`text` takes the **box** it draws into (size, then position — same coordinate rules as above), and the string. The box governs wrapping and how `textAlign` positions the copy inside it. `font` sets size and colour (the CDN also accepts weight, style and family); `textAlign` takes horizontal then vertical; `textBox` draws a background behind the text — mode, colour, padding.
+`text` takes the **box** it draws into (size, then position — same coordinate rules as above), and the string. The box governs wrapping and how `textAlign` positions the copy inside it. `font` takes any of size, colour, weight, style and family (and `reset`), writing only the ones you give; `textAlign` takes horizontal then vertical; `textBox` draws a background behind the text — mode, colour, padding.
 
 Escaping is handled for you — slashes, newlines and tildes are encoded per the CDN's `~s`/`~n`/`~~` rules and the rest is percent-encoded, so a caption can contain a URL, a `#` or a `?`:
 
@@ -126,7 +126,7 @@ serializeCdnUrl({
   uuid,
   operations: [
     preview(1200, 630),
-    font(48, 'ffffff'),
+    font({ size: 48, color: 'ffffff' }),
     textAlign('center', 'bottom'),
     textBox('fill', '00000080', 20),
     text(['80p', '30p'], 'bottom', 'Ship it on Friday')
@@ -137,7 +137,7 @@ serializeCdnUrl({
 ```ts [Builder]
 new CdnUrl({ cdnBase, uuid }).with(
   preview(1200, 630),
-  font(48, 'ffffff'),
+  font({ size: 48, color: 'ffffff' }),
   textAlign('center', 'bottom'),
   textBox('fill', '00000080', 20),
   text(['80p', '30p'], 'bottom', 'Ship it on Friday')
@@ -148,7 +148,7 @@ new CdnUrl({ cdnBase, uuid }).with(
 myCdn
   .file(uuid)
   .preview(1200, 630)
-  .font(48, 'ffffff')
+  .font({ size: 48, color: 'ffffff' })
   .textAlign('center', 'bottom')
   .textBox('fill', '00000080', 20)
   .text(['80p', '30p'], 'bottom', 'Ship it on Friday').href
@@ -183,7 +183,7 @@ Or validate the whole chain and look for orphans:
 ```ts
 import { validateOperations } from '@uploadcare/cdn-url/validate'
 
-validateOperations([font(48), preview(800, 600)])
+validateOperations([font({ size: 48 }), preview(800, 600)])
 // → [{ severity: 'warning', code: 'modifier-without-target', … }]
 ```
 

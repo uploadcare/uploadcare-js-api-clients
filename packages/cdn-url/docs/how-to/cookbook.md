@@ -511,7 +511,7 @@ import { operationInputs } from '@uploadcare/cdn-url/validate'
 import { font, text, textAlign } from '@uploadcare/cdn-url/ops'
 
 const styled = [
-  font(24),
+  font({ size: 24 }),
   textAlign('center', 'bottom'),
   text(['80p', '20p'], 'bottom', 'Hi')
 ]

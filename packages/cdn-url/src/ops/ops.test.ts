@@ -375,6 +375,50 @@ describe('overlays and text', () => {
     })
   })
 
+  it('font writes only the parts given, in the CDN order', () => {
+    expect(font({ size: 24, color: 'fff' })).toEqual({
+      name: 'font',
+      params: ['24', 'fff']
+    })
+    expect(font({ weight: 'bold' })).toEqual({ name: 'font', params: ['bold'] })
+    expect(
+      font({
+        family: 'DejaVuSerif',
+        color: 'FFFFE0',
+        size: 50,
+        style: 'italic',
+        weight: 'bold',
+        reset: true
+      })
+    ).toEqual({
+      name: 'font',
+      params: ['reset', 'bold', 'italic', '50', 'FFFFE0', 'DejaVuSerif']
+    })
+  })
+
+  it('font rejects an empty call and out-of-range values', () => {
+    expect(() => font({})).toThrow(RangeError)
+    expect(() => font({ size: 0 })).toThrow(RangeError)
+    expect(() => font({ size: 1001 })).toThrow(RangeError)
+    // @ts-expect-error not a documented family
+    expect(() => font({ family: 'Arial' })).toThrow(RangeError)
+    // @ts-expect-error not a documented weight
+    expect(() => font({ weight: 'light' })).toThrow(RangeError)
+  })
+
+  it('textBox takes a border radius, writing a zero padding before it', () => {
+    expect(textBox('fit', 'ff000080', 10, 15)).toEqual({
+      name: 'text_box',
+      params: ['fit', 'ff000080', '10', '15']
+    })
+    expect(textBox('fit', 'ff000080', undefined, 15)).toEqual({
+      name: 'text_box',
+      params: ['fit', 'ff000080', '0', '15']
+    })
+    expect(() => textBox('fit', 'fff', 0, -1)).toThrow(RangeError)
+    expect(() => textBox('fit', undefined, 0, 4)).toThrow(TypeError)
+  })
+
   it('text escapes /, newline and tilde in the string', () => {
     expect(text(['80p', '20p'], 'bottom', 'a/b~c\nd')).toEqual({
       name: 'text',

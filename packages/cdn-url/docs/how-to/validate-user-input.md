@@ -100,7 +100,7 @@ Each edge reports the related operation, its `index`, a `reason`, and a `kind`:
 
 ```ts
 const chain = [
-  font(24),
+  font({ size: 24 }),
   textAlign('center', 'bottom'),
   text(['80p', '20p'], 'bottom', 'Hi')
 ]

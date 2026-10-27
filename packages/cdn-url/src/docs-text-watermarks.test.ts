@@ -98,7 +98,7 @@ describe('text-and-watermarks: overlay a logo', () => {
 describe('text-and-watermarks: draw text', () => {
   const ops = [
     preview(1200, 630),
-    font(48, 'ffffff'),
+    font({ size: 48, color: 'ffffff' }),
     textAlign('center', 'bottom'),
     textBox('fill', '00000080', 20),
     text(['80p', '30p'], 'bottom', 'Ship it on Friday')
@@ -111,7 +111,7 @@ describe('text-and-watermarks: draw text', () => {
       myCdn
         .file(uuid)
         .preview(1200, 630)
-        .font(48, 'ffffff')
+        .font({ size: 48, color: 'ffffff' })
         .textAlign('center', 'bottom')
         .textBox('fill', '00000080', 20)
         .text(['80p', '30p'], 'bottom', 'Ship it on Friday').href
@@ -141,7 +141,7 @@ describe('text-and-watermarks: draw text', () => {
 describe('text-and-watermarks: the silent failure', () => {
   it('names what configures a text operation', () => {
     const styled = [
-      font(48, 'ffffff'),
+      font({ size: 48, color: 'ffffff' }),
       textAlign('center', 'bottom'),
       textBox('fill', '00000080', 20),
       text(['80p', '30p'], 'bottom', 'Hello')
@@ -152,15 +152,16 @@ describe('text-and-watermarks: the silent failure', () => {
   })
 
   it('reports a modifier with no target as the page claims', () => {
-    const codes = validateOperations([font(48), preview(800, 600)]).map(
-      (d) => d.code
-    )
+    const codes = validateOperations([
+      font({ size: 48 }),
+      preview(800, 600)
+    ]).map((d) => d.code)
     expect(codes).toContain('modifier-without-target')
   })
 
   it('and stays quiet when the target is there', () => {
     const codes = validateOperations([
-      font(48),
+      font({ size: 48 }),
       text(['80p', '30p'], 'bottom', 'Hello')
     ]).map((d) => d.code)
     expect(codes).not.toContain('modifier-without-target')

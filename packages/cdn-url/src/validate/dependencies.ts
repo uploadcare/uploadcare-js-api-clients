@@ -43,7 +43,7 @@ export type DependencyKind = 'modifier' | 'ceiling'
  * @example
  * ```ts
  * // → { kind: 'modifier', operation: { name: 'font', … }, index: 0, reason: '…' }
- * operationInputs([font(24), text(['1x1'], 'top', 'Hi')], 1)[0]
+ * operationInputs([font({ size: 24 }), text(['1x1'], 'top', 'Hi')], 1)[0]
  * ```
  */
 export interface OperationDependency {
@@ -134,7 +134,7 @@ export function isJpegFormat(op: CdnOperation): boolean {
  * @see https://uploadcare.com/docs/transformations/image/overlay/#overlay-text
  * @example
  * ```ts
- * const ops = [font(24), textAlign('center', 'bottom'), text(['1x1'], 'top', 'Hi')]
+ * const ops = [font({ size: 24 }), textAlign('center', 'bottom'), text(['1x1'], 'top', 'Hi')]
  * operationInputs(ops, 2).map((d) => d.operation.name) // → ['font', 'text_align']
  * ```
  */
@@ -192,7 +192,7 @@ function inputsAt(
  * @example
  * ```ts
  * // a font with no text after it affects nothing
- * operationDependents([preview(), font(24)], 1) // → []
+ * operationDependents([preview(), font({ size: 24 })], 1) // → []
  * ```
  */
 function dependentsAt(
@@ -266,7 +266,7 @@ function indexOf(
  * @see https://uploadcare.com/docs/transformations/image/overlay/#overlay-text
  * @example
  * ```ts
- * const ops = [font(24), textAlign('center', 'bottom'), text(['80p','20p'], 'bottom', 'Hi')]
+ * const ops = [font({ size: 24 }), textAlign('center', 'bottom'), text(['80p','20p'], 'bottom', 'Hi')]
  * operationInputs(ops, 'text').map((d) => d.operation.name) // → ['font', 'text_align']
  * ```
  */
@@ -285,7 +285,7 @@ export function operationInputs(
  * @see https://uploadcare.com/docs/transformations/image/overlay/#overlay-text
  * @example
  * ```ts
- * operationDependents([preview(), font(24)], 'font') // → [] — it affects nothing
+ * operationDependents([preview(), font({ size: 24 })], 'font') // → [] — it affects nothing
  * ```
  */
 export function operationDependents(

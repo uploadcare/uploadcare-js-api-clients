@@ -24,6 +24,19 @@ describe('cdn.file', () => {
     expect(myCdn.file(UUID).href).toBe(`${CDN_BASE}/${UUID}/`)
   })
 
+  it('chains trim, the full font and a rounded text box', () => {
+    expect(
+      myCdn
+        .file(UUID)
+        .trim(30, '10p')
+        .font({ weight: 'bold', size: 50, family: 'DejaVuMono' })
+        .textBox('fit', 'ff000080', 10, 15)
+        .text(['100p', '50p'], ['50p', '50p'], 'Hi').href
+    ).toBe(
+      `${CDN_BASE}/${UUID}/-/trim/30/10p/-/font/bold/50/DejaVuMono/-/text_box/fit/ff000080/10/15/-/text/100px50p/50p,50p/Hi/`
+    )
+  })
+
   it('chains image operations in order', () => {
     expect(myCdn.file(UUID).preview(800, 600).quality('smart').href).toBe(
       `${CDN_BASE}/${UUID}/-/preview/800x600/-/quality/smart/`
