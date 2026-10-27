@@ -1,7 +1,7 @@
 import { readJpegChunks } from '../image/JPEG/readJpegChunks'
 
 export const getIccProfile = async (blob: Blob) => {
-  const iccProfile: DataView[] = []
+  const iccProfile: DataView<ArrayBuffer>[] = []
   const { promiseReadJpegChunks, stack } = readJpegChunks()
 
   await promiseReadJpegChunks(blob)

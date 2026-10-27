@@ -2,7 +2,7 @@ type TChunk = {
   startPos: number
   length: number
   marker: number
-  view: DataView
+  view: DataView<ArrayBuffer>
 }
 
 // TODO: unwrap promises
@@ -11,7 +11,10 @@ export const readJpegChunks = () => {
   const promiseReadJpegChunks = (blob: Blob) =>
     new Promise<boolean>((resolve, reject) => {
       let pos = 2
-      const readToView = (blob: Blob, cb: (view: DataView) => void) => {
+      const readToView = (
+        blob: Blob,
+        cb: (view: DataView<ArrayBuffer>) => void
+      ) => {
         const reader = new FileReader()
 
         reader.addEventListener('load', () => {
@@ -60,7 +63,7 @@ export const readJpegChunks = () => {
           const length = view.getUint16(2) - 2
           return readToView(
             blob.slice(pos, (pos += length)),
-            (view: DataView) => {
+            (view: DataView<ArrayBuffer>) => {
               if (view.byteLength !== length) {
                 reject('Corrupted')
                 return

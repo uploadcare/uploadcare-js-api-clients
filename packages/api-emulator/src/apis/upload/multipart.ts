@@ -176,7 +176,7 @@ export const multipartRoutes: Route[] = [
         )
 
       const received = upload.parts.filter(
-        (part): part is Uint8Array => part !== undefined
+        (part): part is Uint8Array<ArrayBuffer> => part !== undefined
       )
       if (received.length < upload.parts.length)
         // schema: multipartUploadSizeTooSmallError — a part was never PUT.

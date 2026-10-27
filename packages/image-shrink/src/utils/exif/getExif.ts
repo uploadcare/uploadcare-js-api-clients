@@ -1,7 +1,7 @@
 import { readJpegChunks } from '../image/JPEG/readJpegChunks'
 
 export const getExif = async (blob: Blob) => {
-  let exif: DataView | null = null
+  let exif: DataView<ArrayBuffer> | null = null
 
   const { promiseReadJpegChunks, stack } = readJpegChunks()
 

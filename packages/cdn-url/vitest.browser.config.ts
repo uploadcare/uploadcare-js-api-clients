@@ -1,5 +1,5 @@
-import { configDefaults } from 'vitest/config'
-import { defineConfig } from 'vite'
+import { configDefaults, defineConfig } from 'vitest/config'
+import { playwright } from '@vitest/browser-playwright'
 
 /**
  * Runs the same unit test suite in real Chromium — proves the library is
@@ -16,7 +16,7 @@ export default defineConfig({
     exclude: [...configDefaults.exclude, '**/*.node.test.ts'],
     browser: {
       enabled: true,
-      provider: 'playwright',
+      provider: playwright(),
       instances: [
         {
           browser: 'chromium',

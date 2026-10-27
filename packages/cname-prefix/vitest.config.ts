@@ -1,4 +1,5 @@
-import { defineConfig } from 'vite'
+import { defineConfig } from 'vitest/config'
+import { playwright } from '@vitest/browser-playwright'
 
 /**
  * Two projects, because the package ships two implementations of the same API.
@@ -16,7 +17,7 @@ export default defineConfig({
           exclude: ['src/node/**'],
           browser: {
             enabled: true,
-            provider: 'playwright',
+            provider: playwright(),
             instances: [
               {
                 browser: 'chromium',

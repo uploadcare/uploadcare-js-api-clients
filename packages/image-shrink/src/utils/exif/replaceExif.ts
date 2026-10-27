@@ -8,7 +8,7 @@ export const setExifOrientation = (exif: DataView, orientation: number) => {
 }
 export const replaceExif = async (
   blob: Blob,
-  exif: DataView,
+  exif: DataView<ArrayBuffer>,
   isExifApplied: boolean
 ) => {
   if (isExifApplied) {

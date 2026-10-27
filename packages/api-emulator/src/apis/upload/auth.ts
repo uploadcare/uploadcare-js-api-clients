@@ -182,7 +182,7 @@ const verifyAuthToken = async (
 
   let protectedHeader: { alg?: unknown }
   let claims: Claims
-  let signatureBytes: Uint8Array
+  let signatureBytes: Uint8Array<ArrayBuffer>
   try {
     protectedHeader = (decodeSegment(header) ?? {}) as { alg?: unknown }
     claims = (decodeSegment(payload) ?? {}) as Claims
