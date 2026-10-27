@@ -8,7 +8,7 @@
 /**
  * Written as regex **literals**, not composed from a shared source string with
  * `new RegExp`. esbuild will not eliminate a `new RegExp(...)` call even when it
- * carries `/* @__PURE__ *​/`, so the composed form left `GROUP_ID_RE` in bundles
+ * carries a `@__PURE__` annotation, so the composed form left `GROUP_ID_RE` in bundles
  * that only ever parse file urls — measurably, and for no benefit. A literal is
  * side-effect-free by construction, so an unused one is dropped.
  *

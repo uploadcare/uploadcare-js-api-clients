@@ -215,7 +215,7 @@ describe('cookbook: editing a chain', () => {
     ).toBe(
       `https://1s4oyld5dc.ucarecd.net/${uuid}/-/resize/300x/-/blur/10/-/quality/smart/`
     )
-    expect(mapOperations(stored, (ops) => ops.reverse())).toBe(
+    expect(mapOperations(stored, (ops) => ops.toReversed())).toBe(
       `https://1s4oyld5dc.ucarecd.net/${uuid}/-/quality/smart/-/resize/300x/`
     )
   })
@@ -353,7 +353,7 @@ describe('cookbook: Builder tab', () => {
     expect(url.updateOperations((ops) => [blur(10), ...ops]).href).toBe(
       `${cdnBase}/${uuid}/-/blur/10/-/resize/300x/-/quality/smart/`
     )
-    expect(url.updateOperations((ops) => ops.reverse()).href).toBe(
+    expect(url.updateOperations((ops) => ops.toReversed()).href).toBe(
       `${cdnBase}/${uuid}/-/quality/smart/-/resize/300x/`
     )
   })
@@ -424,7 +424,7 @@ describe('cookbook: Fluent tab', () => {
     expect(chain.updateOperations((ops) => [blur(10), ...ops]).href).toBe(
       `${cdnBase}/${uuid}/-/blur/10/-/resize/300x/-/quality/smart/`
     )
-    expect(chain.updateOperations((ops) => ops.reverse()).href).toBe(
+    expect(chain.updateOperations((ops) => ops.toReversed()).href).toBe(
       `${cdnBase}/${uuid}/-/quality/smart/-/resize/300x/`
     )
   })

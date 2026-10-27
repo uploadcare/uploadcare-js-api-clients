@@ -200,7 +200,7 @@ describe('CdnUrl builder', () => {
       ])
       expect(
         CdnUrl.parse(overlays)
-          .updateOperations((ops) => ops.reverse())
+          .updateOperations((ops) => ops.toReversed())
           .operations.map((op) => op.name)
       ).toEqual(['overlay', 'overlay', 'preview', 'overlay'])
     })
