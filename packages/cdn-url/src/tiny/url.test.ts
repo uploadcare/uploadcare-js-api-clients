@@ -52,6 +52,23 @@ describe('tinyParse', () => {
     })
   })
 
+  it('cuts the query and fragment off before looking for the filename', () => {
+    const url = `https://ucarecdn.com/${UUID}/-/preview/?next=/a/b#/c`
+    expect(tinyParse(url)).toMatchObject({
+      modifiers: '-/preview/',
+      filename: '',
+      search: '?next=/a/b',
+      hash: '#/c'
+    })
+    expect(tinyBuild(tinyParse(url))).toBe(url)
+  })
+
+  it('reads a ? after the # as part of the fragment', () => {
+    expect(
+      tinyParse(`https://ucarecdn.com/${UUID}/photo.jpg#a?b`)
+    ).toMatchObject({ filename: 'photo.jpg', search: '', hash: '#a?b' })
+  })
+
   it('puts a conversion prefix in the modifiers, where it round-trips', () => {
     expect(
       tinyParse(`https://ucarecdn.com/${UUID}/gif2video/-/format/webm/`)

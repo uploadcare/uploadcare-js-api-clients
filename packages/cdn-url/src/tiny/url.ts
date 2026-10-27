@@ -69,23 +69,26 @@ export interface TinyFileUrl {
  */
 export function tinyParse(url: string): TinyFileUrl {
   const pathStart = url.indexOf('/', url.indexOf('//') + 2)
-  const path = pathStart === -1 ? '' : url.slice(pathStart + 1)
+  const tail = pathStart === -1 ? '' : url.slice(pathStart + 1)
+  // Cut the query and fragment off first: either may contain a `/`.
+  const query = tail.search(QUERY_RE)
+  const fragment = tail.search(HASH_RE)
+  const path = query === -1 ? tail : tail.slice(0, query)
   const uuidEnd = path.indexOf('/')
   const rest = uuidEnd === -1 ? '' : path.slice(uuidEnd + 1)
   // The last `/` is the modifier/filename boundary: a filename never contains
   // one, and a url that ends in `/` has no filename.
   const cut = rest.lastIndexOf('/')
-  const trailing = rest.slice(cut + 1)
-  const query = trailing.search(QUERY_RE)
-  const fragment = trailing.search(HASH_RE)
-  const queryEnd = fragment === -1 ? trailing.length : fragment
   return {
     cdnBase: pathStart === -1 ? url : url.slice(0, pathStart),
     uuid: uuidEnd === -1 ? path : path.slice(0, uuidEnd),
     modifiers: asModifiersChain(cut === -1 ? '' : `${rest.slice(0, cut)}/`),
-    filename: query === -1 ? trailing : trailing.slice(0, query),
-    search: query === -1 ? '' : trailing.slice(query, queryEnd),
-    hash: fragment === -1 ? '' : trailing.slice(fragment)
+    filename: rest.slice(cut + 1),
+    search:
+      query === -1 || query === fragment
+        ? ''
+        : tail.slice(query, fragment === -1 ? tail.length : fragment),
+    hash: fragment === -1 ? '' : tail.slice(fragment)
   }
 }
 
