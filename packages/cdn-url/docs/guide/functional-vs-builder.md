@@ -163,25 +163,26 @@ That trade is only worth it under a real size budget, and only when you already 
 
 Every entry point is independent, and `sideEffects: false` lets bundlers drop everything you don't import. Each operation creator is an atom: importing `preview` does not pull in the other 46.
 
-What each entry costs when you import everything it exports, bundled and minified from the production build. Shared chunks are included, so these are the real numbers rather than per-file sizes:
+What each entry costs when you import everything it exports, bundled and minified from the production build. Shared chunks are included, so these are the real numbers rather than per-file sizes. `node scripts/measure-sizes.mjs` re-measures every figure on this page:
 
 | Import                                  | Minified | Gzipped |
 | --------------------------------------- | -------- | ------- |
-| `proxy`                                 | 0.4 kB   | 0.3 kB  |
-| `document`                              | 0.6 kB   | 0.4 kB  |
-| `video`                                 | 0.9 kB   | 0.6 kB  |
-| `gif2video`                             | 1.2 kB   | 0.6 kB  |
-| `group`                                 | 1.4 kB   | 0.7 kB  |
+| `proxy`                                 | 0.6 kB   | 0.4 kB  |
+| `document`                              | 0.9 kB   | 0.5 kB  |
+| `video`                                 | 0.9 kB   | 0.5 kB  |
+| `gif2video`                             | 0.8 kB   | 0.5 kB  |
+| `group`                                 | 1.1 kB   | 0.6 kB  |
 | `validate`                              | 5.2 kB   | 2.1 kB  |
-| `builder`                               | 5.7 kB   | 2.0 kB  |
-| `tiny` (string level)                   | 0.9 kB   | 0.5 kB  |
-| `index` (everything below, re-exported) | 8.1 kB   | 3.3 kB  |
-| `ops` (all 48 creators)                 | 6.1 kB   | 2.2 kB  |
-| `fluent` (the `cdn` mega-object)        | 17.4 kB  | 5.9 kB  |
+| `builder`                               | 7.0 kB   | 2.2 kB  |
+| `tiny` (string level)                   | 1.0 kB   | 0.6 kB  |
+| `index` (everything below, re-exported) | 6.9 kB   | 2.3 kB  |
+| `ops` (all 48 creators)                 | 6.6 kB   | 2.5 kB  |
+| `fluent` (the `cdn` mega-object)        | 17.0 kB  | 4.9 kB  |
+| `cdn-base` (the prefixed host)          | 2.3 kB   | 1.4 kB  |
 
-No total above includes `prefixedCdnBase` — the SHA-256 that derives your project's host lives in its own entry, [`@uploadcare/cdn-url/cdn-base`](/guide/cdn-base), so a bundle carries it only if it imports that entry. Doing so adds 1.9 kB minified (1.2 kB gzipped): `cdn` plus one chain measures 15.0 kB minified, 4.4 kB gzipped on its own, and 17.0 kB (5.7 kB gzipped) once it derives the host. Compute the host at build time or paste it as a literal and you pay nothing for the hashing.
+No total above includes `prefixedCdnBase` — the SHA-256 that derives your project's host lives in its own entry, [`@uploadcare/cdn-url/cdn-base`](/guide/cdn-base), so a bundle carries it only if it imports that entry. Doing so adds 1.9 kB minified (1.2 kB gzipped): `cdn` plus one chain measures 16.8 kB minified, 4.9 kB gzipped on its own, and 18.7 kB (6.0 kB gzipped) once it derives the host. Compute the host at build time or paste it as a literal and you pay nothing for the hashing.
 
-Importing everything is the worst case, and it is not what most code does. The core plus one creator is about 1.6 kB gzipped, not 2.2 plus 2.0, because the creators you don't name are dropped. The [string level](/guide/string-level-api) does the same job for 0.4 kB, and costs the same whether you import it from `/tiny` or from the root — 348 B versus 347 B brotli, measured.
+Importing everything is the worst case, and it is not what most code does. The core plus one creator is about 1.7 kB gzipped, not 2.3 plus 2.5, because the creators you don't name are dropped. The [string level](/guide/string-level-api) does the same job for 0.5 kB, and costs the same whether you import it from `/tiny` or from the root — 421 B versus 425 B brotli, measured.
 
 The `fluent` entry is the one exception to "you only pay for what you import": reaching for `cdn.base()` pulls in the whole library, and it cannot tree-shake by design. That's the deal: one import, full surface. If size matters, use the functional core or `builder` instead.
 

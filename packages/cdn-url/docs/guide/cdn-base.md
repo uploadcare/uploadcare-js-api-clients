@@ -172,15 +172,15 @@ accept the extra kilobyte.
 ### What it costs
 
 Marginal cost over a bundle that already imports `cdn` and one chain, measured
-with esbuild `--minify` on the production build:
+with esbuild `--minify` on the production build (`node scripts/measure-sizes.mjs`):
 
-| Where    | Helper                 | Added                                |
-| -------- | ---------------------- | ------------------------------------ |
-| browser  | `prefixedCdnBaseAsync` | **+221 B**                           |
-| browser  | `prefixedCdnBase`      | **+946 B**                           |
-| Node     | `prefixedCdnBase`      | **+151 B**                           |
-| Node     | `prefixedCdnBaseAsync` | a little more than `prefixedCdnBase` |
-| anywhere | a pasted literal host  | 0 B                                  |
+| Where    | Helper                 | Added      |
+| -------- | ---------------------- | ---------- |
+| browser  | `prefixedCdnBaseAsync` | **+232 B** |
+| browser  | `prefixedCdnBase`      | **+945 B** |
+| Node     | `prefixedCdnBase`      | **+178 B** |
+| Node     | `prefixedCdnBaseAsync` | **+239 B** |
+| anywhere | a pasted literal host  | 0 B        |
 
 Brotli, which is what a CDN serves. Neither number is large; the honest summary
 is that a pasted literal beats both, and between the two the async one is roughly
@@ -228,7 +228,7 @@ Better still, if the key is fixed at build time, paste the result as a literal a
 export const CDN_BASE = 'https://1s4oyld5dc.ucarecd.net'
 ```
 
-Nothing else in the library imports either helper, so not naming them drops both: importing everything from the fluent entry measures 17.4 kB minified / 5.9 kB gzipped, and 15.1 kB / 4.5 kB when neither is named. See [tree-shaking](/guide/functional-vs-builder#tree-shaking-what-you-actually-ship) for the full table.
+Nothing else in the library imports either helper, so not naming them drops both: `cdn` plus one chain measures 16.8 kB minified / 4.9 kB gzipped with a literal host, and 18.7 kB / 6.0 kB once it calls `prefixedCdnBase`. See [tree-shaking](/guide/functional-vs-builder#tree-shaking-what-you-actually-ship) for the full table.
 
 ## Things that bite
 

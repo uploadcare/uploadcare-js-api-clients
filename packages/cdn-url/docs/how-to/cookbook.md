@@ -10,10 +10,10 @@ Every recipe is shown in all three API styles. Pick a tab and stay in it. A four
 
 | tab            | what you import                   | gzipped |
 | -------------- | --------------------------------- | ------- |
-| _string level_ | `tinyParse`/`tinyBuild` + a chain | 414 B   |
-| **Atomic**     | functional core + one op creator  | 1487 B  |
-| **Builder**    | `CdnUrl` + one op creator         | 2069 B  |
-| **Fluent**     | `cdn` + a chain                   | 4509 B  |
+| _string level_ | `tinyParse`/`tinyBuild` + a chain | 470 B   |
+| **Atomic**     | functional core + one op creator  | 1677 B  |
+| **Builder**    | `CdnUrl` + one op creator         | 2315 B  |
+| **Fluent**     | `cdn` + a chain                   | 4903 B  |
 
 Measured on one task — parse a URL, add one operation, serialize. None of them include `prefixedCdnBase`: recipes that build from a uuid need [a CDN base](/guide/cdn-base), and deriving it from a public key adds 1.2 kB gzipped unless you paste the host as a literal.
 
@@ -444,7 +444,7 @@ const url = tinyBuild({
 // → https://1s4oyld5dc.ucarecd.net/<uuid>/-/resize/300x/-/quality/smart/-/blur/10/
 ```
 
-414 B gzipped against 1487 B for the Atomic tab. The operations stay type-checked, but nothing is validated at run time, there are no kinds, and it is **file URLs only** — replacing the chain on a group element or a conversion result destroys the URL. Read [The string-level API](/guide/string-level-api) before using it; it is the one style that can hand you a broken URL without an error.
+470 B gzipped against 1677 B for the Atomic tab. The operations stay type-checked, but nothing is validated at run time, there are no kinds, and it is **file URLs only** — replacing the chain on a group element or a conversion result destroys the URL. Read [The string-level API](/guide/string-level-api) before using it; it is the one style that can hand you a broken URL without an error.
 
 ## Understanding a chain
 

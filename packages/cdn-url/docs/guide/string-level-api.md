@@ -2,9 +2,9 @@
 
 Everything else in this library treats an operation as data — `{ name: 'blur', params: ['10'] }`, built by a creator from [`/ops`](/reference/ops/), validated, inspectable. This API treats the modifier chain as one string and a file URL as a handful of named strings.
 
-It costs runtime validation, URL kinds, and the ability to inspect what you are editing. What it buys is bytes: 363 B brotli, against 824 B for the narrowest full-model path and 4024 B for the fluent `cdn` object, [measured below](#what-it-costs).
+It costs runtime validation, URL kinds, and the ability to inspect what you are editing. What it buys is bytes: 421 B brotli, against 881 B for the narrowest full-model path and 4385 B for the fluent `cdn` object, [measured below](#what-it-costs).
 
-Examples import from `@uploadcare/cdn-url/tiny`, the dedicated entry. Everything here is re-exported from the root entry too, and costs the same either way — 348 B against 347 B brotli — so use whichever import path your code already has.
+Examples import from `@uploadcare/cdn-url/tiny`, the dedicated entry. Everything here is re-exported from the root entry too, and costs the same either way — 421 B against 425 B brotli — so use whichever import path your code already has.
 
 Throughout this page `:uuid` stands in for a real file uuid, and `parts` for a value of the exported type `TinyFileUrl`.
 
@@ -32,21 +32,21 @@ One modifiers string holds zero or more operations, which is why `modifiers('res
 
 ## What it costs
 
-Each bundle below parses a URL, adds one `blur`, and serializes it — except the kind-unknown row, which adds a check and no operation, so its number is a floor rather than a like-for-like. Bundled with `esbuild --bundle --minify` against the production build, shared chunks included:
+Each bundle below parses a URL, adds one `blur`, and serializes it — except the kind-unknown row, which adds a check and no operation, so its number is a floor rather than a like-for-like. Bundled with `esbuild --bundle --minify` against the production build, shared chunks included; `node scripts/measure-sizes.mjs` reproduces it:
 
 | The API                       | What it imports                                          | Raw     | Gzip   | Brotli |
 | ----------------------------- | -------------------------------------------------------- | ------- | ------ | ------ |
-| fluent                        | `cdn.parse(url)` → `.blur(10)` → `.href`                 | 15059 B | 4509 B | 4024 B |
-| builder                       | `CdnUrl.parse(url).with(blur(10)).href`                  | 6090 B  | 2069 B | 1878 B |
-| functional, any kind          | `parseCdnUrl` + `serializeCdnUrl` + `blur(10)`           | 4123 B  | 1487 B | 1343 B |
-| string level, kind unknown    | `tinyParse` + `tinyBuild` + an `isFileUrl` guard         | 1958 B  | 950 B  | 843 B  |
-| functional, file only         | `parseFileUrl` + `serializeFileUrl` + `blur(10)`         | 1873 B  | 923 B  | 824 B  |
-| string level, kind known      | `tinyParse` + `tinyBuild` + `modifiers('blur/10')`       | 753 B   | 414 B  | 363 B  |
-| string level, untrusted input | `tinyParse` + `tinyBuild` + `normalizeModifiers(stored)` | 812 B   | 445 B  | 383 B  |
+| fluent                        | `cdn.parse(url)` → `.blur(10)` → `.href`                 | 16803 B | 4903 B | 4385 B |
+| builder                       | `CdnUrl.parse(url).with(blur(10)).href`                  | 7202 B  | 2315 B | 2125 B |
+| functional, any kind          | `parseCdnUrl` + `serializeCdnUrl` + `blur(10)`           | 4992 B  | 1677 B | 1551 B |
+| string level, kind unknown    | `tinyParse` + `tinyBuild` + an `isFileUrl` guard         | 2023 B  | 1012 B | 906 B  |
+| functional, file only         | `parseFileUrl` + `serializeFileUrl` + `blur(10)`         | 1941 B  | 976 B  | 881 B  |
+| string level, kind known      | `tinyParse` + `tinyBuild` + `modifiers('blur/10')`       | 824 B   | 470 B  | 421 B  |
+| string level, untrusted input | `tinyParse` + `tinyBuild` + `normalizeModifiers(stored)` | 891 B   | 507 B  | 440 B  |
 
-The two facades at the top are the ones most code reaches for, and they are 11× and 5× the string level. That gap is the entire reason this API exists — the `cdn` mega-object cannot tree-shake by design, so `fluent` is a floor, not a worst case.
+The two facades at the top are the ones most code reaches for, and they are 10× and 5× the string level. That gap is the entire reason this API exists — the `cdn` mega-object cannot tree-shake by design, so `fluent` is a floor, not a worst case.
 
-Compare the two middle rows instead if you want the honest decision: guarding an unknown URL with `isFileUrl` pulls the real parser back in, landing within 2% of `parseFileUrl` — which also validates and hands you kinds. The bytes are close; the point is that you get strictly less for them. The string level pays off only once the kind is settled, and then it is 44% of `parseFileUrl` (363 vs 824 B brotli).
+Compare the two middle rows instead if you want the honest decision: guarding an unknown URL with `isFileUrl` pulls the real parser back in, landing within 3% of `parseFileUrl` — which also validates and hands you kinds. The bytes are close; the point is that you get strictly less for them. The string level pays off only once the kind is settled, and then it is 48% of `parseFileUrl` (421 vs 881 B brotli).
 
 Row five is worth noting too: accepting an untrusted stored string costs slightly more than authoring literals, because `normalizeModifiers` ships its own normalization.
 

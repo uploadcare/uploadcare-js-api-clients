@@ -17,7 +17,7 @@ features:
   - title: Round-trip parser
     details: Lenient parsing of any CDN URL flavor, including files, groups, nth elements, conversion results and proxified sources. Unknown operations survive serialization.
   - title: Typed operations
-    details: ~45 operation creators with eager validation of ranges, enums and grammars, straight from the CDN docs.
+    details: 48 operation creators with eager validation of ranges, enums and grammars, straight from the CDN docs.
   - title: Chain validation
     details: Cross-operation diagnostics for the core operation requirement, must-be-last rules, last-wins duplicates and dimension ceilings.
   - title: Tree-shakeable

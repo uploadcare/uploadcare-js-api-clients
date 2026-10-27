@@ -42,9 +42,9 @@ conventions in several ways — do not "fix" these divergences.
 - **Per-kind parsers exist alongside `parseCdnUrl`**: `parseFileUrl`,
   `parseGroupUrl`, `parseGroupElementUrl`, `parseArchiveUrl`, `parseProxyUrl`, plus `isFileUrl`
   and friends. `parseCdnUrl` **delegates** to them, so the dispatch lives in
-  one place and cannot drift; a test asserts all five agree on every fixture.
-  They exist for bundle size: importing `parseFileUrl` alone is 714 B gzipped
-  against 1078 B for `parseCdnUrl`. They are exported from the **root entry**,
+  one place and cannot drift; a test asserts all six agree on every fixture.
+  They exist for bundle size: importing `parseFileUrl` alone is 686 B gzipped
+  against 1174 B for `parseCdnUrl`. They are exported from the **root entry**,
   not a new entry point — per-symbol tree-shaking already gives the saving, so
   do not add an entry for them.
 - **Per-kind serializers mirror them**: `serializeFileUrl`, `serializeGroupUrl`,
@@ -106,7 +106,7 @@ conventions in several ways — do not "fix" these divergences.
   registered entry point (the docs use it, since it names the contract) and the same
   symbols are re-exported from the root entry for callers who already import from
   there. It costs nothing: a consumer naming only `tinyParse`/`tinyBuild`/`modifiers`
-  bundles 347 B brotli through the root against 348 B through `/tiny`. Do not remove
+  bundles 425 B brotli through the root against 421 B through `/tiny`. Do not remove
   either path — and remember the root entry's own "import everything" figure carries
   them, which is what the table in `functional-vs-builder.md` reports.
 - **`src/tiny/` holds the string-level API — `literals.ts` (the chain: `modifiers`,
@@ -166,9 +166,9 @@ conventions in several ways — do not "fix" these divergences.
   `videoPath`/`documentPath` returning host-free paths is something the docs state
   plainly.
 - **`prefixedCdnBaseAsync` is the browser-preferred helper, `prefixedCdnBase` the
-  server one.** The async path uses WebCrypto and adds ~221 B brotli to a browser
-  bundle; the sync path must carry a SHA-256 there (~946 B) because no synchronous
-  code can wait for a promise, and under Node it resolves to `node:crypto` (~151
+  server one.** The async path uses WebCrypto and adds ~232 B brotli to a browser
+  bundle; the sync path must carry a SHA-256 there (~945 B) because no synchronous
+  code can wait for a promise, and under Node it resolves to `node:crypto` (~178
   B). Async works under Node too, through `node:crypto`'s WebCrypto. Re-measure
   rather than copying these forward.
 - **`prefixedCdnBase(publicKey, cdnBase = PREFIX_CDN_BASE)` is the only prefix
@@ -178,9 +178,10 @@ conventions in several ways — do not "fix" these divergences.
   caller's behalf — an earlier draft gave `configure` a `publicKey` option and it
   was **removed**: it welded 4.7 kB of SHA-256 (2.1 kB gzipped) into every fluent
   consumer's bundle. Kept in its own module (`src/cdn-base/prefixed.ts`, its own
-  dist chunk), it drops for anyone who doesn't name it: `fluent` measures 19.8 kB
-  min / 6.6 kB gz with it and 15.0 / 4.4 without. The figures in
-  `functional-vs-builder.md` are those; re-measure rather than copy them forward.
+  dist chunk), it drops for anyone who doesn't name it: `cdn` plus one chain
+  measures 18.7 kB min / 6.0 kB gz with it and 16.8 / 4.9 without. The figures in
+  `functional-vs-builder.md` are those; re-measure with `node scripts/measure-sizes.mjs`
+  rather than copy them forward.
 - **One word for the host: `cdnBase`.** `origin` was renamed out of the whole
   package — `ParsedCdnUrl.cdnBase`, `FileUrlInput.cdnBase`, `TinyFileUrl.cdnBase`,
   `CdnUrl.base`, every helper's first argument. It matches
@@ -226,9 +227,9 @@ conventions in several ways — do not "fix" these divergences.
   either: normalizing a loose modifiers string is `tiny/literals.ts`'s job, since the
   chain is its domain object, not the url's. Same job in every bundle — parse a url,
   append one operation, serialize — measured with esbuild `--minify` on the prod
-  flavor: `parseCdnUrl` 1343 B brotli, `parseFileUrl` 824 B, `tinyParse` + `modifiers`
-  363 B, `tinyParse` + `normalizeModifiers` 383 B, and `tinyParse` behind an
-  `isFileUrl` guard 843 B. These are the figures the string-level guide page
+  flavor: `parseCdnUrl` 1551 B brotli, `parseFileUrl` 881 B, `tinyParse` + `modifiers`
+  421 B, `tinyParse` + `normalizeModifiers` 440 B, and `tinyParse` behind an
+  `isFileUrl` guard 906 B. These are the figures the string-level guide page
   publishes; keep the two in step, and re-measure rather than copying them forward. The round-trip law holds for every url in
   the corpus, **including** the ones whose fields it gets wrong — a group element
   keeps `nth/2/` in `modifiers`, a proxy keeps its embedded source there and its
