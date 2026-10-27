@@ -37,7 +37,7 @@ conventions in several ways — do not "fix" these divergences.
   and `fluent` (`base()` mega-object) entries wrap it; they must never grow logic
   the core doesn't have.
 - **`ParsedCdnUrl` is a discriminated union** (`kind: 'file' | 'group' |
-'group-element' | 'archive' | 'proxy'`). Each member carries only the fields its kind
+  'group-element' | 'archive' | 'proxy'`). Each member carries only the fields its kind
   allows (group roots have no `operations`, proxies no `uuid`/`search`).
 - **Per-kind parsers exist alongside `parseCdnUrl`**: `parseFileUrl`,
   `parseGroupUrl`, `parseGroupElementUrl`, `parseArchiveUrl`, `parseProxyUrl`, plus `isFileUrl`
@@ -246,20 +246,20 @@ conventions in several ways — do not "fix" these divergences.
   because the failure mode is a consumer reaching for `tinyParse` on a url whose kind
   they have not established and quietly getting `uuid: '-'`.
 - **`ModifiersChain` is nominal, not a pattern type.** `string & { readonly
-[CHAIN]: true }`, branded through the one `asModifiersChain` entrance, so it is a
+  [CHAIN]: true }`, branded through the one `asModifiersChain` entrance, so it is a
   plain string at run time and free. A pattern type (`'' | `${string}/`) was tried
   first and **rejected**: every string ending in a slash satisfied it, which is
   barely a type. The brand states the invariant that matters — this string came out
   of the chain machinery — so a hand-written `'-/resize/300x/'`, a stored
   `'resize/300x'`, a stray `''` and a `` `${a}${b}` `` concatenation are all
-rejected. Producers: `modifiers()`(typed literals),`normalizeModifiers()`(a
-loose string of any shape: missing marker, doubled or edge slashes, surrounding
-whitespace — the same leniency`parseOperations`grants, normalized with`split('/').filter().join('/')`, one pass, no regex), `joinModifiers()`(append,
-since template concatenation widens back to`string`) and `tinyParse`. The empty
-chain is `modifiers()`, not `''`— that is the ergonomic price of nominality, paid
-on purpose. Verified to survive the emitted`.d.ts`: `declare const CHAIN: unique
+  rejected. Producers: `modifiers()`(typed literals),`normalizeModifiers()`(a
+  loose string of any shape: missing marker, doubled or edge slashes, surrounding
+  whitespace — the same leniency`parseOperations`grants, normalized with`split('/').filter().join('/')`, one pass, no regex), `joinModifiers()`(append,
+  since template concatenation widens back to`string`) and `tinyParse`. The empty
+  chain is `modifiers()`, not `''`— that is the ergonomic price of nominality, paid
+  on purpose. Verified to survive the emitted`.d.ts`: `declare const CHAIN: unique
   symbol`lands in`dist/types`, and a consumer compiled against it still gets the
-rejections. Operation *names* remain `OperationLiteral`'s business; the brand says
+  rejections. Operation *names* remain `OperationLiteral`'s business; the brand says
   where a chain came from, not that every directive in it is spelled right.
 - **A tagged-template writer (`` mods`resize/100x` ``) was built, measured and
   removed. Do not reintroduce it.** TypeScript hands a tag function a

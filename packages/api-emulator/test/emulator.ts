@@ -93,7 +93,7 @@ export const uploadFile = ({
   query = '',
   session
 }: {
-  bytes?: Uint8Array
+  bytes?: Uint8Array<ArrayBuffer>
   name?: string
   type?: string
   pubKey?: string

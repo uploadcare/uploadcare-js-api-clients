@@ -10,8 +10,8 @@ export const TelemetryRequestSchema: z.ZodType<TelemetryRequest> = z.object({
   sessionId: z.string(),
   component: z.string().nullable(),
   userAgent: z.string(),
-  config: z.record(z.unknown()).nullable(),
-  payload: z.record(z.unknown()).nullable()
+  config: z.record(z.string(), z.unknown()).nullable(),
+  payload: z.record(z.string(), z.unknown()).nullable()
 })
 
 export const TelemetryResponseSchema: z.ZodType<TelemetryResponse> = z.object({

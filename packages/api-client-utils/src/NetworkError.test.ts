@@ -1,3 +1,4 @@
+import { describe, it, expect } from 'vitest'
 import { NetworkError } from './NetworkError'
 import { UploadcareError } from './UploadcareError'
 

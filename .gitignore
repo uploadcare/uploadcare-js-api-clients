@@ -14,3 +14,10 @@ packages/cdn-url/docs/.vitepress/cache/
 firebase.json
 .firebaserc
 .firebase/
+
+# npm workspaces resolve from the root lockfile; a per-package one is never read
+# and goes stale, which security scanners then report.
+packages/*/package-lock.json
+
+# Vitest 5 run artifacts
+.vitest/

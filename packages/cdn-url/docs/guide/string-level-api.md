@@ -9,7 +9,7 @@ Examples import from `@uploadcare/cdn-url/tiny`, the dedicated entry. Everything
 Throughout this page `:uuid` stands in for a real file uuid, and `parts` for a value of the exported type `TinyFileUrl`.
 
 ::: tip File URLs only, and only when you already know it is one
-`tinyParse` handles `/:uuid/-/…/filename` and nothing else. It cannot tell what kind of URL you gave it and has no way to tell you, so the caller has to know. If your input is of unknown kind, checking costs more than simply using [`parseFileUrl`](/reference/index/functions/parseFileUrl), which validates as well. See [What it costs](#what-it-costs).
+`tinyParse` handles `/:uuid/-/…/filename` and nothing else. It cannot tell what kind of URL you gave it and has no way to tell you, so the caller has to know. If your input is of unknown kind, checking costs more than simply using [`parseFileUrl`](/reference/core/functions/parseFileUrl), which validates as well. See [What it costs](#what-it-costs).
 
 Reach for this level when the URLs are file URLs by construction — ones your own code built, or a field you control — and a size budget decides the design.
 :::
@@ -129,7 +129,7 @@ https://ucarecdn.com/:uuid/-/resize/300x/photo.jpg?v=2#top
      cdnBase          uuid    modifiers   filename search hash
 ```
 
-The cuts are lexical: the first slash after the host, the last slash of the path, then the first `?` and `#`. The field names are [`ParsedFileUrl`](/reference/index/interfaces/ParsedFileUrl)'s, except that `modifiers` holds the serialized chain where it holds an `operations` array.
+The cuts are lexical: the first slash after the host, the last slash of the path, then the first `?` and `#`. The field names are [`ParsedFileUrl`](/reference/core/interfaces/ParsedFileUrl)'s, except that `modifiers` holds the serialized chain where it holds an `operations` array.
 
 Only `cdnBase` and `uuid` are required — everything else defaults to empty, so `tinyBuild` also builds URLs from scratch. The base is yours to supply, exactly as at every other layer; see [The CDN base](/guide/cdn-base), and note that deriving it with `prefixedCdnBase` costs more bytes than everything on this page put together, so a size-conscious caller pastes the host as a literal:
 
@@ -148,7 +148,7 @@ tinyBuild({ cdnBase, uuid, modifiers: modifiers('preview/800x600') })
 
 `search` and `hash` carry their own punctuation, so supply them as `'?v=2'` and `'#top'` — `tinyBuild` writes the slashes between fields but not the `?` or `#`. `filename` is `''` for a URL that ends in a slash.
 
-A trailing slash on `cdnBase` is trimmed for you — config values and `new URL(x).origin` both produce them — so `'https://ucarecdn.com/'` and `'https://ucarecdn.com'` build the same URL, exactly as [`serializeFileUrl`](/reference/index/functions/serializeFileUrl) behaves. That is the only normalization: `uuid` still has to be a bare segment, and a malformed field yields a malformed URL with no error.
+A trailing slash on `cdnBase` is trimmed for you — config values and `new URL(x).origin` both produce them — so `'https://ucarecdn.com/'` and `'https://ucarecdn.com'` build the same URL, exactly as [`serializeFileUrl`](/reference/core/functions/serializeFileUrl) behaves. That is the only normalization: `uuid` still has to be a bare segment, and a malformed field yields a malformed URL with no error.
 
 Nothing is validated and nothing throws. Unknown operations and internal `@`-prefixed directives (`@clib`) pass through verbatim, which is what makes the round trip exact:
 
@@ -164,13 +164,13 @@ tinyBuild(tinyParse('https://ucarecdn.com')) // → 'https://ucarecdn.com//'
 tinyParse('not a url') // → { cdnBase: 'not a url', uuid: '', … }
 ```
 
-Validate before you get here if the input is untrusted — [`isFileUrl`](/reference/index/functions/isFileUrl) is the cheap check, and [What it costs](#what-it-costs) explains why reaching for it usually means you wanted `parseFileUrl` all along.
+Validate before you get here if the input is untrusted — [`isFileUrl`](/reference/core/functions/isFileUrl) is the cheap check, and [What it costs](#what-it-costs) explains why reaching for it usually means you wanted `parseFileUrl` all along.
 
 ## Other URL kinds
 
 Anything that is not a single-file URL is out of scope. Such a URL still round-trips byte for byte, because the cuts are lexical, so passing one through untouched is harmless. Its _fields_ are meaningless, though: everything between the first and last slash lands in `modifiers` whether or not it is an operation, so reading the fields tells you nothing and editing them destroys the URL.
 
-Use [`parseCdnUrl`](/reference/index/functions/parseCdnUrl) when the kind is not already known.
+Use [`parseCdnUrl`](/reference/core/functions/parseCdnUrl) when the kind is not already known.
 
 ## Editing
 
@@ -279,6 +279,6 @@ const ops = [{ name: 'preview', params: ['800x600'] }]
 normalizeModifiers(serializeOperations(ops)) // → '-/preview/800x600/'
 ```
 
-[`serializeOperations`](/reference/index/functions/serializeOperations) returns a plain string, so it needs `normalizeModifiers` to become a `ModifiersChain` again — the one call that bridges the two.
+[`serializeOperations`](/reference/core/functions/serializeOperations) returns a plain string, so it needs `normalizeModifiers` to become a `ModifiersChain` again — the one call that bridges the two.
 
 From the operation array you have the full model: [`validateOperations`](/reference/validate/functions/validateOperations) for diagnostics, [`operationInputs`](/reference/validate/functions/operationInputs) for order-dependent relationships. From a URL you built at the string level, `parseFileUrl(tinyBuild(parts))` re-enters the typed model.

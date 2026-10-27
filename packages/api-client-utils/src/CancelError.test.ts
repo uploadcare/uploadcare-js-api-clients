@@ -1,3 +1,4 @@
+import { describe, it, expect } from 'vitest'
 import { CancelError } from './CancelError'
 import { UploadcareError } from './UploadcareError'
 

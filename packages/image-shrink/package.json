@@ -52,11 +52,11 @@
   "devDependencies": {
     "@imagemagick/magick-wasm": "^0.0.28",
     "@types/content-type": "^1.1.8",
-    "@vitest/browser": "^3.2.4",
-    "@vitest/coverage-v8": "^3.2.4",
+    "@vitest/browser-playwright": "^5.0.5",
+    "@vitest/coverage-v8": "^5.0.5",
     "playwright": "^1.41.2",
     "raw-body": "^2.5.2",
-    "vite": "^7.0.0",
-    "vitest": "^3.2.4"
+    "vite": "^8.3.5",
+    "vitest": "^5.0.5"
   }
 }

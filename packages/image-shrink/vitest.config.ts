@@ -1,9 +1,10 @@
-/// <reference types="vitest" />
-import { defineConfig, type PluginOption } from 'vite'
+import type { PluginOption } from 'vite'
+import { defineConfig } from 'vitest/config'
 import url from 'url'
 import path from 'path'
 import getRawBody from 'raw-body'
-import { writeFile, mkdir, access } from 'fs/promises'
+import { writeFile, mkdir } from 'fs/promises'
+import { playwright } from '@vitest/browser-playwright'
 
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url))
 
@@ -17,11 +18,8 @@ const uploadPlugin = (): PluginOption => ({
         }
         const body = await getRawBody(req)
         const snapshotsFolder = path.join(__dirname, './src/test/snapshots/')
-        try {
-          await access(snapshotsFolder)
-        } catch (err) {
-          await mkdir(snapshotsFolder)
-        }
+        // Uploads arrive in parallel; `recursive` makes a concurrent mkdir a no-op.
+        await mkdir(snapshotsFolder, { recursive: true })
         await writeFile(
           path.resolve(snapshotsFolder, filename),
           new Uint8Array(body)
@@ -41,7 +39,7 @@ export default defineConfig({
     testTimeout: 100000,
     browser: {
       enabled: true,
-      provider: 'playwright',
+      provider: playwright(),
       instances: [
         {
           browser: 'chromium',

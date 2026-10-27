@@ -1,3 +1,4 @@
+import { describe, it, expect } from 'vitest'
 import { isNode } from './isNode'
 
 /** TODO: add test inside playwright */

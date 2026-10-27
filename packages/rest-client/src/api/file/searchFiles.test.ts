@@ -1,4 +1,4 @@
-import { describe, expect, it } from '@jest/globals'
+import { describe, it, expect } from 'vitest'
 import { Paginator } from '../../tools/paginate'
 import { RestClientValidationError } from '../../tools/RestClientValidationError'
 import { searchFiles, SearchFilesOptions } from './searchFiles'

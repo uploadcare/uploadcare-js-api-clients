@@ -17,7 +17,7 @@ export default defineConfig({
       // import each other without a file extension, which Node's ESM
       // resolution rejects — `attw` reports it as an internal resolution
       // error.
-      rollupTypes: true,
+      bundleTypes: true,
       exclude: ['**/*.test.ts', 'vite.config.ts', 'vitest.config.ts'],
       afterBuild: () => {
         // The `require` conditions need `.d.cts`, or TypeScript reads the
@@ -55,8 +55,7 @@ export default defineConfig({
       },
       fileName: '[name]'
     },
-    rollupOptions: {
-      treeshake: 'smallest',
+    rolldownOptions: {
       // Keep `node:crypto` a runtime import rather than trying to bundle it.
       external: ['node:crypto']
     }

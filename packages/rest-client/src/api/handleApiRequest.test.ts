@@ -1,4 +1,4 @@
-import { describe, expect, it } from '@jest/globals'
+import { describe, it, expect } from 'vitest'
 import { Request, Response } from '../lib/fetch/fetch.node'
 import { RestClientError } from '../tools/RestClientError'
 import {

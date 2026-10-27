@@ -32,11 +32,15 @@
     }
   },
   "sideEffects": false,
-  "files": ["dist/*", "README.md", "LICENSE"],
+  "files": [
+    "dist/*",
+    "README.md",
+    "LICENSE"
+  ],
   "scripts": {
     "prepack": "cp ../../LICENSE ./LICENSE",
     "clean": "rimraf dist",
-    "test:production": "node --experimental-vm-modules ../../node_modules/jest/bin/jest.js",
+    "test:production": "vitest --run",
     "prebuild": "npm run clean",
     "build": "npm run build:types && npm run build:compile",
     "build:types": "dts-bundle-generator --project tsconfig.dts.json -o dist/index.d.ts src/index.ts",
@@ -69,7 +73,8 @@
   "devDependencies": {
     "@types/blueimp-md5": "^2.18.0",
     "@types/node-fetch": "^2.6.2",
-    "@uploadcare/upload-client": "^6.24.0"
+    "@uploadcare/upload-client": "^6.24.0",
+    "vitest": "^5.0.5"
   },
   "dependencies": {
     "blueimp-md5": "^2.19.0",

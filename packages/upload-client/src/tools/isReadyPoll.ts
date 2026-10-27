@@ -50,7 +50,7 @@ function isReadyPoll(
         retryNetworkErrorMaxTimes
       }).then((response) => {
         if (response.isReady) {
-          onProgress && onProgress({ isComputable: true, value: 1 })
+          onProgress?.({ isComputable: true, value: 1 })
           return response
         }
         return false

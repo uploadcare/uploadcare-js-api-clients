@@ -3,6 +3,9 @@
   // Vitest strips types without checking them, so this is what enforces the
   // `@ts-expect-error` API assertions and the valid usage the tests show.
   "extends": "./tsconfig.json",
+  // Vitest 4 no longer brings Node's types along, and the `*.node.test.ts`
+  // files use `node:crypto` and `Buffer`.
+  "compilerOptions": { "types": ["vitest", "node"] },
   "include": ["src/**/*.ts"],
   "exclude": ["node_modules"]
 }

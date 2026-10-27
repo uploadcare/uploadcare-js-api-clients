@@ -4,7 +4,10 @@
  * grayscale, all black, deflated with stored blocks, so it needs no codec and
  * stays browser-safe. Any decoder reads it; `imageSize` reads its IHDR.
  */
-export const blankPng = (width: number, height: number): Uint8Array => {
+export const blankPng = (
+  width: number,
+  height: number
+): Uint8Array<ArrayBuffer> => {
   const row = 1 + Math.ceil(width / 8) // a filter byte, then the pixels
   const raw = new Uint8Array(row * height) // all zero: filter none, black
   return concat([

@@ -34,7 +34,7 @@ export const conversionJobPoller = <T extends ValueOf<typeof ConversionType>>(
   const poller = createJobPoller({
     runner: convert<T>,
     resolveJobs: (response, runnerOptions, runnerSettings) => {
-      onRun && onRun(response as ConversionResponse<ConversionResult[T]>)
+      onRun?.(response as ConversionResponse<ConversionResult[T]>)
       return runnerOptions.paths.map((path) => {
         const problem = response.problems[path]
         if (problem) {
@@ -83,7 +83,7 @@ export const conversionJobPoller = <T extends ValueOf<typeof ConversionType>>(
           ConversionStatusResult[T]
         >
       }
-      onStatus && onStatus(status)
+      onStatus?.(status)
       return status
     },
     isJobFinished: (statusResponse) =>

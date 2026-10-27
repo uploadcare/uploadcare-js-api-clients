@@ -97,17 +97,18 @@
   ],
   "devDependencies": {
     "@arethetypeswrong/cli": "^0.18.2",
+    "@microsoft/api-extractor": "^7.60.0",
     "@size-limit/preset-small-lib": "^12.1.0",
     "jose": "^6.2.12",
-    "oxfmt": "^0.53.0",
+    "oxfmt": "^0.75.0",
     "oxlint": "^1.68.0",
     "oxlint-tsgolint": "^0.23.0",
     "publint": "^0.3.12",
     "size-limit": "^12.1.0",
     "terser": "^5.51.2",
-    "vite": "^7.0.0",
-    "vite-plugin-dts": "^4.5.4",
-    "vitest": "^4.1.11"
+    "vite": "^8.3.5",
+    "vite-plugin-dts": "^5.1.2",
+    "vitest": "^5.0.5"
   },
   "size-limit": [
     {

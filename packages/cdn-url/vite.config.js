@@ -78,7 +78,7 @@ export default defineConfig(({ mode }) => {
       ? []
       : [
           dts({
-            outDir: resolve(__dirname, 'dist/types'),
+            outDirs: resolve(__dirname, 'dist/types'),
             insertTypesEntry: true,
             // Only the library ships: no test configs, doc fixtures or the
             // IIFE wrapper, which has no types entry of its own.
@@ -101,8 +101,10 @@ export default defineConfig(({ mode }) => {
         formats: ['es'],
         fileName: '[name]'
       },
-      rollupOptions: {
-        treeshake: 'smallest',
+      rolldownOptions: {
+        // Rolldown keeps source comments in unminified output; the dev bundle
+        // does not need them, and they would trip verify-bundles' markers.
+        output: { comments: false },
         /**
          * Keep `@uploadcare/cname-prefix` an import rather than inlining it.
          * It ships `node` and browser builds behind export conditions — native

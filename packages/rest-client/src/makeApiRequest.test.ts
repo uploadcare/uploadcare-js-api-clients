@@ -1,4 +1,4 @@
-import { describe, expect, it } from '@jest/globals'
+import { describe, it, expect } from 'vitest'
 import { makeApiRequest } from './makeApiRequest'
 import {
   testSettings,

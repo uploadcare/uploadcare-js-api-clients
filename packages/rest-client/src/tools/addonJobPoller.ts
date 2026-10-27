@@ -31,7 +31,7 @@ export const addonJobPoller = async <T extends ValueOf<typeof AddonName>>(
   const poller = createJobPoller({
     runner: executeAddon,
     resolveJobs: (response, runnerOptions, runnerSettings) => {
-      onRun && onRun(response)
+      onRun?.(response)
       return [
         {
           target: runnerOptions.target,
@@ -49,7 +49,7 @@ export const addonJobPoller = async <T extends ValueOf<typeof AddonName>>(
         },
         job.runnerSettings
       )
-      onStatus && onStatus(response)
+      onStatus?.(response)
       return response
     },
     isJobFinished: (statusResponse) =>

@@ -22,7 +22,7 @@ export type StoredFile = {
   name: string
   size: number
   mimeType: string
-  bytes: Uint8Array
+  bytes: Uint8Array<ArrayBuffer>
   image?: StoredImage
   isStored: boolean
   /**
@@ -57,7 +57,7 @@ export type MultipartUpload = {
   name: string
   mimeType: string
   isStored: boolean
-  parts: (Uint8Array | undefined)[]
+  parts: (Uint8Array<ArrayBuffer> | undefined)[]
 }
 
 /**
@@ -71,7 +71,7 @@ export type DerivativeJob = {
   name: string
   isStored: boolean
   mimeType: string
-  bytes: Uint8Array
+  bytes: Uint8Array<ArrayBuffer>
   file?: StoredFile
 }
 
