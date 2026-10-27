@@ -352,6 +352,12 @@ describe('cdn.document', () => {
       `/${UUID}/document/-/format/jpg/-/page/2/`
     )
   })
+
+  it('takes dpi and quality for jpg output', () => {
+    expect(myCdn.document(UUID).format('jpg').dpi(300).quality(80).path).toBe(
+      `/${UUID}/document/-/format/jpg/-/dpi/300/-/quality/80/`
+    )
+  })
 })
 
 describe('cdn.gif2video', () => {

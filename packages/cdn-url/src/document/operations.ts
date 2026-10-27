@@ -56,6 +56,64 @@ export const format = /* @__PURE__ */ namedOp(
   }
 )
 
+function assertOneOfNumbers(
+  value: number,
+  allowed: readonly number[],
+  label: string
+): void {
+  if (__DEV__ && !allowed.includes(value)) {
+    throw new RangeError(
+      `${label} must be one of ${allowed.join(', ')}; got ${value}`
+    )
+  }
+}
+
+/** DPI values accepted by {@link dpi}. */
+export const DOCUMENT_DPI_VALUES = [72, 96, 150, 200, 250, 300, 600] as const
+/** One of the {@link DOCUMENT_DPI_VALUES}. */
+export type DocumentDpi = (typeof DOCUMENT_DPI_VALUES)[number]
+
+/**
+ * Resolution of `jpg` output, in dots per inch.
+ *
+ * @see https://uploadcare.com/docs/transformations/document-conversion/#process
+ * @example
+ * ```ts
+ * dpi(300) // → -/dpi/300/
+ * ```
+ */
+export const dpi = /* @__PURE__ */ namedOp(
+  'dpi',
+  function dpi(value: DocumentDpi): CdnOperation {
+    assertOneOfNumbers(value, DOCUMENT_DPI_VALUES, 'document dpi')
+    return rawOp('dpi', String(value))
+  }
+)
+
+/** Quality levels accepted by {@link quality}: 10..100 in steps of 10. */
+export const DOCUMENT_QUALITY_VALUES = [
+  10, 20, 30, 40, 50, 60, 70, 80, 90, 100
+] as const
+/** One of the {@link DOCUMENT_QUALITY_VALUES}. */
+export type DocumentQuality = (typeof DOCUMENT_QUALITY_VALUES)[number]
+
+/**
+ * Quality of `jpg` output.
+ *
+ * @see https://uploadcare.com/docs/transformations/document-conversion/#process
+ * @example
+ * ```ts
+ * quality(80) // → -/quality/80/
+ * ```
+ */
+export const quality = /* @__PURE__ */ namedOp(
+  'quality',
+  function quality(value: DocumentQuality): CdnOperation {
+    assertOneOfNumbers(value, DOCUMENT_QUALITY_VALUES, 'document quality')
+    return rawOp('quality', String(value))
+  }
+)
+
 /**
  * 1-based page selector; only valid when the target format is `jpg`/`png`.
  *

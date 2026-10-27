@@ -237,6 +237,14 @@ export class DocumentChain extends Chain<ConversionState> {
   public page(number: number): this {
     return this._add(docOps.page(number))
   }
+  /** Appends `dpi`; mirrors the creator in the matching conversion entry. */
+  public dpi(value: docOps.DocumentDpi): this {
+    return this._add(docOps.dpi(value))
+  }
+  /** Appends `quality`; mirrors the creator in the matching conversion entry. */
+  public quality(value: docOps.DocumentQuality): this {
+    return this._add(docOps.quality(value))
+  }
 
   /** The domain-less REST conversion path. */
   public get path(): string {
