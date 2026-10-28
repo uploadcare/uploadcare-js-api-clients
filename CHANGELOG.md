@@ -1,3 +1,9 @@
+# [6.25.0](https://github.com/uploadcare/uploadcare-js-api-clients/compare/v6.24.0...v6.25.0) (2026-10-28)
+
+
+### Features
+
+* **cdn-url:** add @uploadcare/cdn-url, a typed builder and parser for CDN URLs (beta) ([#571](https://github.com/uploadcare/uploadcare-js-api-clients/issues/571)) ([39bf9c2](https://github.com/uploadcare/uploadcare-js-api-clients/commit/39bf9c24e0c027d42346ec65926fe5e62abfbf0e))
 # [6.24.0](https://github.com/uploadcare/uploadcare-js-api-clients/compare/v6.23.0...v6.24.0) (2026-10-20)
 
 

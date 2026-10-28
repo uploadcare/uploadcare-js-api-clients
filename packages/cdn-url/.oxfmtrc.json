@@ -20,6 +20,7 @@
   "vueIndentScriptAndStyle": false,
   "sortPackageJson": false,
   "ignorePatterns": [
+    "package.json",
     "dist/**",
     "docs/reference/**",
     "docs/.vitepress/dist/**",
