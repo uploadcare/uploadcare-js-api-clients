@@ -89,6 +89,26 @@ if (!iife.includes(BROWSER_DIGEST_MARKER)) {
   failures.push('iife bundle is missing the inlined browser digest')
 }
 
+/**
+ * A pure annotation must precede the call it marks. One stranded before a
+ * closing token marks nothing, and Rollup warns about each one in every
+ * consumer's build.
+ */
+const STRANDED_PURE_RE = /(?:\/\*\s*[#@]__PURE__\s*\*\/\s*)+(?=[)\]},;]|$)/g
+
+for (const [flavor, code] of [
+  ['dev', dev],
+  ['prod', prod],
+  ['iife', iife]
+]) {
+  const stranded = code.match(STRANDED_PURE_RE)?.length ?? 0
+  if (stranded > 0) {
+    failures.push(
+      `${flavor} bundle has ${stranded} pure annotation(s) with no call after them`
+    )
+  }
+}
+
 if (failures.length > 0) {
   console.error('Bundle verification failed:')
   for (const failure of failures) console.error(`  - ${failure}`)
