@@ -17,6 +17,21 @@ const terserOptions = {
   format: { comments: false }
 }
 
+/**
+ * Rolldown marks calls to the `__DEV__`-only asserts pure, and terser drops
+ * them but keeps the annotation (Vite forces `preserve_annotations` for ES
+ * libraries), stranding it before a `}`. Rollup then warns about each one in
+ * every consumer's build, so the strays are removed after minification.
+ */
+const dropStrandedPureAnnotations = {
+  name: 'drop-stranded-pure-annotations',
+  renderChunk: {
+    order: 'post',
+    handler: (code) =>
+      code.replace(/(?:\/\* @__PURE__ \*\/\s*)+(?=[)\]},;]|$)/g, '')
+  }
+}
+
 // The IIFE wrapper assigns the global as a top-level `var UCCdnUrl`, so the
 // global name must be reserved or top-level mangling renames it away.
 const iifeTerserOptions = {
@@ -77,6 +92,7 @@ export default defineConfig(({ mode }) => {
     plugins: isDev
       ? []
       : [
+          dropStrandedPureAnnotations,
           dts({
             outDirs: resolve(__dirname, 'dist/types'),
             insertTypesEntry: true,

@@ -11,11 +11,16 @@ import { join } from 'node:path'
 
 const root = new URL('..', import.meta.url).pathname
 
-function read(flavor) {
+function readFiles(flavor) {
   const dir = join(root, 'dist', flavor)
   return readdirSync(dir)
     .filter((f) => f.endsWith('.js'))
-    .map((f) => readFileSync(join(dir, f), 'utf8'))
+    .map((f) => [`${flavor}/${f}`, readFileSync(join(dir, f), 'utf8')])
+}
+
+function read(flavor) {
+  return readFiles(flavor)
+    .map(([, code]) => code)
     .join('\n')
 }
 
@@ -87,6 +92,28 @@ if (iife.includes(CNAME_PREFIX_SPECIFIER)) {
 }
 if (!iife.includes(BROWSER_DIGEST_MARKER)) {
   failures.push('iife bundle is missing the inlined browser digest')
+}
+
+/**
+ * A pure annotation must precede the call it marks. One stranded before a
+ * closing token marks nothing, and Rollup warns about each one in every
+ * consumer's build.
+ */
+const STRANDED_PURE_RE = /(?:\/\*\s*[#@]__PURE__\s*\*\/\s*)+(?=[)\]},;]|$)/g
+
+// Per file: joined, an annotation stranded at the end of one file would be
+// followed by the next file's code and escape the end-of-input branch.
+for (const [file, code] of [
+  ...readFiles('dev'),
+  ...readFiles('prod'),
+  ['cdn-url.global.js', iife]
+]) {
+  const stranded = code.match(STRANDED_PURE_RE)?.length ?? 0
+  if (stranded > 0) {
+    failures.push(
+      `${file} has ${stranded} pure annotation(s) with no call after them`
+    )
+  }
 }
 
 if (failures.length > 0) {
