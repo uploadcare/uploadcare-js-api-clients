@@ -1,3 +1,9 @@
+## [6.25.1](https://github.com/uploadcare/uploadcare-js-api-clients/compare/v6.25.0...v6.25.1) (2026-11-02)
+
+
+### Bug Fixes
+
+* **cdn-url:** drop pure annotations terser strands before a closing brace ([#598](https://github.com/uploadcare/uploadcare-js-api-clients/issues/598)) ([a742b1b](https://github.com/uploadcare/uploadcare-js-api-clients/commit/a742b1b2a47e0230c76d9595dcb797818a7f3d3f))
 # [6.25.0](https://github.com/uploadcare/uploadcare-js-api-clients/compare/v6.24.0...v6.25.0) (2026-10-28)
 
 
